@@ -13,7 +13,7 @@
  *
  * @ref RTSERVER::Command and @ref RTSERVER::RawCommand implement it to model the control requests exchanged with
  * mne_rt_server (start or stop a measurement, set parameters, request status). Invokers and receivers are
- * expressed through Qt signals and slots rather than dedicated classes.
+ * expressed through callbacks rather than dedicated classes.
  */
 
 #ifndef RTSERVER_COMMAND_PATTERN_H

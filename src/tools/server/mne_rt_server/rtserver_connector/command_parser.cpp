@@ -11,12 +11,12 @@
  *
  * Implements the dual-dialect @c parse() entry point. CLI input is
  * split on whitespace into a keyword and string arguments; JSON input
- * is decoded with @c QJsonDocument and may contain either a single
+ * is decoded with @c mne::JsonDocument and may contain either a single
  * command object or an array of them, supporting batched requests in a
  * single payload. In either case the result is a populated
  * @ref RawCommand handed to every attached @ref CommandManager via the
  * @c Subject::notify mechanism inherited from @ref RTSERVER::Subject; the
- * @c response signal carries replies produced by handlers back to the
+ * @c response callbacks carry replies produced by handlers back to the
  * originating client of the command port.
  */
 
@@ -25,18 +25,10 @@
 //=============================================================================================================
 
 #include "command_parser.h"
-#include <mne/base/log.h>
 #include "command_manager.h"
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
-#include <QStringList>
-#include <QJsonObject>
-#include <QJsonDocument>
-#include <QDebug>
+#include <mne/base/json.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -48,70 +40,54 @@ using namespace RTSERVER;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CommandParser::CommandParser(QObject* parent)
-: QObject(parent)
-{
-}
-
-//=============================================================================================================
-
-bool CommandParser::exists(const QString& p_sCommand)
+bool CommandParser::exists(const std::string& p_sCommand)
 {
     for (IObserver* observer : observers()) {
-        CommandManager* t_pCommandManager = static_cast<CommandManager*>(observer);
-        if (t_pCommandManager->hasCommand(p_sCommand))
+        auto* t_pCommandManager = static_cast<CommandManager*>(observer);
+        if (t_pCommandManager->hasCommand(p_sCommand)) {
             return true;
+        }
     }
     return false;
 }
 
 //=============================================================================================================
 
-bool CommandParser::parse(const QString& p_sInput, QStringList& p_qListCommandsParsed)
+bool CommandParser::parse(const std::string& p_sInput, mne::StringList& p_qListCommandsParsed)
 {
-    if (p_sInput.size() <= 0)
+    if (p_sInput.empty()) {
         return false;
+    }
 
     p_qListCommandsParsed.clear();
 
     //Check if JSON format;
-    bool isJson = false;
-    if (QString::compare(p_sInput.at(0), QString("{")) == 0)
-        isJson = true;
-
-    if (isJson) {
+    if (p_sInput.front() == '{') {
         mne::Log::debug("JSON command recognized");
 
-        QJsonObject t_jsonObjectCommand;
-        QJsonObject t_jsonObjectParameters;
-        QJsonDocument t_jsonDocument(QJsonDocument::fromJson(p_sInput.toUtf8()));
+        const mne::JsonDocument t_jsonDocument = mne::JsonDocument::from_json(p_sInput);
 
         //Switch to command object
-        if (t_jsonDocument.isObject() && t_jsonDocument.object().value(QString("commands")) != QJsonValue::Undefined)
-            t_jsonObjectCommand = t_jsonDocument.object().value(QString("commands")).toObject();
-        else
+        if (!t_jsonDocument.is_object() || t_jsonDocument.object().value("commands").is_undefined()) {
             return false;
+        }
 
         //iterate over commands
-        QJsonObject::Iterator it;
-        QJsonObject::Iterator itParam;
-        for (it = t_jsonObjectCommand.begin(); it != t_jsonObjectCommand.end(); ++it) {
+        for (const auto& [name, parameters] : t_jsonDocument.object().value("commands").to_object()) {
             //Print Command
-            mne::Log::info("{}\r\n", it.key().toStdString());
+            mne::Log::info("{}\r\n", name);
 
-            if (exists(it.key())) {
-                RawCommand t_rawCommand(it.key(), true);
-                m_rawCommand = t_rawCommand;
-                t_jsonObjectParameters = it.value().toObject();
+            if (exists(name)) {
+                m_rawCommand = RawCommand(name, true);
 
                 // push command to processed commands
-                p_qListCommandsParsed.push_back(it.key());
+                p_qListCommandsParsed.push_back(name);
 
                 //append the parameters
-                for (itParam = t_jsonObjectParameters.begin(); itParam != t_jsonObjectParameters.end(); ++itParam) {
-                    mne::Log::info(" {}", itParam.value().toString().toStdString());
+                for (const auto& [key, value] : parameters.to_object()) {
+                    mne::Log::info(" {}", value.to_string());
                     //ToDo do a cross check with the param naming and key
-                    m_rawCommand.pValues().append(itParam.value().toString());
+                    m_rawCommand.pValues().emplace_back(value.to_string());
                 }
 
                 //Notify attached command manager
@@ -120,33 +96,45 @@ bool CommandParser::parse(const QString& p_sInput, QStringList& p_qListCommandsP
             mne::Log::info("\r\n");
         }
     } else {
-        QStringList t_qCommandList = p_sInput.split(" ");
+        const mne::StringList t_qCommandList = mne::split(p_sInput, ' ');
 
         //Print command
-        mne::Log::info("{}\r\n", t_qCommandList[0].toStdString());
+        mne::Log::info("{}\r\n", t_qCommandList[0]);
 
         if (!exists(t_qCommandList[0])) {
             mne::Log::info("\r\n");
             return false;
         }
 
-        RawCommand t_rawCommand(t_qCommandList[0], false);
-        m_rawCommand = t_rawCommand;
+        m_rawCommand = RawCommand(t_qCommandList[0], false);
 
         // push command to processed commands
         p_qListCommandsParsed.push_back(t_qCommandList[0]);
 
-        if (t_qCommandList.size() > 1) //Parameter parsing
-        {
-            //Parse Parameters
-            for (qint32 i = 1; i < t_qCommandList.size(); ++i) {
-                mne::Log::info(" {}", t_qCommandList[i].toStdString());
-                m_rawCommand.pValues().append(t_qCommandList[i]);
-            }
+        //Parse Parameters
+        for (std::size_t i = 1; i < t_qCommandList.size(); ++i) {
+            mne::Log::info(" {}", t_qCommandList[i]);
+            m_rawCommand.pValues().push_back(t_qCommandList[i]);
         }
         mne::Log::info("\r\n");
         notify();
     }
 
     return true;
+}
+
+//=============================================================================================================
+
+void CommandParser::connectResponse(ResponseCallback callback)
+{
+    m_response.push_back(std::move(callback));
+}
+
+//=============================================================================================================
+
+void CommandParser::response(const std::string& p_sResponse, const Command& p_command)
+{
+    for (const ResponseCallback& callback : m_response) {
+        callback(p_sResponse, p_command);
+    }
 }

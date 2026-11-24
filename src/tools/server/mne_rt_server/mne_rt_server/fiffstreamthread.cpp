@@ -18,11 +18,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/base/log.h>
 #include "fiffstreamthread.h"
-
-#include "fiffstreamserver.h"
 #include "mne_rt_commands.h"
+
+#include <mne/base/log.h>
+#include <mne/fiff/fiff_byte_swap.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_tag.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -30,25 +32,11 @@
 
 #include <array>
 #include <chrono>
-#include <cstddef>
 #include <cstring>
+#include <optional>
 #include <span>
 #include <system_error>
 #include <utility>
-
-//=============================================================================================================
-// Fiff INCLUDES
-//=============================================================================================================
-
-#include <mne/fiff/fiff_byte_swap.h>
-#include <mne/fiff/fiff_constants.h>
-#include <mne/fiff/fiff_tag.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtEndian>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -68,13 +56,24 @@ constexpr std::chrono::milliseconds kWriteTimeout(2000);
 
 /** Appends the tags @p write puts on a FIFF stream to @p block. */
 template<typename Write>
-void appendTags(QByteArray& block, Write&& write)
+void appendTags(std::vector<std::byte>& block, Write&& write)
 {
     auto bytes = std::make_unique<mne::MemoryByteStream>();
     const mne::MemoryByteStream& written = *bytes;
     FiffStream stream(std::move(bytes));
     write(stream);
-    block.append(reinterpret_cast<const char*>(written.data().data()), static_cast<qsizetype>(written.size()));
+    const auto data = written.data();
+    block.insert(block.end(), data.begin(), data.begin() + static_cast<std::ptrdiff_t>(written.size()));
+}
+
+/** @return The big-endian 32-bit integer at @p offset of @p data. */
+std::int32_t bigInt32(const std::vector<std::byte>& data, std::size_t offset)
+{
+    std::uint32_t value = 0;
+    for (std::size_t i = 0; i < 4; ++i) {
+        value = (value << 8) | std::to_integer<std::uint32_t>(data[offset + i]);
+    }
+    return static_cast<std::int32_t>(value);
 }
 
 } // namespace
@@ -83,13 +82,12 @@ void appendTags(QByteArray& block, Write&& write)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffStreamThread::FiffStreamThread(qint32 id, mne::TcpSocket socket, QObject* parent)
-: QThread(parent)
-, m_iDataClientId(id)
-, m_sDataClientAlias(QString(""))
+FiffStreamThread::FiffStreamThread(std::int32_t id, mne::TcpSocket socket)
+: m_iDataClientId(id)
 , m_socket(std::move(socket))
 , m_bIsSendingRawBuffer(false)
 , m_bIsRunning(false)
+, m_bIsFinished(false)
 {
 }
 
@@ -97,41 +95,66 @@ FiffStreamThread::FiffStreamThread(qint32 id, mne::TcpSocket socket, QObject* pa
 
 FiffStreamThread::~FiffStreamThread()
 {
-    //Remove from client list
-    FiffStreamServer* t_pFiffStreamServer = qobject_cast<FiffStreamServer*>(this->parent());
-    if (t_pFiffStreamServer)
-        t_pFiffStreamServer->m_qClientList.remove(m_iDataClientId);
-
-    m_bIsRunning = false;
-    QThread::wait();
+    stop();
 }
 
 //=============================================================================================================
 
-void FiffStreamThread::startMeas(qint32 ID)
+void FiffStreamThread::start()
 {
-    if (ID == m_iDataClientId) {
-        Log::debug("Activate raw buffer sending.");
+    m_bIsRunning = true;
+    m_thread = std::thread([this] { run(); });
+}
 
-        m_qMutex.lock();
-        appendTags(m_qSendBlock, [](FiffStream& out) { out.start_block(FIFFB_RAW_DATA); });
-        m_bIsSendingRawBuffer = true;
-        m_qMutex.unlock();
+//=============================================================================================================
+
+void FiffStreamThread::stop()
+{
+    m_bIsRunning = false;
+    if (m_thread.joinable()) {
+        m_thread.join();
     }
 }
 
 //=============================================================================================================
 
-void FiffStreamThread::stopMeas(qint32 ID)
+bool FiffStreamThread::isFinished() const
+{
+    return m_bIsFinished;
+}
+
+//=============================================================================================================
+
+std::string FiffStreamThread::getAlias()
+{
+    const std::scoped_lock lock(m_qMutex);
+    return m_sDataClientAlias;
+}
+
+//=============================================================================================================
+
+void FiffStreamThread::startMeas(std::int32_t ID)
+{
+    if (ID == m_iDataClientId) {
+        Log::debug("Activate raw buffer sending.");
+
+        const std::scoped_lock lock(m_qMutex);
+        appendTags(m_qSendBlock, [](FiffStream& out) { out.start_block(FIFFB_RAW_DATA); });
+        m_bIsSendingRawBuffer = true;
+    }
+}
+
+//=============================================================================================================
+
+void FiffStreamThread::stopMeas(std::int32_t ID)
 {
     Log::debug("void FiffStreamThread::stopMeas(qint32 ID)");
     if (ID == m_iDataClientId || ID == -1) {
         Log::debug("stop raw buffer sending.");
 
-        m_qMutex.lock();
+        const std::scoped_lock lock(m_qMutex);
         appendTags(m_qSendBlock, [](FiffStream& out) { out.end_block(FIFFB_RAW_DATA); });
         m_bIsSendingRawBuffer = false;
-        m_qMutex.unlock();
     }
 }
 
@@ -140,7 +163,7 @@ void FiffStreamThread::stopMeas(qint32 ID)
 void FiffStreamThread::parseCommand(const FiffTag& p_pTag)
 {
     if (p_pTag.size() >= 4) {
-        qint32 t_iCmd = 0;
+        std::int32_t t_iCmd = 0;
         std::memcpy(&t_iCmd, p_pTag.data(), sizeof(t_iCmd));
         t_iCmd = mne::swap_int(t_iCmd);
 
@@ -148,8 +171,12 @@ void FiffStreamThread::parseCommand(const FiffTag& p_pTag)
             //
             // Set Client Alias
             //
-            m_sDataClientAlias = QString::fromUtf8(reinterpret_cast<const char*>(p_pTag.data()) + 4, static_cast<qsizetype>(p_pTag.size() - 4));
-            Log::info("FiffStreamClient (ID {}): new alias = '{}'\r\n", m_iDataClientId, m_sDataClientAlias.toStdString());
+            std::string t_sAlias(reinterpret_cast<const char*>(p_pTag.data()) + 4, static_cast<std::size_t>(p_pTag.size() - 4));
+            {
+                const std::scoped_lock lock(m_qMutex);
+                m_sDataClientAlias = t_sAlias;
+            }
+            Log::info("FiffStreamClient (ID {}): new alias = '{}'\r\n", m_iDataClientId, t_sAlias);
         } else if (t_iCmd == MNE_RT_GET_CLIENT_ID) {
             //
             // Send Client ID
@@ -166,10 +193,10 @@ void FiffStreamThread::parseCommand(const FiffTag& p_pTag)
 
 //=============================================================================================================
 
-void FiffStreamThread::sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData)
+void FiffStreamThread::sendRawBuffer(const std::shared_ptr<const Eigen::MatrixXf>& m_pMatRawData)
 {
+    const std::scoped_lock locker(m_qMutex);
     if (m_bIsSendingRawBuffer) {
-        QMutexLocker locker(&m_qMutex);
         appendTags(m_qSendBlock, [&m_pMatRawData](FiffStream& out) {
             out.write_float(FIFF_DATA_BUFFER, m_pMatRawData->data(), m_pMatRawData->rows() * m_pMatRawData->cols());
         });
@@ -178,10 +205,10 @@ void FiffStreamThread::sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawDa
 
 //=============================================================================================================
 
-void FiffStreamThread::sendMeasurementInfo(qint32 ID, const FiffInfo& p_fiffInfo)
+void FiffStreamThread::sendMeasurementInfo(std::int32_t ID, const FiffInfo& p_fiffInfo)
 {
     if (ID == m_iDataClientId) {
-        QMutexLocker locker(&m_qMutex);
+        const std::scoped_lock locker(m_qMutex);
         appendTags(m_qSendBlock, [&p_fiffInfo](FiffStream& out) { p_fiffInfo.writeToStream(out); });
     }
 }
@@ -190,7 +217,7 @@ void FiffStreamThread::sendMeasurementInfo(qint32 ID, const FiffInfo& p_fiffInfo
 
 void FiffStreamThread::writeClientId()
 {
-    QMutexLocker locker(&m_qMutex);
+    const std::scoped_lock locker(m_qMutex);
     appendTags(m_qSendBlock, [this](FiffStream& out) { out.write_int(FIFF_MNE_RT_CLIENT_ID, &m_iDataClientId); });
 }
 
@@ -198,36 +225,24 @@ void FiffStreamThread::writeClientId()
 
 void FiffStreamThread::run()
 {
-    m_bIsRunning = true;
-
-    FiffStreamServer* t_pParentServer = qobject_cast<FiffStreamServer*>(this->parent());
-
-    connect(t_pParentServer, &FiffStreamServer::remitMeasInfo,
-            this, &FiffStreamThread::sendMeasurementInfo);
-    connect(t_pParentServer, &FiffStreamServer::remitRawBuffer,
-            this, &FiffStreamThread::sendRawBuffer);
-    connect(t_pParentServer, &FiffStreamServer::startMeasFiffStreamClient,
-            this, &FiffStreamThread::startMeas);
-    connect(t_pParentServer, &FiffStreamServer::stopMeasFiffStreamClient,
-            this, &FiffStreamThread::stopMeas);
-
     Log::info("FiffStreamClient (assigned ID {}) accepted\n", m_iDataClientId);
 
-    constexpr qsizetype kHeaderBytes = 4 * sizeof(qint32);
-    QByteArray t_received;
+    constexpr std::size_t kHeaderBytes = 4 * sizeof(std::int32_t);
+    std::vector<std::byte> t_received;
     std::array<std::byte, 4096> t_chunk{};
 
     while (m_socket.is_open() && m_bIsRunning) {
         //
         // Write available data
         //
-        QByteArray t_qBlock;
-        m_qMutex.lock();
-        t_qBlock.swap(m_qSendBlock);
-        m_qMutex.unlock();
+        std::vector<std::byte> t_qBlock;
+        {
+            const std::scoped_lock lock(m_qMutex);
+            t_qBlock.swap(m_qSendBlock);
+        }
         // The producers only append to m_qSendBlock, so writing here in this thread never stalls them.
-        if (!t_qBlock.isEmpty()) {
-            if (const std::error_code t_error = m_socket.write(std::as_bytes(std::span(t_qBlock.constData(), static_cast<std::size_t>(t_qBlock.size()))), kWriteTimeout)) {
+        if (!t_qBlock.empty()) {
+            if (const std::error_code t_error = m_socket.write(t_qBlock, kWriteTimeout)) {
                 Log::info("FiffStreamClient (ID {}) dropped: {}\n", m_iDataClientId, t_error.message());
                 break;
             }
@@ -236,22 +251,22 @@ void FiffStreamThread::run()
         // Read: wait 10 ms for data; parse every complete tag (kind, type, size, next, data)
         const auto t_read = m_socket.read_some(t_chunk, std::chrono::milliseconds(10));
         if (t_read) {
-            t_received.append(reinterpret_cast<const char*>(t_chunk.data()), static_cast<qsizetype>(*t_read));
+            t_received.insert(t_received.end(), t_chunk.begin(), t_chunk.begin() + static_cast<std::ptrdiff_t>(*t_read));
         } else if (t_read.error() != std::errc::timed_out) {
             break;
         }
         while (t_received.size() >= kHeaderBytes) {
-            const qint32 size = qFromBigEndian<qint32>(t_received.constData() + 2 * sizeof(qint32));
+            const std::int32_t size = bigInt32(t_received, 2 * sizeof(std::int32_t));
             if (size < 0) {
                 t_received.clear();
                 break;
             }
-            if (t_received.size() < kHeaderBytes + size) {
+            const std::size_t t_tagBytes = kHeaderBytes + static_cast<std::size_t>(size);
+            if (t_received.size() < t_tagBytes) {
                 break;
             }
-            const auto* begin = reinterpret_cast<const std::byte*>(t_received.constData());
-            FiffStream in(std::make_unique<mne::MemoryByteStream>(std::vector<std::byte>(begin, begin + kHeaderBytes + size)));
-            t_received.remove(0, kHeaderBytes + size);
+            FiffStream in(std::make_unique<mne::MemoryByteStream>(std::vector<std::byte>(t_received.begin(), t_received.begin() + static_cast<std::ptrdiff_t>(t_tagBytes))));
+            t_received.erase(t_received.begin(), t_received.begin() + static_cast<std::ptrdiff_t>(t_tagBytes));
             if (const std::optional<FiffTag> tag = in.read_tag(); tag && tag->kind == FIFF_MNE_RT_COMMAND) {
                 parseCommand(*tag);
             }
@@ -259,4 +274,5 @@ void FiffStreamThread::run()
     }
 
     m_socket.close();
+    m_bIsFinished = true;
 }

@@ -5,47 +5,31 @@
 cmake_minimum_required(VERSION 3.14)
 project(mne_rt_server LANGUAGES CXX)
 
-#Handle qt uic, moc, rrc automatically
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
-set(QT_REQUIRED_COMPONENTS Core)
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-
 set(SOURCES
-    main.cpp 
-    connectormanager.cpp 
-    mne_rt_server.cpp 
-    fiffstreamserver.cpp 
-    fiffstreamthread.cpp 
-    commandserver.cpp 
+    main.cpp
+    connectormanager.cpp
+    mne_rt_server.cpp
+    fiffstreamserver.cpp
+    fiffstreamthread.cpp
+    commandserver.cpp
     commandthread.cpp
 )
 
 set(HEADERS
-    connectormanager.h 
-    mne_rt_server.h 
-    fiffstreamserver.h 
-    fiffstreamthread.h 
-    commandserver.h 
-    commandthread.h 
+    connectormanager.h
+    mne_rt_server.h
+    fiffstreamserver.h
+    fiffstreamthread.h
+    commandserver.h
+    commandthread.h
     mne_rt_commands.h
 )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES} ${HEADERS})
-else()
-    add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
-endif()
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
-set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
-list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
-
-set(MNE_LIBS_REQUIRED 
+set(MNE_LIBS_REQUIRED
     rtserver_connector
-    mne_connectivity
+    rtserver_fiffsimulator
     mne_fiff
     mne_base
     mne_com
@@ -53,15 +37,9 @@ set(MNE_LIBS_REQUIRED
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
     Eigen3::Eigen
 )
-
-if(NOT BUILD_SHARED_LIBS)
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-        rtserver_fiffsimulator)
-endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE FALSE
@@ -72,10 +50,6 @@ install(TARGETS ${PROJECT_NAME}
     BUNDLE DESTINATION . COMPONENT applications
     RUNTIME DESTINATION bin COMPONENT applications
     LIBRARY DESTINATION lib COMPONENT applications)
-
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(${PROJECT_NAME})
-endif()
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)

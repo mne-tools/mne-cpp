@@ -21,21 +21,24 @@
 
 #include <mne/fiff/fiff_info.h>
 #include <rtserver_connector/command_manager.h>
-
 #include <mne/com/tcp_server.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
-#include <QObject>
-#include <QStringList>
+#include <Eigen/Core>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <cstdint>
+#include <functional>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <string>
 #include <thread>
 
 //=============================================================================================================
@@ -53,129 +56,104 @@ class FiffStreamThread;
 
 //=============================================================================================================
 /**
- * DECLARE CLASS FiffStreamServer
- *
- * @brief The FiffStreamServer class provides
+ * @brief The FIFF data port: accepts FiffStreamClients and forwards measurement info and raw buffers to them.
  */
-class FiffStreamServer : public QObject //, public ICommandParser //OLD remove this
+class FiffStreamServer
 {
-    Q_OBJECT
-
-    friend class FiffStreamThread;
-
 public:
-    FiffStreamServer(QObject* parent = 0);
+    /** Requests the measurement info for the FiffStreamClient with the given ID. */
+    using MeasInfoRequestCallback = std::function<void(std::int32_t)>;
 
     //=========================================================================================================
     /**
-     * Destroys the FiffStreamServer.
+     * @param[in] p_commandManager   The command manager of mne_rt_server, which holds the commands of the server.
      */
+    explicit FiffStreamServer(RTSERVER::CommandManager& p_commandManager);
+
+    FiffStreamServer(const FiffStreamServer&) = delete;
+    FiffStreamServer& operator=(const FiffStreamServer&) = delete;
+
     ~FiffStreamServer();
 
     //=========================================================================================================
     /**
-     * ToDo...
-     */
-    inline FiffStreamThread* getClient(qint32 id);
-
-    //=========================================================================================================
-    /**
-     * connect fiff stream server to mne_rt_server commands
+     * Connects the commands of the server to their handlers.
      */
     void connectCommands();
 
+    //=========================================================================================================
     /**
-     * Starts listening for fiff stream clients on all interfaces; a listener thread accepts them and hands every
-     * connection to the thread of the server, which starts a FiffStreamThread for it.
+     * Listens on all interfaces and accepts clients in a thread of its own.
      *
-     * @param[in] port       Port to listen on.
-     * @param[out] error     Why the server does not listen, if it does not.
+     * @param[in] port       Port, 0 for any free one.
+     * @param[out] error     The reason if the server cannot listen.
      *
-     * @return Whether the server listens.
+     * @return True if the server listens.
      */
-    bool listen(std::uint16_t port, QString& error);
+    bool listen(std::uint16_t port, std::string& error);
 
+    //=========================================================================================================
     /**
-     * Returns the port the server listens on, 0 if it does not.
+     * @return The port the server listens on, 0 if it does not.
      */
     std::uint16_t serverPort() const;
 
-    //public slots: --> in Qt 5 not anymore declared as slot
-    void forwardMeasInfo(qint32 ID, const mne::FiffInfo& p_fiffInfo);
-    void forwardRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData);
+    //=========================================================================================================
+    /**
+     * @param[in] callback   Receiver of the measurement info requests; empty to disconnect.
+     */
+    void setMeasInfoRequestCallback(MeasInfoRequestCallback callback);
 
-signals:
-    void requestMeasInfo(qint32 ID);
+    //=========================================================================================================
+    /**
+     * Sends measurement info to a client.
+     *
+     * @param[in] ID             The addressed client.
+     * @param[in] p_fiffInfo     The measurement info.
+     */
+    void forwardMeasInfo(std::int32_t ID, const mne::FiffInfo& p_fiffInfo);
 
-    void startMeasFiffStreamClient(qint32 ID);
-    void stopMeasFiffStreamClient(qint32 ID);
+    //=========================================================================================================
+    /**
+     * Sends a raw buffer to the clients that receive raw buffers.
+     *
+     * @param[in] m_pMatRawData  The raw buffer.
+     */
+    void forwardRawBuffer(const std::shared_ptr<const Eigen::MatrixXf>& m_pMatRawData);
 
-    void remitMeasInfo(qint32 ID, const mne::FiffInfo& p_fiffInfo);
-    void remitRawBuffer(QSharedPointer<Eigen::MatrixXf>);
-
-    void closeFiffStreamServer();
+    //=========================================================================================================
+    /**
+     * Stops accepting clients and disconnects all clients.
+     */
+    void close();
 
 private:
     void incomingConnection(mne::TcpSocket socket);
 
-    //SLOTS
-    //=========================================================================================================
-    /**
-     * Fiff data client list
-     *
-     * @param[in] p_command  The connector list command.
-     */
-    void comClist(RTSERVER::Command p_command);
+    void comClist(const RTSERVER::Command& p_command);
+    void comMeasinfo(const RTSERVER::Command& p_command);
+    void comStart(const RTSERVER::Command& p_command);
+    void comStop(const RTSERVER::Command& p_command);
+    void comStopAll(const RTSERVER::Command& p_command);
 
-    //=========================================================================================================
-    /**
-     * specifies to which client to send the requested fiff info
-     *
-     * @param[in] p_command  The select connector command.
-     */
-    void comMeasinfo(RTSERVER::Command p_command);
+    void requestMeasInfo(std::int32_t ID);
+    void startMeasFiffStreamClient(std::int32_t ID);
+    void stopMeasFiffStreamClient(std::int32_t ID);
 
-    //=========================================================================================================
-    /**
-     * Starts the Measurement of a specified client
-     *
-     * @param[in] p_command  The start command.
-     */
-    void comStart(RTSERVER::Command p_command); //comMeas
+    std::string parseToId(const std::string& p_sRawId, std::int32_t& p_iParsedId);
 
-    //=========================================================================================================
-    /**
-     * Stops a fiff data client from receiving further data
-     *
-     * @param[in] p_command  The stop command.
-     */
-    void comStop(RTSERVER::Command p_command);
+    void removeFinishedClients();
 
-    //=========================================================================================================
-    /**
-     * Stops all connectors
-     *
-     * @param[in] p_command  The stop all command.
-     */
-    void comStopAll(RTSERVER::Command p_command);
-
-    QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
-
-    QMap<qint32, FiffStreamThread*> m_qClientList;
-    qint32 m_iNextClientId;
-
-    std::uint16_t m_iPort;   /**< The port the server listens on, 0 if it does not. */
-    std::jthread m_listener; /**< Accepts the clients; declared last so it stops first. */
+    RTSERVER::CommandManager& m_commandManager;                              /**< Commands of mne_rt_server. */
+    std::mutex m_clientsMutex;                                               /**< Guards the clients and the next ID. */
+    std::map<std::int32_t, std::unique_ptr<FiffStreamThread>> m_qClientList; /**< The clients by ID. */
+    std::int32_t m_iNextClientId;                                            /**< ID of the next client. */
+    std::mutex m_requestMutex;                                               /**< Guards m_measInfoRequest. */
+    MeasInfoRequestCallback m_measInfoRequest;                               /**< Receiver of measurement info requests. */
+    std::uint16_t m_iPort;                                                   /**< The port the server listens on, 0 if it does not. */
+    std::jthread m_listener;                                                 /**< Accepts the clients. */
 };
 
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-FiffStreamThread* FiffStreamServer::getClient(qint32 id)
-{
-    return m_qClientList[id];
-}
 } // NAMESPACE
 
 #endif //FIFFSTREAMSERVER_H

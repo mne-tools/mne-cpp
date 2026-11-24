@@ -22,22 +22,26 @@
 
 #include <mne/fiff/fiff_stream.h>
 #include <mne/fiff/fiff_info.h>
-
 #include <mne/com/tcp_socket.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
-#include <QThread>
-#include <QMutex>
-#include <QSharedPointer>
+#include <Eigen/Core>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <atomic>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <thread>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTSERVER
@@ -47,63 +51,127 @@ namespace RTSERVER
 {
 
 //=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class FiffStreamThread : public QThread
+/**
+ * @brief Serves one client of the FIFF data port in its own thread.
+ *
+ * Other threads queue FIFF tags (measurement info, raw buffers) for the client; the thread writes them and answers
+ * the client's FIFF_MNE_RT_COMMAND tags (client ID, alias).
+ */
+class FiffStreamThread
 {
-    Q_OBJECT
-
 public:
-    FiffStreamThread(qint32 id, mne::TcpSocket socket, QObject* parent);
+    //=========================================================================================================
+    /**
+     * @param[in] id         ID of the client.
+     * @param[in] socket     The connected client.
+     */
+    FiffStreamThread(std::int32_t id, mne::TcpSocket socket);
+
+    FiffStreamThread(const FiffStreamThread&) = delete;
+    FiffStreamThread& operator=(const FiffStreamThread&) = delete;
 
     ~FiffStreamThread();
 
-    void run();
+    //=========================================================================================================
+    /**
+     * Starts serving the client.
+     */
+    void start();
 
-    inline qint32 getID();
+    //=========================================================================================================
+    /**
+     * Stops serving the client and waits for the thread.
+     */
+    void stop();
 
-    inline QString getAlias();
+    //=========================================================================================================
+    /**
+     * @return Whether the client is gone and the thread has ended.
+     */
+    bool isFinished() const;
 
-    //    void deactivateRawBufferSending();
+    //=========================================================================================================
+    /**
+     * @return The client ID.
+     */
+    inline std::int32_t getID() const;
 
+    //=========================================================================================================
+    /**
+     * @return The alias the client set.
+     */
+    std::string getAlias();
+
+    //=========================================================================================================
+    /**
+     * Answers a FIFF_MNE_RT_COMMAND tag of the client.
+     *
+     * @param[in] p_pTag     The tag.
+     */
     void parseCommand(const mne::FiffTag& p_pTag);
 
+    //=========================================================================================================
+    /**
+     * Queues the client ID.
+     */
     void writeClientId();
 
+    //=========================================================================================================
+    /**
+     * Starts the raw data block and the raw buffer sending, if @p ID is the ID of this client.
+     *
+     * @param[in] ID     The addressed client.
+     */
+    void startMeas(std::int32_t ID);
+
+    //=========================================================================================================
+    /**
+     * Ends the raw data block and the raw buffer sending, if @p ID is the ID of this client or -1.
+     *
+     * @param[in] ID     The addressed client, -1 for all.
+     */
+    void stopMeas(std::int32_t ID);
+
+    //=========================================================================================================
+    /**
+     * Queues the measurement info, if @p ID is the ID of this client.
+     *
+     * @param[in] ID             The addressed client.
+     * @param[in] p_fiffInfo     The measurement info.
+     */
+    void sendMeasurementInfo(std::int32_t ID, const mne::FiffInfo& p_fiffInfo);
+
+    //=========================================================================================================
+    /**
+     * Queues a raw buffer, if the client receives raw buffers.
+     *
+     * @param[in] m_pMatRawData  The raw buffer.
+     */
+    void sendRawBuffer(const std::shared_ptr<const Eigen::MatrixXf>& m_pMatRawData);
 
 private:
-    qint32 m_iDataClientId;
-    QString m_sDataClientAlias;
+    void run();
 
-    mne::TcpSocket m_socket;
-
-    QMutex m_qMutex;
-    QByteArray m_qSendBlock;
-
-    bool m_bIsSendingRawBuffer;
-
-    std::atomic<bool> m_bIsRunning;
-
-    void startMeas(qint32 ID);
-
-    void stopMeas(qint32 ID);
-
-    void sendMeasurementInfo(qint32 ID, const mne::FiffInfo& p_fiffInfo);
-
-    void sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData);
-    //void readToBuffer1();
+    std::int32_t m_iDataClientId;        /**< The client ID. */
+    std::string m_sDataClientAlias;      /**< The client alias. */
+    mne::TcpSocket m_socket;             /**< The client. */
+    std::mutex m_qMutex;                 /**< Guards the alias, the send block and the sending flag. */
+    std::vector<std::byte> m_qSendBlock; /**< Bytes not sent yet. */
+    bool m_bIsSendingRawBuffer;          /**< Whether the client receives raw buffers. */
+    std::atomic<bool> m_bIsRunning;      /**< False to stop the thread. */
+    std::atomic<bool> m_bIsFinished;     /**< True once the thread has ended. */
+    std::thread m_thread;                /**< Serves the client. */
 };
 
-inline qint32 FiffStreamThread::getID()
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline std::int32_t FiffStreamThread::getID() const
 {
     return m_iDataClientId;
 }
 
-inline QString FiffStreamThread::getAlias()
-{
-    return m_sDataClientAlias;
-}
 } // NAMESPACE
 
 #endif //FIFFSTREAMTHREAD_H

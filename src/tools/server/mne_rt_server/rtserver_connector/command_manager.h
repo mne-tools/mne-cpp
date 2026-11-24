@@ -20,19 +20,19 @@
  * dispatch table to keep in sync.
  *
  * Schemas can be installed three different ways: explicitly by name and
- * description via @c insert(QString, QString), one at a time by handing
- * over a fully-formed @c Command via @c insert(QString, Command) (the
- * manager re-parents the @c Command so its lifetime tracks the manager),
- * or in bulk by loading a @c QJsonDocument that describes a whole
+ * description via @c insert(std::string, std::string), one at a time by handing
+ * over a fully-formed @c Command via @c insert(std::string, Command) (the
+ * manager becomes the owner that routes the replies of the stored copy),
+ * or in bulk by loading a @c mne::JsonDocument that describes a whole
  * command set in the same JSON layout the server itself emits when a
  * client asks for its command list. The CTOR overload that takes a
- * @c QByteArray/@c QJsonDocument is the convenience entry point for
+ * JSON text or a @c mne::JsonDocument is the convenience entry point for
  * that bulk path.
  *
- * Outbound traffic uses three signals. @c commandMapChanged() notifies
+ * Outbound traffic uses three callback channels. @c commandMapChanged() notifies
  * the rest of the application when the schema set has been mutated.
  * @c triggered(Command) lets the manager push outbound requests onto
- * the command port. @c response(QString, Command) carries the
+ * the command port. @c response(std::string, Command) carries the
  * reply produced by an executed @c Command back to whoever originally
  * sent it. @c m_bIsActive lets a subsystem temporarily mute the manager
  * (during long-running operations, for example) without detaching it
@@ -43,21 +43,25 @@
 #define COMMUNICATIONMANAGER_H
 
 //=============================================================================================================
-// Includes
+// INCLUDES
 //=============================================================================================================
 
 #include "rtserver_connector_global.h"
 #include "command.h"
 #include "command_parser.h"
-
 #include "observer_pattern.h"
 
+#include <mne/base/json.h>
+
 //=============================================================================================================
-// Qt Includes
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QObject>
-#include <QJsonDocument>
+#include <functional>
+#include <map>
+#include <string>
+#include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTSERVER
@@ -67,179 +71,173 @@ namespace RTSERVER
 {
 
 //=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-//=============================================================================================================
 /**
- * @brief Observer-side registry of @ref Command schemas a subsystem accepts from the shared @ref CommandParser.
- *
- * Holds a @c QMap<QString,Command> indexed by command keyword; when
- * @ref CommandParser notifies attached managers of a new
- * @ref RawCommand, each manager looks the keyword up in its own map and
- * either dispatches the corresponding @c Command (re-emitting
- * @c triggered / @c response) or silently passes. Schemas can be added
- * one at a time or bulk-loaded from a @c QJsonDocument matching the
- * server’s self-described command list.
+ * @brief Registry of the commands one component understands; executes the parsed commands that match.
  */
-class RTSERVER_CONNECTOR_EXPORT CommandManager : public QObject, public IObserver
+class RTSERVER_CONNECTOR_EXPORT CommandManager : public IObserver
 {
-    Q_OBJECT
-
 public:
-    explicit CommandManager(bool p_bIsActive = true, QObject* parent = nullptr);
+    using CommandMapChangedCallback = std::function<void()>;                                /**< Schema set changed. */
+    using TriggeredCallback = std::function<void(const Command&)>;                          /**< Command sent. */
+    using ResponseCallback = std::function<void(const std::string& reply, const Command&)>; /**< Reply of a command. */
 
-    explicit CommandManager(const QByteArray& p_qByteArrayJsonDoc, bool p_bIsActive = true, QObject* parent = nullptr);
+    //=========================================================================================================
+    /**
+     * Constructs an empty manager.
+     *
+     * @param[in] p_bIsActive    If the manager executes parsed commands (optional, default true).
+     */
+    explicit CommandManager(bool p_bIsActive = true);
 
-    explicit CommandManager(const QJsonDocument& p_jsonDoc, bool p_bIsActive = true, QObject* parent = nullptr);
+    //=========================================================================================================
+    /**
+     * Constructs a manager with the commands of a JSON command description.
+     *
+     * @param[in] p_sJsonDoc     JSON text holding a "commands" object.
+     * @param[in] p_bIsActive    If the manager executes parsed commands (optional, default true).
+     */
+    explicit CommandManager(std::string_view p_sJsonDoc, bool p_bIsActive = true);
+
+    //=========================================================================================================
+    /**
+     * Constructs a manager with the commands of a JSON command description.
+     *
+     * @param[in] p_jsonDoc      Document holding a "commands" object.
+     * @param[in] p_bIsActive    If the manager executes parsed commands (optional, default true).
+     */
+    explicit CommandManager(const mne::JsonDocument& p_jsonDoc, bool p_bIsActive = true);
+
+    CommandManager(const CommandManager&) = delete;
+    CommandManager& operator=(const CommandManager&) = delete;
 
     ~CommandManager() override;
 
     //=========================================================================================================
     /**
-     * Clears the command manager
+     * Removes all commands.
      */
     void clear();
 
     //=========================================================================================================
     /**
-     * Returns the lookup table of all available commands.
-     *
-     * @return the command lookup table.
+     * @return The commands by keyword.
      */
-    inline QMap<QString, Command>& commandMap();
+    inline std::map<std::string, Command>& commandMap();
 
     //=========================================================================================================
     /**
-     * Checks if a command is managed;
+     * @param[in] p_sCommand     Command keyword.
      *
-     * @param p_sCommand     COmmand to check.
-     *
-     * @return true if part of command manager, false otherwise.
+     * @return Whether the manager knows the command.
      */
-    inline bool hasCommand(const QString& p_sCommand) const;
+    inline bool hasCommand(const std::string& p_sCommand) const;
 
     //=========================================================================================================
     /**
-     * Inserts commands encoded in a json document.
-     * Attention existing items are overwritten.
+     * Inserts the commands of a JSON command description; existing commands are kept.
      *
-     * @param p_jsonDocument    JSON document containing commands.
+     * @param[in] p_jsonDocument     Document holding a "commands" object.
      */
-    void insert(const QJsonDocument& p_jsonDocument);
+    void insert(const mne::JsonDocument& p_jsonDocument);
 
     //=========================================================================================================
     /**
-     * Inserts a single command.
-     * Attention existing items are overwritten.
+     * Inserts or replaces a command without parameters.
      *
-     * @param[in] p_sKey Command name used as the key.
-     * @param[in] p_sDescription Human-readable description of the command.
-     *
+     * @param[in] p_sKey             Command keyword.
+     * @param[in] p_sDescription     Command description.
      */
-    void insert(const QString& p_sKey, const QString& p_sDescription);
+    void insert(const std::string& p_sKey, const std::string& p_sDescription);
 
     //=========================================================================================================
     /**
-     * Inserts a new command and emmits dataChanged signal.
+     * Inserts or replaces a command.
      *
-     * @param p_sKey     Command key word.
-     * @param p_command  Command content. Attention CommandManager takes ownership of that command by reseting commad's parent;.
+     * @param[in] p_sKey     Command keyword.
+     * @param[in] p_command  The command.
      */
-    void insert(const QString& p_sKey, const Command& p_command);
+    void insert(const std::string& p_sKey, const Command& p_command);
 
     //=========================================================================================================
     /**
-     * Returns if CommandManager is active. If true, this manager parses incomming commands.
-     *
-     * @return if true, incomming commands are parsed.
+     * @return Whether the manager executes parsed commands.
      */
     inline bool isActive() const;
 
     //=========================================================================================================
     /**
-     * Sets the activation status of the CommandManager.
-     *
-     * @param[in] status the new activation status of the CommandManager.
+     * @param[in] status     Whether the manager executes parsed commands.
      */
     inline void setStatus(bool status);
 
     //=========================================================================================================
     /**
-     * Updates the IObserver (CommandManager) when a new command was received.
+     * Executes the command the parser has just parsed, if this manager knows it and its parameters convert.
      *
-     * @param[in] p_pSubject  pointer to the subject (CommandParser) to which observer (CommandManager) is attached to.
+     * @param[in] p_pSubject     The notifying @ref CommandParser.
      */
     void update(Subject* p_pSubject) override;
 
-    //=========================================================================================================
-    /**
-     * Subscript operator [] to access commands by command name
-     *
-     * @param[in] key    the command key word.
-     *
-     * @return Command object related to command key word.
-     */
-    Command& operator[](const QString& key);
+    void connectCommandMapChanged(CommandMapChangedCallback callback); /**< Registers a schema-change callback. */
+    void connectTriggered(TriggeredCallback callback);                 /**< Registers a callback of @ref triggered. */
+    void connectResponse(ResponseCallback callback);                   /**< Registers a callback of @ref response. */
 
     //=========================================================================================================
     /**
-     * Subscript operator [] to access commands by command name
+     * Runs the triggered callbacks.
      *
-     * @param key    the command key word.
-     *
-     * @return Command object related to command key word.
+     * @param[in] p_command  The command to send.
      */
-    const Command operator[](const QString& key) const;
+    void triggered(const Command& p_command);
+
+    //=========================================================================================================
+    /**
+     * Runs the response callbacks.
+     *
+     * @param[in] p_sReply   Reply text.
+     * @param[in] p_command  The command replied to.
+     */
+    void response(const std::string& p_sReply, const Command& p_command);
+
+    //=========================================================================================================
+    /**
+     * @param[in] key    Command keyword.
+     *
+     * @return The command; a default command is inserted if there is none.
+     */
+    Command& operator[](const std::string& key);
+
+    //=========================================================================================================
+    /**
+     * @param[in] key    Command keyword.
+     *
+     * @return A copy of the command, or a default command if there is none.
+     */
+    Command operator[](const std::string& key) const;
 
 private:
-    //=========================================================================================================
-    /**
-     * Initializes the command manager by connecting internal signal/slots
-     */
-    void init();
+    void commandMapChanged();
 
-    bool m_bIsActive;
-
-    QJsonDocument m_jsonDocumentOrigin;
-
-    QMetaObject::Connection m_conReplyChannel; /**< The reply channel of the command manager. */
-
-    QMap<QString, Command> m_qMapCommands; /**< Holds a map as an internal lookuptable of available commands. */
-
-signals:
-    void commandMapChanged(); //(QStringList)
-
-    //=========================================================================================================
-    /**
-     * Is emitted when a command is ready to send
-     *
-     * @param p_command  Command which should be send.
-     */
-    void triggered(Command p_command);
-
-    //=========================================================================================================
-    /**
-     * Is triggered when a reply is available. Commands are the emmiters of this signal -> access trough parent.
-     *
-     * @param p_sReply   the plain or JSON formatted reply.
-     *@param p_command   Command which send the response
-     */
-    void response(QString p_sReply, Command p_command);
+    bool m_bIsActive;                                           /**< Whether parsed commands are executed. */
+    mne::JsonDocument m_jsonDocumentOrigin;                     /**< Document the manager was constructed from. */
+    std::map<std::string, Command> m_qMapCommands;              /**< Lookup table of the available commands. */
+    std::vector<CommandMapChangedCallback> m_commandMapChanged; /**< Callbacks of a schema change. */
+    std::vector<TriggeredCallback> m_triggered;                 /**< Callbacks of @ref triggered. */
+    std::vector<ResponseCallback> m_response;                   /**< Callbacks of @ref response. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QMap<QString, Command>& CommandManager::commandMap()
+inline std::map<std::string, Command>& CommandManager::commandMap()
 {
     return m_qMapCommands;
 }
 
 //=============================================================================================================
 
-inline bool CommandManager::hasCommand(const QString& p_sCommand) const
+inline bool CommandManager::hasCommand(const std::string& p_sCommand) const
 {
     return m_qMapCommands.contains(p_sCommand);
 }
@@ -257,6 +255,7 @@ inline void CommandManager::setStatus(bool status)
 {
     m_bIsActive = status;
 }
+
 } // NAMESPACE
 
 #endif // COMMUNICATIONMANAGER_H

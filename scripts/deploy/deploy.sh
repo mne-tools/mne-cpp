@@ -237,9 +237,8 @@ if [[ ${LinkOption} == "dynamic" ]]; then
         ${MockText}cp -a ${BasePath}/out/${BuildName}/resources/. ${BasePath}/out/${BuildName}/bin/mne_analyze.app/Contents/Resources/
     fi
 
-    # mne_rt_server.app — plugins + resources (if it exists as a .app bundle)
+    # mne_rt_server.app — resources (if it exists as a .app bundle)
     if [ -d "${BasePath}/out/${BuildName}/bin/mne_rt_server.app" ]; then
-        ${MockText}cp -a ${BasePath}/out/${BuildName}/bin/mne_rt_server_plugins ${BasePath}/out/${BuildName}/bin/mne_rt_server.app/Contents/MacOS/mne_rt_server_plugins
         ${MockText}mkdir -p ${BasePath}/out/${BuildName}/bin/mne_rt_server.app/Contents/Resources
         ${MockText}cp -a ${BasePath}/out/${BuildName}/resources/. ${BasePath}/out/${BuildName}/bin/mne_rt_server.app/Contents/Resources/
     fi
@@ -291,7 +290,6 @@ if [[ ${LinkOption} == "dynamic" ]]; then
         # mne_scan and mne_analyze plugins are inside their .app bundles now
         ${MockText}rm -rf ${BasePath}/out/${BuildName}/bin/mne_scan_plugins
         ${MockText}rm -rf ${BasePath}/out/${BuildName}/bin/mne_analyze_plugins
-        # mne_rt_server_plugins stays — mne_rt_server is a CLI tool (no .app bundle)
 
         # ---------------------------------------------------------------
         # Strip developer-machine LC_RPATH entries.
@@ -491,7 +489,6 @@ elif [[ ${LinkOption} == "static" ]]; then
         ${MockText}rm -r mne-cpp/resources/data
         ${MockText}rm -r mne-cpp/bin/mne_scan_plugins
         ${MockText}rm -r mne-cpp/bin/mne_analyze_plugins
-        ${MockText}rm -r mne-cpp/bin/mne_rt_server_plugins
 
         # Determine macOS architecture label
         if [[ "$(uname -m)" == "arm64" ]]; then
@@ -768,7 +765,6 @@ elif [[ ${LinkOption} == "static" ]]; then
     # Delete folders which we do not want to ship
     ${MockText}cp -r ${BasePath}/out/${BuildName}/ mne-cpp
     ${MockText}rm -rf mne-cpp/resources/data
-    ${MockText}rm -rf mne-cpp/bin/mne_rt_server_plugins
     ${MockText}rm -rf mne-cpp/bin/mne_scan_plugins
     ${MockText}rm -rf mne-cpp/bin/mne_analyze_plugins
 

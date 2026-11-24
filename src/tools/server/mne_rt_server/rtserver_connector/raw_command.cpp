@@ -10,7 +10,7 @@
  * @brief    Translation unit for @ref RTSERVER::RawCommand: storage of the untyped keyword/argument pair before schema binding.
  *
  * Implements the trivial constructors, copy-assignment and the
- * @c ICommand::execute() override that emits @c executed(QList<QString>)
+ * @c ICommand::execute() override that passes the raw parameters to the registered callbacks
  * so a @ref CommandManager can pick the raw arguments up, look the
  * keyword up in its schema map, and synthesise a typed @ref Command.
  * The JSON-vs-CLI flag carried alongside the arguments lets the eventual
@@ -18,7 +18,7 @@
  */
 
 //=============================================================================================================
-// Includes
+// INCLUDES
 //=============================================================================================================
 
 #include "raw_command.h"
@@ -33,17 +33,15 @@ using namespace RTSERVER;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RawCommand::RawCommand(QObject* parent)
-: QObject(parent)
-, m_bIsJson(false)
+RawCommand::RawCommand()
+: m_bIsJson(false)
 {
 }
 
 //=============================================================================================================
 
-RawCommand::RawCommand(const QString& p_sCommand, bool p_bIsJson, QObject* parent)
-: QObject(parent)
-, m_sCommand(p_sCommand)
+RawCommand::RawCommand(const std::string& p_sCommand, bool p_bIsJson)
+: m_sCommand(p_sCommand)
 , m_bIsJson(p_bIsJson)
 {
 }
@@ -51,7 +49,7 @@ RawCommand::RawCommand(const QString& p_sCommand, bool p_bIsJson, QObject* paren
 //=============================================================================================================
 
 RawCommand::RawCommand(const RawCommand& p_rawCommand)
-: QObject(p_rawCommand.parent())
+: ICommand(p_rawCommand)
 , m_sCommand(p_rawCommand.m_sCommand)
 , m_bIsJson(p_rawCommand.m_bIsJson)
 , m_qListRawParameters(p_rawCommand.m_qListRawParameters)
@@ -62,19 +60,26 @@ RawCommand::RawCommand(const RawCommand& p_rawCommand)
 
 void RawCommand::execute()
 {
-    emit executed(m_qListRawParameters);
+    for (const ExecutedCallback& callback : m_executed) {
+        callback(m_qListRawParameters);
+    }
+}
+
+//=============================================================================================================
+
+void RawCommand::connectExecuted(ExecutedCallback callback)
+{
+    m_executed.push_back(std::move(callback));
 }
 
 //=============================================================================================================
 
 RawCommand& RawCommand::operator=(const RawCommand& rhs)
 {
-    if (this != &rhs) // protect against invalid self-assignment
-    {
+    if (this != &rhs) {
         m_sCommand = rhs.m_sCommand;
         m_bIsJson = rhs.m_bIsJson;
         m_qListRawParameters = rhs.m_qListRawParameters;
     }
-    // to support chained assignment operators (a=b=c), always return *this
     return *this;
 }

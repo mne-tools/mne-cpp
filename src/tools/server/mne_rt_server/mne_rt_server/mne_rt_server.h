@@ -22,19 +22,15 @@
 #include "connectormanager.h"
 #include "commandserver.h"
 #include "fiffstreamserver.h"
+
 #include <rtserver_connector/command_manager.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QObject>
-
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
+#include <condition_variable>
+#include <mutex>
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTSERVER
@@ -44,63 +40,57 @@ namespace RTSERVER
 {
 
 //=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-//=============================================================================================================
 /**
- * DECLARE CLASS MNERTServer
- *
- * @brief The MNERTServer class provides a Fiff data simulator.
+ * @brief mne_rt_server: the command port, the FIFF data port and the connectors.
  */
-class MNERTServer : public QObject
+class MNERTServer
 {
-    Q_OBJECT
-
 public:
+    //=========================================================================================================
+    /**
+     * Sets up the commands and the connectors and starts both servers.
+     */
     MNERTServer();
+
+    MNERTServer(const MNERTServer&) = delete;
+    MNERTServer& operator=(const MNERTServer&) = delete;
 
     //=========================================================================================================
     /**
-     * Destroys the MNERTServer.
+     * Disconnects all clients and stops the connectors.
      */
     ~MNERTServer();
 
     //=========================================================================================================
     /**
-     * Returns the command manager
+     * @return The command manager of the server.
      */
     inline RTSERVER::CommandManager& getCommandManager();
 
     //=========================================================================================================
     /**
-     * Inits the mne_rt_server.
+     * Inserts the commands of the server.
      */
     void init();
 
-signals:
-    void closeServer();
+    //=========================================================================================================
+    /**
+     * Blocks until a client sends the "close" command.
+     */
+    void waitForClose();
 
 private:
-    //SLOTS
-    //=========================================================================================================
-    /**
-     * Closes mne_rt_server
-     */
     void comClose();
-
-    //=========================================================================================================
-    /**
-     * Is called when signal help is executed.
-     */
-    void comHelp(RTSERVER::Command p_command);
-
-    FiffStreamServer m_fiffStreamServer; /**< Fiff stream server. */
-    CommandServer m_commandServer;       /**< Command server. */
-
-    ConnectorManager m_connectorManager; /**< Connector manager. */
+    void comHelp(const RTSERVER::Command& p_command);
 
     RTSERVER::CommandManager m_commandManager; /**< The command manager of the mne_rt_server. */
+    FiffStreamServer m_fiffStreamServer;       /**< Fiff stream server. */
+    CommandServer m_commandServer;             /**< Command server. */
+    ConnectorManager m_connectorManager;       /**< Connector manager. */
+
+    std::mutex m_closeMutex;                  /**< Guards m_bClose. */
+    std::condition_variable m_closeCondition; /**< Signals m_bClose. */
+    bool m_bClose = false;                    /**< True once "close" was received. */
 };
 
 //=============================================================================================================
@@ -111,6 +101,7 @@ inline RTSERVER::CommandManager& MNERTServer::getCommandManager()
 {
     return m_commandManager;
 }
+
 } // NAMESPACE
 
 #endif // MNE_RT_SERVER_H

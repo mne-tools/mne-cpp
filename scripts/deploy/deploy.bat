@@ -159,7 +159,6 @@ IF "%LINK_OPTION%"=="dynamic" (
         REM This script needs to be run from the top level mne-cpp repo folder
         REM Delete folders which we do not want to ship
         %MOCK_TEXT%rmdir %OUT_DIR_NAME%\resources\data /s /q
-        %MOCK_TEXT%rmdir %OUT_DIR_NAME%\bin\mne_rt_server_plugins /s /q
         %MOCK_TEXT%rmdir %OUT_DIR_NAME%\bin\mne_scan_plugins /s /q
         %MOCK_TEXT%rmdir %OUT_DIR_NAME%\bin\mne_analyze_plugins /s /q
 

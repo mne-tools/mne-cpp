@@ -21,18 +21,16 @@
 
 #include <rtserver_connector/iconnector.h>
 
-//=============================================================================================================
-// mne_mne INCLUDES
-//=============================================================================================================
-
 #include <mne/fiff/fiff_info.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QVector>
-#include <QPluginLoader>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTSERVER
@@ -42,10 +40,6 @@ namespace RTSERVER
 {
 
 //=============================================================================================================
-// Function Pointers
-//=============================================================================================================
-
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -53,132 +47,109 @@ class FiffStreamServer;
 
 //=============================================================================================================
 /**
- * DECLARE CLASS ConnectorManager
- *
- * @brief The ConnectorManager class provides a dynamic plugin loader. As well as the handling of the loaded plugins.
+ * @brief Creates the known connectors, selects the active one and connects it to the FIFF stream server.
  */
-class ConnectorManager : public QPluginLoader
+class ConnectorManager
 {
-    Q_OBJECT
-
 public:
     //=========================================================================================================
     /**
-     * Constructs a ConnectorManager with the given parent.
-     *
-     * @param[in] parent pointer to parent Object. (It's normally the default value.).
+     * @param[in] p_pFiffStreamServer    The FIFF stream server the active connector feeds.
+     * @param[in] p_commandManager       The command manager of mne_rt_server.
      */
-    ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObject* parent = 0);
+    ConnectorManager(FiffStreamServer* p_pFiffStreamServer, RTSERVER::CommandManager& p_commandManager);
+
+    ConnectorManager(const ConnectorManager&) = delete;
+    ConnectorManager& operator=(const ConnectorManager&) = delete;
+
+    ~ConnectorManager();
 
     //=========================================================================================================
     /**
-     * Destroys the ConnectorManager.
-     */
-    virtual ~ConnectorManager();
-
-    //=========================================================================================================
-    /**
-     * Connect connector manager to mne_rt_server commands
+     * Connects the connector commands of mne_rt_server to their handlers.
      */
     void connectCommands();
 
     //=========================================================================================================
     /**
-     * Loads plugins from given directory.
-     *
-     * @param[in] dir the plugin directory.
+     * Creates the known connectors and activates the default one of plugin.cfg, or the first one.
      */
-    void loadConnectors(const QString& dir);
+    void loadConnectors();
 
-    static void clearConnectorActivation();
+    //=========================================================================================================
+    /**
+     * Deactivates all connectors.
+     */
+    void clearConnectorActivation();
 
+    //=========================================================================================================
+    /**
+     * Connects the active connector to the FIFF stream server.
+     */
     void connectActiveConnector();
 
+    //=========================================================================================================
+    /**
+     * Disconnects the active connector from the FIFF stream server.
+     */
     void disconnectActiveConnector();
 
     //=========================================================================================================
     /**
-     * Returns vector containing active AbstractSensor plugins.
-     *
-     * @return reference to vector containing active AbstractSensor plugins.
+     * @return The active connector, nullptr if there is none.
      */
     IConnector* getActiveConnector();
 
     //=========================================================================================================
     /**
-     * Returns vector containing all plugins.
-     *
-     * @return reference to vector containing all plugins.
+     * @return The connectors.
      */
-    static inline const QVector<IConnector*>& getConnectors();
+    inline const std::vector<std::unique_ptr<IConnector>>& getConnectors() const;
 
     //=========================================================================================================
     /**
-     * Prints a list of all connectors and their status
+     * @param[in] p_bFlagJSON    JSON instead of text.
      *
-     * @param[in] p_bFlagJSON    if true, function return JSON formatted (default = false).
+     * @return The list of connectors.
      */
-    QByteArray getConnectorList(bool p_bFlagJSON = false) const;
+    std::string getConnectorList(bool p_bFlagJSON = false) const;
 
     //=========================================================================================================
     /**
-     * ToDo
+     * Activates another connector; the active one is stopped.
+     *
+     * @param[in] ID     Connector ID.
+     *
+     * @return The report of the change.
      */
-    QByteArray setActiveConnector(qint32 ID);
+    std::string setActiveConnector(std::int32_t ID);
 
-signals:
-    void sendMeasInfo(qint32, mne::FiffInfo);
-    //    void setBufferSize(qint32 ID);
-    //    void startMeasConnector();
-    //    void stopMeasConnector();
+    //=========================================================================================================
+    /**
+     * Stops all connectors.
+     */
+    void stopConnectors();
 
 private:
-    //SLOTS
-    //=========================================================================================================
-    /**
-     * Sends the connector list
-     *
-     * @param[in] p_command  The connector list command.
-     */
-    void comConlist(RTSERVER::Command p_command);
+    void comConlist(const RTSERVER::Command& p_command);
+    void comSelcon(const RTSERVER::Command& p_command);
+    void comStart(const RTSERVER::Command& p_command);
+    void comStopAll(const RTSERVER::Command& p_command);
 
-    //=========================================================================================================
-    /**
-     * Selects a connector
-     *
-     * @param[in] p_command  The select connector command.
-     */
-    void comSelcon(RTSERVER::Command p_command);
-
-    //=========================================================================================================
-    /**
-     * Starts the Measurement
-     *
-     * @param[in] p_command  The start command.
-     */
-    void comStart(RTSERVER::Command p_command); //comMeas
-
-    //=========================================================================================================
-    /**
-     * Stops all connectors
-     *
-     * @param[in] p_command  The stop all command.
-     */
-    void comStopAll(RTSERVER::Command p_command);
-
-    static QVector<IConnector*> s_vecConnectors; /**< Holds vector of all plugins. */
-
-    FiffStreamServer* m_pFiffStreamServer;
+    std::vector<std::unique_ptr<IConnector>> m_vecConnectors; /**< The connectors. */
+    FiffStreamServer* m_pFiffStreamServer;                    /**< The FIFF stream server, not owned. */
+    RTSERVER::CommandManager& m_commandManager;               /**< Commands of mne_rt_server. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline const QVector<IConnector*>& ConnectorManager::getConnectors()
+inline const std::vector<std::unique_ptr<IConnector>>& ConnectorManager::getConnectors() const
 {
-    return s_vecConnectors;
+    return m_vecConnectors;
 }
+
 } // NAMESPACE
 
 #endif // CONNECTORMANAGER_H

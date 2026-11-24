@@ -12,18 +12,57 @@
  */
 //=============================================================================================================
 
-#include <QtTest/QtTest>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QSignalSpy>
-#include <QVariant>
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 
 #include <rtserver_connector/command.h>
 #include <rtserver_connector/raw_command.h>
 #include <rtserver_connector/command_parser.h>
 #include <rtserver_connector/command_manager.h>
 
+#include <mne/base/json.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtTest/QtTest>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <string>
+#include <vector>
+
 using namespace RTSERVER;
+
+namespace
+{
+
+/** @return Whether @p text contains @p part. */
+bool contains(const std::string& text, const std::string& part)
+{
+    return text.find(part) != std::string::npos;
+}
+
+/** @return A "commands" document with one command and one parameter of @p type. */
+mne::JsonDocument oneCommandDocument(const std::string& name, const std::string& description, const std::string& param, const std::string& type)
+{
+    mne::JsonObject params;
+    if (!param.empty()) {
+        params.insert(param, mne::JsonObject{{"type", type}, {"description", "Client ID"}});
+    }
+    mne::JsonObject commands;
+    commands.insert(name, mne::JsonObject{{"description", description}, {"parameters", params}});
+    return mne::JsonDocument(mne::JsonObject{{"commands", commands}});
+}
+
+} // namespace
 
 //=============================================================================================================
 
@@ -32,6 +71,10 @@ class TestRtServerCommands : public QObject
     Q_OBJECT
 
 private slots:
+    // ---- CommandValue tests ----
+    void testCommandValueTypes();
+    void testCommandValueConvertFrom();
+
     // ---- Command tests ----
     void testCommandDefaultConstruction();
     void testCommandNameDescription();
@@ -46,7 +89,7 @@ private slots:
     void testCommandSubscriptByName();
     void testCommandSubscriptByIndex();
     void testCommandConstSubscript();
-    void testCommandExecuteSignal();
+    void testCommandExecuteCallback();
     void testCommandIsJson();
 
     // ---- RawCommand tests ----
@@ -55,7 +98,7 @@ private slots:
     void testRawCommandFromString_JSON();
     void testRawCommandCopy();
     void testRawCommandAssignment();
-    void testRawCommandExecuteSignal();
+    void testRawCommandExecuteCallback();
 
     // ---- CommandParser tests ----
     void testCommandParserCLI();
@@ -75,43 +118,83 @@ private slots:
     void testCommandManagerActiveToggle();
     void testCommandManagerCommandMapChanged();
     void testCommandManagerUpdate();
+    void testCommandManagerUpdateRejectsBadParameter();
 
-    // ---- Gap-fill tests ----
+    // ---- Reply channels ----
     void testCommandReply();
     void testCommandSend();
     void testCommandParserGetRawCommand();
-    void testCommandManagerFromByteArray();
-    void testCommandManagerTriggeredSignal();
-    void testCommandManagerResponseSignal();
-    void testCommandParserResponseSignal();
+    void testCommandManagerFromJsonText();
+    void testCommandParserResponse();
 
     // ---- Integration: Parser + Manager ----
     void testParserManagerIntegration_CLI();
     void testParserManagerIntegration_JSON();
 
-    // ── Command edge cases ────────────────────────────────────────────
-    void testCommandDirectMemberAccess();
+    // ---- Edge cases ----
     void testCommandReserializeRoundTrip();
     void testCommandEmptyParamsToJson();
     void testCommandMultipleParamTypes();
-    void testCommandExecuteSignalPayload();
-
-    // ── RawCommand edge cases ─────────────────────────────────────────
-    void testRawCommandMultipleParams();
-    void testRawCommandExecuteSignalPayload();
     void testRawCommandCopyIndependence();
-
-    // ── CommandManager edge cases ─────────────────────────────────────
     void testCommandManagerOverwriteCommand();
     void testCommandManagerInsertMultipleFromJson();
     void testCommandManagerInactiveSkipsParsing();
-    void testCommandManagerCommandMapAccess();
-
-    // ── CommandParser edge cases ──────────────────────────────────────
     void testCommandParserMultipleSequentialParses();
     void testCommandParserCLIWithMultipleParams();
     void testCommandParserJsonWithMultipleCommands();
 };
+
+//=============================================================================================================
+// CommandValue tests
+//=============================================================================================================
+
+void TestRtServerCommands::testCommandValueTypes()
+{
+    // The type names are those of the command port's help
+    for (const char* name : {"int", "uint", "float", "double", "bool", "QString"}) {
+        QCOMPARE(CommandValue::fromTypeName(name).typeName(), std::string(name));
+    }
+    QVERIFY(!CommandValue::fromTypeName("QStringList").isValid());
+    QCOMPARE(CommandValue(42).toString(), std::string("42"));
+    QCOMPARE(CommandValue(3.14).toString(), std::string("3.14"));
+    QCOMPARE(CommandValue(true).toString(), std::string("true"));
+    QCOMPARE(CommandValue("7").toInt(), 7);
+    bool ok = true;
+    QCOMPARE(CommandValue("x").toInt(&ok), 0);
+    QVERIFY(!ok);
+}
+
+void TestRtServerCommands::testCommandValueConvertFrom()
+{
+    CommandValue value = CommandValue::fromTypeName("int");
+    QVERIFY(value.convertFrom("12"));
+    QCOMPARE(value.toInt(), 12);
+    QVERIFY(!value.convertFrom("abc"));
+    QCOMPARE(value.toInt(), 12); // unchanged
+
+    CommandValue unsignedValue = CommandValue::fromTypeName("uint");
+    QVERIFY(!unsignedValue.convertFrom("-1"));
+    QVERIFY(unsignedValue.convertFrom("200"));
+    QCOMPARE(unsignedValue.toUInt(), 200U);
+
+    CommandValue floatValue = CommandValue::fromTypeName("float");
+    QVERIFY(floatValue.convertFrom("2.5"));
+    QCOMPARE(floatValue.toFloat(), 2.5F);
+    QVERIFY(!floatValue.convertFrom("1e300"));
+
+    CommandValue boolValue = CommandValue::fromTypeName("bool");
+    QVERIFY(boolValue.convertFrom("yes"));
+    QVERIFY(boolValue.toBool());
+    QVERIFY(boolValue.convertFrom("False"));
+    QVERIFY(!boolValue.toBool());
+
+    CommandValue text = CommandValue::fromTypeName("QString");
+    QVERIFY(text.convertFrom("a b"));
+    QCOMPARE(text.toString(), std::string("a b"));
+
+    CommandValue invalid;
+    QVERIFY(!invalid.convertFrom("1"));
+}
 
 //=============================================================================================================
 // Command tests
@@ -120,89 +203,63 @@ private slots:
 void TestRtServerCommands::testCommandDefaultConstruction()
 {
     Command cmd;
-    QCOMPARE(cmd.command(), QString(""));
-    QCOMPARE(cmd.description(), QString(""));
-    QCOMPARE(cmd.count(), quint32(0));
+    QCOMPARE(cmd.command(), std::string(""));
+    QCOMPARE(cmd.description(), std::string(""));
+    QCOMPARE(cmd.count(), std::uint32_t(0));
     QVERIFY(cmd.isJson());
 }
 
 void TestRtServerCommands::testCommandNameDescription()
 {
     Command cmd("help", "Show help text", false);
-    QCOMPARE(cmd.command(), QString("help"));
-    QCOMPARE(cmd.description(), QString("Show help text"));
-    QCOMPARE(cmd.count(), quint32(0));
+    QCOMPARE(cmd.command(), std::string("help"));
+    QCOMPARE(cmd.description(), std::string("Show help text"));
+    QCOMPARE(cmd.count(), std::uint32_t(0));
     QVERIFY(!cmd.isJson());
 }
 
 void TestRtServerCommands::testCommandWithParams()
 {
-    QStringList names;
-    names << "id" << "value";
-    QList<QVariant> values;
-    values << QVariant(int(42)) << QVariant(QString("test"));
-
-    Command cmd("set", "Set a value", names, values, true);
-    QCOMPARE(cmd.count(), quint32(2));
-    QCOMPARE(cmd.pNames().size(), 2);
-    QCOMPARE(cmd.pNames().at(0), QString("id"));
-    QCOMPARE(cmd.pNames().at(1), QString("value"));
+    Command cmd("set", "Set a value", {"id", "value"}, {CommandValue(42), CommandValue("test")}, true);
+    QCOMPARE(cmd.count(), std::uint32_t(2));
+    QCOMPARE(cmd.pNames(), (mne::StringList{"id", "value"}));
     QCOMPARE(cmd.pValues().at(0).toInt(), 42);
-    QCOMPARE(cmd.pValues().at(1).toString(), QString("test"));
-    // Auto-generated descriptions should be empty strings
-    QCOMPARE(cmd.pDescriptions().size(), 2);
-    QCOMPARE(cmd.pDescriptions().at(0), QString(""));
+    QCOMPARE(cmd.pValues().at(1).toString(), std::string("test"));
+    // Auto-generated descriptions are empty
+    QCOMPARE(cmd.pDescriptions(), (mne::StringList{"", ""}));
 }
 
 void TestRtServerCommands::testCommandWithParamsAndDescriptions()
 {
-    QStringList names;
-    names << "id";
-    QList<QVariant> values;
-    values << QVariant(int(0));
-    QStringList descs;
-    descs << "Client ID";
-
-    Command cmd("get", "Get info", names, values, descs, true);
-    QCOMPARE(cmd.count(), quint32(1));
-    QCOMPARE(cmd.pDescriptions().at(0), QString("Client ID"));
+    Command cmd("get", "Get info", {"id"}, {CommandValue(0)}, {"Client ID"}, true);
+    QCOMPARE(cmd.count(), std::uint32_t(1));
+    QCOMPARE(cmd.pDescriptions().at(0), std::string("Client ID"));
 }
 
 void TestRtServerCommands::testCommandFromJson()
 {
-    QJsonObject paramObj;
-    QJsonObject idParam;
-    idParam.insert("type", QString("int"));
-    idParam.insert("description", QString("Client ID"));
-    QJsonObject params;
-    params.insert("id", idParam);
-
-    QJsonObject content;
-    content.insert("description", QString("Get measurement info"));
-    content.insert("parameters", params);
-
-    Command cmd("measinfo", content, true);
-    QCOMPARE(cmd.command(), QString("measinfo"));
-    QCOMPARE(cmd.description(), QString("Get measurement info"));
-    QCOMPARE(cmd.count(), quint32(1));
-    QCOMPARE(cmd.pNames().at(0), QString("id"));
-    QCOMPARE(cmd.pDescriptions().at(0), QString("Client ID"));
+    const mne::JsonDocument doc = oneCommandDocument("measinfo", "Get measurement info", "id", "int");
+    Command cmd("measinfo", doc.object().value("commands").to_object().value("measinfo").to_object(), true);
+    QCOMPARE(cmd.command(), std::string("measinfo"));
+    QCOMPARE(cmd.description(), std::string("Get measurement info"));
+    QCOMPARE(cmd.count(), std::uint32_t(1));
+    QCOMPARE(cmd.pNames().at(0), std::string("id"));
+    QCOMPARE(cmd.pDescriptions().at(0), std::string("Client ID"));
+    QCOMPARE(cmd.pValues().at(0).typeName(), std::string("int"));
 }
 
 void TestRtServerCommands::testCommandCopy()
 {
-    QStringList names;
-    names << "x";
-    QList<QVariant> values;
-    values << QVariant(3.14);
-
-    Command original("test", "A test", names, values, true);
+    Command original("test", "A test", {"x"}, {CommandValue(3.14)}, true);
+    int executed = 0;
+    original.connectExecuted([&executed](const Command&) { ++executed; });
     Command copy(original);
-
     QCOMPARE(copy.command(), original.command());
     QCOMPARE(copy.description(), original.description());
     QCOMPARE(copy.count(), original.count());
     QCOMPARE(copy.pValues().at(0).toDouble(), 3.14);
+    copy.execute(); // callbacks belong to the original, as connections belong to a QObject
+    QCOMPARE(executed, 0);
 }
 
 void TestRtServerCommands::testCommandAssignment()
@@ -210,124 +267,75 @@ void TestRtServerCommands::testCommandAssignment()
     Command a("alpha", "First");
     Command b("beta", "Second");
     b = a;
-    QCOMPARE(b.command(), QString("alpha"));
-    QCOMPARE(b.description(), QString("First"));
+    QCOMPARE(b.command(), std::string("alpha"));
+    QCOMPARE(b.description(), std::string("First"));
 }
 
 void TestRtServerCommands::testCommandToJsonObject()
 {
-    QStringList names;
-    names << "id";
-    QList<QVariant> values;
-    values << QVariant(int(0));
-    QStringList descs;
-    descs << "Client ID";
-
-    Command cmd("measinfo", "Get info", names, values, descs, true);
-    QJsonObject json = cmd.toJsonObject();
-
-    QCOMPARE(json.value("description").toString(), QString("Get info"));
-    QVERIFY(json.contains("parameters"));
-
-    QJsonObject params = json.value("parameters").toObject();
+    Command cmd("measinfo", "Get info", {"id"}, {CommandValue("0")}, {"Client ID"}, true);
+    const mne::JsonObject json = cmd.toJsonObject();
+    QCOMPARE(json.value("description").to_std_string(), std::string("Get info"));
+    const mne::JsonObject& params = json.value("parameters").to_object();
     QVERIFY(params.contains("id"));
-    QCOMPARE(params.value("id").toObject().value("description").toString(), QString("Client ID"));
+    QCOMPARE(params.value("id").to_object().value("description").to_std_string(), std::string("Client ID"));
+    QCOMPARE(params.value("id").to_object().value("type").to_std_string(), std::string("QString"));
 }
 
 void TestRtServerCommands::testCommandToStringList()
 {
-    QStringList names;
-    names << "id";
-    QList<QVariant> values;
-    values << QVariant(int(0));
-    QStringList descs;
-    descs << "Client ID";
-
-    Command cmd("measinfo", "Get info", names, values, descs, true);
-    QStringList sl = cmd.toStringList();
-
-    QCOMPARE(sl.size(), 3);
-    QCOMPARE(sl.at(0), QString("measinfo"));
-    QVERIFY(sl.at(1).contains("Client ID"));
-    QCOMPARE(sl.at(2), QString("Get info"));
+    Command cmd("measinfo", "Get info", {"id"}, {CommandValue(0)}, {"Client ID"}, true);
+    QCOMPARE(cmd.toStringList(), (mne::StringList{"measinfo", "[Client ID]", "Get info"}));
 }
 
 void TestRtServerCommands::testCommandToStringReadySend()
 {
-    QStringList names;
-    names << "id";
-    QList<QVariant> values;
-    values << QVariant(int(42));
-
-    Command cmd("measinfo", "Get info", names, values, true);
-    QString ready = cmd.toStringReadySend();
-
-    // Format: "measinfo":{"id":"42"}
-    QVERIFY(ready.contains("measinfo"));
-    QVERIFY(ready.contains("id"));
-    QVERIFY(ready.contains("42"));
+    Command cmd("measinfo", "Get info", {"id", "alias"}, {CommandValue(42), CommandValue("x")}, true);
+    QCOMPARE(cmd.toStringReadySend(), std::string(R"("measinfo":{"id":"42","alias":"x"})"));
 }
 
 void TestRtServerCommands::testCommandSubscriptByName()
 {
-    QStringList names;
-    names << "id" << "value";
-    QList<QVariant> values;
-    values << QVariant(int(1)) << QVariant(QString("abc"));
-
-    Command cmd("set", "Set", names, values, true);
+    Command cmd("set", "Set", {"id", "value"}, {CommandValue(1), CommandValue("abc")}, true);
     QCOMPARE(cmd["id"].toInt(), 1);
-    QCOMPARE(cmd["value"].toString(), QString("abc"));
-
-    // Modify through subscript
+    QCOMPARE(cmd["value"].toString(), std::string("abc"));
     cmd["id"].setValue(99);
     QCOMPARE(cmd["id"].toInt(), 99);
+    QVERIFY(!cmd["missing"].isValid());
 }
 
 void TestRtServerCommands::testCommandSubscriptByIndex()
 {
-    QStringList names;
-    names << "x";
-    QList<QVariant> values;
-    values << QVariant(int(5));
-
-    Command cmd("get", "Get", names, values, true);
-    QCOMPARE(cmd[qint32(0)].toInt(), 5);
-
-    cmd[qint32(0)].setValue(10);
-    QCOMPARE(cmd[qint32(0)].toInt(), 10);
+    Command cmd("get", "Get", {"x"}, {CommandValue(5)}, true);
+    QCOMPARE(cmd[std::int32_t(0)].toInt(), 5);
+    cmd[std::int32_t(0)].setValue(10);
+    QCOMPARE(cmd[std::int32_t(0)].toInt(), 10);
+    QVERIFY(!cmd[std::int32_t(3)].isValid());
 }
 
 void TestRtServerCommands::testCommandConstSubscript()
 {
-    QStringList names;
-    names << "id";
-    QList<QVariant> values;
-    values << QVariant(int(7));
-
-    Command cmd("get", "Get", names, values, true);
+    Command cmd("get", "Get", {"id"}, {CommandValue(7)}, true);
     const Command& cref = cmd;
-    QVariant val = cref["id"];
-    QCOMPARE(val.toInt(), 7);
+    QCOMPARE(cref["id"].toInt(), 7);
 }
 
-void TestRtServerCommands::testCommandExecuteSignal()
+void TestRtServerCommands::testCommandExecuteCallback()
 {
     Command cmd("test", "Test");
-    QSignalSpy spy(&cmd, &Command::executed);
+    std::vector<std::string> received;
+    cmd.connectExecuted([&received](const Command& command) { received.push_back(command.command()); });
+    cmd.connectExecuted([&received](const Command&) { received.emplace_back("second"); });
     cmd.execute();
-    QCOMPARE(spy.count(), 1);
+    QCOMPARE(received, (std::vector<std::string>{"test", "second"}));
 }
 
 void TestRtServerCommands::testCommandIsJson()
 {
     Command cmd1(true);
     QVERIFY(cmd1.isJson());
-
     Command cmd2(false);
     QVERIFY(!cmd2.isJson());
-
-    // isJson returns a reference, so we can toggle it
     cmd2.isJson() = true;
     QVERIFY(cmd2.isJson());
 }
@@ -339,63 +347,60 @@ void TestRtServerCommands::testCommandIsJson()
 void TestRtServerCommands::testRawCommandDefault()
 {
     RawCommand raw;
-    QCOMPARE(raw.command(), QString(""));
-    QCOMPARE(raw.count(), quint32(0));
+    QCOMPARE(raw.command(), std::string(""));
+    QCOMPARE(raw.count(), std::uint32_t(0));
     QVERIFY(!raw.isJson());
 }
 
 void TestRtServerCommands::testRawCommandFromString_CLI()
 {
     RawCommand raw("help", false);
-    QCOMPARE(raw.command(), QString("help"));
+    QCOMPARE(raw.command(), std::string("help"));
     QVERIFY(!raw.isJson());
-    QCOMPARE(raw.count(), quint32(0));
-
-    // Add parameters manually
-    raw.pValues().append("param1");
-    raw.pValues().append("param2");
-    QCOMPARE(raw.count(), quint32(2));
-    QCOMPARE(raw.pValues().at(0), QString("param1"));
+    raw.pValues().emplace_back("param1");
+    raw.pValues().emplace_back("param2");
+    QCOMPARE(raw.count(), std::uint32_t(2));
+    QCOMPARE(raw.pValues().at(0), std::string("param1"));
 }
 
 void TestRtServerCommands::testRawCommandFromString_JSON()
 {
     RawCommand raw("measinfo", true);
-    QCOMPARE(raw.command(), QString("measinfo"));
+    QCOMPARE(raw.command(), std::string("measinfo"));
     QVERIFY(raw.isJson());
 }
 
 void TestRtServerCommands::testRawCommandCopy()
 {
     RawCommand original("test", true);
-    original.pValues().append("val1");
-
+    original.pValues().emplace_back("val1");
     RawCommand copy(original);
-    QCOMPARE(copy.command(), QString("test"));
+    QCOMPARE(copy.command(), std::string("test"));
     QVERIFY(copy.isJson());
-    QCOMPARE(copy.count(), quint32(1));
-    QCOMPARE(copy.pValues().at(0), QString("val1"));
+    QCOMPARE(copy.count(), std::uint32_t(1));
+    QCOMPARE(copy.pValues().at(0), std::string("val1"));
 }
 
 void TestRtServerCommands::testRawCommandAssignment()
 {
     RawCommand a("alpha", true);
-    a.pValues().append("x");
-
+    a.pValues().emplace_back("x");
     RawCommand b;
     b = a;
-    QCOMPARE(b.command(), QString("alpha"));
-    QCOMPARE(b.count(), quint32(1));
-    QCOMPARE(b.pValues().at(0), QString("x"));
+    QCOMPARE(b.command(), std::string("alpha"));
+    QCOMPARE(b.count(), std::uint32_t(1));
+    QCOMPARE(b.pValues().at(0), std::string("x"));
 }
 
-void TestRtServerCommands::testRawCommandExecuteSignal()
+void TestRtServerCommands::testRawCommandExecuteCallback()
 {
     RawCommand raw("test", false);
-    raw.pValues().append("p1");
-    QSignalSpy spy(&raw, &RawCommand::executed);
+    raw.pValues().emplace_back("param1");
+    raw.pValues().emplace_back("param2");
+    std::vector<std::string> received;
+    raw.connectExecuted([&received](const std::vector<std::string>& params) { received = params; });
     raw.execute();
-    QCOMPARE(spy.count(), 1);
+    QCOMPARE(received, (std::vector<std::string>{"param1", "param2"}));
 }
 
 //=============================================================================================================
@@ -406,61 +411,49 @@ void TestRtServerCommands::testCommandParserCLI()
 {
     CommandManager manager;
     manager.insert("help", "Show help");
-
     CommandParser parser;
     parser.attach(&manager);
-
-    QStringList parsed;
-    bool result = parser.parse("help", parsed);
-    QVERIFY(result);
-    QCOMPARE(parsed.size(), 1);
-    QCOMPARE(parsed.at(0), QString("help"));
+    mne::StringList parsed;
+    QVERIFY(parser.parse("help", parsed));
+    QCOMPARE(parsed, mne::StringList{"help"});
 }
 
 void TestRtServerCommands::testCommandParserJSON()
 {
     CommandManager manager;
     manager.insert("stop", "Stop");
-
     CommandParser parser;
     parser.attach(&manager);
-
-    QString jsonInput = "{\"commands\":{\"stop\":{}}}";
-    QStringList parsed;
-    bool result = parser.parse(jsonInput, parsed);
-    QVERIFY(result);
-    QCOMPARE(parsed.size(), 1);
-    QCOMPARE(parsed.at(0), QString("stop"));
+    mne::StringList parsed;
+    QVERIFY(parser.parse(R"({"commands":{"stop":{}}})", parsed));
+    QCOMPARE(parsed, mne::StringList{"stop"});
 }
 
 void TestRtServerCommands::testCommandParserEmpty()
 {
     CommandParser parser;
-    QStringList parsed;
+    mne::StringList parsed;
     QVERIFY(!parser.parse("", parsed));
+    QVERIFY(!parser.parse("{not json", parsed));
 }
 
 void TestRtServerCommands::testCommandParserUnknown()
 {
     CommandManager manager;
     manager.insert("help", "Show help");
-
     CommandParser parser;
     parser.attach(&manager);
-
-    QStringList parsed;
+    mne::StringList parsed;
     QVERIFY(!parser.parse("unknown_command", parsed));
-    QCOMPARE(parsed.size(), 0);
+    QVERIFY(parsed.empty());
 }
 
 void TestRtServerCommands::testCommandParserExists()
 {
     CommandManager manager;
     manager.insert("help", "Show help");
-
     CommandParser parser;
     parser.attach(&manager);
-
     QVERIFY(parser.exists("help"));
     QVERIFY(!parser.exists("nonexistent"));
 }
@@ -473,53 +466,38 @@ void TestRtServerCommands::testCommandManagerDefault()
 {
     CommandManager mgr;
     QVERIFY(mgr.isActive());
-    QVERIFY(mgr.commandMap().isEmpty());
+    QVERIFY(mgr.commandMap().empty());
 }
 
 void TestRtServerCommands::testCommandManagerInsertKeyDesc()
 {
     CommandManager mgr;
     mgr.insert("help", "Show help");
-
     QVERIFY(mgr.hasCommand("help"));
-    QCOMPARE(mgr["help"].command(), QString("help"));
-    QCOMPARE(mgr["help"].description(), QString("Show help"));
+    QCOMPARE(mgr["help"].command(), std::string("help"));
+    QCOMPARE(mgr["help"].description(), std::string("Show help"));
+    QVERIFY(!mgr["help"].isJson());
 }
 
 void TestRtServerCommands::testCommandManagerInsertCommand()
 {
     CommandManager mgr;
-    Command cmd("stop", "Stop acquisition");
-    mgr.insert("stop", cmd);
-
+    mgr.insert("stop", Command("stop", "Stop acquisition"));
     QVERIFY(mgr.hasCommand("stop"));
-    QCOMPARE(mgr["stop"].description(), QString("Stop acquisition"));
+    QCOMPARE(mgr["stop"].description(), std::string("Stop acquisition"));
 }
 
 void TestRtServerCommands::testCommandManagerInsertJsonDoc()
 {
-    QJsonObject idParam;
-    idParam.insert("type", QString("int"));
-    idParam.insert("description", QString("Client ID"));
-
-    QJsonObject params;
-    params.insert("id", idParam);
-
-    QJsonObject cmdContent;
-    cmdContent.insert("description", QString("Get measurement info"));
-    cmdContent.insert("parameters", params);
-
-    QJsonObject cmds;
-    cmds.insert("measinfo", cmdContent);
-
-    QJsonObject root;
-    root.insert("commands", cmds);
-    QJsonDocument doc(root);
-
-    CommandManager mgr(doc);
+    CommandManager mgr(oneCommandDocument("measinfo", "Get measurement info", "id", "int"));
     QVERIFY(mgr.hasCommand("measinfo"));
-    QCOMPARE(mgr["measinfo"].description(), QString("Get measurement info"));
-    QCOMPARE(mgr["measinfo"].count(), quint32(1));
+    QCOMPARE(mgr["measinfo"].description(), std::string("Get measurement info"));
+    QCOMPARE(mgr["measinfo"].count(), std::uint32_t(1));
+    QVERIFY(mgr["measinfo"].isJson());
+
+    // Commands already known are kept
+    mgr.insert(oneCommandDocument("measinfo", "Other", "", ""));
+    QCOMPARE(mgr["measinfo"].description(), std::string("Get measurement info"));
 }
 
 void TestRtServerCommands::testCommandManagerHasCommand()
@@ -536,33 +514,28 @@ void TestRtServerCommands::testCommandManagerClear()
     CommandManager mgr;
     mgr.insert("help", "Show help");
     mgr.insert("stop", "Stop");
-    QCOMPARE(mgr.commandMap().size(), 2);
-
+    QCOMPARE(mgr.commandMap().size(), std::size_t(2));
     mgr.clear();
-    QVERIFY(mgr.commandMap().isEmpty());
+    QVERIFY(mgr.commandMap().empty());
 }
 
 void TestRtServerCommands::testCommandManagerSubscript()
 {
     CommandManager mgr;
     mgr.insert("help", "Show help");
-
-    Command& cmd = mgr["help"];
-    QCOMPARE(cmd.command(), QString("help"));
-
+    QCOMPARE(mgr["help"].command(), std::string("help"));
     const CommandManager& constMgr = mgr;
-    Command constCmd = constMgr["help"];
-    QCOMPARE(constCmd.command(), QString("help"));
+    QCOMPARE(constMgr["help"].command(), std::string("help"));
+    QCOMPARE(constMgr["none"].command(), std::string(""));
+    QVERIFY(!mgr.hasCommand("none"));
 }
 
 void TestRtServerCommands::testCommandManagerActiveToggle()
 {
     CommandManager mgr;
     QVERIFY(mgr.isActive());
-
     mgr.setStatus(false);
     QVERIFY(!mgr.isActive());
-
     mgr.setStatus(true);
     QVERIFY(mgr.isActive());
 }
@@ -570,150 +543,102 @@ void TestRtServerCommands::testCommandManagerActiveToggle()
 void TestRtServerCommands::testCommandManagerCommandMapChanged()
 {
     CommandManager mgr;
-    QSignalSpy spy(&mgr, &CommandManager::commandMapChanged);
-
+    int changes = 0;
+    mgr.connectCommandMapChanged([&changes] { ++changes; });
     mgr.insert("help", "Show help");
-    QCOMPARE(spy.count(), 1);
-
+    QCOMPARE(changes, 1);
     mgr.insert("stop", "Stop");
-    QCOMPARE(spy.count(), 2);
+    QCOMPARE(changes, 2);
 }
 
 void TestRtServerCommands::testCommandManagerUpdate()
 {
-    // Build a manager with a command that has one int parameter
-    QStringList names;
-    names << "id";
-    QList<QVariant> values;
-    values << QVariant(int(0));
-
     CommandManager mgr;
-    Command cmd("measinfo", "Get info", names, values, true);
-    mgr.insert("measinfo", cmd);
-
-    // Create a parser and attach the manager
+    mgr.insert("measinfo", Command("measinfo", "Get info", {"id"}, {CommandValue(0)}, true));
     CommandParser parser;
     parser.attach(&mgr);
+    int executed = 0;
+    mgr["measinfo"].connectExecuted([&executed](const Command&) { ++executed; });
 
-    // Spy on the executed signal
-    QSignalSpy spy(&mgr["measinfo"], &Command::executed);
-
-    // Parse a CLI command with parameter
-    QStringList parsed;
+    mne::StringList parsed;
     parser.parse("measinfo 42", parsed);
 
-    // Check the command was executed and parameter was set
-    QCOMPARE(spy.count(), 1);
-    QCOMPARE(mgr["measinfo"][qint32(0)].toInt(), 42);
+    QCOMPARE(executed, 1);
+    QCOMPARE(mgr["measinfo"][std::int32_t(0)].toInt(), 42);
+    QVERIFY(!mgr["measinfo"].isJson()); // the dialect of the request
+}
+
+void TestRtServerCommands::testCommandManagerUpdateRejectsBadParameter()
+{
+    CommandManager mgr;
+    mgr.insert("selcon", Command("selcon", "Select", {"ConID"}, {CommandValue(0)}, true));
+    CommandParser parser;
+    parser.attach(&mgr);
+    int executed = 0;
+    mgr["selcon"].connectExecuted([&executed](const Command&) { ++executed; });
+
+    mne::StringList parsed;
+    QVERIFY(parser.parse("selcon abc", parsed)); // known command ...
+    QVERIFY(parser.parse("selcon", parsed));     // ... and too few parameters
+    QCOMPARE(executed, 0);
 }
 
 //=============================================================================================================
-// Gap-fill tests
+// Reply channels
 //=============================================================================================================
 
 void TestRtServerCommands::testCommandReply()
 {
-    // reply() emits CommandManager::response when parent is a CommandManager
     CommandManager mgr;
-    Command cmd("test", "A test");
-    mgr.insert("test", cmd);
+    mgr.insert("info", Command("info", "Get info"));
+    std::vector<std::pair<std::string, std::string>> replies;
+    mgr.connectResponse([&replies](const std::string& reply, const Command& command) { replies.emplace_back(reply, command.command()); });
+    mgr["info"].reply("result data");
+    QCOMPARE(replies.size(), std::size_t(1));
+    QCOMPARE(replies[0].first, std::string("result data"));
+    QCOMPARE(replies[0].second, std::string("info"));
 
-    QSignalSpy spy(&mgr, &CommandManager::response);
-
-    mgr["test"].reply("some reply");
-    QCOMPARE(spy.count(), 1);
-    QCOMPARE(spy.at(0).at(0).toString(), QString("some reply"));
+    Command loose("loose", "Not in a manager");
+    loose.reply("nobody listens"); // no manager, no effect
+    QCOMPARE(replies.size(), std::size_t(1));
 }
 
 void TestRtServerCommands::testCommandSend()
 {
-    // send() emits CommandManager::triggered when parent is a CommandManager
     CommandManager mgr;
-    Command cmd("test", "A test");
-    mgr.insert("test", cmd);
-
-    QSignalSpy spy(&mgr, &CommandManager::triggered);
-
-    mgr["test"].send();
-    QCOMPARE(spy.count(), 1);
+    mgr.insert("go", Command("go", "Go"));
+    std::vector<std::string> sent;
+    mgr.connectTriggered([&sent](const Command& command) { sent.push_back(command.command()); });
+    mgr["go"].send();
+    QCOMPARE(sent, std::vector<std::string>{"go"});
 }
 
 void TestRtServerCommands::testCommandParserGetRawCommand()
 {
     CommandManager mgr;
     mgr.insert("help", "Show help");
-
     CommandParser parser;
     parser.attach(&mgr);
-
-    QStringList parsed;
+    mne::StringList parsed;
     parser.parse("help", parsed);
-
-    RawCommand& raw = parser.getRawCommand();
-    QCOMPARE(raw.command(), QString("help"));
+    QCOMPARE(parser.getRawCommand().command(), std::string("help"));
 }
 
-void TestRtServerCommands::testCommandManagerFromByteArray()
+void TestRtServerCommands::testCommandManagerFromJsonText()
 {
-    QJsonObject cmdContent;
-    cmdContent.insert("description", QString("Stop acquisition"));
-    cmdContent.insert("parameters", QJsonObject());
-
-    QJsonObject cmds;
-    cmds.insert("stop", cmdContent);
-
-    QJsonObject root;
-    root.insert("commands", cmds);
-
-    QByteArray jsonBytes = QJsonDocument(root).toJson(QJsonDocument::Compact);
-    CommandManager mgr(jsonBytes);
-
+    const std::string json = oneCommandDocument("stop", "Stop acquisition", "", "").to_json(mne::JsonDocument::Compact);
+    CommandManager mgr(json);
     QVERIFY(mgr.hasCommand("stop"));
-    QCOMPARE(mgr["stop"].description(), QString("Stop acquisition"));
+    QCOMPARE(mgr["stop"].description(), std::string("Stop acquisition"));
 }
 
-void TestRtServerCommands::testCommandManagerTriggeredSignal()
-{
-    CommandManager mgr;
-    Command cmd("go", "Go");
-    mgr.insert("go", cmd);
-
-    QSignalSpy spy(&mgr, &CommandManager::triggered);
-
-    // send() on a child command emits triggered on the manager
-    mgr["go"].send();
-    QCOMPARE(spy.count(), 1);
-
-    // Verify the command in the signal
-    Command signalCmd = spy.at(0).at(0).value<Command>();
-    QCOMPARE(signalCmd.command(), QString("go"));
-}
-
-void TestRtServerCommands::testCommandManagerResponseSignal()
-{
-    CommandManager mgr;
-    Command cmd("info", "Get info");
-    mgr.insert("info", cmd);
-
-    QSignalSpy spy(&mgr, &CommandManager::response);
-
-    mgr["info"].reply("result data");
-    QCOMPARE(spy.count(), 1);
-    QCOMPARE(spy.at(0).at(0).toString(), QString("result data"));
-
-    Command signalCmd = spy.at(0).at(1).value<Command>();
-    QCOMPARE(signalCmd.command(), QString("info"));
-}
-
-void TestRtServerCommands::testCommandParserResponseSignal()
+void TestRtServerCommands::testCommandParserResponse()
 {
     CommandParser parser;
-    QSignalSpy spy(&parser, &CommandParser::response);
-
-    // The response signal can be emitted directly (it's just a signal declaration)
-    // In practice it's emitted by the manager through the observer pattern,
-    // but we can verify the signal is connectable and emittable
-    QVERIFY(spy.isValid());
+    std::vector<std::string> replies;
+    parser.connectResponse([&replies](const std::string& reply, const Command&) { replies.push_back(reply); });
+    parser.response("ok", Command("x", "y"));
+    QCOMPARE(replies, std::vector<std::string>{"ok"});
 }
 
 //=============================================================================================================
@@ -722,365 +647,172 @@ void TestRtServerCommands::testCommandParserResponseSignal()
 
 void TestRtServerCommands::testParserManagerIntegration_CLI()
 {
-    // Setup a manager with two commands
     CommandManager mgr;
     mgr.insert("help", "Show help");
-
-    QStringList names;
-    names << "value";
-    QList<QVariant> values;
-    values << QVariant(int(0));
-    Command setCmd("set", "Set value", names, values, false);
-    mgr.insert("set", setCmd);
-
+    mgr.insert("set", Command("set", "Set value", {"value"}, {CommandValue(0)}, false));
     CommandParser parser;
     parser.attach(&mgr);
 
-    // Parse a CLI help command
-    QStringList parsed;
+    mne::StringList parsed;
     QVERIFY(parser.parse("help", parsed));
-    QCOMPARE(parsed.at(0), QString("help"));
+    QCOMPARE(parsed.at(0), std::string("help"));
 
-    // Parse a CLI set command with parameter
-    parsed.clear();
     QVERIFY(parser.parse("set 100", parsed));
-    QCOMPARE(parsed.at(0), QString("set"));
-    QCOMPARE(mgr["set"][qint32(0)].toInt(), 100);
+    QCOMPARE(parsed, mne::StringList{"set"});
+    QCOMPARE(mgr["set"][std::int32_t(0)].toInt(), 100);
 }
 
 void TestRtServerCommands::testParserManagerIntegration_JSON()
 {
-    // Setup manager
-    QStringList names;
-    names << "id";
-    QList<QVariant> values;
-    values << QVariant(int(0));
-
     CommandManager mgr;
-    Command cmd("measinfo", "Get info", names, values, true);
-    mgr.insert("measinfo", cmd);
-
+    mgr.insert("measinfo", Command("measinfo", "Get info", {"id"}, {CommandValue(0)}, false));
     CommandParser parser;
     parser.attach(&mgr);
+    int executed = 0;
+    mgr["measinfo"].connectExecuted([&executed](const Command&) { ++executed; });
 
-    QSignalSpy spy(&mgr["measinfo"], &Command::executed);
-
-    // Parse JSON command
-    QString jsonInput = "{\"commands\":{\"measinfo\":{\"id\":\"7\"}}}";
-    QStringList parsed;
-    QVERIFY(parser.parse(jsonInput, parsed));
-    QCOMPARE(parsed.at(0), QString("measinfo"));
-    QCOMPARE(spy.count(), 1);
+    mne::StringList parsed;
+    QVERIFY(parser.parse(R"({"commands":{"measinfo":{"id":"7"}}})", parsed));
+    QCOMPARE(parsed, mne::StringList{"measinfo"});
+    QCOMPARE(executed, 1);
     QCOMPARE(mgr["measinfo"]["id"].toInt(), 7);
+    QVERIFY(mgr["measinfo"].isJson());
 }
 
 //=============================================================================================================
-
-//=============================================================================================================
-// Command edge cases
-//=============================================================================================================
-
-void TestRtServerCommands::testCommandDirectMemberAccess()
-{
-    Command cmd("test", "A test command");
-    // Public members should be directly accessible
-    QCOMPARE(cmd.m_sCommand, QString("test"));
-    QCOMPARE(cmd.m_sDescription, QString("A test command"));
-    QVERIFY(cmd.m_qListParamNames.isEmpty());
-    QVERIFY(cmd.m_qListParamValues.isEmpty());
-    QVERIFY(cmd.m_qListParamDescriptions.isEmpty());
-    QVERIFY(cmd.m_bIsJson);
-}
-
+// Edge cases
 //=============================================================================================================
 
 void TestRtServerCommands::testCommandReserializeRoundTrip()
 {
-    // Build a command with params
-    QStringList names = {"id", "value"};
-    QList<QVariant> values = {QVariant(42), QVariant(QString("hello"))};
-    QStringList descs = {"Client ID", "Setting value"};
-
-    Command original("set", "Set a value", names, values, descs, true);
-
-    // Serialize to JSON
-    QJsonObject json = original.toJsonObject();
-
-    // Reconstruct from JSON
-    Command reconstructed("set", json, true);
-
+    Command original("set", "Set a value", {"id", "value"}, {CommandValue(42), CommandValue("hello")}, {"Client ID", "Setting value"}, true);
+    Command reconstructed("set", original.toJsonObject(), true);
     QCOMPARE(reconstructed.command(), original.command());
     QCOMPARE(reconstructed.description(), original.description());
     QCOMPARE(reconstructed.count(), original.count());
-    QCOMPARE(reconstructed.pNames().size(), original.pNames().size());
-    QCOMPARE(reconstructed.pDescriptions().at(0), QString("Client ID"));
+    QCOMPARE(reconstructed.pNames(), original.pNames());
+    QCOMPARE(reconstructed.pDescriptions().at(0), std::string("Client ID"));
+    QCOMPARE(reconstructed.pValues().at(0).typeName(), std::string("int"));
+    QCOMPARE(reconstructed.pValues().at(1).typeName(), std::string("QString"));
 }
-
-//=============================================================================================================
 
 void TestRtServerCommands::testCommandEmptyParamsToJson()
 {
     Command cmd("help", "Show help", true);
-    QJsonObject json = cmd.toJsonObject();
-
-    QCOMPARE(json.value("description").toString(), QString("Show help"));
-    QJsonObject params = json.value("parameters").toObject();
-    QVERIFY(params.isEmpty());
+    const mne::JsonObject json = cmd.toJsonObject();
+    QCOMPARE(json.value("description").to_std_string(), std::string("Show help"));
+    QVERIFY(json.value("parameters").is_object());
+    QVERIFY(json.value("parameters").to_object().empty());
 }
-
-//=============================================================================================================
 
 void TestRtServerCommands::testCommandMultipleParamTypes()
 {
-    QStringList names = {"intParam", "floatParam", "stringParam", "boolParam"};
-    QList<QVariant> values = {QVariant(100), QVariant(3.14), QVariant(QString("text")), QVariant(true)};
-
-    Command cmd("multi", "Multi-type params", names, values, true);
-    QCOMPARE(cmd.count(), quint32(4));
+    Command cmd("multi", "Multi-type params", {"intParam", "floatParam", "stringParam", "boolParam"},
+                {CommandValue(100), CommandValue(3.14), CommandValue("text"), CommandValue(true)}, true);
+    QCOMPARE(cmd.count(), std::uint32_t(4));
     QCOMPARE(cmd["intParam"].toInt(), 100);
-    QVERIFY(qAbs(cmd["floatParam"].toDouble() - 3.14) < 0.001);
-    QCOMPARE(cmd["stringParam"].toString(), QString("text"));
+    QVERIFY(std::abs(cmd["floatParam"].toDouble() - 3.14) < 0.001);
+    QCOMPARE(cmd["stringParam"].toString(), std::string("text"));
     QCOMPARE(cmd["boolParam"].toBool(), true);
-
-    // toStringReadySend should include all params
-    QString ready = cmd.toStringReadySend();
-    QVERIFY(ready.contains("multi"));
-    QVERIFY(ready.contains("intParam"));
-    QVERIFY(ready.contains("100"));
+    const std::string ready = cmd.toStringReadySend();
+    QVERIFY(contains(ready, "\"intParam\":\"100\""));
+    QVERIFY(contains(ready, "\"boolParam\":\"true\""));
 }
-
-//=============================================================================================================
-
-void TestRtServerCommands::testCommandExecuteSignalPayload()
-{
-    Command cmd("test", "Test");
-    QSignalSpy spy(&cmd, &Command::executed);
-    cmd.execute();
-    QCOMPARE(spy.count(), 1);
-
-    // The signal carries the command itself
-    Command signalCmd = spy.at(0).at(0).value<Command>();
-    QCOMPARE(signalCmd.command(), QString("test"));
-}
-
-//=============================================================================================================
-// RawCommand edge cases
-//=============================================================================================================
-
-void TestRtServerCommands::testRawCommandMultipleParams()
-{
-    RawCommand raw("set", false);
-    raw.pValues().append("100");
-    raw.pValues().append("200");
-    raw.pValues().append("300");
-    QCOMPARE(raw.count(), quint32(3));
-    QCOMPARE(raw.pValues().at(0), QString("100"));
-    QCOMPARE(raw.pValues().at(2), QString("300"));
-}
-
-//=============================================================================================================
-
-void TestRtServerCommands::testRawCommandExecuteSignalPayload()
-{
-    RawCommand raw("test", false);
-    raw.pValues().append("param1");
-    raw.pValues().append("param2");
-
-    QSignalSpy spy(&raw, &RawCommand::executed);
-    raw.execute();
-    QCOMPARE(spy.count(), 1);
-
-    // The signal carries parameter list
-    QList<QString> params = spy.at(0).at(0).value<QList<QString>>();
-    QCOMPARE(params.size(), 2);
-    QCOMPARE(params.at(0), QString("param1"));
-}
-
-//=============================================================================================================
 
 void TestRtServerCommands::testRawCommandCopyIndependence()
 {
     RawCommand original("test", true);
-    original.pValues().append("val");
-
+    original.pValues().emplace_back("val");
     RawCommand copy(original);
-    copy.pValues().append("extra");
-
-    // Original should be unaffected
-    QCOMPARE(original.count(), quint32(1));
-    QCOMPARE(copy.count(), quint32(2));
+    copy.pValues().emplace_back("extra");
+    QCOMPARE(original.count(), std::uint32_t(1));
+    QCOMPARE(copy.count(), std::uint32_t(2));
 }
-
-//=============================================================================================================
-// CommandManager edge cases
-//=============================================================================================================
 
 void TestRtServerCommands::testCommandManagerOverwriteCommand()
 {
     CommandManager mgr;
     mgr.insert("test", "First description");
-    QCOMPARE(mgr["test"].description(), QString("First description"));
-
-    // Overwrite with new description
+    int executed = 0;
+    mgr["test"].connectExecuted([&executed](const Command&) { ++executed; });
     mgr.insert("test", "Second description");
-    QCOMPARE(mgr["test"].description(), QString("Second description"));
-
-    // Should still be only 1 command
-    QCOMPARE(mgr.commandMap().size(), 1);
+    QCOMPARE(mgr["test"].description(), std::string("Second description"));
+    QCOMPARE(mgr.commandMap().size(), std::size_t(1));
+    mgr["test"].execute(); // the callbacks stay with the stored command
+    QCOMPARE(executed, 1);
 }
-
-//=============================================================================================================
 
 void TestRtServerCommands::testCommandManagerInsertMultipleFromJson()
 {
-    // Build JSON doc with multiple commands
-    QJsonObject cmd1Content;
-    cmd1Content.insert("description", QString("Start acquisition"));
-    cmd1Content.insert("parameters", QJsonObject());
-
-    QJsonObject cmd2Content;
-    cmd2Content.insert("description", QString("Stop acquisition"));
-    cmd2Content.insert("parameters", QJsonObject());
-
-    QJsonObject cmd3Content;
-    cmd3Content.insert("description", QString("Show help"));
-    cmd3Content.insert("parameters", QJsonObject());
-
-    QJsonObject cmds;
-    cmds.insert("start", cmd1Content);
-    cmds.insert("stop", cmd2Content);
-    cmds.insert("help", cmd3Content);
-
-    QJsonObject root;
-    root.insert("commands", cmds);
-    QJsonDocument doc(root);
-
-    CommandManager mgr(doc);
-    QCOMPARE(mgr.commandMap().size(), 3);
+    mne::JsonObject commands;
+    commands.insert("start", mne::JsonObject{{"description", "Start acquisition"}, {"parameters", mne::JsonObject()}});
+    commands.insert("stop", mne::JsonObject{{"description", "Stop acquisition"}, {"parameters", mne::JsonObject()}});
+    commands.insert("help", mne::JsonObject{{"description", "Show help"}, {"parameters", mne::JsonObject()}});
+    CommandManager mgr(mne::JsonDocument(mne::JsonObject{{"commands", commands}}));
+    QCOMPARE(mgr.commandMap().size(), std::size_t(3));
     QVERIFY(mgr.hasCommand("start"));
     QVERIFY(mgr.hasCommand("stop"));
     QVERIFY(mgr.hasCommand("help"));
-    QCOMPARE(mgr["start"].description(), QString("Start acquisition"));
+    QCOMPARE(mgr["start"].description(), std::string("Start acquisition"));
 }
-
-//=============================================================================================================
 
 void TestRtServerCommands::testCommandManagerInactiveSkipsParsing()
 {
     CommandManager mgr;
     mgr.insert("help", "Show help");
-
     CommandParser parser;
     parser.attach(&mgr);
-
-    // Deactivate the manager
     mgr.setStatus(false);
-    QVERIFY(!mgr.isActive());
-
-    QSignalSpy spy(&mgr["help"], &Command::executed);
-
-    // Parse should succeed (parser finds command) but manager won't execute
-    QStringList parsed;
-    parser.parse("help", parsed);
-    // Command should NOT have been executed because manager is inactive
-    QCOMPARE(spy.count(), 0);
+    int executed = 0;
+    mgr["help"].connectExecuted([&executed](const Command&) { ++executed; });
+    mne::StringList parsed;
+    QVERIFY(parser.parse("help", parsed));
+    QCOMPARE(executed, 0);
 }
-
-//=============================================================================================================
-
-void TestRtServerCommands::testCommandManagerCommandMapAccess()
-{
-    CommandManager mgr;
-    mgr.insert("alpha", "First");
-    mgr.insert("beta", "Second");
-    mgr.insert("gamma", "Third");
-
-    QMap<QString, Command>& map = mgr.commandMap();
-    QCOMPARE(map.size(), 3);
-    QVERIFY(map.contains("alpha"));
-    QVERIFY(map.contains("beta"));
-    QVERIFY(map.contains("gamma"));
-    QCOMPARE(map["alpha"].description(), QString("First"));
-}
-
-//=============================================================================================================
-// CommandParser edge cases
-//=============================================================================================================
 
 void TestRtServerCommands::testCommandParserMultipleSequentialParses()
 {
     CommandManager mgr;
     mgr.insert("help", "Show help");
     mgr.insert("stop", "Stop");
-
     CommandParser parser;
     parser.attach(&mgr);
-
-    QStringList parsed;
-
-    // Parse help
+    mne::StringList parsed;
     QVERIFY(parser.parse("help", parsed));
-    QCOMPARE(parsed.size(), 1);
-    QCOMPARE(parsed.at(0), QString("help"));
-
-    // Parse stop
-    parsed.clear();
+    QCOMPARE(parsed, mne::StringList{"help"});
     QVERIFY(parser.parse("stop", parsed));
-    QCOMPARE(parsed.size(), 1);
-    QCOMPARE(parsed.at(0), QString("stop"));
-
-    // Parse help again
-    parsed.clear();
+    QCOMPARE(parsed, mne::StringList{"stop"});
     QVERIFY(parser.parse("help", parsed));
-    QCOMPARE(parsed.at(0), QString("help"));
+    QCOMPARE(parsed, mne::StringList{"help"});
 }
-
-//=============================================================================================================
 
 void TestRtServerCommands::testCommandParserCLIWithMultipleParams()
 {
-    QStringList names = {"x", "y", "z"};
-    QList<QVariant> values = {QVariant(int(0)), QVariant(int(0)), QVariant(int(0))};
-
     CommandManager mgr;
-    Command cmd("move", "Move to position", names, values, false);
-    mgr.insert("move", cmd);
-
+    mgr.insert("move", Command("move", "Move to position", {"x", "y", "z"}, {CommandValue(0), CommandValue(0), CommandValue(0)}, false));
     CommandParser parser;
     parser.attach(&mgr);
-
-    QStringList parsed;
+    mne::StringList parsed;
     QVERIFY(parser.parse("move 10 20 30", parsed));
-    QCOMPARE(parsed.at(0), QString("move"));
-    QCOMPARE(mgr["move"][qint32(0)].toInt(), 10);
-    QCOMPARE(mgr["move"][qint32(1)].toInt(), 20);
-    QCOMPARE(mgr["move"][qint32(2)].toInt(), 30);
+    QCOMPARE(mgr["move"][std::int32_t(0)].toInt(), 10);
+    QCOMPARE(mgr["move"][std::int32_t(1)].toInt(), 20);
+    QCOMPARE(mgr["move"][std::int32_t(2)].toInt(), 30);
 }
-
-//=============================================================================================================
 
 void TestRtServerCommands::testCommandParserJsonWithMultipleCommands()
 {
     CommandManager mgr;
     mgr.insert("start", "Start");
     mgr.insert("stop", "Stop");
-
     CommandParser parser;
     parser.attach(&mgr);
-
-    // JSON with multiple commands
-    QString jsonInput = "{\"commands\":{\"start\":{},\"stop\":{}}}";
-    QStringList parsed;
-    QVERIFY(parser.parse(jsonInput, parsed));
-    QCOMPARE(parsed.size(), 2);
-    QVERIFY(parsed.contains("start"));
-    QVERIFY(parsed.contains("stop"));
+    mne::StringList parsed;
+    QVERIFY(parser.parse(R"({"commands":{"stop":{},"start":{}}})", parsed));
+    QCOMPARE(parsed, (mne::StringList{"start", "stop"})); // in key order, as QJsonObject iterates
 }
 
 //=============================================================================================================
 // MAIN
-//=============================================================================================================
-
 //=============================================================================================================
 
 QTEST_GUILESS_MAIN(TestRtServerCommands)

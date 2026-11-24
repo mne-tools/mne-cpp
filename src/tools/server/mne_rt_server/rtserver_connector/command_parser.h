@@ -19,7 +19,7 @@
  *
  * Two wire dialects are accepted on the same entry point. CLI input is
  * whitespace-tokenised into a command keyword plus string arguments;
- * JSON input is decoded with @c QJsonDocument and may contain either a
+ * JSON input is decoded with @c mne::JsonDocument and may contain either a
  * single command object or an array of commands, allowing batched
  * requests in one round-trip. In either case the result is the same
  * untyped @ref RTSERVER::RawCommand handed to the observers — the type-aware
@@ -28,8 +28,8 @@
  *
  * @c parse() returns @c true when at least one observer claimed the
  * input and additionally records the names of the recognised commands
- * in @c p_qListCommandsParsed; the @c response(QString, Command) signal
- * is the reverse channel used by managers to push reply text back to
+ * in @c p_qListCommandsParsed; the @c response callbacks (see
+ * @c connectResponse) are the reverse channel used by managers to push reply text back to
  * whichever socket originally produced the request.
  */
 
@@ -43,16 +43,17 @@
 #include "rtserver_connector_global.h"
 #include "raw_command.h"
 #include "command.h"
-
 #include "observer_pattern.h"
 
+#include <mne/base/string_utils.h>
+
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QObject>
-#include <QVector>
-#include <QMultiMap>
+#include <functional>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTSERVER
@@ -63,68 +64,61 @@ namespace RTSERVER
 
 //=============================================================================================================
 /**
- * @brief Observer-pattern subject that decodes JSON or CLI command strings into @ref RawCommand and notifies attached managers.
- *
- * Single entry point @c parse() accepts either dialect, builds a
- * @ref RawCommand, and broadcasts it to every attached
- * @ref CommandManager; the @c response signal carries replies back from
- * whichever manager handled the request so the caller (the server's
- * command thread) can forward them to the originating socket.
+ * @brief Parses JSON or CLI command input into a @ref RawCommand and notifies the attached managers.
  */
-class RTSERVER_CONNECTOR_EXPORT CommandParser : public QObject, public Subject
+class RTSERVER_CONNECTOR_EXPORT CommandParser : public Subject
 {
-    Q_OBJECT
-
 public:
-    //=========================================================================================================
-    /**
-     * Default constructor
-     *
-     * @param[in] parent     Parent QObject (optional).
-     */
-    explicit CommandParser(QObject* parent = nullptr);
+    /** Called with a reply and the command it answers. */
+    using ResponseCallback = std::function<void(const std::string& reply, const Command&)>;
+
+    CommandParser() = default;
 
     //=========================================================================================================
     /**
-     * Checks if a command exists
+     * @param[in] p_sCommand     Command keyword.
      *
-     * @param[in] p_sCommand     Command to check.
-     *
-     * @return true if command exists, false otherwise.
+     * @return Whether one of the attached managers knows the command.
      */
-    bool exists(const QString& p_sCommand);
+    bool exists(const std::string& p_sCommand);
 
     //=========================================================================================================
     /**
-     * Parses a CLI command or JSON command (list) and notifies all attached observers (command managers)
+     * Parses the input and notifies the attached managers of every known command.
      *
-     * @param[in] p_sInput               Input to parse.
-     * @param[out] p_qListCommandsParsed  List of parsed commands.
+     * @param[in] p_sInput               JSON ("{...}") or CLI input.
+     * @param[out] p_qListCommandsParsed The keywords of the known commands of the input.
      *
-     * @return false if the input is empty, malformed JSON or an unknown CLI command, true otherwise.
+     * @return False if the input is empty, invalid or (CLI) names an unknown command.
      */
-    bool parse(const QString& p_sInput, QStringList& p_qListCommandsParsed);
+    bool parse(const std::string& p_sInput, mne::StringList& p_qListCommandsParsed);
 
     //=========================================================================================================
     /**
-     * Returns the stored RawCommand
-     *
-     * @return the stored RawCommand.
+     * @return The raw command parsed last.
      */
     inline RawCommand& getRawCommand();
 
-signals:
     //=========================================================================================================
     /**
-     * Response channel which is used by attached observers (command managers) to send data back to subject
+     * Registers a callback of @ref response.
      *
-     *@param[in] p_sResponse     Observer response/data.
-     *@param[in] p_command       Command which send the response
+     * @param[in] callback   Called with every reply.
      */
-    void response(QString p_sResponse, Command p_command);
+    void connectResponse(ResponseCallback callback);
+
+    //=========================================================================================================
+    /**
+     * Passes a reply to the registered response callbacks.
+     *
+     * @param[in] p_sResponse    Reply text.
+     * @param[in] p_command      The command replied to.
+     */
+    void response(const std::string& p_sResponse, const Command& p_command);
 
 private:
-    RawCommand m_rawCommand;
+    RawCommand m_rawCommand;                  /**< The raw command parsed last. */
+    std::vector<ResponseCallback> m_response; /**< Callbacks of @ref response. */
 };
 
 //=============================================================================================================
@@ -135,6 +129,7 @@ RawCommand& CommandParser::getRawCommand()
 {
     return m_rawCommand;
 }
+
 } // NAMESPACE
 
 #endif // COMMANDPARSER_H

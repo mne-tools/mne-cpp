@@ -21,22 +21,18 @@
 
 #include <rtserver_connector/command_parser.h>
 #include <rtserver_connector/command_manager.h>
-
 #include <mne/com/tcp_server.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QObject>
-#include <QStringList>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <cstdint>
+#include <memory>
+#include <mutex>
+#include <string>
 #include <thread>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTSERVER
@@ -49,119 +45,90 @@ namespace RTSERVER
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class CommandThread;
+
 //=============================================================================================================
 /**
- * Command Server which manages command connections in seperate threads. A listener thread accepts the clients
- * and hands every connection to the thread of the server, which starts a CommandThread for it.
- *
- * @brief CommandServer manages threaded command connections
+ * @brief The command port: accepts command clients and runs their commands, one at a time, through the parser.
  */
-class CommandServer : public QObject
+class CommandServer
 {
-    Q_OBJECT
-
 public:
-    //=========================================================================================================
-    /**
-     * Constructs a CommandServer
-     *
-     * @param[in] parent         Parent QObject (optional).
-     */
-    CommandServer(QObject* parent = 0);
+    CommandServer();
+
+    CommandServer(const CommandServer&) = delete;
+    CommandServer& operator=(const CommandServer&) = delete;
+
+    ~CommandServer();
 
     //=========================================================================================================
     /**
-     * Destructor
-     */
-    virtual ~CommandServer();
-
-    //=========================================================================================================
-    /**
-     * Returns the command parser.
-     *
-     * @return the command parser.
+     * @return The parser the registered command managers observe.
      */
     inline RTSERVER::CommandParser& getCommandParser();
 
     //=========================================================================================================
     /**
-     * Starts listening for command clients on all interfaces.
+     * Listens on all interfaces and accepts clients in a thread of its own.
      *
-     * @param[in] port       Port to listen on.
-     * @param[out] error     Why the server does not listen, if it does not.
+     * @param[in] port       Port, 0 for any free one.
+     * @param[out] error     The reason if the server cannot listen.
      *
-     * @return Whether the server listens.
+     * @return True if the server listens.
      */
-    bool listen(std::uint16_t port, QString& error);
+    bool listen(std::uint16_t port, std::string& error);
 
     //=========================================================================================================
     /**
-     * Returns the port the server listens on.
-     *
-     * @return the port, 0 if the server does not listen.
+     * @return The port the server listens on, 0 if it does not.
      */
     std::uint16_t serverPort() const;
 
     //=========================================================================================================
     /**
-     * Slot which is called when a new command is available.
+     * Parses and runs a command; called in the thread of the client.
      *
-     * @param[in] p_sCommand     Raw command.
-     * @param[in] p_iThreadID    ID of the thread which received the command.
+     * @param[in] p_sCommand     The command.
+     * @param[in] p_iThreadID    ID of the client thread the reply goes to.
      */
-    void incommingCommand(QString p_sCommand, qint32 p_iThreadID);
+    void incommingCommand(const std::string& p_sCommand, std::int32_t p_iThreadID);
 
     //=========================================================================================================
     /**
-     * Registers a CommandManager (Observer) at CommandParser (Subject) to include in the chain of notifications
+     * Attaches a command manager to the parser and routes its replies to the clients.
      *
-     * @param[in] p_commandManager   Command Manager to register.
+     * @param[in] p_commandManager   The manager; must outlive the server's clients.
      */
     void registerCommandManager(RTSERVER::CommandManager& p_commandManager);
 
     //=========================================================================================================
     /**
-     * Is called to prepare the reply
+     * Sends a reply to the client whose command is running.
      *
-     * @param[in] p_sReply   The reply which should be send back.
-     * @param[in] p_command  Comman which evoked the reply.
+     * @param[in] p_sReply   Reply text.
+     * @param[in] p_command  The command replied to.
      */
-    void prepareReply(QString p_sReply, RTSERVER::Command p_command);
-
-signals:
-    //=========================================================================================================
-    /**
-     * Reply to a command
-     *
-     * @param[in] p_blockReply   The reply data.
-     * @param[in] p_iID          ID of the client thread to identify the target.
-     */
-    void replyCommand(QString p_blockReply, qint32 p_iID);
+    void prepareReply(const std::string& p_sReply, const RTSERVER::Command& p_command);
 
     //=========================================================================================================
     /**
-     * Signal which triggers closing all command clients
+     * Stops accepting clients and disconnects all clients.
      */
-    void closeCommandThreads();
+    void close();
 
 private:
-    //=========================================================================================================
-    /**
-     * Starts a CommandThread for a new connection.
-     *
-     * @param[in] socket     The accepted connection.
-     */
     void incomingConnection(mne::TcpSocket socket);
 
-    qint32 m_iThreadCount; /**< Is incresed each time a new command client connects to mne_rt_server. */
+    void replyCommand(const std::string& p_blockReply, std::int32_t p_iID);
 
-    RTSERVER::CommandParser m_commandParser; /**< Command parser. */
-
-    //    QMultiMap<QString, qint32> m_qMultiMapCommandThreadID;//This is need when commands are processed by different threads; currently its only one command per time processed by one thread --> m_iCurrentCommandThreadID
-    qint32 m_iCurrentCommandThreadID; /**< Command Thread ID of the current command. */
-
-    std::uint16_t m_iPort;   /**< The port the server listens on, 0 if it does not. */
-    std::jthread m_listener; /**< Accepts the clients; declared last so it stops first. */
+    std::int32_t m_iThreadCount;                           /**< Is incresed each time a new command client connects to mne_rt_server. */
+    RTSERVER::CommandParser m_commandParser;               /**< Command parser. */
+    std::int32_t m_iCurrentCommandThreadID;                /**< Command Thread ID of the current command. */
+    std::uint16_t m_iPort;                                 /**< The port the server listens on, 0 if it does not. */
+    std::mutex m_commandMutex;                             /**< Runs one command at a time. */
+    std::mutex m_threadsMutex;                             /**< Guards m_threads and m_iThreadCount. */
+    std::vector<std::unique_ptr<CommandThread>> m_threads; /**< The client threads. */
+    std::jthread m_listener;                               /**< Accepts the clients. */
 };
 
 //=============================================================================================================
@@ -172,6 +139,7 @@ inline RTSERVER::CommandParser& CommandServer::getCommandParser()
 {
     return m_commandParser;
 }
+
 } // NAMESPACE
 
 #endif //INSTRUCTIONSERVER_H

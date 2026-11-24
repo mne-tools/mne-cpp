@@ -2,31 +2,5 @@
 # Copyright (c) 2026 MNE-CPP Authors
 #   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mne_rt_server_plugins)
-if(WIN32)
-  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-endif()
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mne_rt_server_plugins)
-if(WIN32)
-  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
-  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
-endif()
-
-if(WIN32)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mne_rt_server_plugins)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mne_rt_server_plugins)
-endif()
-
-set(CMAKE_SHARED_LIBRARY_PREFIX "")
-set(CMAKE_STATIC_LIBRARY_PREFIX "")
-
-# Plugins live one level below the executables, so libraries that mne_rt_server itself does not link (e.g.
-# libmne_acq_fiff) must be found relative to the plugin.
-if(APPLE)
-  list(APPEND CMAKE_INSTALL_RPATH "@loader_path/../../lib")
-elseif(UNIX)
-  list(APPEND CMAKE_INSTALL_RPATH "\${ORIGIN}/../../lib")
-endif()
-
+# The connectors are linked into mne_rt_server, which creates them directly.
 add_subdirectory(fiffsimulator)

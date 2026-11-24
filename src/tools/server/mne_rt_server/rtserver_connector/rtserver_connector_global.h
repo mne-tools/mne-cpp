@@ -14,21 +14,24 @@
 #define RTSERVER_CONNECTOR_GLOBAL_H
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtGlobal>
-
-//=============================================================================================================
 // DEFINES
 //=============================================================================================================
 
 #if defined(STATICBUILD)
 #define RTSERVER_CONNECTOR_EXPORT
-#elif defined(RTSERVER_CONNECTOR_LIBRARY)
-#define RTSERVER_CONNECTOR_EXPORT Q_DECL_EXPORT /**< Exported when building the library. */
+#elif defined(_WIN32)
+#if defined(RTSERVER_CONNECTOR_LIBRARY)
+#define RTSERVER_CONNECTOR_EXPORT __declspec(dllexport) /**< Exported when building the library. */
 #else
-#define RTSERVER_CONNECTOR_EXPORT Q_DECL_IMPORT /**< Imported by the server and its plugins. */
+#define RTSERVER_CONNECTOR_EXPORT __declspec(dllimport) /**< Imported by the server and its connectors. */
+#endif
+#else
+#define RTSERVER_CONNECTOR_EXPORT __attribute__((visibility("default"))) /**< Default visibility on ELF/Mach-O. */
+#endif
+
+// Exported classes hold standard-library members and share their ABI with clients built by the same compiler.
+#if defined(_MSC_VER)
+#pragma warning(disable : 4251 4275)
 #endif
 
 #endif // RTSERVER_CONNECTOR_GLOBAL_H

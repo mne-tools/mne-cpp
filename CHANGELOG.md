@@ -264,6 +264,11 @@ aliases; replace the old spelling as below.
   anti-aliased triangle edges and in the font of the time stamp.
 - `mne_acq` is standard C++; only its `view` command, built with the display
   library, uses Qt Widgets.
+- `mne_rt_server` is standard C++ on `mne_com` sockets and threads. The FIFF
+  simulator is built in instead of being loaded as a Qt plugin, so the
+  `mne_rt_server_plugins` folder is gone; commands and wire protocol are
+  unchanged, and replies go out when a command finishes instead of on the
+  next 100 ms poll.
 - A default-constructed `FiffInfo` left `proj_id` and the microseconds of
   `meas_date` uninitialised, so the raw files the converters write differed
   from run to run in `FIFF_PROJ_ID`. They start as -1 and 0.

@@ -9,10 +9,10 @@
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     July, 2012
- * @brief    Interface of the mne_rt_server connector plugins.
+ * @brief    Interface of the mne_rt_server connectors.
  *
- * It lives in its own shared library, linked by the server and by every plugin, so all of them share one
- * IConnector type and meta-object; the server connects to its signals and slots by member pointer.
+ * It lives in its own library, shared by the server and its connectors. The server creates the known connectors
+ * directly and receives their measurement info and raw buffers through callbacks.
  */
 
 #ifndef RTSERVER_ICONNECTOR_H
@@ -24,24 +24,24 @@
 
 #include "rtserver_connector_global.h"
 
+#include <mne/base/json.h>
 #include <mne/fiff/fiff_info.h>
 #include <rtserver_connector/command_manager.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QThread>
-#include <QtPlugin>
-#include <QByteArray>
-#include <QStringList>
-#include <QJsonObject>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cstdint>
+#include <functional>
+#include <memory>
+#include <mutex>
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTSERVER
@@ -54,9 +54,8 @@ namespace RTSERVER
 // ENUMERATIONS
 //=============================================================================================================
 
-//=========================================================================================================
 /**
- * Identifies a connector plugin; every new connector adds its id here.
+ * Connector IDs
  */
 enum ConnectorID
 {
@@ -70,131 +69,142 @@ enum ConnectorID
 
 inline constexpr auto RAW_BUFFFER_SIZE = 10;
 
-//=========================================================================================================
+//=============================================================================================================
 /**
- * The IConnector class is the interface class for all connectors.
+ * @brief Interface of a data source of mne_rt_server.
  *
- * @brief The IConnector class is the interface class of all plugins.
+ * A connector produces the measurement info on request and raw buffers while it runs; both reach the server through
+ * the callbacks set with @ref setMeasInfoCallback and @ref setRawBufferCallback, possibly from the connector's own
+ * thread.
  */
-class RTSERVER_CONNECTOR_EXPORT IConnector : public QThread
+class RTSERVER_CONNECTOR_EXPORT IConnector
 {
-    Q_OBJECT
-
 public:
-    //=========================================================================================================
-    /**
-     * Creates the IConnector.
-     */
+    /** Receives the measurement info requested for the FiffStreamClient with the given ID. */
+    using MeasInfoCallback = std::function<void(std::int32_t, const mne::FiffInfo&)>;
+    /** Receives a raw buffer (channels x samples). */
+    using RawBufferCallback = std::function<void(std::shared_ptr<const Eigen::MatrixXf>)>;
+
     IConnector();
 
-    //=========================================================================================================
-    /**
-     * Destroys the IConnector.
-     */
-    ~IConnector() override;
+    IConnector(const IConnector&) = delete;
+    IConnector& operator=(const IConnector&) = delete;
+
+    virtual ~IConnector();
 
     //=========================================================================================================
     /**
-     * Returns the CommandManager
-     *
-     * @return the CommandManager.
+     * @return The command manager of the connector.
      */
     inline RTSERVER::CommandManager& getCommandManager();
 
     //=========================================================================================================
     /**
-     * Connects the command manager to the available slots.
+     * Connects the commands of the command manager to the handlers of the connector.
      */
     virtual void connectCommandManager() = 0;
 
     //=========================================================================================================
     /**
-     * Returns the unique connector id
-     * Pure virtual method.
-     *
-     * @return the connector ID.
+     * @return The connector ID.
      */
     virtual ConnectorID getConnectorID() const = 0;
 
     //=========================================================================================================
     /**
-     * Returns the plugin name.
-     * Pure virtual method.
-     *
-     * @return the name of plugin.
+     * @return The connector name.
      */
     virtual const char* getName() const = 0;
 
     //=========================================================================================================
     /**
-     * Returns the activation status of the plugin.
-     *
-     * @return true if plugin is activated.
+     * @return The JSON description of the connector, with the "commands" it understands.
+     */
+    virtual const char* getMetaData() const = 0;
+
+    //=========================================================================================================
+    /**
+     * @return Whether the connector is the active one.
      */
     inline bool isActive() const;
 
     //=========================================================================================================
     /**
-     * Starts the IConnector.
-     * Pure virtual method.
+     * Starts the acquisition.
      *
-     * @return true if successful, false otherwise.
+     * @return True if the acquisition started.
      */
-    virtual bool start() = 0; // = 0 call is not longer possible - it has to be reimplemented in child;
+    virtual bool start() = 0;
 
     //=========================================================================================================
     /**
-     * Stops the AbstractPlugin.
-     * Pure virtual method.
+     * Stops the acquisition.
      *
-     * @return true if success, false otherwise.
+     * @return True if the acquisition stopped.
      */
     virtual bool stop() = 0;
 
     //=========================================================================================================
     /**
-     * Sets itsmeta data of the plugin after it was laoded by the pluginmanager.
-     *
-     * @param[in] status the new activation status of the plugin.
+     * @param[in] p_MetaData     The meta data of the connector.
      */
-    inline void setMetaData(QJsonObject& p_MetaData);
+    inline void setMetaData(const mne::JsonObject& p_MetaData);
 
     //=========================================================================================================
     /**
-     * Sets the activation status of the plugin.
+     * Activates or deactivates the connector and its command manager.
      *
-     * @param[in] status    the new activation status of the plugin.
+     * @param[in] status     The activation status.
      */
     inline void setStatus(bool status);
 
     //=========================================================================================================
     /**
-     * Request FiffInfo to be released.
+     * Requests the measurement info for a FiffStreamClient; it arrives through the measurement info callback.
      *
-     * @param[in] ID    ID of the data client to send to. ToDo Remove this - do this processing somewhere else.
+     * @param[in] ID     ID of the FiffStreamClient.
      */
-    virtual void info(qint32 ID) = 0;
+    virtual void info(std::int32_t ID) = 0;
 
-signals:
-    void remitMeasInfo(qint32, mne::FiffInfo);
+    //=========================================================================================================
+    /**
+     * @param[in] callback   Receiver of the measurement info; empty to disconnect.
+     */
+    void setMeasInfoCallback(MeasInfoCallback callback);
 
-    void remitRawBuffer(QSharedPointer<Eigen::MatrixXf>);
+    //=========================================================================================================
+    /**
+     * @param[in] callback   Receiver of the raw buffers; empty to disconnect.
+     */
+    void setRawBufferCallback(RawBufferCallback callback);
 
 protected:
     //=========================================================================================================
     /**
-     * The starting point for the thread. After calling start(), the newly created thread calls this function.
-     * Returning from this method will end the execution of the thread.
-     * Pure virtual method inherited by QThread
+     * Passes measurement info to the measurement info callback, if any.
+     *
+     * @param[in] ID         ID of the FiffStreamClient.
+     * @param[in] p_info     The measurement info.
      */
-    void run() override = 0;
+    void remitMeasInfo(std::int32_t ID, const mne::FiffInfo& p_info);
 
-    QJsonObject m_qJsonObjectMetaData; /**< The meta data of the plugin defined in Q_PLUGIN_METADATA and the corresponding json file. */
+    //=========================================================================================================
+    /**
+     * Passes a raw buffer to the raw buffer callback, if any.
+     *
+     * @param[in] p_buffer   The raw buffer.
+     */
+    void remitRawBuffer(std::shared_ptr<const Eigen::MatrixXf> p_buffer);
+
+    mne::JsonObject m_qJsonObjectMetaData; /**< The meta data of the connector. */
 
     RTSERVER::CommandManager m_commandManager; /**< The CommandManager of the connector. */
 
 private:
-    bool m_bIsActive = false; /**< Holds the activation status. */
+    bool m_bIsActive = false;              /**< Holds the activation status. */
+    std::mutex m_callbackMutex;            /**< Guards the callbacks. */
+    MeasInfoCallback m_measInfoCallback;   /**< Receiver of the measurement info. */
+    RawBufferCallback m_rawBufferCallback; /**< Receiver of the raw buffers. */
 };
 
 //=============================================================================================================
@@ -215,7 +225,7 @@ inline bool IConnector::isActive() const
 
 //=============================================================================================================
 
-inline void IConnector::setMetaData(QJsonObject& p_MetaData)
+inline void IConnector::setMetaData(const mne::JsonObject& p_MetaData)
 {
     m_qJsonObjectMetaData = p_MetaData;
 }
@@ -227,11 +237,7 @@ inline void IConnector::setStatus(bool status)
     m_bIsActive = status;
     m_commandManager.setStatus(status);
 }
-} //Namespace
 
-#ifndef IConnector_iid
-#define IConnector_iid "mne_rt_server/2.0"
-#endif
-Q_DECLARE_INTERFACE(RTSERVER::IConnector, IConnector_iid)
+} //Namespace
 
 #endif // RTSERVER_ICONNECTOR_H

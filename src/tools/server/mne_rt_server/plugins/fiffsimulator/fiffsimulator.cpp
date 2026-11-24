@@ -16,34 +16,28 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/base/log.h>
 #include "fiffsimulator.h"
 
+#include <mne/base/json.h>
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 #include <mne/acq/acq_device_registry.h>
 #include <mne/acq/acq_eigen.h>
 #include <mne/acq/fiff/acq_fiff_replay.h>
 #include <mne/fiff/fiff.h>
 #include <mne/fiff/fiff_types.h>
-#include <mne/base/string_utils.h>
 
 #include <rtserver_connector/command.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtCore/QtPlugin>
-#include <QFile>
-#include <QCoreApplication>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <chrono>
-#include <cstring>
-#include <iostream>
+#include <filesystem>
+#include <format>
+#include <fstream>
 #include <string>
 
 //=============================================================================================================
@@ -54,22 +48,67 @@ using namespace FIFFSIMULATORRTSERVERPLUGIN;
 using namespace mne;
 using namespace RTSERVER;
 
-//=============================================================================================================
-// DEFINE MEMBER CONSTANTS
-//=============================================================================================================
+namespace
+{
 
-const QString FiffSimulator::Commands::BUFSIZE = "bufsize";
-const QString FiffSimulator::Commands::GETBUFSIZE = "getbufsize";
-const QString FiffSimulator::Commands::ACCEL = "accel";
-const QString FiffSimulator::Commands::GETACCEL = "getaccel";
-const QString FiffSimulator::Commands::SIMFILE = "simfile";
+/** Description of the connector and its commands, the former plugin meta data. */
+constexpr const char* kMetaData = R"({
+    "encoding": "UTF-8",
+    "device": "FiffSimulator",
+    "description": "Fiff file simulator",
+    "commands": {
+        "bufsize": {
+            "description": "Sets the buffer size of the FiffStreamClient raw data buffer.",
+            "parameters": {
+                "samples": {
+                    "description": "samples",
+                    "type": "uint"
+                }
+            }
+        },
+        "getbufsize": {
+            "description": "Returns the current buffer size of the FiffStreamClient raw data buffer.",
+            "parameters": {}
+        },
+        "accel": {
+            "description": "Sets the acceleration factor to simulate different sampling rates.",
+            "parameters": {
+                "factor": {
+                    "description": "acceleration factor",
+                    "type": "float"
+                }
+            }
+        },
+        "getaccel": {
+            "description": "Returns the acceleration factor.",
+            "parameters": {}
+        },
+        "simfile": {
+            "description": "The fiff file which should be used as simulation file.",
+            "parameters": {
+                "file": {
+                    "description": "file",
+                    "type": "QString"
+                }
+            }
+        }
+    }
+})";
+
+/** @return The directory of the executable, as QCoreApplication::applicationDirPath() names it. */
+std::string applicationDirPath()
+{
+    return utf8_from_path(executable_dir());
+}
+
+} // namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 FiffSimulator::FiffSimulator()
-: m_sResourceDataPath(QString("%1/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
+: m_sResourceDataPath(std::format("{}/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif", applicationDirPath()))
 , m_uiBufferSampleSize(200) //(4)
 , m_AccelerationFactor(1.0)
 , m_TrueSamplingRate(0.0)
@@ -87,15 +126,13 @@ FiffSimulator::~FiffSimulator()
 
 //=============================================================================================================
 
-void FiffSimulator::comBufsize(Command p_command)
+void FiffSimulator::comBufsize(const Command& p_command)
 {
     //ToDO JSON
-    quint32 t_uiBuffSize = p_command.pValues()[0].toUInt();
+    const std::uint32_t t_uiBuffSize = p_command.pValues()[0].toUInt();
 
     if (t_uiBuffSize > 0) {
-        //        qInfo("bufsize %d", t_uiBuffSize);
-
-        bool t_bWasRunning = m_bIsRunning;
+        const bool t_bWasRunning = m_bIsRunning;
 
         if (m_bIsRunning) {
             this->stop();
@@ -103,12 +140,11 @@ void FiffSimulator::comBufsize(Command p_command)
 
         m_uiBufferSampleSize = t_uiBuffSize;
 
-        if (t_bWasRunning)
+        if (t_bWasRunning) {
             this->start();
+        }
 
-        QString str = QString("\tSet %1 buffer sample size to %2 samples\r\n\n").arg(getName()).arg(t_uiBuffSize);
-
-        m_commandManager[Commands::BUFSIZE].reply(str);
+        m_commandManager[Commands::BUFSIZE].reply(std::format("\tSet {} buffer sample size to {} samples\r\n\n", getName(), t_uiBuffSize));
     } else {
         m_commandManager[Commands::BUFSIZE].reply("Buffer size not set\r\n");
     }
@@ -116,34 +152,26 @@ void FiffSimulator::comBufsize(Command p_command)
 
 //=============================================================================================================
 
-void FiffSimulator::comGetBufsize(Command p_command)
+void FiffSimulator::comGetBufsize(const Command& p_command)
 {
-    bool t_bCommandIsJson = p_command.isJson();
-    if (t_bCommandIsJson) {
-        //
-        //create JSON help object
-        //
-        QJsonObject t_qJsonObjectRoot;
-        t_qJsonObjectRoot.insert(Commands::BUFSIZE, QJsonValue(static_cast<double>(m_uiBufferSampleSize)));
-        QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
-
-        m_commandManager[Commands::GETBUFSIZE].reply(p_qJsonDocument.toJson());
+    if (p_command.isJson()) {
+        JsonObject t_qJsonObjectRoot;
+        t_qJsonObjectRoot.insert(Commands::BUFSIZE, static_cast<double>(m_uiBufferSampleSize));
+        m_commandManager[Commands::GETBUFSIZE].reply(JsonDocument(t_qJsonObjectRoot).to_json());
     } else {
-        QString str = QString("\t%1\r\n\n").arg(m_uiBufferSampleSize);
-        m_commandManager[Commands::GETBUFSIZE].reply(str);
+        m_commandManager[Commands::GETBUFSIZE].reply(std::format("\t{}\r\n\n", m_uiBufferSampleSize));
     }
 }
 
 //=============================================================================================================
 
-void FiffSimulator::comAccel(Command p_command)
+void FiffSimulator::comAccel(const Command& p_command)
 {
     //ToDO JSON
-
-    float t_uiAccel = p_command.pValues()[0].toFloat();
+    const float t_uiAccel = p_command.pValues()[0].toFloat();
 
     if (t_uiAccel > 0) {
-        bool t_bWasRunning = m_bIsRunning;
+        const bool t_bWasRunning = m_bIsRunning;
 
         if (m_bIsRunning) {
             this->stop();
@@ -152,49 +180,42 @@ void FiffSimulator::comAccel(Command p_command)
         m_AccelerationFactor = t_uiAccel;
         m_RawInfo.info.sfreq = m_AccelerationFactor * m_TrueSamplingRate;
 
-        if (t_bWasRunning)
+        if (t_bWasRunning) {
             this->start();
+        }
 
-        QString str = QString("\tSet acceleration factor to %1\r\n\n").arg(t_uiAccel, 0, 'f', 3);
-
-        m_commandManager[Commands::ACCEL].reply(str);
-    } else
-        m_commandManager[Commands::ACCEL].reply("Acceleration facor not set\r\n");
-}
-
-//=============================================================================================================
-
-void FiffSimulator::comGetAccel(Command p_command)
-{
-    bool t_bCommandIsJson = p_command.isJson();
-    if (t_bCommandIsJson) {
-        //
-        //create JSON help object
-        //
-        QJsonObject t_qJsonObjectRoot;
-        t_qJsonObjectRoot.insert(Commands::ACCEL, QJsonValue(static_cast<double>(m_AccelerationFactor)));
-        QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
-
-        m_commandManager[Commands::GETACCEL].reply(p_qJsonDocument.toJson());
+        m_commandManager[Commands::ACCEL].reply(std::format("\tSet acceleration factor to {:.3f}\r\n\n", t_uiAccel));
     } else {
-        QString str = QString("\t%1\r\n\n").arg(m_AccelerationFactor, 0, 'f', 3);
-        m_commandManager[Commands::GETACCEL].reply(str);
+        m_commandManager[Commands::ACCEL].reply("Acceleration facor not set\r\n");
     }
 }
 
 //=============================================================================================================
 
-void FiffSimulator::comSimfile(Command p_command)
+void FiffSimulator::comGetAccel(const Command& p_command)
+{
+    if (p_command.isJson()) {
+        JsonObject t_qJsonObjectRoot;
+        t_qJsonObjectRoot.insert(Commands::ACCEL, static_cast<double>(m_AccelerationFactor));
+        m_commandManager[Commands::GETACCEL].reply(JsonDocument(t_qJsonObjectRoot).to_json());
+    } else {
+        m_commandManager[Commands::GETACCEL].reply(std::format("\t{:.3f}\r\n\n", m_AccelerationFactor));
+    }
+}
+
+//=============================================================================================================
+
+void FiffSimulator::comSimfile(const Command& p_command)
 {
     //
     // simulation file
     //
-    QFile t_file(p_command.pValues()[0].toString());
+    const std::string t_sFile = p_command.pValues()[0].toString();
+    const std::string t_sResourceDataPathOld = m_sResourceDataPath;
 
-    QString t_sResourceDataPathOld = m_sResourceDataPath;
-
-    if (t_file.exists()) {
-        m_sResourceDataPath = p_command.pValues()[0].toString();
+    std::error_code t_error;
+    if (!t_sFile.empty() && std::filesystem::exists(path_from_utf8(t_sFile), t_error)) {
+        m_sResourceDataPath = t_sFile;
         m_RawInfo = FiffRawData();
 
         if (this->readRawInfo()) {
@@ -218,12 +239,11 @@ void FiffSimulator::comSimfile(Command p_command)
 
 void FiffSimulator::connectCommandManager()
 {
-    //Connect slots
-    QObject::connect(&m_commandManager[Commands::BUFSIZE], &Command::executed, this, &FiffSimulator::comBufsize);
-    QObject::connect(&m_commandManager[Commands::GETBUFSIZE], &Command::executed, this, &FiffSimulator::comGetBufsize);
-    QObject::connect(&m_commandManager[Commands::ACCEL], &Command::executed, this, &FiffSimulator::comAccel);
-    QObject::connect(&m_commandManager[Commands::GETACCEL], &Command::executed, this, &FiffSimulator::comGetAccel);
-    QObject::connect(&m_commandManager[Commands::SIMFILE], &Command::executed, this, &FiffSimulator::comSimfile);
+    m_commandManager[Commands::BUFSIZE].connectExecuted([this](const Command& command) { comBufsize(command); });
+    m_commandManager[Commands::GETBUFSIZE].connectExecuted([this](const Command& command) { comGetBufsize(command); });
+    m_commandManager[Commands::ACCEL].connectExecuted([this](const Command& command) { comAccel(command); });
+    m_commandManager[Commands::GETACCEL].connectExecuted([this](const Command& command) { comGetAccel(command); });
+    m_commandManager[Commands::SIMFILE].connectExecuted([this](const Command& command) { comSimfile(command); });
 }
 
 //=============================================================================================================
@@ -242,35 +262,42 @@ const char* FiffSimulator::getName() const
 
 //=============================================================================================================
 
+const char* FiffSimulator::getMetaData() const
+{
+    return kMetaData;
+}
+
+//=============================================================================================================
+
 void FiffSimulator::init()
 {
     //
     // Read cfg file
     //
-    QFile t_qFile(QString("%1/../resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg").arg(QCoreApplication::applicationDirPath()));
-    if (t_qFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream in(&t_qFile);
-        QString key = "simFile = ";
-        while (!in.atEnd()) {
-            QString line = in.readLine();
-            if (line.contains(key, Qt::CaseInsensitive)) {
-                qint32 idx = line.indexOf(key);
-                idx += key.size();
-
-                QString sFileName = line.mid(idx, line.size() - idx);
-
-                QFile t_qFileMeas(sFileName);
-
-                if (t_qFileMeas.open(QIODevice::ReadOnly)) {
-                    m_sResourceDataPath = sFileName;
-                    Log::info("[FiffSimulator::init] Load simulation file {}", sFileName.toStdString());
-                    t_qFileMeas.close();
-                } else {
-                    Log::info("[FiffSimulator::init] Trying to open simulation file {} read from FiffSimulation.cfg failed. Opening sample_audvis_raw.fif instead.", sFileName.toStdString());
-                }
-            }
+    std::ifstream t_qFile(path_from_utf8(std::format("{}/../resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg", applicationDirPath())));
+    if (!t_qFile) {
+        return;
+    }
+    const std::string key = "simFile = ";
+    std::string line;
+    while (std::getline(t_qFile, line)) {
+        if (!line.empty() && line.back() == '\r') {
+            line.pop_back();
         }
-        t_qFile.close();
+        if (to_lower(line).find(to_lower(key)) == std::string::npos) {
+            continue;
+        }
+        // As before: the key is matched case-insensitively but located case-sensitively
+        const std::size_t found = line.find(key);
+        const std::size_t idx = found == std::string::npos ? key.size() - 1 : found + key.size();
+        const std::string sFileName = idx < line.size() ? line.substr(idx) : std::string();
+
+        if (std::ifstream(path_from_utf8(sFileName), std::ios::binary)) {
+            m_sResourceDataPath = sFileName;
+            Log::info("[FiffSimulator::init] Load simulation file {}", sFileName);
+        } else {
+            Log::info("[FiffSimulator::init] Trying to open simulation file {} read from FiffSimulation.cfg failed. Opening sample_audvis_raw.fif instead.", sFileName);
+        }
     }
 }
 
@@ -278,6 +305,10 @@ void FiffSimulator::init()
 
 bool FiffSimulator::start()
 {
+    // A start while running restarts the replay
+    if (m_thread.joinable()) {
+        stop();
+    }
     this->init();
     if (m_RawInfo.empty() && !readRawInfo()) {
         return false;
@@ -302,7 +333,7 @@ bool FiffSimulator::start()
     m_device = std::move(*device);
     m_reader = std::move(*reader);
     m_bIsRunning = true;
-    QThread::start();
+    m_thread = std::thread([this] { run(); });
     return true;
 }
 
@@ -311,7 +342,9 @@ bool FiffSimulator::start()
 bool FiffSimulator::stop()
 {
     m_bIsRunning = false;
-    QThread::wait();
+    if (m_thread.joinable()) {
+        m_thread.join();
+    }
     m_reader.reset();
     m_device.reset(); // closes the replay
     return true;
@@ -319,13 +352,15 @@ bool FiffSimulator::stop()
 
 //=============================================================================================================
 
-void FiffSimulator::info(qint32 ID)
+void FiffSimulator::info(std::int32_t ID)
 {
-    if (m_RawInfo.empty())
+    if (m_RawInfo.empty()) {
         readRawInfo();
+    }
 
-    if (!m_RawInfo.empty())
-        emit remitMeasInfo(ID, m_RawInfo.info);
+    if (!m_RawInfo.empty()) {
+        remitMeasInfo(ID, m_RawInfo.info);
+    }
 }
 
 //=============================================================================================================
@@ -333,9 +368,9 @@ void FiffSimulator::info(qint32 ID)
 bool FiffSimulator::readRawInfo()
 {
     if (m_RawInfo.empty()) {
-        QMutexLocker locker(&mutex);
+        const std::scoped_lock locker(mutex);
 
-        auto raw = FiffRawData::read(m_sResourceDataPath.toStdU16String());
+        auto raw = FiffRawData::read(path_from_utf8(m_sResourceDataPath));
         if (!raw) {
             Log::info("Error: Not able to read raw info: {}", raw.error().what());
             return false;
@@ -364,6 +399,6 @@ void FiffSimulator::run()
             }
             continue;
         }
-        emit remitRawBuffer(QSharedPointer<Eigen::MatrixXf>::create(data.cast<float>()));
+        remitRawBuffer(std::make_shared<const Eigen::MatrixXf>(data.cast<float>()));
     }
 }

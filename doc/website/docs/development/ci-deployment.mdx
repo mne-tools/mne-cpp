@@ -38,7 +38,7 @@ The `MacOSDynamic` workflow in [release-macos.yml](https://github.com/mne-tools/
 
 Dependency resolution uses `macdeployqt` (maintained by Qt). MNE-CPP libraries are manually copied to each app's `Contents/Frameworks` folder, and resources and plugin folders are copied to the corresponding `.app` directories.
 
-Before packaging, standalone plugin folders (`mne_scan_plugins`, `mne_analyze_plugins`, `mne_rt_server_plugins`) and the `resources` symlink are deleted. The `out/Release` folder is compressed to a `.tar.gz` file and uploaded as a release asset.
+Before packaging, standalone plugin folders (`mne_scan_plugins`, `mne_analyze_plugins`) and the `resources` symlink are deleted. The `out/Release` folder is compressed to a `.tar.gz` file and uploaded as a release asset.
 
 ## Static Builds
 

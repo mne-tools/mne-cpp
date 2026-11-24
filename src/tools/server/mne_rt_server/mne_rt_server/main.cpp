@@ -17,24 +17,20 @@
 //=============================================================================================================
 
 #include "mne_rt_server.h"
+
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtCore/QCoreApplication>
-#include <QObject>
-#include <QCommandLineParser>
-#include <QFile>
-#include <QFileInfo>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include <vector>
+#include <filesystem>
+#include <format>
+#include <fstream>
+#include <string>
+#include <system_error>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -46,70 +42,53 @@ using namespace RTSERVER;
 // MAIN
 //=============================================================================================================
 
-#ifdef STATICBUILD
-Q_IMPORT_PLUGIN(FiffSimulator)
-#endif
-
-//=============================================================================================================
 /**
  * The function main marks the entry point of the program.
  * By default, main has the storage class extern.
  *
  * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
- * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+ * @return 0 once a client has closed the server.
  */
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-
     // Command Line Parser
-    QCommandLineParser parser;
-    parser.setApplicationDescription("MNE Rt Server");
-    parser.addHelpOption();
-
-    QCommandLineOption inFileOpt(QStringList() << "f" << "file",
-                                 QCoreApplication::translate("main", "File to stream."),
-                                 QCoreApplication::translate("main", "filePath"));
-
-    parser.addOption(inFileOpt);
-
-    parser.process(app);
+    mne::CommandLineParser parser("MNE Rt Server");
+    parser.add_help_option();
+    parser.add_option({{"f", "file"}, "File to stream.", "filePath", {}});
+    parser.process(argc, argv, "mne_rt_server", MNE_CPP_VERSION);
 
     // Parse input file for mne_rt_server's FiffSimulator
-    if (parser.isSet("file")) {
-        QFile file(QCoreApplication::applicationDirPath() + "/../resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg");
+    if (parser.is_set("file")) {
+        const std::string t_sConfig = std::format("{}/../resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg", mne::utf8_from_path(mne::executable_dir()));
+        const std::string t_sFile = parser.value("file");
+        std::error_code t_error;
 
-        if (QFileInfo(parser.value(inFileOpt)).exists()) {
-            if (file.open(QIODevice::Truncate | QIODevice::Text | QIODevice::WriteOnly)) {
-                QTextStream stream(&file);
-                stream << QString("simFile = %1").arg(parser.value(inFileOpt));
-                ;
+        if (!t_sFile.empty() && std::filesystem::exists(mne::path_from_utf8(t_sFile), t_error)) {
+            std::ofstream file(mne::path_from_utf8(t_sConfig), std::ios::trunc);
+            if (file) {
+                file << "simFile = " << t_sFile;
                 file.close();
 
-                mne::Log::info("{}", QString("[MNERtServer::main] Streaming file %1").arg(parser.value(inFileOpt)).toStdString());
+                mne::Log::info("{}", std::format("[MNERtServer::main] Streaming file {}", t_sFile));
             } else {
-                mne::Log::warning("{}", QString("[MNERtServer::main] Could not open %1").arg(QCoreApplication::applicationDirPath() + "/../resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg").toStdString());
+                mne::Log::warning("{}", std::format("[MNERtServer::main] Could not open {}", t_sConfig));
             }
         } else {
             mne::Log::warning("[MNERtServer::main] Provided file does not exist. Falling back to default one.");
 
-            if (file.open(QIODevice::Truncate | QIODevice::Text | QIODevice::WriteOnly)) {
-                QTextStream stream(&file);
-                stream << QString("simFile = <pathTo>/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+            std::ofstream file(mne::path_from_utf8(t_sConfig), std::ios::trunc);
+            if (file) {
+                file << "simFile = <pathTo>/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
                 file.close();
             } else {
-                mne::Log::warning("{}", QString("[MNERtServer::main] Could not open %1").arg(QCoreApplication::applicationDirPath() + "/../resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg").toStdString());
+                mne::Log::warning("{}", std::format("[MNERtServer::main] Could not open {}", t_sConfig));
             }
         }
     }
 
     MNERTServer t_MneRtServer;
-    QObject::connect(&t_MneRtServer, SIGNAL(closeServer()), &app, SLOT(quit()));
+    t_MneRtServer.waitForClose();
 
-    return app.exec();
+    return 0;
 }
-
-//=============================================================================================================
-// STATIC DEFINITIONS
-//=============================================================================================================

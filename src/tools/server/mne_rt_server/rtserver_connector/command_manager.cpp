@@ -9,10 +9,10 @@
  * @date     March 2026
  * @brief    Translation unit for @ref RTSERVER::CommandManager: schema storage, observer-side dispatch and JSON bulk-load.
  *
- * Implements the @c init() helper that wires the inbound
- * @c triggered/@c response signals to the manager’s own slots, the
+ * Implements the callback channels (@c triggered / @c response /
+ * schema changes), the
  * three @c insert overloads (single keyword, full @ref Command,
- * @c QJsonDocument bulk import), and the @c IObserver::update() hook
+ * @c mne::JsonDocument bulk import), and the @c IObserver::update() hook
  * called by @ref CommandParser when a new @ref RawCommand has arrived.
  * The @c m_qMapCommands lookup table backs both the @c [] operator and
  * @c hasCommand() so attached clients can introspect the accepted
@@ -20,20 +20,13 @@
  */
 
 //=============================================================================================================
-// Includes
+// INCLUDES
 //=============================================================================================================
 
 #include "command_manager.h"
-#include <mne/base/log.h>
 #include "raw_command.h"
 
-//=============================================================================================================
-// Qt Includes
-//=============================================================================================================
-
-#include <QVector>
-#include <QJsonObject>
-#include <QStringList>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -45,47 +38,32 @@ using namespace RTSERVER;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CommandManager::CommandManager(bool p_bIsActive, QObject* parent)
-: QObject(parent)
-, m_bIsActive(p_bIsActive)
+CommandManager::CommandManager(bool p_bIsActive)
+: m_bIsActive(p_bIsActive)
 {
-    init();
 }
 
 //=============================================================================================================
 
-CommandManager::CommandManager(const QByteArray& p_qByteArrayJsonDoc, bool p_bIsActive, QObject* parent)
-: QObject(parent)
-, m_bIsActive(p_bIsActive)
+CommandManager::CommandManager(std::string_view p_sJsonDoc, bool p_bIsActive)
+: m_bIsActive(p_bIsActive)
+, m_jsonDocumentOrigin(mne::JsonDocument::from_json(p_sJsonDoc))
 {
-    init();
-
-    m_jsonDocumentOrigin = QJsonDocument::fromJson(p_qByteArrayJsonDoc);
-
     insert(m_jsonDocumentOrigin);
 }
 
 //=============================================================================================================
 
-CommandManager::CommandManager(const QJsonDocument& p_jsonDoc, bool p_bIsActive, QObject* parent)
-: QObject(parent)
-, m_bIsActive(p_bIsActive)
+CommandManager::CommandManager(const mne::JsonDocument& p_jsonDoc, bool p_bIsActive)
+: m_bIsActive(p_bIsActive)
 , m_jsonDocumentOrigin(p_jsonDoc)
 {
-    init();
-
     insert(m_jsonDocumentOrigin);
 }
 
 //=============================================================================================================
 
-CommandManager::~CommandManager()
-{
-    //Disconnect all connections which are created with the help of this manager.
-    //    this->disconnectAll();
-
-    //Remove commands which where inserted into the static command list
-}
+CommandManager::~CommandManager() = default;
 
 //=============================================================================================================
 
@@ -96,49 +74,41 @@ void CommandManager::clear()
 
 //=============================================================================================================
 
-void CommandManager::init()
+void CommandManager::insert(const mne::JsonDocument& p_jsonDocument)
 {
-}
-
-//=============================================================================================================
-//ToDo connect all commands inserted in this class by default.
-void CommandManager::insert(const QJsonDocument& p_jsonDocument)
-{
-    QJsonObject t_jsonObjectCommand;
-
-    //Switch to command object
-    if (p_jsonDocument.isObject() && p_jsonDocument.object().value(QString("commands")) != QJsonValue::Undefined)
-        t_jsonObjectCommand = p_jsonDocument.object().value(QString("commands")).toObject();
-    else
+    if (!p_jsonDocument.is_object() || p_jsonDocument.object().value("commands").is_undefined()) {
         return;
-
-    QJsonObject::Iterator it;
-    for (it = t_jsonObjectCommand.begin(); it != t_jsonObjectCommand.end(); ++it) {
-        if (!m_qMapCommands.contains(it.key()))
-            m_qMapCommands.insert(it.key(), Command(it.key(), it.value().toObject(), true, this));
-        else
-            mne::Log::warning("Warning: CommandMap contains command {} already. Insertion skipped.\n", it.key().toStdString());
     }
 
-    emit commandMapChanged();
+    for (const auto& [key, content] : p_jsonDocument.object().value("commands").to_object()) {
+        if (!m_qMapCommands.contains(key)) {
+            Command t_command(key, content.to_object(), true);
+            t_command.setManager(this);
+            m_qMapCommands.emplace(key, t_command);
+        } else {
+            mne::Log::warning("Warning: CommandMap contains command {} already. Insertion skipped.\n", key);
+        }
+    }
+
+    commandMapChanged();
 }
 
 //=============================================================================================================
 
-void CommandManager::insert(const QString& p_sKey, const QString& p_sDescription)
+void CommandManager::insert(const std::string& p_sKey, const std::string& p_sDescription)
 {
-    Command t_command(p_sKey, p_sDescription, false, this);
+    Command t_command(p_sKey, p_sDescription, false);
     insert(p_sKey, t_command);
 }
 
 //=============================================================================================================
 
-void CommandManager::insert(const QString& p_sKey, const Command& p_command)
+void CommandManager::insert(const std::string& p_sKey, const Command& p_command)
 {
     Command t_command(p_command);
-    t_command.setParent(this);
-    m_qMapCommands.insert(p_sKey, t_command);
-    emit commandMapChanged();
+    t_command.setManager(this);
+    m_qMapCommands.insert_or_assign(p_sKey, t_command);
+    commandMapChanged();
 }
 
 //=============================================================================================================
@@ -146,47 +116,93 @@ void CommandManager::insert(const QString& p_sKey, const Command& p_command)
 void CommandManager::update(Subject* p_pSubject)
 {
     // If Manager is not active do not parse commands
-    if (!m_bIsActive)
+    if (!m_bIsActive) {
         return;
+    }
 
-    CommandParser* t_pCommandParser = static_cast<CommandParser*>(p_pSubject);
+    auto* t_pCommandParser = static_cast<CommandParser*>(p_pSubject);
 
-    RawCommand t_rawCommand(t_pCommandParser->getRawCommand());
-    QString t_sCommandName = t_rawCommand.command();
-
-    if (!this->hasCommand(t_sCommandName))
+    const RawCommand t_rawCommand(t_pCommandParser->getRawCommand());
+    const auto it = m_qMapCommands.find(t_rawCommand.command());
+    if (it == m_qMapCommands.end()) {
         return;
+    }
+    Command& t_command = it->second;
 
     // check if number of parameters is right
-    if (t_rawCommand.count() >= m_qMapCommands[t_sCommandName].count()) {
-        m_qMapCommands[t_sCommandName].isJson() = t_rawCommand.isJson();
+    if (t_rawCommand.count() >= t_command.count()) {
+        t_command.isJson() = t_rawCommand.isJson();
 
         //Parse Parameters
-        for (quint32 i = 0; i < m_qMapCommands[t_sCommandName].count(); ++i) {
-            QMetaType t_metaType = m_qMapCommands[t_sCommandName][i].metaType();
-
-            QVariant t_qVariantParam(t_rawCommand.pValues()[i]);
-
-            if (t_qVariantParam.canConvert(t_metaType) && t_qVariantParam.convert(t_metaType))
-                m_qMapCommands[t_sCommandName][i] = t_qVariantParam;
-            else
+        for (std::uint32_t i = 0; i < t_command.count(); ++i) {
+            if (!t_command.pValues()[i].convertFrom(t_rawCommand.pValues()[i])) {
                 return;
+            }
         }
 
-        m_qMapCommands[t_sCommandName].execute();
+        t_command.execute();
     }
 }
 
 //=============================================================================================================
 
-Command& CommandManager::operator[](const QString& key)
+void CommandManager::connectCommandMapChanged(CommandMapChangedCallback callback)
+{
+    m_commandMapChanged.push_back(std::move(callback));
+}
+
+//=============================================================================================================
+
+void CommandManager::connectTriggered(TriggeredCallback callback)
+{
+    m_triggered.push_back(std::move(callback));
+}
+
+//=============================================================================================================
+
+void CommandManager::connectResponse(ResponseCallback callback)
+{
+    m_response.push_back(std::move(callback));
+}
+
+//=============================================================================================================
+
+void CommandManager::triggered(const Command& p_command)
+{
+    for (const TriggeredCallback& callback : m_triggered) {
+        callback(p_command);
+    }
+}
+
+//=============================================================================================================
+
+void CommandManager::response(const std::string& p_sReply, const Command& p_command)
+{
+    for (const ResponseCallback& callback : m_response) {
+        callback(p_sReply, p_command);
+    }
+}
+
+//=============================================================================================================
+
+void CommandManager::commandMapChanged()
+{
+    for (const CommandMapChangedCallback& callback : m_commandMapChanged) {
+        callback();
+    }
+}
+
+//=============================================================================================================
+
+Command& CommandManager::operator[](const std::string& key)
 {
     return m_qMapCommands[key];
 }
 
 //=============================================================================================================
 
-const Command CommandManager::operator[](const QString& key) const
+Command CommandManager::operator[](const std::string& key) const
 {
-    return m_qMapCommands[key];
+    const auto it = m_qMapCommands.find(key);
+    return it != m_qMapCommands.end() ? it->second : Command();
 }

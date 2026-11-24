@@ -17,30 +17,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/base/log.h>
 #include "commandserver.h"
-
 #include "commandthread.h"
-#include "mne_rt_server.h"
-#include "fiffstreamserver.h"
-#include "fiffstreamthread.h"
-#include "connectormanager.h"
-#include <stdlib.h>
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
-#include <QPointer>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <chrono>
-#include <iostream>
-#include <memory>
 #include <utility>
 
 //=============================================================================================================
@@ -53,37 +40,32 @@ using namespace RTSERVER;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CommandServer::CommandServer(QObject* parent)
-: QObject(parent)
-, m_iThreadCount(0)
+CommandServer::CommandServer()
+: m_iThreadCount(0)
 , m_iCurrentCommandThreadID(0)
 , m_iPort(0)
 {
-    QObject::connect(&m_commandParser, &CommandParser::response, this, &CommandServer::prepareReply);
+    m_commandParser.connectResponse([this](const std::string& p_sReply, const Command& p_command) { prepareReply(p_sReply, p_command); });
 }
 
 //=============================================================================================================
 
 CommandServer::~CommandServer()
 {
-    m_listener.request_stop();
-    if (m_listener.joinable()) {
-        m_listener.join();
-    }
-    emit closeCommandThreads();
+    close();
 }
 
 //=============================================================================================================
 
-bool CommandServer::listen(std::uint16_t port, QString& error)
+bool CommandServer::listen(std::uint16_t port, std::string& error)
 {
     auto server = mne::TcpServer::listen("0.0.0.0", port);
     if (!server) {
-        error = QString::fromStdString(server.error().message());
+        error = server.error().message();
         return false;
     }
     m_iPort = server->port();
-    m_listener = std::jthread([server = std::move(*server), receiver = QPointer<CommandServer>(this)](const std::stop_token& stop) mutable {
+    m_listener = std::jthread([this, server = std::move(*server)](const std::stop_token& stop) mutable {
         while (!stop.stop_requested()) {
             auto client = server.accept(std::chrono::milliseconds(100));
             if (!client) {
@@ -92,15 +74,7 @@ bool CommandServer::listen(std::uint16_t port, QString& error)
                 }
                 continue;
             }
-            auto socket = std::make_shared<mne::TcpSocket>(std::move(*client));
-            QMetaObject::invokeMethod(
-                receiver,
-                [receiver, socket]() {
-                    if (receiver) {
-                        receiver->incomingConnection(std::move(*socket));
-                    }
-                },
-                Qt::QueuedConnection);
+            incomingConnection(std::move(*client));
         }
     });
     return true;
@@ -115,19 +89,19 @@ std::uint16_t CommandServer::serverPort() const
 
 //=============================================================================================================
 
-void CommandServer::incommingCommand(QString p_sCommand, qint32 p_iThreadID)
+void CommandServer::incommingCommand(const std::string& p_sCommand, std::int32_t p_iThreadID)
 {
-    QStringList t_qListParsedCommands;
+    const std::scoped_lock lock(m_commandMutex);
+
+    mne::StringList t_qListParsedCommands;
 
     m_iCurrentCommandThreadID = p_iThreadID;
 
     if (!m_commandParser.parse(p_sCommand, t_qListParsedCommands)) {
-        QByteArray t_blockReply;
-        t_blockReply.append("command unknown\r\n");
-        mne::Log::warning("[CommandServer::incommingCommand] command unknown: {}", p_sCommand.toStdString());
+        mne::Log::warning("[CommandServer::incommingCommand] command unknown: {}", p_sCommand);
 
         //send reply
-        emit replyCommand(t_blockReply, p_iThreadID);
+        replyCommand("command unknown\r\n", p_iThreadID);
     }
 }
 
@@ -135,22 +109,18 @@ void CommandServer::incommingCommand(QString p_sCommand, qint32 p_iThreadID)
 
 void CommandServer::incomingConnection(mne::TcpSocket socket)
 {
-    CommandThread* t_pCommandThread = new CommandThread(std::move(socket), m_iThreadCount, this);
+    std::vector<std::unique_ptr<CommandThread>> t_finished;
+    const std::scoped_lock lock(m_threadsMutex);
+
+    // Threads of clients that left are joined and dropped
+    const auto t_firstFinished = std::partition(m_threads.begin(), m_threads.end(), [](const auto& thread) { return !thread->isFinished(); });
+    std::move(t_firstFinished, m_threads.end(), std::back_inserter(t_finished));
+    m_threads.erase(t_firstFinished, m_threads.end());
+
+    auto t_pCommandThread = std::make_unique<CommandThread>(std::move(socket), m_iThreadCount, [this](const std::string& p_sCommand, std::int32_t p_iThreadID) { incommingCommand(p_sCommand, p_iThreadID); });
     ++m_iThreadCount;
-
-    //when thread has finished it gets deleted
-    connect(t_pCommandThread, SIGNAL(finished()), t_pCommandThread, SLOT(deleteLater()));
-    connect(this, SIGNAL(closeCommandThreads()), t_pCommandThread, SLOT(deleteLater()));
-
-    //Forwards for thread safety
-    //Connect incomming commands
-    connect(t_pCommandThread, &CommandThread::newCommand,
-            this, &CommandServer::incommingCommand);
-    //Connect command Replies
-    connect(this, &CommandServer::replyCommand,
-            t_pCommandThread, &CommandThread::attachCommandReply);
-
     t_pCommandThread->start();
+    m_threads.push_back(std::move(t_pCommandThread));
 }
 
 //=============================================================================================================
@@ -160,28 +130,39 @@ void CommandServer::registerCommandManager(CommandManager& p_commandManager)
     //Attach Observer to Subject
     m_commandParser.attach(&p_commandManager);
     //Register Reply Channel
-    //    p_commandManager.registerResponseChannel(&m_commandParser, &CommandParser::response);
-    QObject::connect(&p_commandManager, &CommandManager::response, &m_commandParser, &CommandParser::response);
+    p_commandManager.connectResponse([this](const std::string& p_sReply, const Command& p_command) { m_commandParser.response(p_sReply, p_command); });
 }
 
 //=============================================================================================================
 
-void CommandServer::prepareReply(QString p_sReply, Command p_command)
+void CommandServer::prepareReply(const std::string& p_sReply, const Command& /*p_command*/)
 {
-    //Only when multi threaded command parsing is applied
-    //    qDebug() << m_qMultiMapCommandThreadID;
-    //    QMultiMap<QString, qint32>::iterator it = m_qMultiMapCommandThreadID.find(p_command.command());
-    //    qint32 t_iThreadID = it.value(); //Remove this id from stored set
-    //    m_qMultiMapCommandThreadID.remove(p_command.command(), t_iThreadID);
-    //    qDebug() << QThread::currentThreadId();
-
     //Currently only one parsing thread per time
-    qint32 t_iThreadID = m_iCurrentCommandThreadID;
+    replyCommand(p_sReply, m_iCurrentCommandThreadID);
+}
 
-    //print
-    //    printf("%s",p_sReply.toUtf8().constData());
+//=============================================================================================================
 
-    emit replyCommand(p_sReply, t_iThreadID);
+void CommandServer::replyCommand(const std::string& p_blockReply, std::int32_t p_iID)
+{
+    const std::scoped_lock lock(m_threadsMutex);
+    for (const auto& thread : m_threads) {
+        thread->attachCommandReply(p_blockReply, p_iID);
+    }
+}
 
-    Q_UNUSED(p_command);
+//=============================================================================================================
+
+void CommandServer::close()
+{
+    m_listener.request_stop();
+    if (m_listener.joinable()) {
+        m_listener.join();
+    }
+    std::vector<std::unique_ptr<CommandThread>> t_threads;
+    {
+        const std::scoped_lock lock(m_threadsMutex);
+        t_threads.swap(m_threads);
+    }
+    t_threads.clear(); // stops and joins every client thread
 }

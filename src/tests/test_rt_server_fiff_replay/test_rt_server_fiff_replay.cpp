@@ -23,7 +23,6 @@
 #include <mne/acq/fiff/acq_fiff.h>
 #include <mne/fiff/fiff_raw_data.h>
 #include <mne/fiff/fiff_stream.h>
-#include <rtserver_connector/iconnector.h>
 #include <mne/com/tcp_server.h>
 #include <mne/com/tcp_socket.h>
 
@@ -33,10 +32,7 @@
 
 #include <QCoreApplication>
 #include <QDataStream>
-#include <QDir>
 #include <QFile>
-#include <QLibrary>
-#include <QPluginLoader>
 #include <QProcess>
 #include <QtEndian>
 #include <QtTest>
@@ -203,7 +199,6 @@ class TestRtServerFiffReplay : public QObject
 private slots:
     void readsTheMeasurementInfo_data();
     void readsTheMeasurementInfo();
-    void pluginSharesTheConnectorType();
     void streamsTheFile();
     void cleanupTestCase();
 
@@ -305,35 +300,6 @@ void TestRtServerFiffReplay::readsTheMeasurementInfo()
 
 //=============================================================================================================
 
-void TestRtServerFiffReplay::pluginSharesTheConnectorType()
-{
-    // The server connects to IConnector's slots and signals by member pointer. That only works if the plugin derives
-    // from the very IConnector the server knows; a second copy compiled into the plugin makes Qt's checks abort.
-#ifdef STATICBUILD
-    QSKIP("Connectors are linked into the server in static builds");
-#endif
-    const QDir plugins(QCoreApplication::applicationDirPath() + "/../bin/mne_rt_server_plugins");
-    const QStringList files = plugins.entryList(QDir::Files);
-    if (files.isEmpty()) {
-        QSKIP("mne_rt_server plugins not built");
-    }
-    for (const QString& name : files) {
-        if (!QLibrary::isLibrary(name)) { // the import libraries and export files next to a Windows plugin
-            continue;
-        }
-        QPluginLoader loader(plugins.absoluteFilePath(name));
-        QObject* instance = loader.instance();
-        if (instance == nullptr) {
-            QFAIL(qPrintable(name + ": " + loader.errorString()));
-            return;
-        }
-        QVERIFY2(instance->metaObject()->inherits(&RTSERVER::IConnector::staticMetaObject), qPrintable(name));
-        QVERIFY2(dynamic_cast<RTSERVER::IConnector*>(instance), qPrintable(name));
-    }
-}
-
-//=============================================================================================================
-
 void TestRtServerFiffReplay::streamsTheFile()
 {
     const QString base = QCoreApplication::applicationDirPath() + "/..";
@@ -357,6 +323,14 @@ void TestRtServerFiffReplay::streamsTheFile()
     const QString help = send(command, QStringLiteral("help"));
     QVERIFY2(help.contains(QStringLiteral("simfile")),
              qPrintable(QStringLiteral("help reply: ") + help.left(400) + "\nserver: " + QString::fromUtf8(output + m_server.readAll())));
+    // The command vocabulary answers in the dialect of the request
+    QCOMPARE(send(command, QStringLiteral("no_such_command")), QStringLiteral("command unknown\r\n"));
+    QCOMPARE(send(command, QStringLiteral("conlist")), QStringLiteral("  *  (1) Fiff File Simulator\r\n\r\n"));
+    QCOMPARE(send(command, QStringLiteral("bufsize 0")), QStringLiteral("Buffer size not set\r\n"));
+    const QString jsonHelp = send(command, QStringLiteral("{\"commands\":{\"help\":{}}}"));
+    QVERIFY2(jsonHelp.contains(QStringLiteral("\"type\": \"QString\"")) && jsonHelp.contains(QStringLiteral("\"selcon\"")), qPrintable(jsonHelp.left(400)));
+    QVERIFY2(send(command, QStringLiteral("{\"commands\":{\"getbufsize\":{}}}")).contains(QStringLiteral("\"bufsize\": 200")), "getbufsize");
+
     // A file the simulator cannot read is refused, and the simulator still accepts the next one.
     QTemporaryDir dir;
     QFile notFiff(dir.filePath(QStringLiteral("not_fiff.fif")));

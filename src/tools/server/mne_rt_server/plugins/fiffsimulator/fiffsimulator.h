@@ -19,29 +19,23 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fiffsimulator_global.h"
 #include <rtserver_connector/iconnector.h>
+
 #include <mne/acq/acq_device.h>
 #include <mne/acq/acq_reader.h>
 #include <mne/fiff/fiff_raw_data.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QString>
-#include <QMutex>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <atomic>
+#include <cstdint>
+#include <mutex>
 #include <optional>
 #include <memory>
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+#include <string>
+#include <thread>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFSIMULATORRTSERVERPLUGIN
@@ -54,23 +48,19 @@ namespace FIFFSIMULATORRTSERVERPLUGIN
 /**
  * DECLARE CLASS FiffSimulator
  *
- * @brief The FiffSimulator class serves a FIFF file in a loop, replayed through the fiff:// acquisition source.
+ * @brief The FiffSimulator connector replays a FIFF file as raw buffers.
  */
-class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public RTSERVER::IConnector
+class FiffSimulator : public RTSERVER::IConnector
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_rt_server/1.0" FILE "fiffsimulator.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(RTSERVER::IConnector)
-
 public:
+    /** The commands of the connector. */
     struct Commands
     {
-        static const QString BUFSIZE;
-        static const QString GETBUFSIZE;
-        static const QString ACCEL;
-        static const QString GETACCEL;
-        static const QString SIMFILE;
+        static constexpr const char* BUFSIZE = "bufsize";
+        static constexpr const char* GETBUFSIZE = "getbufsize";
+        static constexpr const char* ACCEL = "accel";
+        static constexpr const char* GETACCEL = "getaccel";
+        static constexpr const char* SIMFILE = "simfile";
     };
 
     //=========================================================================================================
@@ -83,87 +73,62 @@ public:
     /**
      * Destroys the FiffSimulator.
      */
-    virtual ~FiffSimulator();
+    ~FiffSimulator() override;
 
-    virtual void connectCommandManager();
+    void connectCommandManager() override;
 
-    virtual RTSERVER::ConnectorID getConnectorID() const;
+    RTSERVER::ConnectorID getConnectorID() const override;
 
-    virtual const char* getName() const;
+    const char* getName() const override;
 
-    virtual void info(qint32 ID);
+    const char* getMetaData() const override;
 
-    virtual bool start();
+    void info(std::int32_t ID) override;
 
-    virtual bool stop();
+    bool start() override;
 
-protected:
-    virtual void run();
+    bool stop() override;
 
 private:
     //=========================================================================================================
     /**
-     * Sets the buffer sample size
-     *
-     * @param[in] p_command  The buffer sample size command.
+     * Sends raw buffers until the connector is stopped.
      */
-    void comBufsize(RTSERVER::Command p_command);
+    void run();
+
+    void comBufsize(const RTSERVER::Command& p_command);
+    void comGetBufsize(const RTSERVER::Command& p_command);
+    void comAccel(const RTSERVER::Command& p_command);
+    void comGetAccel(const RTSERVER::Command& p_command);
+    void comSimfile(const RTSERVER::Command& p_command);
 
     //=========================================================================================================
     /**
-     * Returns the buffer sample size
-     *
-     * @param[in] p_command  The buffer sample size command.
-     */
-    void comGetBufsize(RTSERVER::Command p_command);
-
-    //=========================================================================================================
-    /**
-     * Sets the acceleration factor
-     *
-     * @param[in] p_command  The acceleration factor command.
-     */
-    void comAccel(RTSERVER::Command p_command);
-
-    //=========================================================================================================
-    /**
-     * Returns the acceleration factor
-     *
-     * @param[in] p_command  The acceleration factor command.
-     */
-    void comGetAccel(RTSERVER::Command p_command);
-
-    //=========================================================================================================
-    /**
-     * Sets the fiff simulation file
-     *
-     * @param[in] p_command  The fiff simulation file command.
-     */
-    void comSimfile(RTSERVER::Command p_command);
-
-    //=========================================================================================================
-    /**
-     * Initialise the FiffSimulator.
+     * Reads the simulation file name from FiffSimulation.cfg.
      */
     void init();
 
     //=========================================================================================================
     /**
-     * Read the raw FiffInfo.
+     * Reads the measurement info of the simulation file, unless it is read already.
+     *
+     * @return True if the measurement info is available.
      */
     bool readRawInfo();
 
-    QMutex mutex;
+    std::mutex mutex; /**< Guards reading the measurement info. */
 
     std::optional<mne::AcqDevice> m_device; /**< The fiff:// replay while running. */
     std::optional<mne::AcqReader> m_reader; /**< Reader of the replay's stream. */
     mne::FiffRawData m_RawInfo;             /**< Holds the fiff raw measurement information. */
-    QString m_sResourceDataPath;            /**< Holds the path to the Fiff resource simulation file directory.*/
-    quint32 m_uiBufferSampleSize;           /**< Sample size of the buffer. */
+    std::string m_sResourceDataPath;        /**< Holds the path to the Fiff resource simulation file.*/
+    std::uint32_t m_uiBufferSampleSize;     /**< Sample size of the buffer. */
     float m_AccelerationFactor;             /**< Acceleration factor to simulate different sampling rates. */
     float m_TrueSamplingRate;               /**< The true sampling rate of the fif file. */
-    bool m_bIsRunning;                      /**< Flag whether the producer is running.*/
+    std::atomic<bool> m_bIsRunning;         /**< Flag whether the producer is running.*/
+    std::thread m_thread;                   /**< Producer thread while running. */
 };
+
 } // NAMESPACE
 
 #endif // FIFFSIMULATOR_H

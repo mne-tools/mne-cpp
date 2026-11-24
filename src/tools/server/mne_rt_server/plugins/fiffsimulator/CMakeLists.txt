@@ -5,46 +5,32 @@
 cmake_minimum_required(VERSION 3.14)
 project(rtserver_fiffsimulator LANGUAGES CXX)
 
-#Handle qt uic, moc, rrc automatically
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
-set(QT_REQUIRED_COMPONENTS Core)
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-
 set(SOURCES
     fiffsimulator.cpp
 )
 
 set(HEADERS
     fiffsimulator.h
-    fiffsimulator_global.h
 )
 
-add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+# Linked into mne_rt_server, whose connector manager creates the FIFF simulator
+add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
-set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
-list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
-
-set(MNE_LIBS_REQUIRED 
+set(MNE_LIBS_REQUIRED
     rtserver_connector
     mne_base
     mne_math
     mne_fiff
+    mne_acq
     mne_acq_fiff
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    ${QT_REQUIRED_COMPONENT_LIBS}
+target_link_libraries(${PROJECT_NAME} PUBLIC
     ${MNE_LIBS_REQUIRED}
     Eigen3::Eigen)
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE RTSERVER_FIFFSIMULATOR_PLUGIN)
-
 if(NOT BUILD_SHARED_LIBS)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD QT_STATICPLUGIN)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
