@@ -4,12 +4,12 @@
  * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     fiff_ch_pos.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ * @author   Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Christof Pieloth <pieloth@labp.htwk-leipzig.de>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Coil-frame position record embedded inside FIFF_CH_INFO: coil location and 3x3 EX/EY/EZ orientation triad.

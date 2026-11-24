@@ -4,7 +4,8 @@
  * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     fiff_stream.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ * @author   Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Florian Schlembach <fschlembach@web.de>;
  *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
@@ -12,8 +13,7 @@
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Ruben Doerfel <doerfelruben@aol.com>;
- *           Andreas Griesshammer <ag@fieldlineinc.com>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+ *           Andreas Griesshammer <ag@fieldlineinc.com>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Implementation of @ref FiffStream: FIFF tag I/O, directory and block-tree construction, and the typed read_* / write_* methods.

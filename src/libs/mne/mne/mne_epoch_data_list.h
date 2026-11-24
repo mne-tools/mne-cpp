@@ -4,11 +4,11 @@
  * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     mne_epoch_data_list.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ * @author   Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Ordered list of @ref mne::MNEEpochData objects sharing a common @ref mne::FiffInfo.

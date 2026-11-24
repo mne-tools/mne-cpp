@@ -4,8 +4,8 @@
  * Copyright (c) 2026 MNE-CPP Authors
  *
  * @file     mne_layout.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+ * @author   Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.4.0
  * @date     October 2026
  * @brief    Implementation of @ref mne::MNELayout and @ref mne::MNELayoutPort (MNE-C mne_layout.c).

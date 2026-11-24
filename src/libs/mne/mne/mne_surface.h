@@ -4,12 +4,12 @@
  * Copyright (c) 2013-2026 MNE-CPP Authors
  *
  * @file     mne_surface.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ * @author   Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Christof Pieloth <pieloth@labp.htwk-leipzig.de>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     August 2013
  * @brief    Lightweight triangulated surface (vertices, triangles, normals) used by surface-based routines.

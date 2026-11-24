@@ -4,9 +4,9 @@
  * Copyright (c) 2016-2026 MNE-CPP Authors
  *
  * @file     mne_fiff_contents.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
- *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+ * @author   Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @date     2006
  * @version  dev
  * @brief    Definition of the MNEFiffContents class.

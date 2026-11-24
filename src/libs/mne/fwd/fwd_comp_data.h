@@ -4,10 +4,10 @@
  * Copyright (c) 2017-2026 MNE-CPP Authors
  *
  * @file     fwd_comp_data.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ * @author   Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     March 2017
  * @brief    Software-gradiometer compensation wrapper that subtracts the reference-channel contribution from the primary forward field.

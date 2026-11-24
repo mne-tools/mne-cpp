@@ -4,9 +4,9 @@
  * Copyright (c) 2013-2026 MNE-CPP Authors
  *
  * @file     fiff_byte_swap.h
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+ * @author   Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2013
  * @brief    Endianness swap helpers for the FIFF binary tag I/O layer (FIFF is always written big-endian on disk).

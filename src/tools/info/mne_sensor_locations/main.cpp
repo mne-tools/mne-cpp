@@ -4,8 +4,8 @@
  * Copyright (c) 2026 MNE-CPP Authors
  *
  * @file     main.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+ * @author   Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     2001
  * @brief    Export sensor locations from a measurement FIFF file to text.

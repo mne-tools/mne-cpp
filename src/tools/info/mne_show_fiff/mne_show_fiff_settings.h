@@ -4,8 +4,8 @@
  * Copyright (c) 2017-2026 MNE-CPP Authors
  *
  * @file     mne_show_fiff_settings.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+ * @author   Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @date     2006
  * @version  dev
  * @brief    MNEShowFiffSettings class declaration.

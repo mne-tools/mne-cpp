@@ -4,11 +4,11 @@
  * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     mne_epoch_data_list.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ * @author   Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Andreas Griesshammer <ag@fieldlineinc.com>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+ *           Andreas Griesshammer <ag@fieldlineinc.com>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Implementation of @ref mne::MNEEpochDataList.

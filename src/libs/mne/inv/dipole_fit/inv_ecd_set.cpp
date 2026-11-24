@@ -4,8 +4,8 @@
  * Copyright (c) 2026 MNE-CPP Authors
  *
  * @file     inv_ecd_set.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+ * @author   Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
  * @brief    Implementation of @ref mne::InvEcdSet including the @c .dip and @c .bdip readers/writers.
