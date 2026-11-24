@@ -1,0 +1,44 @@
+---
+id: command-line-option
+title: "mne::CommandLineOption"
+sidebar_label: CommandLineOption
+sidebar_position: 91
+---
+
+# CommandLineOption
+
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/command_line.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/base/command_line.h)
+
+`#include <mne/base/command_line.h>`
+
+```cpp
+struct mne::CommandLineOption
+```
+
+One option: a flag if it has no value name, otherwise an option that takes a value.
+
+```cpp title="src/examples/ex_base/main.cpp"
+// Qt:   QCommandLineParser parser; parser.addOption({{"r", "repeats"}, "Runs.", "n", "3"}); parser.process(app);
+CommandLineParser parser("Averages the epochs of a raw file.");
+parser.add_help_option();
+parser.add_option({{"r", "repeats"}, "Runs per measurement.", "n", "3"});
+parser.add_option({{"proj"}, "Apply the SSP projectors.", {}, {}});
+parser.add_positional_argument("raw", "Raw data file.");
+const std::vector<std::string> args{"mne_average", "--proj", "-r", "5", "sample_raw.fif"};
+const bool parsed = parser.parse(args); // in main(): parser.process(argc, argv, "mne_average", version);
+const std::optional<int> repeats = to_int(parser.value("repeats"));
+```
+
+An option of a [`CommandLineParser`](/docs/api/base/command-line-parser).
+
+---
+
+## Example
+
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
+- Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
+- Build target: `ex_base` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

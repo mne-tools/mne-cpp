@@ -48,6 +48,8 @@ The documented classes this example uses most:
 - [CborParseError](../../api/base/cbor-parse-error.mdx)
 - [CborValue](../../api/base/cbor-value.mdx)
 - [CircularBuffer](../../api/base/circular-buffer.mdx)
+- [CommandLineOption](../../api/base/command-line-option.mdx)
+- [CommandLineParser](../../api/base/command-line-parser.mdx)
 - [Expected](../../api/base/expected.mdx)
 - [FileByteStream](../../api/base/file-byte-stream.mdx)
 - [JsonArray](../../api/base/json-array.mdx)
@@ -93,6 +95,7 @@ The documented classes this example uses most:
 #include <mne/base/byte_stream.h>
 #include <mne/base/cbor.h>
 #include <mne/base/circular_buffer.h>
+#include <mne/base/command_line.h>
 #include <mne/base/json.h>
 #include <mne/base/json_stream_parser.h>
 #include <mne/base/log.h>
@@ -211,6 +214,20 @@ int main()
     const bool isGz = iequals(utf8_from_path(path_from_utf8("T1.NII.GZ").extension()), ".gz");
     //! [string_utils_usage]
     ok &= expect(fields[0] == "MEG 0113" && scale == 1.5e-13 && isGz, "string helpers parsed the line");
+
+    //! [command_line_usage]
+    // Qt:   QCommandLineParser parser; parser.addOption({{"r", "repeats"}, "Runs.", "n", "3"}); parser.process(app);
+    CommandLineParser parser("Averages the epochs of a raw file.");
+    parser.add_help_option();
+    parser.add_option({{"r", "repeats"}, "Runs per measurement.", "n", "3"});
+    parser.add_option({{"proj"}, "Apply the SSP projectors.", {}, {}});
+    parser.add_positional_argument("raw", "Raw data file.");
+    const std::vector<std::string> args{"mne_average", "--proj", "-r", "5", "sample_raw.fif"};
+    const bool parsed = parser.parse(args); // in main(): parser.process(argc, argv, "mne_average", version);
+    const std::optional<int> repeats = to_int(parser.value("repeats"));
+    //! [command_line_usage]
+    ok &= expect(parsed && parser.is_set("proj") && repeats == 5 && parser.positional_arguments() == std::vector<std::string>{"sample_raw.fif"},
+                 "CommandLineParser read the options and the file");
 
     //! [json_usage]
     // Qt:   QJsonParseError error;

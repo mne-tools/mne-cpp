@@ -1,0 +1,239 @@
+---
+id: command-line-parser
+title: "mne::CommandLineParser"
+sidebar_label: CommandLineParser
+sidebar_position: 90
+---
+
+# CommandLineParser
+
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/command_line.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/base/command_line.h)
+
+`#include <mne/base/command_line.h>`
+
+```cpp
+class mne::CommandLineParser
+```
+
+Parses a tool's command line against the options it declares and writes its help and version texts.
+
+```cpp title="src/examples/ex_base/main.cpp"
+// Qt:   QCommandLineParser parser; parser.addOption({{"r", "repeats"}, "Runs.", "n", "3"}); parser.process(app);
+CommandLineParser parser("Averages the epochs of a raw file.");
+parser.add_help_option();
+parser.add_option({{"r", "repeats"}, "Runs per measurement.", "n", "3"});
+parser.add_option({{"proj"}, "Apply the SSP projectors.", {}, {}});
+parser.add_positional_argument("raw", "Raw data file.");
+const std::vector<std::string> args{"mne_average", "--proj", "-r", "5", "sample_raw.fif"};
+const bool parsed = parser.parse(args); // in main(): parser.process(argc, argv, "mne_average", version);
+const std::optional<int> repeats = to_int(parser.value("repeats"));
+```
+
+Command-line parser for the tools, without Qt.
+
+---
+
+## Public Methods
+
+### CommandLineParser(description)
+
+**Parameters:**
+
+- **description** : *std::string*
+  What the tool does, printed by help.
+
+---
+
+### add_help_option()
+
+Adds -h and help, which print the help text.
+
+---
+
+### add_version_option()
+
+Adds -v and version, which print the tool's name and version.
+
+---
+
+### add_option(option)
+
+Declares an option.
+
+**Parameters:**
+
+- **option** : *[CommandLineOption](/docs/api/base/command-line-option)*
+  The option; none of its names may be declared already.
+
+**Returns:**
+
+- *bool* — false if the option has no name or a name is taken.
+
+---
+
+### add_positional_argument(name, description)
+
+Names a positional argument in the help text.
+
+**Parameters:**
+
+- **name** : *std::string*
+  Placeholder, e.g. "file".
+
+- **description** : *std::string*
+  One line for the help text.
+
+---
+
+### parse(args)
+
+Parses `args`; args[0] is the program and is skipped.
+
+Parsing again starts afresh.
+
+**Parameters:**
+
+- **args** : *std::span&lt; const std::string &gt;*
+  The arguments.
+
+**Returns:**
+
+- *bool* — false on an unknown option or a missing value; `error_text()` says which.
+
+---
+
+### parse(argc, argv)
+
+Parses main()'s arguments; see `parse(std::span<const std::string>)`.
+
+**Parameters:**
+
+- **argc** : *int*
+  Argument count.
+
+- **argv** : *const char *const **
+  Arguments; argv[0] is the program.
+
+**Returns:**
+
+- *bool* — false on an unknown option or a missing value.
+
+---
+
+### process(argc, argv, name, version)
+
+Parses main()'s arguments like QCommandLineParser::process(): prints the help or version text and exits with 0 when asked for, prints the error and exits with 1 when parsing fails, and returns otherwise.
+
+**Parameters:**
+
+- **argc** : *int*
+  Argument count.
+
+- **argv** : *const char *const **
+  Arguments.
+
+- **name** : *std::string_view*
+  The tool's name.
+
+- **version** : *std::string_view*
+  The tool's version.
+
+---
+
+### is_set(name)
+
+**Parameters:**
+
+- **name** : *std::string_view*
+  Any of the option's names.
+
+**Returns:**
+
+- *bool* — Whether the option was given.
+
+---
+
+### value(name)
+
+**Parameters:**
+
+- **name** : *std::string_view*
+  Any of the option's names.
+
+**Returns:**
+
+- *std::string* — The option's last value, or its default value if it was not given.
+
+---
+
+### values(name)
+
+**Parameters:**
+
+- **name** : *std::string_view*
+  Any of the option's names.
+
+**Returns:**
+
+- *std::vector&lt; std::string &gt;* — Every value of the option in order, or its default value if it was not given.
+
+---
+
+### positional_arguments()
+
+**Returns:**
+
+- *const std::vector&lt; std::string &gt; &* — The arguments that are not options, in order.
+
+---
+
+### error_text()
+
+**Returns:**
+
+- *const std::string &* — Why the last `parse()` failed; empty if it did not.
+
+---
+
+### help_text(name)
+
+**Parameters:**
+
+- **name** : *std::string_view*
+  The tool's name, for the usage line.
+
+**Returns:**
+
+- *std::string* — The help text.
+
+---
+
+## Example
+
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
+- Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
+- Build target: `ex_base` (runs under CTest)
+
+## Used in examples
+
+### [ex_base](../../examples/base/ex_base.mdx)
+
+Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
+
+````cpp title="src/examples/ex_base/main.cpp, line 144"
+// Qt:   QCommandLineParser parser; parser.addOption({{"r", "repeats"}, "Runs.", "n", "3"}); parser.process(app);
+CommandLineParser parser("Averages the epochs of a raw file.");
+parser.add_help_option();
+parser.add_option({{"r", "repeats"}, "Runs per measurement.", "n", "3"});
+parser.add_option({{"proj"}, "Apply the SSP projectors.", {}, {}});
+parser.add_positional_argument("raw", "Raw data file.");
+const std::vector<std::string> args{"mne_average", "--proj", "-r", "5", "sample_raw.fif"};
+const bool parsed = parser.parse(args); // in main(): parser.process(argc, argv, "mne_average", version);
+const std::optional<int> repeats = to_int(parser.value("repeats"));
+ok &= expect(parsed && parser.is_set("proj") && repeats == 5 && parser.positional_arguments() == std::vector<std::string>{"sample_raw.fif"},
+             "CommandLineParser read the options and the file");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

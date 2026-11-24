@@ -497,7 +497,9 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/base/sha256',
         'api/base/process-options',
         'api/base/process-result',
-        'api/base/xml-element'
+        'api/base/xml-element',
+        'api/base/command-line-parser',
+        'api/base/command-line-option'
       ],
     },
     {

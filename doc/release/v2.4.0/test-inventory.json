@@ -6,9 +6,9 @@
     "commit": "0800c9a1bf606c2df8c44e35fbb42ea13029b549"
   },
   "summary": {
-    "directories": 287,
+    "directories": 288,
     "registration": {
-      "unconditional": 275,
+      "unconditional": 276,
       "conditional": 9,
       "unregistered": 3
     },
@@ -46,6 +46,7 @@
           "test_base_byte_stream",
           "test_base_cbor",
           "test_base_circular_buffer",
+          "test_base_command_line",
           "test_base_json",
           "test_base_logger",
           "test_base_process",
@@ -140,6 +141,7 @@
           "test_base_byte_stream",
           "test_base_cbor",
           "test_base_circular_buffer",
+          "test_base_command_line",
           "test_base_json",
           "test_base_logger",
           "test_base_process",
@@ -234,6 +236,7 @@
           "test_base_byte_stream",
           "test_base_cbor",
           "test_base_circular_buffer",
+          "test_base_command_line",
           "test_base_json",
           "test_base_logger",
           "test_base_process",
@@ -328,6 +331,7 @@
           "test_base_byte_stream",
           "test_base_cbor",
           "test_base_circular_buffer",
+          "test_base_command_line",
           "test_base_json",
           "test_base_logger",
           "test_base_process",
@@ -422,6 +426,7 @@
           "test_base_byte_stream",
           "test_base_cbor",
           "test_base_circular_buffer",
+          "test_base_command_line",
           "test_base_json",
           "test_base_logger",
           "test_base_process",
@@ -516,6 +521,7 @@
           "test_base_byte_stream",
           "test_base_cbor",
           "test_base_circular_buffer",
+          "test_base_command_line",
           "test_base_json",
           "test_base_logger",
           "test_base_process",
@@ -1514,6 +1520,41 @@
       },
       "registry_classes": [
         "CircularBuffer"
+      ]
+    },
+    {
+      "name": "test_base_command_line",
+      "cmake": "src/tests/test_base_command_line/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_base_command_line"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "CommandLineOption",
+        "CommandLineParser"
       ]
     },
     {
