@@ -15,7 +15,7 @@ For instance, a field included as PHI could be the **measurment date and time** 
 
 ## GUI Mode
 
-MNE Anonymize binary file is named `mne_anonymize`. By default, the application is executed in GUI mode. However, if you want to run `mne_anonymize` in GUI mode but you still want to initialize some of the options through a command line call, you can allways do so through the actual command prompt. For example, if you execute `mne_anonymize --in example.fif -bdf` the GUI will start and the options in it will be already set accordingly. The application recognizes several command line options, see bellow.
+The GUI is a separate application, `mne_anonymize_gui`. It accepts the same options to pre-fill its fields, e.g. `mne_anonymize_gui --in example.fif -bdf`. `mne_anonymize` always runs on the command line. Both recognize the options below.
 
 ## Command line Mode 
 
@@ -26,7 +26,7 @@ MNE Anonymize can also be executed in command line mode. This is intended for us
 | Option | Description | 
 |--------|-------------|
 |`-h --help`| Displays help on the command line.|
-|`--no-gui`| Command line version of the application.|
+|`--no-gui`| Accepted for compatibility; has no effect.|
 |`--version`| Show the version of this appliation.|
 |`-i --in <infile>`| File to anonymize.|
 |`-o --out <outfile>` *optional*| Output file `<outfile>`. As default '_anonymized.fif' is attached to the file name.|
@@ -81,30 +81,30 @@ It is important to remark that tags will not be deleted. The information in the 
 
 For all examples we will use MNE-CPP's sample data which can be found inside the project folder in `resources/data/MNE-sample-data/MEG/sample` folder. If you find that folder empty, please read `README.md` file inside `MNE-sample-data` folder.
 
-The easiest way to run `mne_anonymize` is by just running the application and using the GUI. Remember you can pre-initialize the options of the GUI through the command line call. If you want, you can allways use the command line mode, without GUI. For instance:
+Run `mne_anonymize_gui` to use the GUI, or `mne_anonymize` on the command line. For instance:
 
 For specifying an input file to anonymize:
 
 ```
-mne_anonymize --no-gui --in ../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif
+mne_anonymize --in ../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif
 ```
 
 If you are concerned with the space in your drive, you can delete the input file immediately after anonymization through the option `--delete_input_file`. By default, before file deletion the user will be prompted to confirm the deletion of the input file:
 
 ```
-mne_anonymize --no-gui --in ../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file
+mne_anonymize --in ../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file
 ```
 
 You can avoid confirming the deletion with the flag `--avoid_delete_confirmation`:
 
 ```
-mne_anonymize --no-gui --in ../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file --avoid_delete_confirmation
+mne_anonymize --in ../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file --avoid_delete_confirmation
 ```
 
 If you specify the input and the output files with the same name, by default the application will ask you to confirm deletion of the input file. You can also avoid the confirmation and force the deletion with the option `--avoid_delete_confirmation`.
 
 ```
-mne_anonymize --no-gui --in ../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif --out ../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file --avoid_delete_confirmation
+mne_anonymize --in ../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif --out ../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file --avoid_delete_confirmation
 ```
 
 In order to **substract** 35 days from all measurement dates, both in the ID and `FIFF_MEAS_DATE` tags, use:

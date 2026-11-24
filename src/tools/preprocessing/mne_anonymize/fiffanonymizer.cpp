@@ -19,27 +19,25 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/base/log.h>
 #include "fiffanonymizer.h"
 
 #include <mne/base/base_global.h>
-
+#include <mne/base/byte_stream.h>
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 #include <mne/fiff/fiff_dir_entry.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QStack>
-#include <QFileInfo>
-#include <QTimeZone>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <algorithm>
+#include <array>
 #include <cstring>
+#include <ctime>
+#include <format>
+#include <regex>
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -50,6 +48,184 @@ using namespace MNEANONYMIZE;
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
+
+namespace
+{
+
+constexpr std::int64_t kSecsPerDay = 86400;
+constexpr std::int64_t kJulianDayOfEpoch = 2440588; // Julian day of 1970-01-01
+
+// QDate's range is much wider than year_month_day's; dates outside it are not shown, as QDate would show them oddly
+constexpr std::int64_t kMaxShownDays = 11'000'000;
+
+template<typename Function, typename... Args>
+void notify(const Function& function, Args&&... args)
+{
+    if (function) {
+        function(std::forward<Args>(args)...);
+    }
+}
+
+std::optional<std::tm> localTm(std::int64_t secs)
+{
+    const auto time = static_cast<std::time_t>(secs);
+    std::tm tm{};
+#ifdef _WIN32
+    if (localtime_s(&tm, &time) != 0) {
+        return std::nullopt;
+    }
+#else
+    if (localtime_r(&time, &tm) == nullptr) {
+        return std::nullopt;
+    }
+#endif
+    return tm;
+}
+
+std::int64_t daysFromCivil(int year, int month, int day)
+{
+    using namespace std::chrono;
+    const sys_days first{std::chrono::year{year} / std::chrono::month{static_cast<unsigned>(month)} / 1};
+    return first.time_since_epoch().count() + day - 1;
+}
+
+// Wall-clock seconds of a local time, as if the local time were UTC
+std::int64_t wallSecs(const std::tm& tm)
+{
+    return daysFromCivil(tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday) * kSecsPerDay + tm.tm_hour * 3600 + tm.tm_min * 60 + tm.tm_sec;
+}
+
+// Seconds the local time zone is ahead of UTC at @p secs; before 1970, where Windows has no local time, that of 1970
+std::int64_t utcOffset(std::int64_t secs)
+{
+    std::optional<std::tm> tm = localTm(secs);
+    if (!tm) {
+        secs = 0;
+        tm = localTm(secs);
+    }
+    return tm ? wallSecs(*tm) - secs : 0;
+}
+
+// Seconds since the epoch of a local wall-clock time, given as if it were UTC
+std::int64_t secsFromWall(std::int64_t wall)
+{
+    std::int64_t secs = wall - utcOffset(wall);
+    secs = wall - utcOffset(secs);
+    return secs;
+}
+
+// Local date and time like QDateTime::toString("dd.MM.yyyy hh:mm:ss.zzz t")
+std::string formatLocalDateTime(std::int64_t secs)
+{
+    const std::optional<std::tm> tm = localTm(secs);
+    if (!tm) {
+        return {};
+    }
+    std::array<char, 64> zone{};
+    const std::size_t length = std::strftime(zone.data(), zone.size(), "%Z", &*tm);
+    return std::format("{:02}.{:02}.{:04} {:02}:{:02}:{:02}.000 {}",
+                       tm->tm_mday,
+                       tm->tm_mon + 1,
+                       tm->tm_year + 1900,
+                       tm->tm_hour,
+                       tm->tm_min,
+                       tm->tm_sec,
+                       std::string_view(zone.data(), length));
+}
+
+// A date like QDate::toString("dd.MM.yyyy"); empty for a date QDate would hold invalid
+std::string formatJulianDay(std::optional<std::int64_t> julianDay)
+{
+    if (!julianDay) {
+        return {};
+    }
+    const std::int64_t days = *julianDay - kJulianDayOfEpoch;
+    if (days < -kMaxShownDays || days > kMaxShownDays) {
+        return {};
+    }
+    const std::chrono::year_month_day date{std::chrono::sys_days{std::chrono::days{days}}};
+    return std::format("{:02}.{:02}.{:04}",
+                       static_cast<unsigned>(date.day()),
+                       static_cast<unsigned>(date.month()),
+                       static_cast<int>(date.year()));
+}
+
+// Valid like a QDate, which has no year 0
+bool isValidDate(const std::chrono::year_month_day& date)
+{
+    return date.ok() && date.year() != std::chrono::year{0};
+}
+
+std::optional<std::int64_t> julianDay(const std::chrono::year_month_day& date)
+{
+    if (!isValidDate(date)) {
+        return std::nullopt;
+    }
+    return std::chrono::sys_days{date}.time_since_epoch().count() + kJulianDayOfEpoch;
+}
+
+// A date written DDMMYYYY, like QDate::fromString(text, "ddMMyyyy"); not ok() if it is none
+std::chrono::year_month_day parseDate(const std::string& text)
+{
+    static const std::regex pattern("^(\\d{2})(\\d{2})(\\d{4})$");
+    std::smatch match;
+    if (!std::regex_match(text, match, pattern)) {
+        return std::chrono::year_month_day{std::chrono::year{0}, std::chrono::month{0}, std::chrono::day{0}};
+    }
+    return std::chrono::year_month_day{std::chrono::year{std::stoi(match[3].str())},
+                                       std::chrono::month{static_cast<unsigned>(std::stoi(match[2].str()))},
+                                       std::chrono::day{static_cast<unsigned>(std::stoi(match[1].str()))}};
+}
+
+// UTF-8 with every byte that does not start a valid sequence replaced by U+FFFD, as QString::fromUtf8 decodes it
+std::string sanitizedUtf8(std::string_view text)
+{
+    std::string result;
+    result.reserve(text.size());
+    std::size_t i = 0;
+    while (i < text.size()) {
+        const auto lead = static_cast<unsigned char>(text[i]);
+        std::size_t length = 0;
+        std::uint32_t minimum = 0;
+        if (lead < 0x80) {
+            length = 1;
+        } else if (lead >= 0xC2 && lead <= 0xDF) {
+            length = 2;
+            minimum = 0x80;
+        } else if (lead >= 0xE0 && lead <= 0xEF) {
+            length = 3;
+            minimum = 0x800;
+        } else if (lead >= 0xF0 && lead <= 0xF4) {
+            length = 4;
+            minimum = 0x10000;
+        }
+        bool valid = length > 0 && i + length <= text.size();
+        std::uint32_t codePoint = length == 1 ? lead : (lead & (0x7Fu >> length));
+        for (std::size_t k = 1; valid && k < length; ++k) {
+            const auto next = static_cast<unsigned char>(text[i + k]);
+            valid = (next & 0xC0) == 0x80;
+            codePoint = (codePoint << 6) | (next & 0x3Fu);
+        }
+        valid = valid && codePoint >= minimum && codePoint <= 0x10FFFF && (codePoint < 0xD800 || codePoint > 0xDFFF);
+        if (valid) {
+            result.append(text.substr(i, length));
+            i += length;
+        } else {
+            result.append("\xEF\xBF\xBD");
+            ++i;
+        }
+    }
+    return result;
+}
+
+std::filesystem::path absolutePath(const std::string& utf8)
+{
+    std::error_code error;
+    const std::filesystem::path path = std::filesystem::absolute(mne::path_from_utf8(utf8), error);
+    return path.lexically_normal();
+}
+
+} // namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -65,7 +241,7 @@ FiffAnonymizer::FiffAnonymizer()
 , m_dMaxValidFiffVerion(1.3)
 , m_sDefaultString("mne_anonymize")
 , m_sDefaultShortString("mne-cpp")
-, m_dDefaultDate(QDateTime(QDate(2000, 1, 1), QTime(1, 1, 0)))
+, m_dDefaultDate(std::chrono::year{2000} / 1 / 1)
 , m_dMeasurementDate(m_dDefaultDate)
 , m_iMeasurementDateOffset(0)
 , m_bUseMeasurementDateOffset(false)
@@ -75,7 +251,7 @@ FiffAnonymizer::FiffAnonymizer()
 , m_sSubjectFirstName(m_sDefaultString)
 , m_sSubjectMidName("mne")
 , m_sSubjectLastName(m_sDefaultString)
-, m_dSubjectBirthday(QDate(2000, 1, 1))
+, m_dSubjectBirthday(std::chrono::year{2000} / 1 / 1)
 , m_iSubjectBirthdayOffset(0)
 , m_bUseSubjectBirthdayOffset(false)
 , m_sSubjectComment(m_sDefaultString)
@@ -97,16 +273,15 @@ FiffAnonymizer::FiffAnonymizer()
     //is stored in the 2-7 bytes. To do -> Check why!!!
     m_BDfltMAC[0] = 0;
     m_BDfltMAC[1] = 0;
-
-    m_pBlockTypeList = QSharedPointer<QStack<int32_t>>(new QStack<int32_t>);
-    m_pBlockTypeList->clear();
 }
 
 //=============================================================================================================
 
 FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
-: QObject()
-, m_pTag(mne::FiffTag{})
+: m_pTag(obj.m_pTag)
+, m_blockTypeList(obj.m_blockTypeList)
+, m_fFileIn(obj.m_fFileIn)
+, m_fFileOut(obj.m_fFileOut)
 , m_bFileInSet(obj.m_bFileInSet)
 , m_bFileOutSet(obj.m_bFileOutSet)
 , m_bVerboseMode(obj.m_bVerboseMode)
@@ -142,18 +317,17 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 , m_sMNEWorkingDir(obj.m_sDefaultString)
 , m_sMNECommand(obj.m_sDefaultString)
 {
-    m_pTag = obj.m_pTag;
-
     m_BDfltMAC[0] = obj.m_BDfltMAC[0];
     m_BDfltMAC[1] = obj.m_BDfltMAC[1];
-
-    m_pBlockTypeList = QSharedPointer<QStack<int32_t>>(new QStack<int32_t>(*obj.m_pBlockTypeList));
 }
 
 //=============================================================================================================
 
-FiffAnonymizer::FiffAnonymizer(FiffAnonymizer&& obj)
-: m_pTag(mne::FiffTag{})
+FiffAnonymizer::FiffAnonymizer(FiffAnonymizer&& obj) noexcept
+: m_pTag(std::move(obj.m_pTag))
+, m_blockTypeList(std::move(obj.m_blockTypeList))
+, m_fFileIn(std::move(obj.m_fFileIn))
+, m_fFileOut(std::move(obj.m_fFileOut))
 , m_bFileInSet(obj.m_bFileInSet)
 , m_bFileOutSet(obj.m_bFileOutSet)
 , m_bVerboseMode(obj.m_bVerboseMode)
@@ -189,12 +363,8 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer&& obj)
 , m_sMNEWorkingDir(obj.m_sDefaultString)
 , m_sMNECommand(obj.m_sDefaultString)
 {
-    m_pTag = obj.m_pTag;
-
     m_BDfltMAC[0] = obj.m_BDfltMAC[0];
     m_BDfltMAC[1] = obj.m_BDfltMAC[1];
-
-    m_pBlockTypeList.swap(obj.m_pBlockTypeList);
 }
 
 //=============================================================================================================
@@ -211,13 +381,16 @@ int FiffAnonymizer::anonymizeFile()
         return 1;
     }
 
-    printIfVerbose("Max. Valid Fiff version: " + QString::number(m_dMaxValidFiffVerion));
-    printIfVerbose(QString("Build date and time: ") + mne::build_date_time());
+    printIfVerbose("Max. Valid Fiff version: " + mne::format_number(m_dMaxValidFiffVerion, 'g', 6));
+    printIfVerbose(std::string("Build date and time: ") + mne::build_date_time());
     printIfVerbose(" ");
 
-    openInOutStreams();
+    if (openInOutStreams()) {
+        return 1;
+    }
 
     printIfVerbose("Reading info in the file.");
+    m_blockTypeList.clear();
     processHeaderTags();
 
     while ((m_pTag->next != -1) && (!m_pInStream->byte_stream().at_end())) {
@@ -228,9 +401,32 @@ int FiffAnonymizer::anonymizeFile()
 
     closeInOutStreams();
 
-    emit outFileReady();
+    notify(m_callbacks.outFileReady);
 
     return 0;
+}
+
+//=============================================================================================================
+
+void FiffAnonymizer::setCallbacks(FiffAnonymizerCallbacks callbacks)
+{
+    m_callbacks = std::move(callbacks);
+}
+
+//=============================================================================================================
+
+std::int64_t FiffAnonymizer::censorMeasurementDate(std::int64_t inSecs) const
+{
+    if (m_bUseMeasurementDateOffset) {
+        // Days are subtracted from the local date, keeping the local time of day like QDateTime::addDays
+        const std::int64_t wall = inSecs + utcOffset(inSecs);
+        return secsFromWall(wall - static_cast<std::int64_t>(m_iMeasurementDateOffset) * kSecsPerDay);
+    }
+    if (!isValidDate(m_dMeasurementDate)) {
+        return 0;
+    }
+    const std::int64_t days = std::chrono::sys_days{m_dMeasurementDate}.time_since_epoch().count();
+    return secsFromWall(days * kSecsPerDay + 3600 + 60);
 }
 
 //=============================================================================================================
@@ -247,21 +443,16 @@ void FiffAnonymizer::censorTag()
         case FIFF_REF_FILE_ID:
         case FIFF_REF_BLOCK_ID: {
             mne::FiffId inId = m_pTag->to_fiff_id();
-            QDateTime inMeasDate = QDateTime::fromSecsSinceEpoch(inId.time.secs, QTimeZone::LocalTime);
-            emit readingIdMeasurementDate(inMeasDate);
+            const std::int64_t inMeasDate = inId.time.secs;
+            notify(m_callbacks.readingIdMeasurementDate, inMeasDate);
 
-            QDateTime outMeasDate;
-
-            if (m_bUseMeasurementDateOffset) {
-                outMeasDate = inMeasDate.addDays(-m_iMeasurementDateOffset);
-            } else {
-                outMeasDate = m_dMeasurementDate;
-            }
+            const std::int64_t outMeasDate = censorMeasurementDate(inMeasDate);
+            const bool outMeasDateValid = m_bUseMeasurementDateOffset || isValidDate(m_dMeasurementDate);
 
             mne::FiffId outId(inId);
             outId.machid[0] = m_BDfltMAC[0];
             outId.machid[1] = m_BDfltMAC[1];
-            outId.time.secs = static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
+            outId.time.secs = static_cast<int32_t>(outMeasDate);
             outId.time.usecs = 0;
 
             const int fiffIdSize(sizeof(inId) / sizeof(mne::fiff_int_t));
@@ -274,195 +465,191 @@ void FiffAnonymizer::censorTag()
 
             m_pTag->resize(fiffIdSize * sizeof(mne::fiff_int_t));
             memcpy(m_pTag->data(), reinterpret_cast<char*>(outData), fiffIdSize * sizeof(mne::fiff_int_t));
-            printIfVerbose(QString::fromStdString("MAC address in ID tag changed: " + inId.toMachidString() + " -> " + outId.toMachidString()));
-            printIfVerbose("Measurement date in ID tag changed: " + inMeasDate.toString("dd.MM.yyyy hh:mm:ss.zzz t") + " -> " + outMeasDate.toString("dd.MM.yyyy hh:mm:ss.zzz t"));
+            printIfVerbose("MAC address in ID tag changed: " + inId.toMachidString() + " -> " + outId.toMachidString());
+            printIfVerbose("Measurement date in ID tag changed: " + formatLocalDateTime(inMeasDate) + " -> " + (outMeasDateValid ? formatLocalDateTime(outMeasDate) : std::string()));
             break;
         }
         case FIFF_MEAS_DATE: {
-            QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*m_pTag->to_int(), QTimeZone::LocalTime));
-            emit readingFileMeasurementDate(inMeasDate);
-            QDateTime outMeasDate;
+            const std::int64_t inMeasDate = *m_pTag->to_int();
+            notify(m_callbacks.readingFileMeasurementDate, inMeasDate);
 
-            if (m_bUseMeasurementDateOffset) {
-                outMeasDate = inMeasDate.addDays(-m_iMeasurementDateOffset);
-            } else {
-                outMeasDate = m_dMeasurementDate;
-            }
+            const std::int64_t outMeasDate = censorMeasurementDate(inMeasDate);
+            const bool outMeasDateValid = m_bUseMeasurementDateOffset || isValidDate(m_dMeasurementDate);
 
             mne::fiff_int_t outData[1];
-            outData[0] = static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
+            outData[0] = static_cast<int32_t>(outMeasDate);
             memcpy(m_pTag->data(), reinterpret_cast<char*>(outData), sizeof(mne::fiff_int_t));
-            printIfVerbose("Measurement date changed: " + inMeasDate.toString("dd.MM.yyyy hh:mm:ss.zzz t") + " -> " + outMeasDate.toString("dd.MM.yyyy hh:mm:ss.zzz t"));
+            printIfVerbose("Measurement date changed: " + formatLocalDateTime(inMeasDate) + " -> " + (outMeasDateValid ? formatLocalDateTime(outMeasDate) : std::string()));
             break;
         }
         case FIFF_COMMENT: {
-            QString inStr(tagText());
-            emit readingFileComment(inStr);
+            std::string inStr(tagText());
+            notify(m_callbacks.readingFileComment, inStr);
 
-            if (m_pBlockTypeList->top() == FIFFB_MEAS_INFO) {
-                QString outStr(m_sDefaultString);
+            if (!m_blockTypeList.empty() && m_blockTypeList.back() == FIFFB_MEAS_INFO) {
+                std::string outStr(m_sDefaultString);
                 setTagText(outStr);
                 printIfVerbose("Description of the measurement block changed: " + inStr + " -> " + outStr);
             }
             break;
         }
         case FIFF_EXPERIMENTER: {
-            QString inStr(tagText());
-            emit readingFileExperimenter(inStr);
+            std::string inStr(tagText());
+            notify(m_callbacks.readingFileExperimenter, inStr);
 
-            QString outStr(m_sDefaultString);
+            std::string outStr(m_sDefaultString);
             setTagText(outStr);
             printIfVerbose("Experimenter changed: " + inStr + " -> " + outStr);
             break;
         }
         case FIFF_SUBJ_ID: {
-            qint32 inSubjID(*m_pTag->to_int());
-            emit readingSubjectId(inSubjID);
-            qint32 outSubjID(m_iSubjectId);
-            memcpy(m_pTag->data(), &outSubjID, sizeof(qint32));
-            printIfVerbose("Subject ID changed: " + QString::number(inSubjID) + " -> " + QString::number(outSubjID));
+            int32_t inSubjID(*m_pTag->to_int());
+            notify(m_callbacks.readingSubjectId, inSubjID);
+            int32_t outSubjID(m_iSubjectId);
+            memcpy(m_pTag->data(), &outSubjID, sizeof(int32_t));
+            printIfVerbose(std::format("Subject ID changed: {} -> {}", inSubjID, outSubjID));
             break;
         }
         case FIFF_SUBJ_FIRST_NAME: {
-            QString inFirstName(tagText());
-            emit readingSubjectFirstName(inFirstName);
-            QString outFirstName(m_sSubjectFirstName);
+            std::string inFirstName(tagText());
+            notify(m_callbacks.readingSubjectFirstName, inFirstName);
+            std::string outFirstName(m_sSubjectFirstName);
             setTagText(outFirstName);
             printIfVerbose("Subject first name changed: " + inFirstName + " -> " + outFirstName);
             break;
         }
         case FIFF_SUBJ_MIDDLE_NAME: {
-            QString inStr(tagText());
-            emit readingSubjectMiddleName(inStr);
-            QString outStr(m_sSubjectMidName);
+            std::string inStr(tagText());
+            notify(m_callbacks.readingSubjectMiddleName, inStr);
+            std::string outStr(m_sSubjectMidName);
             setTagText(outStr);
             printIfVerbose("Subject middle name changed: " + inStr + " -> " + outStr);
             break;
         }
         case FIFF_SUBJ_LAST_NAME: {
-            QString inStr(tagText());
-            emit readingSubjectLastName(inStr);
-            QString outStr(m_sSubjectLastName);
+            std::string inStr(tagText());
+            notify(m_callbacks.readingSubjectLastName, inStr);
+            std::string outStr(m_sSubjectLastName);
             setTagText(outStr);
             printIfVerbose("Subject last name changed: " + inStr + " -> " + outStr);
             break;
         }
         case FIFF_SUBJ_BIRTH_DAY: {
-            QDate inBirthday(QDate::fromJulianDay(*m_pTag->to_julian()));
-            emit readingSubjectBirthday(inBirthday);
-            QDate outBirthday;
+            const std::int64_t inBirthday = *m_pTag->to_julian();
+            notify(m_callbacks.readingSubjectBirthday, inBirthday);
+            std::optional<std::int64_t> outBirthday;
 
             if (m_bUseSubjectBirthdayOffset) {
-                outBirthday = inBirthday.addDays(-m_iSubjectBirthdayOffset);
+                outBirthday = inBirthday - m_iSubjectBirthdayOffset;
             } else {
-                outBirthday = m_dSubjectBirthday;
+                outBirthday = julianDay(m_dSubjectBirthday);
             }
 
             mne::fiff_int_t outData[1];
-            outData[0] = static_cast<int32_t>(outBirthday.toJulianDay());
+            outData[0] = static_cast<int32_t>(outBirthday.value_or(0));
             memcpy(m_pTag->data(), reinterpret_cast<char*>(outData), sizeof(mne::fiff_int_t));
-            printIfVerbose("Subject birthday date changed: " + inBirthday.toString("dd.MM.yyyy") + " -> " + outBirthday.toString("dd.MM.yyyy"));
+            printIfVerbose("Subject birthday date changed: " + formatJulianDay(inBirthday) + " -> " + formatJulianDay(outBirthday));
             break;
         }
         case FIFF_SUBJ_SEX: {
-            qint32 inSubjectSex(*m_pTag->to_int());
-            emit readingSubjectSex(inSubjectSex);
+            int32_t inSubjectSex(*m_pTag->to_int());
+            notify(m_callbacks.readingSubjectSex, inSubjectSex);
             if (m_bBruteMode) {
-                qint32 outSubjSex(m_iSubjectSex);
-                memcpy(m_pTag->data(), &outSubjSex, sizeof(qint32));
+                int32_t outSubjSex(m_iSubjectSex);
+                memcpy(m_pTag->data(), &outSubjSex, sizeof(int32_t));
                 printIfVerbose("Subject sex changed: " + subjectSexToString(inSubjectSex) + " -> " + subjectSexToString(outSubjSex));
             }
             break;
         }
         case FIFF_SUBJ_HAND: {
-            qint32 inSubjectHand(*m_pTag->to_int());
-            emit readingSubjectHand(inSubjectHand);
+            int32_t inSubjectHand(*m_pTag->to_int());
+            notify(m_callbacks.readingSubjectHand, inSubjectHand);
             if (m_bBruteMode) {
-                qint32 newSubjHand(m_iSubjectHand);
-                memcpy(m_pTag->data(), &newSubjHand, sizeof(qint32));
+                int32_t newSubjHand(m_iSubjectHand);
+                memcpy(m_pTag->data(), &newSubjHand, sizeof(int32_t));
                 printIfVerbose("Subject handedness changed: " + subjectHandToString(inSubjectHand) + " -> " + subjectHandToString(newSubjHand));
             }
             break;
         }
         case FIFF_SUBJ_WEIGHT: {
             float inWeight(*m_pTag->to_float());
-            emit readingSubjectWeight(inWeight);
+            notify(m_callbacks.readingSubjectWeight, inWeight);
             if (m_bBruteMode) {
                 float outWeight(m_fSubjectWeight);
                 memcpy(m_pTag->data(), &outWeight, sizeof(float));
-                printIfVerbose("Subject weight changed: " + QString::number(static_cast<double>(inWeight)) + " -> " + QString::number(static_cast<double>(outWeight)));
+                printIfVerbose("Subject weight changed: " + mne::format_number(static_cast<double>(inWeight), 'g', 6) + " -> " + mne::format_number(static_cast<double>(outWeight), 'g', 6));
             }
             break;
         }
         case FIFF_SUBJ_HEIGHT: {
             float inHeight(*m_pTag->to_float());
-            emit readingSubjectHeight(inHeight);
+            notify(m_callbacks.readingSubjectHeight, inHeight);
             if (m_bBruteMode) {
                 float outHeight(m_fSubjectHeight);
                 memcpy(m_pTag->data(), &outHeight, sizeof(float));
-                printIfVerbose("Subject height changed: " + QString::number(static_cast<double>(inHeight)) + " -> " + QString::number(static_cast<double>(outHeight)));
+                printIfVerbose("Subject height changed: " + mne::format_number(static_cast<double>(inHeight), 'g', 6) + " -> " + mne::format_number(static_cast<double>(outHeight), 'g', 6));
             }
             break;
         }
         case FIFF_SUBJ_COMMENT: {
-            QString inStr(tagText());
-            emit readingSubjectComment(inStr);
-            QString outStr(m_sSubjectComment);
+            std::string inStr(tagText());
+            notify(m_callbacks.readingSubjectComment, inStr);
+            std::string outStr(m_sSubjectComment);
             setTagText(outStr);
             printIfVerbose("Subject comment changed: " + inStr + " -> " + outStr);
             break;
         }
         case FIFF_SUBJ_HIS_ID: {
-            QString inSubjectHisId(tagText());
-            emit readingSubjectHisId(inSubjectHisId);
-            QString outSubjectHisId(m_sSubjectHisId);
+            std::string inSubjectHisId(tagText());
+            notify(m_callbacks.readingSubjectHisId, inSubjectHisId);
+            std::string outSubjectHisId(m_sSubjectHisId);
             setTagText(outSubjectHisId);
             printIfVerbose("Subject Hospital-ID(His Id) changed: " + inSubjectHisId + " -> " + outSubjectHisId);
             break;
         }
         case FIFF_PROJ_ID: {
-            qint32 inProjID(*m_pTag->to_int());
-            emit readingProjectId(inProjID);
+            int32_t inProjID(*m_pTag->to_int());
+            notify(m_callbacks.readingProjectId, inProjID);
             if (m_bBruteMode) {
-                qint32 newProjID(m_iProjectId);
-                memcpy(m_pTag->data(), &newProjID, sizeof(qint32));
-                printIfVerbose("ProjectID changed: " + QString::number(inProjID) + " -> " + QString::number(newProjID));
+                int32_t newProjID(m_iProjectId);
+                memcpy(m_pTag->data(), &newProjID, sizeof(int32_t));
+                printIfVerbose(std::format("ProjectID changed: {} -> {}", inProjID, newProjID));
             }
             break;
         }
         case FIFF_PROJ_NAME: {
-            QString inStr(tagText());
-            emit readingProjectName(inStr);
+            std::string inStr(tagText());
+            notify(m_callbacks.readingProjectName, inStr);
             if (m_bBruteMode) {
-                QString outStr(m_sProjectName);
+                std::string outStr(m_sProjectName);
                 setTagText(outStr);
                 printIfVerbose("Project name changed: " + inStr + " -> " + outStr);
             }
             break;
         }
         case FIFF_PROJ_AIM: {
-            QString inStr(tagText());
-            emit readingProjectAim(inStr);
+            std::string inStr(tagText());
+            notify(m_callbacks.readingProjectAim, inStr);
             if (m_bBruteMode) {
-                QString outStr(m_sProjectAim);
+                std::string outStr(m_sProjectAim);
                 setTagText(outStr);
                 printIfVerbose("Project aim changed: " + inStr + " -> " + outStr);
             }
             break;
         }
         case FIFF_PROJ_PERSONS: {
-            QString inStr(tagText());
-            emit readingProjectPersons(inStr);
-            QString outStr(m_sProjectPersons);
+            std::string inStr(tagText());
+            notify(m_callbacks.readingProjectPersons, inStr);
+            std::string outStr(m_sProjectPersons);
             setTagText(outStr);
             printIfVerbose("Project persons changed: " + inStr + " -> " + outStr);
             break;
         }
         case FIFF_PROJ_COMMENT: {
-            QString inStr(tagText());
-            emit readingProjectComment(inStr);
+            std::string inStr(tagText());
+            notify(m_callbacks.readingProjectComment, inStr);
             if (m_bBruteMode) {
-                QString outStr(m_sProjectComment);
+                std::string outStr(m_sProjectComment);
                 setTagText(outStr);
                 printIfVerbose("Project comment changed: " + inStr + " -> " + outStr);
             }
@@ -474,24 +661,24 @@ void FiffAnonymizer::censorTag()
             printIfVerbose("Warning: Beware that a subject''s face can be reconstructed from it");
             printIfVerbose("Warning: This software can not anonymize MRI data, at the moment.");
             printIfVerbose("  ");
-            emit mriDataFoundInFile(true);
+            notify(m_callbacks.mriDataFoundInFile, true);
             break;
         }
         case FIFF_MNE_ENV_WORKING_DIR: {
-            QString inStr(tagText());
-            emit readingMNEWorkingDir(inStr);
+            std::string inStr(tagText());
+            notify(m_callbacks.readingMNEWorkingDir, inStr);
             if (m_bMNEEnvironmentMode || m_bBruteMode) {
-                QString outStr(m_sMNEWorkingDir);
+                std::string outStr(m_sMNEWorkingDir);
                 setTagText(outStr);
                 printIfVerbose("MNE working directory info changed: " + inStr + " -> " + outStr);
             }
             break;
         }
         case FIFF_MNE_ENV_COMMAND_LINE: {
-            QString inStr(tagText());
-            emit readingMNECommandLine(inStr);
+            std::string inStr(tagText());
+            notify(m_callbacks.readingMNECommandLine, inStr);
             if (m_bMNEEnvironmentMode || m_bBruteMode) {
-                QString outStr(m_sMNECommand);
+                std::string outStr(m_sMNECommand);
                 setTagText(outStr);
                 printIfVerbose("MNE command line info changed: " + inStr + " -> " + outStr);
             }
@@ -543,8 +730,8 @@ void FiffAnonymizer::processHeaderTags()
     if (m_pTag->kind != FIFF_DIR_POINTER) {
         mne::Log::critical("This file may not be compatible with this application. Second tag is not a valid Tag directory pointer tag.");
     }
-    qint32 newTagDirLoc(-1);
-    memcpy(m_pTag->data(), &newTagDirLoc, sizeof(qint32));
+    int32_t newTagDirLoc(-1);
+    memcpy(m_pTag->data(), &newTagDirLoc, sizeof(int32_t));
 
     censorTag();
     writeTag();
@@ -566,11 +753,11 @@ void FiffAnonymizer::processHeaderTags()
 void FiffAnonymizer::updateBlockTypeList()
 {
     if (m_pTag->kind == FIFF_BLOCK_START) {
-        m_pBlockTypeList->push(*m_pTag->to_int());
+        m_blockTypeList.push_back(*m_pTag->to_int());
     }
 
-    if (m_pTag->kind == FIFF_BLOCK_END) {
-        m_pBlockTypeList->pop();
+    if (m_pTag->kind == FIFF_BLOCK_END && !m_blockTypeList.empty()) {
+        m_blockTypeList.pop_back();
     }
 }
 
@@ -580,11 +767,11 @@ bool FiffAnonymizer::checkValidFiffFormatVersion()
 {
     if (m_pTag->kind == FIFF_FILE_ID) {
         mne::FiffId fileId = m_pTag->to_fiff_id();
-        int inMayorVersion = (static_cast<uint32_t>(fileId.version) & 0xFFFF0000) >> 16;
-        int inMinorVersion = (static_cast<uint32_t>(fileId.version) & 0x0000FFFF);
+        int inMayorVersion = static_cast<int>((static_cast<uint32_t>(fileId.version) & 0xFFFF0000) >> 16);
+        int inMinorVersion = static_cast<int>(static_cast<uint32_t>(fileId.version) & 0x0000FFFF);
         double inVersion = inMayorVersion + inMinorVersion / 10.0;
-        emit readingIdFileVersion(inVersion);
-        emit readingIdMac(QString::fromStdString(fileId.toMachidString()));
+        notify(m_callbacks.readingIdFileVersion, inVersion);
+        notify(m_callbacks.readingIdMac, fileId.toMachidString());
 
         if (inVersion > m_dMaxValidFiffVerion) {
             return false;
@@ -596,44 +783,40 @@ bool FiffAnonymizer::checkValidFiffFormatVersion()
 
 //=============================================================================================================
 
-int FiffAnonymizer::setInFile(const QString& sFileIn)
+int FiffAnonymizer::setInFile(const std::string& sFileIn)
 {
-    QFileInfo fiIn(sFileIn);
-    m_fFileIn.setFileName(fiIn.absoluteFilePath());
+    m_fFileIn = absolutePath(sFileIn);
     m_bFileInSet = true;
-    //    qDebug() << "Input file set: " << fiIn.absoluteFilePath();
     return 0;
 }
 
 //=============================================================================================================
 
-QString FiffAnonymizer::getFileNameIn() const
+std::string FiffAnonymizer::getFileNameIn() const
 {
-    return m_fFileIn.fileName();
+    return mne::utf8_from_path(m_fFileIn);
 }
 
 //=============================================================================================================
 
-int FiffAnonymizer::setOutFile(const QString& sFileOut)
+int FiffAnonymizer::setOutFile(const std::string& sFileOut)
 {
-    QFileInfo fiIn(m_fFileIn);
-    QFileInfo fiOut(sFileOut);
-    if (fiOut.absoluteFilePath() == fiIn.absoluteFilePath()) {
+    const std::filesystem::path fileOut = absolutePath(sFileOut);
+    if (fileOut == m_fFileIn) {
         mne::Log::warning("Both input and output file names are the same.");
         return 1;
     } else {
-        m_fFileOut.setFileName(fiOut.absoluteFilePath());
+        m_fFileOut = fileOut;
     }
     m_bFileOutSet = true;
-    //    qDebug() << "Output file set: " << fiOut.absoluteFilePath();
     return 0;
 }
 
 //=============================================================================================================
 
-QString FiffAnonymizer::getFileNameOut() const
+std::string FiffAnonymizer::getFileNameOut() const
 {
-    return m_fFileOut.fileName();
+    return mne::utf8_from_path(m_fFileOut);
 }
 
 //=============================================================================================================
@@ -659,7 +842,7 @@ void FiffAnonymizer::setMNEEnvironmentMode(bool bFlag)
 
 //=============================================================================================================
 
-bool FiffAnonymizer::getMNEEnvironmentMode()
+bool FiffAnonymizer::getMNEEnvironmentMode() const
 {
     return m_bMNEEnvironmentMode;
 }
@@ -680,21 +863,21 @@ bool FiffAnonymizer::getBruteMode() const
 
 //=============================================================================================================
 
-void FiffAnonymizer::setMeasurementDate(const QDateTime& d)
+void FiffAnonymizer::setMeasurementDate(const std::chrono::year_month_day& d)
 {
-    m_dMeasurementDate = QDateTime(d.date(), QTime(1, 1, 0));
+    m_dMeasurementDate = d;
 }
 
 //=============================================================================================================
 
-void FiffAnonymizer::setMeasurementDate(const QString& sMeasDay)
+void FiffAnonymizer::setMeasurementDate(const std::string& sMeasDay)
 {
-    m_dMeasurementDate = QDateTime(QDate::fromString(sMeasDay, "ddMMyyyy"), QTime(1, 1, 0));
+    m_dMeasurementDate = parseDate(sMeasDay);
 }
 
 //=============================================================================================================
 
-QDateTime FiffAnonymizer::getMeasurementDate() const
+std::chrono::year_month_day FiffAnonymizer::getMeasurementDate() const
 {
     return m_dMeasurementDate;
 }
@@ -715,21 +898,21 @@ void FiffAnonymizer::setUseMeasurementDateOffset(bool b)
 
 //=============================================================================================================
 
-void FiffAnonymizer::setSubjectBirthday(const QString& sSubjBirthday)
+void FiffAnonymizer::setSubjectBirthday(const std::string& sSubjBirthday)
 {
-    m_dSubjectBirthday = QDate::fromString(sSubjBirthday, "ddMMyyyy");
+    m_dSubjectBirthday = parseDate(sSubjBirthday);
 }
 
 //=============================================================================================================
 
-void FiffAnonymizer::setSubjectBirthday(const QDate& dSubjBirthday)
+void FiffAnonymizer::setSubjectBirthday(const std::chrono::year_month_day& dSubjBirthday)
 {
-    m_dSubjectBirthday = QDate(dSubjBirthday);
+    m_dSubjectBirthday = dSubjBirthday;
 }
 
 //=============================================================================================================
 
-QDate FiffAnonymizer::getSubjectBirthday()
+std::chrono::year_month_day FiffAnonymizer::getSubjectBirthday() const
 {
     return m_dSubjectBirthday;
 }
@@ -750,14 +933,14 @@ void FiffAnonymizer::setUseSubjectBirthdayOffset(bool b)
 
 //=============================================================================================================
 
-int FiffAnonymizer::getSubjectBirthdayOffset()
+int FiffAnonymizer::getSubjectBirthdayOffset() const
 {
     return m_iSubjectBirthdayOffset;
 }
 
 //=============================================================================================================
 
-void FiffAnonymizer::setSubjectHisId(const QString& sSubjectHisId)
+void FiffAnonymizer::setSubjectHisId(const std::string& sSubjectHisId)
 {
     m_sSubjectHisId = sSubjectHisId;
 }
@@ -766,21 +949,23 @@ void FiffAnonymizer::setSubjectHisId(const QString& sSubjectHisId)
 
 int FiffAnonymizer::openInOutStreams()
 {
-    auto in = mne::FileByteStream::open(m_fFileIn.fileName().toStdU16String(), mne::FileByteStream::Mode::Read);
+    const std::string fileIn = getFileNameIn();
+    auto in = mne::FileByteStream::open(m_fFileIn, mne::FileByteStream::Mode::Read);
     if (!in) {
-        mne::Log::critical("Problem opening the input file: {}", m_fFileIn.fileName().toStdString());
+        mne::Log::critical("Problem opening the input file: {}", fileIn);
         return 1;
     }
-    printIfVerbose("Input file opened correctly: " + m_fFileIn.fileName());
-    m_pInStream = std::make_unique<mne::FiffStream>(std::move(in), m_fFileIn.fileName().toStdString());
+    printIfVerbose("Input file opened correctly: " + fileIn);
+    m_pInStream = std::make_unique<mne::FiffStream>(std::move(in), fileIn);
 
-    auto out = mne::FileByteStream::open(m_fFileOut.fileName().toStdU16String(), mne::FileByteStream::Mode::Write);
+    const std::string fileOut = getFileNameOut();
+    auto out = mne::FileByteStream::open(m_fFileOut, mne::FileByteStream::Mode::Write);
     if (!out) {
-        mne::Log::critical("Problem opening the output file: {}", m_fFileOut.fileName().toStdString());
+        mne::Log::critical("Problem opening the output file: {}", fileOut);
         return 1;
     }
-    printIfVerbose("Output file opened correctly: " + m_fFileOut.fileName());
-    m_pOutStream = std::make_unique<mne::FiffStream>(std::move(out), m_fFileOut.fileName().toStdString());
+    printIfVerbose("Output file opened correctly: " + fileOut);
+    m_pOutStream = std::make_unique<mne::FiffStream>(std::move(out), fileOut);
     return 0;
 }
 
@@ -791,14 +976,14 @@ int FiffAnonymizer::closeInOutStreams()
     if (m_pInStream->close()) {
         printIfVerbose("Input file closed.");
     } else {
-        mne::Log::critical("Problem closing the input file: {}", m_fFileIn.fileName().toStdString());
+        mne::Log::critical("Problem closing the input file: {}", getFileNameIn());
         return 1;
     }
 
     if (m_pOutStream->close()) {
         printIfVerbose("Output file closed.");
     } else {
-        mne::Log::critical("Problem closing the output file: {}", m_fFileOut.fileName().toStdString());
+        mne::Log::critical("Problem closing the output file: {}", getFileNameOut());
         return 1;
     }
 
@@ -807,28 +992,28 @@ int FiffAnonymizer::closeInOutStreams()
 
 //=============================================================================================================
 
-QString FiffAnonymizer::getSubjectHisID()
+std::string FiffAnonymizer::getSubjectHisID() const
 {
     return m_sSubjectHisId;
 }
 
 //=============================================================================================================
 
-int FiffAnonymizer::getMeasurementDayOffset()
+int FiffAnonymizer::getMeasurementDayOffset() const
 {
     return m_iMeasurementDateOffset;
 }
 
 //=============================================================================================================
 
-bool FiffAnonymizer::getUseMeasurementDayOffset()
+bool FiffAnonymizer::getUseMeasurementDayOffset() const
 {
     return m_bUseMeasurementDateOffset;
 }
 
 //=============================================================================================================
 
-bool FiffAnonymizer::getUseSubjectBirthdayOffset()
+bool FiffAnonymizer::getUseSubjectBirthdayOffset() const
 {
     return m_bUseSubjectBirthdayOffset;
 }
@@ -849,17 +1034,53 @@ bool FiffAnonymizer::isFileOutSet() const
 
 //=============================================================================================================
 
-QString FiffAnonymizer::tagText() const
+std::string FiffAnonymizer::tagText() const
 {
     const auto* text = reinterpret_cast<const char*>(m_pTag->data());
-    return QString::fromUtf8(text, std::find(text, text + m_pTag->size(), '\0') - text);
+    return sanitizedUtf8(std::string_view(text, static_cast<std::size_t>(std::find(text, text + m_pTag->size(), '\0') - text)));
 }
 
 //=============================================================================================================
 
-void FiffAnonymizer::setTagText(const QString& text)
+void FiffAnonymizer::setTagText(const std::string& text)
 {
-    const QByteArray utf8 = text.toUtf8();
-    m_pTag->resize(utf8.size());
-    std::memcpy(m_pTag->data(), utf8.constData(), static_cast<std::size_t>(utf8.size()));
+    m_pTag->resize(text.size());
+    std::memcpy(m_pTag->data(), text.data(), text.size());
+}
+
+//=============================================================================================================
+
+std::string FiffAnonymizer::subjectSexToString(int sexCode) const
+{
+    static const std::array<std::string_view, 3> subjectSexRefList = {"unknown", "male", "female"};
+
+    if (sexCode > -1 && sexCode < static_cast<int>(subjectSexRefList.size())) {
+        return std::string(subjectSexRefList[static_cast<std::size_t>(sexCode)]);
+    } else {
+        mne::Log::critical("Invalid subject sex code. [0 = unknown, 1 = male, 2 = female]. The code of the subject is: {}", sexCode);
+        return "invalid-code";
+    }
+}
+
+//=============================================================================================================
+
+std::string FiffAnonymizer::subjectHandToString(int handCode) const
+{
+    static const std::array<std::string_view, 4> subjectHandRefList = {"unknown", "right", "left", "ambidextrous"};
+
+    if ((handCode > -1) && (handCode < static_cast<int>(subjectHandRefList.size()))) {
+        return std::string(subjectHandRefList[static_cast<std::size_t>(handCode)]);
+    } else {
+        mne::Log::critical("Invalid subject handedness code. [0 = unknown, 1 = right, 2 = left, 3 = ambidextrous]. The code of the subject is: {}", handCode);
+        return "invalid-code";
+    }
+}
+
+//=============================================================================================================
+
+void FiffAnonymizer::printIfVerbose(const std::string& str) const
+{
+    if (m_bVerboseMode) {
+        mne::Log::info("{}", str);
+    }
 }

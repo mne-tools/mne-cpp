@@ -19,26 +19,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_anonymize.h"
-#include "apphandler.h"
-#include <mne/base/log.h>
+#include "settingscontrollercl.h"
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-#include <QDebug>
-//=============================================================================================================
-// FORWARD DECLARATIONS
+// STL INCLUDES
 //=============================================================================================================
 
-namespace MNEANONYMIZE
-{
-class SettingsControllerCl;
-}
-
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // MAIN
@@ -54,22 +42,11 @@ class SettingsControllerCl;
  * are null-terminated strings, representing the arguments that were entered on the command line when the
  * program was started.
  *
- * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+ * @return 0 on success, 1 otherwise.
  */
 int main(int argc, char* argv[])
 {
-    MNEANONYMIZE::AppHandler handler;
-    const auto qtApp = handler.createApplication(argc, argv);
+    MNEANONYMIZE::SettingsControllerCl controller(std::vector<std::string>(argv, argv + argc));
 
-    qtApp->setOrganizationName(APPLICATION_ORG);
-    qtApp->setApplicationName(APPLICATION_NAME);
-    qtApp->setApplicationVersion(APPLICATION_VERSION);
-
-    const auto controller = handler.createController(qtApp->arguments());
-
-    if (controller->run()) {
-        return 1;
-    }
-
-    return qtApp->exec();
+    return controller.run() ? 1 : 0;
 }

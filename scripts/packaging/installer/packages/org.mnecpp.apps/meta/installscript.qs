@@ -10,7 +10,7 @@ var applications = [
     { binary: "mne_browse", name: "MNE Browse", comment: "Browse raw MEG/EEG recordings" },
     { binary: "mne_inspect", name: "MNE Inspect", comment: "3-D brain surfaces, source estimates and electrodes" },
     { binary: "mne_align", name: "MNE Align", comment: "Coregister digitiser points with the MRI head surface" },
-    { binary: "mne_anonymize", name: "MNE Anonymize", comment: "Remove personal information from FIFF files" }
+    { binary: "mne_anonymize_gui", name: "MNE Anonymize", comment: "Remove personal information from FIFF files" }
 ];
 
 function Component()

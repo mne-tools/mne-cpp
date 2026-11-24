@@ -480,8 +480,8 @@ elif [[ ${LinkOption} == "static" ]]; then
     # Solve for dependencies for mne_dipole_fit.app bundle
     ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/bin/mne_dipole_fit.app/Contents/MacOS/resources 
 
-    # Solve for dependencies for mne_anonymize.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/bin/mne_anonymize.app/Contents/MacOS/resources
+    # Solve for dependencies for mne_anonymize_gui.app bundle
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/bin/mne_anonymize_gui.app/Contents/MacOS/resources
 
     if [[ ${PackOption} == "true" ]]; then
         # Delete folders which we do not want to ship

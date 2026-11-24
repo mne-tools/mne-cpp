@@ -169,6 +169,10 @@ component_management:
       name: apps/mne_analyze_studio
       paths:
         - src/apps/mne_analyze_studio/**
+    - component_id: apps_mne_anonymize_gui
+      name: apps/mne_anonymize_gui
+      paths:
+        - src/apps/mne_anonymize_gui/**
     - component_id: apps_mne_browse
       name: apps/mne_browse
       paths:

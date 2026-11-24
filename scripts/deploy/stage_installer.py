@@ -35,7 +35,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = REPO_ROOT / "scripts" / "packaging" / "installer"
 ICONS = REPO_ROOT / "doc" / "website" / "static" / "img"
 
-GUI_APPS = {"mne_scan", "mne_analyze", "mne_browse", "mne_inspect", "mne_align", "mne_anonymize"}
+GUI_APPS = {"mne_scan", "mne_analyze", "mne_browse", "mne_inspect", "mne_align", "mne_anonymize_gui"}
 APP_PLUGINS = {"mne_scan_plugins", "mne_analyze_plugins"}
 # Developer utilities that are built and deployed but are of no use to installer users
 EXCLUDED = {"mne_screenshot_regression"}

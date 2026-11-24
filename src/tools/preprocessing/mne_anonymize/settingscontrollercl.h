@@ -22,27 +22,19 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/base/log.h>
 #include "mne_anonymize.h"
 #include "fiffanonymizer.h"
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QSharedPointer>
-#include <QCommandLineParser>
-#include <QFileInfo>
+#include <mne/base/command_line.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
-#include <cstdio>
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+#include <filesystem>
+#include <memory>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNEANONYMIZE
@@ -52,10 +44,6 @@ namespace MNEANONYMIZE
 {
 
 //=============================================================================================================
-// MNEANONYMIZE FORWARD DECLARATIONS
-//=============================================================================================================
-
-//=============================================================================================================
 /**
  * Description of what this class is intended to do (in detail).
  *
@@ -63,13 +51,11 @@ namespace MNEANONYMIZE
  * @details Handles command line input parameters, parses them and sets up anynymizer member objects, properly,
  *          depending on the different options.
  */
-class SettingsControllerCl : public QObject
+class SettingsControllerCl
 {
-    Q_OBJECT
-
 public:
-    typedef QSharedPointer<SettingsControllerCl> SPtr;            /**< Shared pointer type for SettingsControllerCl. */
-    typedef QSharedPointer<const SettingsControllerCl> ConstSPtr; /**< Const shared pointer type for SettingsControllerCl. */
+    using SPtr = std::shared_ptr<SettingsControllerCl>;            /**< Shared pointer type for SettingsControllerCl. */
+    using ConstSPtr = std::shared_ptr<const SettingsControllerCl>; /**< Const shared pointer type for SettingsControllerCl. */
 
     //=========================================================================================================
     /**
@@ -79,36 +65,48 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs a SettingsControllerCl object.
+     * Constructs a SettingsControllerCl object. Like QCommandLineParser::process(), it prints the help or the
+     * version and exits when asked for, and exits with 1 on an unknown option.
      *
-     * @param[in] arguments    String list containing the input arguments in form of a QStringList.
+     * @param[in] arguments    The command line, arguments[0] being the program, as UTF-8.
      */
-    SettingsControllerCl(const QStringList& arguments);
+    explicit SettingsControllerCl(const std::vector<std::string>& arguments);
 
     //=========================================================================================================
     /**
-     * Return a the input file QFileInfo.
-     *
+     * Destroys the SettingsControllerCl object.
      */
-    QFileInfo getQFiInFile();
+    virtual ~SettingsControllerCl() = default;
+
+    SettingsControllerCl(const SettingsControllerCl&) = delete;
+    SettingsControllerCl& operator=(const SettingsControllerCl&) = delete;
 
     //=========================================================================================================
     /**
-     * Return a the output file QFileInfo.
+     * Return the input file, as given or as set.
      *
      */
-    QFileInfo getQFiOutFile();
+    std::filesystem::path getFiInFile() const;
+
+    //=========================================================================================================
+    /**
+     * Return the output file, as given or as set.
+     *
+     */
+    std::filesystem::path getFiOutFile() const;
 
     //=========================================================================================================
     /**
      * Signals the FiffAnonymizer method handling both the multi-parallel setup and the single-thread setup.
+     *
+     * @return 0 on success, 1 otherwise.
      */
     virtual int run();
 
 protected:
     //=========================================================================================================
     /**
-     * Configures the QCommandLineParser member object with all the necesarry options.
+     * Configures the CommandLineParser member object with all the necesarry options.
      */
     void initParser();
 
@@ -119,9 +117,9 @@ protected:
      *
      * @param[in] arguments The arguments to parse.
      *
-     * @return Returns true if parsing was successful, false otherwise.
+     * @return Returns 0 if parsing was successful, 1 otherwise.
      */
-    int parseInputs(const QStringList& arguments);
+    int parseInputs(const std::vector<std::string>& arguments);
 
     //=========================================================================================================
     /**
@@ -130,23 +128,26 @@ protected:
      * anonymizing process. Eventually, once the reading has finished correctly, the input file can be deleted and
      * the output file can then be called as the original input file. This function helps with this process.
      */
-    QString generateRandomFileName();
+    std::string generateRandomFileName();
 
     //=========================================================================================================
     /**
      * If an output filename is not provided this method generates a default output name.
      */
-    QString generateDefaultOutputFileName();
+    std::string generateDefaultOutputFileName();
+
+    //=========================================================================================================
+    /**
+     * Prints the help text and exits with 0, like QCommandLineParser::showHelp().
+     */
+    [[noreturn]] void showHelp() const;
 
 private:
     //=========================================================================================================
     /**
-     * Processes the input parser and configures the state of the FiffAnonymizer instance according to
-     * the options selected. Including input and output files treatment, execution modes and anonymizing options.
+     * Processes the input parser and configures the input and output files of the FiffAnonymizer instance.
      *
-     * @param[in] arguments The arguments to parse.
-     *
-     * @return Returns true if parsing was successful, false otherwise.
+     * @return Returns 0 if parsing was successful, 1 otherwise.
      */
     int parseInOutFiles();
 
@@ -191,14 +192,14 @@ private:
      * Prints a header message if the Verbose option has been set, a header will be printed during execution, right before the
      * file anonymizationFile signal is sent.
      */
-    inline void printHeaderIfVerbose();
+    void printHeaderIfVerbose();
 
     //=========================================================================================================
     /**
      * Prints a footer line or message if the Verbose option has been set, a header will be printed during execution, right before the
      * file anonymizationFile signal is sent.
      */
-    inline void printFooterIfVerbose();
+    void printFooterIfVerbose();
 
     //=========================================================================================================
     /**
@@ -211,27 +212,21 @@ private:
      * @param[in] str String to print.
      *
      */
-    void printIfVerbose(const QString& str) const;
-
-signals:
-    /**
-     * Signal the main qt core application to stop running and exit.
-     */
-    void finished(const int);
+    void printIfVerbose(const std::string& str) const;
 
 protected:
     FiffAnonymizer::SPtr m_pAnonymizer; /**< Local pointer to a Fiffanonyzer object to configure and use.*/
-    QString m_sAppName;                 /**< Application name.*/
-    QString m_sAppVer;                  /**< Application version number.*/
-    QString m_sBuildDate;               /**< Application build date.*/
-    QString m_sBuildHash;               /**< Repository hash whenever the application was built.*/
+    std::string m_sAppName;             /**< Application name.*/
+    std::string m_sAppVer;              /**< Application version number.*/
+    std::string m_sBuildDate;           /**< Application build date.*/
+    std::string m_sBuildHash;           /**< Repository hash whenever the application was built.*/
+    std::string m_sProgramName;         /**< Name of the program in the help text.*/
 
-    QCommandLineParser m_parser; /**< Parser object to work with member ptr to QCoreApp and parse input command line options.*/
+    mne::CommandLineParser m_parser; /**< Parser of the command line options.*/
 
-    QFileInfo m_fiInFile;  /**< Input File info obj.*/
-    QFileInfo m_fiOutFile; /**< Output File info obj.*/
+    std::filesystem::path m_fiInFile;  /**< Input file, as given.*/
+    std::filesystem::path m_fiOutFile; /**< Output file, as given or generated.*/
 
-protected:
     bool m_bGuiMode;                     /**< Object running in GUI mode.*/
     bool m_bDeleteInputFileAfter;        /**< User's request to delete the input file after anonymization.*/
     bool m_bDeleteInputFileConfirmation; /**< User's request to avoid confirmation prompt for input file deletion.*/
@@ -244,17 +239,6 @@ private:
     bool m_bInputFileDeleted;    /**< Flags if the input file has been deleted. */
     bool m_bOutFileRenamed;      /**< Flags if the output file has been renamed to match the name the input file had. */
 };
-
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-inline void SettingsControllerCl::printIfVerbose(const QString& str) const
-{
-    if (m_bVerboseMode) {
-        mne::Log::info("{}", str.toStdString());
-    }
-}
 
 } // namespace MNEANONYMIZE
 

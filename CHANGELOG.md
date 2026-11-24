@@ -256,9 +256,8 @@ aliases; replace the old spelling as below.
   `mne::Json` instead of Qt Core, and link only the MNE-CPP libraries they
   need. Their options, output files and exit codes are unchanged; the help
   text is laid out differently. Number output rounds halfway values away from
-  zero as before. Still on Qt: `mne_acq`, `mne_anonymize` and `mne_rt_server`
-  (graphical or networked), `mne_make_movie` and `mne_screenshot_regression`
-  (rendering).
+  zero as before. Only `mne_screenshot_regression`, which renders with
+  disp3D, and the live `view` of `mne_acq` still need Qt.
 - `mne_make_movie` renders its frames with `mne::RasterImage` instead of
   `QPainter` and no longer needs Qt; frames differ from before only at
   anti-aliased triangle edges and in the font of the time stamp.
@@ -269,6 +268,10 @@ aliases; replace the old spelling as below.
   `mne_rt_server_plugins` folder is gone; commands and wire protocol are
   unchanged, and replies go out when a command finishes instead of on the
   next 100 ms poll.
+- `mne_anonymize` is a Qt-free command-line tool; its graphical interface is
+  the new application `mne_anonymize_gui`. `--no-gui` is still accepted.
+  `-md`, `-mdo`, `-sb` and `-sbo` also work with a single dash, and a file
+  that cannot be opened is reported instead of crashing the tool.
 - A default-constructed `FiffInfo` left `proj_id` and the microseconds of
   `meas_date` uninitialised, so the raw files the converters write differed
   from run to run in `FIFF_PROJ_ID`. They start as -1 and 0.

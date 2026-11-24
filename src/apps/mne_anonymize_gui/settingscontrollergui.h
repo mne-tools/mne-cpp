@@ -24,16 +24,27 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QObject>
 #include <QSharedPointer>
+#include <QString>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <filesystem>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
 namespace MNEANONYMIZE
 {
 class MainWindow;
-class SettingsControllerCl;
 }
+
 //=============================================================================================================
 // DEFINE NAMESPACE MNEANONYMIZE
 //=============================================================================================================
@@ -47,13 +58,12 @@ namespace MNEANONYMIZE
 
 //=============================================================================================================
 /**
- * Controller class for mne_anonymize application when the GUI version of the application is called. This is generally
- * done by default. It controls the declaration and management of a fiffanonymizer and a mainwindow object, and controls
+ * Controller class of mne_anonymize_gui, the GUI version of mne_anonymize. It controls the declaration and management of a fiffanonymizer and a mainwindow object, and controls
  * communication between them.
  *
  * @brief Controller class for the GUI version of mne_anonymize.
  */
-class SettingsControllerGui : public SettingsControllerCl
+class SettingsControllerGui : public QObject, public SettingsControllerCl
 {
     Q_OBJECT
 
@@ -63,9 +73,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a SettingsControllerGUI object.
-    */
-    explicit SettingsControllerGui(const QStringList& arguments);
+     * Constructs a SettingsControllerGUI object, which shows the main window.
+     *
+     * @param[in] arguments    The command line, arguments[0] being the program, as UTF-8.
+     */
+    explicit SettingsControllerGui(const std::vector<std::string>& arguments);
 
 public slots:
     //=========================================================================================================
@@ -127,6 +139,12 @@ private:
      *
      */
     void setupCommunication();
+
+    //=========================================================================================================
+    /**
+     * @return @p path as an absolute QString path.
+     */
+    static QString absoluteFilePath(const std::filesystem::path& path);
 
 private:
     QSharedPointer<MainWindow> m_pWin; /**< A QShared pointer to the address of the MainWindow object containing the GUI.*/
