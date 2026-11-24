@@ -123,13 +123,10 @@ def tool_env(build: Path) -> dict[str, str]:
 
 
 def binary(build: Path, name: str) -> Path:
-    for directory in ("out/Release/bin", "out/Release/tests"):
-        candidate = REPO_ROOT / directory / name
+    """The tool in the build directory itself (a standalone build), else where the main build installs it."""
+    for candidate in (build / name, REPO_ROOT / "out/Release/bin" / name, REPO_ROOT / "out/Release/tests" / name):
         if candidate.exists():
             return candidate
-    candidate = build / name
-    if candidate.exists():
-        return candidate
     raise FileNotFoundError(f"{name} not found; build it first")
 
 
@@ -177,28 +174,36 @@ def suite_acq(build: Path, args: argparse.Namespace) -> list[dict[str, Any]]:
         if result.returncode not in (0, 1) or not out.is_file():
             raise RuntimeError(f"mne_acq_bench failed: {result.stderr[-800:]}")
         metrics = {m["name"]: m for m in json.loads(out.read_text(encoding="utf-8"))["metrics"]}
+    return acq_charts(metrics)
+
+
+def acq_charts(metrics: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
+    """Charts of mne_acq_bench's metrics by name; a metric the build does not measure is left out."""
     lost = [describe_paced(m["name"]) for m in metrics.values() if m["value"] < 0]
     reproduce = "mne_acq_bench --repeats 3 --json acq.json"
-    value = lambda name: metrics[name]["value"]  # noqa: E731
+
+    def points(entries: list[tuple[str, str, float]]) -> list[dict[str, Any]]:
+        return [{"x": x, "y": scale * metrics[name]["value"]} for x, name, scale in entries if name in metrics]
+
     charts = [{
         "id": "acq_throughput", "title": "Acquisition ring throughput", "unit": "GB/s", "higher_is_better": True,
         "subtitle": "int16 samples through the lock-free ring, producer and two readers, verified",
         "command": reproduce,
-        "series": [{"label": "MNE-CPP", "points": [{"x": f"{n} channel{'s' if n > 1 else ''}", "y": value(f"ring_int16_{n}_ch")}
-                                                  for n in (1, 64, 1024, 4096)]}]}, {
+        "series": [{"label": "MNE-CPP", "points": points([(f"{n} channel{'s' if n > 1 else ''}", f"ring_int16_{n}_ch", 1.0)
+                                                          for n in (1, 64, 1024, 4096)])}]}, {
         "id": "acq_latency", "title": "Commit-to-wake latency", "unit": "µs", "higher_is_better": False,
         "subtitle": "time from a producer's commit until the reader runs, per percentile",
         "command": reproduce,
-        "series": [{"label": label, "points": [{"x": f"{reader} reader", "y": value(f"wake_{reader}_{suffix}") / 1000}
-                                               for reader in ("spin", "output", "block")]}
+        "series": [{"label": label, "points": points([(f"{reader} reader", f"wake_{reader}_{suffix}", 1e-3)
+                                                       for reader in ("spin", "output", "block")])}
                    for label, suffix in (("p50", "p50"), ("p99", "p99"), ("p99.9", "p999"))]}, {
         "id": "acq_paced", "title": "Loss-free real-time acquisition", "unit": "MS/s", "higher_is_better": True,
         "subtitle": "paced streams that must not lose a sample (channels × rate)",
         "command": reproduce,
-        "series": [{"label": "MNE-CPP", "points": [
-            {"x": "64 ch × 1 kHz", "y": 64 * value("paced_float32_64_ch_1_khz") / 1000},
-            {"x": "1000 ch × 20 kHz", "y": 1000 * value("paced_float32_1000_ch_20_khz") / 1000},
-            {"x": "256 ch × 20 kHz to FIFF", "y": 256 * value("record_float32_256_ch_20_khz") / 1000}]}]}]
+        "series": [{"label": "MNE-CPP", "points": points([
+            ("64 ch × 1 kHz", "paced_float32_64_ch_1_khz", 64e-3),
+            ("1000 ch × 20 kHz", "paced_float32_1000_ch_20_khz", 1000e-3),
+            ("256 ch × 20 kHz to FIFF", "record_float32_256_ch_20_khz", 256e-3)])}]}]
     if lost:
         charts[-1]["notes"] = [f"Lost samples on this machine: {', '.join(lost)}."]
     return charts
