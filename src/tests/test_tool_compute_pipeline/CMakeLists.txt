@@ -15,7 +15,11 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Core
-    Qt6::Test)
+    Qt6::Test
+    mne_fiff
+    mne_mne
+    mne_base
+    Eigen3::Eigen)
 
 mne_add_test(${PROJECT_NAME}
     LABELS integration slow

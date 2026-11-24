@@ -12,6 +12,15 @@
  */
 
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_proj.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne_inverse_operator.h>
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -19,6 +28,18 @@
 #include <QProcess>
 #include <QCoreApplication>
 #include <QTemporaryDir>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
 
 //=============================================================================================================
 // TEST CLASS
@@ -215,6 +236,59 @@ private slots:
         QVERIFY(!output.isEmpty());
         QFile::remove(stcPrefix + "-lh.stc");
         QFile::remove(stcPrefix + "-rh.stc");
+    }
+
+    //=========================================================================================================
+    // --pred: the model reproduces forward-field data it can explain
+    //=========================================================================================================
+
+    void testPredictedDataReproducesForwardFields()
+    {
+        if (!toolExists("mne_compute_mne"))
+            QSKIP("mne_compute_mne not found");
+        if (m_sInvFile.isEmpty())
+            QSKIP("No inverse operator");
+        const QString fwdFile = m_sResourcePath + "Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+        if (!QFile::exists(fwdFile))
+            QSKIP("Forward solution not available");
+
+        // Ten forward columns of 50 nAm each are the data; sLORETA must not change the prediction
+        const QString predFile = m_scratch.filePath("test_pipeline_pred.txt");
+        QProcess proc;
+        proc.start(m_sBinDir + "/mne_compute_mne", {"--inv", m_sInvFile, "--fwd", fwdFile, "--fwdamp", "50", "--tmin", "0", "--tmax", "9", "--sLORETA", "--snr", "100", "--out", m_scratch.filePath("test_pipeline_pred"), "--pred", predFile});
+        QVERIFY(proc.waitForFinished(120000));
+        QCOMPARE(proc.exitStatus(), QProcess::NormalExit);
+        QCOMPARE(proc.exitCode(), 0);
+
+        auto inv = mne::MNEInverseOperator::read(m_sInvFile.toStdU16String());
+        QVERIFY(inv);
+        auto fwd = mne::MNEForwardSolution::read(fwdFile.toStdU16String());
+        QVERIFY(fwd);
+        const std::vector<std::string>& names = inv->noise_cov.names;
+        Eigen::MatrixXd fields(static_cast<Eigen::Index>(names.size()), 10);
+        for (std::size_t channel = 0; channel < names.size(); ++channel) {
+            const auto row = std::find(fwd->sol.row_names.begin(), fwd->sol.row_names.end(), names[channel]);
+            QVERIFY(row != fwd->sol.row_names.end());
+            fields.row(static_cast<Eigen::Index>(channel)) = fwd->sol.data.row(row - fwd->sol.row_names.begin()).head(10) * 50e-9;
+        }
+        Eigen::MatrixXd projector;
+        mne::FiffProj::make_projector(inv->projs, names, projector);
+        const Eigen::MatrixXd expected = projector * fields;
+
+        QFile pred(predFile);
+        QVERIFY(pred.open(QIODevice::ReadOnly | QIODevice::Text));
+        const QStringList lines = QString::fromUtf8(pred.readAll()).split('\n', Qt::SkipEmptyParts).mid(3);
+        QCOMPARE(lines.size(), static_cast<int>(expected.rows()));
+        Eigen::MatrixXd predicted(expected.rows(), expected.cols());
+        for (int row = 0; row < lines.size(); ++row) {
+            const QStringList values = lines[row].split('\t');
+            QCOMPARE(values.size(), static_cast<int>(expected.cols()));
+            for (int col = 0; col < values.size(); ++col) {
+                predicted(row, col) = values[col].toDouble();
+            }
+        }
+        const double error = (predicted - expected).norm() / expected.norm();
+        QVERIFY2(error < 0.01, qPrintable(QString::number(error)));
     }
 
     //=========================================================================================================

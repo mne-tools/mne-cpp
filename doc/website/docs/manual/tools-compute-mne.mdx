@@ -25,7 +25,7 @@ mne_compute_mne [options]
 | `--in <file>` | Evoked data input file (required) |
 | `--fwd <file>` | Forward solution file (required) |
 | `--cov <file>` | Noise covariance matrix file (required) |
-| `--out <file>` | Output source estimate file (required) |
+| `--out <file>` | Base name of the output: `-lh.stc`/`-rh.stc` for surface, `-vl.stc` for volume source spaces |
 | `--snr <value>` | SNR value for regularization |
 | `--method <type>` | Inverse method: mne, dSPM, sLORETA |
 | `--label <file>` | Restrict estimation to label (repeatable) |
@@ -35,7 +35,7 @@ mne_compute_mne [options]
 | `--scaling <factor>` | Scale output data |
 | `--dip <file>` | Output dipole snapshot file |
 | `--pick <time>` | Extract source estimate at specific time (ms) |
-| `--pred <file>` | Output predicted sensor data |
+| `--pred <file>` | Write the data predicted by the regularised minimum-norm model as text |
 | `--overwrite` | Overwrite output file if it exists |
 
 ## Description

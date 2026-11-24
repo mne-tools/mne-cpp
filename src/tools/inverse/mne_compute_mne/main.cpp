@@ -435,30 +435,43 @@ static bool writeDipFile(const std::string& fileName,
 }
 
 /**
- * @brief Write predicted (forward-modeled) sensor data.
+ * @brief Computes the data the regularised minimum-norm model predicts, as MNE-C's compute_mne_at.
  *
- * Computes predicted sensor data = G * J (forward matrix * source estimate)
- * and writes it as a text file.
+ * The whitened and projected data are expanded in the eigenfields, each component is weighted by
+ * sing^2 / (sing^2 + lambda2), and the result is dewhitened. The prediction does not depend on the
+ * noise normalisation or on how the source orientations are combined.
+ *
+ * @param[in] inv     Inverse operator prepared for the data's nave and lambda2.
+ * @param[in] data    Data of the inverse operator's channels (nChannels x nTimes).
+ * @return The predicted data (nChannels x nTimes).
+ */
+static MatrixXd predictedData(const MNEInverseOperator& inv, const MatrixXd& data)
+{
+    const MatrixXd& fields = inv.eigen_fields.data;
+    const VectorXd weights = inv.sing.cwiseProduct(inv.reginv);
+    const MatrixXd whitened = fields.transpose() * (weights.asDiagonal() * (fields * (inv.whitener * (inv.proj * data))));
+    if (inv.noise_cov.diag) {
+        return inv.noise_cov.data.col(0).cwiseSqrt().asDiagonal() * whitened;
+    }
+    const VectorXd root = inv.noise_cov.eig.cwiseMax(0.0).cwiseSqrt();
+    // The whitener is diag(1 / sqrt(eig)) * eigvec, so eigvec^T * diag(sqrt(eig)) undoes it
+    return inv.noise_cov.eigvec.transpose() * (root.asDiagonal() * whitened);
+}
+
+//=============================================================================================================
+
+/**
+ * @brief Writes predicted sensor data as a text file, one row per channel and one column per time point.
  *
  * @param[in] fileName    Output file path.
- * @param[in] forward     Forward solution (for the gain matrix G).
- * @param[in] stcData     Source estimate data (nSources x nTimes).
+ * @param[in] predicted   Predicted data (nChannels x nTimes).
  * @param[in] timesVec    Time vector in seconds.
  * @return true on success.
  */
 static bool writePredictedData(const std::string& fileName,
-                               const MNEForwardSolution& forward,
-                               const MatrixXd& stcData,
+                               const MatrixXd& predicted,
                                const VectorXd& timesVec)
 {
-    if (forward.sol.data.rows() == 0) {
-        Log::warning("  WARNING: Forward solution has no gain matrix.");
-        return false;
-    }
-
-    // Predicted data = G * J  (nChannels x nSources) * (nSources x nTimes)
-    MatrixXd predicted = forward.sol.data * stcData;
-
     Log::info("  Predicted data: {} channels, {} time points", static_cast<int>(predicted.rows()), static_cast<int>(predicted.cols()));
 
     std::ofstream out(path_from_utf8(fileName));
@@ -467,7 +480,7 @@ static bool writePredictedData(const std::string& fileName,
         return false;
     }
 
-    out << "# Predicted sensor data (forward * sources)\n";
+    out << "# Predicted sensor data (regularised minimum-norm model)\n";
     out << "# " << predicted.rows() << " channels x " << predicted.cols() << " time points\n";
     out << "# Time(ms):";
     for (int t = 0; t < static_cast<int>(predicted.cols()); ++t)
@@ -670,13 +683,7 @@ int main(int argc, char* argv[])
     // --- Predicted data output ---
 
     // --pred: Write predicted sensor data
-    parser.add_option({{"pred"}, "Write predicted sensor data (forward * sources) to file.\n"
-                                 "Requires the forward solution (read from inverse operator).",
-                       "file",
-                       {}});
-
-    // --predfwd: Forward solution file for --pred (if different from inverse)
-    parser.add_option({{"predfwd"}, "Forward solution file for --pred output (default: from inverse operator).", "file", {}});
+    parser.add_option({{"pred"}, "Write the data predicted by the regularised minimum-norm model to a text file.", "file", {}});
 
     // --- Time-point extraction ---
 
@@ -1200,27 +1207,9 @@ int main(int argc, char* argv[])
         const std::string predFile = parser.value("pred");
         Log::info("\nComputing predicted sensor data...");
 
-        // Read forward solution for prediction
-        MNEForwardSolution predFwd;
-        if (parser.is_set("predfwd")) {
-            predFwd = MNEForwardSolution(path_from_utf8(parser.value("predfwd")), {.surf_ori = true});
-        } else if (useFwdAsData) {
-            predFwd = MNEForwardSolution(path_from_utf8(parser.value("fwd")), {.surf_ori = true});
-        } else {
-            Log::info("  NOTE: --pred requires a forward solution.");
-            Log::info("         Use --predfwd to specify one, or use --fwd mode.");
-            Log::info("         Skipping predicted data output.");
-            goto done;
-        }
-
-        if (predFwd.sol.data.rows() > 0) {
-            writePredictedData(predFile, predFwd, stc.data, timesVec);
-        } else {
-            Log::info("  WARNING: Forward solution has no gain matrix.");
-        }
+        writePredictedData(predFile, predictedData(minimumNorm.getPreparedInverseOperator(), data), timesVec);
     }
 
-done:
     Log::info("\nDone.");
 
     return 0;

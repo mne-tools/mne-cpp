@@ -284,6 +284,10 @@ aliases; replace the old spelling as below.
   `InvSourceEstimate::write` refuses data whose rows do not match the vertices.
 - `mne_compute_mne` names a volume estimate `<out>-vl.stc`, which MNE-Python
   reads as a `VolSourceEstimate`.
+- `mne_compute_mne --pred` multiplied a forward solution with the normalised,
+  orientation-combined estimate, which crashed or wrote wrong values, and
+  skipped the output for measured data. It predicts the data from the inverse
+  operator as MNE-C does; `--predfwd` is gone.
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and
