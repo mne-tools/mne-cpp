@@ -257,6 +257,9 @@ aliases; replace the old spelling as below.
   decompresses `.mgz`.
 - `mne_volume_data2mri` read the values of `.w` files as 8-byte doubles; they
   are 4-byte floats, as MNE-Python reads them.
+- Completing a volume source space, which has no triangles, read past the
+  per-vertex triangle lists and crashed `mne_list_source_space` and
+  `mne_make_uniform_stc`; the lists have one entry per vertex.
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and

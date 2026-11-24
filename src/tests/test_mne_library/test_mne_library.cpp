@@ -145,6 +145,7 @@ private slots:
     void sourceSpaces_readAddGeom();
     void sourceSpaces_geometryMatchesDirectComputation();
     void hemisphere_copyComparesEqual();
+    void hemisphere_volumeWithoutTrianglesGetsGeometry();
     void hemisphere_moveKeepsEverything();
 
     // ── InvSourceEstimate ──
@@ -500,7 +501,7 @@ void TestMneLibrary::sourceSpaces_geometryMatchesDirectComputation()
         QVERIFY(hemi->tri_cent.row(i) == cent.transpose());
         QVERIFY(hemi->tri_nn.row(i) == (nn / size).transpose());
     }
-    std::vector<std::vector<int>> tris(static_cast<std::size_t>(hemi->ntri));
+    std::vector<std::vector<int>> tris(static_cast<std::size_t>(hemi->np));
     for (int t = 0; t < hemi->ntri; ++t)
         for (int c = 0; c < 3; ++c)
             tris[static_cast<std::size_t>(hemi->itris(t, c))].push_back(t);
@@ -519,6 +520,26 @@ void TestMneLibrary::sourceSpaces_geometryMatchesDirectComputation()
 
 //=============================================================================================================
 
+void TestMneLibrary::hemisphere_volumeWithoutTrianglesGetsGeometry()
+{
+    // A volume source space has points but no triangles; completing it read past the empty triangle neighbours
+    MNEHemisphere volume;
+    volume.np = 5;
+    volume.ntri = 0;
+    volume.nuse_tri = 0;
+    volume.rr = MNESurfaceOrVolume::PointsT::Random(5, 3);
+    volume.itris = MNESurfaceOrVolume::TrianglesT(0, 3);
+    QVERIFY(volume.complete_source_space_info());
+    QCOMPARE(volume.neighbor_tri.size(), std::size_t(5));
+    QCOMPARE(volume.neighbor_vert.size(), std::size_t(5));
+    for (int v = 0; v < 5; ++v) {
+        QCOMPARE(volume.neighbor_tri[static_cast<std::size_t>(v)].size(), Eigen::Index(0));
+        QCOMPARE(volume.neighbor_vert[static_cast<std::size_t>(v)].size(), Eigen::Index(0));
+    }
+}
+
+//=============================================================================================================
+
 void TestMneLibrary::hemisphere_copyComparesEqual()
 {
     if (!hasData())
@@ -528,8 +549,7 @@ void TestMneLibrary::hemisphere_copyComparesEqual()
     MNESourceSpaces srcSpaces(srcPath().toStdU16String());
     const MNEHemisphere original(*srcSpaces.hemisphereAt(0));
     QVERIFY(original.dist.eigen().rows() == original.np);
-    const MNEHemisphere copy(original);
-    QVERIFY(copy == original);
+    QVERIFY(MNEHemisphere(original) == original);
 }
 
 //=============================================================================================================

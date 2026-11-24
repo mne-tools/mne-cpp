@@ -354,15 +354,16 @@ bool MNEHemisphere::compute_patch_info()
 
 bool MNEHemisphere::add_geometry_info()
 {
-    // The triangles of each vertex in increasing order; like the triangle list, it has ntri entries
+    // The triangles of each vertex in increasing order, one entry per vertex (a volume has no triangles)
     const auto ntris = static_cast<int>(this->itris.rows());
-    std::vector<int> counts(static_cast<std::size_t>(ntris), 0);
+    const auto nverts = static_cast<std::size_t>(std::max(this->np, 0));
+    std::vector<int> counts(nverts, 0);
     for (int t = 0; t < ntris; ++t)
         for (int corner = 0; corner < 3; ++corner)
-            ++counts[static_cast<std::size_t>(this->itris(t, corner))];
-    neighbor_tri.assign(static_cast<std::size_t>(ntris), Eigen::VectorXi());
-    for (int vertex = 0; vertex < ntris; ++vertex)
-        neighbor_tri[static_cast<std::size_t>(vertex)].resize(counts[static_cast<std::size_t>(vertex)]);
+            ++counts.at(static_cast<std::size_t>(this->itris(t, corner)));
+    neighbor_tri.assign(nverts, Eigen::VectorXi());
+    for (std::size_t vertex = 0; vertex < nverts; ++vertex)
+        neighbor_tri[vertex].resize(counts[vertex]);
     std::ranges::fill(counts, 0);
     for (int t = 0; t < ntris; ++t) {
         for (int corner = 0; corner < 3; ++corner) {
