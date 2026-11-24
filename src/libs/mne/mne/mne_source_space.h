@@ -212,7 +212,7 @@ public:
     // Source-space filtering, I/O, and label helpers (moved from MNESurfaceOrVolume)
     //=========================================================================================================
 
-    static int filter_source_spaces(const MNESurface& surf,
+    static int filter_source_spaces(const MNESurface& bounding,
                                     float limit,
                                     const mne::FiffCoordTrans& mri_head_t,
                                     std::vector<std::unique_ptr<MNESourceSpace>>& spaces,

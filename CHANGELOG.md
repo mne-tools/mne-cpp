@@ -260,6 +260,9 @@ aliases; replace the old spelling as below.
 - Completing a volume source space, which has no triangles, read past the
   per-vertex triangle lists and crashed `mne_list_source_space` and
   `mne_make_uniform_stc`; the lists have one entry per vertex.
+- `MNESourceSpace::filter_source_spaces()` crashed on a bounding surface
+  without triangle geometry, as `mne_volume_source_space` builds it; the
+  geometry is computed when missing.
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and

@@ -146,6 +146,7 @@ private slots:
     void sourceSpaces_geometryMatchesDirectComputation();
     void hemisphere_copyComparesEqual();
     void hemisphere_volumeWithoutTrianglesGetsGeometry();
+    void volumeSourceSpace_fromSurfaceWithoutTriangleData();
     void hemisphere_moveKeepsEverything();
 
     // ── InvSourceEstimate ──
@@ -536,6 +537,31 @@ void TestMneLibrary::hemisphere_volumeWithoutTrianglesGetsGeometry()
         QCOMPARE(volume.neighbor_tri[static_cast<std::size_t>(v)].size(), Eigen::Index(0));
         QCOMPARE(volume.neighbor_vert[static_cast<std::size_t>(v)].size(), Eigen::Index(0));
     }
+}
+
+//=============================================================================================================
+
+void TestMneLibrary::volumeSourceSpace_fromSurfaceWithoutTriangleData()
+{
+    if (!hasData())
+        QSKIP("No test data");
+
+    // A surface assembled from vertices and triangle indices only, as mne_volume_source_space builds it
+    auto bem = MNESurface::read_bem_surface2(bemPath().toStdU16String(), -1, 1);
+    QVERIFY(bem != nullptr);
+    MNESurface surf;
+    surf.np = bem->np;
+    surf.ntri = bem->ntri;
+    surf.rr = bem->rr;
+    surf.nn = bem->nn;
+    surf.itris = bem->itris;
+    surf.id = bem->id;
+    surf.coord_frame = bem->coord_frame;
+    QVERIFY(surf.tris.empty());
+
+    const auto space = MNESourceSpace::make_volume_source_space(surf, 0.02f, 0.0f, 0.005f);
+    QVERIFY(space != nullptr);
+    QVERIFY(space->nuse > 0);
 }
 
 //=============================================================================================================

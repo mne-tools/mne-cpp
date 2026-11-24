@@ -1476,11 +1476,19 @@ std::unique_ptr<MNESourceSpace> MNESourceSpace::make_volume_source_space(const M
 
 //=============================================================================================================
 
-int MNESourceSpace::filter_source_spaces(const MNESurface& surf, float limit, const FiffCoordTrans& mri_head_t, std::vector<std::unique_ptr<MNESourceSpace>>& spaces, std::ostream* filtered)
+int MNESourceSpace::filter_source_spaces(const MNESurface& bounding, float limit, const FiffCoordTrans& mri_head_t, std::vector<std::unique_ptr<MNESourceSpace>>& spaces, std::ostream* filtered)
 /*
      * Remove all source space points closer to the surface than a given limit
      */
 {
+    // The inside test sums the solid angles of the triangles; compute them for a surface that comes without
+    std::optional<MNESurface> completed;
+    if (std::ssize(bounding.tris) != bounding.ntri) {
+        completed.emplace(bounding);
+        completed->type = MNE_SOURCE_SPACE_SURFACE; // a bounding surface, whatever its caller set
+        completed->add_triangle_data();
+    }
+    const MNESurface& surf = completed ? *completed : bounding;
     MNESourceSpace* s;
     int k, p1, p2;
     Eigen::Vector3f r1;
