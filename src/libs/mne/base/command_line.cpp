@@ -218,7 +218,8 @@ std::string CommandLineParser::help_text(std::string_view name) const
         if (!option.valueName.empty())
             spelled += " <" + option.valueName + ">";
         std::string description = option.description;
-        if (!option.defaultValue.empty()) {
+        // A description that already names its default keeps its own wording
+        if (!option.defaultValue.empty() && description.find("default") == std::string::npos) {
             const bool sentence = description.ends_with('.');
             if (sentence)
                 description.pop_back();

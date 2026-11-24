@@ -52,6 +52,7 @@ private slots:
     void errors();
     void declaringATakenNameFails();
     void helpTextListsEverything();
+    void helpTextNamesADefaultOnce();
     void agreesWithQCommandLineParser_data();
     void agreesWithQCommandLineParser();
 
@@ -148,6 +149,18 @@ void TestBaseCommandLine::helpTextListsEverything()
                                  "--fwd <file>", "Arguments:", "input"}) {
         QVERIFY2(help.find(expected) != std::string::npos, expected);
     }
+}
+
+//=============================================================================================================
+
+void TestBaseCommandLine::helpTextNamesADefaultOnce()
+{
+    CommandLineParser parser;
+    parser.add_option({{"snr"}, "Signal-to-noise ratio (default: 3.0).", "value", "3.0"});
+    parser.add_option({{"frame"}, "\"head\" (default) or \"device\".", "frame", "head"});
+    const std::string help = parser.help_text("tool");
+    QVERIFY(help.find("Signal-to-noise ratio (default: 3.0).\n") != std::string::npos);
+    QVERIFY(help.find("\"head\" (default) or \"device\".\n") != std::string::npos);
 }
 
 //=============================================================================================================
