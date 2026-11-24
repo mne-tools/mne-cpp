@@ -218,6 +218,48 @@ private slots:
     }
 
     //=========================================================================================================
+    // Volume pipeline: the single .stc holds one vertex per source
+    //=========================================================================================================
+
+    void testVolumeEstimateHasOneVertexPerSource()
+    {
+        for (const char* tool : {"mne_volume_source_space", "mne_forward_solution", "mne_inverse_operator", "mne_compute_mne"}) {
+            if (!toolExists(tool)) {
+                QSKIP("volume pipeline tools not found");
+            }
+        }
+        const QString bemFile = m_sResourcePath + "subjects/sample/bem/sample-5120-bem.fif";
+        const QString aveFile = m_sResourcePath + "MEG/sample/sample_audvis-ave.fif";
+        const QString covFile = m_sResourcePath + "MEG/sample/sample_audvis-cov.fif";
+        const QString transFile = m_sResourcePath + "MEG/sample/all-trans.fif";
+        if (!QFile::exists(bemFile) || !QFile::exists(aveFile) || !QFile::exists(covFile) || !QFile::exists(transFile)) {
+            QSKIP("Required test data not available");
+        }
+
+        const QString srcFile = m_scratch.filePath("vol-src.fif");
+        const QString fwdFile = m_scratch.filePath("vol-fwd.fif");
+        const QString invFile = m_scratch.filePath("vol-inv.fif");
+        const QString stcBase = m_scratch.filePath("vol");
+        runTool("mne_volume_source_space", {"--bem", bemFile, "--grid", "15", "--out", srcFile});
+        runTool("mne_forward_solution", {"--src", srcFile, "--meas", aveFile, "--mri", transFile, "--origin", "0:0:40", "--meg", "--fwd", fwdFile}, 120000);
+        runTool("mne_inverse_operator", {"--fwd", fwdFile, "--noisecov", covFile, "--meg", "--inv", invFile}, 120000);
+        runTool("mne_compute_mne", {"--inv", invFile, "--meas", aveFile, "--snr", "3", "--out", stcBase, "--nomatch"}, 120000);
+
+        QFile stc(stcBase + ".stc");
+        QVERIFY(stc.open(QIODevice::ReadOnly));
+        QDataStream in(&stc);
+        in.setByteOrder(QDataStream::BigEndian);
+        in.skipRawData(8);
+        quint32 nVertices = 0;
+        in >> nVertices;
+        in.skipRawData(static_cast<int>(4 * nVertices));
+        quint32 nTimes = 0;
+        in >> nTimes;
+        QVERIFY(nVertices > 0 && nTimes > 0);
+        QCOMPARE(stc.size(), qint64(4) * (4 + nVertices + qint64(nVertices) * nTimes));
+    }
+
+    //=========================================================================================================
     // mne_check_surface: run on BEM surface
     //=========================================================================================================
 

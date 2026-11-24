@@ -278,6 +278,10 @@ aliases; replace the old spelling as below.
 - `mne_mna_bids_converter pack` built every session it scanned in a BIDS
   tree without a project sidecar but never added it to its subject, so the
   packed project was empty.
+- Minimum-norm estimates on a volume source space listed every vertex
+  twice, so the `.stc` written by `mne_compute_mne` could not be read back.
+  `InvMinimumNorm` takes the vertices of all source spaces, and
+  `InvSourceEstimate::write` refuses data whose rows do not match the vertices.
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and

@@ -184,6 +184,9 @@ Expected<InvSourceEstimate> InvSourceEstimate::read(const std::filesystem::path&
 
 Expected<void> InvSourceEstimate::write(const std::filesystem::path& path) const
 {
+    if (data.rows() != vertices.size()) {
+        return fail(ErrorCode::Format, "the data have {} rows for {} vertices", data.rows(), vertices.size());
+    }
     std::ofstream out(path, std::ios::binary | std::ios::trunc);
     if (!out) {
         return fail(ErrorCode::Io, "cannot write {}", mne::utf8_from_path(path));

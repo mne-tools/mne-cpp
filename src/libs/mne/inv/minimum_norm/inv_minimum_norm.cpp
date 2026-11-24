@@ -156,14 +156,26 @@ InvSourceEstimate InvMinimumNorm::calculateInverse(const MatrixXd& data, float t
     Log::info("[done]");
 
     //Results
-    VectorXi p_vecVertices(inv.src[0].vertno.size() + inv.src[1].vertno.size());
-    p_vecVertices << inv.src[0].vertno, inv.src[1].vertno;
+    // One volume source space, two hemispheres, or both in a mixed source space
+    const std::vector<VectorXi> spaceVertices = inv.src.get_vertno();
+    Eigen::Index nVertices = 0;
+    for (const VectorXi& spaceVertno : spaceVertices) {
+        nVertices += spaceVertno.size();
+    }
+    VectorXi p_vecVertices(nVertices);
+    Eigen::Index offset = 0;
+    for (const VectorXi& spaceVertno : spaceVertices) {
+        p_vecVertices.segment(offset, spaceVertno.size()) = spaceVertno;
+        offset += spaceVertno.size();
+    }
 
     InvSourceEstimate stc(sol, p_vecVertices, tmin, tstep);
 
     // Record where the left hemisphere ends so the estimate can be written as
     // an MNE-C / MNE-Python compatible -lh.stc / -rh.stc pair.
-    stc.nVerticesLh = static_cast<int>(inv.src[0].vertno.size());
+    if (spaceVertices.size() == 2) {
+        stc.nVerticesLh = static_cast<int>(spaceVertices[0].size());
+    }
 
     return stc;
 }

@@ -154,6 +154,7 @@ private slots:
     // ── InvSourceEstimate ──
     void sourceEstimate_fullLifecycle();
     void sourceEstimate_writeReadBuffer();
+    void sourceEstimate_writeRefusesMismatchedVertices();
     void sourceEstimate_writeReadFile();
 
     // ── MNEBem ──
@@ -715,6 +716,14 @@ void TestMneLibrary::sourceEstimate_writeReadBuffer()
     const std::filesystem::path path = dir.filePath("buffer.stc").toStdU16String();
     QVERIFY(stc.write(path));
     QCOMPARE(InvSourceEstimate::read(path).value().samples(), 5);
+}
+
+void TestMneLibrary::sourceEstimate_writeRefusesMismatchedVertices()
+{
+    InvSourceEstimate stc(MatrixXd::Random(10, 5), VectorXi::LinSpaced(20, 0, 19), 0.0f, 0.001f);
+
+    QTemporaryDir dir;
+    QVERIFY(!stc.write(dir.filePath("mismatch.stc").toStdU16String()));
 }
 
 void TestMneLibrary::sourceEstimate_writeReadFile()
