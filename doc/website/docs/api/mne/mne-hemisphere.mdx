@@ -55,6 +55,17 @@ Copy constructor.
 
 ---
 
+### MNEHemisphere(other)
+
+Move constructor: takes over the fields the copy constructor copies.
+
+**Parameters:**
+
+- **other** : *MNEHemisphere &&*
+  Hemisphere to move from; left valid but unspecified.
+
+---
+
 ### ~MNEHemisphere()
 
 Destroys the hemisphere source space.
@@ -156,6 +167,21 @@ Copy assignment operator.
 
 - **other** : *const [MNEHemisphere](/docs/api/mne/mne-hemisphere) &*
   The [`MNEHemisphere`](/docs/api/mne/mne-hemisphere) to assign from.
+
+**Returns:**
+
+- *[MNEHemisphere](/docs/api/mne/mne-hemisphere) &* — Reference to this object.
+
+---
+
+### operator=(other)
+
+Move assignment: takes over the fields the copy assignment copies.
+
+**Parameters:**
+
+- **other** : *[MNEHemisphere](/docs/api/mne/mne-hemisphere) &&*
+  Hemisphere to move from; left valid but unspecified.
 
 **Returns:**
 
