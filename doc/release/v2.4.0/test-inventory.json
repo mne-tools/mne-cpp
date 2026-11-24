@@ -6,10 +6,10 @@
     "commit": "0800c9a1bf606c2df8c44e35fbb42ea13029b549"
   },
   "summary": {
-    "directories": 289,
+    "directories": 290,
     "registration": {
       "unconditional": 277,
-      "conditional": 9,
+      "conditional": 10,
       "unregistered": 3
     },
     "missing_directories": [],
@@ -22,7 +22,7 @@
       "sample-data": 21,
       "test-data": 122
     },
-    "gui": 47,
+    "gui": 48,
     "with_qskip": 100,
     "ci_excluded": {},
     "retry_paths": [],
@@ -67,6 +67,7 @@
           "test_math_sphere",
           "test_math_warp",
           "test_mne_acq_tool",
+          "test_mne_anonymize_gui",
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
@@ -163,6 +164,7 @@
           "test_math_sphere",
           "test_math_warp",
           "test_mne_acq_tool",
+          "test_mne_anonymize_gui",
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
@@ -259,6 +261,7 @@
           "test_math_sphere",
           "test_math_warp",
           "test_mne_acq_tool",
+          "test_mne_anonymize_gui",
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
@@ -355,6 +358,7 @@
           "test_math_sphere",
           "test_math_warp",
           "test_mne_acq_tool",
+          "test_mne_anonymize_gui",
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
@@ -451,6 +455,7 @@
           "test_math_sphere",
           "test_math_warp",
           "test_mne_acq_tool",
+          "test_mne_anonymize_gui",
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
@@ -547,6 +552,7 @@
           "test_math_sphere",
           "test_math_warp",
           "test_mne_acq_tool",
+          "test_mne_anonymize_gui",
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
@@ -7526,6 +7532,42 @@
         "ubuntu-24.04-qt-min": "run",
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_anonymize_gui",
+      "cmake": "src/tests/test_mne_anonymize_gui/CMakeLists.txt",
+      "registration": {
+        "state": "conditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [
+          "BUILD_MNE_ANONYMIZE_GUI AND NOT WASM"
+        ],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_anonymize_gui"
+      ],
+      "labels": [
+        "gui",
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 120,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
       },
       "registry_classes": []
     },
