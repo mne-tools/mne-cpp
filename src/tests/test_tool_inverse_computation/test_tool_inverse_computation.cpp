@@ -418,6 +418,8 @@ void TestToolInverseComputation::testReadWFileSynthetic()
     QVERIFY(file.open(QIODevice::WriteOnly));
     QDataStream out(&file);
     out.setByteOrder(QDataStream::BigEndian);
+    // w files store 4-byte floats, as MNE-Python's _read_w reads them
+    out.setFloatingPointPrecision(QDataStream::SinglePrecision);
 
     quint16 header = 0;
     out << header;

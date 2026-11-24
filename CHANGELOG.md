@@ -255,6 +255,8 @@ aliases; replace the old spelling as below.
 - `mne_make_cor_set` read float (`MRI_FLOAT`) mgh voxels as 8-byte doubles
   and could not read gzipped `.mgz` volumes; it reads 4-byte floats and
   decompresses `.mgz`.
+- `mne_volume_data2mri` read the values of `.w` files as 8-byte doubles; they
+  are 4-byte floats, as MNE-Python reads them.
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and

@@ -97,10 +97,10 @@ static bool readWFile(const std::string& filename, VectorXd& data, VectorXi& ver
         read(b3);
         vertices(i) = (b1 << 16) | (b2 << 8) | b3;
 
-        // Value: read as an 8-byte double, as QDataStream's default double precision did for a float
-        double val = 0.0;
+        // Value: a 4-byte float
+        float val = 0.0f;
         read(val);
-        data(i) = static_cast<float>(val);
+        data(i) = val;
     }
     return true;
 }
