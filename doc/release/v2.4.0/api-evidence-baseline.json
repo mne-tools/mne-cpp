@@ -4,7 +4,7 @@
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
     "exported_classes": 484,
-    "exported_free_functions": 212,
+    "exported_free_functions": 214,
     "registered_classes": 583,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
@@ -901,6 +901,16 @@
     },
     {
       "name": "parse_iso8601",
+      "header": "base/string_utils.h",
+      "library": "base"
+    },
+    {
+      "name": "tie_away_from_zero",
+      "header": "base/string_utils.h",
+      "library": "base"
+    },
+    {
+      "name": "format_number",
       "header": "base/string_utils.h",
       "library": "base"
     },
