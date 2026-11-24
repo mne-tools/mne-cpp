@@ -30,11 +30,11 @@
 #include <mne/mne/mne_bem_surface.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QVector>
-#include <QString>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNESURF2BEM
@@ -64,7 +64,7 @@ public:
      *
      * @return Human-readable name string.
      */
-    static QString getNameOf(int id);
+    static std::string getNameOf(int id);
 
     //=========================================================================================================
     /**
@@ -89,7 +89,7 @@ public:
      *
      * @return true if all checks pass.
      */
-    static bool checkSurfaces(const QVector<mne::MNEBemSurface>& surfs);
+    static bool checkSurfaces(const std::vector<mne::MNEBemSurface>& surfs);
 
     //=========================================================================================================
     /**
@@ -99,7 +99,7 @@ public:
      *
      * @return true if thickness check passes.
      */
-    static bool checkThicknesses(const QVector<mne::MNEBemSurface>& surfs);
+    static bool checkThicknesses(const std::vector<mne::MNEBemSurface>& surfs);
 
     //=========================================================================================================
     /**
@@ -120,7 +120,7 @@ public:
      * @param[in] surf  The BEM surface.
      * @param[in] name  Display name for the surface.
      */
-    static void reportTriangleAreas(const mne::MNEBemSurface& surf, const QString& name);
+    static void reportTriangleAreas(const mne::MNEBemSurface& surf, const std::string& name);
 
 private:
     //=========================================================================================================

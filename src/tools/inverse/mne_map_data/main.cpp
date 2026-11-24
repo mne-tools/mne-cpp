@@ -28,17 +28,9 @@
 #include <mne/mne/mne.h>
 #include <mne/mne/mne_forward_solution.h>
 #include <mne/mne/mne_inverse_operator.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -51,6 +43,8 @@
 //=============================================================================================================
 
 #include <memory>
+#include <print>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -69,85 +63,70 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_map_data");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Map evoked data between sensor arrays via forward/inverse.\n\n"
+                             "Source-localizes the input evoked data using the inverse operator,\n"
+                             "then projects the source estimate through the forward solution\n"
+                             "(with target sensor geometry) to produce mapped evoked data.");
+    parser.add_help_option();
+    parser.add_version_option();
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Map evoked data between sensor arrays via forward/inverse.\n\n"
-                                     "Source-localizes the input evoked data using the inverse operator,\n"
-                                     "then projects the source estimate through the forward solution\n"
-                                     "(with target sensor geometry) to produce mapped evoked data.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_option({{"from"}, "Source evoked FIFF file.", "file", {}});
+    parser.add_option({{"to"}, "Target measurement info FIFF file (for target sensor layout).", "file", {}});
+    parser.add_option({{"fwd"}, "Forward solution FIFF file.", "file", {}});
+    parser.add_option({{"inv"}, "Inverse operator FIFF file (optional; computed from fwd if omitted).", "file", {}});
+    parser.add_option({{"out"}, "Output evoked FIFF file.", "file", {}});
+    parser.add_option({{"snr"}, "SNR for regularization (default 3.0).", "value", "3.0"});
 
-    QCommandLineOption fromOpt("from", "Source evoked FIFF file.", "file");
-    parser.addOption(fromOpt);
+    parser.process(argc, argv, "mne_map_data", PROGRAM_VERSION);
 
-    QCommandLineOption toOpt("to", "Target measurement info FIFF file (for target sensor layout).", "file");
-    parser.addOption(toOpt);
+    const std::string fromFile = parser.value("from");
+    const std::string toFile = parser.value("to");
+    const std::string fwdFile = parser.value("fwd");
+    const std::string invFile = parser.value("inv");
+    const std::string outFile = parser.value("out");
+    float snr = static_cast<float>(to_double(parser.value("snr")).value_or(0.0));
 
-    QCommandLineOption fwdOpt("fwd", "Forward solution FIFF file.", "file");
-    parser.addOption(fwdOpt);
-
-    QCommandLineOption invOpt("inv", "Inverse operator FIFF file (optional; computed from fwd if omitted).", "file");
-    parser.addOption(invOpt);
-
-    QCommandLineOption outOpt("out", "Output evoked FIFF file.", "file");
-    parser.addOption(outOpt);
-
-    QCommandLineOption snrOpt("snr", "SNR for regularization (default 3.0).", "value", "3.0");
-    parser.addOption(snrOpt);
-
-    parser.process(app);
-
-    QString fromFile = parser.value(fromOpt);
-    QString toFile = parser.value(toOpt);
-    QString fwdFile = parser.value(fwdOpt);
-    QString invFile = parser.value(invOpt);
-    QString outFile = parser.value(outOpt);
-    float snr = parser.value(snrOpt).toFloat();
-
-    if (fromFile.isEmpty() || toFile.isEmpty() || fwdFile.isEmpty() || outFile.isEmpty()) {
+    if (fromFile.empty() || toFile.empty() || fwdFile.empty() || outFile.empty()) {
         Log::critical("--from, --to, --fwd, and --out are required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_map_data"));
+        return 1;
     }
 
     float lambda2 = 1.0f / (snr * snr);
 
     // 1. Load source evoked data
-    Log::info("Loading source evoked: {}", fromFile.toStdString());
-    auto read = FiffEvokedSet::read(fromFile.toStdU16String());
+    Log::info("Loading source evoked: {}", fromFile);
+    auto read = FiffEvokedSet::read(path_from_utf8(fromFile));
     if (!read) {
         Log::critical("{}", read.error().what());
         return 1;
     }
     FiffEvokedSet& srcEvokedSet = *read;
     if (srcEvokedSet.evoked.empty()) {
-        Log::critical("No evoked data sets found in: {}", fromFile.toStdString());
+        Log::critical("No evoked data sets found in: {}", fromFile);
         return 1;
     }
     Log::info("  {} evoked set(s), {} channels", static_cast<long long>(srcEvokedSet.evoked.size()), srcEvokedSet.info.nchan);
 
     // 2. Load target measurement info
-    Log::info("Loading target info: {}", toFile.toStdString());
-    FiffStream toStream(toFile.toStdU16String());
+    Log::info("Loading target info: {}", toFile);
+    FiffStream toStream(path_from_utf8(toFile));
     if (!toStream.open()) {
-        Log::critical("Cannot open target file: {}", toFile.toStdString());
+        Log::critical("Cannot open target file: {}", toFile);
         return 1;
     }
     FiffInfo targetInfo;
     std::shared_ptr<FiffDirNode> targetNode;
     if (!toStream.read_meas_info(toStream.dirtree(), targetInfo, targetNode)) {
-        Log::critical("Cannot read target measurement info: {}", toFile.toStdString());
+        Log::critical("Cannot read target measurement info: {}", toFile);
         return 1;
     }
     toStream.close();
     Log::info("  {} channels in target", targetInfo.nchan);
 
     // 3. Load forward solution
-    Log::info("Loading forward solution: {}", fwdFile.toStdString());
-    auto fwdRead = MNEForwardSolution::read(fwdFile.toStdU16String());
+    Log::info("Loading forward solution: {}", fwdFile);
+    auto fwdRead = MNEForwardSolution::read(path_from_utf8(fwdFile));
     if (!fwdRead) {
         Log::critical("{}", fwdRead.error().what());
         return 1;
@@ -157,9 +136,9 @@ int main(int argc, char* argv[])
 
     // 4. Load or compute inverse operator
     MNEInverseOperator invOp;
-    if (!invFile.isEmpty()) {
-        Log::info("Loading inverse operator: {}", invFile.toStdString());
-        auto invRead = MNEInverseOperator::read(invFile.toStdU16String());
+    if (!invFile.empty()) {
+        Log::info("Loading inverse operator: {}", invFile);
+        auto invRead = MNEInverseOperator::read(path_from_utf8(invFile));
         if (!invRead) {
             Log::critical("{}", invRead.error().what());
             return 1;
@@ -233,9 +212,9 @@ int main(int argc, char* argv[])
     }
 
     // 7. Write output
-    Log::info("Writing output: {}", outFile.toStdString());
-    if (!outEvokedSet.save(outFile.toStdU16String())) {
-        Log::critical("Cannot write output evoked: {}", outFile.toStdString());
+    Log::info("Writing output: {}", outFile);
+    if (!outEvokedSet.save(path_from_utf8(outFile))) {
+        Log::critical("Cannot write output evoked: {}", outFile);
         return 1;
     }
 

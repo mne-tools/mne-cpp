@@ -16,19 +16,23 @@
 
 #include <mne/base/log.h>
 #include "mne_watershed_bem_settings.h"
+#include <mne/base/command_line.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
-#include <QProcessEnvironment>
+#include <cstdlib>
+#include <optional>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace MNEWATERSHEDBEM;
+using mne::CommandLineParser;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -42,136 +46,115 @@ MNEWatershedBemSettings::MNEWatershedBemSettings(int* argc, char** argv)
 , m_iPreflood(-1)
 , m_bVerbose(false)
 {
-    QCommandLineParser parser;
-    parser.setApplicationDescription(
+    CommandLineParser parser(
         "Create BEM surfaces using the watershed algorithm included with FreeSurfer.\n\n"
         "This tool invokes FreeSurfer's mri_watershed to segment brain, skull, and\n"
         "skin surfaces from an MRI volume, then creates a FIFF BEM head surface file.\n\n"
         "Ported from the original MNE shell script mne_watershed_bem by Matti Hamalainen\n"
         "(SVN $Id: mne_watershed_bem 3391 2012-11-30 21:13:09Z msh $).\n\n"
         "Cross-referenced with MNE-Python's mne.bem.make_watershed_bem().");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_help_option();
+    parser.add_version_option();
 
     // --subject
-    QCommandLineOption subjectOpt(QStringList() << "subject",
-                                  "Subject name (defaults to $SUBJECT environment variable).",
-                                  "subject");
-    parser.addOption(subjectOpt);
+    parser.add_option({{"subject"}, "Subject name (defaults to $SUBJECT environment variable).", "subject", ""});
 
     // --subjects-dir
-    QCommandLineOption subjectsDirOpt(QStringList() << "subjects-dir",
-                                      "Subjects directory (defaults to $SUBJECTS_DIR environment variable).",
-                                      "dir");
-    parser.addOption(subjectsDirOpt);
+    parser.add_option({{"subjects-dir"}, "Subjects directory (defaults to $SUBJECTS_DIR environment variable).", "dir", ""});
 
     // --volume
-    QCommandLineOption volumeOpt(QStringList() << "volume",
-                                 "MRI volume name (default: T1).",
-                                 "name", "T1");
-    parser.addOption(volumeOpt);
+    parser.add_option({{"volume"}, "MRI volume name (default: T1).", "name", "T1"});
 
     // --overwrite
-    QCommandLineOption overwriteOpt(QStringList() << "overwrite",
-                                    "Overwrite existing watershed files.");
-    parser.addOption(overwriteOpt);
+    parser.add_option({{"overwrite"}, "Overwrite existing watershed files.", "", ""});
 
     // --atlas
-    QCommandLineOption atlasOpt(QStringList() << "atlas",
-                                "Specify the --atlas option for mri_watershed.");
-    parser.addOption(atlasOpt);
+    parser.add_option({{"atlas"}, "Specify the --atlas option for mri_watershed.", "", ""});
 
     // --gcaatlas
-    QCommandLineOption gcaAtlasOpt(QStringList() << "gcaatlas",
-                                   "Use the subcortical atlas for mri_watershed.");
-    parser.addOption(gcaAtlasOpt);
+    parser.add_option({{"gcaatlas"}, "Use the subcortical atlas for mri_watershed.", "", ""});
 
     // --preflood
-    QCommandLineOption prefloodOpt(QStringList() << "preflood",
-                                   "Change the preflood height for mri_watershed.",
-                                   "number");
-    parser.addOption(prefloodOpt);
+    parser.add_option({{"preflood"}, "Change the preflood height for mri_watershed.", "number", ""});
 
     // --verbose
-    QCommandLineOption verboseOpt(QStringList() << "verbose",
-                                  "Enable verbose output.");
-    parser.addOption(verboseOpt);
+    parser.add_option({{"verbose"}, "Enable verbose output.", "", ""});
 
-    // Build argument list from argc/argv
-    QStringList args;
-    for (int i = 0; i < *argc; ++i) {
-        args << QString(argv[i]);
-    }
+    parser.process(*argc, argv, "mne_watershed_bem", MNE_CPP_VERSION);
 
-    parser.process(args);
+    const auto envValue = [](const char* name) {
+        const char* value = std::getenv(name);
+        return std::string(value ? value : "");
+    };
 
     // Subject
-    if (parser.isSet(subjectOpt)) {
-        m_sSubject = parser.value(subjectOpt);
+    if (parser.is_set("subject")) {
+        m_sSubject = parser.value("subject");
     } else {
-        m_sSubject = QProcessEnvironment::systemEnvironment().value("SUBJECT", "");
+        m_sSubject = envValue("SUBJECT");
     }
 
     // Subjects dir
-    if (parser.isSet(subjectsDirOpt)) {
-        m_sSubjectsDir = parser.value(subjectsDirOpt);
+    if (parser.is_set("subjects-dir")) {
+        m_sSubjectsDir = parser.value("subjects-dir");
     } else {
-        m_sSubjectsDir = QProcessEnvironment::systemEnvironment().value("SUBJECTS_DIR", "");
+        m_sSubjectsDir = envValue("SUBJECTS_DIR");
     }
 
     // FreeSurfer home
-    m_sFreeSurferHome = QProcessEnvironment::systemEnvironment().value("FREESURFER_HOME", "");
+    m_sFreeSurferHome = envValue("FREESURFER_HOME");
 
     // Volume
-    m_sVolume = parser.value(volumeOpt);
+    m_sVolume = parser.value("volume");
 
     // Overwrite
-    m_bOverwrite = parser.isSet(overwriteOpt);
+    m_bOverwrite = parser.is_set("overwrite");
 
     // Atlas
-    m_bAtlas = parser.isSet(atlasOpt);
+    m_bAtlas = parser.is_set("atlas");
 
     // GCA Atlas
-    m_bGcaAtlas = parser.isSet(gcaAtlasOpt);
+    m_bGcaAtlas = parser.is_set("gcaatlas");
 
     // Preflood
-    if (parser.isSet(prefloodOpt)) {
-        bool ok;
-        m_iPreflood = parser.value(prefloodOpt).toInt(&ok);
-        if (!ok) {
-            mne::Log::warning("Invalid preflood value: {}", parser.value(prefloodOpt).toStdString());
+    if (parser.is_set("preflood")) {
+        const std::optional<int> preflood = mne::to_int(parser.value("preflood"));
+        if (!preflood) {
+            mne::Log::warning("Invalid preflood value: {}", parser.value("preflood"));
             m_iPreflood = -1;
+        } else {
+            m_iPreflood = *preflood;
         }
     }
 
     // Verbose
-    m_bVerbose = parser.isSet(verboseOpt);
+    m_bVerbose = parser.is_set("verbose");
 }
 
 //=============================================================================================================
 
-QString MNEWatershedBemSettings::subject() const
+std::string MNEWatershedBemSettings::subject() const
 {
     return m_sSubject;
 }
 
 //=============================================================================================================
 
-QString MNEWatershedBemSettings::subjectsDir() const
+std::string MNEWatershedBemSettings::subjectsDir() const
 {
     return m_sSubjectsDir;
 }
 
 //=============================================================================================================
 
-QString MNEWatershedBemSettings::freeSurferHome() const
+std::string MNEWatershedBemSettings::freeSurferHome() const
 {
     return m_sFreeSurferHome;
 }
 
 //=============================================================================================================
 
-QString MNEWatershedBemSettings::volume() const
+std::string MNEWatershedBemSettings::volume() const
 {
     return m_sVolume;
 }

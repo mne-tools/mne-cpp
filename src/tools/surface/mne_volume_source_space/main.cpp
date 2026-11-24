@@ -18,22 +18,23 @@
 #include <mne/mne/mne_bem.h>
 #include <mne/mne/mne_bem_surface.h>
 #include <mne/fiff/fiff_constants.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCommandLineOption>
-#include <QCommandLineParser>
-#include <QCoreApplication>
-#include <QFile>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <fstream>
+#include <print>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -52,45 +53,31 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_volume_source_space");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Create a volumetric source space inside a BEM surface.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"bem"}, "BEM FIFF file (inner skull surface used as boundary).", "file", {}});
+    parser.add_option({{"grid"}, "Grid spacing in mm.", "mm", "7.0"});
+    parser.add_option({{"exclude"}, "Exclude points closer to CM than this (mm).", "mm", "0"});
+    parser.add_option({{"mindist"}, "Minimum distance from surface in mm.", "mm", "5.0"});
+    parser.add_option({{"out"}, "Output source space FIFF file.", "file", {}});
+    parser.process(argc, argv, "mne_volume_source_space", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Create a volumetric source space inside a BEM surface.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string bemFile = parser.value("bem");
+    const std::string outFile = parser.value("out");
+    float gridMm = static_cast<float>(to_double(parser.value("grid")).value_or(0.0));
+    float excludeMm = static_cast<float>(to_double(parser.value("exclude")).value_or(0.0));
+    float mindistMm = static_cast<float>(to_double(parser.value("mindist")).value_or(0.0));
 
-    QCommandLineOption bemOpt("bem", "BEM FIFF file (inner skull surface used as boundary).", "file");
-    parser.addOption(bemOpt);
-
-    QCommandLineOption gridOpt("grid", "Grid spacing in mm.", "mm", "7.0");
-    parser.addOption(gridOpt);
-
-    QCommandLineOption excludeOpt("exclude", "Exclude points closer to CM than this (mm).", "mm", "0");
-    parser.addOption(excludeOpt);
-
-    QCommandLineOption mindistOpt("mindist", "Minimum distance from surface in mm.", "mm", "5.0");
-    parser.addOption(mindistOpt);
-
-    QCommandLineOption outOpt("out", "Output source space FIFF file.", "file");
-    parser.addOption(outOpt);
-
-    parser.process(app);
-
-    QString bemFile = parser.value(bemOpt);
-    QString outFile = parser.value(outOpt);
-    float gridMm = parser.value(gridOpt).toFloat();
-    float excludeMm = parser.value(excludeOpt).toFloat();
-    float mindistMm = parser.value(mindistOpt).toFloat();
-
-    if (bemFile.isEmpty()) {
+    if (bemFile.empty()) {
         Log::critical("--bem is required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_volume_source_space"));
+        return 1;
     }
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         Log::critical("--out is required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_volume_source_space"));
+        return 1;
     }
 
     // Convert mm to meters
@@ -99,9 +86,9 @@ int main(int argc, char* argv[])
     float mindist = mindistMm / 1000.0f;
 
     // Read BEM file - find innermost surface
-    MNEBem bem(bemFile.toStdU16String());
+    MNEBem bem(path_from_utf8(bemFile));
     if (bem.size() == 0) {
-        Log::critical("Cannot read BEM from: {}", bemFile.toStdString());
+        Log::critical("Cannot read BEM from: {}", bemFile);
         return 1;
     }
 
@@ -139,14 +126,14 @@ int main(int argc, char* argv[])
     Log::info("Volume source space: {} total points, {} active", sp->np, sp->nuse);
 
     // Write output
-    QFile outF(outFile);
-    if (!outF.open(QIODevice::WriteOnly)) {
-        Log::critical("Cannot write output file: {}", outFile.toStdString());
+    // Fail early, as before, if the output cannot be created
+    if (!std::ofstream(path_from_utf8(outFile), std::ios::binary)) {
+        Log::critical("Cannot write output file: {}", outFile);
         return 1;
     }
-    auto outStream = FiffStream::start_file(outFile.toStdU16String());
+    auto outStream = FiffStream::start_file(path_from_utf8(outFile));
     if (!outStream) {
-        Log::critical("Cannot write output file: {}", outFile.toStdString());
+        Log::critical("Cannot write output file: {}", outFile);
         return 1;
     }
     outStream->start_block(FIFFB_MNE);
@@ -155,7 +142,6 @@ int main(int argc, char* argv[])
     outStream->end_block(FIFFB_MNE_SOURCE_SPACE);
     outStream->end_block(FIFFB_MNE);
     outStream->end_file();
-    outF.close();
-    Log::info("Written volume source space to: {}", outFile.toStdString());
+    Log::info("Written volume source space to: {}", outFile);
     return 0;
 }

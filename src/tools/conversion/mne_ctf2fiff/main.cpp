@@ -21,26 +21,32 @@
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_ch_info.h>
 #include <mne/fiff/fiff_types.h>
+#include <mne/base/byte_stream.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QDir>
-#include <QFileInfo>
-#include <QDataStream>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <chrono>
+#include <cstdint>
+#include <cstring>
+#include <filesystem>
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -93,9 +99,9 @@ struct CtfSensorInfo
 
 struct CtfDatasetInfo
 {
-    QString dsPath;
-    QString res4Path;
-    QString meg4Path;
+    std::string dsPath;
+    std::string res4Path;
+    std::string meg4Path;
 
     int nChannels;
     int nSamples; // total samples per channel per trial
@@ -103,26 +109,62 @@ struct CtfDatasetInfo
     double sfreq;
     int dataFormat; // 1=short, 4=int, 8=double
 
-    QList<CtfSensorInfo> sensors;
+    std::vector<CtfSensorInfo> sensors;
 };
 
 //=============================================================================================================
-// Read big-endian integers/doubles from QDataStream
+// Big-endian file reader
 //=============================================================================================================
 
-static qint32 readInt32BE(QDataStream& ds)
+/**
+ * Reads big-endian values from a file; reads past the end give 0 and seeks past the end stay at the end.
+ */
+class CtfBigEndianReader
 {
-    qint32 val;
-    ds >> val;
-    return val;
-}
+public:
+    explicit CtfBigEndianReader(const std::string& path)
+    : m_stream(mne::FileByteStream::open(mne::path_from_utf8(path), mne::FileByteStream::Mode::Read))
+    {
+    }
 
-static double readFloat64BE(QDataStream& ds)
-{
-    double val;
-    ds >> val;
-    return val;
-}
+    bool isOpen() const
+    {
+        return m_stream != nullptr;
+    }
+
+    std::uint64_t pos() const
+    {
+        return m_stream->pos();
+    }
+
+    void seek(std::uint64_t position)
+    {
+        if (!m_stream->seek(position))
+            m_stream->seek(m_stream->size());
+    }
+
+    void skip(std::uint64_t bytes)
+    {
+        seek(pos() + bytes);
+    }
+
+    void readRaw(char* data, std::size_t bytes)
+    {
+        m_stream->read(data, bytes);
+    }
+
+    template<typename T>
+    T read()
+    {
+        T value{};
+        if (!m_stream->read_big_endian(value))
+            value = T{};
+        return value;
+    }
+
+private:
+    std::unique_ptr<mne::FileByteStream> m_stream;
+};
 
 //=============================================================================================================
 // Parse CTF res4 header
@@ -130,31 +172,25 @@ static double readFloat64BE(QDataStream& ds)
 
 static bool parseRes4(CtfDatasetInfo& info)
 {
-    QFile file(info.res4Path);
-    if (!file.open(QIODevice::ReadOnly)) {
-        Log::critical("Cannot open res4: {}", info.res4Path.toStdString());
+    CtfBigEndianReader ds(info.res4Path);
+    if (!ds.isOpen()) {
+        Log::critical("Cannot open res4: {}", info.res4Path);
         return false;
     }
 
-    QDataStream ds(&file);
-    ds.setByteOrder(QDataStream::BigEndian);
-    ds.setFloatingPointPrecision(QDataStream::DoublePrecision);
-
     // Skip header identifier (8 bytes: "MEG41RS" or "MEG42RS")
     char headerTag[9] = {0};
-    ds.readRawData(headerTag, 8);
+    ds.readRaw(headerTag, 8);
     Log::info("Res4 tag: {}", headerTag);
 
     // Skip appName (256 bytes), DataOrigin (256 bytes), DataDescription (256 bytes)
-    ds.skipRawData(256 + 256 + 256);
+    ds.skip(256 + 256 + 256);
 
     // General header fields
-    qint16 nSensors;
-    ds >> nSensors;
-    info.nChannels = nSensors;
+    info.nChannels = ds.read<std::int16_t>();
 
     // Skip some reserved bytes (2 bytes)
-    ds.skipRawData(2);
+    ds.skip(2);
 
     // Read sample rate and sample count
     // After the padding, at offset 1844 - some_offset
@@ -162,22 +198,18 @@ static bool parseRes4(CtfDatasetInfo& info)
     // Offset 780: nSamples (int32)
     // Offset 784: nTrials (int16)
     // Offset 796: sampleRate (double)
-    file.seek(776);
-    ds.setDevice(&file);
-    info.nSamples = readInt32BE(ds);
-    qint16 nTrials;
-    ds >> nTrials;
-    info.nTrials = nTrials;
+    ds.seek(776);
+    info.nSamples = ds.read<std::int32_t>();
+    info.nTrials = ds.read<std::int16_t>();
 
-    ds.skipRawData(6); // padding to align to 8-byte boundary
+    ds.skip(6); // padding to align to 8-byte boundary
 
     // Skip to sample rate position
-    file.seek(788);
-    ds.setDevice(&file);
-    info.sfreq = readFloat64BE(ds);
+    ds.seek(788);
+    info.sfreq = ds.read<double>();
 
     // Read data time (epoch length in seconds)
-    double epochTime = readFloat64BE(ds);
+    double epochTime = ds.read<double>();
 
     // Skip to number of samples if still 0
     if (info.nSamples <= 0 || info.sfreq <= 0) {
@@ -189,61 +221,55 @@ static bool parseRes4(CtfDatasetInfo& info)
     Log::info("Res4: {} channels, {} samples/trial, {} trials, {:.1f} Hz", info.nChannels, info.nSamples, info.nTrials, info.sfreq);
 
     // Seek to sensor records (at fixed offset after general header)
-    file.seek(CTF_RES4_HEADER_SIZE);
-    ds.setDevice(&file);
+    ds.seek(CTF_RES4_HEADER_SIZE);
 
     // Read sensor information records
     for (int c = 0; c < info.nChannels; ++c) {
-        qint64 startPos = file.pos();
+        const std::uint64_t startPos = ds.pos();
 
         CtfSensorInfo sen;
         memset(&sen, 0, sizeof(sen));
 
         // Sensor name (32 bytes)
-        ds.readRawData(sen.name, CTF_SENSOR_NAME_SIZE);
+        ds.readRaw(sen.name, CTF_SENSOR_NAME_SIZE);
 
         // Sensor type (2 bytes)
-        qint16 stype;
-        ds >> stype;
-        sen.sensorType = stype;
+        sen.sensorType = ds.read<std::int16_t>();
 
         // Skip to gains (fixed offsets within sensor record)
         // original_run_no(2), ctfCoilType(4), reserved(4)
-        ds.skipRawData(2 + 4 + 4);
+        ds.skip(2 + 4 + 4);
 
         // properGain, qGain, ioGain, ioOffset (each 8 bytes)
-        sen.properGain = readFloat64BE(ds);
-        sen.qGain = readFloat64BE(ds);
-        sen.ioGain = readFloat64BE(ds);
-        sen.ioOffset = readFloat64BE(ds);
+        sen.properGain = ds.read<double>();
+        sen.qGain = ds.read<double>();
+        sen.ioGain = ds.read<double>();
+        sen.ioOffset = ds.read<double>();
 
         // Number of coils (2 bytes)
-        qint16 nCoils;
-        ds >> nCoils;
+        const std::int16_t nCoils = ds.read<std::int16_t>();
         sen.nCoils = std::min(static_cast<int>(nCoils), CTF_MAX_COILS);
 
-        ds.skipRawData(2); // padding
+        ds.skip(2); // padding
 
         // Read coil positions
         for (int j = 0; j < sen.nCoils; ++j) {
             // CTF coordinates are in cm, convert to m
-            sen.coils[j].x = readFloat64BE(ds) * 0.01;
-            sen.coils[j].y = readFloat64BE(ds) * 0.01;
-            sen.coils[j].z = readFloat64BE(ds) * 0.01;
-            sen.coils[j].ox = readFloat64BE(ds);
-            sen.coils[j].oy = readFloat64BE(ds);
-            sen.coils[j].oz = readFloat64BE(ds);
-            sen.coils[j].area = readFloat64BE(ds) * 1e-4; // cm^2 to m^2
+            sen.coils[j].x = ds.read<double>() * 0.01;
+            sen.coils[j].y = ds.read<double>() * 0.01;
+            sen.coils[j].z = ds.read<double>() * 0.01;
+            sen.coils[j].ox = ds.read<double>();
+            sen.coils[j].oy = ds.read<double>();
+            sen.coils[j].oz = ds.read<double>();
+            sen.coils[j].area = ds.read<double>() * 1e-4; // cm^2 to m^2
         }
 
-        info.sensors.append(sen);
+        info.sensors.push_back(sen);
 
         // Skip to next sensor record
-        file.seek(startPos + CTF_SENSOR_RECORD_SIZE);
-        ds.setDevice(&file);
+        ds.seek(startPos + CTF_SENSOR_RECORD_SIZE);
     }
 
-    file.close();
     return true;
 }
 
@@ -253,22 +279,18 @@ static bool parseRes4(CtfDatasetInfo& info)
 
 static bool readMeg4Data(const CtfDatasetInfo& info, MatrixXd& data)
 {
-    QFile file(info.meg4Path);
-    if (!file.open(QIODevice::ReadOnly)) {
-        Log::critical("Cannot open meg4: {}", info.meg4Path.toStdString());
+    CtfBigEndianReader ds(info.meg4Path);
+    if (!ds.isOpen()) {
+        Log::critical("Cannot open meg4: {}", info.meg4Path);
         return false;
     }
 
     // Skip meg4 header (8 bytes: "MEG41CP" or similar)
-    file.seek(8);
+    ds.seek(8);
 
     int nChan = info.nChannels;
     int totalSamples = info.nSamples * info.nTrials;
     data.resize(nChan, totalSamples);
-
-    QDataStream ds(&file);
-    ds.setByteOrder(QDataStream::BigEndian);
-    ds.setFloatingPointPrecision(QDataStream::DoublePrecision);
 
     // Read trial by trial
     for (int trial = 0; trial < info.nTrials; ++trial) {
@@ -285,15 +307,13 @@ static bool readMeg4Data(const CtfDatasetInfo& info, MatrixXd& data)
             for (int s = 0; s < info.nSamples; ++s) {
                 double val = 0.0;
                 // CTF datasets typically use 32-bit integers
-                qint32 ival;
-                ds >> ival;
+                const std::int32_t ival = ds.read<std::int32_t>();
                 val = static_cast<double>(ival) * gainFactor;
                 data(c, colOffset + s) = val;
             }
         }
     }
 
-    file.close();
     Log::info("Read {} channels x {} samples", nChan, totalSamples);
     return true;
 }
@@ -304,7 +324,7 @@ static bool readMeg4Data(const CtfDatasetInfo& info, MatrixXd& data)
 
 static void mapCtfToFiff(const CtfSensorInfo& sen, FiffChInfo& ch)
 {
-    ch.ch_name = (QString::fromLatin1(sen.name, static_cast<int>(strnlen(sen.name, CTF_SENSOR_NAME_SIZE)))).toStdString();
+    ch.ch_name = mne::latin1_to_utf8(std::string_view(sen.name, strnlen(sen.name, CTF_SENSOR_NAME_SIZE)));
 
     switch (sen.sensorType) {
         case CTF_SEN_TYPE_MEG:
@@ -366,41 +386,58 @@ static void mapCtfToFiff(const CtfSensorInfo& sen, FiffChInfo& ch)
 
 //=============================================================================================================
 
+/**
+ * @return The path of the first non-hidden file in @p dir whose name ends with @p extension, ignoring case, in
+ *         case-insensitive name order; empty if there is none.
+ */
+static std::string ctfFindFile(const std::filesystem::path& dir, const std::string& extension)
+{
+    // (lower-case name, name) of each candidate; the smallest pair is the first in case-insensitive order
+    std::optional<std::pair<std::string, std::string>> first;
+    std::error_code error;
+    for (const auto& entry : std::filesystem::directory_iterator(dir, error)) {
+        std::string name = mne::utf8_from_path(entry.path().filename());
+        std::string lower = mne::to_lower(name);
+        std::error_code typeError;
+        if (name.starts_with('.') || !entry.is_regular_file(typeError) || !lower.ends_with(extension))
+            continue;
+        std::pair<std::string, std::string> candidate(std::move(lower), std::move(name));
+        if (!first || candidate < *first)
+            first = std::move(candidate);
+    }
+    if (!first)
+        return {};
+    return mne::utf8_from_path(dir / mne::path_from_utf8(first->second));
+}
+
+//=============================================================================================================
+
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_ctf2fiff");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Convert CTF .ds MEG datasets to FIFF format.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"ds"}, "Input CTF .ds directory.", "dir", {}});
+    parser.add_option({{"out"}, "Output FIFF file.", "file", {}});
+    parser.process(argc, argv, "mne_ctf2fiff", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Convert CTF .ds MEG datasets to FIFF format.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string dsPath = parser.value("ds");
+    const std::string outFile = parser.value("out");
 
-    QCommandLineOption dsOpt("ds", "Input CTF .ds directory.", "dir");
-    parser.addOption(dsOpt);
-
-    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
-    parser.addOption(outOpt);
-
-    parser.process(app);
-
-    QString dsPath = parser.value(dsOpt);
-    QString outFile = parser.value(outOpt);
-
-    if (dsPath.isEmpty()) {
+    if (dsPath.empty()) {
         Log::critical("--ds is required.");
         return 1;
     }
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         Log::critical("--out is required.");
         return 1;
     }
 
     // Locate res4 and meg4 files in .ds directory
-    QDir dsDir(dsPath);
-    if (!dsDir.exists()) {
-        Log::critical("Dataset directory does not exist: {}", dsPath.toStdString());
+    const std::filesystem::path dsDir = mne::path_from_utf8(dsPath);
+    std::error_code dirError;
+    if (!std::filesystem::is_directory(dsDir, dirError)) {
+        Log::critical("Dataset directory does not exist: {}", dsPath);
         return 1;
     }
 
@@ -408,24 +445,22 @@ int main(int argc, char* argv[])
     info.dsPath = dsPath;
 
     // Find res4 file
-    QStringList res4Files = dsDir.entryList(QStringList() << "*.res4", QDir::Files);
-    if (res4Files.isEmpty()) {
-        Log::critical("No .res4 file found in {}", dsPath.toStdString());
+    info.res4Path = ctfFindFile(dsDir, ".res4");
+    if (info.res4Path.empty()) {
+        Log::critical("No .res4 file found in {}", dsPath);
         return 1;
     }
-    info.res4Path = dsDir.filePath(res4Files.first());
 
     // Find meg4 file
-    QStringList meg4Files = dsDir.entryList(QStringList() << "*.meg4", QDir::Files);
-    if (meg4Files.isEmpty()) {
-        Log::critical("No .meg4 file found in {}", dsPath.toStdString());
+    info.meg4Path = ctfFindFile(dsDir, ".meg4");
+    if (info.meg4Path.empty()) {
+        Log::critical("No .meg4 file found in {}", dsPath);
         return 1;
     }
-    info.meg4Path = dsDir.filePath(meg4Files.first());
 
-    Log::info("CTF dataset: {}", dsPath.toStdString());
-    Log::info("  res4: {}", info.res4Path.toStdString());
-    Log::info("  meg4: {}", info.meg4Path.toStdString());
+    Log::info("CTF dataset: {}", dsPath);
+    Log::info("  res4: {}", info.res4Path);
+    Log::info("  meg4: {}", info.meg4Path);
 
     // Parse res4 header
     if (!parseRes4(info))
@@ -441,7 +476,8 @@ int main(int argc, char* argv[])
     FiffInfo fiffInfo;
     fiffInfo.sfreq = info.sfreq;
     fiffInfo.nchan = nChan;
-    fiffInfo.meas_date[0] = static_cast<fiff_int_t>(QDateTime::currentDateTime().toSecsSinceEpoch());
+    const auto now = std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
+    fiffInfo.meas_date[0] = static_cast<fiff_int_t>(now.time_since_epoch().count());
     fiffInfo.meas_date[1] = 0;
 
     // Set coordinate transform (CTF device -> head, identity for now)
@@ -463,13 +499,13 @@ int main(int argc, char* argv[])
 
     // Write FIFF output
     Eigen::RowVectorXd cals;
-    auto stream = FiffStream::start_writing_raw(outFile.toStdU16String(), fiffInfo, cals);
+    auto stream = FiffStream::start_writing_raw(mne::path_from_utf8(outFile), fiffInfo, cals);
     if (!stream) {
-        Log::critical("Cannot open output: {}", outFile.toStdString());
+        Log::critical("Cannot open output: {}", outFile);
         return 1;
     }
 
-    int nSamples = data.cols();
+    const int nSamples = static_cast<int>(data.cols());
     int chunkSize = 10000;
     for (int start = 0; start < nSamples; start += chunkSize) {
         int end = std::min(start + chunkSize, nSamples);
@@ -478,7 +514,7 @@ int main(int argc, char* argv[])
     }
 
     stream->finish_writing_raw();
-    Log::info("Written FIFF: {} ({} channels, {} samples, {:.1f} Hz)", outFile.toStdString(), nChan, nSamples, info.sfreq);
+    Log::info("Written FIFF: {} ({} channels, {} samples, {:.1f} Hz)", outFile, nChan, nSamples, info.sfreq);
 
     return 0;
 }

@@ -22,23 +22,23 @@
 #include <mne/math/sphere.h>
 
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QFileInfo>
-#include <QTextStream>
+#include <mne/base/command_line.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <format>
+#include <fstream>
+#include <print>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -57,29 +57,22 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_fit_sphere_to_surf");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Fit a sphere to surface points.\n\nReads a FreeSurfer surface or FIFF BEM surface and fits a best-fit sphere.");
+    parser.add_help_option();
+    parser.add_version_option();
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Fit a sphere to surface points.\n\nReads a FreeSurfer surface or FIFF BEM surface and fits a best-fit sphere.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_option({{"surf"}, "Surface file (FreeSurfer format or FIFF BEM).", "name", ""});
+    parser.add_option({{"out"}, "Output text file with sphere parameters.", "name", ""});
 
-    QCommandLineOption surfOpt("surf", "Surface file (FreeSurfer format or FIFF BEM).", "name");
-    parser.addOption(surfOpt);
+    parser.process(argc, argv, "mne_fit_sphere_to_surf", PROGRAM_VERSION);
 
-    QCommandLineOption outOpt("out", "Output text file with sphere parameters.", "name");
-    parser.addOption(outOpt);
+    const std::string surfName = parser.value("surf");
+    const std::string outName = parser.value("out");
 
-    parser.process(app);
-
-    QString surfName = parser.value(surfOpt);
-    QString outName = parser.value(outOpt);
-
-    if (surfName.isEmpty() || outName.isEmpty()) {
+    if (surfName.empty() || outName.empty()) {
         Log::critical("Both --surf and --out are required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_fit_sphere_to_surf"));
+        return 1;
     }
 
     MatrixX3f vertices;
@@ -88,7 +81,7 @@ int main(int argc, char* argv[])
     bool loaded = false;
 
     // Attempt FIFF BEM
-    if (auto bem = MNEBem::read(surfName.toStdU16String())) {
+    if (auto bem = MNEBem::read(path_from_utf8(surfName))) {
         vertices = (*bem)[0].rr;
         Log::info("Read FIFF BEM surface: {} vertices", static_cast<int>(vertices.rows()));
         loaded = true;
@@ -97,7 +90,7 @@ int main(int argc, char* argv[])
     // Attempt FreeSurfer surface
     if (!loaded) {
         FsSurface surf;
-        if (FsSurface::read(surfName.toStdU16String(), surf, false)) {
+        if (FsSurface::read(path_from_utf8(surfName), surf, false)) {
             vertices = surf.rr();
             Log::info("Read FreeSurfer surface: {} vertices", static_cast<int>(vertices.rows()));
             loaded = true;
@@ -105,7 +98,7 @@ int main(int argc, char* argv[])
     }
 
     if (!loaded) {
-        Log::critical("Cannot read surface from: {}", surfName.toStdString());
+        Log::critical("Cannot read surface from: {}", surfName);
         return 1;
     }
 
@@ -125,19 +118,16 @@ int main(int argc, char* argv[])
     Log::info("Sphere radius : {:10.6f} m", radius);
 
     // Write output
-    QFile outFile(outName);
-    if (!outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        Log::critical("Cannot open output file: {}", outName.toStdString());
+    std::ofstream outFile(path_from_utf8(outName));
+    if (!outFile) {
+        Log::critical("Cannot open output file: {}", outName);
         return 1;
     }
 
-    QTextStream out(&outFile);
-    out.setRealNumberPrecision(8);
-    out.setRealNumberNotation(QTextStream::FixedNotation);
-    out << center(0) << " " << center(1) << " " << center(2) << " " << radius << "\n";
+    outFile << std::format("{:.8f} {:.8f} {:.8f} {:.8f}\n", center(0), center(1), center(2), radius);
     outFile.close();
 
-    Log::info("Wrote sphere parameters to {}", outName.toStdString());
+    Log::info("Wrote sphere parameters to {}", outName);
 
     return 0;
 }

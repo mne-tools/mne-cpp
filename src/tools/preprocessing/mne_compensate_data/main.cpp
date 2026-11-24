@@ -19,23 +19,24 @@
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_ctf_comp.h>
 #include <mne/fiff/fiff_stream.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <filesystem>
+#include <string>
+#include <system_error>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -54,35 +55,23 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_compensate_data");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Apply CTF software compensation to raw FIFF data.\n\nSets the desired compensation grade (0-3).");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"in"}, "Input raw FIFF file.", "file", {}});
+    parser.add_option({{"out"}, "Output FIFF file.", "file", {}});
+    parser.add_option({{"grade"}, "Desired compensation grade (0, 1, 2, or 3).", "value", {}});
+    parser.process(argc, argv, "mne_compensate_data", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Apply CTF software compensation to raw FIFF data.\n\nSets the desired compensation grade (0-3).");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string inFile = parser.value("in");
+    const std::string outFile = parser.value("out");
+    int grade = parser.is_set("grade") ? to_int(parser.value("grade")).value_or(0) : -1;
 
-    QCommandLineOption inOpt("in", "Input raw FIFF file.", "file");
-    parser.addOption(inOpt);
-
-    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
-    parser.addOption(outOpt);
-
-    QCommandLineOption gradeOpt("grade", "Desired compensation grade (0, 1, 2, or 3).", "value");
-    parser.addOption(gradeOpt);
-
-    parser.process(app);
-
-    QString inFile = parser.value(inOpt);
-    QString outFile = parser.value(outOpt);
-    int grade = parser.isSet(gradeOpt) ? parser.value(gradeOpt).toInt() : -1;
-
-    if (inFile.isEmpty()) {
+    if (inFile.empty()) {
         Log::critical("--in is required.");
         return 1;
     }
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         Log::critical("--out is required.");
         return 1;
     }
@@ -92,20 +81,21 @@ int main(int argc, char* argv[])
     }
 
     // Open input file
-    FiffRawData raw(inFile.toStdU16String());
+    FiffRawData raw(path_from_utf8(inFile));
     if (raw.info.empty()) {
-        Log::critical("Cannot read raw data from: {}", inFile.toStdString());
+        Log::critical("Cannot read raw data from: {}", inFile);
         return 1;
     }
 
-    qint32 currentComp = raw.info.get_current_comp();
+    int currentComp = raw.info.get_current_comp();
     Log::info("Current compensation grade: {}", currentComp);
     Log::info("Desired compensation grade: {}", grade);
 
     if (currentComp == grade) {
         Log::info("Data already at desired compensation grade. No changes needed.");
-        // Just copy the file
-        QFile::copy(inFile, outFile);
+        // Just copy the file; an existing output file is left alone
+        std::error_code error;
+        std::filesystem::copy_file(path_from_utf8(inFile), path_from_utf8(outFile), error);
         return 0;
     }
 
@@ -136,9 +126,9 @@ int main(int argc, char* argv[])
 
     // Write output
     Eigen::RowVectorXd cals;
-    auto outStream = FiffStream::start_writing_raw(outFile.toStdU16String(), raw.info, cals);
+    auto outStream = FiffStream::start_writing_raw(path_from_utf8(outFile), raw.info, cals);
     if (!outStream) {
-        Log::critical("Cannot open output file: {}", outFile.toStdString());
+        Log::critical("Cannot open output file: {}", outFile);
         return 1;
     }
 
@@ -151,7 +141,7 @@ int main(int argc, char* argv[])
     }
 
     outStream->finish_writing_raw();
-    Log::info("Written compensated data to: {}", outFile.toStdString());
+    Log::info("Written compensated data to: {}", outFile);
 
     return 0;
 }

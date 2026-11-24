@@ -17,27 +17,32 @@
 #include <mne/fiff/fiff_stream.h>
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_ch_info.h>
+#include <mne/base/command_line.h>
+#include <mne/base/endian.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QTextStream>
-#include <QFileInfo>
-#include <QDir>
-#include <QRegularExpression>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <bit>
+#include <chrono>
+#include <cstdint>
+#include <cstring>
+#include <filesystem>
+#include <format>
+#include <fstream>
+#include <iterator>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -58,16 +63,16 @@ using namespace Eigen;
 
 struct BVChannelInfo
 {
-    QString name;
-    QString refName;
+    std::string name;
+    std::string refName;
     double resolution; // microvolts per bit
-    QString unit;
+    std::string unit;
 };
 
 struct BVMarker
 {
-    QString type;
-    QString description;
+    std::string type;
+    std::string description;
     int position; // sample index
     int duration; // in samples
     int channel;  // 0 = all channels
@@ -76,35 +81,34 @@ struct BVMarker
 struct BVHeader
 {
     // Common Infos
-    QString dataFile;
-    QString markerFile;
-    QString dataFormat;  // BINARY or ASCII
-    int dataOrientation; // 0 = MULTIPLEXED, 1 = VECTORIZED
+    std::string dataFile;
+    std::string markerFile;
+    std::string dataFormat; // BINARY or ASCII
+    int dataOrientation;    // 0 = MULTIPLEXED, 1 = VECTORIZED
     int numberOfChannels;
     double samplingInterval; // in microseconds
 
     // Binary Format
-    QString binaryFormat; // INT_16, UINT_16, IEEE_FLOAT_32
+    std::string binaryFormat; // INT_16, UINT_16, IEEE_FLOAT_32
 
     // Channel info
-    QList<BVChannelInfo> channels;
+    std::vector<BVChannelInfo> channels;
 
     // Markers
-    QList<BVMarker> markers;
+    std::vector<BVMarker> markers;
 };
 
 //=============================================================================================================
 
-static bool parseBVHeader(const QString& vhdrPath, BVHeader& hdr)
+static bool parseBVHeader(const std::string& vhdrPath, BVHeader& hdr)
 {
-    QFile file(vhdrPath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Cannot open header file: {}", vhdrPath.toStdString());
+    std::ifstream file(mne::path_from_utf8(vhdrPath));
+    if (!file) {
+        Log::critical("Cannot open header file: {}", vhdrPath);
         return false;
     }
 
-    QTextStream in(&file);
-    QString currentSection;
+    std::string currentSection;
     int chIdx = 0;
 
     hdr.dataOrientation = 0; // default: multiplexed
@@ -112,27 +116,28 @@ static bool parseBVHeader(const QString& vhdrPath, BVHeader& hdr)
     hdr.samplingInterval = 1000.0; // 1 ms default
     hdr.binaryFormat = "INT_16";
 
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
+    std::string rawLine;
+    while (std::getline(file, rawLine)) {
+        const std::string line(mne::trimmed(rawLine));
 
         // Skip empty lines and comments
-        if (line.isEmpty() || line.startsWith(';'))
+        if (line.empty() || line.starts_with(';'))
             continue;
 
         // Section header
-        if (line.startsWith('[') && line.endsWith(']')) {
-            currentSection = line.mid(1, line.length() - 2);
+        if (line.starts_with('[') && line.ends_with(']')) {
+            currentSection = line.substr(1, line.length() - 2);
             chIdx = 0;
             continue;
         }
 
         // Key=value
-        int eqPos = line.indexOf('=');
-        if (eqPos < 0)
+        const std::size_t eqPos = line.find('=');
+        if (eqPos == std::string::npos)
             continue;
 
-        QString key = line.left(eqPos).trimmed();
-        QString value = line.mid(eqPos + 1).trimmed();
+        const std::string key(mne::trimmed(std::string_view(line).substr(0, eqPos)));
+        const std::string value(mne::trimmed(std::string_view(line).substr(eqPos + 1)));
 
         if (currentSection == "Common Infos") {
             if (key == "DataFile")
@@ -142,41 +147,39 @@ static bool parseBVHeader(const QString& vhdrPath, BVHeader& hdr)
             else if (key == "DataFormat")
                 hdr.dataFormat = value;
             else if (key == "DataOrientation") {
-                hdr.dataOrientation = (value.toUpper() == "VECTORIZED") ? 1 : 0;
+                hdr.dataOrientation = mne::iequals(value, "VECTORIZED") ? 1 : 0;
             } else if (key == "NumberOfChannels")
-                hdr.numberOfChannels = value.toInt();
+                hdr.numberOfChannels = mne::to_int(value).value_or(0);
             else if (key == "SamplingInterval")
-                hdr.samplingInterval = value.toDouble();
+                hdr.samplingInterval = mne::to_double(value).value_or(0.0);
         } else if (currentSection == "Binary Infos") {
             if (key == "BinaryFormat")
                 hdr.binaryFormat = value;
         } else if (currentSection == "Channel Infos") {
             // Format: ChN=name,refName,resolution,unit
-            QStringList parts = value.split(',');
+            const StringList parts = mne::split(value, ',');
             BVChannelInfo ch;
-            ch.name = (parts.size() > 0) ? parts[0].trimmed() : QString("Ch%1").arg(chIdx + 1);
-            ch.refName = (parts.size() > 1) ? parts[1].trimmed() : QString();
-            ch.resolution = (parts.size() > 2) ? parts[2].trimmed().toDouble() : 1.0;
-            ch.unit = (parts.size() > 3) ? parts[3].trimmed() : "µV";
+            ch.name = (parts.size() > 0) ? std::string(mne::trimmed(parts[0])) : std::format("Ch{}", chIdx + 1);
+            ch.refName = (parts.size() > 1) ? std::string(mne::trimmed(parts[1])) : std::string();
+            ch.resolution = (parts.size() > 2) ? mne::to_double(parts[2]).value_or(0.0) : 1.0;
+            ch.unit = (parts.size() > 3) ? std::string(mne::trimmed(parts[3])) : "µV";
             if (ch.resolution == 0.0)
                 ch.resolution = 1.0;
-            hdr.channels.append(ch);
+            hdr.channels.push_back(ch);
             chIdx++;
         }
     }
 
-    file.close();
-
     if (hdr.numberOfChannels == 0)
-        hdr.numberOfChannels = hdr.channels.size();
+        hdr.numberOfChannels = static_cast<int>(hdr.channels.size());
 
     // Fill missing channel definitions
-    while (hdr.channels.size() < hdr.numberOfChannels) {
+    while (std::ssize(hdr.channels) < hdr.numberOfChannels) {
         BVChannelInfo ch;
-        ch.name = QString("Ch%1").arg(hdr.channels.size() + 1);
+        ch.name = std::format("Ch{}", hdr.channels.size() + 1);
         ch.resolution = 1.0;
         ch.unit = "µV";
-        hdr.channels.append(ch);
+        hdr.channels.push_back(ch);
     }
 
     return true;
@@ -186,47 +189,46 @@ static bool parseBVHeader(const QString& vhdrPath, BVHeader& hdr)
 // Parse BrainVision .vmrk marker file
 //=============================================================================================================
 
-static bool parseBVMarkers(const QString& vmrkPath, BVHeader& hdr)
+static bool parseBVMarkers(const std::string& vmrkPath, BVHeader& hdr)
 {
-    QFile file(vmrkPath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::info("Warning: Cannot open marker file: {}", vmrkPath.toStdString());
+    std::ifstream file(mne::path_from_utf8(vmrkPath));
+    if (!file) {
+        Log::info("Warning: Cannot open marker file: {}", vmrkPath);
         return false;
     }
 
-    QTextStream in(&file);
-    QString currentSection;
+    std::string currentSection;
 
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith(';'))
+    std::string rawLine;
+    while (std::getline(file, rawLine)) {
+        const std::string line(mne::trimmed(rawLine));
+        if (line.empty() || line.starts_with(';'))
             continue;
 
-        if (line.startsWith('[') && line.endsWith(']')) {
-            currentSection = line.mid(1, line.length() - 2);
+        if (line.starts_with('[') && line.ends_with(']')) {
+            currentSection = line.substr(1, line.length() - 2);
             continue;
         }
 
         if (currentSection == "Marker Infos") {
-            int eqPos = line.indexOf('=');
-            if (eqPos < 0)
+            const std::size_t eqPos = line.find('=');
+            if (eqPos == std::string::npos)
                 continue;
 
-            QString value = line.mid(eqPos + 1).trimmed();
-            QStringList parts = value.split(',');
+            const std::string_view value = mne::trimmed(std::string_view(line).substr(eqPos + 1));
+            const StringList parts = mne::split(value, ',');
             if (parts.size() >= 4) {
                 BVMarker mkr;
-                mkr.type = parts[0].trimmed();
-                mkr.description = parts[1].trimmed();
-                mkr.position = parts[2].trimmed().toInt();
-                mkr.duration = parts[3].trimmed().toInt();
-                mkr.channel = (parts.size() > 4) ? parts[4].trimmed().toInt() : 0;
-                hdr.markers.append(mkr);
+                mkr.type = std::string(mne::trimmed(parts[0]));
+                mkr.description = std::string(mne::trimmed(parts[1]));
+                mkr.position = mne::to_int(parts[2]).value_or(0);
+                mkr.duration = mne::to_int(parts[3]).value_or(0);
+                mkr.channel = (parts.size() > 4) ? mne::to_int(parts[4]).value_or(0) : 0;
+                hdr.markers.push_back(mkr);
             }
         }
     }
 
-    file.close();
     return true;
 }
 
@@ -234,16 +236,32 @@ static bool parseBVMarkers(const QString& vmrkPath, BVHeader& hdr)
 // Read BrainVision binary data
 //=============================================================================================================
 
-static bool readBVData(const QString& dataPath, const BVHeader& hdr, MatrixXd& data)
+/** Reads a little-endian value at @p offset of @p bytes; 0 past the end, like QDataStream. */
+template<typename T>
+static T readBVLittleEndian(const std::vector<char>& bytes, std::size_t offset)
 {
-    QFile file(dataPath);
-    if (!file.open(QIODevice::ReadOnly)) {
-        Log::critical("Cannot open data file: {}", dataPath.toStdString());
+    T value{};
+    if (offset + sizeof(T) <= bytes.size()) {
+        std::memcpy(&value, bytes.data() + offset, sizeof(T));
+        if constexpr (std::endian::native == std::endian::big)
+            value = mne::byte_swap(value);
+    }
+    return value;
+}
+
+//=============================================================================================================
+
+static bool readBVData(const std::string& dataPath, const BVHeader& hdr, MatrixXd& data)
+{
+    std::ifstream file(mne::path_from_utf8(dataPath), std::ios::binary);
+    if (!file) {
+        Log::critical("Cannot open data file: {}", dataPath);
         return false;
     }
+    const std::vector<char> bytes((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
     int nChan = hdr.numberOfChannels;
-    qint64 fileSize = file.size();
+    const std::int64_t fileSize = std::ssize(bytes);
     int bytesPerSample;
 
     if (hdr.binaryFormat == "IEEE_FLOAT_32")
@@ -251,67 +269,41 @@ static bool readBVData(const QString& dataPath, const BVHeader& hdr, MatrixXd& d
     else // INT_16, UINT_16
         bytesPerSample = 2;
 
-    qint64 nSamples;
-    if (hdr.dataOrientation == 0) {
-        // Multiplexed: samples are interleaved [ch0_s0, ch1_s0, ..., chN_s0, ch0_s1, ...]
-        nSamples = fileSize / (nChan * bytesPerSample);
-    } else {
-        // Vectorized: all samples for ch0, then ch1, etc.
-        nSamples = fileSize / (nChan * bytesPerSample);
-    }
+    // Multiplexed: samples are interleaved [ch0_s0, ch1_s0, ..., chN_s0, ch0_s1, ...]
+    // Vectorized: all samples for ch0, then ch1, etc.
+    const std::int64_t nSamples = fileSize / (nChan * bytesPerSample);
 
-    Log::info("Data: {} channels x {} samples ({})", nChan, nSamples, hdr.binaryFormat.toStdString());
+    Log::info("Data: {} channels x {} samples ({})", nChan, nSamples, hdr.binaryFormat);
 
     data.resize(nChan, nSamples);
-    QDataStream ds(&file);
-    ds.setByteOrder(QDataStream::LittleEndian);
-    ds.setFloatingPointPrecision(QDataStream::SinglePrecision);
+    std::size_t offset = 0;
+    const auto readValue = [&]() {
+        double val = 0.0;
+        if (hdr.binaryFormat == "IEEE_FLOAT_32") {
+            val = static_cast<double>(readBVLittleEndian<float>(bytes, offset));
+        } else if (hdr.binaryFormat == "INT_16") {
+            val = static_cast<double>(readBVLittleEndian<std::int16_t>(bytes, offset));
+        } else { // UINT_16
+            val = static_cast<double>(readBVLittleEndian<std::uint16_t>(bytes, offset));
+        }
+        offset += static_cast<std::size_t>(bytesPerSample);
+        return val;
+    };
 
     if (hdr.dataOrientation == 0) {
         // Multiplexed
-        for (qint64 s = 0; s < nSamples; ++s) {
-            for (int c = 0; c < nChan; ++c) {
-                double val = 0.0;
-                if (hdr.binaryFormat == "IEEE_FLOAT_32") {
-                    float fval;
-                    ds >> fval;
-                    val = static_cast<double>(fval);
-                } else if (hdr.binaryFormat == "INT_16") {
-                    qint16 ival;
-                    ds >> ival;
-                    val = static_cast<double>(ival);
-                } else { // UINT_16
-                    quint16 uval;
-                    ds >> uval;
-                    val = static_cast<double>(uval);
-                }
-                data(c, s) = val * hdr.channels[c].resolution;
-            }
+        for (std::int64_t s = 0; s < nSamples; ++s) {
+            for (int c = 0; c < nChan; ++c)
+                data(c, s) = readValue() * hdr.channels[c].resolution;
         }
     } else {
         // Vectorized
         for (int c = 0; c < nChan; ++c) {
-            for (qint64 s = 0; s < nSamples; ++s) {
-                double val = 0.0;
-                if (hdr.binaryFormat == "IEEE_FLOAT_32") {
-                    float fval;
-                    ds >> fval;
-                    val = static_cast<double>(fval);
-                } else if (hdr.binaryFormat == "INT_16") {
-                    qint16 ival;
-                    ds >> ival;
-                    val = static_cast<double>(ival);
-                } else {
-                    quint16 uval;
-                    ds >> uval;
-                    val = static_cast<double>(uval);
-                }
-                data(c, s) = val * hdr.channels[c].resolution;
-            }
+            for (std::int64_t s = 0; s < nSamples; ++s)
+                data(c, s) = readValue() * hdr.channels[c].resolution;
         }
     }
 
-    file.close();
     return true;
 }
 
@@ -319,31 +311,21 @@ static bool readBVData(const QString& dataPath, const BVHeader& hdr, MatrixXd& d
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_brain_vision2fiff");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Convert BrainVision EEG files (.vhdr/.vmrk/.eeg) to FIFF format.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"vhdr"}, "Input BrainVision header file (.vhdr).", "file", {}});
+    parser.add_option({{"out"}, "Output FIFF file.", "file", {}});
+    parser.process(argc, argv, "mne_brain_vision2fiff", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Convert BrainVision EEG files (.vhdr/.vmrk/.eeg) to FIFF format.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string vhdrFile = parser.value("vhdr");
+    const std::string outFile = parser.value("out");
 
-    QCommandLineOption vhdrOpt("vhdr", "Input BrainVision header file (.vhdr).", "file");
-    parser.addOption(vhdrOpt);
-
-    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
-    parser.addOption(outOpt);
-
-    parser.process(app);
-
-    QString vhdrFile = parser.value(vhdrOpt);
-    QString outFile = parser.value(outOpt);
-
-    if (vhdrFile.isEmpty()) {
+    if (vhdrFile.empty()) {
         Log::critical("--vhdr is required.");
         return 1;
     }
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         Log::critical("--out is required.");
         return 1;
     }
@@ -353,22 +335,21 @@ int main(int argc, char* argv[])
     if (!parseBVHeader(vhdrFile, hdr))
         return 1;
 
-    QFileInfo vhdrInfo(vhdrFile);
-    QDir baseDir = vhdrInfo.absoluteDir();
+    const std::filesystem::path baseDir = std::filesystem::absolute(mne::path_from_utf8(vhdrFile)).parent_path();
 
-    Log::info("BrainVision header: {} channels, sfreq={:.1f} Hz, format={}", hdr.numberOfChannels, 1e6 / hdr.samplingInterval, hdr.binaryFormat.toStdString());
+    Log::info("BrainVision header: {} channels, sfreq={:.1f} Hz, format={}", hdr.numberOfChannels, 1e6 / hdr.samplingInterval, hdr.binaryFormat);
 
     // Parse markers if available
-    if (!hdr.markerFile.isEmpty()) {
-        QString vmrkPath = baseDir.filePath(hdr.markerFile);
+    if (!hdr.markerFile.empty()) {
+        const std::string vmrkPath = mne::utf8_from_path(baseDir / mne::path_from_utf8(hdr.markerFile));
         parseBVMarkers(vmrkPath, hdr);
         Log::info("Markers: {} events", static_cast<long long>(hdr.markers.size()));
     }
 
     // Read binary data
-    QString dataPath = baseDir.filePath(hdr.dataFile);
+    const std::string dataPath = mne::utf8_from_path(baseDir / mne::path_from_utf8(hdr.dataFile));
     MatrixXd data;
-    if (hdr.dataFormat.toUpper() == "BINARY") {
+    if (mne::iequals(hdr.dataFormat, "BINARY")) {
         if (!readBVData(dataPath, hdr, data))
             return 1;
     } else {
@@ -387,30 +368,31 @@ int main(int argc, char* argv[])
     FiffInfo info;
     info.sfreq = sfreq;
     info.nchan = nChan;
-    info.meas_date[0] = static_cast<fiff_int_t>(QDateTime::currentDateTime().toSecsSinceEpoch());
+    const auto now = std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
+    info.meas_date[0] = static_cast<fiff_int_t>(now.time_since_epoch().count());
     info.meas_date[1] = 0;
 
     for (int c = 0; c < nChan; ++c) {
         FiffChInfo ch;
-        ch.ch_name = hdr.channels[c].name.toStdString();
+        ch.ch_name = hdr.channels[c].name;
         ch.scanNo = c + 1;
         ch.logNo = c + 1;
 
         // Classify channel type from name
-        QString nameUp = QString::fromStdString(ch.ch_name).toUpper();
-        if (nameUp.startsWith("EOG") || nameUp.contains("EOG")) {
+        const std::string nameLow = mne::to_lower(ch.ch_name);
+        if (nameLow.contains("eog")) {
             ch.kind = FIFFV_EOG_CH;
             ch.unit = FIFF_UNIT_V;
             ch.chpos.coil_type = FIFFV_COIL_NONE;
-        } else if (nameUp.startsWith("ECG") || nameUp.contains("ECG")) {
+        } else if (nameLow.contains("ecg")) {
             ch.kind = FIFFV_ECG_CH;
             ch.unit = FIFF_UNIT_V;
             ch.chpos.coil_type = FIFFV_COIL_NONE;
-        } else if (nameUp.startsWith("EMG") || nameUp.contains("EMG")) {
+        } else if (nameLow.contains("emg")) {
             ch.kind = FIFFV_EMG_CH;
             ch.unit = FIFF_UNIT_V;
             ch.chpos.coil_type = FIFFV_COIL_NONE;
-        } else if (nameUp.startsWith("STI") || nameUp.startsWith("TRIG")) {
+        } else if (nameLow.starts_with("sti") || nameLow.starts_with("trig")) {
             ch.kind = FIFFV_STIM_CH;
             ch.unit = FIFF_UNIT_V;
             ch.chpos.coil_type = FIFFV_COIL_NONE;
@@ -428,14 +410,14 @@ int main(int argc, char* argv[])
 
     // Write FIFF
     Eigen::RowVectorXd cals;
-    auto stream = FiffStream::start_writing_raw(outFile.toStdU16String(), info, cals);
+    auto stream = FiffStream::start_writing_raw(mne::path_from_utf8(outFile), info, cals);
     if (!stream) {
-        Log::critical("Cannot open output: {}", outFile.toStdString());
+        Log::critical("Cannot open output: {}", outFile);
         return 1;
     }
 
     // Write data in chunks
-    int nSamples = data.cols();
+    const int nSamples = static_cast<int>(data.cols());
     int chunkSize = 10000;
     for (int start = 0; start < nSamples; start += chunkSize) {
         int end = std::min(start + chunkSize, nSamples);
@@ -444,7 +426,7 @@ int main(int argc, char* argv[])
     }
 
     stream->finish_writing_raw();
-    Log::info("Written FIFF: {} ({} channels, {} samples, {:.1f} Hz)", outFile.toStdString(), nChan, nSamples, sfreq);
+    Log::info("Written FIFF: {} ({} channels, {} samples, {:.1f} Hz)", outFile, nChan, nSamples, sfreq);
 
     return 0;
 }

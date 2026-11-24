@@ -14,11 +14,16 @@
 #define MNESETUPMRISETTINGS_H
 
 //=============================================================================================================
-// QT INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include <QCommandLineParser>
-#include <QStringList>
+#include <mne/base/string_utils.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <string>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNESETUPMRI
@@ -51,7 +56,7 @@ public:
      *
      * @return Subject name string.
      */
-    QString subject() const;
+    std::string subject() const;
 
     //=========================================================================================================
     /**
@@ -59,7 +64,7 @@ public:
      *
      * @return Subjects directory path.
      */
-    QString subjectsDir() const;
+    std::string subjectsDir() const;
 
     //=========================================================================================================
     /**
@@ -67,7 +72,7 @@ public:
      *
      * @return List of MRI set names.
      */
-    QStringList mriSets() const;
+    mne::StringList mriSets() const;
 
     //=========================================================================================================
     /**
@@ -86,11 +91,11 @@ public:
     bool verbose() const;
 
 private:
-    QString m_sSubject;      /**< Subject name. */
-    QString m_sSubjectsDir;  /**< Subjects directory path. */
-    QStringList m_slMriSets; /**< MRI set names to process. */
-    bool m_bOverwrite;       /**< Whether to overwrite existing data. */
-    bool m_bVerbose;         /**< Verbose output. */
+    std::string m_sSubject;      /**< Subject name. */
+    std::string m_sSubjectsDir;  /**< Subjects directory path. */
+    mne::StringList m_slMriSets; /**< MRI set names to process. */
+    bool m_bOverwrite;           /**< Whether to overwrite existing data. */
+    bool m_bVerbose;             /**< Verbose output. */
 };
 
 } // namespace MNESETUPMRI

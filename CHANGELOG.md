@@ -241,6 +241,14 @@ aliases; replace the old spelling as below.
 - `FiffRawData::read_raw_segment()` skipped the buffer a segment starts in
   when the segment starts on that buffer's last sample, and returned
   uninitialised data for it.
+- The command-line tools are standard C++: they parse their options with
+  `mne::CommandLineParser` and use `std::filesystem`, `std::print` and
+  `mne::Json` instead of Qt Core, and link only the MNE-CPP libraries they
+  need. Their options, output files and exit codes are unchanged; the help
+  text is laid out differently. Number output rounds halfway values away from
+  zero as before. Still on Qt: `mne_acq`, `mne_anonymize` and `mne_rt_server`
+  (graphical or networked), `mne_make_movie` and `mne_screenshot_regression`
+  (rendering).
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and

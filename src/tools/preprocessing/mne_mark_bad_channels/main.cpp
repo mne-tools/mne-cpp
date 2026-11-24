@@ -19,25 +19,26 @@
 #include <mne/fiff/fiff_raw_data.h>
 #include <mne/fiff/fiff_tag.h>
 #include <mne/fiff/fiff_types.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QFileInfo>
-#include <QTextStream>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <filesystem>
+#include <fstream>
+#include <string>
+#include <string_view>
+#include <system_error>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -53,19 +54,26 @@ using namespace mne;
 
 //=============================================================================================================
 
-static StringList readBadChannelList(const QString& filename)
+static bool isReadable(const std::string& filename)
+{
+    return std::ifstream(path_from_utf8(filename)).is_open();
+}
+
+//=============================================================================================================
+
+static StringList readBadChannelList(const std::string& filename)
 {
     StringList bads;
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Cannot open bad channel file: {}", filename.toStdString());
+    std::ifstream file(path_from_utf8(filename));
+    if (!file) {
+        Log::critical("Cannot open bad channel file: {}", filename);
         return bads;
     }
-    QTextStream in(&file);
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (!line.isEmpty() && !line.startsWith('#'))
-            bads.push_back(line.toStdString());
+    std::string raw;
+    while (std::getline(file, raw)) {
+        const std::string_view line = trimmed(raw);
+        if (!line.empty() && !line.starts_with('#'))
+            bads.emplace_back(line);
     }
     return bads;
 }
@@ -74,36 +82,26 @@ static StringList readBadChannelList(const QString& filename)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_mark_bad_channels");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Mark or update bad channels in a FIFF file.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"bad"}, "Text file listing bad channel names (one per line).", "file", {}});
+    parser.add_option({{"fif"}, "FIFF file to modify.", "file", {}});
+    parser.process(argc, argv, "mne_mark_bad_channels", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Mark or update bad channels in a FIFF file.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string badName = parser.value("bad");
+    const std::string fifName = parser.value("fif");
 
-    QCommandLineOption badOpt("bad", "Text file listing bad channel names (one per line).", "file");
-    parser.addOption(badOpt);
-
-    QCommandLineOption fifOpt("fif", "FIFF file to modify.", "file");
-    parser.addOption(fifOpt);
-
-    parser.process(app);
-
-    QString badName = parser.value(badOpt);
-    QString fifName = parser.value(fifOpt);
-
-    if (fifName.isEmpty() || badName.isEmpty()) {
+    if (fifName.empty() || badName.empty()) {
         Log::critical("Both --fif and --bad are required.");
         return 1;
     }
-    if (!QFileInfo(badName).isReadable()) {
-        Log::critical("Cannot open bad channel file: {}", badName.toStdString());
+    if (!isReadable(badName)) {
+        Log::critical("Cannot open bad channel file: {}", badName);
         return 1;
     }
-    if (!QFileInfo(fifName).isReadable()) {
-        Log::critical("Cannot read FIFF file: {}", fifName.toStdString());
+    if (!isReadable(fifName)) {
+        Log::critical("Cannot read FIFF file: {}", fifName);
         return 1;
     }
 
@@ -121,13 +119,13 @@ int main(int argc, char* argv[])
     // Open the FIFF file and read raw data
     FiffRawData raw;
     try {
-        raw = FiffRawData(fifName.toStdU16String());
+        raw = FiffRawData(path_from_utf8(fifName));
     } catch (const std::exception& error) {
-        Log::critical("Cannot read FIFF file {}: {}", fifName.toStdString(), error.what());
+        Log::critical("Cannot read FIFF file {}: {}", fifName, error.what());
         return 1;
     }
     if (raw.info.empty()) {
-        Log::critical("Cannot read FIFF file: {}", fifName.toStdString());
+        Log::critical("Cannot read FIFF file: {}", fifName);
         return 1;
     }
 
@@ -145,17 +143,17 @@ int main(int argc, char* argv[])
     }
 
     // Write to temp file, then replace
-    QString tmpName = fifName + ".tmp";
+    const std::string tmpName = fifName + ".tmp";
     Eigen::RowVectorXd cals;
-    auto outStream = FiffStream::start_writing_raw(tmpName.toStdU16String(), raw.info, cals);
+    auto outStream = FiffStream::start_writing_raw(path_from_utf8(tmpName), raw.info, cals);
     if (!outStream) {
         Log::critical("Cannot open temp file for writing.");
         return 1;
     }
 
     // Write data in chunks
-    int nSamples = data.cols();
-    int nChan = data.rows();
+    int nSamples = static_cast<int>(data.cols());
+    int nChan = static_cast<int>(data.rows());
     int chunkSize = 10000;
     for (int start = 0; start < nSamples; start += chunkSize) {
         int end = std::min(start + chunkSize, nSamples);
@@ -166,10 +164,11 @@ int main(int argc, char* argv[])
     outStream->finish_writing_raw();
 
     // Replace original with temp
-    QFile::remove(fifName);
-    QFile::rename(tmpName, fifName);
+    std::error_code error;
+    std::filesystem::remove(path_from_utf8(fifName), error);
+    std::filesystem::rename(path_from_utf8(tmpName), path_from_utf8(fifName), error);
 
-    Log::info("Successfully updated bad channels in {}", fifName.toStdString());
+    Log::info("Successfully updated bad channels in {}", fifName);
 
     return 0;
 }

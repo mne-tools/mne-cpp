@@ -32,24 +32,19 @@
 #include <mne/base/log.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QDir>
-#include <QDirIterator>
-#include <QFile>
-#include <QFileInfo>
-#include <QTextStream>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <chrono>
+#include <cstdio>
 #include <filesystem>
 #include <optional>
+#include <print>
+#include <string>
+#include <string_view>
+#include <system_error>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -58,79 +53,189 @@
 using namespace mne;
 
 //=============================================================================================================
+// PATH HELPERS
+//=============================================================================================================
+
+/** @return @p path as a std::filesystem path. */
+static std::filesystem::path fsPath(const std::string& path)
+{
+    return path_from_utf8(path);
+}
+
+/**
+ * @return @p name inside the directory @p dir, joined with '/'; @p name itself if it is absolute.
+ */
+static std::string dirFilePath(std::string dir, const std::string& name)
+{
+    if (fsPath(name).is_absolute())
+        return name;
+    if (dir.empty())
+        dir = ".";
+    else if (dir.size() > 1 && dir.ends_with('/'))
+        dir.pop_back();
+    if (name.empty())
+        return dir;
+    return dir.ends_with('/') ? dir + name : dir + "/" + name;
+}
+
+/** @return The final component of @p path. */
+static std::string fileNameOf(const std::string& path)
+{
+    return utf8_from_path(fsPath(path).filename());
+}
+
+/** @return The text after the last '.' of the file name of @p path, empty if there is none. */
+static std::string suffixOf(const std::string& path)
+{
+    const std::string name = fileNameOf(path);
+    const std::size_t dot = name.rfind('.');
+    return dot == std::string::npos ? std::string() : name.substr(dot + 1);
+}
+
+/** @return The absolute path of the directory that contains @p path. */
+static std::string absoluteDirOf(const std::string& path)
+{
+    std::error_code error;
+    const std::filesystem::path absolute = std::filesystem::absolute(fsPath(path), error);
+    return utf8_from_path(absolute.lexically_normal().parent_path());
+}
+
+/** @return @p path with "." and ".." resolved lexically, as written; no trailing separator. */
+static std::string cleanPath(const std::string& path)
+{
+    std::string clean = utf8_from_path(fsPath(path).lexically_normal());
+    if constexpr (std::filesystem::path::preferred_separator != '/')
+        std::ranges::replace(clean, static_cast<char>(std::filesystem::path::preferred_separator), '/');
+    if (clean.size() > 1 && clean.ends_with('/'))
+        clean.pop_back();
+    return clean;
+}
+
+/**
+ * @return @p path relative to the directory @p dir (taken absolute), both cleaned and joined with '/'; a relative
+ *         @p path is only cleaned.
+ */
+static std::string relativeFilePath(const std::string& dir, const std::string& path)
+{
+    if (!fsPath(path).is_absolute())
+        return cleanPath(path);
+    std::error_code error;
+    const std::filesystem::path base = std::filesystem::absolute(fsPath(dir), error).lexically_normal();
+    const std::filesystem::path target = std::filesystem::absolute(fsPath(path), error).lexically_normal();
+    return cleanPath(utf8_from_path(target.lexically_relative(base)));
+}
+
+/** Creates @p dir and its parents. */
+static void makePath(const std::string& dir)
+{
+    std::error_code error;
+    std::filesystem::create_directories(fsPath(dir), error);
+}
+
+/**
+ * @return The non-hidden subdirectories (or files) of @p dir whose names start with @p prefix ignoring case, in
+ *         case-insensitive name order.
+ */
+static StringList entryList(const std::string& dir, bool directories, std::string_view prefix = {})
+{
+    StringList names;
+    std::error_code error;
+    for (const auto& entry : std::filesystem::directory_iterator(fsPath(dir), error)) {
+        const std::string name = utf8_from_path(entry.path().filename());
+        if (name.starts_with('.') || !to_lower(name).starts_with(to_lower(prefix)))
+            continue;
+        std::error_code typeError;
+        if (directories ? entry.is_directory(typeError) : entry.is_regular_file(typeError))
+            names.push_back(name);
+    }
+    std::ranges::sort(names, [](const std::string& a, const std::string& b) {
+        const std::string lowerA = to_lower(a);
+        const std::string lowerB = to_lower(b);
+        return lowerA != lowerB ? lowerA < lowerB : a < b;
+    });
+    return names;
+}
+
+/** @return Whether @p path exists. */
+static bool pathExists(const std::string& path)
+{
+    std::error_code error;
+    return std::filesystem::exists(fsPath(path), error);
+}
+
+//=============================================================================================================
 // BIDS HELPERS
 //=============================================================================================================
 
 /**
  * Map an MnaFileRole to a BIDS-like subdirectory.
  */
-static QString bidsSubdirForRole(MnaFileRole role)
+static std::string bidsSubdirForRole(MnaFileRole role)
 {
     switch (role) {
         case MnaFileRole::Surface:
         case MnaFileRole::Annotation:
-            return QStringLiteral("anat");
+            return "anat";
         case MnaFileRole::Bem:
         case MnaFileRole::SourceSpace:
-            return QStringLiteral("bem");
+            return "bem";
         case MnaFileRole::Digitizer:
         case MnaFileRole::Transform:
         case MnaFileRole::Evoked:
-            return QStringLiteral("meg");
+            return "meg";
         case MnaFileRole::SourceEstimate:
-            return QStringLiteral("source");
+            return "source";
         default:
-            return QStringLiteral("other");
+            return "other";
     }
 }
 
 /**
  * Build a BIDS-like relative path: sub-<subj>/ses-<sess>/<modality>/<filename>
  */
-static QString bidsBuildRelPath(const QString& subjId, const QString& sessId,
-                                MnaFileRole role, const QString& fileName)
+static std::string bidsBuildRelPath(const std::string& subjId, const std::string& sessId,
+                                    MnaFileRole role, const std::string& fileName)
 {
-    return QStringLiteral("sub-%1/ses-%2/%3/%4")
-        .arg(subjId, sessId, bidsSubdirForRole(role), QFileInfo(fileName).fileName());
+    return "sub-" + subjId + "/ses-" + sessId + "/" + bidsSubdirForRole(role) + "/" + fileNameOf(fileName);
 }
 
 /**
  * Guess MnaFileRole from a file name.
  */
-static MnaFileRole guessRoleFromFileName(const QString& fileName)
+static MnaFileRole guessRoleFromFileName(const std::string& fileName)
 {
-    const QString fn = fileName.toLower();
+    const std::string fn = to_lower(fileName);
 
     // Surface files
-    if (fn.endsWith(QLatin1String(".pial")) || fn.endsWith(QLatin1String(".inflated")) || fn.endsWith(QLatin1String(".white")) || fn.endsWith(QLatin1String(".orig")) || fn.endsWith(QLatin1String(".sphere")))
+    if (fn.ends_with(".pial") || fn.ends_with(".inflated") || fn.ends_with(".white") || fn.ends_with(".orig") || fn.ends_with(".sphere"))
         return MnaFileRole::Surface;
 
     // Annotations
-    if (fn.endsWith(QLatin1String(".annot")))
+    if (fn.ends_with(".annot"))
         return MnaFileRole::Annotation;
 
     // Source estimates
-    if (fn.endsWith(QLatin1String(".stc")) || fn.endsWith(QLatin1String(".w")))
+    if (fn.ends_with(".stc") || fn.ends_with(".w"))
         return MnaFileRole::SourceEstimate;
 
     // FIFF-based files — use name heuristics
-    if (fn.contains(QLatin1String("-bem")) || fn.contains(QLatin1String("_bem")))
+    if (fn.contains("-bem") || fn.contains("_bem"))
         return MnaFileRole::Bem;
-    if (fn.contains(QLatin1String("-src")) || fn.contains(QLatin1String("_src")) || fn.contains(QLatin1String("-oct-")))
+    if (fn.contains("-src") || fn.contains("_src") || fn.contains("-oct-"))
         return MnaFileRole::SourceSpace;
-    if (fn.contains(QLatin1String("-trans")) || fn.contains(QLatin1String("_trans")) || fn.contains(QLatin1String("all-trans")))
+    if (fn.contains("-trans") || fn.contains("_trans") || fn.contains("all-trans"))
         return MnaFileRole::Transform;
-    if (fn.contains(QLatin1String("-ave")) || fn.contains(QLatin1String("_ave")))
+    if (fn.contains("-ave") || fn.contains("_ave"))
         return MnaFileRole::Evoked;
-    if (fn.contains(QLatin1String("-fwd")) || fn.contains(QLatin1String("_fwd")))
+    if (fn.contains("-fwd") || fn.contains("_fwd"))
         return MnaFileRole::Forward;
-    if (fn.contains(QLatin1String("-inv")) || fn.contains(QLatin1String("_inv")))
+    if (fn.contains("-inv") || fn.contains("_inv"))
         return MnaFileRole::Inverse;
-    if (fn.contains(QLatin1String("-cov")) || fn.contains(QLatin1String("_cov")))
+    if (fn.contains("-cov") || fn.contains("_cov"))
         return MnaFileRole::Covariance;
-    if (fn.contains(QLatin1String("_raw")) || fn.contains(QLatin1String("-raw")))
+    if (fn.contains("_raw") || fn.contains("-raw"))
         return MnaFileRole::Raw;
-    if (fn.contains(QLatin1String("_dig")) || fn.contains(QLatin1String("digitizer")))
+    if (fn.contains("_dig") || fn.contains("digitizer"))
         return MnaFileRole::Digitizer;
 
     return MnaFileRole::Custom;
@@ -139,15 +244,15 @@ static MnaFileRole guessRoleFromFileName(const QString& fileName)
 /**
  * Infer BIDS modality directory from a subdirectory name.
  */
-static MnaFileRole guessRoleFromBidsDir(const QString& dirName)
+static MnaFileRole guessRoleFromBidsDir(const std::string& dirName)
 {
-    if (dirName == QLatin1String("anat"))
+    if (dirName == "anat")
         return MnaFileRole::Surface; // default; file name will disambiguate
-    if (dirName == QLatin1String("bem"))
+    if (dirName == "bem")
         return MnaFileRole::Bem;
-    if (dirName == QLatin1String("meg") || dirName == QLatin1String("eeg"))
+    if (dirName == "meg" || dirName == "eeg")
         return MnaFileRole::Raw;
-    if (dirName == QLatin1String("source"))
+    if (dirName == "source")
         return MnaFileRole::SourceEstimate;
     return MnaFileRole::Custom;
 }
@@ -156,14 +261,8 @@ static MnaFileRole guessRoleFromBidsDir(const QString& dirName)
 // COMMAND: extract
 //=============================================================================================================
 
-/** @return @p path as a std::filesystem path. */
-static std::filesystem::path fsPath(const QString& path)
-{
-    return path_from_utf8(path.toStdString());
-}
-
 /** @return The project at @p path, or nothing after reporting why it cannot be read. */
-static std::optional<MnaProject> readProject(const QString& path)
+static std::optional<MnaProject> readProject(const std::string& path)
 {
     Expected<MnaProject> project = MnaIO::read(fsPath(path));
     if (!project) {
@@ -174,13 +273,13 @@ static std::optional<MnaProject> readProject(const QString& path)
 }
 
 /** Writes @p project to @p path and reports the outcome; returns the exit code. */
-static int writeProject(const MnaProject& project, const QString& path, const QString& done)
+static int writeProject(const MnaProject& project, const std::string& path, const std::string& done)
 {
     if (const Expected<void> written = MnaIO::write(project, fsPath(path)); !written) {
         Log::critical("failed to write {}", written.error().what());
         return 1;
     }
-    Log::info("{}", done.toStdString());
+    Log::info("{}", done);
     return 0;
 }
 
@@ -189,11 +288,11 @@ static UtcTime now()
     return std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
 }
 
-static int cmdExtract(const QString& inputPath, const QString& outputDir)
+static int cmdExtract(const std::string& inputPath, const std::string& outputDir)
 {
     std::optional<MnaProject> read = readProject(inputPath);
     if (!read || read->subjects.empty()) {
-        Log::critical("empty project: {}", inputPath.toStdString());
+        Log::critical("empty project: {}", inputPath);
         return 1;
     }
     const MnaProject& proj = *read;
@@ -206,41 +305,41 @@ static int cmdExtract(const QString& inputPath, const QString& outputDir)
             for (const MnaRecording& rec : sess.recordings) {
                 for (const MnaFileRef& ref : rec.files) {
                     // Build BIDS output path
-                    const QString refPath = QString::fromStdString(ref.path);
-                    QString relPath = refPath;
-                    if (relPath.isEmpty())
-                        relPath = bidsBuildRelPath(QString::fromStdString(subj.id), QString::fromStdString(sess.id), ref.role,
-                                                   QStringLiteral("file_") + QString::number(extracted));
+                    const std::string& refPath = ref.path;
+                    std::string relPath = refPath;
+                    if (relPath.empty())
+                        relPath = bidsBuildRelPath(subj.id, sess.id, ref.role, "file_" + std::to_string(extracted));
 
-                    const QString fullPath = QDir(outputDir).filePath(relPath);
+                    const std::string fullPath = dirFilePath(outputDir, relPath);
 
                     if (ref.embedded && !ref.data.empty()) {
-                        QDir().mkpath(QFileInfo(fullPath).absolutePath());
+                        makePath(absoluteDirOf(fullPath));
                         if (write_file_bytes(fsPath(fullPath), ref.data)) {
-                            Log::info("  extracted: {}", relPath.toStdString());
+                            Log::info("  extracted: {}", relPath);
                             ++extracted;
                         } else {
-                            Log::critical("Failed: {}", relPath.toStdString());
+                            Log::critical("Failed: {}", relPath);
                         }
                     } else if (!ref.embedded) {
                         // Copy from source location relative to the project file
-                        const QString srcDir = QFileInfo(inputPath).absolutePath();
+                        const std::string srcDir = absoluteDirOf(inputPath);
                         // Resolve ".." lexically, as written; the OS would follow symlinks out of the project folder
-                        const QString srcPath = QDir::cleanPath(QDir(srcDir).filePath(refPath));
-                        if (QFile::exists(srcPath)) {
-                            QDir().mkpath(QFileInfo(fullPath).absolutePath());
-                            if (QFile::copy(srcPath, fullPath)) {
-                                Log::info("  copied:    {}", relPath.toStdString());
+                        const std::string srcPath = cleanPath(dirFilePath(srcDir, refPath));
+                        if (pathExists(srcPath)) {
+                            makePath(absoluteDirOf(fullPath));
+                            std::error_code copyError;
+                            if (std::filesystem::copy_file(fsPath(srcPath), fsPath(fullPath), copyError)) {
+                                Log::info("  copied:    {}", relPath);
                                 ++extracted;
                             } else {
-                                Log::critical("Failed: {} (copy error)", relPath.toStdString());
+                                Log::critical("Failed: {} (copy error)", relPath);
                             }
                         } else {
-                            Log::warning("Skipped: {} (source not found)", refPath.toStdString());
+                            Log::warning("Skipped: {} (source not found)", refPath);
                             ++skipped;
                         }
                     } else {
-                        Log::warning("Skipped: {} (empty embedded data)", refPath.toStdString());
+                        Log::warning("Skipped: {} (empty embedded data)", refPath);
                         ++skipped;
                     }
                 }
@@ -261,8 +360,8 @@ static int cmdExtract(const QString& inputPath, const QString& outputDir)
         }
     }
     outProj.modified = now();
-    const QString sidecarPath = QDir(outputDir).filePath(QStringLiteral("project.mna"));
-    if (writeProject(outProj, sidecarPath, QStringLiteral("  Sidecar written: ") + sidecarPath) != 0) {
+    const std::string sidecarPath = dirFilePath(outputDir, "project.mna");
+    if (writeProject(outProj, sidecarPath, "  Sidecar written: " + sidecarPath) != 0) {
         return 1;
     }
 
@@ -274,19 +373,19 @@ static int cmdExtract(const QString& inputPath, const QString& outputDir)
 // COMMAND: pack
 //=============================================================================================================
 
-static int cmdPack(const QString& inputDir, const QString& outputPath, bool embed)
+static int cmdPack(const std::string& inputDir, const std::string& outputPath, bool embed)
 {
     // Check if there's an existing project.mna sidecar to use as template
-    const QString sidecarPath = QDir(inputDir).filePath(QStringLiteral("project.mna"));
+    const std::string sidecarPath = dirFilePath(inputDir, "project.mna");
     MnaProject proj;
 
-    if (QFile::exists(sidecarPath)) {
+    if (pathExists(sidecarPath)) {
         std::optional<MnaProject> sidecar = readProject(sidecarPath);
         if (!sidecar) {
             return 1;
         }
         proj = std::move(*sidecar);
-        Log::info("  Using existing sidecar: {}", sidecarPath.toStdString());
+        Log::info("  Using existing sidecar: {}", sidecarPath);
 
         if (embed) {
             // Read file data into each ref
@@ -294,9 +393,9 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
                 for (MnaSession& sess : subj.sessions) {
                     for (MnaRecording& rec : sess.recordings) {
                         for (MnaFileRef& ref : rec.files) {
-                            const QString filePath = QDir(inputDir).filePath(QString::fromStdString(ref.path));
+                            const std::string filePath = dirFilePath(inputDir, ref.path);
                             if (!ref.embed(fsPath(filePath))) {
-                                Log::warning("cannot read {}", filePath.toStdString());
+                                Log::warning("cannot read {}", filePath);
                             }
                         }
                     }
@@ -305,70 +404,70 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
         }
     } else {
         // Scan the directory for BIDS structure: sub-*/ses-*/<modality>/*
-        Log::info("  Scanning BIDS directory: {}", inputDir.toStdString());
+        Log::info("  Scanning BIDS directory: {}", inputDir);
 
         proj.name = "BIDS Import";
         proj.description = "Imported from BIDS directory";
 
         // Find sub-* directories
-        QDir rootDir(inputDir);
-        QStringList subDirs = rootDir.entryList(QStringList() << QStringLiteral("sub-*"),
-                                                QDir::Dirs | QDir::NoDotAndDotDot);
+        const std::string& rootDir = inputDir;
+        StringList subDirs = entryList(rootDir, true, "sub-");
 
-        if (subDirs.isEmpty()) {
+        if (subDirs.empty()) {
             // Flat structure — treat all files as belonging to one subject
-            subDirs << QStringLiteral(".");
+            subDirs.push_back(".");
         }
 
-        for (const QString& subDirName : subDirs) {
+        for (const std::string& subDirName : subDirs) {
             MnaSubject subj;
-            subj.id = (subDirName.startsWith(QLatin1String("sub-")) ? subDirName.mid(4) : subDirName).toStdString();
+            subj.id = subDirName.starts_with("sub-") ? subDirName.substr(4) : subDirName;
 
-            QDir subDir(rootDir.filePath(subDirName));
-            QStringList sesDirs = subDir.entryList(QStringList() << QStringLiteral("ses-*"),
-                                                   QDir::Dirs | QDir::NoDotAndDotDot);
-            if (sesDirs.isEmpty())
-                sesDirs << QStringLiteral(".");
+            const std::string subDir = dirFilePath(rootDir, subDirName);
+            StringList sesDirs = entryList(subDir, true, "ses-");
+            if (sesDirs.empty())
+                sesDirs.push_back(".");
 
-            for (const QString& sesDirName : sesDirs) {
+            for (const std::string& sesDirName : sesDirs) {
                 MnaSession sess;
-                sess.id = sesDirName.startsWith(QLatin1String("ses-")) ? sesDirName.mid(4).toStdString() : std::string("01");
+                sess.id = sesDirName.starts_with("ses-") ? sesDirName.substr(4) : std::string("01");
 
                 MnaRecording rec;
                 rec.id = "recording-01";
 
-                QDir sesDir(subDir.filePath(sesDirName));
+                const std::string sesDir = dirFilePath(subDir, sesDirName);
                 // Iterate modality dirs: anat, meg, bem, source, etc.
-                QStringList modDirs = sesDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-                if (modDirs.isEmpty())
-                    modDirs << QStringLiteral(".");
+                StringList modDirs = entryList(sesDir, true);
+                if (modDirs.empty())
+                    modDirs.push_back(".");
 
-                for (const QString& modDirName : modDirs) {
-                    QDir modDir(sesDir.filePath(modDirName));
+                for (const std::string& modDirName : modDirs) {
+                    const std::string modDir = dirFilePath(sesDir, modDirName);
                     MnaFileRole defaultRole = guessRoleFromBidsDir(modDirName);
 
-                    QStringList files = modDir.entryList(QDir::Files | QDir::NoDotAndDotDot);
-                    for (const QString& fileName : files) {
+                    const StringList files = entryList(modDir, false);
+                    for (const std::string& fileName : files) {
                         MnaFileRef ref;
                         // Prefer file-name heuristic; fall back to directory-based guess
                         ref.role = guessRoleFromFileName(fileName);
                         if (ref.role == MnaFileRole::Custom && defaultRole != MnaFileRole::Custom)
                             ref.role = defaultRole;
 
-                        const QString absPath = modDir.filePath(fileName);
-                        ref.path = rootDir.relativeFilePath(absPath).toStdString();
-                        ref.format = QFileInfo(fileName).suffix().toStdString();
+                        const std::string absPath = dirFilePath(modDir, fileName);
+                        ref.path = relativeFilePath(rootDir, absPath);
+                        ref.format = suffixOf(fileName);
 
                         if (embed) {
                             if (!ref.embed(fsPath(absPath))) {
-                                Log::warning("cannot read {}", absPath.toStdString());
+                                Log::warning("cannot read {}", absPath);
                             }
                         } else {
                             ref.embedded = false;
-                            ref.size_bytes = QFileInfo(absPath).size();
+                            std::error_code sizeError;
+                            const std::uintmax_t size = std::filesystem::file_size(fsPath(absPath), sizeError);
+                            ref.size_bytes = sizeError ? 0 : static_cast<decltype(ref.size_bytes)>(size);
                         }
 
-                        Log::info("  + {}  {}", QString::fromUtf8(to_string(ref.role)).toStdString(), QString::fromStdString(ref.path).toStdString());
+                        Log::info("  + {}  {}", to_string(ref.role), ref.path);
                         rec.files.push_back(std::move(ref));
                     }
                 }
@@ -385,14 +484,14 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
     }
 
     proj.modified = now();
-    return writeProject(proj, outputPath, QStringLiteral("  Written: ") + outputPath);
+    return writeProject(proj, outputPath, "  Written: " + outputPath);
 }
 
 //=============================================================================================================
 // COMMAND: convert
 //=============================================================================================================
 
-static int cmdConvert(const QString& inputPath, const QString& outputPath)
+static int cmdConvert(const std::string& inputPath, const std::string& outputPath)
 {
     std::optional<MnaProject> read = readProject(inputPath);
     if (!read) {
@@ -400,23 +499,23 @@ static int cmdConvert(const QString& inputPath, const QString& outputPath)
     }
     MnaProject& proj = *read;
 
-    const QString outSuffix = QFileInfo(outputPath).suffix().toLower();
-    const QString inSuffix = QFileInfo(inputPath).suffix().toLower();
+    const std::string outSuffix = to_lower(suffixOf(outputPath));
+    const std::string inSuffix = to_lower(suffixOf(inputPath));
 
     // When converting .mna → .mnx, embed file data automatically
-    if (outSuffix == QLatin1String("mnx") && inSuffix == QLatin1String("mna")) {
-        const QString projDir = QFileInfo(inputPath).absolutePath();
+    if (outSuffix == "mnx" && inSuffix == "mna") {
+        const std::string projDir = absoluteDirOf(inputPath);
         for (MnaSubject& subj : proj.subjects) {
             for (MnaSession& sess : subj.sessions) {
                 for (MnaRecording& rec : sess.recordings) {
                     for (MnaFileRef& ref : rec.files) {
                         if (!ref.embedded) {
-                            const QString filePath = QDir::cleanPath(QDir(projDir).filePath(QString::fromStdString(ref.path)));
+                            const std::string filePath = cleanPath(dirFilePath(projDir, ref.path));
                             if (ref.embed(fsPath(filePath))) {
-                                ref.path = QFileInfo(filePath).fileName().toStdString();
-                                Log::info("  embedded: {}", filePath.toStdString());
+                                ref.path = fileNameOf(filePath);
+                                Log::info("  embedded: {}", filePath);
                             } else {
-                                Log::warning("cannot read {}, keeping as reference", filePath.toStdString());
+                                Log::warning("cannot read {}, keeping as reference", filePath);
                             }
                         }
                     }
@@ -426,7 +525,7 @@ static int cmdConvert(const QString& inputPath, const QString& outputPath)
     }
 
     // When converting .mnx → .mna, strip embedded data (files must be extracted first)
-    if (outSuffix == QLatin1String("mna") && inSuffix == QLatin1String("mnx")) {
+    if (outSuffix == "mna" && inSuffix == "mnx") {
         Log::info("  Note: embedded data will be dropped. Use 'extract' first to write files to disk.");
         for (MnaSubject& subj : proj.subjects) {
             for (MnaSession& sess : subj.sessions) {
@@ -441,56 +540,54 @@ static int cmdConvert(const QString& inputPath, const QString& outputPath)
     }
 
     proj.modified = now();
-    return writeProject(proj, outputPath, QStringLiteral("  Converted: ") + inputPath + QStringLiteral(" -> ") + outputPath);
+    return writeProject(proj, outputPath, "  Converted: " + inputPath + " -> " + outputPath);
 }
 
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
 
-static void printUsage(QTextStream& out)
+static void printUsage(std::FILE* out)
 {
-    out << "Usage: mne_mna_bids_converter <command> [options]\n\n"
-        << "Commands:\n"
-        << "  extract  <input.mnx|mna> <output_dir>    Extract files to BIDS directory tree\n"
-        << "  pack     <bids_dir> <output.mnx|mna>     Import BIDS directory into MNA/MNX project\n"
-        << "  convert  <input.mna|mnx> <output.mnx|mna>  Convert between MNA (JSON) and MNX (CBOR)\n"
-        << "\nOptions:\n"
-        << "  --embed     (pack) Embed file data into the output (default for .mnx)\n"
-        << "  --no-embed  (pack) Store file references only (default for .mna)\n"
-        << "  -h, --help  Show this help\n"
-        << "  --version   Show version\n";
+    std::print(out,
+               "Usage: mne_mna_bids_converter <command> [options]\n\n"
+               "Commands:\n"
+               "  extract  <input.mnx|mna> <output_dir>    Extract files to BIDS directory tree\n"
+               "  pack     <bids_dir> <output.mnx|mna>     Import BIDS directory into MNA/MNX project\n"
+               "  convert  <input.mna|mnx> <output.mnx|mna>  Convert between MNA (JSON) and MNX (CBOR)\n"
+               "\nOptions:\n"
+               "  --embed     (pack) Embed file data into the output (default for .mnx)\n"
+               "  --no-embed  (pack) Store file references only (default for .mna)\n"
+               "  -h, --help  Show this help\n"
+               "  --version   Show version\n");
 }
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    app.setApplicationName(QStringLiteral("mne_mna_bids_converter"));
-    app.setApplicationVersion(QStringLiteral(MNE_CPP_VERSION));
+    StringList args(argv + std::min(argc, 1), argv + argc); // without the program name
 
-    QTextStream out(stdout);
-    QTextStream err(stderr);
-
-    QStringList args = app.arguments();
-    args.removeFirst(); // program name
+    const auto contains = [&args](std::string_view arg) {
+        return std::ranges::find(args, arg) != args.end();
+    };
 
     // Check for help/version flags
-    if (args.isEmpty() || args.contains(QStringLiteral("-h")) || args.contains(QStringLiteral("--help"))) {
-        printUsage(out);
-        return args.isEmpty() ? 1 : 0;
+    if (args.empty() || contains("-h") || contains("--help")) {
+        printUsage(stdout);
+        return args.empty() ? 1 : 0;
     }
-    if (args.contains(QStringLiteral("--version"))) {
-        out << "mne_mna_bids_converter " << MNE_CPP_VERSION << "\n";
+    if (contains("--version")) {
+        std::println("mne_mna_bids_converter {}", MNE_CPP_VERSION);
         return 0;
     }
 
-    const QString cmd = args.takeFirst();
+    const std::string cmd = args.front();
+    args.erase(args.begin());
 
     // Parse optional flags
-    bool forceEmbed = args.removeAll(QStringLiteral("--embed")) > 0;
-    bool forceNoEmbed = args.removeAll(QStringLiteral("--no-embed")) > 0;
+    bool forceEmbed = std::erase(args, "--embed") > 0;
+    bool forceNoEmbed = std::erase(args, "--no-embed") > 0;
 
-    if (cmd == QLatin1String("extract")) {
+    if (cmd == "extract") {
         if (args.size() < 2) {
             Log::critical("extract requires <input> <output_dir>");
             return 1;
@@ -498,7 +595,7 @@ int main(int argc, char* argv[])
         return cmdExtract(args[0], args[1]);
     }
 
-    if (cmd == QLatin1String("pack")) {
+    if (cmd == "pack") {
         if (args.size() < 2) {
             Log::critical("pack requires <bids_dir> <output.mnx|mna>");
             return 1;
@@ -509,11 +606,11 @@ int main(int argc, char* argv[])
         else if (forceNoEmbed)
             embed = false;
         else
-            embed = args[1].endsWith(QLatin1String(".mnx"), Qt::CaseInsensitive);
+            embed = to_lower(args[1]).ends_with(".mnx");
         return cmdPack(args[0], args[1], embed);
     }
 
-    if (cmd == QLatin1String("convert")) {
+    if (cmd == "convert") {
         if (args.size() < 2) {
             Log::critical("convert requires <input> <output>");
             return 1;
@@ -521,7 +618,7 @@ int main(int argc, char* argv[])
         return cmdConvert(args[0], args[1]);
     }
 
-    Log::critical("unknown command '{}'", cmd.toStdString());
-    printUsage(err);
+    Log::critical("unknown command '{}'", cmd);
+    printUsage(stderr);
     return 1;
 }

@@ -48,16 +48,19 @@
 #include <mne/mne/mne_triangle.h>
 
 #include <mne/fiff/fiff_byte_swap.h>
+#include <mne/base/byte_stream.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QDataStream>
-#include <QDir>
-#include <QFile>
-#include <QFileInfo>
-#include <QTextStream>
+#include <array>
+#include <cstdint>
+#include <format>
+#include <fstream>
+#include <string>
+#include <string_view>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -66,6 +69,27 @@
 using namespace MNESETUPFORWARDMODEL;
 using namespace mne;
 using namespace Eigen;
+
+//=============================================================================================================
+// LOCAL HELPERS
+//=============================================================================================================
+
+namespace
+{
+
+bool fileExists(const std::string& path)
+{
+    std::error_code ec;
+    return std::filesystem::exists(path_from_utf8(path), ec);
+}
+
+bool dirExists(const std::string& path)
+{
+    std::error_code ec;
+    return std::filesystem::is_directory(path_from_utf8(path), ec);
+}
+
+} // namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -83,12 +107,12 @@ int SetupForwardModel::run()
     //
     // Validate settings
     //
-    if (m_settings.subjectsDir().isEmpty()) {
+    if (m_settings.subjectsDir().empty()) {
         Log::critical("The environment variable SUBJECTS_DIR should be set.");
         Log::critical("Use --subjects-dir or set the SUBJECTS_DIR environment variable.");
         return 1;
     }
-    if (m_settings.subject().isEmpty()) {
+    if (m_settings.subject().empty()) {
         Log::critical("Subject not specified.");
         Log::critical("Use --subject or set the SUBJECT environment variable.");
         return 1;
@@ -97,36 +121,36 @@ int SetupForwardModel::run()
     //
     // Derive paths
     //
-    QString subjectDir = m_settings.subjectsDir() + "/" + m_settings.subject();
-    QString bemDir = subjectDir + "/bem";
-    QString ext = m_settings.useSurfFormat() ? "surf" : "tri";
+    std::string subjectDir = m_settings.subjectsDir() + "/" + m_settings.subject();
+    std::string bemDir = subjectDir + "/bem";
+    std::string ext = m_settings.useSurfFormat() ? "surf" : "tri";
 
-    if (!QDir(subjectDir).exists()) {
-        Log::critical("Could not find the MRI data directory {}", subjectDir.toStdString());
+    if (!dirExists(subjectDir)) {
+        Log::critical("Could not find the MRI data directory {}", subjectDir);
         return 1;
     }
-    if (!QDir(bemDir).exists()) {
-        Log::critical("Could not find the BEM directory {}", bemDir.toStdString());
+    if (!dirExists(bemDir)) {
+        Log::critical("Could not find the BEM directory {}", bemDir);
         return 1;
     }
 
     //
     // Locate surface files
     //
-    QString innerSkullFile;
+    std::string innerSkullFile;
     if (!locateSurface(bemDir, "inner_skull", ext, innerSkullFile)) {
         Log::critical("Could not find the inner skull triangulation");
         return 1;
     }
 
-    QString outerSkullFile, outerSkinFile;
+    std::string outerSkullFile, outerSkinFile;
     if (!m_settings.homogeneous()) {
         if (!locateSurface(bemDir, "outer_skull", ext, outerSkullFile)) {
-            Log::critical("Could not find the outer skull triangulation {}", outerSkullFile.toStdString());
+            Log::critical("Could not find the outer skull triangulation {}", outerSkullFile);
             return 1;
         }
         if (!locateSurface(bemDir, "outer_skin", ext, outerSkinFile)) {
-            Log::critical("Could not find the scalp triangulation {}", outerSkinFile.toStdString());
+            Log::critical("Could not find the scalp triangulation {}", outerSkinFile);
             return 1;
         }
     }
@@ -137,8 +161,8 @@ int SetupForwardModel::run()
     Log::info("{}", "");
     Log::info("Setting up the BEM with the following parameters:");
     Log::info("{}", "");
-    Log::info("SUBJECTS_DIR       = {}", m_settings.subjectsDir().toStdString());
-    Log::info("Subject            = {}", m_settings.subject().toStdString());
+    Log::info("SUBJECTS_DIR       = {}", m_settings.subjectsDir());
+    Log::info("Subject            = {}", m_settings.subject());
 
     // Read inner skull
     MNEBemSurface innerSkull;
@@ -155,7 +179,7 @@ int SetupForwardModel::run()
             return 1;
         }
     }
-    Log::info("Inner skull        = {} ({} triangles)", innerSkullFile.toStdString(), innerSkull.ntri);
+    Log::info("Inner skull        = {} ({} triangles)", innerSkullFile, innerSkull.ntri);
 
     MNEBemSurface outerSkull, outerSkin;
     if (!m_settings.homogeneous()) {
@@ -173,7 +197,7 @@ int SetupForwardModel::run()
                 return 1;
             }
         }
-        Log::info("Outer skull        = {} ({} triangles)", outerSkullFile.toStdString(), outerSkull.ntri);
+        Log::info("Outer skull        = {} ({} triangles)", outerSkullFile, outerSkull.ntri);
 
         // Read outer skin (scalp)
         if (m_settings.useSurfFormat()) {
@@ -189,7 +213,7 @@ int SetupForwardModel::run()
                 return 1;
             }
         }
-        Log::info("Scalp              = {} ({} triangles)", outerSkinFile.toStdString(), outerSkin.ntri);
+        Log::info("Scalp              = {} ({} triangles)", outerSkinFile, outerSkin.ntri);
     }
 
     Log::info("brain conductivity = {:g} S/m", m_settings.brainConductivity());
@@ -201,32 +225,24 @@ int SetupForwardModel::run()
     //
     // Figure out the model name
     //
-    QString modelFile;
-    if (m_settings.modelName().isEmpty()) {
+    std::string modelFile;
+    if (m_settings.modelName().empty()) {
         if (m_settings.homogeneous()) {
-            modelFile = QString("%1/%2-%3-bem.fif")
-                            .arg(bemDir)
-                            .arg(m_settings.subject())
-                            .arg(innerSkull.ntri);
+            modelFile = std::format("{}/{}-{}-bem.fif", bemDir, m_settings.subject(), innerSkull.ntri);
         } else {
-            modelFile = QString("%1/%2-%3-%4-%5-bem.fif")
-                            .arg(bemDir)
-                            .arg(m_settings.subject())
-                            .arg(innerSkull.ntri)
-                            .arg(outerSkull.ntri)
-                            .arg(outerSkin.ntri);
+            modelFile = std::format("{}/{}-{}-{}-{}-bem.fif", bemDir, m_settings.subject(), innerSkull.ntri, outerSkull.ntri, outerSkin.ntri);
         }
     } else {
         modelFile = bemDir + "/" + m_settings.modelName() + "-bem.fif";
     }
 
-    Log::info("Resulting BEM      = {}\n", modelFile.toStdString());
+    Log::info("Resulting BEM      = {}\n", modelFile);
 
     //
     // Check if file already exists
     //
-    if (QFileInfo::exists(modelFile) && !m_settings.overwrite()) {
-        Log::critical("Output file {} already exists.", modelFile.toStdString());
+    if (fileExists(modelFile) && !m_settings.overwrite()) {
+        Log::critical("Output file {} already exists.", modelFile);
         Log::critical("Use --overwrite to overwrite.");
         return 1;
     }
@@ -246,11 +262,11 @@ int SetupForwardModel::run()
         bem.push_back(innerSkull);
     }
 
-    if (auto written = bem.write(modelFile.toStdU16String()); !written) {
+    if (auto written = bem.write(path_from_utf8(modelFile)); !written) {
         Log::critical("{}", written.error().what());
         return 1;
     }
-    Log::info("BEM geometry file written to {}\n", modelFile.toStdString());
+    Log::info("BEM geometry file written to {}\n", modelFile);
 
     //
     // >> 2. Creating ascii pnt files and surf files
@@ -258,14 +274,8 @@ int SetupForwardModel::run()
     Log::info(">> 2. Creating ascii pnt files and surf files...");
 
     if (m_settings.homogeneous()) {
-        QString pntFile = QString("%1/%2-inner_skull-%3.pnt")
-                              .arg(bemDir)
-                              .arg(m_settings.subject())
-                              .arg(innerSkull.ntri);
-        QString surfFile = QString("%1/%2-inner_skull-%3.surf")
-                               .arg(bemDir)
-                               .arg(m_settings.subject())
-                               .arg(innerSkull.ntri);
+        std::string pntFile = std::format("{}/{}-inner_skull-{}.pnt", bemDir, m_settings.subject(), innerSkull.ntri);
+        std::string surfFile = std::format("{}/{}-inner_skull-{}.surf", bemDir, m_settings.subject(), innerSkull.ntri);
 
         if (!exportPntFile(innerSkull, pntFile))
             return 1;
@@ -274,14 +284,8 @@ int SetupForwardModel::run()
     } else {
         // Outer skin (scalp)
         {
-            QString pntFile = QString("%1/%2-outer_skin-%3.pnt")
-                                  .arg(bemDir)
-                                  .arg(m_settings.subject())
-                                  .arg(outerSkin.ntri);
-            QString surfFile = QString("%1/%2-outer_skin-%3.surf")
-                                   .arg(bemDir)
-                                   .arg(m_settings.subject())
-                                   .arg(outerSkin.ntri);
+            std::string pntFile = std::format("{}/{}-outer_skin-{}.pnt", bemDir, m_settings.subject(), outerSkin.ntri);
+            std::string surfFile = std::format("{}/{}-outer_skin-{}.surf", bemDir, m_settings.subject(), outerSkin.ntri);
 
             if (!exportPntFile(outerSkin, pntFile))
                 return 1;
@@ -291,14 +295,8 @@ int SetupForwardModel::run()
 
         // Outer skull
         {
-            QString pntFile = QString("%1/%2-outer_skull-%3.pnt")
-                                  .arg(bemDir)
-                                  .arg(m_settings.subject())
-                                  .arg(outerSkull.ntri);
-            QString surfFile = QString("%1/%2-outer_skull-%3.surf")
-                                   .arg(bemDir)
-                                   .arg(m_settings.subject())
-                                   .arg(outerSkull.ntri);
+            std::string pntFile = std::format("{}/{}-outer_skull-{}.pnt", bemDir, m_settings.subject(), outerSkull.ntri);
+            std::string surfFile = std::format("{}/{}-outer_skull-{}.surf", bemDir, m_settings.subject(), outerSkull.ntri);
 
             if (!exportPntFile(outerSkull, pntFile))
                 return 1;
@@ -308,14 +306,8 @@ int SetupForwardModel::run()
 
         // Inner skull
         {
-            QString pntFile = QString("%1/%2-inner_skull-%3.pnt")
-                                  .arg(bemDir)
-                                  .arg(m_settings.subject())
-                                  .arg(innerSkull.ntri);
-            QString surfFile = QString("%1/%2-inner_skull-%3.surf")
-                                   .arg(bemDir)
-                                   .arg(m_settings.subject())
-                                   .arg(innerSkull.ntri);
+            std::string pntFile = std::format("{}/{}-inner_skull-{}.pnt", bemDir, m_settings.subject(), innerSkull.ntri);
+            std::string surfFile = std::format("{}/{}-inner_skull-{}.surf", bemDir, m_settings.subject(), innerSkull.ntri);
 
             if (!exportPntFile(innerSkull, pntFile))
                 return 1;
@@ -331,14 +323,15 @@ int SetupForwardModel::run()
     if (!m_settings.noSolution()) {
         Log::info(">> 3. Calculating BEM geometry data (this takes several minutes)...\n");
 
-        QString solFile = modelFile;
-        solFile.replace(".fif", "-sol.fif");
+        std::string solFile = modelFile;
+        for (std::size_t pos = solFile.find(".fif"); pos != std::string::npos; pos = solFile.find(".fif", pos + 8))
+            solFile.replace(pos, 4, "-sol.fif");
 
         if (!prepareBemSolution(modelFile, solFile)) {
             Log::critical("Model preparation failed.");
             return 1;
         } else {
-            Log::info("\nThe model {} is now ready for use", solFile.toStdString());
+            Log::info("\nThe model {} is now ready for use", solFile);
         }
     }
 
@@ -348,18 +341,18 @@ int SetupForwardModel::run()
 
 //=============================================================================================================
 
-bool SetupForwardModel::locateSurface(const QString& bemDir, const QString& name,
-                                      const QString& ext, QString& path) const
+bool SetupForwardModel::locateSurface(const std::string& bemDir, const std::string& name,
+                                      const std::string& ext, std::string& path) const
 {
     // Try: <bem_dir>/<name>.<ext>
     path = bemDir + "/" + name + "." + ext;
-    if (QFileInfo::exists(path)) {
+    if (fileExists(path)) {
         return true;
     }
 
     // Try: <bem_dir>/<subject>-<name>.<ext>
-    QString alt = bemDir + "/" + m_settings.subject() + "-" + name + "." + ext;
-    if (QFileInfo::exists(alt)) {
+    std::string alt = bemDir + "/" + m_settings.subject() + "-" + name + "." + ext;
+    if (fileExists(alt)) {
         path = alt;
         return true;
     }
@@ -370,7 +363,7 @@ bool SetupForwardModel::locateSurface(const QString& bemDir, const QString& name
 
 //=============================================================================================================
 
-bool SetupForwardModel::readAsciiTriFile(const QString& fileName, int id, float sigma,
+bool SetupForwardModel::readAsciiTriFile(const std::string& fileName, int id, float sigma,
                                          float shift, MNEBemSurface& surf) const
 {
     //
@@ -385,51 +378,50 @@ bool SetupForwardModel::readAsciiTriFile(const QString& fileName, int id, float 
     //   v1 v2 v3   (1-based vertex indices)
     //   ...
     //
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Could not open ASCII triangle file: {}", fileName.toStdString());
+    std::ifstream in(path_from_utf8(fileName));
+    if (!in) {
+        Log::critical("Could not open ASCII triangle file: {}", fileName);
         return false;
     }
-
-    QTextStream in(&file);
 
     // Read number of vertices
     int nvert = 0;
     in >> nvert;
     if (nvert <= 0) {
-        Log::critical("Invalid vertex count in {}", fileName.toStdString());
+        Log::critical("Invalid vertex count in {}", fileName);
         return false;
     }
 
     // Read vertices
     MatrixX3f rr(nvert, 3);
     for (int k = 0; k < nvert; ++k) {
-        float x, y, z;
+        // Read as double and round to float, as QTextStream did
+        double x = 0.0, y = 0.0, z = 0.0;
         in >> x >> y >> z;
-        if (in.status() != QTextStream::Ok) {
-            Log::critical("Error reading vertex {} from {}", k, fileName.toStdString());
+        if (!in) {
+            Log::critical("Error reading vertex {} from {}", k, fileName);
             return false;
         }
-        rr(k, 0) = x;
-        rr(k, 1) = y;
-        rr(k, 2) = z;
+        rr(k, 0) = static_cast<float>(x);
+        rr(k, 1) = static_cast<float>(y);
+        rr(k, 2) = static_cast<float>(z);
     }
 
     // Read number of triangles
     int ntri = 0;
     in >> ntri;
     if (ntri <= 0) {
-        Log::critical("Invalid triangle count in {}", fileName.toStdString());
+        Log::critical("Invalid triangle count in {}", fileName);
         return false;
     }
 
     // Read triangles (1-based in file, convert to 0-based)
     MatrixX3i tris(ntri, 3);
     for (int k = 0; k < ntri; ++k) {
-        int v1, v2, v3;
+        int v1 = 0, v2 = 0, v3 = 0;
         in >> v1 >> v2 >> v3;
-        if (in.status() != QTextStream::Ok) {
-            Log::critical("Error reading triangle {} from {}", k, fileName.toStdString());
+        if (!in) {
+            Log::critical("Error reading triangle {} from {}", k, fileName);
             return false;
         }
         if (m_settings.swap()) {
@@ -442,7 +434,7 @@ bool SetupForwardModel::readAsciiTriFile(const QString& fileName, int id, float 
             tris(k, 2) = v3 - 1;
         }
     }
-    file.close();
+    in.close();
 
     //
     // Convert units: default is mm, --meters means already in meters
@@ -475,10 +467,10 @@ bool SetupForwardModel::readAsciiTriFile(const QString& fileName, int id, float 
 
 //=============================================================================================================
 
-bool SetupForwardModel::readFreeSurferSurf(const QString& fileName, int id, float sigma,
+bool SetupForwardModel::readFreeSurferSurf(const std::string& fileName, int id, float sigma,
                                            float shift, MNEBemSurface& surf) const
 {
-    auto geometry = FsSurface::read_geometry(fileName.toStdU16String());
+    auto geometry = FsSurface::read_geometry(path_from_utf8(fileName));
     if (!geometry) {
         Log::critical("{}", geometry.error().what());
         return false;
@@ -525,85 +517,81 @@ void SetupForwardModel::shiftVertices(MNEBemSurface& surf, float shift) const
 //=============================================================================================================
 
 bool SetupForwardModel::exportPntFile(const MNEBemSurface& surf,
-                                      const QString& fileName) const
+                                      const std::string& fileName) const
 {
     //
     // Write ASCII .pnt file (mne_list_bem equivalent)
     //
     // Format: nvert on first line, then one "x y z" per line in mm
     //
-    QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        Log::critical("Could not open {} for writing", fileName.toStdString());
+    std::ofstream out(path_from_utf8(fileName));
+    if (!out) {
+        Log::critical("Could not open {} for writing", fileName);
         return false;
     }
 
-    QTextStream out(&file);
     out << surf.np << "\n";
     for (int k = 0; k < surf.np; ++k) {
         // Convert from meters to mm for output
-        out << QString("%1 %2 %3\n")
-                   .arg(static_cast<double>(surf.rr(k, 0)) * 1000.0, 0, 'f', 4)
-                   .arg(static_cast<double>(surf.rr(k, 1)) * 1000.0, 0, 'f', 4)
-                   .arg(static_cast<double>(surf.rr(k, 2)) * 1000.0, 0, 'f', 4);
+        out << std::format("{:.4f} {:.4f} {:.4f}\n",
+                           static_cast<double>(surf.rr(k, 0)) * 1000.0,
+                           static_cast<double>(surf.rr(k, 1)) * 1000.0,
+                           static_cast<double>(surf.rr(k, 2)) * 1000.0);
     }
-    file.close();
-    Log::info("Written {}", fileName.toStdString());
+    out.close();
+    Log::info("Written {}", fileName);
     return true;
 }
 
 //=============================================================================================================
 
 bool SetupForwardModel::exportSurfFile(const MNEBemSurface& surf,
-                                       const QString& fileName) const
+                                       const std::string& fileName) const
 {
     //
     // Write FreeSurfer binary surface file (mne_list_bem --surf equivalent)
     //
-    QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly)) {
-        Log::critical("Could not open {} for writing", fileName.toStdString());
+    auto file = FileByteStream::open(path_from_utf8(fileName), FileByteStream::Mode::Write);
+    if (!file) {
+        Log::critical("Could not open {} for writing", fileName);
         return false;
     }
 
-    QDataStream ds(&file);
-    ds.setByteOrder(QDataStream::BigEndian);
-
     // Magic number for triangle surface: 0xFFFFFE
-    ds << quint8(0xFF) << quint8(0xFF) << quint8(0xFE);
+    const std::array<std::uint8_t, 3> magic = {0xFF, 0xFF, 0xFE};
+    file->write(magic.data(), magic.size());
 
     // Two lines of text (comment + newline)
-    QByteArray comment = "created by mne_setup_forward_model\n\n";
-    file.write(comment);
+    const std::string_view comment = "created by mne_setup_forward_model\n\n";
+    file->write(comment.data(), comment.size());
 
     // Number of vertices and faces
-    ds << qint32(surf.np) << qint32(surf.ntri);
+    file->write_big_endian(static_cast<std::int32_t>(surf.np));
+    file->write_big_endian(static_cast<std::int32_t>(surf.ntri));
 
     // Vertex coordinates (as float32 in mm — FreeSurfer convention)
-    ds.setFloatingPointPrecision(QDataStream::SinglePrecision);
     for (int k = 0; k < surf.np; ++k) {
-        float x = surf.rr(k, 0) * 1000.0f; // meters -> mm
-        float y = surf.rr(k, 1) * 1000.0f;
-        float z = surf.rr(k, 2) * 1000.0f;
-        ds << x << y << z;
+        file->write_big_endian(surf.rr(k, 0) * 1000.0f); // meters -> mm
+        file->write_big_endian(surf.rr(k, 1) * 1000.0f);
+        file->write_big_endian(surf.rr(k, 2) * 1000.0f);
     }
 
     // Triangle vertex indices (as int32, 0-based)
     for (int k = 0; k < surf.ntri; ++k) {
-        ds << qint32(surf.itris(k, 0))
-           << qint32(surf.itris(k, 1))
-           << qint32(surf.itris(k, 2));
+        file->write_big_endian(static_cast<std::int32_t>(surf.itris(k, 0)));
+        file->write_big_endian(static_cast<std::int32_t>(surf.itris(k, 1)));
+        file->write_big_endian(static_cast<std::int32_t>(surf.itris(k, 2)));
     }
 
-    file.close();
-    Log::info("Written {}", fileName.toStdString());
+    file->close();
+    Log::info("Written {}", fileName);
     return true;
 }
 
 //=============================================================================================================
 
-bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
-                                           const QString& solFile) const
+bool SetupForwardModel::prepareBemSolution(const std::string& bemFile,
+                                           const std::string& solFile) const
 {
     //
     // Compute the BEM solution matrix using FwdBemModel
@@ -617,13 +605,13 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
     std::unique_ptr<FwdBemModel> bemModel;
 
     if (m_settings.homogeneous()) {
-        bemModel = FwdBemModel::fwd_bem_load_homog_surface(const_cast<QString&>(bemFile).toStdU16String());
+        bemModel = FwdBemModel::fwd_bem_load_homog_surface(path_from_utf8(bemFile));
     } else {
-        bemModel = FwdBemModel::fwd_bem_load_three_layer_surfaces(const_cast<QString&>(bemFile).toStdU16String());
+        bemModel = FwdBemModel::fwd_bem_load_three_layer_surfaces(path_from_utf8(bemFile));
     }
 
     if (!bemModel) {
-        Log::critical("Could not load BEM surfaces from {}", bemFile.toStdString());
+        Log::critical("Could not load BEM surfaces from {}", bemFile);
         return false;
     }
 
@@ -638,11 +626,11 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
     Log::info("Solution computed.");
 
     Log::info("Saving...");
-    if (bemModel->fwd_bem_save_model(solFile.toStdU16String()) != 0) {
-        Log::critical("Could not write {}", solFile.toStdString());
+    if (bemModel->fwd_bem_save_model(path_from_utf8(solFile)) != 0) {
+        Log::critical("Could not write {}", solFile);
         return false;
     }
-    Log::info("Saved the result to {}", solFile.toStdString());
+    Log::info("Saved the result to {}", solFile);
 
 
     return true;

@@ -21,12 +21,12 @@
 #include <mne/fiff/fiff_stream.h>
 
 //=============================================================================================================
-// Qt INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QList>
-#include <QString>
-#include <QTextStream>
+#include <cstdio>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE SHOWFIFF
@@ -54,7 +54,7 @@ public:
      *
      * @return true if succeeded
      */
-    static bool show_fiff_contents(QTextStream& out, const MNEShowFiffSettings& settings);
+    static bool show_fiff_contents(std::FILE* out, const MNEShowFiffSettings& settings);
 
     /**
      * Show contents of a fif file
@@ -70,18 +70,18 @@ public:
      *
      * @return true if succeeded
      */
-    static bool show_fiff_contents(QTextStream& out, const QString& name, bool verbose, const QList<int>& tags, int indent_step, bool long_strings, bool blocks_only);
+    static bool show_fiff_contents(std::FILE* out, const std::string& name, bool verbose, const std::vector<int>& tags, int indent_step, bool long_strings, bool blocks_only);
 
 private:
-    static void print_file_id(QTextStream& out, const mne::FiffTag& tag);
+    static void print_file_id(std::FILE* out, const mne::FiffTag& tag);
 
-    static void print_ch_info(QTextStream& out, const mne::FiffTag& tag);
+    static void print_ch_info(std::FILE* out, const mne::FiffTag& tag);
 
-    static void print_transform(QTextStream& out, const mne::FiffTag& tag);
+    static void print_transform(std::FILE* out, const mne::FiffTag& tag);
 
-    static void print_dig_point(QTextStream& out, const mne::FiffTag& tag);
+    static void print_dig_point(std::FILE* out, const mne::FiffTag& tag);
 
-    static void print_matrix(QTextStream& out, mne::FiffStream& stream, mne::FiffDirEntry this_ent);
+    static void print_matrix(std::FILE* out, mne::FiffStream& stream, mne::FiffDirEntry this_ent);
 };
 
 } // NAMESPACE SHOWFIFF

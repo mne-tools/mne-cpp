@@ -21,29 +21,35 @@
 #include <mne/fiff/fiff_raw_data.h>
 #include <mne/fiff/fiff_stream.h>
 
+#include <mne/base/command_line.h>
+#include <mne/base/endian.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QFileInfo>
-#include <QDir>
-#include <QTextStream>
-#include <QDataStream>
-#include <QByteArray>
-#include <QRegularExpression>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <bit>
+#include <cmath>
+#include <cstdint>
+#include <filesystem>
+#include <format>
+#include <fstream>
+#include <limits>
+#include <optional>
+#include <ostream>
+#include <print>
+#include <string>
+#include <string_view>
+#include <system_error>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -59,109 +65,118 @@ using namespace Eigen;
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
 // MAT-file Level 5 constants
-static const quint32 miDOUBLE = 9;
-static const quint32 miINT32 = 5;
-static const quint32 miUINT32 = 6;
-static const quint32 miINT8 = 1;
-static const quint32 miMATRIX = 14;
-static const quint32 mxDOUBLE_CLASS = 6;
+static const std::uint32_t miDOUBLE = 9;
+static const std::uint32_t miINT32 = 5;
+static const std::uint32_t miUINT32 = 6;
+static const std::uint32_t miINT8 = 1;
+static const std::uint32_t miMATRIX = 14;
+static const std::uint32_t mxDOUBLE_CLASS = 6;
 
 //=============================================================================================================
 // MAT-file writing helpers
 //=============================================================================================================
 
-static void writePad(QDataStream& ds, int numBytes)
+/** Writes @p value little-endian. */
+template<typename T>
+static void writeLittleEndian(std::ostream& ds, T value)
+{
+    if constexpr (std::endian::native == std::endian::big)
+        value = mne::byte_swap(value);
+    ds.write(reinterpret_cast<const char*>(&value), sizeof(T));
+}
+
+static void writePad(std::ostream& ds, int numBytes)
 {
     int pad = (8 - (numBytes % 8)) % 8;
     for (int i = 0; i < pad; ++i)
-        ds << static_cast<quint8>(0);
+        writeLittleEndian<std::uint8_t>(ds, 0);
 }
 
-static void writeMatTag(QDataStream& ds, quint32 dataType, quint32 numBytes)
+static void writeMatTag(std::ostream& ds, std::uint32_t dataType, std::uint32_t numBytes)
 {
-    ds << dataType;
-    ds << numBytes;
+    writeLittleEndian(ds, dataType);
+    writeLittleEndian(ds, numBytes);
 }
 
-static void writeSmallTag(QDataStream& ds, quint32 dataType, quint32 numBytes, const QByteArray& data)
+static void writeSmallTag(std::ostream& ds, std::uint32_t dataType, std::uint32_t numBytes, const std::string& data)
 {
     if (numBytes <= 4) {
-        quint32 packed = (numBytes << 16) | dataType;
-        ds << packed;
-        ds.writeRawData(data.constData(), numBytes);
-        int pad = 4 - numBytes;
+        std::uint32_t packed = (numBytes << 16) | dataType;
+        writeLittleEndian(ds, packed);
+        ds.write(data.data(), numBytes);
+        int pad = 4 - static_cast<int>(numBytes);
         for (int i = 0; i < pad; ++i)
-            ds << static_cast<quint8>(0);
+            writeLittleEndian<std::uint8_t>(ds, 0);
     } else {
         writeMatTag(ds, dataType, numBytes);
-        ds.writeRawData(data.constData(), numBytes);
-        writePad(ds, numBytes);
+        ds.write(data.data(), numBytes);
+        writePad(ds, static_cast<int>(numBytes));
     }
 }
 
-static void writeMatrixVariable(QDataStream& ds, const QString& name, const MatrixXd& mat)
+static void writeMatrixVariable(std::ostream& ds, const std::string& name, const MatrixXd& mat)
 {
-    int nRows = mat.rows();
-    int nCols = mat.cols();
-    QByteArray nameBytes = name.toLatin1();
+    const int nRows = static_cast<int>(mat.rows());
+    const int nCols = static_cast<int>(mat.cols());
+    const std::string& nameBytes = name;
 
-    quint32 flagsSize = 8;
-    quint32 dimsSize = 8;
-    quint32 nameSize = nameBytes.size();
-    quint32 namePadded = nameSize <= 4 ? 4 : nameSize + ((8 - (nameSize % 8)) % 8);
-    quint32 nameTagSize = nameSize <= 4 ? 8 : 8 + namePadded;
-    quint32 dataSize = nRows * nCols * 8;
-    quint32 dataPadded = dataSize + ((8 - (dataSize % 8)) % 8);
+    std::uint32_t flagsSize = 8;
+    std::uint32_t dimsSize = 8;
+    std::uint32_t nameSize = static_cast<std::uint32_t>(nameBytes.size());
+    std::uint32_t namePadded = nameSize <= 4 ? 4 : nameSize + ((8 - (nameSize % 8)) % 8);
+    std::uint32_t nameTagSize = nameSize <= 4 ? 8 : 8 + namePadded;
+    std::uint32_t dataSize = static_cast<std::uint32_t>(nRows * nCols * 8);
+    std::uint32_t dataPadded = dataSize + ((8 - (dataSize % 8)) % 8);
 
-    quint32 arrayFlagsSubSize = 8 + flagsSize;
-    quint32 dimsSubSize = 8 + dimsSize;
-    quint32 nameSubSize = nameTagSize;
-    quint32 dataSubSize = 8 + dataPadded;
+    std::uint32_t arrayFlagsSubSize = 8 + flagsSize;
+    std::uint32_t dimsSubSize = 8 + dimsSize;
+    std::uint32_t nameSubSize = nameTagSize;
+    std::uint32_t dataSubSize = 8 + dataPadded;
 
-    quint32 totalPayload = arrayFlagsSubSize + dimsSubSize + nameSubSize + dataSubSize;
+    std::uint32_t totalPayload = arrayFlagsSubSize + dimsSubSize + nameSubSize + dataSubSize;
 
     writeMatTag(ds, miMATRIX, totalPayload);
 
     // Array Flags
     writeMatTag(ds, miUINT32, flagsSize);
-    ds << static_cast<quint32>(mxDOUBLE_CLASS);
-    ds << static_cast<quint32>(0);
+    writeLittleEndian(ds, static_cast<std::uint32_t>(mxDOUBLE_CLASS));
+    writeLittleEndian(ds, static_cast<std::uint32_t>(0));
 
     // Dimensions
     writeMatTag(ds, miINT32, dimsSize);
-    ds << static_cast<qint32>(nRows);
-    ds << static_cast<qint32>(nCols);
+    writeLittleEndian(ds, static_cast<std::int32_t>(nRows));
+    writeLittleEndian(ds, static_cast<std::int32_t>(nCols));
 
     // Name
     if (nameSize <= 4) {
         writeSmallTag(ds, miINT8, nameSize, nameBytes);
     } else {
         writeMatTag(ds, miINT8, nameSize);
-        ds.writeRawData(nameBytes.constData(), nameSize);
-        writePad(ds, nameSize);
+        ds.write(nameBytes.data(), nameSize);
+        writePad(ds, static_cast<int>(nameSize));
     }
 
     // Data (column-major)
     writeMatTag(ds, miDOUBLE, dataSize);
     for (int c = 0; c < nCols; ++c) {
         for (int r = 0; r < nRows; ++r) {
-            ds << mat(r, c);
+            writeLittleEndian(ds, mat(r, c));
         }
     }
-    writePad(ds, dataSize);
+    writePad(ds, static_cast<int>(dataSize));
 }
 
-static void writeMatHeader(QDataStream& ds, const QString& toolName)
+static void writeMatHeader(std::ostream& ds, const std::string& toolName)
 {
-    QByteArray headerText = QString("MATLAB 5.0 MAT-file, created by %1").arg(toolName).toLatin1();
-    headerText.append(QByteArray(116 - headerText.size(), ' '));
-    ds.writeRawData(headerText.constData(), 116);
+    std::string headerText = std::format("MATLAB 5.0 MAT-file, created by {}", toolName);
+    headerText.resize(116, ' ');
+    ds.write(headerText.data(), 116);
 
     for (int i = 0; i < 8; ++i)
-        ds << static_cast<quint8>(0);
+        writeLittleEndian<std::uint8_t>(ds, 0);
 
-    ds << static_cast<quint16>(0x0100);
-    ds << static_cast<quint16>(0x4D49);
+    writeLittleEndian(ds, static_cast<std::uint16_t>(0x0100));
+    writeLittleEndian(ds, static_cast<std::uint16_t>(0x4D49));
 }
 
 //=============================================================================================================
@@ -173,79 +188,84 @@ struct EventEntry
     int id;
 };
 
-static QList<EventEntry> readEvents(const QString& filename)
+static std::vector<EventEntry> readEvents(const std::string& filename)
 {
-    QList<EventEntry> events;
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Cannot open event file: {}", filename.toStdString());
+    std::vector<EventEntry> events;
+    std::ifstream in(mne::path_from_utf8(filename));
+    if (!in) {
+        Log::critical("Cannot open event file: {}", filename);
         return events;
     }
 
-    QTextStream in(&file);
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#'))
+    std::string rawLine;
+    while (std::getline(in, rawLine)) {
+        const std::string_view line = mne::trimmed(rawLine);
+        if (line.empty() || line.starts_with('#'))
             continue;
 
-        QStringList parts = line.split(QRegularExpression("\\s+"));
+        const std::vector<std::string_view> parts = mne::split_whitespace(line);
         if (parts.size() >= 3) {
             EventEntry ev;
-            ev.sample = parts[0].toInt();
-            ev.prev = parts[1].toInt();
-            ev.id = parts[2].toInt();
-            events.append(ev);
+            ev.sample = mne::to_int(parts[0]).value_or(0);
+            ev.prev = mne::to_int(parts[1]).value_or(0);
+            ev.id = mne::to_int(parts[2]).value_or(0);
+            events.push_back(ev);
         }
     }
-    file.close();
     return events;
+}
+
+//=============================================================================================================
+
+/** @return @p text as a float; 0 if it is not a number or out of float range. */
+static float epochsToFloat(std::string_view text)
+{
+    const std::optional<double> value = mne::to_double(text);
+    if (!value)
+        return 0.0f;
+    if (std::isinf(*value) || std::isnan(*value))
+        return static_cast<float>(*value);
+    if (std::abs(*value) > static_cast<double>(std::numeric_limits<float>::max()))
+        return 0.0f;
+    return static_cast<float>(*value);
+}
+
+//=============================================================================================================
+
+/** @return @p value rounded half away from zero and truncated to int. */
+static int epochsRound(double value)
+{
+    return static_cast<int>(value >= 0.0 ? value + 0.5 : value - 0.5);
 }
 
 //=============================================================================================================
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_epochs2mat");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Export epochs to MATLAB .mat format.\n\n"
+                             "Reads events from a text file, extracts epochs from raw data\n"
+                             "around matching events, and writes each epoch as a MAT5 file.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"raw"}, "Raw FIFF file.", "file", {}});
+    parser.add_option({{"event"}, "Event file (text: sample prev event_id).", "file", {}});
+    parser.add_option({{"tmin"}, "Epoch start time in seconds (e.g. -0.2).", "sec", {}});
+    parser.add_option({{"tmax"}, "Epoch end time in seconds (e.g. 0.5).", "sec", {}});
+    parser.add_option({{"event-id"}, "Event ID to extract.", "id", {}});
+    parser.add_option({{"out"}, "Output directory for .mat files.", "dir", {}});
+    parser.process(argc, argv, "mne_epochs2mat", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Export epochs to MATLAB .mat format.\n\n"
-                                     "Reads events from a text file, extracts epochs from raw data\n"
-                                     "around matching events, and writes each epoch as a MAT5 file.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string rawFile = parser.value("raw");
+    const std::string eventFile = parser.value("event");
+    const std::string outDir = parser.value("out");
+    float tmin = epochsToFloat(parser.value("tmin"));
+    float tmax = epochsToFloat(parser.value("tmax"));
+    int eventId = mne::to_int(parser.value("event-id")).value_or(0);
 
-    QCommandLineOption rawOpt("raw", "Raw FIFF file.", "file");
-    parser.addOption(rawOpt);
-
-    QCommandLineOption eventOpt("event", "Event file (text: sample prev event_id).", "file");
-    parser.addOption(eventOpt);
-
-    QCommandLineOption tminOpt("tmin", "Epoch start time in seconds (e.g. -0.2).", "sec");
-    parser.addOption(tminOpt);
-
-    QCommandLineOption tmaxOpt("tmax", "Epoch end time in seconds (e.g. 0.5).", "sec");
-    parser.addOption(tmaxOpt);
-
-    QCommandLineOption eventIdOpt("event-id", "Event ID to extract.", "id");
-    parser.addOption(eventIdOpt);
-
-    QCommandLineOption outOpt("out", "Output directory for .mat files.", "dir");
-    parser.addOption(outOpt);
-
-    parser.process(app);
-
-    QString rawFile = parser.value(rawOpt);
-    QString eventFile = parser.value(eventOpt);
-    QString outDir = parser.value(outOpt);
-    float tmin = parser.value(tminOpt).toFloat();
-    float tmax = parser.value(tmaxOpt).toFloat();
-    int eventId = parser.value(eventIdOpt).toInt();
-
-    if (rawFile.isEmpty() || eventFile.isEmpty() || outDir.isEmpty() || !parser.isSet(tminOpt) || !parser.isSet(tmaxOpt) || !parser.isSet(eventIdOpt)) {
+    if (rawFile.empty() || eventFile.empty() || outDir.empty() || !parser.is_set("tmin") || !parser.is_set("tmax") || !parser.is_set("event-id")) {
         Log::critical("--raw, --event, --tmin, --tmax, --event-id, and --out are required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_epochs2mat"));
+        return 1;
     }
 
     if (tmin >= tmax) {
@@ -253,26 +273,28 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    const QFileInfo rawFileInfo(rawFile);
-    if (!rawFileInfo.isFile() || !rawFileInfo.isReadable()) {
-        Log::critical("Cannot read raw data: {}", rawFile.toStdString());
+    std::error_code fileError;
+    if (!std::filesystem::is_regular_file(mne::path_from_utf8(rawFile), fileError) || !std::ifstream(mne::path_from_utf8(rawFile))) {
+        Log::critical("Cannot read raw data: {}", rawFile);
         return 1;
     }
 
     // Create output directory
-    QDir dir(outDir);
-    if (!dir.exists()) {
-        if (!dir.mkpath(".")) {
-            Log::critical("Cannot create output directory: {}", outDir.toStdString());
+    const std::filesystem::path dir = mne::path_from_utf8(outDir);
+    std::error_code dirError;
+    if (!std::filesystem::is_directory(dir, dirError)) {
+        std::filesystem::create_directories(dir, dirError);
+        if (!std::filesystem::is_directory(dir, dirError)) {
+            Log::critical("Cannot create output directory: {}", outDir);
             return 1;
         }
     }
 
     // Load raw data
-    Log::info("Loading raw: {}", rawFile.toStdString());
-    FiffRawData raw(rawFile.toStdU16String());
+    Log::info("Loading raw: {}", rawFile);
+    FiffRawData raw(mne::path_from_utf8(rawFile));
     if (raw.info.empty()) {
-        Log::critical("Cannot read raw data: {}", rawFile.toStdString());
+        Log::critical("Cannot read raw data: {}", rawFile);
         return 1;
     }
 
@@ -281,16 +303,16 @@ int main(int argc, char* argv[])
     Log::info("  {} channels, {:.1f} Hz", nChan, sfreq);
 
     // Read events
-    QList<EventEntry> events = readEvents(eventFile);
-    if (events.isEmpty()) {
-        Log::critical("No events read from: {}", eventFile.toStdString());
+    std::vector<EventEntry> events = readEvents(eventFile);
+    if (events.empty()) {
+        Log::critical("No events read from: {}", eventFile);
         return 1;
     }
     Log::info("Read {} events", static_cast<long long>(events.size()));
 
     // Compute sample offsets for epoch
-    int sminOffset = static_cast<int>(qRound(tmin * sfreq));
-    int smaxOffset = static_cast<int>(qRound(tmax * sfreq));
+    int sminOffset = epochsRound(tmin * sfreq);
+    int smaxOffset = epochsRound(tmax * sfreq);
     int epochLen = smaxOffset - sminOffset + 1;
 
     Log::info("Epoch: {:.3f} to {:.3f} s ({} samples), event ID = {}", tmin, tmax, epochLen, eventId);
@@ -302,7 +324,7 @@ int main(int argc, char* argv[])
 
     // Extract and write epochs
     int epochCount = 0;
-    for (int e = 0; e < events.size(); ++e) {
+    for (std::size_t e = 0; e < events.size(); ++e) {
         if (events[e].id != eventId)
             continue;
 
@@ -326,16 +348,12 @@ int main(int argc, char* argv[])
         ++epochCount;
 
         // Write MAT file
-        QString matFile = dir.filePath(QString("epoch_%1.mat").arg(epochCount, 3, 10, QChar('0')));
-        QFile outF(matFile);
-        if (!outF.open(QIODevice::WriteOnly)) {
-            Log::critical("Cannot open output file: {}", matFile.toStdString());
+        const std::string matFile = mne::utf8_from_path(dir / std::format("epoch_{:03}.mat", epochCount));
+        std::ofstream ds(mne::path_from_utf8(matFile), std::ios::binary);
+        if (!ds) {
+            Log::critical("Cannot open output file: {}", matFile);
             return 1;
         }
-
-        QDataStream ds(&outF);
-        ds.setByteOrder(QDataStream::LittleEndian);
-        ds.setFloatingPointPrecision(QDataStream::DoublePrecision);
 
         writeMatHeader(ds, "mne_epochs2mat");
         writeMatrixVariable(ds, "data", data);
@@ -346,9 +364,9 @@ int main(int argc, char* argv[])
 
         writeMatrixVariable(ds, "times", timesMat);
 
-        outF.close();
+        ds.close();
 
-        Log::info("  Wrote epoch {} -> {} ({} x {})", epochCount, matFile.toStdString(), nChan, epochLen);
+        Log::info("  Wrote epoch {} -> {} ({} x {})", epochCount, matFile, nChan, epochLen);
     }
 
     Log::info("Done. Extracted {} epochs for event ID {}.", epochCount, eventId);

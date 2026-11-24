@@ -20,27 +20,33 @@
 #include <mne/fiff/fiff_dig_point_set.h>
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_stream.h>
+#include <mne/base/command_line.h>
+#include <mne/base/endian.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCommandLineOption>
-#include <QCommandLineParser>
-#include <QCoreApplication>
-#include <QFile>
-#include <QFileInfo>
-#include <QStringList>
-#include <QTextStream>
-#include <QtEndian>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <bit>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <fstream>
+#include <iterator>
+#include <limits>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // DEFINES
@@ -64,12 +70,31 @@ constexpr double kTriggerCal = 0.0015259021896696422;
 constexpr double kEogCal = 0.3814755474174106;
 constexpr double kEegCal = 0.07629510948348212;
 
-QStringList channelNames()
+StringList channelNames()
 {
-    return QStringList{"GateIn", "Trig1", "Trig2", "EOG"} + QStringLiteral("Fp1 Fpz Fp2 AF1 AFz AF2 F7 F3 F1 Fz F2 F4 F8 FT9 FT7 FC5 FC3 FC1 FCz FC2 FC4 FC6 FT8 FT10 "
-                                                                           "T7 C5 C3 C1 Cz C2 C4 C6 T8 TP9 TP7 CP5 CP3 CP1 CPz CP2 CP4 CP6 TP8 TP10 "
-                                                                           "P9 P7 P3 P1 Pz P2 P4 P8 P10 PO3 POz PO4 O1 Oz O2 Iz")
-                                                                .split(QLatin1Char(' '));
+    StringList names{"GateIn", "Trig1", "Trig2", "EOG"};
+    for (const std::string& name : mne::split("Fp1 Fpz Fp2 AF1 AFz AF2 F7 F3 F1 Fz F2 F4 F8 FT9 FT7 FC5 FC3 FC1 FCz FC2 FC4 FC6 FT8 FT10 "
+                                              "T7 C5 C3 C1 Cz C2 C4 C6 T8 TP9 TP7 CP5 CP3 CP1 CPz CP2 CP4 CP6 TP8 TP10 "
+                                              "P9 P7 P3 P1 Pz P2 P4 P8 P10 PO3 POz PO4 O1 Oz O2 Iz",
+                                              ' '))
+        names.push_back(name);
+    return names;
+}
+
+// The text as a float, or nothing if it is not a number or out of float range
+std::optional<float> toFloat(std::string_view text)
+{
+    const std::optional<double> value = mne::to_double(text);
+    if (!value)
+        return std::nullopt;
+    if (std::isinf(*value) || std::isnan(*value))
+        return static_cast<float>(*value);
+    if (std::abs(*value) > static_cast<double>(std::numeric_limits<float>::max()))
+        return std::nullopt;
+    const float result = static_cast<float>(*value);
+    if (*value != 0.0 && result == 0.0f)
+        return std::nullopt;
+    return result;
 }
 
 FiffInfo eximiaInfo()
@@ -77,10 +102,10 @@ FiffInfo eximiaInfo()
     FiffInfo info;
     info.sfreq = kSfreq;
     info.nchan = kChannels;
-    const QStringList names = channelNames();
+    const StringList names = channelNames();
     for (int c = 0; c < kChannels; ++c) {
         FiffChInfo ch;
-        ch.ch_name = names[c].toStdString();
+        ch.ch_name = names[c];
         ch.scanNo = c + 1;
         ch.logNo = c + 1;
         ch.unit = FIFF_UNIT_V;
@@ -106,42 +131,46 @@ FiffInfo eximiaInfo()
 
 // eXimia digitizer text, as MNE-C's mne_eximia2fiff reads it: "Scalp" lines naming Left, Nasion or Right are
 // the fiducials and "Point ... Original" lines the EEG electrodes (number in the fifth column); x y z in mm
-bool readDigitizer(const QString& path, FiffDigPointSet& points)
+bool readDigitizer(const std::string& path, FiffDigPointSet& points)
 {
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Cannot open digitizer file {}", path.toStdString());
+    std::ifstream in(mne::path_from_utf8(path));
+    if (!in) {
+        Log::critical("Cannot open digitizer file {}", path);
         return false;
     }
-    QTextStream in(&file);
-    while (!in.atEnd()) {
-        const QString line = in.readLine();
-        const QStringList f = line.simplified().split(QLatin1Char(' '), Qt::SkipEmptyParts);
+    std::string line;
+    while (std::getline(in, line)) {
+        if (line.ends_with('\r'))
+            line.pop_back();
+        const std::vector<std::string_view> f = mne::split_whitespace(line);
         FiffDigPoint p;
-        if (line.contains(QLatin1String("Scalp"))) {
+        if (line.contains("Scalp")) {
             p.kind = FIFFV_POINT_CARDINAL;
-            p.ident = line.contains(QLatin1String("Left")) ? FIFFV_POINT_LPA
-                : line.contains(QLatin1String("Nasion"))   ? FIFFV_POINT_NASION
-                : line.contains(QLatin1String("Right"))    ? FIFFV_POINT_RPA
-                                                           : 0;
-        } else if (line.contains(QLatin1String("Point")) && line.contains(QLatin1String("Original")) && f.size() >= 5) {
+            p.ident = line.contains("Left") ? FIFFV_POINT_LPA
+                : line.contains("Nasion")   ? FIFFV_POINT_NASION
+                : line.contains("Right")    ? FIFFV_POINT_RPA
+                                            : 0;
+        } else if (line.contains("Point") && line.contains("Original") && f.size() >= 5) {
             p.kind = FIFFV_POINT_EEG;
-            p.ident = f[4].toInt();
+            p.ident = mne::to_int(f[4]).value_or(0);
         }
         if (p.ident == 0 || f.size() < 3)
             continue;
-        bool ok[3] = {false, false, false};
-        for (int k = 0; k < 3; ++k)
-            p.r[k] = f[k].toFloat(&ok[k]) * 1e-3f;
-        if (!ok[0] || !ok[1] || !ok[2]) {
-            Log::critical("Malformed digitizer line in {}: {}", path.toStdString(), line.toStdString());
+        bool ok = true;
+        for (int k = 0; k < 3; ++k) {
+            const std::optional<float> value = toFloat(f[k]);
+            ok = ok && value.has_value();
+            p.r[k] = value.value_or(0.0f) * 1e-3f;
+        }
+        if (!ok) {
+            Log::critical("Malformed digitizer line in {}: {}", path, line);
             return false;
         }
         p.coord_frame = FIFFV_COORD_UNKNOWN;
         points.push_back(p);
     }
     if (!points.transform_to_head()) {
-        Log::critical("{} lacks the Left, Nasion and Right fiducials needed for head coordinates", path.toStdString());
+        Log::critical("{} lacks the Left, Nasion and Right fiducials needed for head coordinates", path);
         return false;
     }
     return true;
@@ -155,76 +184,71 @@ bool readDigitizer(const QString& path, FiffDigPointSet& points)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_eximia2fiff");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Convert eXimia EEG (.nxe) data to FIFF format, as mne.io.read_raw_eximia reads it.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"nxe"}, "eXimia .nxe data file.", "file", {}});
+    parser.add_option({{"dig"}, "eXimia digitizer text file (fiducials and EEG electrodes).", "file", {}});
+    parser.add_option({{"out"}, "Output FIFF file.", "file", {}});
+    parser.process(argc, argv, "mne_eximia2fiff", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Convert eXimia EEG (.nxe) data to FIFF format, as mne.io.read_raw_eximia reads it.");
-    parser.addHelpOption();
-    parser.addVersionOption();
-
-    QCommandLineOption nxeOpt("nxe", "eXimia .nxe data file.", "file");
-    parser.addOption(nxeOpt);
-    QCommandLineOption digOpt("dig", "eXimia digitizer text file (fiducials and EEG electrodes).", "file");
-    parser.addOption(digOpt);
-    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
-    parser.addOption(outOpt);
-
-    parser.process(app);
-
-    const QString nxeFile = parser.value(nxeOpt);
-    const QString outFile = parser.value(outOpt);
-    if (nxeFile.isEmpty()) {
+    const std::string nxeFile = parser.value("nxe");
+    const std::string outFile = parser.value("out");
+    if (nxeFile.empty()) {
         Log::critical("eXimia .nxe file (--nxe) is required.");
         return 1;
     }
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         Log::critical("Output file (--out) is required.");
         return 1;
     }
 
-    QFile nxe(nxeFile);
-    if (!nxe.open(QIODevice::ReadOnly)) {
-        Log::critical("Cannot open {}", nxeFile.toStdString());
+    std::ifstream nxe(mne::path_from_utf8(nxeFile), std::ios::binary);
+    if (!nxe) {
+        Log::critical("Cannot open {}", nxeFile);
         return 1;
     }
-    const QByteArray bytes = nxe.readAll();
-    const qint64 frame = kChannels * qint64(sizeof(qint16));
-    const qint64 nSamples = bytes.size() / frame;
+    const std::vector<char> bytes((std::istreambuf_iterator<char>(nxe)), std::istreambuf_iterator<char>());
+    const std::int64_t frame = kChannels * static_cast<std::int64_t>(sizeof(std::int16_t));
+    const std::int64_t nSamples = std::ssize(bytes) / frame;
     if (nSamples == 0) {
-        Log::critical("{} holds no complete sample of {} channels", nxeFile.toStdString(), kChannels);
+        Log::critical("{} holds no complete sample of {} channels", nxeFile, kChannels);
         return 1;
     }
-    if (bytes.size() % frame != 0)
-        Log::warning("{} ends with a partial sample; the file is likely truncated", nxeFile.toStdString());
+    if (std::ssize(bytes) % frame != 0)
+        Log::warning("{} ends with a partial sample; the file is likely truncated", nxeFile);
 
     FiffInfo info = eximiaInfo();
-    if (parser.isSet(digOpt) && !readDigitizer(parser.value(digOpt), info.dig))
+    if (parser.is_set("dig") && !readDigitizer(parser.value("dig"), info.dig))
         return 1;
 
     Eigen::MatrixXd data(kChannels, nSamples);
-    const auto* raw = reinterpret_cast<const uchar*>(bytes.constData());
-    for (qint64 s = 0; s < nSamples; ++s)
-        for (int c = 0; c < kChannels; ++c)
-            data(c, s) = qFromLittleEndian<qint16>(raw + (s * kChannels + c) * qint64(sizeof(qint16))) * double(info.chs[c].cal);
+    for (std::int64_t s = 0; s < nSamples; ++s) {
+        for (int c = 0; c < kChannels; ++c) {
+            std::int16_t value = 0;
+            std::memcpy(&value, bytes.data() + (s * kChannels + c) * static_cast<std::int64_t>(sizeof(std::int16_t)), sizeof(value));
+            if constexpr (std::endian::native == std::endian::big)
+                value = mne::byte_swap(value);
+            data(c, s) = value * double(info.chs[c].cal);
+        }
+    }
 
     Eigen::RowVectorXd cals;
-    auto stream = FiffStream::start_writing_raw(outFile.toStdU16String(), info, cals);
+    auto stream = FiffStream::start_writing_raw(mne::path_from_utf8(outFile), info, cals);
     if (!stream) {
-        Log::critical("Cannot open output: {}", outFile.toStdString());
+        Log::critical("Cannot open output: {}", outFile);
         return 1;
     }
-    constexpr qint64 kBuffer = 10000;
-    for (qint64 start = 0; start < nSamples; start += kBuffer) {
-        const qint64 n = std::min(kBuffer, nSamples - start);
+    constexpr std::int64_t kBuffer = 10000;
+    for (std::int64_t start = 0; start < nSamples; start += kBuffer) {
+        const std::int64_t n = std::min(kBuffer, nSamples - start);
         if (!stream->write_raw_buffer(data.middleCols(start, n), cals)) {
-            Log::critical("Writing {} failed", outFile.toStdString());
+            Log::critical("Writing {} failed", outFile);
             return 1;
         }
     }
     stream->finish_writing_raw();
 
-    Log::info("Converted {}: {} channels, {} samples at {:.0f} Hz -> {}", QFileInfo(nxeFile).fileName().toStdString(), kChannels, static_cast<long long>(nSamples), kSfreq, outFile.toStdString());
+    Log::info("Converted {}: {} channels, {} samples at {:.0f} Hz -> {}", mne::utf8_from_path(mne::path_from_utf8(nxeFile).filename()), kChannels, static_cast<long long>(nSamples), kSfreq, outFile);
     return 0;
 }

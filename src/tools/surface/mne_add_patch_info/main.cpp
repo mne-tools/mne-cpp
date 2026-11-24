@@ -18,17 +18,9 @@
 #include <mne/mne/mne_source_space.h>
 #include <mne/fiff/fiff_stream.h>
 #include <mne/fiff/fiff_constants.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QMap>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -40,11 +32,14 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
+#include <map>
 #include <queue>
 #include <vector>
 #include <set>
 #include <cmath>
 #include <limits>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -140,37 +135,27 @@ static void multiSourceDijkstra(
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_add_patch_info");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Add patch information to a source space.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"src"}, "Input source space FIFF file.", "file", {}});
+    parser.add_option({{"out"}, "Output source space FIFF file with patch info.", "file", {}});
+    parser.process(argc, argv, "mne_add_patch_info", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Add patch information to a source space.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string srcFile = parser.value("src");
+    const std::string outFile = parser.value("out");
 
-    QCommandLineOption srcOpt("src", "Input source space FIFF file.", "file");
-    parser.addOption(srcOpt);
-
-    QCommandLineOption outOpt("out", "Output source space FIFF file with patch info.", "file");
-    parser.addOption(outOpt);
-
-    parser.process(app);
-
-    QString srcFile = parser.value(srcOpt);
-    QString outFile = parser.value(outOpt);
-
-    if (srcFile.isEmpty()) {
+    if (srcFile.empty()) {
         Log::critical("--src is required.");
         return 1;
     }
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         Log::critical("--out is required.");
         return 1;
     }
 
     // Read source space
-    auto read = MNESourceSpaces::read(srcFile.toStdU16String());
+    auto read = MNESourceSpaces::read(path_from_utf8(srcFile));
     if (!read) {
         Log::critical("{}", read.error().what());
         return 1;
@@ -193,15 +178,15 @@ int main(int argc, char* argv[])
         auto adj = buildAdjacency(sp.rr, sp.itris);
 
         // Collect active (in-use) vertices
-        QList<int> activeList;
+        std::vector<int> activeList;
         for (int i = 0; i < sp.np; ++i) {
             if (sp.inuse[i])
-                activeList.append(i);
+                activeList.push_back(i);
         }
 
-        VectorXi sourceVerts(activeList.size());
-        for (int i = 0; i < activeList.size(); ++i)
-            sourceVerts(i) = activeList[i];
+        VectorXi sourceVerts(std::ssize(activeList));
+        for (int i = 0; i < std::ssize(activeList); ++i)
+            sourceVerts(i) = activeList[static_cast<std::size_t>(i)];
 
         Log::info("  Running multi-source Dijkstra with {} source vertices...", static_cast<int>(sourceVerts.size()));
 
@@ -210,7 +195,7 @@ int main(int argc, char* argv[])
         multiSourceDijkstra(adj, sourceVerts, sp.np, nearest, dist);
 
         // Count patch sizes
-        QMap<int, int> patchSizes;
+        std::map<int, int> patchSizes;
         for (int i = 0; i < sp.np; ++i) {
             if (nearest(i) >= 0)
                 patchSizes[nearest(i)]++;
@@ -222,25 +207,25 @@ int main(int argc, char* argv[])
 
         int minPatch = sp.np, maxPatch = 0;
         double avgPatch = 0;
-        for (auto it = patchSizes.begin(); it != patchSizes.end(); ++it) {
-            if (it.value() < minPatch)
-                minPatch = it.value();
-            if (it.value() > maxPatch)
-                maxPatch = it.value();
-            avgPatch += it.value();
+        for (const auto& [vertex, size] : patchSizes) {
+            if (size < minPatch)
+                minPatch = size;
+            if (size > maxPatch)
+                maxPatch = size;
+            avgPatch += size;
         }
-        if (!patchSizes.isEmpty())
-            avgPatch /= patchSizes.size();
+        if (!patchSizes.empty())
+            avgPatch /= static_cast<double>(patchSizes.size());
 
         Log::info("  Patch info: {} patches, size range {}..{} (avg {:.1f})", static_cast<int>(patchSizes.size()), minPatch, maxPatch, avgPatch);
     }
 
     // Write output
-    Log::info("\nWriting source space with patch info to: {}", outFile.toStdString());
+    Log::info("\nWriting source space with patch info to: {}", outFile);
 
-    auto outStream = FiffStream::start_file(outFile.toStdU16String());
+    auto outStream = FiffStream::start_file(path_from_utf8(outFile));
     if (!outStream) {
-        Log::critical("Cannot open output file: {}", outFile.toStdString());
+        Log::critical("Cannot open output file: {}", outFile);
         return 1;
     }
     src.write_to_stream(*outStream);

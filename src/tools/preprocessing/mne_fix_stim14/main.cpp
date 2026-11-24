@@ -23,16 +23,9 @@
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_stream.h>
 #include <mne/fiff/fiff_tag.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCommandLineOption>
-#include <QCommandLineParser>
-#include <QCoreApplication>
-#include <QFile>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -40,6 +33,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <print>
 #include <string>
 #include <vector>
 
@@ -81,10 +75,9 @@ int fixSamples(FiffTag& tag, int channel, int nchan, Fix fix)
 }
 
 /** Fixes @p path in place; @return the error, empty on success. */
-std::string fixFile(const QString& path, bool fix32)
+std::string fixFile(const std::string& path, bool fix32)
 {
-    QFile file(path);
-    auto stream = FiffStream::open_update(path.toStdU16String());
+    auto stream = FiffStream::open_update(path_from_utf8(path));
     if (!stream) {
         return "cannot open the file for update";
     }
@@ -163,30 +156,25 @@ std::string fixFile(const QString& path, bool fix32)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_fix_stim14");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Fix the trigger channels of raw FIFF files in place.\n\n"
+                             "STI 014 gets the range 1 and keeps only the low byte of its samples.\n"
+                             "With --32, STI101 and STI201 keep only the low 16 bits of their 32-bit samples.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"32"}, "Keep only the two lowest bytes of STI101 and STI201 (32-bit integer and float data).", {}, {}});
+    parser.add_positional_argument("files", "Raw FIFF files, fixed in place.");
+    parser.process(argc, argv, "mne_fix_stim14", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Fix the trigger channels of raw FIFF files in place.\n\n"
-                                     "STI 014 gets the range 1 and keeps only the low byte of its samples.\n"
-                                     "With --32, STI101 and STI201 keep only the low 16 bits of their 32-bit samples.");
-    parser.addHelpOption();
-    parser.addVersionOption();
-    const QCommandLineOption fix32Opt("32", "Keep only the two lowest bytes of STI101 and STI201 (32-bit integer and float data).");
-    parser.addOption(fix32Opt);
-    parser.addPositionalArgument("files", "Raw FIFF files, fixed in place.", "<file>...");
-    parser.process(app);
-
-    const QStringList files = parser.positionalArguments();
-    if (files.isEmpty()) {
-        parser.showHelp(1);
+    const StringList& files = parser.positional_arguments();
+    if (files.empty()) {
+        std::print("{}", parser.help_text("mne_fix_stim14"));
+        return 1;
     }
     int failed = 0;
-    for (const QString& path : files) {
-        Log::info("{}", path.toStdString());
-        if (const std::string error = fixFile(path, parser.isSet(fix32Opt)); !error.empty()) {
-            Log::critical("  {}: {}", path.toStdString(), error);
+    for (const std::string& path : files) {
+        Log::info("{}", path);
+        if (const std::string error = fixFile(path, parser.is_set("32")); !error.empty()) {
+            Log::critical("  {}: {}", path, error);
             ++failed;
         }
     }

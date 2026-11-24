@@ -14,11 +14,10 @@
 #define MNEWATERSHEDBEMSETTINGS_H
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QCommandLineParser>
-#include <QString>
+#include <string>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNEWATERSHEDBEM
@@ -54,7 +53,7 @@ public:
      *
      * @return Subject name string.
      */
-    QString subject() const;
+    std::string subject() const;
 
     //=========================================================================================================
     /**
@@ -62,7 +61,7 @@ public:
      *
      * @return Subjects directory path.
      */
-    QString subjectsDir() const;
+    std::string subjectsDir() const;
 
     //=========================================================================================================
     /**
@@ -70,7 +69,7 @@ public:
      *
      * @return FreeSurfer home path.
      */
-    QString freeSurferHome() const;
+    std::string freeSurferHome() const;
 
     //=========================================================================================================
     /**
@@ -78,7 +77,7 @@ public:
      *
      * @return Volume name (default: "T1").
      */
-    QString volume() const;
+    std::string volume() const;
 
     //=========================================================================================================
     /**
@@ -121,15 +120,15 @@ public:
     bool verbose() const;
 
 private:
-    QString m_sSubject;        /**< Subject name. */
-    QString m_sSubjectsDir;    /**< Subjects directory path. */
-    QString m_sFreeSurferHome; /**< FreeSurfer home path. */
-    QString m_sVolume;         /**< MRI volume name. */
-    bool m_bOverwrite;         /**< Whether to overwrite existing data. */
-    bool m_bAtlas;             /**< Use --atlas for mri_watershed. */
-    bool m_bGcaAtlas;          /**< Use subcortical atlas. */
-    int m_iPreflood;           /**< Preflood height (-1 = not set). */
-    bool m_bVerbose;           /**< Verbose output. */
+    std::string m_sSubject;        /**< Subject name. */
+    std::string m_sSubjectsDir;    /**< Subjects directory path. */
+    std::string m_sFreeSurferHome; /**< FreeSurfer home path. */
+    std::string m_sVolume;         /**< MRI volume name. */
+    bool m_bOverwrite;             /**< Whether to overwrite existing data. */
+    bool m_bAtlas;                 /**< Use --atlas for mri_watershed. */
+    bool m_bGcaAtlas;              /**< Use subcortical atlas. */
+    int m_iPreflood;               /**< Preflood height (-1 = not set). */
+    bool m_bVerbose;               /**< Verbose output. */
 };
 
 } // namespace MNEWATERSHEDBEM

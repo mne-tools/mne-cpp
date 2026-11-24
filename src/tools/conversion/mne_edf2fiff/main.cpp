@@ -19,23 +19,19 @@
 #include <mne/fiff/fiff_file.h>
 #include <mne/fiff/fiff_raw_data.h>
 #include <mne/fiff/fiff_stream.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCommandLineParser>
-#include <QCoreApplication>
-#include <QFile>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <algorithm>
+#include <cmath>
 #include <filesystem>
+#include <print>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -56,47 +52,40 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication a(argc, argv);
-    QCoreApplication::setApplicationName("mne_edf2fiff");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("EDF/EDF+/BDF to FIFF conversion. Samples are stored in SI units like mne.io.read_raw_edf; "
+                             "channels sampled below the highest rate are skipped.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"fileIn"}, "The input EDF or BDF file. Needs to be specified.", "in", {}});
+    parser.add_option({{"fileOut"}, "The output file. If not specified, the input file name with a .fif extension.", "out", {}});
+    parser.process(argc, argv, "mne_edf2fiff", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("EDF/EDF+/BDF to FIFF conversion. Samples are stored in SI units like mne.io.read_raw_edf; "
-                                     "channels sampled below the highest rate are skipped.");
-    parser.addHelpOption();
-    parser.addVersionOption();
-
-    QCommandLineOption inputOption("fileIn", "The input EDF or BDF file. Needs to be specified.", "in");
-    QCommandLineOption outputOption("fileOut", "The output file. If not specified, the input file name with a .fif extension.", "out");
-    parser.addOption(inputOption);
-    parser.addOption(outputOption);
-    parser.process(a);
-
-    const QString sInputFile = parser.value(inputOption);
-    QString sOutputFile = parser.value(outputOption);
-    if (sInputFile.isEmpty()) {
-        parser.showHelp(1);
+    const std::string sInputFile = parser.value("fileIn");
+    std::string sOutputFile = parser.value("fileOut");
+    if (sInputFile.empty()) {
+        std::print("{}", parser.help_text("mne_edf2fiff"));
+        return 1;
     }
 
-    const std::filesystem::path inputPath = mne::path_from_utf8(sInputFile.toStdString());
+    const std::filesystem::path inputPath = mne::path_from_utf8(sInputFile);
     EDFReader reader;
     if (!reader.supports_extension(mne::utf8_from_path(inputPath.extension()))) {
-        Log::critical("Not an EDF or BDF file: {}", sInputFile.toStdString());
+        Log::critical("Not an EDF or BDF file: {}", sInputFile);
         return 1;
     }
     if (!reader.open(inputPath) || reader.sample_count() <= 0) {
-        Log::critical("Could not read {}", sInputFile.toStdString());
+        Log::critical("Could not read {}", sInputFile);
         return 1;
     }
-    if (sOutputFile.isEmpty()) {
-        sOutputFile = sInputFile.left(sInputFile.lastIndexOf('.')) + ".fif";
+    if (sOutputFile.empty()) {
+        sOutputFile = sInputFile.substr(0, sInputFile.rfind('.')) + ".fif";
     }
 
     const FiffRawData fiffRaw = reader.to_fiff_raw_data();
     RowVectorXd cals;
-    auto outfid = FiffStream::start_writing_raw(sOutputFile.toStdU16String(), fiffRaw.info, cals);
+    auto outfid = FiffStream::start_writing_raw(mne::path_from_utf8(sOutputFile), fiffRaw.info, cals);
     if (!outfid) {
-        Log::critical("Could not write {}", sOutputFile.toStdString());
+        Log::critical("Could not write {}", sOutputFile);
         return 1;
     }
     fiff_int_t first = 0;
@@ -111,6 +100,6 @@ int main(int argc, char* argv[])
     }
     outfid->finish_writing_raw();
 
-    Log::info("Wrote {}", sOutputFile.toStdString());
+    Log::info("Wrote {}", sOutputFile);
     return 0;
 }

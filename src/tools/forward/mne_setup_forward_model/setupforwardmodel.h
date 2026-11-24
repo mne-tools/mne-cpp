@@ -31,10 +31,10 @@
 #include <mne/mne/mne_bem_surface.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
+#include <string>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNESETUPFORWARDMODEL
@@ -98,8 +98,8 @@ private:
      *
      * @return true if the file was found.
      */
-    bool locateSurface(const QString& bemDir, const QString& name,
-                       const QString& ext, QString& path) const;
+    bool locateSurface(const std::string& bemDir, const std::string& name,
+                       const std::string& ext, std::string& path) const;
 
     //=========================================================================================================
     /**
@@ -113,7 +113,7 @@ private:
      *
      * @return true on success.
      */
-    bool readAsciiTriFile(const QString& fileName, int id, float sigma,
+    bool readAsciiTriFile(const std::string& fileName, int id, float sigma,
                           float shift, mne::MNEBemSurface& surf) const;
 
     //=========================================================================================================
@@ -128,7 +128,7 @@ private:
      *
      * @return true on success.
      */
-    bool readFreeSurferSurf(const QString& fileName, int id, float sigma,
+    bool readFreeSurferSurf(const std::string& fileName, int id, float sigma,
                             float shift, mne::MNEBemSurface& surf) const;
 
     //=========================================================================================================
@@ -152,7 +152,7 @@ private:
      * @return true on success.
      */
     bool exportPntFile(const mne::MNEBemSurface& surf,
-                       const QString& fileName) const;
+                       const std::string& fileName) const;
 
     //=========================================================================================================
     /**
@@ -165,7 +165,7 @@ private:
      * @return true on success.
      */
     bool exportSurfFile(const mne::MNEBemSurface& surf,
-                        const QString& fileName) const;
+                        const std::string& fileName) const;
 
     //=========================================================================================================
     /**
@@ -180,8 +180,8 @@ private:
      *
      * @return true on success.
      */
-    bool prepareBemSolution(const QString& bemFile,
-                            const QString& solFile) const;
+    bool prepareBemSolution(const std::string& bemFile,
+                            const std::string& solFile) const;
 
     //=========================================================================================================
 

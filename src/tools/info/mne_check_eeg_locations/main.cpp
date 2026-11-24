@@ -20,23 +20,23 @@
 #include <mne/fiff/fiff_ch_info.h>
 #include <mne/fiff/fiff_constants.h>
 
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <print>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -55,58 +55,51 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_check_eeg_locations");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Validate EEG electrode positions in a FIFF file.\n\nChecks for undefined, duplicate, and out-of-range electrode locations.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"meas"}, "Measurement FIFF file.", "name", {}});
+    parser.process(argc, argv, "mne_check_eeg_locations", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Validate EEG electrode positions in a FIFF file.\n\nChecks for undefined, duplicate, and out-of-range electrode locations.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string measName = parser.value("meas");
 
-    QCommandLineOption measOpt("meas", "Measurement FIFF file.", "name");
-    parser.addOption(measOpt);
-
-    parser.process(app);
-
-    QString measName = parser.value(measOpt);
-
-    if (measName.isEmpty()) {
+    if (measName.empty()) {
         Log::critical("The --meas option is required.");
-        parser.showHelp(1);
-    }
-
-    // Read measurement info
-    FiffRawData raw(measName.toStdU16String());
-
-    if (raw.info.chs.empty()) {
-        Log::critical("No channel information found in {}", measName.toStdString());
+        std::print("{}", parser.help_text("mne_check_eeg_locations"));
         return 1;
     }
 
-    Log::info("Opened {} : {} channels", measName.toStdString(), raw.info.nchan);
+    // Read measurement info
+    FiffRawData raw(path_from_utf8(measName));
+
+    if (raw.info.chs.empty()) {
+        Log::critical("No channel information found in {}", measName);
+        return 1;
+    }
+
+    Log::info("Opened {} : {} channels", measName, raw.info.nchan);
 
     // Collect EEG channels
     struct EegEntry
     {
         int index;
-        QString name;
+        std::string name;
         Vector3f pos;
     };
 
-    QList<EegEntry> eegChannels;
+    std::vector<EegEntry> eegChannels;
     for (int k = 0; k < raw.info.nchan; ++k) {
         const FiffChInfo& ch = raw.info.chs[k];
         if (ch.kind == FIFFV_EEG_CH) {
             EegEntry e;
             e.index = k;
-            e.name = QString::fromStdString(ch.ch_name);
+            e.name = ch.ch_name;
             e.pos = ch.chpos.r0;
-            eegChannels.append(e);
+            eegChannels.push_back(e);
         }
     }
 
-    if (eegChannels.isEmpty()) {
+    if (eegChannels.empty()) {
         Log::info("No EEG channels found.");
         return 0;
     }
@@ -118,22 +111,22 @@ int main(int argc, char* argv[])
     // Check 1: Undefined locations (all zeros)
     for (const auto& e : eegChannels) {
         if (e.pos.norm() < 1e-10f) {
-            Log::warning("WARNING: {} (ch {}): location is undefined (all zeros).", e.name.toStdString(), e.index + 1);
+            Log::warning("WARNING: {} (ch {}): location is undefined (all zeros).", e.name, e.index + 1);
             ++nProblems;
         }
     }
 
     // Check 2: Duplicate positions (within 1mm tolerance)
     constexpr float dupTol = 0.001f; // 1 mm
-    for (int i = 0; i < eegChannels.size(); ++i) {
+    for (int i = 0; i < std::ssize(eegChannels); ++i) {
         if (eegChannels[i].pos.norm() < 1e-10f)
             continue; // skip undefined
-        for (int j = i + 1; j < eegChannels.size(); ++j) {
+        for (int j = i + 1; j < std::ssize(eegChannels); ++j) {
             if (eegChannels[j].pos.norm() < 1e-10f)
                 continue;
             float dist = (eegChannels[i].pos - eegChannels[j].pos).norm();
             if (dist < dupTol) {
-                Log::warning("WARNING: {} and {} have duplicate positions (distance = {:.4f} mm).", eegChannels[i].name.toStdString(), eegChannels[j].name.toStdString(), dist * 1000.0f);
+                Log::warning("WARNING: {} and {} have duplicate positions (distance = {:.4f} mm).", eegChannels[i].name, eegChannels[j].name, dist * 1000.0f);
                 ++nProblems;
             }
         }
@@ -147,7 +140,7 @@ int main(int argc, char* argv[])
             continue; // skip undefined
         float r = e.pos.norm();
         if (r < minRadius || r > maxRadius) {
-            Log::warning("WARNING: {} (ch {}): distance from origin = {:.1f} mm (expected {:.0f}-{:.0f} mm).", e.name.toStdString(), e.index + 1, r * 1000.0f, minRadius * 1000.0f, maxRadius * 1000.0f);
+            Log::warning("WARNING: {} (ch {}): distance from origin = {:.1f} mm (expected {:.0f}-{:.0f} mm).", e.name, e.index + 1, r * 1000.0f, minRadius * 1000.0f, maxRadius * 1000.0f);
             ++nProblems;
         }
     }

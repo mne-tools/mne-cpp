@@ -18,18 +18,10 @@
 #include <mne/inv/inv_source_estimate.h>
 #include <mne/mne/mne.h>
 #include <mne/mne/mne_source_space.h>
+#include <mne/base/byte_stream.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QTextStream>
-#include <QDataStream>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -42,7 +34,12 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstdint>
+#include <format>
+#include <fstream>
 #include <memory>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -59,47 +56,60 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-static bool readWFile(const QString& filename, VectorXd& data, VectorXi& vertices)
+static bool readWFile(const std::string& filename, VectorXd& data, VectorXi& vertices)
 {
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly)) {
-        Log::critical("Cannot open w file: {}", filename.toStdString());
+    const std::unique_ptr<FileByteStream> file = FileByteStream::open(path_from_utf8(filename), FileByteStream::Mode::Read);
+    if (!file) {
+        Log::critical("Cannot open w file: {}", filename);
         return false;
     }
-    QDataStream in(&file);
-    in.setByteOrder(QDataStream::BigEndian);
+
+    // Like a QDataStream: big endian, and once a read runs past the end every value reads as zero
+    bool pastEnd = false;
+    auto read = [&file, &pastEnd]<class T>(T& value) {
+        if (pastEnd || !file->read_big_endian(value)) {
+            pastEnd = true;
+            value = T{};
+        }
+    };
 
     // Skip 2-byte header
-    quint16 header;
-    in >> header;
+    std::uint16_t header = 0;
+    read(header);
 
     // Number of vertices (3 bytes)
-    quint8 b1, b2, b3;
-    in >> b1 >> b2 >> b3;
-    qint32 nvert = (b1 << 16) | (b2 << 8) | b3;
+    std::uint8_t b1 = 0;
+    std::uint8_t b2 = 0;
+    std::uint8_t b3 = 0;
+    read(b1);
+    read(b2);
+    read(b3);
+    std::int32_t nvert = (b1 << 16) | (b2 << 8) | b3;
 
     vertices.resize(nvert);
     data.resize(nvert);
 
     for (int i = 0; i < nvert; i++) {
         // Vertex number (3 bytes)
-        in >> b1 >> b2 >> b3;
+        read(b1);
+        read(b2);
+        read(b3);
         vertices(i) = (b1 << 16) | (b2 << 8) | b3;
 
-        // Value (float)
-        float val;
-        in >> val;
-        data(i) = val;
+        // Value: read as an 8-byte double, as QDataStream's default double precision did for a float
+        double val = 0.0;
+        read(val);
+        data(i) = static_cast<float>(val);
     }
     return true;
 }
 
 //=============================================================================================================
 
-static bool readStcFile(const QString& filename, MatrixXd& data, VectorXi& vertices,
+static bool readStcFile(const std::string& filename, MatrixXd& data, VectorXi& vertices,
                         float& tmin, float& tstep)
 {
-    auto read = InvSourceEstimate::read(filename.toStdU16String());
+    auto read = InvSourceEstimate::read(path_from_utf8(filename));
     if (!read) {
         Log::critical("{}", read.error().what());
         return false;
@@ -117,43 +127,33 @@ static bool readStcFile(const QString& filename, MatrixXd& data, VectorXi& verti
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_volume_data2mri");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Map source estimate data to MRI vertex space.\n\nReads volume source space and STC/W estimates.");
+    parser.add_help_option();
+    parser.add_version_option();
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Map source estimate data to MRI vertex space.\n\nReads volume source space and STC/W estimates.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_option({{"src"}, "Source space FIFF file.", "file", {}});
+    parser.add_option({{"stc"}, "STC source estimate file.", "file", {}});
+    parser.add_option({{"w"}, "W source estimate file.", "file", {}});
+    parser.add_option({{"out"}, "Output MRI file (mgh format).", "file", {}});
+    parser.add_option({{"tpoint"}, "Time point index for STC files.", "index", "0"});
 
-    QCommandLineOption srcOpt("src", "Source space FIFF file.", "file");
-    parser.addOption(srcOpt);
-    QCommandLineOption stcOpt("stc", "STC source estimate file.", "file");
-    parser.addOption(stcOpt);
-    QCommandLineOption wOpt("w", "W source estimate file.", "file");
-    parser.addOption(wOpt);
-    QCommandLineOption outOpt("out", "Output MRI file (mgh format).", "file");
-    parser.addOption(outOpt);
-    QCommandLineOption tpointOpt("tpoint", "Time point index for STC files.", "index", "0");
-    parser.addOption(tpointOpt);
+    parser.process(argc, argv, "mne_volume_data2mri", PROGRAM_VERSION);
 
-    parser.process(app);
+    const std::string srcFile = parser.value("src");
+    const std::string stcFile = parser.value("stc");
+    const std::string wFile = parser.value("w");
+    const std::string outFile = parser.value("out");
+    const int tpoint = to_int(parser.value("tpoint")).value_or(0);
 
-    QString srcFile = parser.value(srcOpt);
-    QString stcFile = parser.value(stcOpt);
-    QString wFile = parser.value(wOpt);
-    QString outFile = parser.value(outOpt);
-    int tpoint = parser.value(tpointOpt).toInt();
-
-    if (srcFile.isEmpty()) {
+    if (srcFile.empty()) {
         Log::critical("Source space file (--src) is required.");
         return 1;
     }
-    if (stcFile.isEmpty() && wFile.isEmpty()) {
+    if (stcFile.empty() && wFile.empty()) {
         Log::info("Either --stc or --w must be specified.");
         return 1;
     }
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         Log::critical("Output file (--out) is required.");
         return 1;
     }
@@ -162,8 +162,8 @@ int main(int argc, char* argv[])
     // Read source space
     //
     std::vector<std::unique_ptr<MNESourceSpace>> spaces;
-    if (MNESourceSpace::read_source_spaces(srcFile.toStdU16String(), spaces) != FIFF_OK || spaces.empty()) {
-        Log::critical("Failed to read source space from: {}", srcFile.toStdString());
+    if (MNESourceSpace::read_source_spaces(path_from_utf8(srcFile), spaces) != FIFF_OK || spaces.empty()) {
+        Log::critical("Failed to read source space from: {}", srcFile);
         return 1;
     }
 
@@ -175,7 +175,7 @@ int main(int argc, char* argv[])
     VectorXd values;
     VectorXi vertices;
 
-    if (!stcFile.isEmpty()) {
+    if (!stcFile.empty()) {
         MatrixXd stcData;
         float tmin;
         float tstep;
@@ -223,24 +223,22 @@ int main(int argc, char* argv[])
         found = true;
 
         // Write vertex values as text (vertex index and value)
-        QFile outF(outFile);
-        if (!outF.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            Log::critical("Cannot write output file: {}", outFile.toStdString());
+        std::ofstream out(path_from_utf8(outFile));
+        if (!out) {
+            Log::critical("Cannot write output file: {}", outFile);
             return 1;
         }
-        QTextStream out(&outF);
         out << "# MNE volume data overlay\n";
         out << "# Source space: " << srcFile << "\n";
         out << "# Vertices: " << sp.np << "\n";
         out << "# Non-zero: " << nonZero << "\n";
         for (int i = 0; i < sp.np; i++) {
             if (vertValues(i) != 0.0) {
-                out << i << " "
-                    << sp.rr(i, 0) << " " << sp.rr(i, 1) << " " << sp.rr(i, 2) << " "
-                    << vertValues(i) << "\n";
+                out << std::format("{} {:g} {:g} {:g} {:g}\n", i, sp.rr(i, 0), sp.rr(i, 1), sp.rr(i, 2), vertValues(i));
             }
         }
-        Log::info("Wrote {} non-zero vertex values to {}", nonZero, outFile.toStdString());
+        out.close();
+        Log::info("Wrote {} non-zero vertex values to {}", nonZero, outFile);
         break;
     }
 

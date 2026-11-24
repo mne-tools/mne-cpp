@@ -34,18 +34,34 @@
 #include <mne/fiff/fiff_file.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_coord_trans.h>
+#include <mne/base/process.h>
+#include <mne/base/byte_stream.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
-#include <QDataStream>
-#include <QDateTime>
-#include <QDir>
-#include <QDirIterator>
-#include <QFile>
-#include <QFileInfo>
-#include <QProcess>
+#include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <array>
+#include <cctype>
+#include <cstdint>
+#include <cstdlib>
+#include <cstdio>
+#include <ctime>
+#include <filesystem>
+#include <format>
+#include <fstream>
+#include <print>
+#include <string>
+#include <string_view>
+#include <system_error>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -54,6 +70,125 @@
 using namespace MNEFLASHBEM;
 using namespace mne;
 using namespace Eigen;
+
+//=============================================================================================================
+// LOCAL HELPERS
+//=============================================================================================================
+
+namespace
+{
+
+bool fileExists(const std::string& path)
+{
+    std::error_code ec;
+    return std::filesystem::exists(path_from_utf8(path), ec);
+}
+
+bool dirExists(const std::string& path)
+{
+    std::error_code ec;
+    return std::filesystem::is_directory(path_from_utf8(path), ec);
+}
+
+bool makePath(const std::string& path)
+{
+    std::error_code ec;
+    std::filesystem::create_directories(path_from_utf8(path), ec);
+    return std::filesystem::is_directory(path_from_utf8(path), ec);
+}
+
+void removeFile(const std::string& path)
+{
+    std::error_code ec;
+    if (!std::filesystem::is_directory(path_from_utf8(path), ec))
+        std::filesystem::remove(path_from_utf8(path), ec);
+}
+
+void removeRecursively(const std::string& path)
+{
+    std::error_code ec;
+    std::filesystem::remove_all(path_from_utf8(path), ec);
+}
+
+// Matches a QDir name filter: '*' and '?' wildcards, ASCII case-insensitive
+bool wildcardMatch(std::string_view pattern, std::string_view name)
+{
+    std::size_t p = 0, n = 0, star = std::string_view::npos, mark = 0;
+    const auto same = [](char a, char b) {
+        return std::tolower(static_cast<unsigned char>(a)) == std::tolower(static_cast<unsigned char>(b));
+    };
+    while (n < name.size()) {
+        if (p < pattern.size() && (pattern[p] == '?' || same(pattern[p], name[n]))) {
+            ++p;
+            ++n;
+        } else if (p < pattern.size() && pattern[p] == '*') {
+            star = p++;
+            mark = n;
+        } else if (star != std::string_view::npos) {
+            p = star + 1;
+            n = ++mark;
+        } else {
+            return false;
+        }
+    }
+    while (p < pattern.size() && pattern[p] == '*')
+        ++p;
+    return p == pattern.size();
+}
+
+// The names of the visible files in a directory that match any of the patterns (all if none), sorted by name
+StringList listFiles(const std::string& dir, const StringList& patterns = {})
+{
+    StringList names;
+    std::error_code ec;
+    for (std::filesystem::directory_iterator it(path_from_utf8(dir), ec), end; !ec && it != end; it.increment(ec)) {
+        if (!it->is_regular_file(ec))
+            continue;
+        const std::string name = utf8_from_path(it->path().filename());
+        if (name.starts_with('.'))
+            continue;
+        if (!patterns.empty() && std::ranges::none_of(patterns, [&](const std::string& pattern) { return wildcardMatch(pattern, name); }))
+            continue;
+        names.push_back(name);
+    }
+    std::ranges::sort(names);
+    return names;
+}
+
+// The local time in the format of QDateTime::toString(), e.g. "Tue Nov 24 08:32:48 2026"
+std::string currentDateTimeText()
+{
+    static constexpr std::array<const char*, 7> days = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+    static constexpr std::array<const char*, 12> months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+    const std::time_t now = std::time(nullptr);
+    std::tm local{};
+#ifdef _WIN32
+    localtime_s(&local, &now);
+#else
+    localtime_r(&now, &local);
+#endif
+    return std::format("{} {} {} {:02}:{:02}:{:02} {}",
+                       days[static_cast<std::size_t>(local.tm_wday)],
+                       months[static_cast<std::size_t>(local.tm_mon)],
+                       local.tm_mday,
+                       local.tm_hour,
+                       local.tm_min,
+                       local.tm_sec,
+                       local.tm_year + 1900);
+}
+
+// Runs a program with its output forwarded to this process's standard output and error
+ProcessResult runForwarded(const std::string& program, const StringList& args, ProcessOptions options)
+{
+    options.on_output = [](ProcessChannel channel, std::string_view data) {
+        std::FILE* stream = channel == ProcessChannel::StdOut ? stdout : stderr;
+        std::print(stream, "{}", data);
+        std::fflush(stream);
+    };
+    return run_process(path_from_utf8(program), args, options);
+}
+
+} // namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -72,16 +207,16 @@ int FlashBem::run()
     //
     // Validate environment — ported from mne_flash_bem shell script
     //
-    if (m_settings.freeSurferHome().isEmpty()) {
+    if (m_settings.freeSurferHome().empty()) {
         Log::critical("The FreeSurfer environment needs to be set up for this script.");
         Log::critical("Please set FREESURFER_HOME.");
         return 1;
     }
-    if (m_settings.subjectsDir().isEmpty()) {
+    if (m_settings.subjectsDir().empty()) {
         Log::critical("SUBJECTS_DIR has not been set.");
         return 1;
     }
-    if (m_settings.subject().isEmpty()) {
+    if (m_settings.subject().empty()) {
         Log::critical("SUBJECT has not been set.");
         return 1;
     }
@@ -89,26 +224,26 @@ int FlashBem::run()
     //
     // Derive paths
     //
-    QString subjectDir = m_settings.subjectsDir() + "/" + m_settings.subject();
-    QString mriDir = subjectDir + "/mri";
-    QString mriFlashDir = mriDir + "/flash";
-    QString paramDir = mriFlashDir + "/parameter_maps";
-    QString bemDir = subjectDir + "/bem";
-    QString flashBemDir = bemDir + "/flash";
-    QString flashDir = m_settings.flashDir();
+    std::string subjectDir = m_settings.subjectsDir() + "/" + m_settings.subject();
+    std::string mriDir = subjectDir + "/mri";
+    std::string mriFlashDir = mriDir + "/flash";
+    std::string paramDir = mriFlashDir + "/parameter_maps";
+    std::string bemDir = subjectDir + "/bem";
+    std::string flashBemDir = bemDir + "/flash";
+    std::string flashDir = m_settings.flashDir();
 
-    QDateTime startTime = QDateTime::currentDateTime();
+    const std::string startTime = currentDateTimeText();
 
     Log::info("{}", "");
-    Log::info("Processing the flash MRI data for subject {} to produce", m_settings.subject().toStdString());
-    Log::info("BEM meshes under {}", flashBemDir.toStdString());
+    Log::info("Processing the flash MRI data for subject {} to produce", m_settings.subject());
+    Log::info("BEM meshes under {}", flashBemDir);
     Log::info("{}", "");
 
     //
     // Step 1: Convert DICOM images to MGZ format
     //
-    if (!QDir().mkpath(paramDir)) {
-        Log::critical("Could not create directory {}", paramDir.toStdString());
+    if (!makePath(paramDir)) {
+        Log::critical("Could not create directory {}", paramDir);
         return 1;
     }
 
@@ -122,15 +257,15 @@ int FlashBem::run()
     //
     // Change to flash directory
     //
-    if (!QDir(mriFlashDir).exists()) {
-        Log::critical("Could not find directory {}", mriFlashDir.toStdString());
+    if (!dirExists(mriFlashDir)) {
+        Log::critical("Could not find directory {}", mriFlashDir);
         return 1;
     }
 
     //
     // Optional gradient unwarping
     //
-    if (!m_settings.unwarp().isEmpty()) {
+    if (!m_settings.unwarp().empty()) {
         if (!unwarpImages(mriFlashDir)) {
             return 1;
         }
@@ -140,9 +275,8 @@ int FlashBem::run()
     // Clear parameter maps if some data were reconverted
     //
     if (echosConverted > 0) {
-        QDir paramDirObj(paramDir);
-        paramDirObj.removeRecursively();
-        QDir().mkpath(paramDir);
+        removeRecursively(paramDir);
+        makePath(paramDir);
         Log::info("Parameter maps directory cleared");
     }
 
@@ -198,50 +332,46 @@ int FlashBem::run()
     cleanup(bemDir, mriDir, convertedT1, convertedBrain);
 
     Log::info("\nThank you for waiting.");
-    Log::info("The BEM triangulations for this subject are now available at {}", flashBemDir.toStdString());
+    Log::info("The BEM triangulations for this subject are now available at {}", flashBemDir);
     Log::info("We hope the BEM meshes created will facilitate your MEG and EEG data analyses.");
-    Log::info("\nProcessing started at {}", startTime.toString().toStdString());
-    Log::info("Processing finished at {}\n", QDateTime::currentDateTime().toString().toStdString());
+    Log::info("\nProcessing started at {}", startTime);
+    Log::info("Processing finished at {}\n", currentDateTimeText());
 
     return 0;
 }
 
 //=============================================================================================================
 
-bool FlashBem::runCommand(const QString& program, const QStringList& args,
-                          const QString& workDir)
+bool FlashBem::runCommand(const std::string& program, const StringList& args,
+                          const std::string& workDir)
 {
     // Print the command being run
-    Log::info("Running: {} {}", program.toStdString(), args.join(' ').toStdString());
-
-    QProcess process;
-    process.setProcessChannelMode(QProcess::ForwardedChannels);
+    Log::info("Running: {} {}", program, join(args, " "));
 
     // Set up FreeSurfer environment
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    env.insert("FREESURFER_HOME", m_settings.freeSurferHome());
-    env.insert("SUBJECTS_DIR", m_settings.subjectsDir());
-    env.insert("SUBJECT", m_settings.subject());
-    process.setProcessEnvironment(env);
+    ProcessOptions options;
+    options.environment = {{"FREESURFER_HOME", m_settings.freeSurferHome()},
+                           {"SUBJECTS_DIR", m_settings.subjectsDir()},
+                           {"SUBJECT", m_settings.subject()}};
 
-    if (!workDir.isEmpty()) {
-        process.setWorkingDirectory(workDir);
+    if (!workDir.empty()) {
+        options.working_dir = path_from_utf8(workDir);
     }
 
-    process.start(program, args);
+    const ProcessResult result = runForwarded(program, args, options);
 
-    if (!process.waitForStarted()) {
-        Log::critical("Failed to start {} : {}", program.toStdString(), process.errorString().toStdString());
+    if (!result.started) {
+        Log::critical("Failed to start {} : {}", program, result.error);
         return false;
     }
 
-    if (!process.waitForFinished(-1)) {
-        Log::critical("{} did not finish: {}", program.toStdString(), process.errorString().toStdString());
+    if (result.crashed || result.timed_out) {
+        Log::critical("{} did not finish: {}", program, result.crashed ? "Process crashed" : "Process timed out");
         return false;
     }
 
-    if (process.exitCode() != 0) {
-        Log::critical("{} failed with exit code {}", program.toStdString(), process.exitCode());
+    if (result.exit_code != 0) {
+        Log::critical("{} failed with exit code {}", program, result.exit_code);
         return false;
     }
 
@@ -250,7 +380,7 @@ bool FlashBem::runCommand(const QString& program, const QStringList& args,
 
 //=============================================================================================================
 
-bool FlashBem::convertImages(const QString& flashDir, const QString& mriFlashDir,
+bool FlashBem::convertImages(const std::string& flashDir, const std::string& mriFlashDir,
                              int& echosConverted)
 {
     m_step++;
@@ -260,24 +390,22 @@ bool FlashBem::convertImages(const QString& flashDir, const QString& mriFlashDir
     //
     // Determine which flash angles to process
     //
-    QStringList flashes;
-    flashes << "05";
+    StringList flashes = {"05"};
     if (!m_settings.noFlash30()) {
-        flashes << "30";
+        flashes.push_back("30");
     }
 
     //
     // Determine echo numbering: try 001-008 first, then 002-009
     //   (matching the original shell script behavior)
     //
-    QStringList echos;
-    echos << "001" << "002" << "003" << "004" << "005" << "006" << "007" << "008";
+    StringList echos = {"001", "002", "003", "004", "005", "006", "007", "008"};
 
     bool missing = false;
-    for (const QString& flash : flashes) {
-        for (const QString& echo : echos) {
-            QString dir = flashDir + "/flash" + flash + "/" + echo;
-            if (!QDir(dir).exists()) {
+    for (const std::string& flash : flashes) {
+        for (const std::string& echo : echos) {
+            std::string dir = std::format("{}/flash{}/{}", flashDir, flash, echo);
+            if (!dirExists(dir)) {
                 missing = true;
                 break;
             }
@@ -287,18 +415,17 @@ bool FlashBem::convertImages(const QString& flashDir, const QString& mriFlashDir
     }
 
     if (missing) {
-        echos.clear();
-        echos << "002" << "003" << "004" << "005" << "006" << "007" << "008" << "009";
+        echos = {"002", "003", "004", "005", "006", "007", "008", "009"};
     }
 
     //
     // Verify all directories exist
     //
-    for (const QString& flash : flashes) {
-        for (const QString& echo : echos) {
-            QString dir = flashDir + "/flash" + flash + "/" + echo;
-            if (!QDir(dir).exists()) {
-                Log::critical("Directory {} is missing", dir.toStdString());
+    for (const std::string& flash : flashes) {
+        for (const std::string& echo : echos) {
+            std::string dir = std::format("{}/flash{}/{}", flashDir, flash, echo);
+            if (!dirExists(dir)) {
+                Log::critical("Directory {} is missing", dir);
                 return false;
             }
         }
@@ -307,30 +434,28 @@ bool FlashBem::convertImages(const QString& flashDir, const QString& mriFlashDir
     //
     // Convert each echo
     //
-    QString mriConvert = m_settings.freeSurferHome() + "/bin/mri_convert";
+    std::string mriConvert = m_settings.freeSurferHome() + "/bin/mri_convert";
 
     echosConverted = 0;
-    for (const QString& flash : flashes) {
-        for (const QString& echo : echos) {
-            QString dir = flashDir + "/flash" + flash + "/" + echo;
-            QString destFile = mriFlashDir + "/mef" + flash + "_" + echo + ".mgz";
+    for (const std::string& flash : flashes) {
+        for (const std::string& echo : echos) {
+            std::string dir = std::format("{}/flash{}/{}", flashDir, flash, echo);
+            std::string destFile = std::format("{}/mef{}_{}.mgz", mriFlashDir, flash, echo);
 
             // Skip if already converted
-            if (QFileInfo::exists(destFile)) {
-                Log::info("{} is already there", destFile.toStdString());
+            if (fileExists(destFile)) {
+                Log::info("{} is already there", destFile);
                 continue;
             }
 
             // Pick the first file in the directory
-            QDir echoDir(dir);
-            QStringList entries = echoDir.entryList(QDir::Files | QDir::NoDotAndDotDot,
-                                                    QDir::Name);
-            if (entries.isEmpty()) {
-                Log::critical("No files found in {}", dir.toStdString());
+            const StringList entries = listFiles(dir);
+            if (entries.empty()) {
+                Log::critical("No files found in {}", dir);
                 return false;
             }
 
-            QString sampleFile = dir + "/" + entries.first();
+            std::string sampleFile = dir + "/" + entries.front();
             if (!runCommand(mriConvert, {sampleFile, destFile})) {
                 return false;
             }
@@ -343,27 +468,24 @@ bool FlashBem::convertImages(const QString& flashDir, const QString& mriFlashDir
 
 //=============================================================================================================
 
-bool FlashBem::unwarpImages(const QString& mriFlashDir)
+bool FlashBem::unwarpImages(const std::string& mriFlashDir)
 {
     Log::info("\nApplying gradient unwarping...\n");
 
-    QDir dir(mriFlashDir);
-    QStringList filters;
-    filters << "mef*.mgz";
-    QStringList files = dir.entryList(filters, QDir::Files, QDir::Name);
+    const StringList files = listFiles(mriFlashDir, {"mef*.mgz"});
 
-    for (const QString& file : files) {
+    for (const std::string& file : files) {
         // Skip files already unwarped (ending in u.mgz)
-        if (file.endsWith("u.mgz"))
+        if (file.ends_with("u.mgz"))
             continue;
 
-        QString inFile = mriFlashDir + "/" + file;
-        QString baseName = file.left(file.size() - 4); // Remove .mgz
-        QString outFile = mriFlashDir + "/" + baseName + "u.mgz";
+        std::string inFile = std::format("{}/{}", mriFlashDir, file);
+        const std::string baseName = file.substr(0, file.size() - 4); // Remove .mgz
+        std::string outFile = std::format("{}/{}u.mgz", mriFlashDir, baseName);
 
         if (!runCommand("grad_unwarp",
                         {"-i", inFile, "-o", outFile, "-unwarp", m_settings.unwarp()})) {
-            Log::critical("Could not unwarp with option {}", m_settings.unwarp().toStdString());
+            Log::critical("Could not unwarp with option {}", m_settings.unwarp());
             return false;
         }
     }
@@ -373,7 +495,7 @@ bool FlashBem::unwarpImages(const QString& mriFlashDir)
 
 //=============================================================================================================
 
-bool FlashBem::createParameterMaps(const QString& mriFlashDir, const QString& paramDir)
+bool FlashBem::createParameterMaps(const std::string& mriFlashDir, const std::string& paramDir)
 {
     m_step++;
     Log::info("{}", "");
@@ -382,8 +504,7 @@ bool FlashBem::createParameterMaps(const QString& mriFlashDir, const QString& pa
     //
     // Check if parameter maps already exist
     //
-    QDir paramDirObj(paramDir);
-    if (paramDirObj.entryList(QDir::Files | QDir::NoDotAndDotDot).size() > 0) {
+    if (!listFiles(paramDir).empty()) {
         Log::info("Parameter maps were already computed");
         return true;
     }
@@ -391,34 +512,33 @@ bool FlashBem::createParameterMaps(const QString& mriFlashDir, const QString& pa
     //
     // Collect all echo files
     //
-    QDir flashDirObj(mriFlashDir);
-    QStringList pattern;
-    if (!m_settings.unwarp().isEmpty()) {
-        pattern << "mef05*u.mgz" << "mef30*u.mgz";
+    StringList pattern;
+    if (!m_settings.unwarp().empty()) {
+        pattern = {"mef05*u.mgz", "mef30*u.mgz"};
     } else {
-        pattern << "mef05*.mgz" << "mef30*.mgz";
+        pattern = {"mef05*.mgz", "mef30*.mgz"};
     }
-    QStringList files = flashDirObj.entryList(pattern, QDir::Files, QDir::Name);
+    const StringList files = listFiles(mriFlashDir, pattern);
 
-    QStringList fullPaths;
-    for (const QString& f : files) {
-        fullPaths << (mriFlashDir + "/" + f);
+    StringList fullPaths;
+    for (const std::string& f : files) {
+        fullPaths.push_back(std::format("{}/{}", mriFlashDir, f));
     }
 
     // mri_ms_fitparms <files> <output_dir>
-    QStringList args = fullPaths;
-    args << paramDir;
+    StringList args = fullPaths;
+    args.push_back(paramDir);
 
     return runCommand(m_settings.freeSurferHome() + "/bin/mri_ms_fitparms", args);
 }
 
 //=============================================================================================================
 
-bool FlashBem::createFlash5Volume(const QString& mriFlashDir, const QString& paramDir)
+bool FlashBem::createFlash5Volume(const std::string& mriFlashDir, const std::string& paramDir)
 {
     m_step++;
 
-    QString flash5File = paramDir + "/flash5.mgz";
+    std::string flash5File = paramDir + "/flash5.mgz";
 
     if (!m_settings.noFlash30()) {
         //
@@ -427,13 +547,13 @@ bool FlashBem::createFlash5Volume(const QString& mriFlashDir, const QString& par
         Log::info("{}", "");
         Log::info("Step {} : Synthesizing flash 5...\n", m_step);
 
-        if (QFileInfo::exists(flash5File)) {
+        if (fileExists(flash5File)) {
             Log::info("Synthesized flash 5 volume is already there");
             return true;
         }
 
         // Remove old registered version
-        QFile::remove(paramDir + "/flash5_reg.mgz");
+        removeFile(paramDir + "/flash5_reg.mgz");
 
         // mri_synthesize 20 5 5 T1.mgz PD.mgz flash5.mgz
         return runCommand(m_settings.freeSurferHome() + "/bin/mri_synthesize",
@@ -448,24 +568,16 @@ bool FlashBem::createFlash5Volume(const QString& mriFlashDir, const QString& par
         Log::info("{}", "");
         Log::info("Step {} : Averaging flash5 echoes...\n", m_step);
 
-        QDir flashDirObj(mriFlashDir);
-        QStringList pattern;
-        if (!m_settings.unwarp().isEmpty()) {
-            pattern << "mef05*u.mgz";
-        } else {
-            pattern << "mef05*.mgz";
-        }
-        QStringList files = flashDirObj.entryList(pattern, QDir::Files, QDir::Name);
+        const StringList files = listFiles(mriFlashDir, {m_settings.unwarp().empty() ? "mef05*.mgz" : "mef05*u.mgz"});
 
-        QStringList args;
-        args << "-noconform";
-        for (const QString& f : files) {
-            args << (mriFlashDir + "/" + f);
+        StringList args = {"-noconform"};
+        for (const std::string& f : files) {
+            args.push_back(std::format("{}/{}", mriFlashDir, f));
         }
-        args << flash5File;
+        args.push_back(flash5File);
 
         // Remove old registered version
-        QFile::remove(paramDir + "/flash5_reg.mgz");
+        removeFile(paramDir + "/flash5_reg.mgz");
 
         return runCommand(m_settings.freeSurferHome() + "/bin/mri_average", args);
     }
@@ -473,26 +585,26 @@ bool FlashBem::createFlash5Volume(const QString& mriFlashDir, const QString& par
 
 //=============================================================================================================
 
-bool FlashBem::registerWithMprage(const QString& paramDir, const QString& mriDir)
+bool FlashBem::registerWithMprage(const std::string& paramDir, const std::string& mriDir)
 {
     m_step++;
     Log::info("{}", "");
     Log::info("Step {} : Registering flash 5 with MPRAGE...\n", m_step);
 
-    QString flash5Reg = paramDir + "/flash5_reg.mgz";
-    if (QFileInfo::exists(flash5Reg)) {
+    std::string flash5Reg = paramDir + "/flash5_reg.mgz";
+    if (fileExists(flash5Reg)) {
         Log::info("Registered flash 5 image is already there");
         return true;
     }
 
     // Determine reference volume
-    QString refVolume;
-    if (QFileInfo::exists(mriDir + "/T1.mgz")) {
+    std::string refVolume;
+    if (fileExists(mriDir + "/T1.mgz")) {
         refVolume = mriDir + "/T1.mgz";
-    } else if (QDir(mriDir + "/T1").exists()) {
+    } else if (dirExists(mriDir + "/T1")) {
         refVolume = mriDir + "/T1";
     } else {
-        Log::critical("Could not find T1 reference volume in {}", mriDir.toStdString());
+        Log::critical("Could not find T1 reference volume in {}", mriDir);
         return false;
     }
 
@@ -504,11 +616,11 @@ bool FlashBem::registerWithMprage(const QString& paramDir, const QString& mriDir
 
 //=============================================================================================================
 
-bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
+bool FlashBem::convertToCor(const std::string& paramDir, const std::string& mriDir,
                             bool& convertedT1, bool& convertedBrain)
 {
     m_step++;
-    QString mriConvert = m_settings.freeSurferHome() + "/bin/mri_convert";
+    std::string mriConvert = m_settings.freeSurferHome() + "/bin/mri_convert";
 
     //
     // Step 5a: Convert flash5_reg.mgz to COR format
@@ -516,13 +628,12 @@ bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
     Log::info("{}", "");
     Log::info("Step {}a: Converting flash5 volume into COR format...\n", m_step);
 
-    QString flash5Dir = mriDir + "/flash5";
-    QDir().mkpath(flash5Dir);
+    std::string flash5Dir = mriDir + "/flash5";
+    makePath(flash5Dir);
 
     // Remove old COR files
-    QDir flash5DirObj(flash5Dir);
-    for (const QString& f : flash5DirObj.entryList(QDir::Files)) {
-        flash5DirObj.remove(f);
+    for (const std::string& f : listFiles(flash5Dir)) {
+        removeFile(std::format("{}/{}", flash5Dir, f));
     }
 
     if (!runCommand(mriConvert, {paramDir + "/flash5_reg.mgz", flash5Dir})) {
@@ -534,14 +645,12 @@ bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
     // Step 5b: Convert T1 to COR if needed
     //
     convertedT1 = false;
-    QString t1Dir = mriDir + "/T1";
+    std::string t1Dir = mriDir + "/T1";
     bool needT1 = false;
 
-    if (QDir(t1Dir).exists()) {
+    if (dirExists(t1Dir)) {
         // Check if COR files exist
-        QDir t1DirObj(t1Dir);
-        QStringList corFiles = t1DirObj.entryList({"COR*"}, QDir::Files);
-        if (corFiles.isEmpty()) {
+        if (listFiles(t1Dir, {"COR*"}).empty()) {
             needT1 = true;
         }
     } else {
@@ -552,13 +661,13 @@ bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
         Log::info("{}", "");
         Log::info("Step {}b : Converting T1 volume into COR format...\n", m_step);
 
-        QString t1Mgz = mriDir + "/T1.mgz";
-        if (!QFileInfo::exists(t1Mgz)) {
+        std::string t1Mgz = mriDir + "/T1.mgz";
+        if (!fileExists(t1Mgz)) {
             Log::critical("Both T1 mgz and T1 COR volumes missing");
             return false;
         }
 
-        QDir().mkpath(t1Dir);
+        makePath(t1Dir);
         if (!runCommand(mriConvert, {t1Mgz, t1Dir})) {
             Log::critical("T1 volume conversion to COR failed");
             return false;
@@ -573,13 +682,11 @@ bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
     // Step 5c: Convert brain to COR if needed
     //
     convertedBrain = false;
-    QString brainDir = mriDir + "/brain";
+    std::string brainDir = mriDir + "/brain";
     bool needBrain = false;
 
-    if (QDir(brainDir).exists()) {
-        QDir brainDirObj(brainDir);
-        QStringList corFiles = brainDirObj.entryList({"COR*"}, QDir::Files);
-        if (corFiles.isEmpty()) {
+    if (dirExists(brainDir)) {
+        if (listFiles(brainDir, {"COR*"}).empty()) {
             needBrain = true;
         }
     } else {
@@ -590,13 +697,13 @@ bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
         Log::info("{}", "");
         Log::info("Step {}c : Converting brain volume into COR format...\n", m_step);
 
-        QString brainMgz = mriDir + "/brain.mgz";
-        if (!QFileInfo::exists(brainMgz)) {
+        std::string brainMgz = mriDir + "/brain.mgz";
+        if (!fileExists(brainMgz)) {
             Log::critical("Both brain mgz and brain COR volumes missing");
             return false;
         }
 
-        QDir().mkpath(brainDir);
+        makePath(brainDir);
         if (!runCommand(mriConvert, {brainMgz, brainDir})) {
             Log::critical("brain volume conversion to COR failed");
             return false;
@@ -624,7 +731,7 @@ bool FlashBem::createBemSurfaces()
 
 //=============================================================================================================
 
-bool FlashBem::convertTriToSurf(const QString& bemDir, const QString& paramDir)
+bool FlashBem::convertTriToSurf(const std::string& bemDir, const std::string& paramDir)
 {
     m_step++;
     Log::info("{}", "");
@@ -633,8 +740,8 @@ bool FlashBem::convertTriToSurf(const QString& bemDir, const QString& paramDir)
     //
     // Create flash output directory
     //
-    QString flashBemDir = bemDir + "/flash";
-    QDir().mkpath(flashBemDir);
+    std::string flashBemDir = bemDir + "/flash";
+    makePath(flashBemDir);
 
     //
     // Read the flash5_reg.mgz volume to get the vox-to-RAS transform
@@ -642,7 +749,7 @@ bool FlashBem::convertTriToSurf(const QString& bemDir, const QString& paramDir)
     //   from the .tri file (which uses voxel-based coordinates from
     //   mri_make_bem_surfaces) to surface RAS coordinates.
     //
-    QString flash5RegFile = paramDir + "/flash5_reg.mgz";
+    std::string flash5RegFile = paramDir + "/flash5_reg.mgz";
 
     //
     // Convert each surface using mne_convert_surface equivalent:
@@ -651,25 +758,26 @@ bool FlashBem::convertTriToSurf(const QString& bemDir, const QString& paramDir)
     // In the original script, the .tri files are produced by mri_make_bem_surfaces
     // and placed in the bem/ directory. We move them to bem/flash/ and convert.
     //
-    QStringList surfNames;
-    surfNames << "inner_skull" << "outer_skull" << "outer_skin";
+    const StringList surfNames = {"inner_skull", "outer_skull", "outer_skin"};
 
-    for (const QString& surfName : surfNames) {
-        Log::info("\n{} ...\n", surfName.toStdString());
+    for (const std::string& surfName : surfNames) {
+        Log::info("\n{} ...\n", surfName);
 
         // Move .tri file from bem/ to bem/flash/
-        QString triSrc = bemDir + "/" + surfName + ".tri";
-        QString triDst = flashBemDir + "/" + surfName + ".tri";
+        std::string triSrc = std::format("{}/{}.tri", bemDir, surfName);
+        std::string triDst = std::format("{}/{}.tri", flashBemDir, surfName);
 
-        if (QFileInfo::exists(triSrc)) {
+        if (fileExists(triSrc)) {
             // Remove existing destination if present
-            QFile::remove(triDst);
-            if (!QFile::rename(triSrc, triDst)) {
-                Log::critical("Could not move {} to {}", triSrc.toStdString(), triDst.toStdString());
+            removeFile(triDst);
+            std::error_code ec;
+            std::filesystem::rename(path_from_utf8(triSrc), path_from_utf8(triDst), ec);
+            if (ec) {
+                Log::critical("Could not move {} to {}", triSrc, triDst);
                 return false;
             }
-        } else if (!QFileInfo::exists(triDst)) {
-            Log::critical("Could not find {} .tri file", surfName.toStdString());
+        } else if (!fileExists(triDst)) {
+            Log::critical("Could not find {} .tri file", surfName);
             return false;
         }
 
@@ -686,29 +794,27 @@ bool FlashBem::convertTriToSurf(const QString& bemDir, const QString& paramDir)
         //       volume, swaps triangle winding, and writes a FreeSurfer binary
         //       surface file.
         //
-        QString mneConvertSurface;
+        std::string mneConvertSurface;
 
         // Try to find mne_convert_surface in PATH or known locations
-        QStringList searchPaths;
-        QString mneBinDir = qEnvironmentVariable("MNE_BIN_DIR");
-        if (!mneBinDir.isEmpty()) {
-            searchPaths << mneBinDir;
+        StringList searchPaths;
+        if (const char* mneBinDir = std::getenv("MNE_BIN_DIR"); mneBinDir && *mneBinDir) {
+            searchPaths.emplace_back(mneBinDir);
         }
-        QString mneRoot = qEnvironmentVariable("MNE_ROOT");
-        if (!mneRoot.isEmpty()) {
-            searchPaths << (mneRoot + "/bin");
+        if (const char* mneRoot = std::getenv("MNE_ROOT"); mneRoot && *mneRoot) {
+            searchPaths.push_back(std::string(mneRoot) + "/bin");
         }
-        searchPaths << (m_settings.freeSurferHome() + "/bin");
+        searchPaths.push_back(m_settings.freeSurferHome() + "/bin");
 
-        for (const QString& path : searchPaths) {
-            QString candidate = path + "/mne_convert_surface";
-            if (QFileInfo::exists(candidate)) {
+        for (const std::string& path : searchPaths) {
+            std::string candidate = path + "/mne_convert_surface";
+            if (fileExists(candidate)) {
                 mneConvertSurface = candidate;
                 break;
             }
         }
 
-        if (mneConvertSurface.isEmpty()) {
+        if (mneConvertSurface.empty()) {
             //
             // mne_convert_surface not found — perform the conversion
             // directly using mne-cpp libraries.
@@ -727,58 +833,58 @@ bool FlashBem::convertTriToSurf(const QString& bemDir, const QString& paramDir)
             Log::info("mne_convert_surface not found, using built-in conversion.");
 
             // Read .tri file
-            QFile triFile(triDst);
-            if (!triFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                Log::critical("Could not open {}", triDst.toStdString());
+            std::ifstream in(path_from_utf8(triDst));
+            if (!in) {
+                Log::critical("Could not open {}", triDst);
                 return false;
             }
 
-            QTextStream in(&triFile);
             int nvert = 0;
             in >> nvert;
             if (nvert <= 0) {
-                Log::critical("Invalid vertex count in {}", triDst.toStdString());
+                Log::critical("Invalid vertex count in {}", triDst);
                 return false;
             }
 
             MatrixX3f rr(nvert, 3);
             for (int k = 0; k < nvert; ++k) {
-                float x, y, z;
+                // Read as double and round to float, as QTextStream did
+                double x = 0.0, y = 0.0, z = 0.0;
                 in >> x >> y >> z;
-                rr(k, 0) = x;
-                rr(k, 1) = y;
-                rr(k, 2) = z;
+                rr(k, 0) = static_cast<float>(x);
+                rr(k, 1) = static_cast<float>(y);
+                rr(k, 2) = static_cast<float>(z);
             }
 
             int ntri = 0;
             in >> ntri;
             if (ntri <= 0) {
-                Log::critical("Invalid triangle count in {}", triDst.toStdString());
+                Log::critical("Invalid triangle count in {}", triDst);
                 return false;
             }
 
             MatrixX3i tris(ntri, 3);
             for (int k = 0; k < ntri; ++k) {
-                int v1, v2, v3;
+                int v1 = 0, v2 = 0, v3 = 0;
                 in >> v1 >> v2 >> v3;
                 // Swap winding order (--swap) and convert from 1-based to 0-based
                 tris(k, 0) = v1 - 1;
                 tris(k, 1) = v3 - 1; // Swapped
                 tris(k, 2) = v2 - 1; // Swapped
             }
-            triFile.close();
+            in.close();
 
-            Log::info("Read {} vertices, {} triangles from {}", nvert, ntri, triDst.toStdString());
+            Log::info("Read {} vertices, {} triangles from {}", nvert, ntri, triDst);
 
             //
             // Read the MGH volume to get vox-to-RAS transform
             //
             MriVolData volData;
             std::vector<FiffCoordTrans> additionalTrans;
-            QString subjectMriDir = m_settings.subjectsDir() + "/" + m_settings.subject() + "/mri";
+            std::string subjectMriDir = m_settings.subjectsDir() + "/" + m_settings.subject() + "/mri";
 
-            if (!MriMghIO::read(flash5RegFile.toStdString(), volData, additionalTrans, subjectMriDir.toStdString(), false)) {
-                Log::critical("Could not read MGH file {}", flash5RegFile.toStdString());
+            if (!MriMghIO::read(flash5RegFile, volData, additionalTrans, subjectMriDir, false)) {
+                Log::critical("Could not read MGH file {}", flash5RegFile);
                 return false;
             }
 
@@ -790,48 +896,47 @@ bool FlashBem::convertTriToSurf(const QString& bemDir, const QString& paramDir)
             //
             // Write as FreeSurfer binary surface (big-endian triangle format)
             //
-            QString surfOut = flashBemDir + "/" + surfName + ".surf";
+            std::string surfOut = std::format("{}/{}.surf", flashBemDir, surfName);
 
-            QFile surfFile(surfOut);
-            if (!surfFile.open(QIODevice::WriteOnly)) {
-                Log::critical("Could not open {} for writing", surfOut.toStdString());
+            auto surfFile = FileByteStream::open(path_from_utf8(surfOut), FileByteStream::Mode::Write);
+            if (!surfFile) {
+                Log::critical("Could not open {} for writing", surfOut);
                 return false;
             }
 
-            QDataStream ds(&surfFile);
-            ds.setByteOrder(QDataStream::BigEndian);
-
             // Magic number for triangle surface: 0xFFFFFE
-            ds << quint8(0xFF) << quint8(0xFF) << quint8(0xFE);
+            const std::array<std::uint8_t, 3> magic = {0xFF, 0xFF, 0xFE};
+            surfFile->write(magic.data(), magic.size());
 
             // Two lines of text (created_by + newline)
-            QByteArray comment = "created by mne_flash_bem\n\n";
-            surfFile.write(comment);
+            const std::string_view comment = "created by mne_flash_bem\n\n";
+            surfFile->write(comment.data(), comment.size());
 
             // Number of vertices and faces
-            ds << qint32(nvert) << qint32(ntri);
+            surfFile->write_big_endian(static_cast<std::int32_t>(nvert));
+            surfFile->write_big_endian(static_cast<std::int32_t>(ntri));
 
             // Vertex coordinates (as float32)
             for (int k = 0; k < nvert; ++k) {
-                float x = rr(k, 0);
-                float y = rr(k, 1);
-                float z = rr(k, 2);
-                ds.setFloatingPointPrecision(QDataStream::SinglePrecision);
-                ds << x << y << z;
+                surfFile->write_big_endian(rr(k, 0));
+                surfFile->write_big_endian(rr(k, 1));
+                surfFile->write_big_endian(rr(k, 2));
             }
 
             // Triangle vertex indices (as int32, 0-based)
             for (int k = 0; k < ntri; ++k) {
-                ds << qint32(tris(k, 0)) << qint32(tris(k, 1)) << qint32(tris(k, 2));
+                surfFile->write_big_endian(static_cast<std::int32_t>(tris(k, 0)));
+                surfFile->write_big_endian(static_cast<std::int32_t>(tris(k, 1)));
+                surfFile->write_big_endian(static_cast<std::int32_t>(tris(k, 2)));
             }
 
-            surfFile.close();
-            Log::info("Written {}", surfOut.toStdString());
+            surfFile->close();
+            Log::info("Written {}", surfOut);
         } else {
             //
             // mne_convert_surface is available — use it directly
             //
-            QString surfOut = flashBemDir + "/" + surfName + ".surf";
+            std::string surfOut = std::format("{}/{}.surf", flashBemDir, surfName);
             if (!runCommand(mneConvertSurface,
                             {"--tri", triDst,
                              "--surfout", surfOut,
@@ -847,26 +952,26 @@ bool FlashBem::convertTriToSurf(const QString& bemDir, const QString& paramDir)
 
 //=============================================================================================================
 
-void FlashBem::cleanup(const QString& bemDir, const QString& mriDir,
+void FlashBem::cleanup(const std::string& bemDir, const std::string& mriDir,
                        bool convertedT1, bool convertedBrain)
 {
     Log::info("{}", "");
     Log::info("Final step : Cleaning up...\n");
 
     // Remove inner_skull_tmp.tri
-    QFile::remove(bemDir + "/inner_skull_tmp.tri");
+    removeFile(bemDir + "/inner_skull_tmp.tri");
 
     // Remove COR volumes created during this run
     if (convertedT1) {
-        QDir(mriDir + "/T1").removeRecursively();
+        removeRecursively(mriDir + "/T1");
         Log::info("Deleted the T1 COR volume");
     }
     if (convertedBrain) {
-        QDir(mriDir + "/brain").removeRecursively();
+        removeRecursively(mriDir + "/brain");
         Log::info("Deleted the brain COR volume");
     }
 
     // Always remove flash5 COR volume (created fresh each run)
-    QDir(mriDir + "/flash5").removeRecursively();
+    removeRecursively(mriDir + "/flash5");
     Log::info("Deleted the flash5 COR volume");
 }

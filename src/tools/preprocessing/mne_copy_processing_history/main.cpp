@@ -15,15 +15,15 @@
 //=============================================================================================================
 
 #include <mne/fiff/fiff_stream.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -41,40 +41,30 @@ using namespace mne;
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_copy_processing_history");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Copy processing history block from one FIFF file to another.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"from"}, "Source FIFF file containing processing history.", "file", {}});
+    parser.add_option({{"to"}, "Destination FIFF file (will be modified).", "file", {}});
+    parser.process(argc, argv, "mne_copy_processing_history", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Copy processing history block from one FIFF file to another.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string fromFile = parser.value("from");
+    const std::string toFile = parser.value("to");
 
-    QCommandLineOption fromOpt("from", "Source FIFF file containing processing history.", "file");
-    parser.addOption(fromOpt);
-
-    QCommandLineOption toOpt("to", "Destination FIFF file (will be modified).", "file");
-    parser.addOption(toOpt);
-
-    parser.process(app);
-
-    QString fromFile = parser.value(fromOpt);
-    QString toFile = parser.value(toOpt);
-
-    if (fromFile.isEmpty()) {
+    if (fromFile.empty()) {
         Log::critical("--from is required.");
         return 1;
     }
-    if (toFile.isEmpty()) {
+    if (toFile.empty()) {
         Log::critical("--to is required.");
         return 1;
     }
 
-    if (!FiffStream::copy_processing_history(fromFile.toStdU16String(), toFile.toStdU16String())) {
-        Log::critical("Failed to copy processing history from {} to {}", fromFile.toStdString(), toFile.toStdString());
+    if (!FiffStream::copy_processing_history(path_from_utf8(fromFile), path_from_utf8(toFile))) {
+        Log::critical("Failed to copy processing history from {} to {}", fromFile, toFile);
         return 1;
     }
 
-    Log::info("Successfully copied processing history from {} to {}", fromFile.toStdString(), toFile.toStdString());
+    Log::info("Successfully copied processing history from {} to {}", fromFile, toFile);
     return 0;
 }

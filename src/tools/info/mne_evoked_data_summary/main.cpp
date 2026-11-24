@@ -18,19 +18,19 @@
 #include <mne/fiff/fiff_evoked.h>
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_constants.h>
+#include <mne/base/command_line.h>
 #include <mne/base/string_utils.h>
 
 #include <mne/base/log.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QMap>
+#include <format>
+#include <map>
+#include <print>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -46,7 +46,7 @@ using namespace mne;
 
 //=============================================================================================================
 
-static QString channelKindName(fiff_int_t kind)
+static std::string channelKindName(fiff_int_t kind)
 {
     switch (kind) {
         case FIFFV_MEG_CH:
@@ -62,13 +62,13 @@ static QString channelKindName(fiff_int_t kind)
         case FIFFV_ECG_CH:
             return "ECG";
         default:
-            return QString("OTHER(%1)").arg(kind);
+            return std::format("OTHER({})", kind);
     }
 }
 
 //=============================================================================================================
 
-static QString coilTypeName(fiff_int_t kind, fiff_int_t coilType)
+static std::string coilTypeName(fiff_int_t kind, fiff_int_t coilType)
 {
     if (kind != FIFFV_MEG_CH)
         return channelKindName(kind);
@@ -96,38 +96,31 @@ static QString coilTypeName(fiff_int_t kind, fiff_int_t coilType)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_evoked_data_summary");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Print human-readable summary of evoked data.\n\n"
+                             "Reads all evoked data sets from a FIFF file and prints\n"
+                             "set number, comment, nave, time range, channel count,\n"
+                             "and channel type breakdown.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"meas"}, "Evoked FIFF file.", "file", {}});
+    parser.process(argc, argv, "mne_evoked_data_summary", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Print human-readable summary of evoked data.\n\n"
-                                     "Reads all evoked data sets from a FIFF file and prints\n"
-                                     "set number, comment, nave, time range, channel count,\n"
-                                     "and channel type breakdown.");
-    parser.addHelpOption();
-    parser.addVersionOption();
-
-    QCommandLineOption measOpt("meas", "Evoked FIFF file.", "file");
-    parser.addOption(measOpt);
-
-    parser.process(app);
-
-    QString measFile = parser.value(measOpt);
-    if (measFile.isEmpty()) {
+    const std::string measFile = parser.value("meas");
+    if (measFile.empty()) {
         Log::critical("--meas is required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_evoked_data_summary"));
+        return 1;
     }
 
     // Read evoked data
-    auto read = FiffEvokedSet::read(measFile.toStdU16String(), {}, {}, false);
+    auto read = FiffEvokedSet::read(path_from_utf8(measFile), {}, {}, false);
     if (!read) {
         Log::critical("{}", read.error().what());
         return 1;
     }
     FiffEvokedSet& evokedSet = *read;
 
-    Log::info("File: {}", measFile.toStdString());
+    Log::info("File: {}", measFile);
     Log::info("Number of evoked data sets: {}\n", static_cast<long long>(evokedSet.evoked.size()));
 
     for (int i = 0; i < std::ssize(evokedSet.evoked); ++i) {
@@ -144,16 +137,16 @@ int main(int argc, char* argv[])
         Log::info("  Channels   : {}", evoked.info.nchan);
 
         // Count channel types
-        QMap<QString, int> typeCounts;
+        std::map<std::string, int> typeCounts;
         for (int c = 0; c < std::ssize(evoked.info.chs); ++c) {
             const FiffChInfo& ch = evoked.info.chs[c];
-            QString typeName = coilTypeName(ch.kind, ch.chpos.coil_type);
+            const std::string typeName = coilTypeName(ch.kind, ch.chpos.coil_type);
             typeCounts[typeName]++;
         }
 
         Log::info("  Channel types:");
-        for (auto it = typeCounts.constBegin(); it != typeCounts.constEnd(); ++it) {
-            Log::info("    {:<12} : {}", it.key().toStdString(), it.value());
+        for (const auto& [typeName, count] : typeCounts) {
+            Log::info("    {:<12} : {}", typeName, count);
         }
         Log::info("{}", "");
     }

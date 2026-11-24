@@ -30,10 +30,10 @@
 #define WATERSHEDBEM_H
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
+#include <string>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNEWATERSHEDBEM
@@ -99,7 +99,7 @@ private:
      *
      * @return true on success.
      */
-    bool runMriWatershed(const QString& mriInput, const QString& wsDir);
+    bool runMriWatershed(const std::string& mriInput, const std::string& wsDir);
 
     //=========================================================================================================
     /**
@@ -116,7 +116,7 @@ private:
      *
      * @return true on success.
      */
-    bool convertSurfaces(const QString& wsDir, const QString& mgzFile);
+    bool convertSurfaces(const std::string& wsDir, const std::string& mgzFile);
 
     //=========================================================================================================
     /**
@@ -131,7 +131,7 @@ private:
      *
      * @return true on success.
      */
-    bool createBemFif(const QString& surfFile, const QString& fifFile);
+    bool createBemFif(const std::string& surfFile, const std::string& fifFile);
 
     //=========================================================================================================
 

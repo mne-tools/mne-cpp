@@ -21,10 +21,10 @@
 #define MNESETUPFORWARDMODELSETTINGS_H
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
+#include <string>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNESETUPFORWARDMODEL
@@ -57,7 +57,7 @@ public:
      *
      * @return Subject name string.
      */
-    QString subject() const;
+    std::string subject() const;
 
     //=========================================================================================================
     /**
@@ -65,7 +65,7 @@ public:
      *
      * @return Subjects directory path.
      */
-    QString subjectsDir() const;
+    std::string subjectsDir() const;
 
     //=========================================================================================================
     /**
@@ -97,7 +97,7 @@ public:
      *
      * @return Model name string, empty for auto-generated name.
      */
-    QString modelName() const;
+    std::string modelName() const;
 
     //=========================================================================================================
     /**
@@ -183,12 +183,12 @@ public:
     bool overwrite() const;
 
 private:
-    QString m_sSubject;         /**< Subject name. */
-    QString m_sSubjectsDir;     /**< Subjects directory path. */
+    std::string m_sSubject;     /**< Subject name. */
+    std::string m_sSubjectsDir; /**< Subjects directory path. */
     float m_fScalpConductivity; /**< Scalp conductivity [S/m]. */
     float m_fSkullConductivity; /**< Skull conductivity [S/m]. */
     float m_fBrainConductivity; /**< Brain conductivity [S/m]. */
-    QString m_sModelName;       /**< BEM model name (empty = auto). */
+    std::string m_sModelName;   /**< BEM model name (empty = auto). */
     bool m_bHomogeneous;        /**< Single-compartment model. */
     bool m_bUseSurfFormat;      /**< Use .surf instead of .tri. */
     int m_iIcoLevel;            /**< ICO subdivision level, -1 = not used. */

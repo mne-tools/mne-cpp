@@ -17,24 +17,28 @@
 #include <mne/fs/fs_annotation.h>
 #include <mne/fs/fs_surface.h>
 #include <mne/fs/fs_label.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QDir>
-#include <QFile>
-#include <QTextStream>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cmath>
+#include <cstdlib>
+#include <filesystem>
+#include <format>
+#include <fstream>
+#include <limits>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -50,68 +54,83 @@ using namespace Eigen;
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
 //=============================================================================================================
+/**
+ * Qt's asprintf, QString::number and QTextStream round exact decimal ties away from zero where std::format rounds
+ * them to even. Moves a tie at @p decimals to the neighbouring double away from zero, so that std::format writes
+ * the digits Qt wrote.
+ */
+static double annotQtTie(double value, int decimals)
+{
+    const double scaled = std::ldexp(value, decimals + 1);
+    // A tie at decimals is an odd multiple of 2^-(decimals + 1)
+    if (std::isfinite(scaled) && scaled == std::trunc(scaled) && std::fmod(scaled, 2.0) != 0.0) {
+        return std::nextafter(value, value < 0 ? -std::numeric_limits<double>::infinity() : std::numeric_limits<double>::infinity());
+    }
+    return value;
+}
 
-static bool writeLabel(const QString& filename, const QString& comment,
+//=============================================================================================================
+
+static bool writeLabel(const std::string& filename, const std::string& comment,
                        const VectorXi& vertices, const MatrixX3f& positions,
                        const VectorXd& values)
 {
-    QFile file(filename);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        Log::critical("Cannot write label file: {}", filename.toStdString());
+    std::ofstream out(path_from_utf8(filename));
+    if (!out) {
+        Log::critical("Cannot write label file: {}", filename);
         return false;
     }
-    QTextStream out(&file);
     out << "#" << comment << "\n";
     out << vertices.size() << "\n";
     for (int i = 0; i < vertices.size(); i++) {
-        out << QString::asprintf("%d  %8.4f  %8.4f  %8.4f  %10.6f\n",
-                                 vertices(i),
-                                 positions(i, 0), positions(i, 1), positions(i, 2),
-                                 values(i));
+        out << std::format("{}  {:8.4f}  {:8.4f}  {:8.4f}  {:10.6f}\n",
+                           vertices(i),
+                           annotQtTie(positions(i, 0), 4), annotQtTie(positions(i, 1), 4), annotQtTie(positions(i, 2), 4),
+                           annotQtTie(values(i), 6));
     }
     return true;
 }
 
 //=============================================================================================================
 
-static bool processHemisphere(const QString& subjectsDir, const QString& subject,
-                              const QString& hemi, const QString& annotName,
-                              const QString& surfName, const QString& outDir)
+static bool processHemisphere(const std::string& subjectsDir, const std::string& subject,
+                              const std::string& hemi, const std::string& annotName,
+                              const std::string& surfName, const std::string& outDir)
 {
     // Read surface for vertex coordinates
-    QString surfPath = QString("%1/%2/surf/%3.%4").arg(subjectsDir, subject, hemi, surfName);
+    const std::string surfPath = std::format("{}/{}/surf/{}.{}", subjectsDir, subject, hemi, surfName);
     FsSurface surface;
-    if (!FsSurface::read(surfPath.toStdU16String(), surface)) {
-        Log::critical("Cannot read surface: {}", surfPath.toStdString());
+    if (!FsSurface::read(path_from_utf8(surfPath), surface)) {
+        Log::critical("Cannot read surface: {}", surfPath);
         return false;
     }
-    Log::info("Read surface: {} ({} vertices)", surfPath.toStdString(), static_cast<long long>(surface.rr().rows()));
+    Log::info("Read surface: {} ({} vertices)", surfPath, static_cast<long long>(surface.rr().rows()));
 
     // Read annotation
-    QString annotPath = QString("%1/%2/label/%3.%4.annot").arg(subjectsDir, subject, hemi, annotName);
+    const std::string annotPath = std::format("{}/{}/label/{}.{}.annot", subjectsDir, subject, hemi, annotName);
     FsAnnotation annot;
-    if (!FsAnnotation::read(annotPath.toStdU16String(), annot)) {
-        Log::critical("Cannot read annotation: {}", annotPath.toStdString());
+    if (!FsAnnotation::read(path_from_utf8(annotPath), annot)) {
+        Log::critical("Cannot read annotation: {}", annotPath);
         return false;
     }
-    Log::info("Read annotation: {}", annotPath.toStdString());
+    Log::info("Read annotation: {}", annotPath);
 
     // Convert to labels using the library method
     std::vector<FsLabel> labels;
     std::vector<Eigen::RowVector4i> labelRgbas;
     annot.toLabels(surface, labels, labelRgbas);
 
-    Log::info("Found {} labels in {} hemisphere", static_cast<long long>(labels.size()), hemi.toStdString());
+    Log::info("Found {} labels in {} hemisphere", static_cast<long long>(labels.size()), hemi);
 
     // Write each label to a file
     int written = 0;
     for (int i = 0; i < std::ssize(labels); i++) {
         const FsLabel& label = labels[i];
-        QString labelName = QString::fromStdString(label.name);
-        if (labelName.isEmpty())
-            labelName = QString("label_%1").arg(i);
+        std::string labelName = label.name;
+        if (labelName.empty())
+            labelName = std::format("label_{}", i);
 
-        QString filename = QString("%1/%2-%3.label").arg(outDir, labelName, hemi);
+        const std::string filename = std::format("{}/{}-{}.label", outDir, labelName, hemi);
 
         VectorXi verts = label.vertices;
         MatrixX3f pos(verts.size(), 3);
@@ -126,13 +145,13 @@ static bool processHemisphere(const QString& subjectsDir, const QString& subject
             }
         }
 
-        QString comment = QString(" %1 annotation %2 %3").arg(annotName, hemi, labelName);
+        const std::string comment = std::format(" {} annotation {} {}", annotName, hemi, labelName);
         if (writeLabel(filename, comment, verts, pos, values)) {
             written++;
         }
     }
 
-    Log::info("Wrote {} label files for {} hemisphere", written, hemi.toStdString());
+    Log::info("Wrote {} label files for {} hemisphere", written, hemi);
     return true;
 }
 
@@ -140,61 +159,46 @@ static bool processHemisphere(const QString& subjectsDir, const QString& subject
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_annot2labels");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    const char* subjectsDirEnv = std::getenv("SUBJECTS_DIR");
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Convert FreeSurfer annotation file to individual label files.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    CommandLineParser parser("Convert FreeSurfer annotation file to individual label files.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"subject"}, "Subject name.", "name", {}});
+    parser.add_option({{"subjects_dir"}, "Subjects directory.", "dir", subjectsDirEnv ? subjectsDirEnv : ""});
+    parser.add_option({{"annot"}, "Annotation name (e.g., aparc, aparc.a2009s).", "name", "aparc"});
+    parser.add_option({{"hemi"}, "Hemisphere: lh or rh (default: both).", "hemi", {}});
+    parser.add_option({{"outdir"}, "Output directory for label files.", "dir", {}});
+    parser.add_option({{"surf"}, "Surface to use for coordinates.", "name", "white"});
+    parser.process(argc, argv, "mne_annot2labels", PROGRAM_VERSION);
 
-    QCommandLineOption subjectOpt("subject", "Subject name.", "name");
-    parser.addOption(subjectOpt);
+    const std::string subject = parser.value("subject");
+    const std::string subjectsDir = parser.value("subjects_dir");
+    const std::string annotName = parser.value("annot");
+    const std::string hemi = parser.value("hemi");
+    std::string outDir = parser.value("outdir");
+    const std::string surfName = parser.value("surf");
 
-    QCommandLineOption subjectsDirOpt("subjects_dir", "Subjects directory.", "dir", qEnvironmentVariable("SUBJECTS_DIR"));
-    parser.addOption(subjectsDirOpt);
-
-    QCommandLineOption annotOpt("annot", "Annotation name (e.g., aparc, aparc.a2009s).", "name", "aparc");
-    parser.addOption(annotOpt);
-
-    QCommandLineOption hemiOpt("hemi", "Hemisphere: lh or rh (default: both).", "hemi");
-    parser.addOption(hemiOpt);
-
-    QCommandLineOption outdirOpt("outdir", "Output directory for label files.", "dir");
-    parser.addOption(outdirOpt);
-
-    QCommandLineOption surfOpt("surf", "Surface to use for coordinates.", "name", "white");
-    parser.addOption(surfOpt);
-
-    parser.process(app);
-
-    QString subject = parser.value(subjectOpt);
-    QString subjectsDir = parser.value(subjectsDirOpt);
-    QString annotName = parser.value(annotOpt);
-    QString hemi = parser.value(hemiOpt);
-    QString outDir = parser.value(outdirOpt);
-    QString surfName = parser.value(surfOpt);
-
-    if (subject.isEmpty()) {
+    if (subject.empty()) {
         Log::critical("--subject is required.");
         return 1;
     }
-    if (subjectsDir.isEmpty()) {
+    if (subjectsDir.empty()) {
         Log::critical("--subjects_dir or $SUBJECTS_DIR is required.");
         return 1;
     }
 
     // Default output dir
-    if (outDir.isEmpty())
-        outDir = QString("%1/%2/label").arg(subjectsDir, subject);
+    if (outDir.empty())
+        outDir = std::format("{}/{}/label", subjectsDir, subject);
 
-    QDir().mkpath(outDir);
+    std::error_code ec;
+    std::filesystem::create_directories(path_from_utf8(outDir), ec);
 
     bool ok = true;
-    if (hemi.isEmpty() || hemi == "lh")
+    if (hemi.empty() || hemi == "lh")
         ok = processHemisphere(subjectsDir, subject, "lh", annotName, surfName, outDir) && ok;
-    if (hemi.isEmpty() || hemi == "rh")
+    if (hemi.empty() || hemi == "rh")
         ok = processHemisphere(subjectsDir, subject, "rh", annotName, surfName, outDir) && ok;
 
     return ok ? 0 : 1;

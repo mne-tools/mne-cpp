@@ -15,19 +15,21 @@
 //=============================================================================================================
 
 #include "mne_setup_mri_settings.h"
+#include <mne/base/command_line.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
-#include <QProcessEnvironment>
+#include <cstdlib>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace MNESETUPMRI;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -37,97 +39,82 @@ MNESetupMriSettings::MNESetupMriSettings(int* argc, char** argv)
 : m_bOverwrite(false)
 , m_bVerbose(false)
 {
-    QCommandLineParser parser;
-    parser.setApplicationDescription(
+    CommandLineParser parser(
         "Set up FreeSurfer MRI data for use with MNE software.\n\n"
         "This tool creates the Neuromag-compatible directory structure and\n"
         "converts FreeSurfer MRI volumes (COR files or .mgz) into COR.fif\n"
         "FIFF files, following the original MNE C tool by Matti Hamalainen.\n\n"
         "Ported from SVN MNE mne_setup_mri / mne_make_cor_set.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_help_option();
+    parser.add_version_option();
 
     // --subject
-    QCommandLineOption subjectOpt(QStringList() << "subject",
-                                  "Subject name (defaults to $SUBJECT environment variable).",
-                                  "subject");
-    parser.addOption(subjectOpt);
+    parser.add_option({{"subject"}, "Subject name (defaults to $SUBJECT environment variable).", "subject", ""});
 
     // --subjects-dir
-    QCommandLineOption subjectsDirOpt(QStringList() << "subjects-dir",
-                                      "Subjects directory (defaults to $SUBJECTS_DIR environment variable).",
-                                      "dir");
-    parser.addOption(subjectsDirOpt);
+    parser.add_option({{"subjects-dir"}, "Subjects directory (defaults to $SUBJECTS_DIR environment variable).", "dir", ""});
 
     // --mri
-    QCommandLineOption mriOpt(QStringList() << "mri",
-                              "MRI set name to process (can be specified multiple times, default: T1 brain).",
-                              "name");
-    parser.addOption(mriOpt);
+    parser.add_option({{"mri"}, "MRI set name to process (can be specified multiple times, default: T1 brain).", "name", ""});
 
     // --overwrite
-    QCommandLineOption overwriteOpt(QStringList() << "overwrite",
-                                    "Overwrite existing data.");
-    parser.addOption(overwriteOpt);
+    parser.add_option({{"overwrite"}, "Overwrite existing data.", "", ""});
 
     // --verbose
-    QCommandLineOption verboseOpt(QStringList() << "verbose",
-                                  "Enable verbose output.");
-    parser.addOption(verboseOpt);
+    parser.add_option({{"verbose"}, "Enable verbose output.", "", ""});
 
-    // Build argument list from argc/argv
-    QStringList args;
-    for (int i = 0; i < *argc; ++i) {
-        args << QString(argv[i]);
-    }
+    parser.process(*argc, argv, "mne_setup_mri", MNE_CPP_VERSION);
 
-    parser.process(args);
+    const auto envValue = [](const char* name) {
+        const char* value = std::getenv(name);
+        return std::string(value ? value : "");
+    };
 
     // Subject
-    if (parser.isSet(subjectOpt)) {
-        m_sSubject = parser.value(subjectOpt);
+    if (parser.is_set("subject")) {
+        m_sSubject = parser.value("subject");
     } else {
-        m_sSubject = QProcessEnvironment::systemEnvironment().value("SUBJECT", "");
+        m_sSubject = envValue("SUBJECT");
     }
 
     // Subjects dir
-    if (parser.isSet(subjectsDirOpt)) {
-        m_sSubjectsDir = parser.value(subjectsDirOpt);
+    if (parser.is_set("subjects-dir")) {
+        m_sSubjectsDir = parser.value("subjects-dir");
     } else {
-        m_sSubjectsDir = QProcessEnvironment::systemEnvironment().value("SUBJECTS_DIR", "");
+        m_sSubjectsDir = envValue("SUBJECTS_DIR");
     }
 
     // MRI sets
-    if (parser.isSet(mriOpt)) {
-        m_slMriSets = parser.values(mriOpt);
+    if (parser.is_set("mri")) {
+        m_slMriSets = parser.values("mri");
     } else {
-        m_slMriSets << "T1" << "brain";
+        m_slMriSets = {"T1", "brain"};
     }
 
     // Overwrite
-    m_bOverwrite = parser.isSet(overwriteOpt);
+    m_bOverwrite = parser.is_set("overwrite");
 
     // Verbose
-    m_bVerbose = parser.isSet(verboseOpt);
+    m_bVerbose = parser.is_set("verbose");
 }
 
 //=============================================================================================================
 
-QString MNESetupMriSettings::subject() const
+std::string MNESetupMriSettings::subject() const
 {
     return m_sSubject;
 }
 
 //=============================================================================================================
 
-QString MNESetupMriSettings::subjectsDir() const
+std::string MNESetupMriSettings::subjectsDir() const
 {
     return m_sSubjectsDir;
 }
 
 //=============================================================================================================
 
-QStringList MNESetupMriSettings::mriSets() const
+StringList MNESetupMriSettings::mriSets() const
 {
     return m_slMriSets;
 }

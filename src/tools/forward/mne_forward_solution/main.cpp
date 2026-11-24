@@ -18,20 +18,16 @@
 #include <mne/fwd/compute_fwd/compute_fwd.h>
 #include <mne/mne/mne_forward_solution.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QApplication>
-#include <QCommandLineParser>
-#include <QFile>
+#include <mne/base/command_line.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <memory>
+#include <optional>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -60,61 +56,50 @@ using namespace mne;
  */
 int main(int argc, char* argv[])
 {
-    QApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_forward_solution");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
-
     //=========================================================================================================
     // Command line parser
     //=========================================================================================================
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription(
+    CommandLineParser parser(
         "Compute the MEG/EEG forward solution.\n"
         "Port of the original MNE-C mne_forward_solution by Matti Hamalainen.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_help_option();
+    parser.add_version_option();
 
     // Source & sensor options
-    QCommandLineOption srcOpt("src", "Source space file.", "file");
-    QCommandLineOption measOpt("meas", "MEG/EEG measurement file (sensor & electrode locations).", "file");
-    QCommandLineOption fwdOpt("fwd", "Output forward solution file.", "file");
+    parser.add_option({{"src"}, "Source space file.", "file", ""});
+    parser.add_option({{"meas"}, "MEG/EEG measurement file (sensor & electrode locations).", "file", ""});
+    parser.add_option({{"fwd"}, "Output forward solution file.", "file", ""});
 
     // Transform options
-    QCommandLineOption mriOpt("mri", "MRI description file for head/MRI transform.", "file");
-    QCommandLineOption transOpt("trans", "Text file for head/MRI transform.", "file");
-    QCommandLineOption notransOpt("notrans", "Head and MRI coordinate systems are identical.");
+    parser.add_option({{"mri"}, "MRI description file for head/MRI transform.", "file", ""});
+    parser.add_option({{"trans"}, "Text file for head/MRI transform.", "file", ""});
+    parser.add_option({{"notrans"}, "Head and MRI coordinate systems are identical.", "", ""});
 
     // BEM & sphere model options
-    QCommandLineOption bemOpt("bem", "BEM model file.", "file");
-    QCommandLineOption originOpt("origin", "Sphere model origin in head coordinates (x:y:z in mm).", "x:y:z");
-    QCommandLineOption eegscalpOpt("eegscalp", "Scale electrode locations to the scalp surface (sphere model).");
-    QCommandLineOption eegmodelsOpt("eegmodels", "File of EEG sphere model specifications.", "file");
-    QCommandLineOption eegmodelOpt("eegmodel", "Name of the EEG sphere model to use (default: Default).", "name");
-    QCommandLineOption eegradOpt("eegrad", "Scalp radius for EEG sphere model in mm (default: 90.0).", "radius");
+    parser.add_option({{"bem"}, "BEM model file.", "file", ""});
+    parser.add_option({{"origin"}, "Sphere model origin in head coordinates (x:y:z in mm).", "x:y:z", ""});
+    parser.add_option({{"eegscalp"}, "Scale electrode locations to the scalp surface (sphere model).", "", ""});
+    parser.add_option({{"eegmodels"}, "File of EEG sphere model specifications.", "file", ""});
+    parser.add_option({{"eegmodel"}, "Name of the EEG sphere model to use (default: Default).", "name", ""});
+    parser.add_option({{"eegrad"}, "Scalp radius for EEG sphere model in mm (default: 90.0).", "radius", ""});
 
     // Modality flags
-    QCommandLineOption megOpt("meg", "Compute the MEG forward solution.");
-    QCommandLineOption eegOpt("eeg", "Compute the EEG forward solution.");
-    QCommandLineOption gradOpt("grad", "Compute the gradient of the field with respect to dipole coordinates.");
-    QCommandLineOption fixedOpt("fixed", "Calculate only for the source orientation given by surface normals.");
-    QCommandLineOption accurateOpt("accurate", "Use accurate coil definitions in MEG forward computation.");
-    QCommandLineOption mricoordOpt("mricoord", "Do calculations in MRI coordinates instead of head coordinates.");
-    QCommandLineOption allOpt("all", "Calculate forward solution in all nodes instead of selected ones only.");
+    parser.add_option({{"meg"}, "Compute the MEG forward solution.", "", ""});
+    parser.add_option({{"eeg"}, "Compute the EEG forward solution.", "", ""});
+    parser.add_option({{"grad"}, "Compute the gradient of the field with respect to dipole coordinates.", "", ""});
+    parser.add_option({{"fixed"}, "Calculate only for the source orientation given by surface normals.", "", ""});
+    parser.add_option({{"accurate"}, "Use accurate coil definitions in MEG forward computation.", "", ""});
+    parser.add_option({{"mricoord"}, "Do calculations in MRI coordinates instead of head coordinates.", "", ""});
+    parser.add_option({{"all"}, "Calculate forward solution in all nodes instead of selected ones only.", "", ""});
 
     // Source space filtering
-    QCommandLineOption labelOpt("label", "FsLabel file to select sources (can be specified multiple times).", "file");
-    QCommandLineOption mindistOpt("mindist", "Minimum distance of sources from the inner skull surface (mm).", "dist");
-    QCommandLineOption mindistoutOpt("mindistout", "Output file for omitted source space points.", "file");
-    QCommandLineOption includeallOpt("includeall", "Omit all source space checks.");
+    parser.add_option({{"label"}, "FsLabel file to select sources (can be specified multiple times).", "file", ""});
+    parser.add_option({{"mindist"}, "Minimum distance of sources from the inner skull surface (mm).", "dist", ""});
+    parser.add_option({{"mindistout"}, "Output file for omitted source space points.", "file", ""});
+    parser.add_option({{"includeall"}, "Omit all source space checks.", "", ""});
 
-    parser.addOptions({srcOpt, measOpt, fwdOpt,
-                       mriOpt, transOpt, notransOpt,
-                       bemOpt, originOpt, eegscalpOpt, eegmodelsOpt, eegmodelOpt, eegradOpt,
-                       megOpt, eegOpt, gradOpt, fixedOpt, accurateOpt, mricoordOpt, allOpt,
-                       labelOpt, mindistOpt, mindistoutOpt, includeallOpt});
-
-    parser.process(app);
+    parser.process(argc, argv, "mne_forward_solution", PROGRAM_VERSION);
 
     //=========================================================================================================
     // Populate settings from parsed arguments
@@ -123,103 +108,105 @@ int main(int argc, char* argv[])
     std::shared_ptr<ComputeFwdSettings> settings = std::make_shared<ComputeFwdSettings>();
 
     // Build the command string for FIFF stamping
-    settings->command = QCoreApplication::arguments().join(" ").toStdString();
+    StringList arguments(argv, argv + argc);
+    settings->command = join(arguments, " ");
 
     // Source & sensor files
-    if (parser.isSet(srcOpt))
-        settings->srcname = parser.value(srcOpt).toStdString();
-    if (parser.isSet(measOpt))
-        settings->measname = parser.value(measOpt).toStdString();
-    if (parser.isSet(fwdOpt))
-        settings->solname = parser.value(fwdOpt).toStdString();
+    if (parser.is_set("src"))
+        settings->srcname = parser.value("src");
+    if (parser.is_set("meas"))
+        settings->measname = parser.value("meas");
+    if (parser.is_set("fwd"))
+        settings->solname = parser.value("fwd");
 
     // Transform options (--mri and --trans are mutually exclusive with --notrans)
-    if (parser.isSet(notransOpt)) {
+    if (parser.is_set("notrans")) {
         settings->mri_head_ident = true;
         settings->mriname.clear();
         settings->transname.clear();
-    } else if (parser.isSet(mriOpt)) {
+    } else if (parser.is_set("mri")) {
         settings->mri_head_ident = false;
-        settings->mriname = parser.value(mriOpt).toStdString();
+        settings->mriname = parser.value("mri");
         settings->transname.clear();
-    } else if (parser.isSet(transOpt)) {
+    } else if (parser.is_set("trans")) {
         settings->mri_head_ident = false;
-        settings->transname = parser.value(transOpt).toStdString();
+        settings->transname = parser.value("trans");
         settings->mriname.clear();
     }
 
     // BEM model
-    if (parser.isSet(bemOpt))
-        settings->bemname = parser.value(bemOpt).toStdString();
+    if (parser.is_set("bem"))
+        settings->bemname = parser.value("bem");
 
     // Sphere model origin (x:y:z in mm, converted to meters)
-    if (parser.isSet(originOpt)) {
-        QStringList parts = parser.value(originOpt).split(':');
+    if (parser.is_set("origin")) {
+        const StringList parts = split(parser.value("origin"), ':');
         if (parts.size() != 3) {
             Log::critical("Could not interpret the origin.");
             return 1;
         }
-        bool ok1, ok2, ok3;
-        settings->r0[0] = parts[0].toFloat(&ok1) / 1000.0f;
-        settings->r0[1] = parts[1].toFloat(&ok2) / 1000.0f;
-        settings->r0[2] = parts[2].toFloat(&ok3) / 1000.0f;
-        if (!ok1 || !ok2 || !ok3) {
+        const std::optional<double> x = to_double(parts[0]);
+        const std::optional<double> y = to_double(parts[1]);
+        const std::optional<double> z = to_double(parts[2]);
+        if (!x || !y || !z) {
             Log::critical("Could not interpret the origin.");
             return 1;
         }
+        settings->r0[0] = static_cast<float>(*x) / 1000.0f;
+        settings->r0[1] = static_cast<float>(*y) / 1000.0f;
+        settings->r0[2] = static_cast<float>(*z) / 1000.0f;
     }
 
     // EEG sphere model options
-    if (parser.isSet(eegscalpOpt))
+    if (parser.is_set("eegscalp"))
         settings->scale_eeg_pos = true;
-    if (parser.isSet(eegmodelsOpt))
-        settings->eeg_model_file = parser.value(eegmodelsOpt).toStdString();
-    if (parser.isSet(eegmodelOpt))
-        settings->eeg_model_name = parser.value(eegmodelOpt).toStdString();
-    if (parser.isSet(eegradOpt)) {
-        bool ok;
-        float rad = parser.value(eegradOpt).toFloat(&ok);
-        if (!ok || rad <= 0) {
+    if (parser.is_set("eegmodels"))
+        settings->eeg_model_file = parser.value("eegmodels");
+    if (parser.is_set("eegmodel"))
+        settings->eeg_model_name = parser.value("eegmodel");
+    if (parser.is_set("eegrad")) {
+        const std::optional<double> rad = to_double(parser.value("eegrad"));
+        if (!rad || *rad <= 0) {
             Log::critical("Radius must be a positive number.");
             return 1;
         }
-        settings->eeg_sphere_rad = rad / 1000.0f;
+        settings->eeg_sphere_rad = static_cast<float>(*rad) / 1000.0f;
     }
 
     // Modality flags
-    if (parser.isSet(megOpt))
+    if (parser.is_set("meg"))
         settings->include_meg = true;
-    if (parser.isSet(eegOpt))
+    if (parser.is_set("eeg"))
         settings->include_eeg = true;
-    if (parser.isSet(gradOpt))
+    if (parser.is_set("grad"))
         settings->compute_grad = true;
-    if (parser.isSet(fixedOpt))
+    if (parser.is_set("fixed"))
         settings->fixed_ori = true;
-    if (parser.isSet(accurateOpt))
+    if (parser.is_set("accurate"))
         settings->accurate = true;
-    if (parser.isSet(mricoordOpt))
+    if (parser.is_set("mricoord"))
         settings->coord_frame = FIFFV_COORD_MRI;
-    if (parser.isSet(allOpt))
+    if (parser.is_set("all"))
         settings->do_all = true;
 
     // Source space filtering
-    if (parser.isSet(labelOpt)) {
-        for (const QString& label : parser.values(labelOpt))
-            settings->labels.emplace_back(label.toStdU16String());
+    if (parser.is_set("label")) {
+        for (const std::string& label : parser.values("label"))
+            settings->labels.push_back(path_from_utf8(label));
         settings->nlabel = static_cast<int>(settings->labels.size());
     }
-    if (parser.isSet(mindistOpt)) {
-        bool ok;
-        float dist = parser.value(mindistOpt).toFloat(&ok);
-        if (!ok) {
+    if (parser.is_set("mindist")) {
+        const std::optional<double> dist = to_double(parser.value("mindist"));
+        if (!dist) {
             Log::critical("Could not interpret the distance.");
             return 1;
         }
-        settings->mindist = (dist <= 0.0f) ? 0.0f : dist / 1000.0f;
+        const auto distMm = static_cast<float>(*dist);
+        settings->mindist = (distMm <= 0.0f) ? 0.0f : distMm / 1000.0f;
     }
-    if (parser.isSet(mindistoutOpt))
-        settings->mindistoutname = parser.value(mindistoutOpt).toStdString();
-    if (parser.isSet(includeallOpt))
+    if (parser.is_set("mindistout"))
+        settings->mindistoutname = parser.value("mindistout");
+    if (parser.is_set("includeall"))
         settings->filter_spaces = false;
 
     //=========================================================================================================

@@ -19,23 +19,25 @@
 #include <mne/fiff/fiff_stream.h>
 #include <mne/fiff/fiff_coord_trans.h>
 #include <mne/fiff/fiff_types.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QTextStream>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cmath>
+#include <format>
+#include <fstream>
+#include <limits>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -49,6 +51,22 @@ using namespace Eigen;
 //=============================================================================================================
 
 #define PROGRAM_VERSION MNE_CPP_VERSION
+
+//=============================================================================================================
+/**
+ * Qt's asprintf, QString::number and QTextStream round exact decimal ties away from zero where std::format rounds
+ * them to even. Moves a tie at @p decimals to the neighbouring double away from zero, so that std::format writes
+ * the digits Qt wrote.
+ */
+static double listSrcQtTie(double value, int decimals)
+{
+    const double scaled = std::ldexp(value, decimals + 1);
+    // A tie at decimals is an odd multiple of 2^-(decimals + 1)
+    if (std::isfinite(scaled) && scaled == std::trunc(scaled) && std::fmod(scaled, 2.0) != 0.0) {
+        return std::nextafter(value, value < 0 ? -std::numeric_limits<double>::infinity() : std::numeric_limits<double>::infinity());
+    }
+    return value;
+}
 
 //=============================================================================================================
 
@@ -88,58 +106,40 @@ static const char* spaceTypeName(int type)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_list_source_space");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("List source space information in various output formats.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"src"}, "Source space FIFF file.", "file", {}});
+    parser.add_option({{"pnt"}, "Output point file (MRIlab format).", "file", {}});
+    parser.add_option({{"dip"}, "Output dipole file (MRIlab format).", "file", {}});
+    parser.add_option({{"vert"}, "Output vertex file (text).", "file", {}});
+    parser.add_option({{"all"}, "List all vertices (not just active).", {}, {}});
+    parser.add_option({{"coord"}, "Coordinate frame: head or mri.", "name", "mri"});
+    parser.process(argc, argv, "mne_list_source_space", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("List source space information in various output formats.");
-    parser.addHelpOption();
-    parser.addVersionOption();
-
-    QCommandLineOption srcOpt("src", "Source space FIFF file.", "file");
-    parser.addOption(srcOpt);
-
-    QCommandLineOption pntOpt("pnt", "Output point file (MRIlab format).", "file");
-    parser.addOption(pntOpt);
-
-    QCommandLineOption dipOpt("dip", "Output dipole file (MRIlab format).", "file");
-    parser.addOption(dipOpt);
-
-    QCommandLineOption vertOpt("vert", "Output vertex file (text).", "file");
-    parser.addOption(vertOpt);
-
-    QCommandLineOption allOpt("all", "List all vertices (not just active).");
-    parser.addOption(allOpt);
-
-    QCommandLineOption coordOpt("coord", "Coordinate frame: head or mri.", "name", "mri");
-    parser.addOption(coordOpt);
-
-    parser.process(app);
-
-    QString srcName = parser.value(srcOpt);
-    QString pntName = parser.value(pntOpt);
-    QString dipName = parser.value(dipOpt);
-    QString vertName = parser.value(vertOpt);
-    bool listAll = parser.isSet(allOpt);
+    const std::string srcName = parser.value("src");
+    const std::string pntName = parser.value("pnt");
+    const std::string dipName = parser.value("dip");
+    const std::string vertName = parser.value("vert");
+    bool listAll = parser.is_set("all");
     [[maybe_unused]] int coordFrame = FIFFV_COORD_MRI;
-    QString coordStr = parser.value(coordOpt);
+    const std::string coordStr = parser.value("coord");
     if (coordStr == "head")
         coordFrame = FIFFV_COORD_HEAD;
     else if (coordStr == "mri")
         coordFrame = FIFFV_COORD_MRI;
     else {
-        Log::critical("Unknown coordinate frame: {} (use head or mri)", coordStr.toStdString());
+        Log::critical("Unknown coordinate frame: {} (use head or mri)", coordStr);
         return 1;
     }
 
-    if (srcName.isEmpty()) {
+    if (srcName.empty()) {
         Log::critical("--src is required.");
         return 1;
     }
 
     // Read source spaces
-    auto read = MNESourceSpaces::read(srcName.toStdU16String());
+    auto read = MNESourceSpaces::read(path_from_utf8(srcName));
     if (!read) {
         Log::critical("{}", read.error().what());
         return 1;
@@ -152,7 +152,7 @@ int main(int argc, char* argv[])
     }
 
     // Print summary
-    Log::info("Source space file : {}", srcName.toStdString());
+    Log::info("Source space file : {}", srcName);
     Log::info("Number of spaces  : {}", sourceSpaces.size());
     Log::info("{}", "");
 
@@ -213,36 +213,34 @@ int main(int argc, char* argv[])
     Log::info("Total active vertices : {} / {}", totalActive, totalVerts);
 
     // Write point file (MRIlab format)
-    if (!pntName.isEmpty()) {
-        QFile pntFile(pntName);
-        if (!pntFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            Log::critical("Cannot open output file: {}", pntName.toStdString());
+    if (!pntName.empty()) {
+        std::ofstream pnt(path_from_utf8(pntName));
+        if (!pnt) {
+            Log::critical("Cannot open output file: {}", pntName);
             return 1;
         }
-        QTextStream pnt(&pntFile);
 
         for (int s = 0; s < sourceSpaces.size(); s++) {
             const MNESourceSpace& space = sourceSpaces[s];
             for (int v = 0; v < space.np; v++) {
                 if (!listAll && space.inuse(v) == 0)
                     continue;
-                pnt << QString::asprintf("%10.4f %10.4f %10.4f\n",
-                                         space.rr(v, 0) * 1000.0f,
-                                         space.rr(v, 1) * 1000.0f,
-                                         space.rr(v, 2) * 1000.0f);
+                pnt << std::format("{:10.4f} {:10.4f} {:10.4f}\n",
+                                   listSrcQtTie(space.rr(v, 0) * 1000.0f, 4),
+                                   listSrcQtTie(space.rr(v, 1) * 1000.0f, 4),
+                                   listSrcQtTie(space.rr(v, 2) * 1000.0f, 4));
             }
         }
-        Log::info("Wrote point file: {}", pntName.toStdString());
+        Log::info("Wrote point file: {}", pntName);
     }
 
     // Write dipole file (MRIlab format: position + orientation)
-    if (!dipName.isEmpty()) {
-        QFile dipFile(dipName);
-        if (!dipFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            Log::critical("Cannot open output file: {}", dipName.toStdString());
+    if (!dipName.empty()) {
+        std::ofstream dip(path_from_utf8(dipName));
+        if (!dip) {
+            Log::critical("Cannot open output file: {}", dipName);
             return 1;
         }
-        QTextStream dip(&dipFile);
 
         int dipNum = 1;
         for (int s = 0; s < sourceSpaces.size(); s++) {
@@ -250,35 +248,34 @@ int main(int argc, char* argv[])
             for (int v = 0; v < space.np; v++) {
                 if (!listAll && space.inuse(v) == 0)
                     continue;
-                dip << QString::asprintf("%5d %8.3f %8.3f %8.3f  %7.4f %7.4f %7.4f\n",
-                                         dipNum++,
-                                         space.rr(v, 0) * 1000.0f, space.rr(v, 1) * 1000.0f, space.rr(v, 2) * 1000.0f,
-                                         space.nn(v, 0), space.nn(v, 1), space.nn(v, 2));
+                dip << std::format("{:5} {:8.3f} {:8.3f} {:8.3f}  {:7.4f} {:7.4f} {:7.4f}\n",
+                                   dipNum++,
+                                   listSrcQtTie(space.rr(v, 0) * 1000.0f, 3), listSrcQtTie(space.rr(v, 1) * 1000.0f, 3), listSrcQtTie(space.rr(v, 2) * 1000.0f, 3),
+                                   listSrcQtTie(space.nn(v, 0), 4), listSrcQtTie(space.nn(v, 1), 4), listSrcQtTie(space.nn(v, 2), 4));
             }
         }
-        Log::info("Wrote dipole file: {}", dipName.toStdString());
+        Log::info("Wrote dipole file: {}", dipName);
     }
 
     // Write vertex file (text: vertex_number x y z)
-    if (!vertName.isEmpty()) {
-        QFile vertFile(vertName);
-        if (!vertFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            Log::critical("Cannot open output file: {}", vertName.toStdString());
+    if (!vertName.empty()) {
+        std::ofstream vert(path_from_utf8(vertName));
+        if (!vert) {
+            Log::critical("Cannot open output file: {}", vertName);
             return 1;
         }
-        QTextStream vert(&vertFile);
 
         for (int s = 0; s < sourceSpaces.size(); s++) {
             const MNESourceSpace& space = sourceSpaces[s];
             for (int v = 0; v < space.np; v++) {
                 if (!listAll && space.inuse(v) == 0)
                     continue;
-                vert << QString::asprintf("%6d %10.4f %10.4f %10.4f\n",
-                                          v,
-                                          space.rr(v, 0) * 1000.0f, space.rr(v, 1) * 1000.0f, space.rr(v, 2) * 1000.0f);
+                vert << std::format("{:6} {:10.4f} {:10.4f} {:10.4f}\n",
+                                    v,
+                                    listSrcQtTie(space.rr(v, 0) * 1000.0f, 4), listSrcQtTie(space.rr(v, 1) * 1000.0f, 4), listSrcQtTie(space.rr(v, 2) * 1000.0f, 4));
             }
         }
-        Log::info("Wrote vertex file: {}", vertName.toStdString());
+        Log::info("Wrote vertex file: {}", vertName);
     }
 
     return 0;

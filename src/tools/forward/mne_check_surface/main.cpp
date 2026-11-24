@@ -19,15 +19,8 @@
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fs/fs_surface.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
+#include <mne/base/command_line.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -42,6 +35,8 @@
 
 #include <cmath>
 #include <numbers>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -60,7 +55,7 @@ using namespace Eigen;
 // STATIC HELPERS (ported from SurfaceChecks in mne_surf2bem)
 //=============================================================================================================
 
-static QString nameOf(int id)
+static std::string nameOf(int id)
 {
     switch (id) {
         case FIFFV_BEM_SURF_ID_HEAD:
@@ -118,40 +113,40 @@ static bool isCompleteSurface(const MNEBemSurface& surf)
         cm += surf.rr.row(k).transpose();
     cm /= static_cast<float>(surf.np);
 
-    Log::info("{} CM is {:6.2f} {:6.2f} {:6.2f} mm", nameOf(surf.id).toStdString(), 1000.0f * cm(0), 1000.0f * cm(1), 1000.0f * cm(2));
+    Log::info("{} CM is {:6.2f} {:6.2f} {:6.2f} mm", nameOf(surf.id), 1000.0f * cm(0), 1000.0f * cm(1), 1000.0f * cm(2));
 
     double totAngle = sumSolids(cm, surf) / (4.0 * std::numbers::pi);
     if (fabs(totAngle - 1.0) > 1e-5) {
-        Log::info("Surface {} is NOT complete (solid angle = {:g} * 4*PI instead of 1.0)", nameOf(surf.id).toStdString(), totAngle);
+        Log::info("Surface {} is NOT complete (solid angle = {:g} * 4*PI instead of 1.0)", nameOf(surf.id), totAngle);
         return false;
     }
-    Log::info("Surface {} is complete.", nameOf(surf.id).toStdString());
+    Log::info("Surface {} is complete.", nameOf(surf.id));
     return true;
 }
 
 //=============================================================================================================
 
-static bool checkNesting(const QVector<MNEBemSurface>& surfs)
+static bool checkNesting(const std::vector<MNEBemSurface>& surfs)
 {
-    for (int j = 0; j < surfs.size() - 1; ++j) {
-        const QString inner = nameOf(surfs[j + 1].id);
-        const QString outer = nameOf(surfs[j].id);
+    for (std::size_t j = 0; j + 1 < surfs.size(); ++j) {
+        const std::string inner = nameOf(surfs[j + 1].id);
+        const std::string outer = nameOf(surfs[j].id);
 
         // Test first vertex of inner surface against outer
         Vector3f pt = surfs[j + 1].rr.row(0);
         double totAngle = sumSolids(pt, surfs[j]) / (4.0 * std::numbers::pi);
         if (fabs(totAngle - 1.0) > 1e-5) {
-            Log::info("Checking that {} is inside {}... [FAILED]", inner.toStdString(), outer.toStdString());
+            Log::info("Checking that {} is inside {}... [FAILED]", inner, outer);
             return false;
         }
-        Log::info("Checking that {} is inside {}... [OK]", inner.toStdString(), outer.toStdString());
+        Log::info("Checking that {} is inside {}... [OK]", inner, outer);
     }
     return true;
 }
 
 //=============================================================================================================
 
-static void reportTriangleAreas(const MNEBemSurface& surf, const QString& name)
+static void reportTriangleAreas(const MNEBemSurface& surf, const std::string& name)
 {
     double minArea = 1e30, maxArea = 0.0, totalArea = 0.0;
     for (int k = 0; k < surf.ntri; ++k) {
@@ -165,7 +160,7 @@ static void reportTriangleAreas(const MNEBemSurface& surf, const QString& name)
             maxArea = area;
         totalArea += area;
     }
-    Log::info("{}: {} triangles, area {:7.1f} ... {:7.1f} mm^2 (total {:10.1f} mm^2)", name.toStdString(), surf.ntri, 1e6 * minArea, 1e6 * maxArea, 1e6 * totalArea);
+    Log::info("{}: {} triangles, area {:7.1f} ... {:7.1f} mm^2 (total {:10.1f} mm^2)", name, surf.ntri, 1e6 * minArea, 1e6 * maxArea, 1e6 * totalArea);
 }
 
 //=============================================================================================================
@@ -189,73 +184,61 @@ static float minSurfaceDist(const MNEBemSurface& s1, const MNEBemSurface& s2)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_check_surface");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Check BEM surface topology (completeness, nesting, thickness).\n\nUse --bem for BEM FIFF files or --surf for FreeSurfer surface files.");
+    parser.add_help_option();
+    parser.add_version_option();
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Check BEM surface topology (completeness, nesting, thickness).\n\nUse --bem for BEM FIFF files or --surf for FreeSurfer surface files.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_option({{"bem"}, "BEM FIFF file to check.", "file", ""});
+    parser.add_option({{"surf"}, "FreeSurfer surface file to check (standalone).", "file", ""});
+    parser.add_option({{"id"}, "Surface ID for --surf: 4=head, 3=skull, 1=brain.", "id", "1"});
+    parser.add_option({{"thickness"}, "Also check inter-surface distances.", "", ""});
 
-    QCommandLineOption bemOpt("bem", "BEM FIFF file to check.", "file");
-    parser.addOption(bemOpt);
+    parser.process(argc, argv, "mne_check_surface", PROGRAM_VERSION);
 
-    QCommandLineOption surfOpt("surf", "FreeSurfer surface file to check (standalone).", "file");
-    parser.addOption(surfOpt);
+    const std::string bemFile = parser.value("bem");
+    const std::string surfFile = parser.value("surf");
+    const int surfId = to_int(parser.value("id")).value_or(0);
+    const bool doThickness = parser.is_set("thickness");
 
-    QCommandLineOption idOpt("id", "Surface ID for --surf: 4=head, 3=skull, 1=brain.", "id", "1");
-    parser.addOption(idOpt);
-
-    QCommandLineOption thicknessOpt("thickness", "Also check inter-surface distances.");
-    parser.addOption(thicknessOpt);
-
-    parser.process(app);
-
-    QString bemFile = parser.value(bemOpt);
-    QString surfFile = parser.value(surfOpt);
-    int surfId = parser.value(idOpt).toInt();
-    bool doThickness = parser.isSet(thicknessOpt);
-
-    if (bemFile.isEmpty() && surfFile.isEmpty()) {
+    if (bemFile.empty() && surfFile.empty()) {
         Log::critical("Either --bem or --surf is required.");
         return 1;
     }
 
-    QVector<MNEBemSurface> surfs;
+    std::vector<MNEBemSurface> surfs;
 
-    if (!bemFile.isEmpty()) {
+    if (!bemFile.empty()) {
         // Read BEM from FIFF
-        MNEBem bem(bemFile.toStdU16String());
+        MNEBem bem(path_from_utf8(bemFile));
         if (bem.size() == 0) {
-            Log::critical("Cannot read BEM from: {}", bemFile.toStdString());
+            Log::critical("Cannot read BEM from: {}", bemFile);
             return 1;
         }
-        Log::info("Read {} surfaces from {}\n", bem.size(), bemFile.toStdString());
+        Log::info("Read {} surfaces from {}\n", bem.size(), bemFile);
         for (int i = 0; i < std::ssize(bem); ++i)
-            surfs.append(bem[i]);
+            surfs.push_back(bem[i]);
     } else {
         // Read single FreeSurfer surface
         FsSurface surface;
-        if (!FsSurface::read(surfFile.toStdU16String(), surface)) {
-            Log::critical("Cannot read surface: {}", surfFile.toStdString());
+        if (!FsSurface::read(path_from_utf8(surfFile), surface)) {
+            Log::critical("Cannot read surface: {}", surfFile);
             return 1;
         }
         MNEBemSurface bemSurf;
         bemSurf.id = surfId;
-        bemSurf.np = surface.rr().rows();
-        bemSurf.ntri = surface.tris().rows();
+        bemSurf.np = static_cast<int>(surface.rr().rows());
+        bemSurf.ntri = static_cast<int>(surface.tris().rows());
         bemSurf.rr = surface.rr();
         bemSurf.itris = surface.tris();
         bemSurf.nn = surface.nn();
         bemSurf.coord_frame = FIFFV_COORD_MRI;
-        surfs.append(bemSurf);
-        Log::info("Read surface: {} ({} vertices, {} triangles)\n", surfFile.toStdString(), bemSurf.np, bemSurf.ntri);
+        surfs.push_back(bemSurf);
+        Log::info("Read surface: {} ({} vertices, {} triangles)\n", surfFile, bemSurf.np, bemSurf.ntri);
     }
 
     // Check completeness
     bool allOk = true;
-    for (int k = 0; k < surfs.size(); ++k) {
+    for (std::size_t k = 0; k < surfs.size(); ++k) {
         if (!isCompleteSurface(surfs[k]))
             allOk = false;
         reportTriangleAreas(surfs[k], nameOf(surfs[k].id));
@@ -271,9 +254,9 @@ int main(int argc, char* argv[])
     // Check inter-surface distances
     if (doThickness && surfs.size() > 1) {
         Log::info("{}", "");
-        for (int k = 0; k < surfs.size() - 1; ++k) {
+        for (std::size_t k = 0; k + 1 < surfs.size(); ++k) {
             float dist = minSurfaceDist(surfs[k], surfs[k + 1]);
-            Log::info("Minimum distance between {} and {}: {:6.1f} mm", nameOf(surfs[k].id).toStdString(), nameOf(surfs[k + 1].id).toStdString(), 1000.0f * dist);
+            Log::info("Minimum distance between {} and {}: {:6.1f} mm", nameOf(surfs[k].id), nameOf(surfs[k + 1].id), 1000.0f * dist);
         }
     }
 

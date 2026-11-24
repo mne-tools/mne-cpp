@@ -18,24 +18,32 @@
 #include <mne/fiff/fiff_cov.h>
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_raw_data.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QTextStream>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+#include <format>
+#include <fstream>
+#include <istream>
+#include <optional>
+#include <ostream>
+#include <print>
+#include <string>
+#include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -66,7 +74,7 @@ struct LspToken
     };
     Type type;
     double numVal;
-    QString strVal;
+    std::string strVal;
 };
 
 //=============================================================================================================
@@ -74,7 +82,7 @@ struct LspToken
 class LspParser
 {
 public:
-    explicit LspParser(QTextStream& stream)
+    explicit LspParser(std::istream& stream)
     : m_stream(stream)
     , m_pos(0)
     {
@@ -87,7 +95,7 @@ public:
             return {LspToken::EndOfFile, 0.0, {}};
         }
 
-        QChar c = m_buffer[m_pos];
+        char c = m_buffer[m_pos];
         if (c == '(') {
             m_pos++;
             return {LspToken::LeftParen, 0.0, {"("}};
@@ -98,27 +106,36 @@ public:
         }
 
         // Read a token (number or symbol)
-        QString tok;
+        std::string tok;
         while (m_pos < m_buffer.size()) {
-            QChar ch = m_buffer[m_pos];
-            if (ch.isSpace() || ch == '(' || ch == ')')
+            char ch = m_buffer[m_pos];
+            if (isSpace(ch) || ch == '(' || ch == ')')
                 break;
             tok += ch;
             m_pos++;
         }
 
-        bool ok = false;
-        double val = tok.toDouble(&ok);
-        if (ok)
-            return {LspToken::Number, val, tok};
+        const std::optional<double> val = mne::to_double(tok);
+        if (val)
+            return {LspToken::Number, *val, tok};
         return {LspToken::Symbol, 0.0, tok};
     }
 
 private:
+    static bool isSpace(char c)
+    {
+        return c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r';
+    }
+
+    bool atEnd()
+    {
+        return m_stream.peek() == std::istream::traits_type::eof();
+    }
+
     void skipWhitespace()
     {
         while (true) {
-            while (m_pos < m_buffer.size() && m_buffer[m_pos].isSpace())
+            while (m_pos < m_buffer.size() && isSpace(m_buffer[m_pos]))
                 m_pos++;
             if (m_pos < m_buffer.size())
                 return;
@@ -129,28 +146,28 @@ private:
 
     bool readMore()
     {
-        if (m_stream.atEnd())
+        if (atEnd())
             return false;
-        m_buffer = m_stream.readLine();
+        std::getline(m_stream, m_buffer);
         // Strip comments (lines starting with ; or #)
-        if (m_buffer.startsWith(';') || m_buffer.startsWith('#')) {
+        if (m_buffer.starts_with(';') || m_buffer.starts_with('#')) {
             m_buffer.clear();
         }
         m_pos = 0;
-        return !m_buffer.isEmpty() || !m_stream.atEnd();
+        return !m_buffer.empty() || !atEnd();
     }
 
-    QTextStream& m_stream;
-    QString m_buffer;
-    int m_pos;
+    std::istream& m_stream;
+    std::string m_buffer;
+    std::size_t m_pos;
 };
 
 //=============================================================================================================
 
-static bool parseLspMatrix(QTextStream& stream, MatrixXd& mat)
+static bool parseLspMatrix(std::istream& stream, MatrixXd& mat)
 {
     LspParser parser(stream);
-    QList<QList<double>> rows;
+    std::vector<std::vector<double>> rows;
 
     // Skip tokens until we find the opening parenthesis of the matrix
     LspToken tok;
@@ -174,25 +191,25 @@ static bool parseLspMatrix(QTextStream& stream, MatrixXd& mat)
             break;
 
         if (tok.type == LspToken::LeftParen) {
-            QList<double> row;
+            std::vector<double> row;
             while (true) {
                 tok = parser.next();
                 if (tok.type == LspToken::RightParen || tok.type == LspToken::EndOfFile)
                     break;
                 if (tok.type == LspToken::Number)
-                    row.append(tok.numVal);
+                    row.push_back(tok.numVal);
             }
-            rows.append(row);
+            rows.push_back(row);
         }
     }
 
-    if (rows.isEmpty())
+    if (rows.empty())
         return false;
 
-    int n = rows.size();
+    const int n = static_cast<int>(rows.size());
     mat.resize(n, n);
     for (int i = 0; i < n; ++i) {
-        if (rows[i].size() != n) {
+        if (std::ssize(rows[i]) != n) {
             Log::critical("Row {} has {} values, expected {} (matrix must be square).", i, static_cast<long long>(rows[i].size()), n);
             return false;
         }
@@ -206,49 +223,141 @@ static bool parseLspMatrix(QTextStream& stream, MatrixXd& mat)
 
 //=============================================================================================================
 
+/**
+ * @param[in] value       Any value.
+ * @param[in] format      'f', 'e' or 'g' as in QString::number.
+ * @param[in] precision   Decimals for 'f' and 'e', significant digits for 'g'.
+ *
+ * @return @p value formatted like QString::number(value, format, precision), which rounds ties away from zero
+ *         where std::format rounds them to even.
+ */
+static std::string lspQtNumber(double value, char format, int precision)
+{
+    if (std::isnan(value))
+        return "nan";
+    if (std::isinf(value))
+        return value < 0 ? "-inf" : "inf";
+    const double magnitude = std::abs(value);
+    // Decimal digits d0 d1 d2 ... of magnitude = d0.d1d2... * 10^exponent
+    const auto expand = [magnitude](int decimals, std::string& digits, int& exponent) {
+        const std::string text = std::format("{:.{}e}", magnitude, decimals);
+        const std::size_t ePos = text.find('e');
+        digits = text.substr(0, 1) + text.substr(2, ePos - 2);
+        exponent = std::stoi(text.substr(ePos + 1));
+    };
+    std::string digits;
+    int exponent = 0;
+    expand(17, digits, exponent);
+    const int significant = format == 'e' ? precision + 1 : format == 'g' ? std::max(precision, 1)
+                                                                          : exponent + 1 + precision;
+    expand(std::max(significant, 0) + 40, digits, exponent);
+    const std::string_view tail = std::string_view(digits).substr(static_cast<std::size_t>(std::max(significant, 0)) + 1);
+    if (tail.find_first_not_of('0') == std::string_view::npos || tail.find_first_not_of('9') == std::string_view::npos)
+        expand(std::max(significant, 0) + 1100, digits, exponent); // exact for every double
+
+    std::string rounded;
+    if (significant >= 0) {
+        rounded = digits.substr(0, static_cast<std::size_t>(significant));
+        if (digits[static_cast<std::size_t>(significant)] >= '5') {
+            int i = significant - 1;
+            while (i >= 0 && rounded[static_cast<std::size_t>(i)] == '9')
+                rounded[static_cast<std::size_t>(i--)] = '0';
+            if (i >= 0) {
+                ++rounded[static_cast<std::size_t>(i)];
+            } else {
+                rounded.insert(rounded.begin(), '1');
+                ++exponent;
+                if (format != 'f')
+                    rounded.pop_back();
+            }
+        }
+    }
+    const bool zero = rounded.find_first_not_of('0') == std::string::npos;
+    if (zero)
+        exponent = 0;
+
+    const auto fixed = [&](int decimals) {
+        std::string intPart;
+        std::string fraction;
+        if (zero) {
+            intPart = "0";
+            fraction.assign(static_cast<std::size_t>(decimals), '0');
+        } else if (exponent + 1 <= 0) {
+            intPart = "0";
+            fraction = std::string(static_cast<std::size_t>(-(exponent + 1)), '0') + rounded;
+        } else {
+            const std::size_t intDigits = static_cast<std::size_t>(exponent) + 1;
+            intPart = rounded.substr(0, intDigits);
+            fraction = rounded.substr(intDigits);
+        }
+        fraction.resize(static_cast<std::size_t>(decimals), '0');
+        return decimals > 0 ? intPart + "." + fraction : intPart;
+    };
+    const auto scientific = [&](std::string mantissaDigits) {
+        if (mantissaDigits.empty())
+            mantissaDigits = "0";
+        std::string text(1, mantissaDigits[0]);
+        if (mantissaDigits.size() > 1)
+            text += "." + mantissaDigits.substr(1);
+        return text + std::format("e{}{:02}", exponent < 0 ? '-' : '+', std::abs(exponent));
+    };
+
+    std::string text;
+    if (format == 'f') {
+        text = fixed(precision);
+    } else if (format == 'e') {
+        text = scientific(zero ? std::string(static_cast<std::size_t>(precision + 1), '0') : rounded);
+    } else {
+        const int digitsWanted = std::max(precision, 1);
+        if (!zero && (exponent < -4 || exponent >= digitsWanted)) {
+            std::string mantissa = rounded;
+            mantissa.erase(mantissa.find_last_not_of('0') + 1);
+            text = scientific(mantissa);
+        } else {
+            text = fixed(std::max(digitsWanted - 1 - exponent, 0));
+            if (text.find('.') != std::string::npos) {
+                text.erase(text.find_last_not_of('0') + 1);
+                if (text.back() == '.')
+                    text.pop_back();
+            }
+        }
+    }
+    return value < 0 ? "-" + text : text;
+}
+
+//=============================================================================================================
+
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_convert_lspcov");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
-
-    QCommandLineParser parser;
-    parser.setApplicationDescription(
+    CommandLineParser parser(
         "Convert a LISP-format covariance matrix to FIFF format.\n\n"
         "The LISP format stores symmetric matrices as nested S-expressions\n"
         "produced by external graph tools. The tool reads the matrix, matches\n"
         "it against the channel information from a FIFF measurement file,\n"
         "and writes a standard FIFF covariance file.\n\n"
         "Port of the MNE-C mne_convert_lspcov utility.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"lspcov"}, "Input LISP-format covariance file.", "file", {}});
+    parser.add_option({{"meas"}, "Measurement FIFF file (for channel names).", "file", {}});
+    parser.add_option({{"out"}, "Output FIFF covariance file.", "file", {}});
+    parser.add_option({{"outasc"}, "Output text (ASCII) covariance file.", "file", {}});
+    parser.process(argc, argv, "mne_convert_lspcov", PROGRAM_VERSION);
 
-    QCommandLineOption lspcovOpt("lspcov", "Input LISP-format covariance file.", "file");
-    QCommandLineOption measOpt("meas", "Measurement FIFF file (for channel names).", "file");
-    QCommandLineOption outOpt("out", "Output FIFF covariance file.", "file");
-    QCommandLineOption outascOpt("outasc", "Output text (ASCII) covariance file.", "file");
+    const std::string lspcovFile = parser.value("lspcov");
+    const std::string measFile = parser.value("meas");
+    const std::string outFile = parser.value("out");
+    const std::string outascFile = parser.value("outasc");
 
-    parser.addOption(lspcovOpt);
-    parser.addOption(measOpt);
-    parser.addOption(outOpt);
-    parser.addOption(outascOpt);
-
-    parser.process(app);
-
-    QString lspcovFile = parser.value(lspcovOpt);
-    QString measFile = parser.value(measOpt);
-    QString outFile = parser.value(outOpt);
-    QString outascFile = parser.value(outascOpt);
-
-    if (lspcovFile.isEmpty()) {
+    if (lspcovFile.empty()) {
         Log::critical("--lspcov is required.");
         return 1;
     }
-    if (measFile.isEmpty()) {
+    if (measFile.empty()) {
         Log::critical("--meas is required.");
         return 1;
     }
-    if (outFile.isEmpty() && outascFile.isEmpty()) {
+    if (outFile.empty() && outascFile.empty()) {
         Log::critical("At least one of --out or --outasc is required.");
         return 1;
     }
@@ -256,9 +365,9 @@ int main(int argc, char* argv[])
     //=========================================================================
     // Read measurement info for channel names
     //=========================================================================
-    FiffRawData raw(measFile.toStdU16String());
+    FiffRawData raw(mne::path_from_utf8(measFile));
     if (raw.info.empty()) {
-        Log::critical("Cannot read measurement info from: {}", measFile.toStdString());
+        Log::critical("Cannot read measurement info from: {}", measFile);
         return 1;
     }
     const FiffInfo& info = raw.info;
@@ -269,19 +378,18 @@ int main(int argc, char* argv[])
     //=========================================================================
     // Parse LISP covariance matrix
     //=========================================================================
-    QFile lspFile(lspcovFile);
-    if (!lspFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Cannot open LISP covariance file: {}", lspcovFile.toStdString());
+    std::ifstream lspStream(mne::path_from_utf8(lspcovFile));
+    if (!lspStream) {
+        Log::critical("Cannot open LISP covariance file: {}", lspcovFile);
         return 1;
     }
-    QTextStream lspStream(&lspFile);
 
     MatrixXd covMat;
     if (!parseLspMatrix(lspStream, covMat)) {
-        Log::critical("Failed to parse LISP covariance matrix from: {}", lspcovFile.toStdString());
+        Log::critical("Failed to parse LISP covariance matrix from: {}", lspcovFile);
         return 1;
     }
-    lspFile.close();
+    lspStream.close();
 
     Log::info("Parsed {}x{} matrix from LISP file", static_cast<int>(covMat.rows()), static_cast<int>(covMat.cols()));
 
@@ -296,31 +404,30 @@ int main(int argc, char* argv[])
     //=========================================================================
     // Write ASCII output
     //=========================================================================
-    if (!outascFile.isEmpty()) {
-        QFile ascFile(outascFile);
-        if (!ascFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            Log::critical("Cannot open output file: {}", outascFile.toStdString());
+    if (!outascFile.empty()) {
+        std::ofstream out(mne::path_from_utf8(outascFile));
+        if (!out) {
+            Log::critical("Cannot open output file: {}", outascFile);
             return 1;
         }
-        QTextStream out(&ascFile);
-        out << "# Covariance matrix converted from LISP format\n";
-        out << "# Channels: " << nChan << "\n";
+        std::print(out, "# Covariance matrix converted from LISP format\n");
+        std::print(out, "# Channels: {}\n", nChan);
         for (int i = 0; i < nChan; ++i) {
             for (int j = 0; j < nChan; ++j) {
-                out << QString::number(covMat(i, j), 'e', 8);
+                std::print(out, "{}", lspQtNumber(covMat(i, j), 'e', 8));
                 if (j < nChan - 1)
-                    out << "\t";
+                    std::print(out, "\t");
             }
-            out << "\n";
+            std::print(out, "\n");
         }
-        ascFile.close();
-        Log::info("Written ASCII covariance to: {}", outascFile.toStdString());
+        out.close();
+        Log::info("Written ASCII covariance to: {}", outascFile);
     }
 
     //=========================================================================
     // Write FIFF covariance
     //=========================================================================
-    if (!outFile.isEmpty()) {
+    if (!outFile.empty()) {
         // Build channel name list
         StringList chNames;
         for (int i = 0; i < nChan; ++i) {
@@ -345,12 +452,12 @@ int main(int argc, char* argv[])
         cov.data = covMat;
         cov.nfree = 1;
 
-        if (!cov.save(outFile.toStdU16String())) {
-            Log::critical("Cannot write output file: {}", outFile.toStdString());
+        if (!cov.save(mne::path_from_utf8(outFile))) {
+            Log::critical("Cannot write output file: {}", outFile);
             return 1;
         }
 
-        Log::info("Written FIFF covariance to: {}", outFile.toStdString());
+        Log::info("Written FIFF covariance to: {}", outFile);
     }
 
     return 0;

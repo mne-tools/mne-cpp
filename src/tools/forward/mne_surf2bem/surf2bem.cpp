@@ -32,16 +32,17 @@
 #include <mne/fiff/fiff_file.h>
 
 #include <mne/fiff/fiff_byte_swap.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QDir>
-#include <QFile>
-#include <QFileInfo>
-#include <QTextStream>
-#include <QDebug>
+#include <cstdio>
+#include <format>
+#include <fstream>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -64,9 +65,9 @@ Surf2Bem::Surf2Bem(const MNESurf2BemSettings& settings)
 
 int Surf2Bem::run()
 {
-    const QVector<SurfaceInput>& inputs = m_settings.surfaces();
+    const std::vector<SurfaceInput>& inputs = m_settings.surfaces();
 
-    if (inputs.isEmpty()) {
+    if (inputs.empty()) {
         Log::info("Usage: mne_surf2bem [options]");
         Log::info("Use --help for available options.");
         return 1;
@@ -76,25 +77,24 @@ int Surf2Bem::run()
     // Report input summary
     //
     Log::info("{}", "");
-    for (int k = 0; k < inputs.size(); ++k) {
-        QString line = QString::asprintf("input  file # %3d : %s", k + 1, qPrintable(inputs[k].fileName));
-        line += inputs[k].id > 0 ? QString(" / id = %1").arg(inputs[k].id) : QString(" / id N/A");
-        line += inputs[k].sigma > 0.0f ? QString::asprintf(" / sigma = %g S/m", inputs[k].sigma) : QString(" / sigma N/A");
+    for (std::size_t k = 0; k < inputs.size(); ++k) {
+        std::string line = std::format("input  file # {:3d} : {}", k + 1, inputs[k].fileName);
+        line += inputs[k].id > 0 ? std::format(" / id = {}", inputs[k].id) : std::string(" / id N/A");
+        line += inputs[k].sigma > 0.0f ? std::format(" / sigma = {:g} S/m", static_cast<double>(inputs[k].sigma)) : std::string(" / sigma N/A");
         if (inputs[k].shift != 0.0f)
-            line += QString::asprintf(" / shift %6.1f mm", 1000.0f * inputs[k].shift);
-        Log::info("{}", line.toStdString());
+            line += std::format(" / shift {:6.1f} mm", static_cast<double>(1000.0f * inputs[k].shift));
+        Log::info("{}", line);
     }
-    if (!m_settings.outputFile().isEmpty())
-        Log::info("output file       : {}", m_settings.outputFile().toStdString());
+    if (!m_settings.outputFile().empty())
+        Log::info("output file       : {}", m_settings.outputFile());
     Log::info("{}", "");
 
     //
     // Step 1: Read all surfaces
     //
-    QVector<MNEBemSurface> surfs;
-    surfs.resize(inputs.size());
+    std::vector<MNEBemSurface> surfs(inputs.size());
 
-    for (int k = 0; k < inputs.size(); ++k) {
+    for (std::size_t k = 0; k < inputs.size(); ++k) {
         bool ok;
         if (inputs[k].isAsciiTri) {
             ok = readAsciiTriSurface(inputs[k], surfs[k]);
@@ -106,20 +106,20 @@ int Surf2Bem::run()
         }
 
         if (!ok) {
-            Log::critical("Failed to read surface {}", inputs[k].fileName.toStdString());
+            Log::critical("Failed to read surface {}", inputs[k].fileName);
             fflush(stderr);
             return 1;
         }
 
         surfs[k].id = inputs[k].id;
-        Log::info("{} read. id = {}\n", inputs[k].fileName.toStdString(), inputs[k].id);
+        Log::info("{} read. id = {}\n", inputs[k].fileName, inputs[k].id);
         fflush(stderr);
     }
 
     //
     // Step 2: Shift vertices along normals if requested
     //
-    for (int k = 0; k < inputs.size(); ++k) {
+    for (std::size_t k = 0; k < inputs.size(); ++k) {
         if (inputs[k].shift != 0.0f) {
             if (!shiftVertices(surfs[k], inputs[k].shift)) {
                 return 1;
@@ -139,7 +139,7 @@ int Surf2Bem::run()
         if (!SurfaceChecks::checkSurfaces(surfs)) {
             return 1;
         }
-        for (int k = 0; k < surfs.size(); ++k) {
+        for (std::size_t k = 0; k < surfs.size(); ++k) {
             if (!SurfaceChecks::checkSurfaceSize(surfs[k])) {
                 return 1;
             }
@@ -158,10 +158,10 @@ int Surf2Bem::run()
     //
     // Step 5: Write BEM FIFF output
     //
-    if (!m_settings.outputFile().isEmpty()) {
+    if (!m_settings.outputFile().empty()) {
         // Build MNEBem from surfaces, applying conductivities
         MNEBem bem;
-        for (int k = 0; k < surfs.size(); ++k) {
+        for (std::size_t k = 0; k < surfs.size(); ++k) {
             if (inputs[k].sigma > 0.0f) {
                 surfs[k].sigma = inputs[k].sigma;
             }
@@ -169,14 +169,14 @@ int Surf2Bem::run()
         }
 
 
-        if (auto written = bem.write(m_settings.outputFile().toStdU16String()); !written) {
+        if (auto written = bem.write(path_from_utf8(m_settings.outputFile())); !written) {
             Log::critical("{}", written.error().what());
 
 
             return 1;
         }
 
-        Log::info("{} written.", m_settings.outputFile().toStdString());
+        Log::info("{} written.", m_settings.outputFile());
     } else {
         Log::info("No output requested.");
     }
@@ -191,13 +191,13 @@ bool Surf2Bem::readFreeSurferSurface(const SurfaceInput& input, MNEBemSurface& b
     //
     // Read FreeSurfer binary surface directly.
     // BEM surface names such as inner_skull.surf name no hemisphere, which FsSurface::read() requires
-    auto geometry = FsSurface::read_geometry(input.fileName.toStdU16String());
+    auto geometry = FsSurface::read_geometry(path_from_utf8(input.fileName));
     if (!geometry) {
         Log::critical("{}", geometry.error().what());
         fflush(stderr);
         return false;
     }
-    Log::info("{}: {} vertices and {} triangles", input.fileName.toStdString(), static_cast<int>(geometry->rr.rows()), static_cast<int>(geometry->tris.rows()));
+    Log::info("{}: {} vertices and {} triangles", input.fileName, static_cast<int>(geometry->rr.rows()), static_cast<int>(geometry->tris.rows()));
 
     bemSurf.np = static_cast<int>(geometry->rr.rows());
     bemSurf.ntri = static_cast<int>(geometry->tris.rows());
@@ -230,51 +230,50 @@ bool Surf2Bem::readAsciiTriSurface(const SurfaceInput& input, MNEBemSurface& bem
     //   v1 v2 v3   (1-based vertex indices)
     //   ...
     //
-    QFile file(input.fileName);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Could not open ASCII triangle file: {}", input.fileName.toStdString());
+    std::ifstream in(path_from_utf8(input.fileName));
+    if (!in) {
+        Log::critical("Could not open ASCII triangle file: {}", input.fileName);
         return false;
     }
-
-    QTextStream in(&file);
 
     // Read number of vertices
     int nvert = 0;
     in >> nvert;
     if (nvert <= 0) {
-        Log::critical("Invalid vertex count in {}", input.fileName.toStdString());
+        Log::critical("Invalid vertex count in {}", input.fileName);
         return false;
     }
 
     // Read vertices
     MatrixX3f rr(nvert, 3);
     for (int k = 0; k < nvert; ++k) {
-        float x, y, z;
+        // Read as double and round to float, as QTextStream did
+        double x = 0.0, y = 0.0, z = 0.0;
         in >> x >> y >> z;
-        if (in.status() != QTextStream::Ok) {
-            Log::critical("Error reading vertex {} from {}", k, input.fileName.toStdString());
+        if (!in) {
+            Log::critical("Error reading vertex {} from {}", k, input.fileName);
             return false;
         }
-        rr(k, 0) = x;
-        rr(k, 1) = y;
-        rr(k, 2) = z;
+        rr(k, 0) = static_cast<float>(x);
+        rr(k, 1) = static_cast<float>(y);
+        rr(k, 2) = static_cast<float>(z);
     }
 
     // Read number of triangles
     int ntri = 0;
     in >> ntri;
     if (ntri <= 0) {
-        Log::critical("Invalid triangle count in {}", input.fileName.toStdString());
+        Log::critical("Invalid triangle count in {}", input.fileName);
         return false;
     }
 
     // Read triangles (1-based in file, convert to 0-based)
     MatrixX3i tris(ntri, 3);
     for (int k = 0; k < ntri; ++k) {
-        int v1, v2, v3;
+        int v1 = 0, v2 = 0, v3 = 0;
         in >> v1 >> v2 >> v3;
-        if (in.status() != QTextStream::Ok) {
-            Log::critical("Error reading triangle {} from {}", k, input.fileName.toStdString());
+        if (!in) {
+            Log::critical("Error reading triangle {} from {}", k, input.fileName);
             return false;
         }
         if (input.swap) {
@@ -287,7 +286,7 @@ bool Surf2Bem::readAsciiTriSurface(const SurfaceInput& input, MNEBemSurface& bem
             tris(k, 2) = v3 - 1;
         }
     }
-    file.close();
+    in.close();
 
     //
     // Convert units: if mm==true (default), convert from mm to meters
@@ -331,14 +330,14 @@ bool Surf2Bem::shiftVertices(MNEBemSurface& surf, float shift)
     // Recompute normals after shifting
     surf.nn = FsSurface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
 
-    Log::info("{} vertex locations shifted by {:6.1f} mm.", SurfaceChecks::getNameOf(surf.id).toStdString(), 1000.0f * shift);
+    Log::info("{} vertex locations shifted by {:6.1f} mm.", SurfaceChecks::getNameOf(surf.id), 1000.0f * shift);
 
     return true;
 }
 
 //=============================================================================================================
 
-void Surf2Bem::orderSurfaces(QVector<MNEBemSurface>& surfs)
+void Surf2Bem::orderSurfaces(std::vector<MNEBemSurface>& surfs)
 {
     //
     // Reorder to head, skull, brain for proper BEM nesting
@@ -358,10 +357,10 @@ void Surf2Bem::orderSurfaces(QVector<MNEBemSurface>& surfs)
     }
 
     if (headIdx >= 0 && skullIdx >= 0 && brainIdx >= 0) {
-        QVector<MNEBemSurface> ordered(3);
-        ordered[0] = surfs[headIdx];
-        ordered[1] = surfs[skullIdx];
-        ordered[2] = surfs[brainIdx];
+        std::vector<MNEBemSurface> ordered(3);
+        ordered[0] = surfs[static_cast<std::size_t>(headIdx)];
+        ordered[1] = surfs[static_cast<std::size_t>(skullIdx)];
+        ordered[2] = surfs[static_cast<std::size_t>(brainIdx)];
         surfs = ordered;
     }
 }

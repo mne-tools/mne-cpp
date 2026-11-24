@@ -23,12 +23,15 @@
 
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_file.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
+#include <optional>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -50,18 +53,15 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
     // The original C tool used a custom positional argument parser where
     // --id, --swap, --shift, etc. apply to the most recently specified
     // surface. We replicate that behavior here rather than using
-    // QCommandLineParser, which doesn't support positional association.
+    // a declarative option parser, which does not support positional association.
     //
-    QStringList args;
-    for (int i = 0; i < *argc; ++i) {
-        args << QString(argv[i]);
-    }
+    const mne::StringList args(argv, argv + *argc);
 
-    for (int i = 1; i < args.size(); ++i) {
-        const QString& arg = args[i];
+    for (std::size_t i = 1; i < args.size(); ++i) {
+        const std::string& arg = args[i];
 
         if (arg == "--help" || arg == "-h") {
-            mne::Log::info("Usage: {} [options]", args[0].toStdString());
+            mne::Log::info("Usage: {} [options]", args[0]);
             mne::Log::info("Convert FreeSurfer surfaces into BEM FIFF files.\n");
             mne::Log::info("Ported from the original MNE C tool mne_surf2bem by Matti Hamalainen");
             mne::Log::info("(SVN $Id: mne_surf2bem.c 3351 2012-03-05 12:03:50Z msh $).\n");
@@ -97,7 +97,7 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
             return;
         } else if (arg == "--surf" || arg == "--tri") {
             if (i + 1 >= args.size()) {
-                mne::Log::critical("{} : argument required.", arg.toStdString());
+                mne::Log::critical("{} : argument required.", arg);
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
@@ -105,7 +105,7 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
             SurfaceInput si;
             si.fileName = args[++i];
             si.isAsciiTri = (arg == "--tri");
-            m_surfaces.append(si);
+            m_surfaces.push_back(si);
         } else if (arg == "--fif") {
             if (i + 1 >= args.size()) {
                 mne::Log::critical("--fif: argument required.");
@@ -121,37 +121,37 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
                 m_iExitCode = 1;
                 return;
             }
-            bool ok;
-            int val = args[++i].toInt(&ok);
-            if (!ok) {
-                mne::Log::critical("Illegal number: {}", args[i].toStdString());
+            const std::optional<int> parsed = mne::to_int(args[++i]);
+            if (!parsed) {
+                mne::Log::critical("Illegal number: {}", args[i]);
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
             }
-            if (m_surfaces.isEmpty()) {
+            const auto val = *parsed;
+            if (m_surfaces.empty()) {
                 mne::Log::critical("Specify surface before its id.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
             }
-            m_surfaces.last().id = val;
+            m_surfaces.back().id = val;
         } else if (arg == "--swap") {
-            if (m_surfaces.isEmpty()) {
+            if (m_surfaces.empty()) {
                 mne::Log::critical("Specify surface before --swap.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
             }
-            m_surfaces.last().swap = true;
+            m_surfaces.back().swap = true;
         } else if (arg == "--meters") {
-            if (m_surfaces.isEmpty()) {
+            if (m_surfaces.empty()) {
                 mne::Log::critical("Specify surface before --meters.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
             }
-            m_surfaces.last().mm = false;
+            m_surfaces.back().mm = false;
         } else if (arg == "--coordf") {
             if (i + 1 >= args.size()) {
                 mne::Log::critical("--coordf: argument required.");
@@ -159,14 +159,14 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
                 m_iExitCode = 1;
                 return;
             }
-            bool ok;
-            int val = args[++i].toInt(&ok);
-            if (!ok) {
-                mne::Log::critical("Illegal number: {}", args[i].toStdString());
+            const std::optional<int> parsed = mne::to_int(args[++i]);
+            if (!parsed) {
+                mne::Log::critical("Illegal number: {}", args[i]);
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
             }
+            const auto val = *parsed;
             m_iCoordFrame = val;
         } else if (arg == "--ico") {
             if (i + 1 >= args.size()) {
@@ -175,15 +175,15 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
                 m_iExitCode = 1;
                 return;
             }
-            bool ok;
-            int val = args[++i].toInt(&ok);
-            if (!ok) {
-                mne::Log::critical("Illegal number: {}", args[i].toStdString());
+            const std::optional<int> parsed = mne::to_int(args[++i]);
+            if (!parsed) {
+                mne::Log::critical("Illegal number: {}", args[i]);
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
             }
-            if (m_surfaces.isEmpty()) {
+            const auto val = *parsed;
+            if (m_surfaces.empty()) {
                 mne::Log::critical("Specify surface before --ico.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
@@ -195,7 +195,7 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
                 m_iExitCode = 1;
                 return;
             }
-            m_surfaces.last().ico = val;
+            m_surfaces.back().ico = val;
         } else if (arg == "--sigma") {
             if (i + 1 >= args.size()) {
                 mne::Log::critical("--sigma: argument required.");
@@ -203,21 +203,21 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
                 m_iExitCode = 1;
                 return;
             }
-            bool ok;
-            float val = args[++i].toFloat(&ok);
-            if (!ok) {
-                mne::Log::critical("Illegal number: {}", args[i].toStdString());
+            const std::optional<double> parsed = mne::to_double(args[++i]);
+            if (!parsed) {
+                mne::Log::critical("Illegal number: {}", args[i]);
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
             }
-            if (m_surfaces.isEmpty()) {
+            const auto val = static_cast<float>(*parsed);
+            if (m_surfaces.empty()) {
                 mne::Log::critical("Specify surface before its conductivity.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
             }
-            m_surfaces.last().sigma = val;
+            m_surfaces.back().sigma = val;
         } else if (arg == "--shift") {
             if (i + 1 >= args.size()) {
                 mne::Log::critical("--shift: argument required.");
@@ -225,22 +225,22 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
                 m_iExitCode = 1;
                 return;
             }
-            bool ok;
-            float val = args[++i].toFloat(&ok);
-            if (!ok) {
-                mne::Log::critical("Incomprehensible value: {}", args[i].toStdString());
+            const std::optional<double> parsed = mne::to_double(args[++i]);
+            if (!parsed) {
+                mne::Log::critical("Incomprehensible value: {}", args[i]);
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
             }
-            if (m_surfaces.isEmpty()) {
+            const auto val = static_cast<float>(*parsed);
+            if (m_surfaces.empty()) {
                 mne::Log::critical("Specify the surface before the vertex shift.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
             }
             // Convert mm to meters (matching original C code)
-            m_surfaces.last().shift = val / 1000.0f;
+            m_surfaces.back().shift = val / 1000.0f;
         } else if (arg == "--force") {
             m_bForce = true;
         } else if (arg == "--check") {
@@ -249,7 +249,7 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
             m_bCheck = true;
             m_bCheckMore = true;
         } else {
-            mne::Log::critical("Unrecognized argument: {}", arg.toStdString());
+            mne::Log::critical("Unrecognized argument: {}", arg);
             m_bShouldExit = true;
             m_iExitCode = 1;
             return;
@@ -259,14 +259,14 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
 
 //=============================================================================================================
 
-const QVector<SurfaceInput>& MNESurf2BemSettings::surfaces() const
+const std::vector<SurfaceInput>& MNESurf2BemSettings::surfaces() const
 {
     return m_surfaces;
 }
 
 //=============================================================================================================
 
-QString MNESurf2BemSettings::outputFile() const
+std::string MNESurf2BemSettings::outputFile() const
 {
     return m_sOutputFile;
 }

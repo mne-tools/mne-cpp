@@ -16,21 +16,11 @@
 
 #include <mne/fiff/fiff.h>
 #include <mne/fiff/fiff_file.h>
+#include <mne/base/byte_stream.h>
+#include <mne/base/command_line.h>
+#include <mne/base/endian.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QTextStream>
-#include <QDataStream>
-#include <QFileInfo>
-#include <QStringList>
-#include <QRegularExpression>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -42,6 +32,17 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
+#include <bit>
+#include <cmath>
+#include <cstdint>
+#include <format>
+#include <fstream>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
 #include <vector>
 
 //=============================================================================================================
@@ -63,34 +64,82 @@ using namespace Eigen;
 
 struct TuftsHeader
 {
-    qint32 nChannels;
-    qint32 nSamples;
+    std::int32_t nChannels;
+    std::int32_t nSamples;
     float sFreq;
-    qint32 dataOffset;
+    std::int32_t dataOffset;
 };
 
 //=============================================================================================================
 
-static bool readTuftsHeader(QFile& file, TuftsHeader& header)
+/**
+ * Reads little-endian values from a file; reads past the end give 0 and seeks past the end stay at the end.
+ */
+class TuftsLittleEndianReader
 {
-    QDataStream in(&file);
-    in.setByteOrder(QDataStream::LittleEndian);
+public:
+    explicit TuftsLittleEndianReader(const std::string& path)
+    : m_stream(mne::FileByteStream::open(mne::path_from_utf8(path), mne::FileByteStream::Mode::Read))
+    {
+    }
 
+    bool isOpen() const
+    {
+        return m_stream != nullptr;
+    }
+
+    void seek(std::uint64_t position)
+    {
+        if (!m_stream->seek(position))
+            m_stream->seek(m_stream->size());
+    }
+
+    template<typename T>
+    T read()
+    {
+        T value{};
+        if (m_stream->read(&value, sizeof(T)) != sizeof(T))
+            return T{};
+        if constexpr (std::endian::native == std::endian::big)
+            value = mne::byte_swap(value);
+        return value;
+    }
+
+private:
+    std::unique_ptr<mne::FileByteStream> m_stream;
+};
+
+//=============================================================================================================
+
+/** @return @p text as a float, or nothing if it is not a number or out of float range. */
+static std::optional<float> tuftsToFloat(std::string_view text)
+{
+    const std::optional<double> value = mne::to_double(text);
+    if (!value)
+        return std::nullopt;
+    if (std::isinf(*value) || std::isnan(*value))
+        return static_cast<float>(*value);
+    if (std::abs(*value) > static_cast<double>(std::numeric_limits<float>::max()))
+        return std::nullopt;
+    const float result = static_cast<float>(*value);
+    if (*value != 0.0 && result == 0.0f)
+        return std::nullopt;
+    return result;
+}
+
+//=============================================================================================================
+
+static bool readTuftsHeader(TuftsLittleEndianReader& in, TuftsHeader& header)
+{
     // Tufts raw format header
-    qint16 nch;
-    in >> nch;
-    header.nChannels = nch;
+    header.nChannels = in.read<std::int16_t>();
 
-    qint16 dummy;
-    in >> dummy; // epoch size or flags
+    [[maybe_unused]] const std::int16_t dummy = in.read<std::int16_t>(); // epoch size or flags
 
-    qint32 nSamples;
-    in >> nSamples;
-    header.nSamples = nSamples;
+    header.nSamples = in.read<std::int32_t>();
 
     // Sampling frequency (typically stored as period in ms)
-    qint16 periodMs;
-    in >> periodMs;
+    const std::int16_t periodMs = in.read<std::int16_t>();
     if (periodMs > 0)
         header.sFreq = 1000.0f / periodMs;
     else
@@ -104,60 +153,59 @@ static bool readTuftsHeader(QFile& file, TuftsHeader& header)
 
 //=============================================================================================================
 
-static bool readElpFile(const QString& filename, MatrixX3f& positions, QStringList& names)
+static bool readElpFile(const std::string& filename, MatrixX3f& positions, StringList& names)
 {
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Cannot open elp file: {}", filename.toStdString());
+    std::ifstream in(mne::path_from_utf8(filename));
+    if (!in) {
+        Log::critical("Cannot open elp file: {}", filename);
         return false;
     }
-    QTextStream in(&file);
 
-    QVector<Vector3f> posVec;
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#') || line.startsWith('%'))
+    std::vector<Vector3f> posVec;
+    std::string rawLine;
+    while (std::getline(in, rawLine)) {
+        const std::string_view line = mne::trimmed(rawLine);
+        if (line.empty() || line.starts_with('#') || line.starts_with('%'))
             continue;
-        QStringList parts = line.split(QRegularExpression("\\s+"));
+        const std::vector<std::string_view> parts = mne::split_whitespace(line);
         if (parts.size() >= 4) {
-            names.append(parts[0]);
+            names.emplace_back(parts[0]);
             // Positions are typically in spherical or Cartesian coords (mm)
-            float x = parts[1].toFloat() * 0.001f;
-            float y = parts[2].toFloat() * 0.001f;
-            float z = parts[3].toFloat() * 0.001f;
-            posVec.append(Vector3f(x, y, z));
+            float x = tuftsToFloat(parts[1]).value_or(0.0f) * 0.001f;
+            float y = tuftsToFloat(parts[2]).value_or(0.0f) * 0.001f;
+            float z = tuftsToFloat(parts[3]).value_or(0.0f) * 0.001f;
+            posVec.emplace_back(x, y, z);
         }
     }
-    positions.resize(posVec.size(), 3);
-    for (int i = 0; i < posVec.size(); i++) {
+    positions.resize(std::ssize(posVec), 3);
+    for (int i = 0; i < std::ssize(posVec); i++) {
         positions.row(i) = posVec[i].transpose();
     }
-    Log::info("Read {} electrode positions from {}", static_cast<int>(posVec.size()), filename.toStdString());
+    Log::info("Read {} electrode positions from {}", static_cast<int>(posVec.size()), filename);
     return true;
 }
 
 //=============================================================================================================
 
-static bool readCalibration(const QString& filename, VectorXf& cals)
+static bool readCalibration(const std::string& filename, VectorXf& cals)
 {
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Cannot open calibration file: {}", filename.toStdString());
+    std::ifstream in(mne::path_from_utf8(filename));
+    if (!in) {
+        Log::critical("Cannot open calibration file: {}", filename);
         return false;
     }
-    QTextStream in(&file);
-    QVector<float> calVec;
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#'))
+    std::vector<float> calVec;
+    std::string rawLine;
+    while (std::getline(in, rawLine)) {
+        const std::string_view line = mne::trimmed(rawLine);
+        if (line.empty() || line.starts_with('#'))
             continue;
-        bool ok;
-        float val = line.toFloat(&ok);
-        if (ok && val != 0.0f)
-            calVec.append(val);
+        const std::optional<float> val = tuftsToFloat(line);
+        if (val && *val != 0.0f)
+            calVec.push_back(*val);
     }
-    cals.resize(calVec.size());
-    for (int i = 0; i < calVec.size(); i++)
+    cals.resize(std::ssize(calVec));
+    for (int i = 0; i < std::ssize(calVec); i++)
         cals(i) = calVec[i];
     Log::info("Read {} calibration values", static_cast<int>(calVec.size()));
     return true;
@@ -167,39 +215,27 @@ static bool readCalibration(const QString& filename, VectorXf& cals)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_tufts2fiff");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Convert Tufts University EEG data to FIFF format.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"raw"}, "Tufts raw data file.", "file", {}});
+    parser.add_option({{"cal"}, "Calibration file.", "file", {}});
+    parser.add_option({{"elp"}, "Electrode position file.", "file", {}});
+    parser.add_option({{"out"}, "Output FIFF file.", "file", {}});
+    parser.add_option({{"sfreq"}, "Override sampling frequency.", "Hz", {}});
+    parser.process(argc, argv, "mne_tufts2fiff", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Convert Tufts University EEG data to FIFF format.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string rawFile = parser.value("raw");
+    const std::string calFile = parser.value("cal");
+    const std::string elpFile = parser.value("elp");
+    const std::string outFile = parser.value("out");
+    float sfreqOverride = parser.is_set("sfreq") ? tuftsToFloat(parser.value("sfreq")).value_or(0.0f) : 0.0f;
 
-    QCommandLineOption rawOpt("raw", "Tufts raw data file.", "file");
-    parser.addOption(rawOpt);
-    QCommandLineOption calOpt("cal", "Calibration file.", "file");
-    parser.addOption(calOpt);
-    QCommandLineOption elpOpt("elp", "Electrode position file.", "file");
-    parser.addOption(elpOpt);
-    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
-    parser.addOption(outOpt);
-    QCommandLineOption sfreqOpt("sfreq", "Override sampling frequency.", "Hz");
-    parser.addOption(sfreqOpt);
-
-    parser.process(app);
-
-    QString rawFile = parser.value(rawOpt);
-    QString calFile = parser.value(calOpt);
-    QString elpFile = parser.value(elpOpt);
-    QString outFile = parser.value(outOpt);
-    float sfreqOverride = parser.isSet(sfreqOpt) ? parser.value(sfreqOpt).toFloat() : 0.0f;
-
-    if (rawFile.isEmpty()) {
+    if (rawFile.empty()) {
         Log::critical("Raw data file (--raw) is required.");
         return 1;
     }
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         Log::critical("Output file (--out) is required.");
         return 1;
     }
@@ -207,9 +243,9 @@ int main(int argc, char* argv[])
     //
     // Read Tufts raw data
     //
-    QFile raw(rawFile);
-    if (!raw.open(QIODevice::ReadOnly)) {
-        Log::critical("Cannot open raw file: {}", rawFile.toStdString());
+    TuftsLittleEndianReader raw(rawFile);
+    if (!raw.isOpen()) {
+        Log::critical("Cannot open raw file: {}", rawFile);
         return 1;
     }
 
@@ -224,14 +260,14 @@ int main(int argc, char* argv[])
 
     // Read calibration if provided
     VectorXf cals;
-    if (!calFile.isEmpty()) {
+    if (!calFile.empty()) {
         readCalibration(calFile, cals);
     }
 
     // Read electrode positions if provided
     MatrixX3f elpPositions;
-    QStringList elpNames;
-    if (!elpFile.isEmpty()) {
+    StringList elpNames;
+    if (!elpFile.empty()) {
         readElpFile(elpFile, elpPositions, elpNames);
     }
 
@@ -251,10 +287,10 @@ int main(int argc, char* argv[])
         ch.unit = FIFF_UNIT_V;
         ch.unit_mul = FIFF_UNITM_NONE;
 
-        if (k < elpNames.size()) {
-            ch.ch_name = elpNames[k].toStdString();
+        if (k < std::ssize(elpNames)) {
+            ch.ch_name = elpNames[k];
         } else {
-            ch.ch_name = QString("EEG%1").arg(k + 1, 3, 10, QChar('0')).toStdString();
+            ch.ch_name = std::format("EEG{:03}", k + 1);
         }
 
         if (k < elpPositions.rows()) {
@@ -269,22 +305,15 @@ int main(int argc, char* argv[])
     //
     // Read raw data
     //
-    raw.seek(header.dataOffset);
+    raw.seek(static_cast<std::uint64_t>(header.dataOffset));
     int nSamples = header.nSamples;
     MatrixXf data(nch, nSamples);
 
-    QDataStream dataIn(&raw);
-    dataIn.setByteOrder(QDataStream::LittleEndian);
-    dataIn.setFloatingPointPrecision(QDataStream::SinglePrecision);
-
     for (int s = 0; s < nSamples; s++) {
         for (int c = 0; c < nch; c++) {
-            qint16 val;
-            dataIn >> val;
-            data(c, s) = static_cast<float>(val);
+            data(c, s) = static_cast<float>(raw.read<std::int16_t>());
         }
     }
-    raw.close();
 
     // Apply calibrations
     for (int c = 0; c < nch; c++) {
@@ -296,7 +325,7 @@ int main(int argc, char* argv[])
     //
     // Write FIFF output
     //
-    auto stream = FiffStream::start_file(outFile.toStdU16String());
+    auto stream = FiffStream::start_file(mne::path_from_utf8(outFile));
     if (!stream) {
         Log::critical("Cannot create output FIFF file.");
         return 1;
@@ -339,7 +368,7 @@ int main(int argc, char* argv[])
     // Write in 10-second buffers
     int bufSize = static_cast<int>(10.0f * header.sFreq);
     for (int start = 0; start < nSamples; start += bufSize) {
-        int end = qMin(start + bufSize, nSamples);
+        int end = std::min(start + bufSize, nSamples);
         MatrixXf buf = data.block(0, start, nch, end - start);
 
         fiff_int_t firstSamp = start;
@@ -351,7 +380,7 @@ int main(int argc, char* argv[])
     stream->end_block(FIFFB_MEAS);
     stream->end_file();
 
-    Log::info("Wrote FIFF: {} channels, {} samples at {:.1f} Hz to {}", nch, nSamples, header.sFreq, outFile.toStdString());
+    Log::info("Wrote FIFF: {} channels, {} samples at {:.1f} Hz to {}", nch, nSamples, header.sFreq, outFile);
 
     return 0;
 }

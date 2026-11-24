@@ -19,18 +19,9 @@
 #include <mne/fiff/fiff_stream.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fs/fs_surface.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCommandLineOption>
-#include <QCommandLineParser>
-#include <QCoreApplication>
-#include <QFile>
-#include <QTextStream>
-#include <QRegularExpression>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -38,6 +29,18 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <format>
+#include <fstream>
+#include <print>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -77,7 +80,7 @@ static SparseMatrix<double> buildSmoothingOperator(const MatrixX3i& tris, int nV
     // Build sparse triplets
     typedef Triplet<double> T;
     std::vector<T> triplets;
-    triplets.reserve(nVert * 7); // ~6 neighbors average on icosphere
+    triplets.reserve(static_cast<std::size_t>(nVert) * 7); // ~6 neighbors average on icosphere
 
     for (int i = 0; i < nVert; ++i) {
         int deg = static_cast<int>(neighbors[i].size());
@@ -100,67 +103,56 @@ static SparseMatrix<double> buildSmoothingOperator(const MatrixX3i& tris, int nV
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_smooth");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Smooth source estimate data on a cortical surface.");
+    parser.add_help_option();
+    parser.add_version_option();
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Smooth source estimate data on a cortical surface.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_option({{"src"}, "Source space FIFF file (for surface connectivity).", "file", {}});
+    parser.add_option({{"surf"}, "FreeSurfer surface file (alternative to --src).", "file", {}});
+    parser.add_option({{"stc"}, "Input STC file (text format: vertex value [per time]).", "file", {}});
+    parser.add_option({{"out"}, "Output smoothed STC file.", "file", {}});
+    parser.add_option({{"smooth"}, "Number of smoothing iterations.", "n", "5"});
 
-    QCommandLineOption srcOpt("src", "Source space FIFF file (for surface connectivity).", "file");
-    parser.addOption(srcOpt);
+    parser.process(argc, argv, "mne_smooth", PROGRAM_VERSION);
 
-    QCommandLineOption surfOpt("surf", "FreeSurfer surface file (alternative to --src).", "file");
-    parser.addOption(surfOpt);
+    const std::string srcFile = parser.value("src");
+    const std::string surfFile = parser.value("surf");
+    const std::string stcFile = parser.value("stc");
+    const std::string outFile = parser.value("out");
+    const int nSmooth = to_int(parser.value("smooth")).value_or(0);
 
-    QCommandLineOption stcOpt("stc", "Input STC file (text format: vertex value [per time]).", "file");
-    parser.addOption(stcOpt);
-
-    QCommandLineOption outOpt("out", "Output smoothed STC file.", "file");
-    parser.addOption(outOpt);
-
-    QCommandLineOption smoothOpt("smooth", "Number of smoothing iterations.", "n", "5");
-    parser.addOption(smoothOpt);
-
-    parser.process(app);
-
-    QString srcFile = parser.value(srcOpt);
-    QString surfFile = parser.value(surfOpt);
-    QString stcFile = parser.value(stcOpt);
-    QString outFile = parser.value(outOpt);
-    int nSmooth = parser.value(smoothOpt).toInt();
-
-    if (srcFile.isEmpty() && surfFile.isEmpty()) {
+    if (srcFile.empty() && surfFile.empty()) {
         Log::critical("Either --src or --surf is required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_smooth"));
+        return 1;
     }
-    if (stcFile.isEmpty()) {
+    if (stcFile.empty()) {
         Log::critical("--stc is required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_smooth"));
+        return 1;
     }
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         Log::critical("--out is required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_smooth"));
+        return 1;
     }
 
     // Get surface triangulation
     MatrixX3i tris;
     int nVert = 0;
 
-    if (!surfFile.isEmpty()) {
+    if (!surfFile.empty()) {
         FsSurface surface;
-        if (!FsSurface::read(surfFile.toStdU16String(), surface)) {
-            Log::critical("Cannot read surface: {}", surfFile.toStdString());
+        if (!FsSurface::read(path_from_utf8(surfFile), surface)) {
+            Log::critical("Cannot read surface: {}", surfFile);
             return 1;
         }
         tris = surface.tris();
-        nVert = surface.rr().rows();
+        nVert = static_cast<int>(surface.rr().rows());
         Log::info("Read surface: {} vertices, {} triangles", nVert, static_cast<int>(tris.rows()));
     } else {
         // Read source space
-        auto read = MNESourceSpaces::read(srcFile.toStdU16String());
+        auto read = MNESourceSpaces::read(path_from_utf8(srcFile));
         if (!read) {
             Log::critical("{}", read.error().what());
             return 1;
@@ -177,23 +169,23 @@ int main(int argc, char* argv[])
     Log::info("Built smoothing operator: {} x {}", static_cast<int>(S.rows()), static_cast<int>(S.cols()));
 
     // Read STC data (text format: one value per line, or vertex value pairs)
-    QFile stcIn(stcFile);
-    if (!stcIn.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Cannot open STC file: {}", stcFile.toStdString());
+    std::ifstream stcIn(path_from_utf8(stcFile));
+    if (!stcIn) {
+        Log::critical("Cannot open STC file: {}", stcFile);
         return 1;
     }
 
-    QTextStream in(&stcIn);
-    QList<QPair<int, double>> dataList;
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#'))
+    std::vector<std::pair<int, double>> dataList;
+    std::string rawLine;
+    while (std::getline(stcIn, rawLine)) {
+        const std::string_view line = trimmed(rawLine);
+        if (line.empty() || line.starts_with('#'))
             continue;
-        QStringList parts = line.split(QRegularExpression("\\s+"));
+        const std::vector<std::string_view> parts = split_whitespace(line);
         if (parts.size() >= 2) {
-            dataList.append(qMakePair(parts[0].toInt(), parts[1].toDouble()));
+            dataList.emplace_back(to_int(parts[0]).value_or(0), to_double(parts[1]).value_or(0.0));
         } else if (parts.size() == 1) {
-            dataList.append(qMakePair(dataList.size(), parts[0].toDouble()));
+            dataList.emplace_back(static_cast<int>(dataList.size()), to_double(parts[0]).value_or(0.0));
         }
     }
     stcIn.close();
@@ -214,19 +206,18 @@ int main(int argc, char* argv[])
     Log::info("Applied {} iterations of Laplacian smoothing", nSmooth);
 
     // Write output
-    QFile stcOut(outFile);
-    if (!stcOut.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        Log::critical("Cannot write output file: {}", outFile.toStdString());
+    std::ofstream out(path_from_utf8(outFile));
+    if (!out) {
+        Log::critical("Cannot write output file: {}", outFile);
         return 1;
     }
-    QTextStream out(&stcOut);
     out << "# Smoothed source estimate (" << nSmooth << " iterations)\n";
     for (int i = 0; i < nVert; ++i) {
         if (smoothed(i) != 0.0)
-            out << i << " " << QString::number(smoothed(i), 'g', 10) << "\n";
+            out << std::format("{} {:.10g}\n", i, smoothed(i));
     }
-    stcOut.close();
-    Log::info("Written smoothed data to: {}", outFile.toStdString());
+    out.close();
+    Log::info("Written smoothed data to: {}", outFile);
 
     return 0;
 }

@@ -162,26 +162,26 @@ void TestSurfaceChecks::initTestCase()
 
 void TestSurfaceChecks::testGetNameOfHead()
 {
-    QString name = SurfaceChecks::getNameOf(FIFFV_BEM_SURF_ID_HEAD);
-    QVERIFY(name.contains("skin"));
+    const std::string name = SurfaceChecks::getNameOf(FIFFV_BEM_SURF_ID_HEAD);
+    QVERIFY(name.find("skin") != std::string::npos);
 }
 
 void TestSurfaceChecks::testGetNameOfSkull()
 {
-    QString name = SurfaceChecks::getNameOf(FIFFV_BEM_SURF_ID_SKULL);
-    QVERIFY(name.contains("skull"));
+    const std::string name = SurfaceChecks::getNameOf(FIFFV_BEM_SURF_ID_SKULL);
+    QVERIFY(name.find("skull") != std::string::npos);
 }
 
 void TestSurfaceChecks::testGetNameOfBrain()
 {
-    QString name = SurfaceChecks::getNameOf(FIFFV_BEM_SURF_ID_BRAIN);
-    QVERIFY(name.contains("skull"));
+    const std::string name = SurfaceChecks::getNameOf(FIFFV_BEM_SURF_ID_BRAIN);
+    QVERIFY(name.find("skull") != std::string::npos);
 }
 
 void TestSurfaceChecks::testGetNameOfUnknown()
 {
-    QString name = SurfaceChecks::getNameOf(9999);
-    QVERIFY(name.contains("unknown"));
+    const std::string name = SurfaceChecks::getNameOf(9999);
+    QVERIFY(name.find("unknown") != std::string::npos);
 }
 
 //=============================================================================================================
@@ -217,8 +217,8 @@ void TestSurfaceChecks::testCheckSurfaces()
     MNEBemSurface skull = createIcosahedron(0.08f, FIFFV_BEM_SURF_ID_SKULL);
     MNEBemSurface brain = createIcosahedron(0.06f, FIFFV_BEM_SURF_ID_BRAIN);
 
-    QVector<MNEBemSurface> surfs;
-    surfs << skin << skull << brain;
+    std::vector<MNEBemSurface> surfs;
+    surfs = {skin, skull, brain};
 
     QVERIFY(SurfaceChecks::checkSurfaces(surfs));
 }
@@ -230,8 +230,8 @@ void TestSurfaceChecks::testCheckSurfacesWrongOrder()
     MNEBemSurface skull = createIcosahedron(0.08f, FIFFV_BEM_SURF_ID_SKULL);
     MNEBemSurface brain = createIcosahedron(0.12f, FIFFV_BEM_SURF_ID_BRAIN); // bigger than skin!
 
-    QVector<MNEBemSurface> surfs;
-    surfs << skin << skull << brain;
+    std::vector<MNEBemSurface> surfs;
+    surfs = {skin, skull, brain};
 
     // This should fail because brain is not inside skull
     QVERIFY(!SurfaceChecks::checkSurfaces(surfs));
@@ -260,8 +260,8 @@ void TestSurfaceChecks::testCheckThicknesses()
     MNEBemSurface skin = createIcosahedron(0.10f, FIFFV_BEM_SURF_ID_HEAD);
     MNEBemSurface skull = createIcosahedron(0.08f, FIFFV_BEM_SURF_ID_SKULL);
 
-    QVector<MNEBemSurface> surfs;
-    surfs << skin << skull;
+    std::vector<MNEBemSurface> surfs;
+    surfs = {skin, skull};
 
     // checkThicknesses always returns true (just reports distances)
     QVERIFY(SurfaceChecks::checkThicknesses(surfs));

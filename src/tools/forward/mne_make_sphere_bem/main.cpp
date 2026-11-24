@@ -18,15 +18,8 @@
 #include <mne/mne/mne_bem_surface.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
+#include <mne/base/command_line.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -34,6 +27,17 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <cmath>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -110,59 +114,46 @@ static void makeIcosphere(int nSubdiv, MatrixX3f& verts, MatrixX3i& tris)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_make_sphere_bem");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Create a spherical BEM model.");
+    parser.add_help_option();
+    parser.add_version_option();
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Create a spherical BEM model.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_option({{"out"}, "Output BEM FIFF file.", "file", ""});
+    parser.add_option({{"origin"}, "Sphere origin in mm (x,y,z).", "x,y,z", "0,0,40"});
+    parser.add_option({{"radii"}, "Shell radii in mm.", "r1,r2,r3", "71,80,90"});
+    parser.add_option({{"conductivity"}, "Conductivities.", "s1,s2,s3", "0.33,0.0042,0.33"});
+    parser.add_option({{"ico"}, "Icosahedron subdivision level.", "n", "4"});
 
-    QCommandLineOption outOpt("out", "Output BEM FIFF file.", "file");
-    parser.addOption(outOpt);
+    parser.process(argc, argv, "mne_make_sphere_bem", PROGRAM_VERSION);
 
-    QCommandLineOption originOpt("origin", "Sphere origin in mm (x,y,z).", "x,y,z", "0,0,40");
-    parser.addOption(originOpt);
-
-    QCommandLineOption radiiOpt("radii", "Shell radii in mm.", "r1,r2,r3", "71,80,90");
-    parser.addOption(radiiOpt);
-
-    QCommandLineOption condOpt("conductivity", "Conductivities.", "s1,s2,s3", "0.33,0.0042,0.33");
-    parser.addOption(condOpt);
-
-    QCommandLineOption icoOpt("ico", "Icosahedron subdivision level.", "n", "4");
-    parser.addOption(icoOpt);
-
-    parser.process(app);
-
-    QString outFile = parser.value(outOpt);
+    const std::string outFile = parser.value("out");
+    const auto toFloat = [](const std::string& text) {
+        return static_cast<float>(to_double(text).value_or(0.0));
+    };
 
     // Parse origin
-    QStringList originParts = parser.value(originOpt).split(',');
+    const StringList originParts = split(parser.value("origin"), ',');
     if (originParts.size() != 3) {
         Log::critical("--origin: need x,y,z");
         return 1;
     }
-    Vector3f origin(originParts[0].toFloat() / 1000.0f,
-                    originParts[1].toFloat() / 1000.0f,
-                    originParts[2].toFloat() / 1000.0f);
+    Vector3f origin(toFloat(originParts[0]) / 1000.0f,
+                    toFloat(originParts[1]) / 1000.0f,
+                    toFloat(originParts[2]) / 1000.0f);
 
     // Parse radii
-    QList<float> radii;
-    QStringList radiiParts = parser.value(radiiOpt).split(',');
-    for (const QString& p : radiiParts)
-        radii.append(p.toFloat() / 1000.0f);
+    std::vector<float> radii;
+    for (const std::string& p : split(parser.value("radii"), ','))
+        radii.push_back(toFloat(p) / 1000.0f);
 
     // Parse conductivities
-    QList<float> sigmas;
-    QStringList sigmaParts = parser.value(condOpt).split(',');
-    for (const QString& p : sigmaParts)
-        sigmas.append(p.toFloat());
+    std::vector<float> sigmas;
+    for (const std::string& p : split(parser.value("conductivity"), ','))
+        sigmas.push_back(toFloat(p));
 
-    int icoLevel = parser.value(icoOpt).toInt();
+    const int icoLevel = to_int(parser.value("ico")).value_or(0);
 
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         Log::critical("--out is required.");
         return 1;
     }
@@ -179,24 +170,24 @@ int main(int argc, char* argv[])
 
     // Create BEM model
     MNEBem bem;
-    QList<int> surfIds = {FIFFV_BEM_SURF_ID_BRAIN, FIFFV_BEM_SURF_ID_SKULL, FIFFV_BEM_SURF_ID_HEAD};
+    const std::vector<int> surfIds = {FIFFV_BEM_SURF_ID_BRAIN, FIFFV_BEM_SURF_ID_SKULL, FIFFV_BEM_SURF_ID_HEAD};
 
     // Sort radii ascending (innermost first)
-    QList<int> sortIdx;
-    for (int i = 0; i < radii.size(); ++i)
-        sortIdx.append(i);
-    std::sort(sortIdx.begin(), sortIdx.end(), [&](int a, int b) { return radii[a] < radii[b]; });
+    std::vector<std::size_t> sortIdx(radii.size());
+    for (std::size_t i = 0; i < radii.size(); ++i)
+        sortIdx[i] = i;
+    std::sort(sortIdx.begin(), sortIdx.end(), [&](std::size_t a, std::size_t b) { return radii[a] < radii[b]; });
 
-    for (int i = 0; i < radii.size(); ++i) {
-        int si = sortIdx[i];
+    for (std::size_t i = 0; i < radii.size(); ++i) {
+        const std::size_t si = sortIdx[i];
         float radius = radii[si];
         float sigma = sigmas[si];
         int surfId = (i < surfIds.size()) ? surfIds[i] : FIFFV_BEM_SURF_ID_BRAIN;
 
         MNEBemSurface surf;
         surf.id = surfId;
-        surf.np = unitVerts.rows();
-        surf.ntri = tris.rows();
+        surf.np = static_cast<int>(unitVerts.rows());
+        surf.ntri = static_cast<int>(tris.rows());
         surf.coord_frame = FIFFV_COORD_HEAD;
         surf.sigma = sigma;
 
@@ -217,11 +208,11 @@ int main(int argc, char* argv[])
     }
 
     // Write BEM
-    if (auto written = bem.write(outFile.toStdU16String()); !written) {
+    if (auto written = bem.write(path_from_utf8(outFile)); !written) {
         Log::critical("{}", written.error().what());
         return 1;
     }
-    Log::info("Written spherical BEM model to: {}", outFile.toStdString());
+    Log::info("Written spherical BEM model to: {}", outFile);
 
     return 0;
 }

@@ -16,24 +16,29 @@
 
 #include <mne/fiff/fiff.h>
 #include <mne/fiff/fiff_ctf_comp.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QTextStream>
-#include <QRegularExpression>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cmath>
+#include <cstddef>
+#include <cstdlib>
+#include <format>
+#include <fstream>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -50,25 +55,58 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-static bool readAsciiMatrix(const QString& filename,
-                            MatrixXd& data,
-                            QStringList& rowNames,
-                            QStringList& colNames)
+// Parses a matrix entry as QString::toDouble: an infinity when it overflows, 0 when it is no number
+static double matrixValue(std::string_view text)
 {
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Cannot open matrix file: {}", filename.toStdString());
+    if (const std::optional<double> value = to_double(text)) {
+        return *value;
+    }
+    // to_double rejects a number beyond the double range, for which QString returns an infinity
+    const std::string number(trimmed(text));
+    char* end = nullptr;
+    const double parsed = std::strtod(number.c_str(), &end);
+    return !number.empty() && end == number.c_str() + number.size() && std::isinf(parsed) ? parsed : 0.0;
+}
+
+//=============================================================================================================
+
+// Splits a trimmed line at whitespace; an empty line gives one empty field, as QString::split does
+static StringList splitFields(std::string_view line)
+{
+    StringList fields;
+    for (const std::string_view field : split_whitespace(line))
+        fields.emplace_back(field);
+    if (fields.empty())
+        fields.emplace_back();
+    return fields;
+}
+
+//=============================================================================================================
+
+static bool readAsciiMatrix(const std::string& filename,
+                            MatrixXd& data,
+                            StringList& rowNames,
+                            StringList& colNames)
+{
+    std::ifstream file(path_from_utf8(filename));
+    if (!file) {
+        Log::critical("Cannot open matrix file: {}", filename);
         return false;
     }
-    QTextStream in(&file);
+    StringList lines;
+    for (std::string line; std::getline(file, line);)
+        lines.push_back(std::move(line));
+    std::size_t next = 0;
+    const auto readLine = [&]() -> std::string_view {
+        return next < lines.size() ? trimmed(lines[next++]) : std::string_view();
+    };
 
     // First line: nrow ncol
     int nrow = 0, ncol = 0;
-    QString dimLine = in.readLine().trimmed();
-    QStringList dimParts = dimLine.split(QRegularExpression("\\s+"));
+    const StringList dimParts = splitFields(readLine());
     if (dimParts.size() >= 2) {
-        nrow = dimParts[0].toInt();
-        ncol = dimParts[1].toInt();
+        nrow = to_int(dimParts[0]).value_or(0);
+        ncol = to_int(dimParts[1]).value_or(0);
     }
     if (nrow <= 0 || ncol <= 0) {
         Log::critical("Invalid dimensions in matrix file: {} x {}", nrow, ncol);
@@ -76,34 +114,32 @@ static bool readAsciiMatrix(const QString& filename,
     }
 
     // Second line: column names
-    QString colLine = in.readLine().trimmed();
-    colNames = colLine.split(QRegularExpression("\\s+"));
-    while (colNames.size() < ncol) {
-        colNames.append(QString("col%1").arg(colNames.size() + 1));
+    colNames = splitFields(readLine());
+    while (std::ssize(colNames) < ncol) {
+        colNames.push_back(std::format("col{}", colNames.size() + 1));
     }
-    if (colNames.size() > ncol)
-        colNames = colNames.mid(0, ncol);
+    if (std::ssize(colNames) > ncol)
+        colNames.resize(static_cast<std::size_t>(ncol));
 
     // Data lines: row_name val1 val2 ...
     data.resize(nrow, ncol);
     rowNames.clear();
     for (int r = 0; r < nrow; r++) {
-        if (in.atEnd()) {
+        if (next >= lines.size()) {
             Log::critical("Unexpected end of matrix file at row {}", r);
             return false;
         }
-        QString line = in.readLine().trimmed();
-        QStringList parts = line.split(QRegularExpression("\\s+"));
-        if (parts.size() >= ncol + 1) {
-            rowNames.append(parts[0]);
+        const StringList parts = splitFields(readLine());
+        if (std::ssize(parts) >= ncol + 1) {
+            rowNames.push_back(parts[0]);
             for (int c = 0; c < ncol; c++) {
-                data(r, c) = parts[c + 1].toDouble();
+                data(r, c) = matrixValue(parts[c + 1]);
             }
-        } else if (parts.size() >= ncol) {
+        } else if (std::ssize(parts) >= ncol) {
             // No row name, just values
-            rowNames.append(QString("row%1").arg(r + 1));
+            rowNames.push_back(std::format("row{}", r + 1));
             for (int c = 0; c < ncol; c++) {
-                data(r, c) = parts[c].toDouble();
+                data(r, c) = matrixValue(parts[c]);
             }
         }
     }
@@ -116,40 +152,29 @@ static bool readAsciiMatrix(const QString& filename,
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_create_comp_data");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Create CTF compensation data from ASCII matrix files.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"in"}, "Input ASCII matrix file.", "file", {}});
+    parser.add_option({{"kind"}, "CTF compensation kind (e.g. 101, 201, 301).", "kind", {}});
+    parser.add_option({{"out"}, "Output FIFF file.", "file", {}});
+    parser.add_option({{"calibrated"}, "Matrix data is already calibrated.", {}, {}});
+    parser.process(argc, argv, "mne_create_comp_data", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Create CTF compensation data from ASCII matrix files.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string inFile = parser.value("in");
+    const std::string outFile = parser.value("out");
+    int ctfKind = to_int(parser.value("kind")).value_or(0);
+    bool calibrated = parser.is_set("calibrated");
 
-    QCommandLineOption inOpt("in", "Input ASCII matrix file.", "file");
-    parser.addOption(inOpt);
-    QCommandLineOption kindOpt("kind", "CTF compensation kind (e.g. 101, 201, 301).", "kind");
-    parser.addOption(kindOpt);
-    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
-    parser.addOption(outOpt);
-    QCommandLineOption calibratedOpt("calibrated", "Matrix data is already calibrated.");
-    parser.addOption(calibratedOpt);
-
-    parser.process(app);
-
-    QString inFile = parser.value(inOpt);
-    QString outFile = parser.value(outOpt);
-    int ctfKind = parser.value(kindOpt).toInt();
-    bool calibrated = parser.isSet(calibratedOpt);
-
-    if (inFile.isEmpty()) {
+    if (inFile.empty()) {
         Log::critical("Input matrix file (--in) is required.");
         return 1;
     }
-    if (!parser.isSet(kindOpt)) {
+    if (!parser.is_set("kind")) {
         Log::critical("Compensation kind (--kind) is required.");
         return 1;
     }
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         Log::critical("Output file (--out) is required.");
         return 1;
     }
@@ -158,7 +183,7 @@ int main(int argc, char* argv[])
     // Read the ASCII matrix
     //
     MatrixXd data;
-    QStringList rowNames, colNames;
+    StringList rowNames, colNames;
     if (!readAsciiMatrix(inFile, data, rowNames, colNames))
         return 1;
 
@@ -168,7 +193,7 @@ int main(int argc, char* argv[])
     //
     // Write FIFF output with CTF compensation data
     //
-    auto stream = FiffStream::start_file(outFile.toStdU16String());
+    auto stream = FiffStream::start_file(path_from_utf8(outFile));
     if (!stream) {
         Log::critical("Cannot create output FIFF file.");
         return 1;
@@ -187,20 +212,14 @@ int main(int argc, char* argv[])
     stream->write_int(FIFF_MNE_CTF_COMP_CALIBRATED, &cal);
 
     // Write the named matrix
-    StringList rows;
-    StringList cols;
-    for (const QString& name : rowNames)
-        rows.push_back(name.toStdString());
-    for (const QString& name : colNames)
-        cols.push_back(name.toStdString());
-    FiffNamedMatrix namedMat(nrow, ncol, rows, cols, data);
+    FiffNamedMatrix namedMat(nrow, ncol, rowNames, colNames, data);
     stream->write_named_matrix(FIFF_MNE_CTF_COMP_DATA, namedMat);
 
     stream->end_block(FIFFB_MNE_CTF_COMP_DATA);
     stream->end_block(FIFFB_MNE_CTF_COMP);
     stream->end_file();
 
-    Log::info("Wrote CTF compensation data (kind={}, {}x{}, {}) to {}", ctfKind, nrow, ncol, calibrated ? "calibrated" : "uncalibrated", outFile.toStdString());
+    Log::info("Wrote CTF compensation data (kind={}, {}x{}, {}) to {}", ctfKind, nrow, ncol, calibrated ? "calibrated" : "uncalibrated", outFile);
 
     return 0;
 }

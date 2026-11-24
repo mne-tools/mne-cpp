@@ -19,17 +19,23 @@
 #include <mne/fiff/fiff_dir_entry.h>
 #include <mne/fiff/fiff_ch_info.h>
 
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QTextStream>
+#include <algorithm>
+#include <cstddef>
+#include <format>
+#include <fstream>
+#include <optional>
+#include <print>
+#include <string>
+#include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -47,14 +53,14 @@ using namespace mne;
 
 struct ChannelAlias
 {
-    QString from;
-    QString to;
+    std::string from;
+    std::string to;
     int toKind; // -1 means do not change kind
 };
 
 //=============================================================================================================
 
-static QString explainKind(int kind)
+static std::string explainKind(int kind)
 {
     switch (kind) {
         case FIFFV_MEG_CH:
@@ -82,57 +88,78 @@ static QString explainKind(int kind)
 
 //=============================================================================================================
 
-static QList<ChannelAlias> readAliases(const QString& filename, bool reverse)
+// Byte length of the first @p maxUnits UTF-16 code units of the UTF-8 @p text, never splitting a character
+static std::size_t utf16Prefix(std::string_view text, std::size_t maxUnits)
 {
-    QList<ChannelAlias> aliases;
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Cannot open alias file: {}", filename.toStdString());
+    std::size_t bytes = 0;
+    std::size_t units = 0;
+    while (bytes < text.size()) {
+        const auto lead = static_cast<unsigned char>(text[bytes]);
+        const std::size_t length = lead < 0x80 ? 1 : lead < 0xE0 ? 2
+            : lead < 0xF0                                        ? 3
+                                                                 : 4;
+        const std::size_t width = length == 4 ? 2 : 1;
+        if (units + width > maxUnits)
+            break;
+        units += width;
+        bytes += length;
+    }
+    return std::min(bytes, text.size());
+}
+
+//=============================================================================================================
+
+static std::vector<ChannelAlias> readAliases(const std::string& filename, bool reverse)
+{
+    std::vector<ChannelAlias> aliases;
+    std::ifstream file(path_from_utf8(filename));
+    if (!file) {
+        Log::critical("Cannot open alias file: {}", filename);
         return aliases;
     }
-    QTextStream in(&file);
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#'))
+    std::string raw;
+    while (std::getline(file, raw)) {
+        const std::string_view line = trimmed(raw);
+        if (line.empty() || line.starts_with('#'))
             continue;
 
-        QStringList parts = line.split(':');
+        const StringList parts = split(line, ':');
         if (parts.size() < 2) {
-            Log::critical("Alias line should contain a colon: {}", line.toStdString());
-            return QList<ChannelAlias>();
+            Log::critical("Alias line should contain a colon: {}", line);
+            return {};
         }
 
         ChannelAlias a;
         if (reverse) {
-            a.from = parts[1].trimmed();
-            a.to = parts[0].trimmed();
+            a.from = trimmed(parts[1]);
+            a.to = trimmed(parts[0]);
         } else {
-            a.from = parts[0].trimmed();
-            a.to = parts[1].trimmed();
+            a.from = trimmed(parts[0]);
+            a.to = trimmed(parts[1]);
         }
 
         a.toKind = -1;
         if (parts.size() >= 3) {
-            bool ok;
-            a.toKind = parts[2].trimmed().toInt(&ok);
-            if (!ok) {
-                Log::critical("Cannot interpret new kind: {}", parts[2].toStdString());
-                return QList<ChannelAlias>();
+            const std::optional<int> kind = to_int(trimmed(parts[2]));
+            if (!kind) {
+                Log::critical("Cannot interpret new kind: {}", parts[2]);
+                return {};
             }
+            a.toKind = *kind;
         }
 
-        if (a.to.isEmpty()) {
-            Log::critical("Destination name missing (from = {})", a.from.toStdString());
-            return QList<ChannelAlias>();
+        if (a.to.empty()) {
+            Log::critical("Destination name missing (from = {})", a.from);
+            return {};
         }
 
         // Truncate to 15 chars (FIFF channel name limit)
-        if (a.to.length() > 15) {
-            a.to.truncate(15);
-            Log::warning("Warning: name truncated to <{}>", a.to.toStdString());
+        if (const std::size_t prefix = utf16Prefix(a.to, 15); prefix < a.to.size()) {
+            a.to.resize(prefix);
+            Log::warning("Warning: name truncated to <{}>", a.to);
         }
 
-        aliases.append(a);
+        aliases.push_back(a);
     }
     return aliases;
 }
@@ -141,52 +168,40 @@ static QList<ChannelAlias> readAliases(const QString& filename, bool reverse)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_rename_channels");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Give new names to selected channels in a FIFF file.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"fif"}, "FIFF file to modify.", "name", {}});
+    parser.add_option({{"alias"}, "Alias file (<old>:<new>[:<kind>]).", "name", {}});
+    parser.add_option({{"revert", "reverse"}, "Swap old/new in the alias file.", {}, {}});
+    parser.process(argc, argv, "mne_rename_channels", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Give new names to selected channels in a FIFF file.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string fifName = parser.value("fif");
+    const std::string aliasName = parser.value("alias");
+    bool reverse = parser.is_set("revert");
 
-    QCommandLineOption fifOpt("fif", "FIFF file to modify.", "name");
-    parser.addOption(fifOpt);
-
-    QCommandLineOption aliasOpt("alias", "Alias file (<old>:<new>[:<kind>]).", "name");
-    parser.addOption(aliasOpt);
-
-    QCommandLineOption revertOpt(QStringList() << "revert" << "reverse", "Swap old/new in the alias file.");
-    parser.addOption(revertOpt);
-
-    parser.process(app);
-
-    QString fifName = parser.value(fifOpt);
-    QString aliasName = parser.value(aliasOpt);
-    bool reverse = parser.isSet(revertOpt);
-
-    if (fifName.isEmpty() || aliasName.isEmpty()) {
+    if (fifName.empty() || aliasName.empty()) {
         Log::critical("Both --fif and --alias are required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_rename_channels"));
+        return 1;
     }
 
-    Log::info("fif file   : {}", fifName.toStdString());
-    Log::info("alias file : {}", aliasName.toStdString());
+    Log::info("fif file   : {}", fifName);
+    Log::info("alias file : {}", aliasName);
     if (reverse)
         Log::info("Exchange the roles of old and new channel names in the alias file");
 
-    QList<ChannelAlias> aliases = readAliases(aliasName, reverse);
-    if (aliases.isEmpty()) {
+    const std::vector<ChannelAlias> aliases = readAliases(aliasName, reverse);
+    if (aliases.empty()) {
         Log::critical("No aliases read.");
         return 1;
     }
-    Log::info("{} aliases read from {}", static_cast<long long>(aliases.size()), aliasName.toStdString());
+    Log::info("{} aliases read from {}", static_cast<long long>(aliases.size()), aliasName);
 
     // Open FIFF file for in-place update
-    QFile file(fifName);
-    auto stream = FiffStream::open_update(fifName.toStdU16String());
+    auto stream = FiffStream::open_update(path_from_utf8(fifName));
     if (!stream) {
-        Log::critical("Cannot open file for update: {}", fifName.toStdString());
+        Log::critical("Cannot open file for update: {}", fifName);
         return 1;
     }
 
@@ -199,14 +214,14 @@ int main(int argc, char* argv[])
 
             for (const ChannelAlias& a : aliases) {
                 if (ch.ch_name == a.from) {
-                    QString line = QString("%1 -> %2").arg(ch.ch_name, a.to);
+                    std::string line = std::format("{} -> {}", ch.ch_name, a.to);
                     nMod++;
-                    ch.ch_name = a.to.toStdString();
+                    ch.ch_name = a.to;
                     if (a.toKind > 0) {
-                        line += QString(" (%1 -> %2)").arg(explainKind(ch.kind), explainKind(a.toKind));
+                        line += std::format(" ({} -> {})", explainKind(ch.kind), explainKind(a.toKind));
                         ch.kind = a.toKind;
                     }
-                    Log::info("{}", line.toStdString());
+                    Log::info("{}", line);
                     stream->byte_stream().seek(stream->dir()[k].pos);
                     stream->write_ch_info(ch);
                     break;
@@ -217,7 +232,7 @@ int main(int argc, char* argv[])
 
     stream->close();
     Log::info("{} changes done", nMod);
-    Log::info("{} processed.", fifName.toStdString());
+    Log::info("{} processed.", fifName);
 
     return 0;
 }

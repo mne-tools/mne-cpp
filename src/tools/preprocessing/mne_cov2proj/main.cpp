@@ -20,17 +20,9 @@
 #include <mne/fiff/fiff_stream.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_raw_data.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -43,6 +35,9 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <format>
+#include <fstream>
+#include <string>
 #include <vector>
 
 //=============================================================================================================
@@ -62,39 +57,25 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_cov2proj");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Convert noise covariance eigenvectors to SSP projection operators.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"cov"}, "Input noise covariance FIFF file.", "file", {}});
+    parser.add_option({{"raw"}, "Raw FIFF file (for channel info).", "file", {}});
+    parser.add_option({{"nproj"}, "Number of projectors to create.", "n", "5"});
+    parser.add_option({{"out"}, "Output projection FIFF file.", "file", {}});
+    parser.process(argc, argv, "mne_cov2proj", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Convert noise covariance eigenvectors to SSP projection operators.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string covFile = parser.value("cov");
+    const std::string rawFile = parser.value("raw");
+    const std::string outFile = parser.value("out");
+    int nProj = to_int(parser.value("nproj")).value_or(0);
 
-    QCommandLineOption covOpt("cov", "Input noise covariance FIFF file.", "file");
-    parser.addOption(covOpt);
-
-    QCommandLineOption rawOpt("raw", "Raw FIFF file (for channel info).", "file");
-    parser.addOption(rawOpt);
-
-    QCommandLineOption nprojOpt("nproj", "Number of projectors to create.", "n", "5");
-    parser.addOption(nprojOpt);
-
-    QCommandLineOption outOpt("out", "Output projection FIFF file.", "file");
-    parser.addOption(outOpt);
-
-    parser.process(app);
-
-    QString covFile = parser.value(covOpt);
-    QString rawFile = parser.value(rawOpt);
-    QString outFile = parser.value(outOpt);
-    int nProj = parser.value(nprojOpt).toInt();
-
-    if (covFile.isEmpty()) {
+    if (covFile.empty()) {
         Log::critical("--cov is required.");
         return 1;
     }
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         Log::critical("--out is required.");
         return 1;
     }
@@ -102,21 +83,21 @@ int main(int argc, char* argv[])
     // Read covariance
     FiffCov cov;
     try {
-        cov = FiffCov(covFile.toStdU16String());
+        cov = FiffCov(path_from_utf8(covFile));
     } catch (const std::exception& error) {
-        Log::critical("Cannot read covariance from {}: {}", covFile.toStdString(), error.what());
+        Log::critical("Cannot read covariance from {}: {}", covFile, error.what());
         return 1;
     }
     if (cov.empty()) {
-        Log::critical("Cannot read covariance from: {}", covFile.toStdString());
+        Log::critical("Cannot read covariance from: {}", covFile);
         return 1;
     }
     Log::info("Read covariance: {} x {} channels", cov.dim, cov.dim);
 
     // Get channel names
     StringList chNames = cov.names;
-    if (chNames.empty() && !rawFile.isEmpty()) {
-        FiffRawData raw(rawFile.toStdU16String());
+    if (chNames.empty() && !rawFile.empty()) {
+        FiffRawData raw(path_from_utf8(rawFile));
         chNames = raw.info.ch_names;
     }
 
@@ -134,7 +115,7 @@ int main(int argc, char* argv[])
     Log::info("Eigenvalue range: {:g} .. {:g}", eigenvalues(0), eigenvalues(eigenvalues.size() - 1));
 
     // Select the top nProj eigenvectors (largest eigenvalues = most noise)
-    int nEig = eigenvalues.size();
+    int nEig = static_cast<int>(eigenvalues.size());
     if (nProj > nEig)
         nProj = nEig;
 
@@ -159,14 +140,13 @@ int main(int argc, char* argv[])
     }
 
     // Write projectors to file
-    QFile outF(outFile);
-    if (!outF.open(QIODevice::WriteOnly)) {
-        Log::critical("Cannot open output file: {}", outFile.toStdString());
+    if (!std::ofstream(path_from_utf8(outFile), std::ios::binary)) {
+        Log::critical("Cannot open output file: {}", outFile);
         return 1;
     }
-    auto stream = FiffStream::start_file(outFile.toStdU16String());
+    auto stream = FiffStream::start_file(path_from_utf8(outFile));
     if (!stream) {
-        Log::critical("Cannot open output file: {}", outFile.toStdString());
+        Log::critical("Cannot open output file: {}", outFile);
         return 1;
     }
 
@@ -175,6 +155,6 @@ int main(int argc, char* argv[])
     stream->end_block(FIFFB_MNE);
     stream->end_file();
 
-    Log::info("Written {} projectors to: {}", nProj, outFile.toStdString());
+    Log::info("Written {} projectors to: {}", nProj, outFile);
     return 0;
 }

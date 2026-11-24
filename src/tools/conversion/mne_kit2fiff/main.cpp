@@ -22,20 +22,11 @@
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_ch_info.h>
 #include <mne/fiff/fiff_types.h>
+#include <mne/base/byte_stream.h>
+#include <mne/base/command_line.h>
+#include <mne/base/endian.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QTextStream>
-#include <QRegularExpression>
-#include <QFileInfo>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -44,6 +35,22 @@
 #include <Eigen/Core>
 #include <Eigen/SVD>
 #include <Eigen/LU>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <bit>
+#include <chrono>
+#include <cmath>
+#include <cstdint>
+#include <format>
+#include <fstream>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -78,7 +85,7 @@ struct KitCoilDef
 
 struct KitSensorInfo
 {
-    QString name;
+    std::string name;
     int type; // 1=MEG, 2=ref, 3=trigger, 0=misc
     KitCoilDef coil;
     double gain;
@@ -91,54 +98,81 @@ struct KitDatasetInfo
     double sfreq;
     int dataOffset; // byte offset to data in sqd file
     int systemId;
-    QList<KitSensorInfo> sensors;
+    std::vector<KitSensorInfo> sensors;
+};
+
+//=============================================================================================================
+// Little-endian file reader
+//=============================================================================================================
+
+/**
+ * Reads little-endian values from a file; reads past the end give 0 and seeks past the end stay at the end.
+ */
+class KitLittleEndianReader
+{
+public:
+    explicit KitLittleEndianReader(const std::string& path)
+    : m_stream(mne::FileByteStream::open(mne::path_from_utf8(path), mne::FileByteStream::Mode::Read))
+    {
+    }
+
+    bool isOpen() const
+    {
+        return m_stream != nullptr;
+    }
+
+    void seek(std::uint64_t position)
+    {
+        if (!m_stream->seek(position))
+            m_stream->seek(m_stream->size());
+    }
+
+    template<typename T>
+    T read()
+    {
+        T value{};
+        if (m_stream->read(&value, sizeof(T)) != sizeof(T))
+            return T{};
+        if constexpr (std::endian::native == std::endian::big)
+            value = mne::byte_swap(value);
+        return value;
+    }
+
+private:
+    std::unique_ptr<mne::FileByteStream> m_stream;
 };
 
 //=============================================================================================================
 // Parse KIT .sqd header
 //=============================================================================================================
 
-static bool parseSqdHeader(const QString& sqdPath, KitDatasetInfo& info)
+static bool parseSqdHeader(const std::string& sqdPath, KitDatasetInfo& info)
 {
-    QFile file(sqdPath);
-    if (!file.open(QIODevice::ReadOnly)) {
-        Log::critical("Cannot open SQD file: {}", sqdPath.toStdString());
+    KitLittleEndianReader ds(sqdPath);
+    if (!ds.isOpen()) {
+        Log::critical("Cannot open SQD file: {}", sqdPath);
         return false;
     }
 
-    QDataStream ds(&file);
-    ds.setByteOrder(QDataStream::LittleEndian);
-    ds.setFloatingPointPrecision(QDataStream::DoublePrecision);
-
     // Read system ID
-    file.seek(KIT_SYSTEM_ID_OFFSET);
-    qint32 sysId;
-    ds >> sysId;
-    info.systemId = sysId;
+    ds.seek(KIT_SYSTEM_ID_OFFSET);
+    info.systemId = ds.read<std::int32_t>();
 
     // Read number of channels
-    file.seek(KIT_NCHAN_OFFSET);
-    qint32 nChan;
-    ds >> nChan;
-    info.nChannels = nChan;
+    ds.seek(KIT_NCHAN_OFFSET);
+    info.nChannels = ds.read<std::int32_t>();
 
     // Read sample rate
-    file.seek(KIT_SFREQ_OFFSET);
-    double sfreq;
-    ds >> sfreq;
-    info.sfreq = sfreq;
+    ds.seek(KIT_SFREQ_OFFSET);
+    info.sfreq = ds.read<double>();
 
     // Read number of samples
-    file.seek(KIT_NSAMP_OFFSET);
-    qint32 nSamp;
-    ds >> nSamp;
-    info.nSamples = nSamp;
+    ds.seek(KIT_NSAMP_OFFSET);
+    info.nSamples = ds.read<std::int32_t>();
 
     // Read data offset
-    file.seek(KIT_DATA_OFFSET_OFFSET);
-    qint32 dataOff;
-    ds >> dataOff;
-    info.dataOffset = dataOff;
+    ds.seek(KIT_DATA_OFFSET_OFFSET);
+    info.dataOffset = ds.read<std::int32_t>();
     if (info.dataOffset <= 0)
         info.dataOffset = KIT_HEADER_SIZE;
 
@@ -147,15 +181,14 @@ static bool parseSqdHeader(const QString& sqdPath, KitDatasetInfo& info)
     // Initialize sensors with default info
     for (int c = 0; c < info.nChannels; ++c) {
         KitSensorInfo sen;
-        sen.name = QString("MEG %1").arg(c + 1, 3, 10, QChar('0'));
+        sen.name = std::format("MEG {:03}", c + 1);
         sen.type = (c < 160) ? 1 : 0; // First 160 are typically MEG
         sen.gain = 1.0;
         sen.coil.position = Vector3d::Zero();
         sen.coil.orientation = Vector3d(0, 0, 1);
-        info.sensors.append(sen);
+        info.sensors.push_back(sen);
     }
 
-    file.close();
     return true;
 }
 
@@ -163,43 +196,50 @@ static bool parseSqdHeader(const QString& sqdPath, KitDatasetInfo& info)
 // Read sensor layout file (tab/space-delimited: idx x y z ox oy oz)
 //=============================================================================================================
 
-static bool readSensorLayout(const QString& snsPath, KitDatasetInfo& info)
+/** @return @p text as a number, 0 if it is none. */
+static double kitToDouble(std::string_view text)
 {
-    QFile file(snsPath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Cannot open sensor file: {}", snsPath.toStdString());
+    return mne::to_double(text).value_or(0.0);
+}
+
+//=============================================================================================================
+
+static bool readSensorLayout(const std::string& snsPath, KitDatasetInfo& info)
+{
+    std::ifstream in(mne::path_from_utf8(snsPath));
+    if (!in) {
+        Log::critical("Cannot open sensor file: {}", snsPath);
         return false;
     }
 
-    QTextStream in(&file);
     int count = 0;
 
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#') || line.startsWith('%'))
+    std::string rawLine;
+    while (std::getline(in, rawLine)) {
+        const std::string_view line = mne::trimmed(rawLine);
+        if (line.empty() || line.starts_with('#') || line.starts_with('%'))
             continue;
 
-        QStringList parts = line.split(QRegularExpression("\\s+"));
+        const std::vector<std::string_view> parts = mne::split_whitespace(line);
         if (parts.size() < 7)
             continue;
 
-        int idx = parts[0].toInt() - 1; // 1-based to 0-based
+        int idx = mne::to_int(parts[0]).value_or(0) - 1; // 1-based to 0-based
         if (idx < 0 || idx >= info.nChannels)
             continue;
 
         // Positions in mm, convert to m
-        info.sensors[idx].coil.position(0) = parts[1].toDouble() * 0.001;
-        info.sensors[idx].coil.position(1) = parts[2].toDouble() * 0.001;
-        info.sensors[idx].coil.position(2) = parts[3].toDouble() * 0.001;
-        info.sensors[idx].coil.orientation(0) = parts[4].toDouble();
-        info.sensors[idx].coil.orientation(1) = parts[5].toDouble();
-        info.sensors[idx].coil.orientation(2) = parts[6].toDouble();
+        info.sensors[idx].coil.position(0) = kitToDouble(parts[1]) * 0.001;
+        info.sensors[idx].coil.position(1) = kitToDouble(parts[2]) * 0.001;
+        info.sensors[idx].coil.position(2) = kitToDouble(parts[3]) * 0.001;
+        info.sensors[idx].coil.orientation(0) = kitToDouble(parts[4]);
+        info.sensors[idx].coil.orientation(1) = kitToDouble(parts[5]);
+        info.sensors[idx].coil.orientation(2) = kitToDouble(parts[6]);
         info.sensors[idx].type = 1; // MEG channel
         count++;
     }
 
-    file.close();
-    Log::info("Read {} sensor positions from {}", count, snsPath.toStdString());
+    Log::info("Read {} sensor positions from {}", count, snsPath);
     return true;
 }
 
@@ -207,53 +247,51 @@ static bool readSensorLayout(const QString& snsPath, KitDatasetInfo& info)
 // Read HPI coil positions and compute Procrustes alignment (device->head transform)
 //=============================================================================================================
 
-static bool computeDevHeadTransform(const QString& hpiPath, FiffCoordTrans& trans)
+static bool computeDevHeadTransform(const std::string& hpiPath, FiffCoordTrans& trans)
 {
     // HPI file format: pairs of device and head coordinate lines
     // Format: x y z (in mm) - first N lines are device coords, next N are head coords
     // Or alternating lines: device_x device_y device_z head_x head_y head_z
-    QFile file(hpiPath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::info("Warning: Cannot open HPI file: {}", hpiPath.toStdString());
+    std::ifstream in(mne::path_from_utf8(hpiPath));
+    if (!in) {
+        Log::info("Warning: Cannot open HPI file: {}", hpiPath);
         return false;
     }
 
-    QTextStream in(&file);
-    QList<Vector3d> devicePts;
-    QList<Vector3d> headPts;
+    std::vector<Vector3d> devicePts;
+    std::vector<Vector3d> headPts;
 
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#'))
+    std::string rawLine;
+    while (std::getline(in, rawLine)) {
+        const std::string_view line = mne::trimmed(rawLine);
+        if (line.empty() || line.starts_with('#'))
             continue;
 
-        QStringList parts = line.split(QRegularExpression("\\s+"));
+        const std::vector<std::string_view> parts = mne::split_whitespace(line);
         if (parts.size() >= 6) {
             // Format: dev_x dev_y dev_z head_x head_y head_z
             Vector3d dev, head;
-            dev(0) = parts[0].toDouble() * 0.001; // mm to m
-            dev(1) = parts[1].toDouble() * 0.001;
-            dev(2) = parts[2].toDouble() * 0.001;
-            head(0) = parts[3].toDouble() * 0.001;
-            head(1) = parts[4].toDouble() * 0.001;
-            head(2) = parts[5].toDouble() * 0.001;
-            devicePts.append(dev);
-            headPts.append(head);
+            dev(0) = kitToDouble(parts[0]) * 0.001; // mm to m
+            dev(1) = kitToDouble(parts[1]) * 0.001;
+            dev(2) = kitToDouble(parts[2]) * 0.001;
+            head(0) = kitToDouble(parts[3]) * 0.001;
+            head(1) = kitToDouble(parts[4]) * 0.001;
+            head(2) = kitToDouble(parts[5]) * 0.001;
+            devicePts.push_back(dev);
+            headPts.push_back(head);
         } else if (parts.size() >= 3) {
             // Alternating device/head lines
             Vector3d pt;
-            pt(0) = parts[0].toDouble() * 0.001;
-            pt(1) = parts[1].toDouble() * 0.001;
-            pt(2) = parts[2].toDouble() * 0.001;
+            pt(0) = kitToDouble(parts[0]) * 0.001;
+            pt(1) = kitToDouble(parts[1]) * 0.001;
+            pt(2) = kitToDouble(parts[2]) * 0.001;
             if (devicePts.size() <= headPts.size())
-                devicePts.append(pt);
+                devicePts.push_back(pt);
             else
-                headPts.append(pt);
+                headPts.push_back(pt);
         }
     }
-    file.close();
-
-    int nPts = std::min(devicePts.size(), headPts.size());
+    const int nPts = static_cast<int>(std::min(devicePts.size(), headPts.size()));
     if (nPts < 3) {
         Log::info("Warning: Need at least 3 HPI points, got {}", nPts);
         return false;
@@ -330,33 +368,28 @@ static bool computeDevHeadTransform(const QString& hpiPath, FiffCoordTrans& tran
 // Read KIT .sqd data
 //=============================================================================================================
 
-static bool readSqdData(const QString& sqdPath, const KitDatasetInfo& info, MatrixXd& data)
+static bool readSqdData(const std::string& sqdPath, const KitDatasetInfo& info, MatrixXd& data)
 {
-    QFile file(sqdPath);
-    if (!file.open(QIODevice::ReadOnly)) {
-        Log::critical("Cannot open SQD: {}", sqdPath.toStdString());
+    KitLittleEndianReader ds(sqdPath);
+    if (!ds.isOpen()) {
+        Log::critical("Cannot open SQD: {}", sqdPath);
         return false;
     }
 
-    file.seek(info.dataOffset);
+    ds.seek(static_cast<std::uint64_t>(info.dataOffset));
 
     int nChan = info.nChannels;
     int nSamp = info.nSamples;
     data.resize(nChan, nSamp);
 
-    QDataStream ds(&file);
-    ds.setByteOrder(QDataStream::LittleEndian);
-
     // KIT data is typically stored as 16-bit integers, channel-interleaved
     for (int s = 0; s < nSamp; ++s) {
         for (int c = 0; c < nChan; ++c) {
-            qint16 val;
-            ds >> val;
+            const std::int16_t val = ds.read<std::int16_t>();
             data(c, s) = static_cast<double>(val) * info.sensors[c].gain;
         }
     }
 
-    file.close();
     Log::info("Read {} channels x {} samples", nChan, nSamp);
     return true;
 }
@@ -365,48 +398,31 @@ static bool readSqdData(const QString& sqdPath, const KitDatasetInfo& info, Matr
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_kit2fiff");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Convert KIT/Ricoh .sqd/.con MEG data to FIFF format.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"sqd"}, "Input KIT .sqd or .con file.", "file", {}});
+    parser.add_option({{"sns"}, "Sensor layout definition file.", "file", {}});
+    parser.add_option({{"hpi"}, "HPI coil positions in head coords.", "file", {}});
+    parser.add_option({{"out"}, "Output FIFF file.", "file", {}});
+    parser.add_option({{"stim"}, "Comma-separated stimulus channel indices.", "list", {}});
+    parser.process(argc, argv, "mne_kit2fiff", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Convert KIT/Ricoh .sqd/.con MEG data to FIFF format.");
-    parser.addHelpOption();
-    parser.addVersionOption();
-
-    QCommandLineOption sqdOpt("sqd", "Input KIT .sqd or .con file.", "file");
-    parser.addOption(sqdOpt);
-
-    QCommandLineOption snsOpt("sns", "Sensor layout definition file.", "file");
-    parser.addOption(snsOpt);
-
-    QCommandLineOption hpiOpt("hpi", "HPI coil positions in head coords.", "file");
-    parser.addOption(hpiOpt);
-
-    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
-    parser.addOption(outOpt);
-
-    QCommandLineOption stimOpt("stim", "Comma-separated stimulus channel indices.", "list");
-    parser.addOption(stimOpt);
-
-    parser.process(app);
-
-    QString sqdFile = parser.value(sqdOpt);
-    QString snsFile = parser.value(snsOpt);
-    QString hpiFile = parser.value(hpiOpt);
-    QString outFile = parser.value(outOpt);
-    QList<int> stimChannels;
-    if (parser.isSet(stimOpt)) {
-        QStringList parts = parser.value(stimOpt).split(',');
-        for (const QString& p : parts)
-            stimChannels.append(p.trimmed().toInt());
+    const std::string sqdFile = parser.value("sqd");
+    const std::string snsFile = parser.value("sns");
+    const std::string hpiFile = parser.value("hpi");
+    const std::string outFile = parser.value("out");
+    std::vector<int> stimChannels;
+    if (parser.is_set("stim")) {
+        for (const std::string& p : mne::split(parser.value("stim"), ','))
+            stimChannels.push_back(mne::to_int(p).value_or(0));
     }
 
-    if (sqdFile.isEmpty()) {
+    if (sqdFile.empty()) {
         Log::critical("--sqd is required.");
         return 1;
     }
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         Log::critical("--out is required.");
         return 1;
     }
@@ -417,7 +433,7 @@ int main(int argc, char* argv[])
         return 1;
 
     // Read optional sensor layout
-    if (!snsFile.isEmpty()) {
+    if (!snsFile.empty()) {
         if (!readSensorLayout(snsFile, info))
             return 1;
     }
@@ -435,7 +451,7 @@ int main(int argc, char* argv[])
     devHeadTrans.trans = Matrix4f::Identity();
     devHeadTrans.invtrans = Matrix4f::Identity();
 
-    if (!hpiFile.isEmpty())
+    if (!hpiFile.empty())
         computeDevHeadTransform(hpiFile, devHeadTrans);
 
     // Read data
@@ -448,7 +464,8 @@ int main(int argc, char* argv[])
     FiffInfo fiffInfo;
     fiffInfo.sfreq = info.sfreq;
     fiffInfo.nchan = nChan;
-    fiffInfo.meas_date[0] = static_cast<fiff_int_t>(QDateTime::currentDateTime().toSecsSinceEpoch());
+    const auto now = std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
+    fiffInfo.meas_date[0] = static_cast<fiff_int_t>(now.time_since_epoch().count());
     fiffInfo.meas_date[1] = 0;
     fiffInfo.dev_head_t = devHeadTrans;
 
@@ -456,7 +473,7 @@ int main(int argc, char* argv[])
         FiffChInfo ch;
         ch.scanNo = c + 1;
         ch.logNo = c + 1;
-        ch.ch_name = info.sensors[c].name.toStdString();
+        ch.ch_name = info.sensors[c].name;
         ch.cal = 1.0;
         ch.range = 1.0;
 
@@ -497,13 +514,13 @@ int main(int argc, char* argv[])
 
     // Write FIFF
     Eigen::RowVectorXd cals;
-    auto stream = FiffStream::start_writing_raw(outFile.toStdU16String(), fiffInfo, cals);
+    auto stream = FiffStream::start_writing_raw(mne::path_from_utf8(outFile), fiffInfo, cals);
     if (!stream) {
-        Log::critical("Cannot open output: {}", outFile.toStdString());
+        Log::critical("Cannot open output: {}", outFile);
         return 1;
     }
 
-    int nSamples = data.cols();
+    const int nSamples = static_cast<int>(data.cols());
     int chunkSize = 10000;
     for (int start = 0; start < nSamples; start += chunkSize) {
         int end = std::min(start + chunkSize, nSamples);
@@ -512,7 +529,7 @@ int main(int argc, char* argv[])
     }
 
     stream->finish_writing_raw();
-    Log::info("Written FIFF: {} ({} channels, {} samples, {:.1f} Hz)", outFile.toStdString(), nChan, nSamples, info.sfreq);
+    Log::info("Written FIFF: {} ({} channels, {} samples, {:.1f} Hz)", outFile, nChan, nSamples, info.sfreq);
 
     return 0;
 }

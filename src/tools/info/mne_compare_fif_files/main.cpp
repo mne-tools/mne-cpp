@@ -18,22 +18,17 @@
 #include <mne/fiff/fiff_tag.h>
 #include <mne/fiff/fiff_dir_node.h>
 #include <mne/fiff/fiff_constants.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <algorithm>
+#include <format>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -49,7 +44,7 @@ using namespace mne;
 
 //=============================================================================================================
 
-static QString tagName(int kind)
+static std::string tagName(int kind)
 {
     // Return a human-readable tag name for common FIFF tags
     switch (kind) {
@@ -86,7 +81,7 @@ static QString tagName(int kind)
         case FIFF_COMMENT:
             return "COMMENT";
         default:
-            return QString("TAG_%1").arg(kind);
+            return std::format("TAG_{}", kind);
     }
 }
 
@@ -94,54 +89,42 @@ static QString tagName(int kind)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_compare_fif_files");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Compare two FIFF files tag by tag.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"file1"}, "First FIFF file.", "file", {}});
+    parser.add_option({{"file2"}, "Second FIFF file.", "file", {}});
+    parser.add_option({{"verbose"}, "Show matching tags too.", {}, {}});
+    parser.process(argc, argv, "mne_compare_fif_files", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Compare two FIFF files tag by tag.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string file1 = parser.value("file1");
+    const std::string file2 = parser.value("file2");
+    bool verbose = parser.is_set("verbose");
 
-    QCommandLineOption file1Opt("file1", "First FIFF file.", "file");
-    parser.addOption(file1Opt);
-
-    QCommandLineOption file2Opt("file2", "Second FIFF file.", "file");
-    parser.addOption(file2Opt);
-
-    QCommandLineOption verboseOpt("verbose", "Show matching tags too.");
-    parser.addOption(verboseOpt);
-
-    parser.process(app);
-
-    QString file1 = parser.value(file1Opt);
-    QString file2 = parser.value(file2Opt);
-    bool verbose = parser.isSet(verboseOpt);
-
-    if (file1.isEmpty() || file2.isEmpty()) {
+    if (file1.empty() || file2.empty()) {
         Log::critical("Both --file1 and --file2 are required.");
         return 1;
     }
 
     // Open both files
-    FiffStream stream1(file1.toStdU16String());
-    FiffStream stream2(file2.toStdU16String());
+    FiffStream stream1(path_from_utf8(file1));
+    FiffStream stream2(path_from_utf8(file2));
 
     if (!stream1.open()) {
-        Log::critical("Cannot parse FIFF: {}", file1.toStdString());
+        Log::critical("Cannot parse FIFF: {}", file1);
         return 1;
     }
 
     if (!stream2.open()) {
-        Log::critical("Cannot parse FIFF: {}", file2.toStdString());
+        Log::critical("Cannot parse FIFF: {}", file2);
         return 1;
     }
 
     const std::vector<FiffDirEntry>& dir1 = stream1.dir();
     const std::vector<FiffDirEntry>& dir2 = stream2.dir();
 
-    Log::info("File 1: {} ({} directory entries)", file1.toStdString(), static_cast<int>(dir1.size()));
-    Log::info("File 2: {} ({} directory entries)", file2.toStdString(), static_cast<int>(dir2.size()));
+    Log::info("File 1: {} ({} directory entries)", file1, static_cast<int>(dir1.size()));
+    Log::info("File 2: {} ({} directory entries)", file2, static_cast<int>(dir2.size()));
     Log::info("{}", "");
 
     int nMatch = 0, nDiff = 0, nMissing = 0;
@@ -169,21 +152,21 @@ int main(int argc, char* argv[])
         if (isMatch) {
             nMatch++;
             if (verbose)
-                Log::info("  [{:4}] {} : MATCH (size={})", i, tagName(dir1[i].kind).toStdString(), dir1[i].size);
+                Log::info("  [{:4}] {} : MATCH (size={})", i, tagName(dir1[i].kind), dir1[i].size);
         } else {
             nDiff++;
-            QString line = QString::asprintf("  [%4d] DIFF:", i);
+            std::string line = std::format("  [{:4}] DIFF:", i);
             if (!kindMatch)
-                line += QString::asprintf(" kind=%d vs %d", dir1[i].kind, dir2[i].kind);
+                line += std::format(" kind={} vs {}", dir1[i].kind, dir2[i].kind);
             else
                 line += " kind=" + tagName(dir1[i].kind);
             if (!typeMatch)
-                line += QString::asprintf(" type=%d vs %d", dir1[i].type, dir2[i].type);
+                line += std::format(" type={} vs {}", dir1[i].type, dir2[i].type);
             if (!sizeMatch)
-                line += QString::asprintf(" size=%d vs %d", dir1[i].size, dir2[i].size);
+                line += std::format(" size={} vs {}", dir1[i].size, dir2[i].size);
             if (sizeMatch && !dataMatch)
                 line += " DATA_DIFFERS";
-            Log::info("{}", line.toStdString());
+            Log::info("{}", line);
         }
     }
 

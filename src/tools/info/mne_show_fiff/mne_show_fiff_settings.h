@@ -13,13 +13,6 @@
 #ifndef SHOWFIFFSETTINGS_H
 #define SHOWFIFFSETTINGS_H
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
@@ -27,17 +20,15 @@
 #include <Eigen/Core>
 
 
-//*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QString>
-#include <QList>
+#include <memory>
+#include <string>
+#include <vector>
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE SHOWFIFF
 //=============================================================================================================
@@ -45,7 +36,6 @@
 namespace SHOWFIFF
 {
 
-//*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -60,8 +50,8 @@ namespace SHOWFIFF
 class MNEShowFiffSettings
 {
 public:
-    typedef QSharedPointer<MNEShowFiffSettings> SPtr;            /**< Shared pointer type for MNEShowFiffSettings. */
-    typedef QSharedPointer<const MNEShowFiffSettings> ConstSPtr; /**< Const shared pointer type for MNEShowFiffSettings. */
+    typedef std::shared_ptr<MNEShowFiffSettings> SPtr;            /**< Shared pointer type for MNEShowFiffSettings. */
+    typedef std::shared_ptr<const MNEShowFiffSettings> ConstSPtr; /**< Const shared pointer type for MNEShowFiffSettings. */
 
     //=========================================================================================================
     /**
@@ -91,23 +81,18 @@ public:
     void checkIntegrity();
 
 public:
-    QString inname;    /**< The input file. */
-    int indent;        /**< Number of spaces to use in indentation (default %d in terse and 0 in verbose output). */
-    bool verbose;      /**< Verbose output. */
-    QList<int> tags;   /**< Provide information about these tags (can have multiple of these). */
-    bool long_strings; /**< Print long strings in full? */
-    bool blocks_only;  /**< Only list the blocks (the tree structure). */
+    std::string inname;    /**< The input file. */
+    int indent;            /**< Number of spaces to use in indentation (default %d in terse and 0 in verbose output). */
+    bool verbose;          /**< Verbose output. */
+    std::vector<int> tags; /**< Provide information about these tags (can have multiple of these). */
+    bool long_strings;     /**< Print long strings in full? */
+    bool blocks_only;      /**< Only list the blocks (the tree structure). */
 
 private:
     void usage(char* name);
     bool check_unrecognized_args(int argc, char** argv);
     bool check_args(int* argc, char** argv);
 };
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
 
 
 } //NAMESPACE SHOWFIFF

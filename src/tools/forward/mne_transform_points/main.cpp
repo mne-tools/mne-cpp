@@ -19,23 +19,24 @@
 
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QTextStream>
-#include <QRegularExpression>
+#include <mne/base/command_line.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <format>
+#include <fstream>
+#include <optional>
+#include <print>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -52,9 +53,9 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-static int frameFromName(const QString& name)
+static int frameFromName(const std::string& name)
 {
-    QString lower = name.toLower();
+    const std::string lower = to_lower(name);
     if (lower == "head")
         return FIFFV_COORD_HEAD;
     if (lower == "mri")
@@ -72,57 +73,44 @@ static int frameFromName(const QString& name)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_transform_points");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Transform 3D points between coordinate frames.\n\nReads a FIFF coordinate transform and applies it to a set of 3D points.");
+    parser.add_help_option();
+    parser.add_version_option();
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Transform 3D points between coordinate frames.\n\nReads a FIFF coordinate transform and applies it to a set of 3D points.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_option({{"trans"}, "FIFF coordinate transform file.", "name", ""});
+    parser.add_option({{"in"}, "Input text file (one point per line: x y z).", "name", ""});
+    parser.add_option({{"out"}, "Output text file.", "name", ""});
+    parser.add_option({{"from"}, "Source frame name (head, mri, device).", "name", ""});
+    parser.add_option({{"to"}, "Target frame name (head, mri, device).", "name", ""});
 
-    QCommandLineOption transOpt("trans", "FIFF coordinate transform file.", "name");
-    parser.addOption(transOpt);
+    parser.process(argc, argv, "mne_transform_points", PROGRAM_VERSION);
 
-    QCommandLineOption inOpt("in", "Input text file (one point per line: x y z).", "name");
-    parser.addOption(inOpt);
+    const std::string transName = parser.value("trans");
+    const std::string inName = parser.value("in");
+    const std::string outName = parser.value("out");
+    const std::string fromName = parser.value("from");
+    const std::string toName = parser.value("to");
 
-    QCommandLineOption outOpt("out", "Output text file.", "name");
-    parser.addOption(outOpt);
-
-    QCommandLineOption fromOpt("from", "Source frame name (head, mri, device).", "name");
-    parser.addOption(fromOpt);
-
-    QCommandLineOption toOpt("to", "Target frame name (head, mri, device).", "name");
-    parser.addOption(toOpt);
-
-    parser.process(app);
-
-    QString transName = parser.value(transOpt);
-    QString inName = parser.value(inOpt);
-    QString outName = parser.value(outOpt);
-    QString fromName = parser.value(fromOpt);
-    QString toName = parser.value(toOpt);
-
-    if (transName.isEmpty() || inName.isEmpty() || outName.isEmpty() || fromName.isEmpty() || toName.isEmpty()) {
+    if (transName.empty() || inName.empty() || outName.empty() || fromName.empty() || toName.empty()) {
         Log::critical("All options --trans, --in, --out, --from, and --to are required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_transform_points"));
+        return 1;
     }
 
     int fromFrame = frameFromName(fromName);
     int toFrame = frameFromName(toName);
 
     if (fromFrame < 0) {
-        Log::critical("Unknown source frame: {}", fromName.toStdString());
+        Log::critical("Unknown source frame: {}", fromName);
         return 1;
     }
     if (toFrame < 0) {
-        Log::critical("Unknown target frame: {}", toName.toStdString());
+        Log::critical("Unknown target frame: {}", toName);
         return 1;
     }
 
     // Read the transform between the requested frames (inverted if stored the other way round)
-    const auto read = FiffCoordTrans::read(transName.toStdU16String(), fromFrame, toFrame);
+    const auto read = FiffCoordTrans::read(path_from_utf8(transName), fromFrame, toFrame);
     if (!read) {
         Log::critical("{}", read.error().what());
         return 1;
@@ -132,62 +120,54 @@ int main(int argc, char* argv[])
     Log::info("Read transform: {} -> {}", std::string(FiffCoordTrans::frame_name(trans.from)), std::string(FiffCoordTrans::frame_name(trans.to)));
 
     // Read input points
-    QFile inFile(inName);
-    if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Cannot open input file: {}", inName.toStdString());
+    std::ifstream inFile(path_from_utf8(inName));
+    if (!inFile) {
+        Log::critical("Cannot open input file: {}", inName);
         return 1;
     }
 
-    QList<Vector3f> points;
-    QTextStream inStream(&inFile);
-    while (!inStream.atEnd()) {
-        QString line = inStream.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#'))
+    std::vector<Vector3f> points;
+    std::string rawLine;
+    while (std::getline(inFile, rawLine)) {
+        const std::string_view line = trimmed(rawLine);
+        if (line.empty() || line.starts_with('#'))
             continue;
-        QStringList parts = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+        const std::vector<std::string_view> parts = split_whitespace(line);
         if (parts.size() < 3) {
-            Log::critical("Invalid line in input file: {}", line.toStdString());
+            Log::critical("Invalid line in input file: {}", line);
             return 1;
         }
-        bool ok1, ok2, ok3;
-        float x = parts[0].toFloat(&ok1);
-        float y = parts[1].toFloat(&ok2);
-        float z = parts[2].toFloat(&ok3);
-        if (!ok1 || !ok2 || !ok3) {
-            Log::critical("Cannot parse coordinates: {}", line.toStdString());
+        const std::optional<double> x = to_double(parts[0]);
+        const std::optional<double> y = to_double(parts[1]);
+        const std::optional<double> z = to_double(parts[2]);
+        if (!x || !y || !z) {
+            Log::critical("Cannot parse coordinates: {}", line);
             return 1;
         }
-        points.append(Vector3f(x, y, z));
+        points.emplace_back(static_cast<float>(*x), static_cast<float>(*y), static_cast<float>(*z));
     }
-    inFile.close();
 
-    Log::info("Read {} points from {}", static_cast<long long>(points.size()), inName.toStdString());
+    Log::info("Read {} points from {}", static_cast<long long>(points.size()), inName);
 
     // Build matrix from points
-    MatrixX3f rr(points.size(), 3);
-    for (int i = 0; i < points.size(); ++i)
-        rr.row(i) = points[i].transpose();
+    MatrixX3f rr(std::ssize(points), 3);
+    for (Eigen::Index i = 0; i < std::ssize(points); ++i)
+        rr.row(i) = points[static_cast<std::size_t>(i)].transpose();
 
     const MatrixX3f transformed = trans.apply_trans(rr);
 
     // Write output
-    QFile outFile(outName);
-    if (!outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        Log::critical("Cannot open output file: {}", outName.toStdString());
+    std::ofstream outFile(path_from_utf8(outName));
+    if (!outFile) {
+        Log::critical("Cannot open output file: {}", outName);
         return 1;
     }
 
-    QTextStream outStream(&outFile);
-    outStream.setRealNumberPrecision(8);
-    outStream.setRealNumberNotation(QTextStream::FixedNotation);
-    for (int i = 0; i < transformed.rows(); ++i) {
-        outStream << transformed(i, 0) << " "
-                  << transformed(i, 1) << " "
-                  << transformed(i, 2) << "\n";
-    }
+    for (Eigen::Index i = 0; i < transformed.rows(); ++i)
+        outFile << std::format("{:.8f} {:.8f} {:.8f}\n", transformed(i, 0), transformed(i, 1), transformed(i, 2));
     outFile.close();
 
-    Log::info("Wrote {} transformed points to {}", static_cast<int>(transformed.rows()), outName.toStdString());
+    Log::info("Wrote {} transformed points to {}", static_cast<int>(transformed.rows()), outName);
 
     return 0;
 }

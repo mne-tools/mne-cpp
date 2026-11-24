@@ -24,16 +24,9 @@
 #include <mne/mna/mna_graph_executor.h>
 #include <mne/mna/mna_op_registry.h>
 
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -55,44 +48,25 @@ using namespace mne;
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName(QStringLiteral("mne_inverse_pipeline"));
-    QCoreApplication::setApplicationVersion(QStringLiteral(PROGRAM_VERSION));
-
-
     //
     // Command-line parsing
     //
-    QCommandLineParser parser;
-    parser.setApplicationDescription(
-        QStringLiteral("Execute an MNA analysis pipeline for inverse source estimation.\n"
-                       "Reads a .mna project file, validates the processing graph, and\n"
-                       "runs each node in topological order."));
-    parser.addHelpOption();
-    parser.addVersionOption();
+    CommandLineParser parser("Execute an MNA analysis pipeline for inverse source estimation.\n"
+                             "Reads a .mna project file, validates the processing graph, and\n"
+                             "runs each node in topological order.");
+    parser.add_help_option();
+    parser.add_version_option();
 
-    QCommandLineOption mnaFileOpt(
-        QStringList() << QStringLiteral("p") << QStringLiteral("project"),
-        QStringLiteral("Path to the .mna project file."),
-        QStringLiteral("file"));
-    parser.addOption(mnaFileOpt);
+    parser.add_option({{"p", "project"}, "Path to the .mna project file.", "file", {}});
+    parser.add_option({{"n", "dry-run"}, "Validate the graph without executing it.", {}, {}});
+    parser.add_option({{"list-ops"}, "List all registered operators and exit.", {}, {}});
 
-    QCommandLineOption dryRunOpt(
-        QStringList() << QStringLiteral("n") << QStringLiteral("dry-run"),
-        QStringLiteral("Validate the graph without executing it."));
-    parser.addOption(dryRunOpt);
-
-    QCommandLineOption listOpsOpt(
-        QStringLiteral("list-ops"),
-        QStringLiteral("List all registered operators and exit."));
-    parser.addOption(listOpsOpt);
-
-    parser.process(app);
+    parser.process(argc, argv, "mne_inverse_pipeline", PROGRAM_VERSION);
 
     //
     // --list-ops: print registered operators
     //
-    if (parser.isSet(listOpsOpt)) {
+    if (parser.is_set("list-ops")) {
         const MnaOpRegistry& registry = MnaOpRegistry::instance();
         const StringList ops = registry.registered_ops();
         std::println("Registered MNA operators ({}):", ops.size());
@@ -105,15 +79,16 @@ int main(int argc, char* argv[])
     //
     // Require project file
     //
-    if (!parser.isSet(mnaFileOpt)) {
+    if (!parser.is_set("project")) {
         Log::critical("Error: --project <file> is required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_inverse_pipeline"));
+        return 1;
     }
 
     //
     // Load MNA project
     //
-    const std::filesystem::path mnaPath = path_from_utf8(parser.value(mnaFileOpt).toStdString());
+    const std::filesystem::path mnaPath = path_from_utf8(parser.value("project"));
     Log::info("Loading MNA project: {}", utf8_from_path(mnaPath));
     Expected<MnaProject> project = MnaIO::read(mnaPath);
     if (!project) {
@@ -148,7 +123,7 @@ int main(int argc, char* argv[])
     //
     // Dry run — stop here
     //
-    if (parser.isSet(dryRunOpt)) {
+    if (parser.is_set("dry-run")) {
         std::println("Dry run complete. {} nodes validated.", graph.nodes().size());
         return 0;
     }

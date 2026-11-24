@@ -17,26 +17,33 @@
 #include <mne/fiff/fiff.h>
 #include <mne/mne/mne.h>
 #include <mne/fs/fs_surface.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QTextStream>
-#include <QRegularExpression>
-#include <QDataStream>
-#include <QFileInfo>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <cmath>
+#include <cstddef>
+#include <cstdlib>
+#include <filesystem>
+#include <format>
+#include <fstream>
+#include <iterator>
+#include <ostream>
+#include <print>
+#include <string>
+#include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -64,42 +71,198 @@ enum SurfaceFormat
     FORMAT_SMF
 };
 
-static SurfaceFormat detectFormat(const QString& filename);
-static bool readTriFile(const QString& filename, MatrixX3f& rr, MatrixX3i& tris);
-static bool writeTriFile(const QString& filename, const MatrixX3f& rr, const MatrixX3i& tris);
-static bool readSmfFile(const QString& filename, MatrixX3f& rr, MatrixX3i& tris);
-static bool writeSmfFile(const QString& filename, const MatrixX3f& rr, const MatrixX3i& tris);
-static bool readFifSurface(const QString& filename, MatrixX3f& rr, MatrixX3i& tris);
-static bool writeFifSurface(const QString& filename, const MatrixX3f& rr, const MatrixX3i& tris, int surfId);
+static SurfaceFormat detectFormat(const std::string& filename);
+static bool readTriFile(const std::string& filename, MatrixX3f& rr, MatrixX3i& tris);
+static bool writeTriFile(const std::string& filename, const MatrixX3f& rr, const MatrixX3i& tris);
+static bool readSmfFile(const std::string& filename, MatrixX3f& rr, MatrixX3i& tris);
+static bool writeSmfFile(const std::string& filename, const MatrixX3f& rr, const MatrixX3i& tris);
+static bool readFifSurface(const std::string& filename, MatrixX3f& rr, MatrixX3i& tris);
+static bool writeFifSurface(const std::string& filename, const MatrixX3f& rr, const MatrixX3i& tris, int surfId);
 
 //=============================================================================================================
 
-static SurfaceFormat detectFormat(const QString& filename)
+static SurfaceFormat detectFormat(const std::string& filename)
 {
-    if (filename.endsWith(".fif"))
+    if (filename.ends_with(".fif"))
         return FORMAT_FIF;
-    if (filename.endsWith(".tri"))
+    if (filename.ends_with(".tri"))
         return FORMAT_TRI;
-    if (filename.endsWith(".smf"))
+    if (filename.ends_with(".smf"))
         return FORMAT_SMF;
     // FreeSurfer surfaces typically have no extension or are named like lh.white, rh.pial
-    QFileInfo fi(filename);
-    QString base = fi.fileName();
-    if (base.startsWith("lh.") || base.startsWith("rh."))
+    const std::string base = mne::utf8_from_path(mne::path_from_utf8(filename).filename());
+    if (base.starts_with("lh.") || base.starts_with("rh."))
         return FORMAT_FREESURFER;
     return FORMAT_UNKNOWN;
 }
 
 //=============================================================================================================
 
-static bool readTriFile(const QString& filename, MatrixX3f& rr, MatrixX3i& tris)
+/**
+ * Reads whitespace-separated numbers from a text file; a missing or malformed number reads as 0.
+ */
+class SurfNumberReader
 {
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Cannot open tri file: {}", filename.toStdString());
+public:
+    explicit SurfNumberReader(std::istream& in)
+    : m_text((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>())
+    {
+    }
+
+    SurfNumberReader& operator>>(int& value)
+    {
+        value = mne::to_int(nextToken()).value_or(0);
+        return *this;
+    }
+
+    SurfNumberReader& operator>>(float& value)
+    {
+        value = static_cast<float>(mne::to_double(nextToken()).value_or(0.0));
+        return *this;
+    }
+
+private:
+    static bool isSpace(char c)
+    {
+        return c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r';
+    }
+
+    std::string_view nextToken()
+    {
+        while (m_pos < m_text.size() && isSpace(m_text[m_pos]))
+            ++m_pos;
+        const std::size_t start = m_pos;
+        while (m_pos < m_text.size() && !isSpace(m_text[m_pos]))
+            ++m_pos;
+        return std::string_view(m_text).substr(start, m_pos - start);
+    }
+
+    std::string m_text;
+    std::size_t m_pos = 0;
+};
+
+//=============================================================================================================
+
+/**
+ * @param[in] value       Any value.
+ * @param[in] format      'f', 'e' or 'g' as in QString::number.
+ * @param[in] precision   Decimals for 'f' and 'e', significant digits for 'g'.
+ *
+ * @return @p value formatted like QString::number(value, format, precision), which rounds ties away from zero
+ *         where std::format rounds them to even.
+ */
+static std::string surfQtNumber(double value, char format, int precision)
+{
+    if (std::isnan(value))
+        return "nan";
+    if (std::isinf(value))
+        return value < 0 ? "-inf" : "inf";
+    const double magnitude = std::abs(value);
+    // Decimal digits d0 d1 d2 ... of magnitude = d0.d1d2... * 10^exponent
+    const auto expand = [magnitude](int decimals, std::string& digits, int& exponent) {
+        const std::string text = std::format("{:.{}e}", magnitude, decimals);
+        const std::size_t ePos = text.find('e');
+        digits = text.substr(0, 1) + text.substr(2, ePos - 2);
+        exponent = std::stoi(text.substr(ePos + 1));
+    };
+    std::string digits;
+    int exponent = 0;
+    expand(17, digits, exponent);
+    const int significant = format == 'e' ? precision + 1 : format == 'g' ? std::max(precision, 1)
+                                                                          : exponent + 1 + precision;
+    expand(std::max(significant, 0) + 40, digits, exponent);
+    const std::string_view tail = std::string_view(digits).substr(static_cast<std::size_t>(std::max(significant, 0)) + 1);
+    if (tail.find_first_not_of('0') == std::string_view::npos || tail.find_first_not_of('9') == std::string_view::npos)
+        expand(std::max(significant, 0) + 1100, digits, exponent); // exact for every double
+
+    std::string rounded;
+    if (significant >= 0) {
+        rounded = digits.substr(0, static_cast<std::size_t>(significant));
+        if (digits[static_cast<std::size_t>(significant)] >= '5') {
+            int i = significant - 1;
+            while (i >= 0 && rounded[static_cast<std::size_t>(i)] == '9')
+                rounded[static_cast<std::size_t>(i--)] = '0';
+            if (i >= 0) {
+                ++rounded[static_cast<std::size_t>(i)];
+            } else {
+                rounded.insert(rounded.begin(), '1');
+                ++exponent;
+                if (format != 'f')
+                    rounded.pop_back();
+            }
+        }
+    }
+    const bool zero = rounded.find_first_not_of('0') == std::string::npos;
+    if (zero)
+        exponent = 0;
+
+    const auto fixed = [&](int decimals) {
+        std::string intPart;
+        std::string fraction;
+        if (zero) {
+            intPart = "0";
+            fraction.assign(static_cast<std::size_t>(decimals), '0');
+        } else if (exponent + 1 <= 0) {
+            intPart = "0";
+            fraction = std::string(static_cast<std::size_t>(-(exponent + 1)), '0') + rounded;
+        } else {
+            const std::size_t intDigits = static_cast<std::size_t>(exponent) + 1;
+            intPart = rounded.substr(0, intDigits);
+            fraction = rounded.substr(intDigits);
+        }
+        fraction.resize(static_cast<std::size_t>(decimals), '0');
+        return decimals > 0 ? intPart + "." + fraction : intPart;
+    };
+    const auto scientific = [&](std::string mantissaDigits) {
+        if (mantissaDigits.empty())
+            mantissaDigits = "0";
+        std::string text(1, mantissaDigits[0]);
+        if (mantissaDigits.size() > 1)
+            text += "." + mantissaDigits.substr(1);
+        return text + std::format("e{}{:02}", exponent < 0 ? '-' : '+', std::abs(exponent));
+    };
+
+    std::string text;
+    if (format == 'f') {
+        text = fixed(precision);
+    } else if (format == 'e') {
+        text = scientific(zero ? std::string(static_cast<std::size_t>(precision + 1), '0') : rounded);
+    } else {
+        const int digitsWanted = std::max(precision, 1);
+        if (!zero && (exponent < -4 || exponent >= digitsWanted)) {
+            std::string mantissa = rounded;
+            mantissa.erase(mantissa.find_last_not_of('0') + 1);
+            text = scientific(mantissa);
+        } else {
+            text = fixed(std::max(digitsWanted - 1 - exponent, 0));
+            if (text.find('.') != std::string::npos) {
+                text.erase(text.find_last_not_of('0') + 1);
+                if (text.back() == '.')
+                    text.pop_back();
+            }
+        }
+    }
+    return value < 0 ? "-" + text : text;
+}
+
+//=============================================================================================================
+
+/** Six significant digits, the format the tool has always written. */
+static std::string surfFormatReal(float value)
+{
+    return surfQtNumber(static_cast<double>(value), 'g', 6);
+}
+
+//=============================================================================================================
+
+static bool readTriFile(const std::string& filename, MatrixX3f& rr, MatrixX3i& tris)
+{
+    std::ifstream file(mne::path_from_utf8(filename));
+    if (!file) {
+        Log::critical("Cannot open tri file: {}", filename);
         return false;
     }
-    QTextStream in(&file);
+    SurfNumberReader in(file);
     int nvert = 0;
     in >> nvert;
     if (nvert <= 0) {
@@ -134,86 +297,90 @@ static bool readTriFile(const QString& filename, MatrixX3f& rr, MatrixX3i& tris)
 
 //=============================================================================================================
 
-static bool writeTriFile(const QString& filename, const MatrixX3f& rr, const MatrixX3i& tris)
+static bool writeTriFile(const std::string& filename, const MatrixX3f& rr, const MatrixX3i& tris)
 {
-    QFile file(filename);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        Log::critical("Cannot write tri file: {}", filename.toStdString());
+    std::ofstream out(mne::path_from_utf8(filename));
+    if (!out) {
+        Log::critical("Cannot write tri file: {}", filename);
         return false;
     }
-    QTextStream out(&file);
     int nvert = static_cast<int>(rr.rows());
     int ntri = static_cast<int>(tris.rows());
-    out << nvert << "\n";
+    std::print(out, "{}\n", nvert);
     for (int i = 0; i < nvert; i++) {
-        out << (i + 1) << " " << rr(i, 0) << " " << rr(i, 1) << " " << rr(i, 2) << "\n";
+        std::print(out, "{} {} {} {}\n", i + 1, surfFormatReal(rr(i, 0)), surfFormatReal(rr(i, 1)), surfFormatReal(rr(i, 2)));
     }
-    out << ntri << "\n";
+    std::print(out, "{}\n", ntri);
     for (int i = 0; i < ntri; i++) {
-        out << (i + 1) << " " << (tris(i, 0) + 1) << " " << (tris(i, 1) + 1) << " " << (tris(i, 2) + 1) << "\n";
+        std::print(out, "{} {} {} {}\n", i + 1, tris(i, 0) + 1, tris(i, 1) + 1, tris(i, 2) + 1);
     }
     return true;
 }
 
 //=============================================================================================================
 
-static bool readSmfFile(const QString& filename, MatrixX3f& rr, MatrixX3i& tris)
+static bool readSmfFile(const std::string& filename, MatrixX3f& rr, MatrixX3i& tris)
 {
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Cannot open smf file: {}", filename.toStdString());
+    std::ifstream in(mne::path_from_utf8(filename));
+    if (!in) {
+        Log::critical("Cannot open smf file: {}", filename);
         return false;
     }
-    QTextStream in(&file);
-    QVector<Vector3f> verts;
-    QVector<Vector3i> faces;
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#'))
+    std::vector<Vector3f> verts;
+    std::vector<Vector3i> faces;
+    const auto toFloat = [](std::string_view text) {
+        return static_cast<float>(mne::to_double(text).value_or(0.0));
+    };
+    const auto toInt = [](std::string_view text) {
+        return mne::to_int(text).value_or(0);
+    };
+    std::string rawLine;
+    while (std::getline(in, rawLine)) {
+        const std::string_view line = mne::trimmed(rawLine);
+        if (line.empty() || line.starts_with('#'))
             continue;
-        QStringList parts = line.split(QRegularExpression("\\s+"));
+        const std::vector<std::string_view> parts = mne::split_whitespace(line);
         if (parts.size() < 4)
             continue;
         if (parts[0] == "v") {
-            verts.append(Vector3f(parts[1].toFloat(), parts[2].toFloat(), parts[3].toFloat()));
+            verts.emplace_back(toFloat(parts[1]), toFloat(parts[2]), toFloat(parts[3]));
         } else if (parts[0] == "f") {
-            faces.append(Vector3i(parts[1].toInt() - 1, parts[2].toInt() - 1, parts[3].toInt() - 1));
+            faces.emplace_back(toInt(parts[1]) - 1, toInt(parts[2]) - 1, toInt(parts[3]) - 1);
         }
     }
-    rr.resize(verts.size(), 3);
-    for (int i = 0; i < verts.size(); i++)
+    rr.resize(std::ssize(verts), 3);
+    for (int i = 0; i < std::ssize(verts); i++)
         rr.row(i) = verts[i].transpose();
-    tris.resize(faces.size(), 3);
-    for (int i = 0; i < faces.size(); i++)
+    tris.resize(std::ssize(faces), 3);
+    for (int i = 0; i < std::ssize(faces); i++)
         tris.row(i) = faces[i].transpose();
     return true;
 }
 
 //=============================================================================================================
 
-static bool writeSmfFile(const QString& filename, const MatrixX3f& rr, const MatrixX3i& tris)
+static bool writeSmfFile(const std::string& filename, const MatrixX3f& rr, const MatrixX3i& tris)
 {
-    QFile file(filename);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        Log::critical("Cannot write smf file: {}", filename.toStdString());
+    std::ofstream out(mne::path_from_utf8(filename));
+    if (!out) {
+        Log::critical("Cannot write smf file: {}", filename);
         return false;
     }
-    QTextStream out(&file);
-    out << "# SMF surface file\n";
+    std::print(out, "# SMF surface file\n");
     for (int i = 0; i < rr.rows(); i++) {
-        out << "v " << rr(i, 0) << " " << rr(i, 1) << " " << rr(i, 2) << "\n";
+        std::print(out, "v {} {} {}\n", surfFormatReal(rr(i, 0)), surfFormatReal(rr(i, 1)), surfFormatReal(rr(i, 2)));
     }
     for (int i = 0; i < tris.rows(); i++) {
-        out << "f " << (tris(i, 0) + 1) << " " << (tris(i, 1) + 1) << " " << (tris(i, 2) + 1) << "\n";
+        std::print(out, "f {} {} {}\n", tris(i, 0) + 1, tris(i, 1) + 1, tris(i, 2) + 1);
     }
     return true;
 }
 
 //=============================================================================================================
 
-static bool readFifSurface(const QString& filename, MatrixX3f& rr, MatrixX3i& tris)
+static bool readFifSurface(const std::string& filename, MatrixX3f& rr, MatrixX3i& tris)
 {
-    auto read = MNEBem::read(filename.toStdU16String());
+    auto read = MNEBem::read(mne::path_from_utf8(filename));
     if (!read) {
         Log::critical("{}", read.error().what());
         return false;
@@ -227,12 +394,11 @@ static bool readFifSurface(const QString& filename, MatrixX3f& rr, MatrixX3i& tr
 
 //=============================================================================================================
 
-static bool writeFifSurface(const QString& filename, const MatrixX3f& rr, const MatrixX3i& tris, int surfId)
+static bool writeFifSurface(const std::string& filename, const MatrixX3f& rr, const MatrixX3i& tris, int surfId)
 {
-    QFile file(filename);
-    auto stream = FiffStream::start_file(filename.toStdU16String());
+    auto stream = FiffStream::start_file(mne::path_from_utf8(filename));
     if (!stream) {
-        Log::critical("Cannot create FIF file: {}", filename.toStdString());
+        Log::critical("Cannot create FIF file: {}", filename);
         return false;
     }
     stream->start_block(FIFFB_BEM);
@@ -277,95 +443,76 @@ static bool writeFifSurface(const QString& filename, const MatrixX3f& rr, const 
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_convert_surface");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Convert between surface file formats (FreeSurfer, FIFF, tri, SMF).");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"surf"}, "Input FreeSurfer surface file.", "file", {}});
+    parser.add_option({{"fif"}, "Input FIF surface file.", "file", {}});
+    parser.add_option({{"tri"}, "Input ASCII tri format file.", "file", {}});
+    parser.add_option({{"smf"}, "Input SMF format file.", "file", {}});
+    parser.add_option({{"out"}, "Output file (format detected from extension).", "file", {}});
+    parser.add_option({{"outtri"}, "Output as ASCII tri format.", "file", {}});
+    parser.add_option({{"outfif"}, "Output as FIF format.", "file", {}});
+    parser.add_option({{"outsurf"}, "Output as FreeSurfer surface format.", "file", {}});
+    parser.add_option({{"outsmf"}, "Output as SMF format.", "file", {}});
+    parser.add_option({{"surfid"}, "Surface ID for FIF output (4=head).", "id", "4"});
+    parser.add_option({{"meters"}, "Input coordinates are in meters.", {}, {}});
+    parser.add_option({{"millimeters"}, "Input coordinates are in millimeters.", {}, {}});
+    parser.process(argc, argv, "mne_convert_surface", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Convert between surface file formats (FreeSurfer, FIFF, tri, SMF).");
-    parser.addHelpOption();
-    parser.addVersionOption();
-
-    QCommandLineOption surfOpt("surf", "Input FreeSurfer surface file.", "file");
-    parser.addOption(surfOpt);
-    QCommandLineOption fifOpt("fif", "Input FIF surface file.", "file");
-    parser.addOption(fifOpt);
-    QCommandLineOption triOpt("tri", "Input ASCII tri format file.", "file");
-    parser.addOption(triOpt);
-    QCommandLineOption smfOpt("smf", "Input SMF format file.", "file");
-    parser.addOption(smfOpt);
-    QCommandLineOption outOpt("out", "Output file (format detected from extension).", "file");
-    parser.addOption(outOpt);
-    QCommandLineOption outtriOpt("outtri", "Output as ASCII tri format.", "file");
-    parser.addOption(outtriOpt);
-    QCommandLineOption outfifOpt("outfif", "Output as FIF format.", "file");
-    parser.addOption(outfifOpt);
-    QCommandLineOption outsurfOpt("outsurf", "Output as FreeSurfer surface format.", "file");
-    parser.addOption(outsurfOpt);
-    QCommandLineOption outsmfOpt("outsmf", "Output as SMF format.", "file");
-    parser.addOption(outsmfOpt);
-    QCommandLineOption surfidOpt("surfid", "Surface ID for FIF output (default: 4=head).", "id", "4");
-    parser.addOption(surfidOpt);
-    QCommandLineOption metersOpt("meters", "Input coordinates are in meters.");
-    parser.addOption(metersOpt);
-    QCommandLineOption millimetersOpt("millimeters", "Input coordinates are in millimeters.");
-    parser.addOption(millimetersOpt);
-
-    parser.process(app);
-
-    QString inputFile;
+    std::string inputFile;
     SurfaceFormat inputFormat = FORMAT_UNKNOWN;
-    QString outputFile;
+    std::string outputFile;
     SurfaceFormat outputFormat = FORMAT_UNKNOWN;
-    int surfId = parser.value(surfidOpt).toInt();
+    int surfId = mne::to_int(parser.value("surfid")).value_or(0);
     float scaleFactor = 1.0f;
     bool scaleSet = false;
 
-    if (parser.isSet(surfOpt)) {
-        inputFile = parser.value(surfOpt);
+    if (parser.is_set("surf")) {
+        inputFile = parser.value("surf");
         inputFormat = FORMAT_FREESURFER;
-    } else if (parser.isSet(fifOpt)) {
-        inputFile = parser.value(fifOpt);
+    } else if (parser.is_set("fif")) {
+        inputFile = parser.value("fif");
         inputFormat = FORMAT_FIF;
-    } else if (parser.isSet(triOpt)) {
-        inputFile = parser.value(triOpt);
+    } else if (parser.is_set("tri")) {
+        inputFile = parser.value("tri");
         inputFormat = FORMAT_TRI;
-    } else if (parser.isSet(smfOpt)) {
-        inputFile = parser.value(smfOpt);
+    } else if (parser.is_set("smf")) {
+        inputFile = parser.value("smf");
         inputFormat = FORMAT_SMF;
     }
 
-    if (parser.isSet(outOpt)) {
-        outputFile = parser.value(outOpt);
+    if (parser.is_set("out")) {
+        outputFile = parser.value("out");
         outputFormat = detectFormat(outputFile);
-    } else if (parser.isSet(outtriOpt)) {
-        outputFile = parser.value(outtriOpt);
+    } else if (parser.is_set("outtri")) {
+        outputFile = parser.value("outtri");
         outputFormat = FORMAT_TRI;
-    } else if (parser.isSet(outfifOpt)) {
-        outputFile = parser.value(outfifOpt);
+    } else if (parser.is_set("outfif")) {
+        outputFile = parser.value("outfif");
         outputFormat = FORMAT_FIF;
-    } else if (parser.isSet(outsurfOpt)) {
-        outputFile = parser.value(outsurfOpt);
+    } else if (parser.is_set("outsurf")) {
+        outputFile = parser.value("outsurf");
         outputFormat = FORMAT_FREESURFER;
-    } else if (parser.isSet(outsmfOpt)) {
-        outputFile = parser.value(outsmfOpt);
+    } else if (parser.is_set("outsmf")) {
+        outputFile = parser.value("outsmf");
         outputFormat = FORMAT_SMF;
     }
 
-    if (parser.isSet(metersOpt)) {
+    if (parser.is_set("meters")) {
         scaleFactor = 1.0f;
         scaleSet = true;
     }
-    if (parser.isSet(millimetersOpt)) {
+    if (parser.is_set("millimeters")) {
         scaleFactor = 0.001f;
         scaleSet = true;
     }
 
-    if (inputFile.isEmpty()) {
+    if (inputFile.empty()) {
         Log::info("No input file specified.");
         return 1;
     }
-    if (outputFile.isEmpty()) {
+    if (outputFile.empty()) {
         Log::info("No output file specified.");
         return 1;
     }
@@ -396,7 +543,7 @@ int main(int argc, char* argv[])
             break;
         case FORMAT_FREESURFER: {
             FsSurface surface;
-            ok = FsSurface::read(inputFile.toStdU16String(), surface);
+            ok = FsSurface::read(mne::path_from_utf8(inputFile), surface);
             if (ok) {
                 rr = surface.rr();
                 tris = surface.tris();
@@ -453,6 +600,6 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    Log::info("Wrote surface to {}", outputFile.toStdString());
+    Log::info("Wrote surface to {}", outputFile);
     return 0;
 }

@@ -31,23 +31,32 @@
 #include <mne/fs/fs_surfaceset.h>
 
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QFileInfo>
-#include <QDir>
+#include <mne/base/command_line.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+#include <filesystem>
+#include <format>
+#include <fstream>
+#include <limits>
+#include <map>
+#include <print>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -81,43 +90,41 @@ static bool makeIcosahedron(int grade, MatrixX3f& verts)
     const float phi = (1.0f + std::sqrt(5.0f)) / 2.0f;
 
     // Base icosahedron vertices (12 vertices)
-    QVector<Vector3f> icoVerts;
-    icoVerts.reserve(12);
-    icoVerts << Vector3f(-1, phi, 0) << Vector3f(1, phi, 0)
-             << Vector3f(-1, -phi, 0) << Vector3f(1, -phi, 0)
-             << Vector3f(0, -1, phi) << Vector3f(0, 1, phi)
-             << Vector3f(0, -1, -phi) << Vector3f(0, 1, -phi)
-             << Vector3f(phi, 0, -1) << Vector3f(phi, 0, 1)
-             << Vector3f(-phi, 0, -1) << Vector3f(-phi, 0, 1);
+    std::vector<Vector3f> icoVerts = {
+        Vector3f(-1, phi, 0), Vector3f(1, phi, 0),
+        Vector3f(-1, -phi, 0), Vector3f(1, -phi, 0),
+        Vector3f(0, -1, phi), Vector3f(0, 1, phi),
+        Vector3f(0, -1, -phi), Vector3f(0, 1, -phi),
+        Vector3f(phi, 0, -1), Vector3f(phi, 0, 1),
+        Vector3f(-phi, 0, -1), Vector3f(-phi, 0, 1)};
 
     // Normalize to unit sphere
     for (auto& v : icoVerts)
         v.normalize();
 
     // Base icosahedron triangles (20 faces)
-    QVector<Vector3i> icoFaces;
-    icoFaces.reserve(20);
-    icoFaces << Vector3i(0, 11, 5) << Vector3i(0, 5, 1) << Vector3i(0, 1, 7)
-             << Vector3i(0, 7, 10) << Vector3i(0, 10, 11) << Vector3i(1, 5, 9)
-             << Vector3i(5, 11, 4) << Vector3i(11, 10, 2) << Vector3i(10, 7, 6)
-             << Vector3i(7, 1, 8) << Vector3i(3, 9, 4) << Vector3i(3, 4, 2)
-             << Vector3i(3, 2, 6) << Vector3i(3, 6, 8) << Vector3i(3, 8, 9)
-             << Vector3i(4, 9, 5) << Vector3i(2, 4, 11) << Vector3i(6, 2, 10)
-             << Vector3i(8, 6, 7) << Vector3i(9, 8, 1);
+    std::vector<Vector3i> icoFaces = {
+        Vector3i(0, 11, 5), Vector3i(0, 5, 1), Vector3i(0, 1, 7),
+        Vector3i(0, 7, 10), Vector3i(0, 10, 11), Vector3i(1, 5, 9),
+        Vector3i(5, 11, 4), Vector3i(11, 10, 2), Vector3i(10, 7, 6),
+        Vector3i(7, 1, 8), Vector3i(3, 9, 4), Vector3i(3, 4, 2),
+        Vector3i(3, 2, 6), Vector3i(3, 6, 8), Vector3i(3, 8, 9),
+        Vector3i(4, 9, 5), Vector3i(2, 4, 11), Vector3i(6, 2, 10),
+        Vector3i(8, 6, 7), Vector3i(9, 8, 1)};
 
     // Subdivide
     for (int g = 0; g < std::abs(grade); ++g) {
-        QVector<Vector3f> newVerts = icoVerts;
-        QVector<Vector3i> newFaces;
-        QMap<QPair<int, int>, int> edgeMidpoint;
+        std::vector<Vector3f> newVerts = icoVerts;
+        std::vector<Vector3i> newFaces;
+        std::map<std::pair<int, int>, int> edgeMidpoint;
 
         auto getMidpoint = [&](int v0, int v1) -> int {
-            auto key = qMakePair(qMin(v0, v1), qMax(v0, v1));
-            if (edgeMidpoint.contains(key))
-                return edgeMidpoint[key];
-            Vector3f mid = (newVerts[v0] + newVerts[v1]).normalized();
-            int idx = newVerts.size();
-            newVerts.append(mid);
+            const auto key = std::make_pair(std::min(v0, v1), std::max(v0, v1));
+            if (const auto it = edgeMidpoint.find(key); it != edgeMidpoint.end())
+                return it->second;
+            Vector3f mid = (newVerts[static_cast<std::size_t>(v0)] + newVerts[static_cast<std::size_t>(v1)]).normalized();
+            const auto idx = static_cast<int>(newVerts.size());
+            newVerts.push_back(mid);
             edgeMidpoint[key] = idx;
             return idx;
         };
@@ -127,10 +134,10 @@ static bool makeIcosahedron(int grade, MatrixX3f& verts)
             int b = getMidpoint(f(1), f(2));
             int c = getMidpoint(f(2), f(0));
 
-            newFaces << Vector3i(f(0), a, c)
-                     << Vector3i(a, f(1), b)
-                     << Vector3i(c, b, f(2))
-                     << Vector3i(a, b, c);
+            newFaces.emplace_back(f(0), a, c);
+            newFaces.emplace_back(a, f(1), b);
+            newFaces.emplace_back(c, b, f(2));
+            newFaces.emplace_back(a, b, c);
         }
 
         icoVerts = newVerts;
@@ -138,9 +145,9 @@ static bool makeIcosahedron(int grade, MatrixX3f& verts)
     }
 
     // Copy to output
-    verts.resize(icoVerts.size(), 3);
-    for (int i = 0; i < icoVerts.size(); ++i) {
-        verts.row(i) = icoVerts[i].transpose();
+    verts.resize(std::ssize(icoVerts), 3);
+    for (std::size_t i = 0; i < icoVerts.size(); ++i) {
+        verts.row(static_cast<Eigen::Index>(i)) = icoVerts[i].transpose();
     }
 
     Log::info("  Icosahedron grade {}: {} vertices", std::abs(grade), static_cast<int>(verts.rows()));
@@ -163,8 +170,8 @@ static int selectVerticesIco(const MatrixX3f& surfVerts,
                              VectorXi& inuse,
                              VectorXi& vertno)
 {
-    int np = surfVerts.rows();
-    int nico = icoVerts.rows();
+    const auto np = static_cast<int>(surfVerts.rows());
+    const auto nico = static_cast<int>(icoVerts.rows());
 
     // Normalize surface vertices to the unit sphere
     MatrixX3f surfNorm(np, 3);
@@ -220,7 +227,7 @@ static int selectVerticesSpacing(const MatrixX3f& surfVerts,
                                  VectorXi& inuse,
                                  VectorXi& vertno)
 {
-    int np = surfVerts.rows();
+    const auto np = static_cast<int>(surfVerts.rows());
     float spacingM = spacing / 1000.0f; // mm to m
     float spacingSq = spacingM * spacingM;
 
@@ -228,12 +235,12 @@ static int selectVerticesSpacing(const MatrixX3f& surfVerts,
 
     // Greedy selection: iterate through vertices and select if far enough
     // from all previously selected vertices
-    QVector<int> selected;
-    selected.reserve(np / 10);
+    std::vector<int> selected;
+    selected.reserve(static_cast<std::size_t>(np / 10));
 
     for (int i = 0; i < np; ++i) {
         bool tooClose = false;
-        for (int j = 0; j < selected.size(); ++j) {
+        for (std::size_t j = 0; j < selected.size(); ++j) {
             float dist = (surfVerts.row(i) - surfVerts.row(selected[j])).squaredNorm();
             if (dist < spacingSq) {
                 tooClose = true;
@@ -241,15 +248,15 @@ static int selectVerticesSpacing(const MatrixX3f& surfVerts,
             }
         }
         if (!tooClose) {
-            selected.append(i);
+            selected.push_back(i);
             inuse(i) = 1;
         }
     }
 
-    int nuse = selected.size();
+    const auto nuse = static_cast<int>(selected.size());
     vertno.resize(nuse);
     for (int i = 0; i < nuse; ++i) {
-        vertno(i) = selected[i];
+        vertno(i) = selected[static_cast<std::size_t>(i)];
     }
 
     return nuse;
@@ -273,8 +280,8 @@ static MNEHemisphere buildHemisphere(const FsSurface& surf,
     MNEHemisphere hemi;
 
     hemi.id = hemiId;
-    hemi.np = surf.rr().rows();
-    hemi.ntri = surf.tris().rows();
+    hemi.np = static_cast<int>(surf.rr().rows());
+    hemi.ntri = static_cast<int>(surf.tris().rows());
     hemi.coord_frame = FIFFV_COORD_MRI;
     hemi.type = 1; // FsSurface type
 
@@ -284,23 +291,23 @@ static MNEHemisphere buildHemisphere(const FsSurface& surf,
     hemi.itris = surf.tris();
 
     // Selection info
-    hemi.nuse = vertno.size();
+    hemi.nuse = static_cast<int>(vertno.size());
     hemi.inuse = inuse;
     hemi.vertno = vertno;
 
     // Build use_tris (triangles that use only selected vertices)
-    QVector<int> useTrisIdx;
+    std::vector<int> useTrisIdx;
     for (int t = 0; t < hemi.ntri; ++t) {
         if (inuse(hemi.itris(t, 0)) &&
             inuse(hemi.itris(t, 1)) &&
             inuse(hemi.itris(t, 2))) {
-            useTrisIdx.append(t);
+            useTrisIdx.push_back(t);
         }
     }
-    hemi.nuse_tri = useTrisIdx.size();
+    hemi.nuse_tri = static_cast<int>(useTrisIdx.size());
     hemi.use_itris.resize(hemi.nuse_tri, 3);
     for (int i = 0; i < hemi.nuse_tri; ++i) {
-        hemi.use_itris.row(i) = hemi.itris.row(useTrisIdx[i]);
+        hemi.use_itris.row(i) = hemi.itris.row(useTrisIdx[static_cast<std::size_t>(i)]);
     }
 
     // Add geometry information (normals, triangle centers, etc.)
@@ -327,16 +334,11 @@ static MNEHemisphere buildHemisphere(const FsSurface& surf,
  */
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_make_source_space");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
-
     //=========================================================================================================
     // Command line parser
     //=========================================================================================================
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription(
+    CommandLineParser parser(
         "Create cortical source spaces from FreeSurfer surfaces.\n"
         "Port of the original MNE-C mne_make_source_space by Matti Hamalainen.\n\n"
         "Reads FreeSurfer surface meshes for left and right hemispheres,\n"
@@ -344,91 +346,83 @@ int main(int argc, char* argv[])
         "and writes the resulting source space to a FIFF file.\n\n"
         "Requires --surf and a decimation method (--ico, --oct, --spacing, or --all).\n"
         "Subject defaults to $SUBJECT environment variable if --subject is not given.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_help_option();
+    parser.add_version_option();
 
     // --subject: Subject name
-    QCommandLineOption subjectOpt(QStringList() << "subject",
-                                  "Name of the FreeSurfer subject.", "name");
-    parser.addOption(subjectOpt);
+    parser.add_option({{"subject"}, "Name of the FreeSurfer subject.", "name", ""});
 
     // --subjects_dir: Subjects directory (default: $SUBJECTS_DIR)
-    QCommandLineOption subjectsDirOpt(QStringList() << "subjects_dir",
-                                      "FreeSurfer subjects directory (default: $SUBJECTS_DIR).", "dir");
-    parser.addOption(subjectsDirOpt);
+    parser.add_option({{"subjects_dir"}, "FreeSurfer subjects directory (default: $SUBJECTS_DIR).", "dir", ""});
 
     // --surf: FsSurface name(s) (required, matching SVN MNE-C)
-    QCommandLineOption surfOpt(QStringList() << "surf",
-                               "FsSurface name to use (e.g., white, pial). "
-                               "For multiple surfaces, separate with colons (e.g., white:pial).",
-                               "names");
-    parser.addOption(surfOpt);
+    parser.add_option({{"surf"},
+                       "FsSurface name to use (e.g., white, pial). "
+                       "For multiple surfaces, separate with colons (e.g., white:pial).",
+                       "names",
+                       ""});
 
     // --ico: Icosahedron subdivision grade
-    QCommandLineOption icoOpt(QStringList() << "ico",
-                              "Icosahedron subdivision grade for downsampling (1-7).\n"
-                              "Grade 1 = 42 vertices, 2 = 162, 3 = 642, 4 = 2562, 5 = 10242, 6 = 40962, 7 = 163842.",
-                              "grade");
-    parser.addOption(icoOpt);
+    parser.add_option({{"ico"},
+                       "Icosahedron subdivision grade for downsampling (1-7).\n"
+                       "Grade 1 = 42 vertices, 2 = 162, 3 = 642, 4 = 2562, 5 = 10242, 6 = 40962, 7 = 163842.",
+                       "grade",
+                       ""});
 
     // --oct: Octahedron subdivision grade
-    QCommandLineOption octOpt(QStringList() << "oct",
-                              "Octahedron subdivision grade (stored as negative ico grade internally).",
-                              "grade");
-    parser.addOption(octOpt);
+    parser.add_option({{"oct"}, "Octahedron subdivision grade (stored as negative ico grade internally).", "grade", ""});
 
     // --spacing: Approximate spacing in mm
-    QCommandLineOption spacingOpt(QStringList() << "spacing",
-                                  "Approximate source space spacing in mm (alternative to --ico/--oct).",
-                                  "dist");
-    parser.addOption(spacingOpt);
+    parser.add_option({{"spacing"}, "Approximate source space spacing in mm (alternative to --ico/--oct).", "dist", ""});
 
     // --all: Use all surface vertices
-    QCommandLineOption allOpt(QStringList() << "all",
-                              "Use all surface vertices (no decimation).");
-    parser.addOption(allOpt);
+    parser.add_option({{"all"}, "Use all surface vertices (no decimation).", "", ""});
 
     // --src: Output file name
-    QCommandLineOption srcOpt(QStringList() << "src",
-                              "Output source space file (default: <subject>-<ico/spacing>-src.fif).",
-                              "file");
-    parser.addOption(srcOpt);
+    parser.add_option({{"src"}, "Output source space file (default: <subject>-<ico/spacing>-src.fif).", "file", ""});
 
-    parser.process(app);
+    parser.process(argc, argv, "mne_make_source_space", PROGRAM_VERSION);
 
     //=========================================================================================================
     // Validate arguments
     //=========================================================================================================
 
-    if (!parser.isSet(subjectOpt)) {
+    const auto envValue = [](const char* name) {
+        const char* value = std::getenv(name);
+        return std::string(value ? value : "");
+    };
+
+    if (!parser.is_set("subject")) {
         // Fall back to $SUBJECT environment variable (matching SVN MNE-C)
-        QString envSubject = qEnvironmentVariable("SUBJECT");
-        if (envSubject.isEmpty()) {
+        const std::string envSubject = envValue("SUBJECT");
+        if (envSubject.empty()) {
             Log::critical("Error: --subject option is required (or set $SUBJECT).");
-            parser.showHelp(1);
+            std::print("{}", parser.help_text("mne_make_source_space"));
+            return 1;
         }
-        Log::info("Using subject from $SUBJECT: {}", envSubject.toStdString());
+        Log::info("Using subject from $SUBJECT: {}", envSubject);
     }
 
-    QString subject = parser.isSet(subjectOpt) ? parser.value(subjectOpt)
-                                               : qEnvironmentVariable("SUBJECT");
-    QString subjectsDir;
-    if (parser.isSet(subjectsDirOpt)) {
-        subjectsDir = parser.value(subjectsDirOpt);
+    const std::string subject = parser.is_set("subject") ? parser.value("subject")
+                                                         : envValue("SUBJECT");
+    std::string subjectsDir;
+    if (parser.is_set("subjects_dir")) {
+        subjectsDir = parser.value("subjects_dir");
     } else {
-        subjectsDir = qEnvironmentVariable("SUBJECTS_DIR");
-        if (subjectsDir.isEmpty()) {
+        subjectsDir = envValue("SUBJECTS_DIR");
+        if (subjectsDir.empty()) {
             Log::critical("Error: SUBJECTS_DIR not set. Use --subjects_dir.");
             return 1;
         }
     }
 
     // --surf is required (matching SVN MNE-C)
-    if (!parser.isSet(surfOpt)) {
+    if (!parser.is_set("surf")) {
         Log::critical("Error: --surf option is required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_make_source_space"));
+        return 1;
     }
-    QString surfName = parser.value(surfOpt);
+    const std::string surfName = parser.value("surf");
 
     // Determine decimation method (must be explicitly specified)
     enum DecimMethod
@@ -440,21 +434,21 @@ int main(int argc, char* argv[])
     int icoGrade = 0;
     float spacing = 0.0f;
 
-    if (parser.isSet(allOpt)) {
+    if (parser.is_set("all")) {
         decimMethod = ALL;
-    } else if (parser.isSet(spacingOpt)) {
+    } else if (parser.is_set("spacing")) {
         decimMethod = SPACING;
-        spacing = parser.value(spacingOpt).toFloat();
+        spacing = static_cast<float>(to_double(parser.value("spacing")).value_or(0.0));
         if (spacing <= 0.0f) {
             Log::critical("Error: --spacing must be a positive number.");
             return 1;
         }
-    } else if (parser.isSet(icoOpt) || parser.isSet(octOpt)) {
+    } else if (parser.is_set("ico") || parser.is_set("oct")) {
         decimMethod = ICO;
-        if (parser.isSet(icoOpt)) {
-            icoGrade = parser.value(icoOpt).toInt();
+        if (parser.is_set("ico")) {
+            icoGrade = to_int(parser.value("ico")).value_or(0);
         } else {
-            icoGrade = parser.value(octOpt).toInt();
+            icoGrade = to_int(parser.value("oct")).value_or(0);
         }
         if (icoGrade < 1 || icoGrade > 7) {
             Log::critical("Error: --ico/--oct grade should be between 1 and 7.");
@@ -462,19 +456,20 @@ int main(int argc, char* argv[])
         }
     } else {
         Log::critical("Error: A decimation method is required (--ico, --oct, --spacing, or --all).");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_make_source_space"));
+        return 1;
     }
 
     // Determine output file name
-    QString srcName;
-    if (parser.isSet(srcOpt)) {
-        srcName = parser.value(srcOpt);
+    std::string srcName;
+    if (parser.is_set("src")) {
+        srcName = parser.value("src");
     } else {
-        QString tag;
+        std::string tag;
         if (decimMethod == ICO)
-            tag = QString("ico-%1").arg(icoGrade);
+            tag = std::format("ico-{}", icoGrade);
         else if (decimMethod == SPACING)
-            tag = QString("spacing-%1").arg(static_cast<int>(spacing));
+            tag = std::format("spacing-{}", static_cast<int>(spacing));
         else
             tag = "all";
 
@@ -498,24 +493,23 @@ int main(int argc, char* argv[])
     // Process each hemisphere
     //=========================================================================================================
 
-    QStringList hemiNames = {"lh", "rh"};
+    const StringList hemiNames = {"lh", "rh"};
     int hemiIds[2] = {FIFFV_MNE_SURF_LEFT_HEMI, FIFFV_MNE_SURF_RIGHT_HEMI};
 
-    QVector<MNEHemisphere> hemispheres;
+    std::vector<MNEHemisphere> hemispheres;
 
     for (int h = 0; h < 2; ++h) {
         Log::info("\n========================================");
-        Log::info("Processing {} hemisphere...", hemiNames[h].toStdString());
+        Log::info("Processing {} hemisphere...", hemiNames[static_cast<std::size_t>(h)]);
 
         // Read FreeSurfer surface
-        QString surfPath = subjectsDir + "/" + subject + "/surf/" +
-            hemiNames[h] + "." + surfName;
+        const std::string surfPath = std::format("{}/{}/surf/{}.{}", subjectsDir, subject, hemiNames[static_cast<std::size_t>(h)], surfName);
 
-        Log::info("Reading surface from {}...", surfPath.toStdString());
+        Log::info("Reading surface from {}...", surfPath);
 
         FsSurface surf;
-        if (!FsSurface::read(surfPath.toStdU16String(), surf)) {
-            Log::critical("Error: Could not read surface {}", surfPath.toStdString());
+        if (!FsSurface::read(path_from_utf8(surfPath), surf)) {
+            Log::critical("Error: Could not read surface {}", surfPath);
             return 1;
         }
 
@@ -528,7 +522,7 @@ int main(int argc, char* argv[])
 
         if (decimMethod == ALL) {
             Log::info("  Using all vertices.");
-            int np = surf.rr().rows();
+            const auto np = static_cast<int>(surf.rr().rows());
             inuse = VectorXi::Ones(np);
             vertno.resize(np);
             for (int i = 0; i < np; ++i)
@@ -545,13 +539,13 @@ int main(int argc, char* argv[])
         Log::info("  Selected {} source locations.", nuse);
 
         if (nuse == 0) {
-            Log::critical("Error: No vertices selected for {}", hemiNames[h].toStdString());
+            Log::critical("Error: No vertices selected for {}", hemiNames[static_cast<std::size_t>(h)]);
             return 1;
         }
 
         // Build hemisphere
         MNEHemisphere hemi = buildHemisphere(surf, inuse, vertno, hemiIds[h]);
-        hemispheres.append(hemi);
+        hemispheres.push_back(hemi);
     }
 
     //=========================================================================================================
@@ -559,37 +553,37 @@ int main(int argc, char* argv[])
     //=========================================================================================================
 
     Log::info("\n========================================");
-    Log::info("Writing source space to {}...", srcName.toStdString());
+    Log::info("Writing source space to {}...", srcName);
 
     // Ensure output directory exists
-    QFileInfo fi(srcName);
-    QDir().mkpath(fi.path());
+    const std::filesystem::path srcPath = path_from_utf8(srcName);
+    std::error_code ec;
+    if (srcPath.has_parent_path())
+        std::filesystem::create_directories(srcPath.parent_path(), ec);
 
-    QFile srcFile(srcName);
-    if (!srcFile.open(QIODevice::WriteOnly)) {
-        Log::critical("Error: Could not open output file {}", srcName.toStdString());
+    if (!std::ofstream(srcPath, std::ios::binary)) {
+        Log::critical("Error: Could not open output file {}", srcName);
         return 1;
     }
 
-    auto pStream = FiffStream::start_file(srcName.toStdU16String());
+    auto pStream = FiffStream::start_file(srcPath);
     pStream->start_block(FIFFB_MNE);
-    for (int h = 0; h < hemispheres.size(); ++h) {
-        hemispheres[h].writeToStream(*pStream);
+    for (MNEHemisphere& hemisphere : hemispheres) {
+        hemisphere.writeToStream(*pStream);
     }
     pStream->end_block(FIFFB_MNE);
     pStream->end_file();
-    srcFile.close();
 
     // Summary
     Log::info("\nSource space created successfully:");
-    for (int h = 0; h < hemispheres.size(); ++h) {
+    for (std::size_t h = 0; h < hemispheres.size(); ++h) {
         if (hemispheres[h].nuse_tri > 0) {
             Log::info("  {} hemisphere: {} of {} vertices selected, {} use triangles", h == 0 ? "Left" : "Right", hemispheres[h].nuse, hemispheres[h].np, hemispheres[h].nuse_tri);
         } else {
             Log::info("  {} hemisphere: {} of {} vertices selected", h == 0 ? "Left" : "Right", hemispheres[h].nuse, hemispheres[h].np);
         }
     }
-    Log::info("\nOutput: {}", srcName.toStdString());
+    Log::info("\nOutput: {}", srcName);
     Log::info("\nYou can now use mne_forward_solution to compute forward solutions");
     Log::info("using this source space.\n");
 

@@ -15,21 +15,22 @@
 //=============================================================================================================
 
 #include "mne_setup_forward_model_settings.h"
+#include <mne/base/command_line.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QProcessEnvironment>
-#include <QDebug>
+#include <cstdlib>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace MNESETUPFORWARDMODEL;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -53,14 +54,21 @@ MNESetupForwardModelSettings::MNESetupForwardModelSettings(int* argc, char** arg
     //
     // Read environment variables
     //
-    m_sSubjectsDir = QProcessEnvironment::systemEnvironment().value("SUBJECTS_DIR", "");
-    m_sSubject = QProcessEnvironment::systemEnvironment().value("SUBJECT", "");
+    const auto envValue = [](const char* name) {
+        const char* value = std::getenv(name);
+        return std::string(value ? value : "");
+    };
+    m_sSubjectsDir = envValue("SUBJECTS_DIR");
+    m_sSubject = envValue("SUBJECT");
 
     //
     // Parse command-line arguments
     //
-    QCommandLineParser parser;
-    parser.setApplicationDescription(
+    const auto toFloat = [](const std::string& text) {
+        return static_cast<float>(to_double(text).value_or(0.0));
+    };
+
+    CommandLineParser parser(
         "Set up the BEM (Boundary Element Model) for forward modeling.\n\n"
         "This tool reads triangulated surface files (inner skull, outer skull, scalp),\n"
         "creates a BEM geometry FIFF file with conductivity assignments, exports .pnt\n"
@@ -68,149 +76,121 @@ MNESetupForwardModelSettings::MNESetupForwardModelSettings(int* argc, char** arg
         "Ported from the original MNE shell script mne_setup_forward_model by\n"
         "Matti Hamalainen (SVN $Id: mne_setup_forward_model 3282 2011-02-02 14:28:16Z gramfort $).\n\n"
         "Cross-referenced with MNE-Python's mne.make_bem_model() and mne.make_bem_solution().");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_help_option();
+    parser.add_version_option();
 
-    QCommandLineOption subjectOpt("subject",
-                                  "Subject name (defaults to $SUBJECT environment variable).", "name");
-    parser.addOption(subjectOpt);
+    parser.add_option({{"subject"}, "Subject name (defaults to $SUBJECT environment variable).", "name", ""});
 
-    QCommandLineOption subjectsDirOpt("subjects-dir",
-                                      "Subjects directory (defaults to $SUBJECTS_DIR environment variable).", "dir");
-    parser.addOption(subjectsDirOpt);
+    parser.add_option({{"subjects-dir"}, "Subjects directory (defaults to $SUBJECTS_DIR environment variable).", "dir", ""});
 
-    QCommandLineOption scalpcOpt("scalpc",
-                                 "Scalp conductivity [S/m] (default: 0.3).", "value");
-    parser.addOption(scalpcOpt);
+    parser.add_option({{"scalpc"}, "Scalp conductivity [S/m] (default: 0.3).", "value", ""});
 
-    QCommandLineOption skullcOpt("skullc",
-                                 "Skull conductivity [S/m] (default: 0.006).", "value");
-    parser.addOption(skullcOpt);
+    parser.add_option({{"skullc"}, "Skull conductivity [S/m] (default: 0.006).", "value", ""});
 
-    QCommandLineOption braincOpt("brainc",
-                                 "Brain conductivity [S/m] (default: 0.3).", "value");
-    parser.addOption(braincOpt);
+    parser.add_option({{"brainc"}, "Brain conductivity [S/m] (default: 0.3).", "value", ""});
 
-    QCommandLineOption modelOpt("model",
-                                "BEM model name (without -bem.fif suffix). If omitted, an auto-generated\n"
-                                "name based on triangle counts is used.",
-                                "name");
-    parser.addOption(modelOpt);
+    parser.add_option({{"model"},
+                       "BEM model name (without -bem.fif suffix). If omitted, an auto-generated\n"
+                       "name based on triangle counts is used.",
+                       "name",
+                       ""});
 
-    QCommandLineOption homogOpt("homog",
-                                "Create a single-compartment (homogeneous) model using only the inner skull surface.");
-    parser.addOption(homogOpt);
+    parser.add_option({{"homog"}, "Create a single-compartment (homogeneous) model using only the inner skull surface.", "", ""});
 
-    QCommandLineOption surfOpt("surf",
-                               "Use FreeSurfer binary surface files (.surf) as input instead of ASCII\n"
-                               "triangle files (.tri).");
-    parser.addOption(surfOpt);
+    parser.add_option({{"surf"},
+                       "Use FreeSurfer binary surface files (.surf) as input instead of ASCII\n"
+                       "triangle files (.tri).",
+                       "",
+                       ""});
 
-    QCommandLineOption icoOpt("ico",
-                              "Downsample surfaces to icosahedron subdivision level (0-6). Requires that\n"
-                              "surfaces are isomorphic with a higher-level subdivision. Mainly useful for\n"
-                              "downsampling surfaces produced by mri_watershed.",
-                              "number");
-    parser.addOption(icoOpt);
+    parser.add_option({{"ico"},
+                       "Downsample surfaces to icosahedron subdivision level (0-6). Requires that\n"
+                       "surfaces are isomorphic with a higher-level subdivision. Mainly useful for\n"
+                       "downsampling surfaces produced by mri_watershed.",
+                       "number",
+                       ""});
 
-    QCommandLineOption nosolOpt("nosol",
-                                "Omit the BEM solution preparation step.");
-    parser.addOption(nosolOpt);
+    parser.add_option({{"nosol"}, "Omit the BEM solution preparation step.", "", ""});
 
-    QCommandLineOption noswapOpt("noswap",
-                                 "Do not swap triangle vertex winding order (assume counterclockwise ordering).\n"
-                                 "Only effective for ASCII .tri files.");
-    parser.addOption(noswapOpt);
+    parser.add_option({{"noswap"},
+                       "Do not swap triangle vertex winding order (assume counterclockwise ordering).\n"
+                       "Only effective for ASCII .tri files.",
+                       "",
+                       ""});
 
-    QCommandLineOption metersOpt("meters",
-                                 "Triangulation coordinates are in meters. Only effective for ASCII .tri files.");
-    parser.addOption(metersOpt);
+    parser.add_option({{"meters"}, "Triangulation coordinates are in meters. Only effective for ASCII .tri files.", "", ""});
 
-    QCommandLineOption innerShiftOpt("innershift",
-                                     "Shift inner skull surface outward by this amount [mm].", "mm");
-    parser.addOption(innerShiftOpt);
+    parser.add_option({{"innershift"}, "Shift inner skull surface outward by this amount [mm].", "mm", ""});
 
-    QCommandLineOption outerShiftOpt("outershift",
-                                     "Shift outer skull surface outward by this amount [mm].", "mm");
-    parser.addOption(outerShiftOpt);
+    parser.add_option({{"outershift"}, "Shift outer skull surface outward by this amount [mm].", "mm", ""});
 
-    QCommandLineOption scalpShiftOpt("scalpshift",
-                                     "Shift scalp surface outward by this amount [mm].", "mm");
-    parser.addOption(scalpShiftOpt);
+    parser.add_option({{"scalpshift"}, "Shift scalp surface outward by this amount [mm].", "mm", ""});
 
-    QCommandLineOption overwriteOpt("overwrite",
-                                    "Overwrite existing output files.");
-    parser.addOption(overwriteOpt);
+    parser.add_option({{"overwrite"}, "Overwrite existing output files.", "", ""});
 
-    // Build argument list from argc/argv
-    QStringList args;
-    for (int i = 0; i < *argc; ++i) {
-        args << QString(argv[i]);
-    }
-
-    parser.process(args);
+    parser.process(*argc, argv, "mne_setup_forward_model", MNE_CPP_VERSION);
 
     // Apply parsed values
-    if (parser.isSet(subjectOpt)) {
-        m_sSubject = parser.value(subjectOpt);
+    if (parser.is_set("subject")) {
+        m_sSubject = parser.value("subject");
     }
-    if (parser.isSet(subjectsDirOpt)) {
-        m_sSubjectsDir = parser.value(subjectsDirOpt);
+    if (parser.is_set("subjects-dir")) {
+        m_sSubjectsDir = parser.value("subjects-dir");
     }
-    if (parser.isSet(scalpcOpt)) {
-        m_fScalpConductivity = parser.value(scalpcOpt).toFloat();
+    if (parser.is_set("scalpc")) {
+        m_fScalpConductivity = toFloat(parser.value("scalpc"));
     }
-    if (parser.isSet(skullcOpt)) {
-        m_fSkullConductivity = parser.value(skullcOpt).toFloat();
+    if (parser.is_set("skullc")) {
+        m_fSkullConductivity = toFloat(parser.value("skullc"));
     }
-    if (parser.isSet(braincOpt)) {
-        m_fBrainConductivity = parser.value(braincOpt).toFloat();
+    if (parser.is_set("brainc")) {
+        m_fBrainConductivity = toFloat(parser.value("brainc"));
     }
-    if (parser.isSet(modelOpt)) {
-        m_sModelName = parser.value(modelOpt);
+    if (parser.is_set("model")) {
+        m_sModelName = parser.value("model");
     }
-    if (parser.isSet(homogOpt)) {
+    if (parser.is_set("homog")) {
         m_bHomogeneous = true;
     }
-    if (parser.isSet(surfOpt)) {
+    if (parser.is_set("surf")) {
         m_bUseSurfFormat = true;
     }
-    if (parser.isSet(icoOpt)) {
-        m_iIcoLevel = parser.value(icoOpt).toInt();
+    if (parser.is_set("ico")) {
+        m_iIcoLevel = to_int(parser.value("ico")).value_or(0);
     }
-    if (parser.isSet(nosolOpt)) {
+    if (parser.is_set("nosol")) {
         m_bNoSolution = true;
     }
-    if (parser.isSet(noswapOpt)) {
+    if (parser.is_set("noswap")) {
         m_bSwap = false;
     }
-    if (parser.isSet(metersOpt)) {
+    if (parser.is_set("meters")) {
         m_bMeters = true;
     }
-    if (parser.isSet(innerShiftOpt)) {
-        m_fInnerShift = parser.value(innerShiftOpt).toFloat();
+    if (parser.is_set("innershift")) {
+        m_fInnerShift = toFloat(parser.value("innershift"));
     }
-    if (parser.isSet(outerShiftOpt)) {
-        m_fOuterShift = parser.value(outerShiftOpt).toFloat();
+    if (parser.is_set("outershift")) {
+        m_fOuterShift = toFloat(parser.value("outershift"));
     }
-    if (parser.isSet(scalpShiftOpt)) {
-        m_fScalpShift = parser.value(scalpShiftOpt).toFloat();
+    if (parser.is_set("scalpshift")) {
+        m_fScalpShift = toFloat(parser.value("scalpshift"));
     }
-    if (parser.isSet(overwriteOpt)) {
+    if (parser.is_set("overwrite")) {
         m_bOverwrite = true;
     }
 }
 
 //=============================================================================================================
 
-QString MNESetupForwardModelSettings::subject() const
+std::string MNESetupForwardModelSettings::subject() const
 {
     return m_sSubject;
 }
 
 //=============================================================================================================
 
-QString MNESetupForwardModelSettings::subjectsDir() const
+std::string MNESetupForwardModelSettings::subjectsDir() const
 {
     return m_sSubjectsDir;
 }
@@ -238,7 +218,7 @@ float MNESetupForwardModelSettings::brainConductivity() const
 
 //=============================================================================================================
 
-QString MNESetupForwardModelSettings::modelName() const
+std::string MNESetupForwardModelSettings::modelName() const
 {
     return m_sModelName;
 }

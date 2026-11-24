@@ -29,16 +29,25 @@
 
 #include "batchprocessor.h"
 #include <mne/mne/mne_process_description.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QDir>
-#include <QTextStream>
+#include <algorithm>
+#include <charconv>
+#include <cmath>
+#include <cstdlib>
+#include <filesystem>
+#include <limits>
+#include <optional>
+#include <print>
+#include <string>
+#include <string_view>
+#include <system_error>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -57,121 +66,171 @@ using namespace mne;
 // HELPERS
 //=============================================================================================================
 
-/**
- * Prints a richly formatted, grouped help text to stdout.
- */
-static StringList toStringList(const QStringList& values)
+// Parses a number as QString::toDouble: an infinity when it overflows, 0 with @p ok false when it is no number
+static double toDouble(std::string_view text, bool& ok)
 {
-    StringList list;
-    list.reserve(static_cast<std::size_t>(values.size()));
-    for (const QString& value : values)
-        list.push_back(value.toStdString());
-    return list;
+    if (const std::optional<double> value = to_double(text)) {
+        ok = true;
+        return *value;
+    }
+    ok = false;
+    // to_double rejects a number beyond the double range, for which QString returns an infinity
+    const std::string number(trimmed(text));
+    char* end = nullptr;
+    const double parsed = std::strtod(number.c_str(), &end);
+    return !number.empty() && end == number.c_str() + number.size() && std::isinf(parsed) ? parsed : 0.0;
 }
 
 //=============================================================================================================
 
+// Parses a number as QString::toFloat: an infinity when it overflows the float range, a signed 0 when it underflows
+static float toFloat(std::string_view text, bool& ok)
+{
+    const double value = toDouble(text, ok);
+    if (std::isfinite(value) && std::abs(value) > std::numeric_limits<float>::max()) {
+        ok = false;
+        return value > 0 ? std::numeric_limits<float>::infinity() : -std::numeric_limits<float>::infinity();
+    }
+    const auto single = static_cast<float>(value);
+    if (value != 0.0 && single == 0.0f) {
+        ok = false;
+    }
+    return single;
+}
+
+//=============================================================================================================
+
+static float toFloat(std::string_view text)
+{
+    bool ok = false;
+    return toFloat(text, ok);
+}
+
+//=============================================================================================================
+
+// Parses an unsigned decimal or 0x-prefixed hexadecimal mask; 0 when the text is no such number
+static unsigned int toMask(std::string_view text)
+{
+    int base = 10;
+    if (text.size() >= 2 && text[0] == '0' && (text[1] == 'x' || text[1] == 'X')) {
+        text.remove_prefix(2);
+        base = 16;
+    }
+    text = trimmed(text);
+    if (text.starts_with('+'))
+        text.remove_prefix(1);
+    unsigned int value = 0;
+    const auto [end, error] = std::from_chars(text.data(), text.data() + text.size(), value, base);
+    if (text.empty() || error != std::errc() || end != text.data() + text.size())
+        return 0;
+    return value;
+}
+
+//=============================================================================================================
+
+/**
+ * Prints a richly formatted, grouped help text to stdout.
+ */
 static void printHelp()
 {
-    QTextStream out(stdout);
-
-    out << "\n"
-        << "Usage: mne_process_raw [options]\n"
-        << "\n"
-        << "  Process raw MEG/EEG data — filtering, averaging, covariance\n"
-        << "  computation, event detection, SSP operator creation, and decimation.\n"
-        << "\n"
-        << "  Ported from MNE-C mne_process_raw by Matti Hamalainen.\n"
-        << "\n"
-        << "General:\n"
-        << "  --help                    Print this help and exit.\n"
-        << "  --version                 Print version information and exit.\n"
-        << "  --cd <dir>                Change working directory before processing.\n"
-        << "\n"
-        << "Input:\n"
-        << "  --raw <file>              Raw data file to process.  May be given\n"
-        << "                            multiple times for grand averaging.\n"
-        << "  --grad <number>           Desired software gradient compensation order.\n"
-        << "  --allowmaxshield          Allow loading of unprocessed MaxShield data.\n"
-        << "\n"
-        << "Events:\n"
-        << "  --events <file>           Load event list from file.\n"
-        << "  --eventsout <file>        Save detected events to file.\n"
-        << "  --allevents               Detect all trigger transitions, not just\n"
-        << "                            rising edges.\n"
-        << "  --digtrig <name>          Trigger channel name (default: 'STI 014').\n"
-        << "                            Use underscores for spaces (e.g. STI_014).\n"
-        << "  --digtrigmask <value>     Trigger channel bit mask (decimal or 0xHex).\n"
-        << "\n"
-        << "Projection (SSP):\n"
-        << "  --proj <file>             Load SSP vectors from file (repeatable).\n"
-        << "  --projon                  Activate SSP when processing.\n"
-        << "  --projoff                 Deactivate SSP when processing.\n"
-        << "  --makeproj                Compute new SSP operators from the data.\n"
-        << "  --projevent <code>        Event code for projector computation.\n"
-        << "  --projtmin <sec>          Start time for projector window.\n"
-        << "  --projtmax <sec>          End time for projector window.\n"
-        << "  --projngrad <n>           Gradiometer SSP components  (default: 2).\n"
-        << "  --projnmag <n>            Magnetometer SSP components (default: 2).\n"
-        << "  --projneeg <n>            EEG SSP components          (default: 0).\n"
-        << "  --projgradrej <fT/cm>     Grad rejection for SSP      (default: 2000).\n"
-        << "  --projmagrej <fT>         Mag  rejection for SSP      (default: 3000).\n"
-        << "  --projeegrej <uV>         EEG  rejection for SSP      (default: 0).\n"
-        << "  --saveprojtag <tag>       Tag appended to SSP output filenames.\n"
-        << "\n"
-        << "Filtering:\n"
-        << "  --filtersize <n>          FFT length for filtering  (default: 8192).\n"
-        << "  --highpass <Hz>           High-pass corner frequency.\n"
-        << "  --lowpass <Hz>            Low-pass  corner frequency.\n"
-        << "  --highpassw <Hz>          High-pass transition bandwidth.\n"
-        << "  --lowpassw <Hz>           Low-pass  transition bandwidth.\n"
-        << "  --filteroff               Do not filter the data.\n"
-        << "\n"
-        << "Output / Decimation:\n"
-        << "  --save <file>             Save processed raw data to file.\n"
-        << "  --decim <factor>          Decimation factor (default: 1).\n"
-        << "  --split <MB>              Split output at this file size (MB).\n"
-        << "  --anon                    Omit subject information from output.\n"
-        << "  --savehere                Write output to current dir instead of\n"
-        << "                            the raw file's directory.\n"
-        << "\n"
-        << "Averaging:\n"
-        << "  --ave <file>              Average description file (repeatable).\n"
-        << "  --saveavetag <tag>        Tag appended to average output filenames.\n"
-        << "  --gave <file>             Grand average output file.\n"
-        << "\n"
-        << "Covariance:\n"
-        << "  --cov <file>              Covariance description file (repeatable).\n"
-        << "  --savecovtag <tag>        Tag appended to covariance output filenames.\n"
-        << "  --gcov <file>             Grand covariance output file.\n"
-        << "\n"
-        << "Examples:\n"
-        << "\n"
-        << "  Detect events and save them:\n"
-        << "    mne_process_raw --raw data.fif --eventsout events.fif\n"
-        << "\n"
-        << "  Band-pass filter and save:\n"
-        << "    mne_process_raw --raw data.fif --highpass 1 --lowpass 40 \\\n"
-        << "                    --save filtered.fif\n"
-        << "\n"
-        << "  Compute averages from a description file:\n"
-        << "    mne_process_raw --raw data.fif --ave auditory.ave\n"
-        << "\n"
-        << "  Compute noise covariance:\n"
-        << "    mne_process_raw --raw data.fif --cov noise.cov\n"
-        << "\n"
-        << "  Grand average across subjects:\n"
-        << "    mne_process_raw --raw subj1.fif --raw subj2.fif \\\n"
-        << "                    --ave paradigm.ave --gave grand_avg.fif\n"
-        << "\n"
-        << "  Decimate and save with projection:\n"
-        << "    mne_process_raw --raw data.fif --proj ssp.fif --projon \\\n"
-        << "                    --decim 4 --save decimated.fif\n"
-        << "\n"
-        << "  Create SSP operators from empty-room data:\n"
-        << "    mne_process_raw --raw empty_room.fif --makeproj \\\n"
-        << "                    --projngrad 3 --projnmag 3\n"
-        << "\n";
+    std::print("{}",
+               "\n"
+               "Usage: mne_process_raw [options]\n"
+               "\n"
+               "  Process raw MEG/EEG data — filtering, averaging, covariance\n"
+               "  computation, event detection, SSP operator creation, and decimation.\n"
+               "\n"
+               "  Ported from MNE-C mne_process_raw by Matti Hamalainen.\n"
+               "\n"
+               "General:\n"
+               "  --help                    Print this help and exit.\n"
+               "  --version                 Print version information and exit.\n"
+               "  --cd <dir>                Change working directory before processing.\n"
+               "\n"
+               "Input:\n"
+               "  --raw <file>              Raw data file to process.  May be given\n"
+               "                            multiple times for grand averaging.\n"
+               "  --grad <number>           Desired software gradient compensation order.\n"
+               "  --allowmaxshield          Allow loading of unprocessed MaxShield data.\n"
+               "\n"
+               "Events:\n"
+               "  --events <file>           Load event list from file.\n"
+               "  --eventsout <file>        Save detected events to file.\n"
+               "  --allevents               Detect all trigger transitions, not just\n"
+               "                            rising edges.\n"
+               "  --digtrig <name>          Trigger channel name (default: 'STI 014').\n"
+               "                            Use underscores for spaces (e.g. STI_014).\n"
+               "  --digtrigmask <value>     Trigger channel bit mask (decimal or 0xHex).\n"
+               "\n"
+               "Projection (SSP):\n"
+               "  --proj <file>             Load SSP vectors from file (repeatable).\n"
+               "  --projon                  Activate SSP when processing.\n"
+               "  --projoff                 Deactivate SSP when processing.\n"
+               "  --makeproj                Compute new SSP operators from the data.\n"
+               "  --projevent <code>        Event code for projector computation.\n"
+               "  --projtmin <sec>          Start time for projector window.\n"
+               "  --projtmax <sec>          End time for projector window.\n"
+               "  --projngrad <n>           Gradiometer SSP components  (default: 2).\n"
+               "  --projnmag <n>            Magnetometer SSP components (default: 2).\n"
+               "  --projneeg <n>            EEG SSP components          (default: 0).\n"
+               "  --projgradrej <fT/cm>     Grad rejection for SSP      (default: 2000).\n"
+               "  --projmagrej <fT>         Mag  rejection for SSP      (default: 3000).\n"
+               "  --projeegrej <uV>         EEG  rejection for SSP      (default: 0).\n"
+               "  --saveprojtag <tag>       Tag appended to SSP output filenames.\n"
+               "\n"
+               "Filtering:\n"
+               "  --filtersize <n>          FFT length for filtering  (default: 8192).\n"
+               "  --highpass <Hz>           High-pass corner frequency.\n"
+               "  --lowpass <Hz>            Low-pass  corner frequency.\n"
+               "  --highpassw <Hz>          High-pass transition bandwidth.\n"
+               "  --lowpassw <Hz>           Low-pass  transition bandwidth.\n"
+               "  --filteroff               Do not filter the data.\n"
+               "\n"
+               "Output / Decimation:\n"
+               "  --save <file>             Save processed raw data to file.\n"
+               "  --decim <factor>          Decimation factor (default: 1).\n"
+               "  --split <MB>              Split output at this file size (MB).\n"
+               "  --anon                    Omit subject information from output.\n"
+               "  --savehere                Write output to current dir instead of\n"
+               "                            the raw file's directory.\n"
+               "\n"
+               "Averaging:\n"
+               "  --ave <file>              Average description file (repeatable).\n"
+               "  --saveavetag <tag>        Tag appended to average output filenames.\n"
+               "  --gave <file>             Grand average output file.\n"
+               "\n"
+               "Covariance:\n"
+               "  --cov <file>              Covariance description file (repeatable).\n"
+               "  --savecovtag <tag>        Tag appended to covariance output filenames.\n"
+               "  --gcov <file>             Grand covariance output file.\n"
+               "\n"
+               "Examples:\n"
+               "\n"
+               "  Detect events and save them:\n"
+               "    mne_process_raw --raw data.fif --eventsout events.fif\n"
+               "\n"
+               "  Band-pass filter and save:\n"
+               "    mne_process_raw --raw data.fif --highpass 1 --lowpass 40 \\\n"
+               "                    --save filtered.fif\n"
+               "\n"
+               "  Compute averages from a description file:\n"
+               "    mne_process_raw --raw data.fif --ave auditory.ave\n"
+               "\n"
+               "  Compute noise covariance:\n"
+               "    mne_process_raw --raw data.fif --cov noise.cov\n"
+               "\n"
+               "  Grand average across subjects:\n"
+               "    mne_process_raw --raw subj1.fif --raw subj2.fif \\\n"
+               "                    --ave paradigm.ave --gave grand_avg.fif\n"
+               "\n"
+               "  Decimate and save with projection:\n"
+               "    mne_process_raw --raw data.fif --proj ssp.fif --projon \\\n"
+               "                    --decim 4 --save decimated.fif\n"
+               "\n"
+               "  Create SSP operators from empty-room data:\n"
+               "    mne_process_raw --raw empty_room.fif --makeproj \\\n"
+               "                    --projngrad 3 --projnmag 3\n"
+               "\n");
 }
 
 //=============================================================================================================
@@ -187,186 +246,119 @@ static void printHelp()
  */
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_process_raw");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
-
     //=========================================================================
     // Set up command-line parser
     //=========================================================================
-    QCommandLineParser parser;
-    parser.setApplicationDescription(
+    CommandLineParser parser(
         "Process raw MEG/EEG data.\n\n"
         "Ported from MNE-C mne_process_raw by Matti Hamalainen.\n"
         "Supports filtering, averaging, covariance computation, event detection,\n"
         "SSP operator creation, and decimation of raw data files.");
-    parser.addVersionOption();
+    parser.add_version_option();
 
     // Custom help option (replaces the default one with grouped output)
-    QCommandLineOption helpOpt(QStringList() << "h" << "help", "Print this help and exit.");
-    parser.addOption(helpOpt);
+    parser.add_option({{"h", "help"}, "Print this help and exit.", {}, {}});
 
     // --- Working directory ---
-    QCommandLineOption cdOpt("cd", "Change working directory.", "dir");
-    parser.addOption(cdOpt);
+    parser.add_option({{"cd"}, "Change working directory.", "dir", {}});
 
     // --- Raw data files ---
-    QCommandLineOption rawOpt("raw", "Input raw data file (may be specified multiple times).", "file");
-    parser.addOption(rawOpt);
+    parser.add_option({{"raw"}, "Input raw data file (may be specified multiple times).", "file", {}});
 
     // --- Gradient compensation ---
-    QCommandLineOption gradOpt("grad", "Desired software gradient compensation order.", "number");
-    parser.addOption(gradOpt);
+    parser.add_option({{"grad"}, "Desired software gradient compensation order.", "number", {}});
 
     // --- MaxShield ---
-    QCommandLineOption maxshieldOpt("allowmaxshield", "Allow unprocessed MaxShield data.");
-    parser.addOption(maxshieldOpt);
+    parser.add_option({{"allowmaxshield"}, "Allow unprocessed MaxShield data.", {}, {}});
 
     // --- Event I/O ---
-    QCommandLineOption eventsOpt("events", "Load events from this file.", "file");
-    parser.addOption(eventsOpt);
-
-    QCommandLineOption eventsOutOpt("eventsout", "Save detected events to this file.", "file");
-    parser.addOption(eventsOutOpt);
-
-    QCommandLineOption allEventsOpt("allevents", "Save all trigger line transitions (not just rising edges).");
-    parser.addOption(allEventsOpt);
+    parser.add_option({{"events"}, "Load events from this file.", "file", {}});
+    parser.add_option({{"eventsout"}, "Save detected events to this file.", "file", {}});
+    parser.add_option({{"allevents"}, "Save all trigger line transitions (not just rising edges).", {}, {}});
 
     // --- Projection ---
-    QCommandLineOption projOpt("proj", "Load SSP projection from this file (may be specified multiple times).", "file");
-    parser.addOption(projOpt);
-
-    QCommandLineOption projOnOpt("projon", "Apply SSP to the data.");
-    parser.addOption(projOnOpt);
-
-    QCommandLineOption projOffOpt("projoff", "Do not apply SSP to the data.");
-    parser.addOption(projOffOpt);
-
-    QCommandLineOption makeProjOpt("makeproj", "Create new SSP operators from the data.");
-    parser.addOption(makeProjOpt);
-
-    QCommandLineOption projEventOpt("projevent", "Event code for projector creation.", "number");
-    parser.addOption(projEventOpt);
-
-    QCommandLineOption projTminOpt("projtmin", "Start time for projector calculation (sec).", "time");
-    parser.addOption(projTminOpt);
-
-    QCommandLineOption projTmaxOpt("projtmax", "End time for projector calculation (sec).", "time");
-    parser.addOption(projTmaxOpt);
-
-    QCommandLineOption projNGradOpt("projngrad", "Number of gradiometer components for SSP (default=2).", "value", "2");
-    parser.addOption(projNGradOpt);
-
-    QCommandLineOption projNMagOpt("projnmag", "Number of magnetometer components for SSP (default=2).", "value", "2");
-    parser.addOption(projNMagOpt);
-
-    QCommandLineOption projNEegOpt("projneeg", "Number of EEG components for SSP (default=0).", "value", "0");
-    parser.addOption(projNEegOpt);
-
-    QCommandLineOption projGradRejOpt("projgradrej", "Grad rejection for SSP (fT/cm, default=2000).", "value", "2000");
-    parser.addOption(projGradRejOpt);
-
-    QCommandLineOption projMagRejOpt("projmagrej", "Mag rejection for SSP (fT, default=3000).", "value", "3000");
-    parser.addOption(projMagRejOpt);
-
-    QCommandLineOption projEegRejOpt("projeegrej", "EEG rejection for SSP (uV, default=0).", "value", "0");
-    parser.addOption(projEegRejOpt);
-
-    QCommandLineOption saveProjTagOpt("saveprojtag", "Tag for projection output files.", "tag");
-    parser.addOption(saveProjTagOpt);
+    parser.add_option({{"proj"}, "Load SSP projection from this file (may be specified multiple times).", "file", {}});
+    parser.add_option({{"projon"}, "Apply SSP to the data.", {}, {}});
+    parser.add_option({{"projoff"}, "Do not apply SSP to the data.", {}, {}});
+    parser.add_option({{"makeproj"}, "Create new SSP operators from the data.", {}, {}});
+    parser.add_option({{"projevent"}, "Event code for projector creation.", "number", {}});
+    parser.add_option({{"projtmin"}, "Start time for projector calculation (sec).", "time", {}});
+    parser.add_option({{"projtmax"}, "End time for projector calculation (sec).", "time", {}});
+    parser.add_option({{"projngrad"}, "Number of gradiometer components for SSP (default=2).", "value", "2"});
+    parser.add_option({{"projnmag"}, "Number of magnetometer components for SSP (default=2).", "value", "2"});
+    parser.add_option({{"projneeg"}, "Number of EEG components for SSP (default=0).", "value", "0"});
+    parser.add_option({{"projgradrej"}, "Grad rejection for SSP (fT/cm, default=2000).", "value", "2000"});
+    parser.add_option({{"projmagrej"}, "Mag rejection for SSP (fT, default=3000).", "value", "3000"});
+    parser.add_option({{"projeegrej"}, "EEG rejection for SSP (uV, default=0).", "value", "0"});
+    parser.add_option({{"saveprojtag"}, "Tag for projection output files.", "tag", {}});
 
     // --- Filter ---
-    QCommandLineOption filterSizeOpt("filtersize", "Filter length (default=8192).", "size", "8192");
-    parser.addOption(filterSizeOpt);
-
-    QCommandLineOption highpassOpt("highpass", "Highpass corner frequency (Hz).", "freq");
-    parser.addOption(highpassOpt);
-
-    QCommandLineOption lowpassOpt("lowpass", "Lowpass corner frequency (Hz).", "freq");
-    parser.addOption(lowpassOpt);
-
-    QCommandLineOption highpasswOpt("highpassw", "Highpass transition width (Hz).", "freq");
-    parser.addOption(highpasswOpt);
-
-    QCommandLineOption lowpasswOpt("lowpassw", "Lowpass transition width (Hz).", "freq");
-    parser.addOption(lowpasswOpt);
-
-    QCommandLineOption filterOffOpt("filteroff", "Do not filter the data.");
-    parser.addOption(filterOffOpt);
+    parser.add_option({{"filtersize"}, "Filter length (default=8192).", "size", "8192"});
+    parser.add_option({{"highpass"}, "Highpass corner frequency (Hz).", "freq", {}});
+    parser.add_option({{"lowpass"}, "Lowpass corner frequency (Hz).", "freq", {}});
+    parser.add_option({{"highpassw"}, "Highpass transition width (Hz).", "freq", {}});
+    parser.add_option({{"lowpassw"}, "Lowpass transition width (Hz).", "freq", {}});
+    parser.add_option({{"filteroff"}, "Do not filter the data.", {}, {}});
 
     // --- Save/Decimate ---
-    QCommandLineOption saveOpt("save", "Save filtered/decimated raw data to this file.", "file");
-    parser.addOption(saveOpt);
-
-    QCommandLineOption anonOpt("anon", "Omit subject info from output.");
-    parser.addOption(anonOpt);
-
-    QCommandLineOption decimOpt("decim", "Decimation factor for saving (default=1).", "factor", "1");
-    parser.addOption(decimOpt);
-
-    QCommandLineOption splitOpt("split", "Split output files at this size (MB).", "size");
-    parser.addOption(splitOpt);
+    parser.add_option({{"save"}, "Save filtered/decimated raw data to this file.", "file", {}});
+    parser.add_option({{"anon"}, "Omit subject info from output.", {}, {}});
+    parser.add_option({{"decim"}, "Decimation factor for saving (default=1).", "factor", "1"});
+    parser.add_option({{"split"}, "Split output files at this size (MB).", "size", {}});
 
     // --- Averaging ---
-    QCommandLineOption aveOpt("ave", "Average description file (may be specified multiple times).", "file");
-    parser.addOption(aveOpt);
-
-    QCommandLineOption saveAveTagOpt("saveavetag", "Tag for average output files.", "tag");
-    parser.addOption(saveAveTagOpt);
-
-    QCommandLineOption gaveOpt("gave", "Grand average output file.", "file");
-    parser.addOption(gaveOpt);
+    parser.add_option({{"ave"}, "Average description file (may be specified multiple times).", "file", {}});
+    parser.add_option({{"saveavetag"}, "Tag for average output files.", "tag", {}});
+    parser.add_option({{"gave"}, "Grand average output file.", "file", {}});
 
     // --- Covariance ---
-    QCommandLineOption covOpt("cov", "Covariance description file (may be specified multiple times).", "file");
-    parser.addOption(covOpt);
-
-    QCommandLineOption saveCovTagOpt("savecovtag", "Tag for covariance output files.", "tag");
-    parser.addOption(saveCovTagOpt);
-
-    QCommandLineOption gcovOpt("gcov", "Grand average covariance output file.", "file");
-    parser.addOption(gcovOpt);
+    parser.add_option({{"cov"}, "Covariance description file (may be specified multiple times).", "file", {}});
+    parser.add_option({{"savecovtag"}, "Tag for covariance output files.", "tag", {}});
+    parser.add_option({{"gcov"}, "Grand average covariance output file.", "file", {}});
 
     // --- Save location ---
-    QCommandLineOption saveHereOpt("savehere", "Save output files in current directory instead of raw data directory.");
-    parser.addOption(saveHereOpt);
+    parser.add_option({{"savehere"}, "Save output files in current directory instead of raw data directory.", {}, {}});
 
     // --- Trigger ---
-    QCommandLineOption digTrigOpt("digtrig", "Digital trigger channel name (default='STI 014').", "name", "STI 014");
-    parser.addOption(digTrigOpt);
-
-    QCommandLineOption digTrigMaskOpt("digtrigmask", "Mask for digital trigger channel (decimal or 0x hex).", "value");
-    parser.addOption(digTrigMaskOpt);
+    parser.add_option({{"digtrig"}, "Digital trigger channel name (default='STI 014').", "name", "STI 014"});
+    parser.add_option({{"digtrigmask"}, "Mask for digital trigger channel (decimal or 0x hex).", "value", {}});
 
     //=========================================================================
     // Parse command-line arguments
     //=========================================================================
-    parser.parse(app.arguments());
-
-    if (parser.isSet(helpOpt)) {
-        printHelp();
-        return 0;
+    bool parsed = parser.parse(argc, argv);
+    if (!parsed && parser.error_text().starts_with("Missing value after")) {
+        // Only the last argument can miss its value; it is ignored, as before
+        parsed = parser.parse(argc - 1, argv);
     }
-    if (parser.isSet("version")) {
-        QTextStream(stdout) << QCoreApplication::applicationName()
-                            << " " << QCoreApplication::applicationVersion() << "\n";
-        return 0;
-    }
-
-    // Report unknown options
-    if (!parser.unknownOptionNames().isEmpty()) {
-        for (const QString& opt : parser.unknownOptionNames())
-            Log::critical("Unknown option: {}", opt.toStdString());
+    if (!parsed) {
+        // The parser stops at the first problem; an unknown option is reported by name as before
+        const std::string& error = parser.error_text();
+        const std::string_view prefix = "Unknown option '";
+        if (error.starts_with(prefix) && error.ends_with("'."))
+            Log::critical("Unknown option: {}", std::string_view(error).substr(prefix.size(), error.size() - prefix.size() - 2));
+        else
+            Log::critical("{}", error);
         printHelp();
         return 1;
+    }
+
+    if (parser.is_set("help")) {
+        printHelp();
+        return 0;
+    }
+    if (parser.is_set("version")) {
+        std::println("mne_process_raw {}", PROGRAM_VERSION);
+        return 0;
     }
 
     //=========================================================================
     // Change working directory if requested
     //=========================================================================
-    if (parser.isSet(cdOpt)) {
-        QDir::setCurrent(parser.value(cdOpt));
-        Log::info("Working directory changed to: {}", QDir::currentPath().toStdString());
+    if (parser.is_set("cd")) {
+        std::error_code error;
+        std::filesystem::current_path(path_from_utf8(parser.value("cd")), error);
+        Log::info("Working directory changed to: {}", utf8_from_path(std::filesystem::current_path(error)));
     }
 
     //=========================================================================
@@ -375,76 +367,71 @@ int main(int argc, char* argv[])
     ProcessingSettings settings;
 
     // Raw files
-    settings.rawFiles = toStringList(parser.values(rawOpt));
+    settings.rawFiles = parser.values("raw");
 
     // Event files
-    settings.eventFiles = toStringList(parser.values(eventsOpt));
-    settings.eventsOutFiles = toStringList(parser.values(eventsOutOpt));
+    settings.eventFiles = parser.values("events");
+    settings.eventsOutFiles = parser.values("eventsout");
 
     // Trigger settings
     // Underscores stand for spaces, as in MNE-C
-    settings.digTrigger = parser.value(digTrigOpt).replace('_', ' ').toStdString();
+    settings.digTrigger = parser.value("digtrig");
+    std::ranges::replace(settings.digTrigger, '_', ' ');
 
-    if (parser.isSet(digTrigMaskOpt)) {
-        QString maskStr = parser.value(digTrigMaskOpt);
-        bool ok;
-        if (maskStr.startsWith("0x", Qt::CaseInsensitive))
-            settings.digTriggerMask = maskStr.toUInt(&ok, 16);
-        else
-            settings.digTriggerMask = maskStr.toUInt(&ok, 10);
-    }
+    if (parser.is_set("digtrigmask"))
+        settings.digTriggerMask = toMask(parser.value("digtrigmask"));
 
     // Projection settings
-    settings.projFiles = toStringList(parser.values(projOpt));
-    if (parser.isSet(projOnOpt))
+    settings.projFiles = parser.values("proj");
+    if (parser.is_set("projon"))
         settings.projOn = 1;
-    else if (parser.isSet(projOffOpt))
+    else if (parser.is_set("projoff"))
         settings.projOn = 0;
 
-    settings.makeProj = parser.isSet(makeProjOpt);
-    settings.projEvent = parser.value(projEventOpt).toInt();
-    settings.projTmin = parser.value(projTminOpt).toFloat();
-    settings.projTmax = parser.value(projTmaxOpt).toFloat();
-    settings.projNGrad = parser.value(projNGradOpt).toInt();
-    settings.projNMag = parser.value(projNMagOpt).toInt();
-    settings.projNEeg = parser.value(projNEegOpt).toInt();
-    settings.projGradReject = parser.value(projGradRejOpt).toFloat() * 1e-13f;
-    settings.projMagReject = parser.value(projMagRejOpt).toFloat() * 1e-15f;
-    settings.projEegReject = parser.value(projEegRejOpt).toFloat() * 1e-6f;
-    settings.saveProjTag = parser.value(saveProjTagOpt).toStdString();
+    settings.makeProj = parser.is_set("makeproj");
+    settings.projEvent = to_int(parser.value("projevent")).value_or(0);
+    settings.projTmin = toFloat(parser.value("projtmin"));
+    settings.projTmax = toFloat(parser.value("projtmax"));
+    settings.projNGrad = to_int(parser.value("projngrad")).value_or(0);
+    settings.projNMag = to_int(parser.value("projnmag")).value_or(0);
+    settings.projNEeg = to_int(parser.value("projneeg")).value_or(0);
+    settings.projGradReject = toFloat(parser.value("projgradrej")) * 1e-13f;
+    settings.projMagReject = toFloat(parser.value("projmagrej")) * 1e-15f;
+    settings.projEegReject = toFloat(parser.value("projeegrej")) * 1e-6f;
+    settings.saveProjTag = parser.value("saveprojtag");
     if (!settings.saveProjTag.empty())
         settings.makeProj = true;
 
     // Filter settings
-    settings.filter.filterSize = parser.value(filterSizeOpt).toInt();
-    if (parser.isSet(highpassOpt))
-        settings.filter.highpass = parser.value(highpassOpt).toFloat();
-    if (parser.isSet(lowpassOpt))
-        settings.filter.lowpass = parser.value(lowpassOpt).toFloat();
-    if (parser.isSet(highpasswOpt))
-        settings.filter.highpassWidth = parser.value(highpasswOpt).toFloat();
-    if (parser.isSet(lowpasswOpt))
-        settings.filter.lowpassWidth = parser.value(lowpasswOpt).toFloat();
-    settings.filter.filterOn = !parser.isSet(filterOffOpt);
+    settings.filter.filterSize = to_int(parser.value("filtersize")).value_or(0);
+    if (parser.is_set("highpass"))
+        settings.filter.highpass = toFloat(parser.value("highpass"));
+    if (parser.is_set("lowpass"))
+        settings.filter.lowpass = toFloat(parser.value("lowpass"));
+    if (parser.is_set("highpassw"))
+        settings.filter.highpassWidth = toFloat(parser.value("highpassw"));
+    if (parser.is_set("lowpassw"))
+        settings.filter.lowpassWidth = toFloat(parser.value("lowpassw"));
+    settings.filter.filterOn = !parser.is_set("filteroff");
 
     // Save settings
-    settings.saveFiles = toStringList(parser.values(saveOpt));
-    settings.decimation = parser.value(decimOpt).toInt();
-    if (parser.isSet(splitOpt))
-        settings.splitSize = static_cast<qint64>(parser.value(splitOpt).toFloat() * 1024 * 1024);
+    settings.saveFiles = parser.values("save");
+    settings.decimation = to_int(parser.value("decim")).value_or(0);
+    if (parser.is_set("split"))
+        settings.splitSize = static_cast<long>(toFloat(parser.value("split")) * 1024 * 1024);
 
     // Averaging settings
-    settings.aveFiles = toStringList(parser.values(aveOpt));
-    settings.saveAveTag = parser.value(saveAveTagOpt).toStdString();
-    settings.grandAveFile = parser.value(gaveOpt).toStdString();
+    settings.aveFiles = parser.values("ave");
+    settings.saveAveTag = parser.value("saveavetag");
+    settings.grandAveFile = parser.value("gave");
 
     // Covariance settings
-    settings.covFiles = toStringList(parser.values(covOpt));
-    settings.saveCovTag = parser.value(saveCovTagOpt).toStdString();
-    settings.grandCovFile = parser.value(gcovOpt).toStdString();
+    settings.covFiles = parser.values("cov");
+    settings.saveCovTag = parser.value("savecovtag");
+    settings.grandCovFile = parser.value("gcov");
 
     // Other settings
-    settings.saveHere = parser.isSet(saveHereOpt);
+    settings.saveHere = parser.is_set("savehere");
 
     //=========================================================================
     // Validate required options

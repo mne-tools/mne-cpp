@@ -19,17 +19,8 @@
 #include <mne/fiff/fiff_stream.h>
 #include <mne/fiff/fiff_types.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QFileInfo>
-#include <QDir>
+#include <mne/base/command_line.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -42,7 +33,13 @@
 //=============================================================================================================
 
 #include <algorithm>
+#include <filesystem>
+#include <format>
+#include <fstream>
 #include <iterator>
+#include <string>
+#include <system_error>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -59,69 +56,58 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_make_scalp_surfaces");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Generate decimated scalp surfaces from BEM outer skin.\n\n"
+                             "Reads a BEM file, finds the outer skin surface, and creates\n"
+                             "decimated versions at the specified vertex counts.");
+    parser.add_help_option();
+    parser.add_version_option();
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Generate decimated scalp surfaces from BEM outer skin.\n\n"
-                                     "Reads a BEM file, finds the outer skin surface, and creates\n"
-                                     "decimated versions at the specified vertex counts.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_option({{"bem"}, "BEM file with outer skin surface.", "file", ""});
+    parser.add_option({{"out"}, "Output directory for decimated surfaces.", "dir", ""});
+    parser.add_option({{"grades"}, "Comma-separated target vertex counts (default: 2562,10242,40962).", "counts", "2562,10242,40962"});
 
-    QCommandLineOption bemOpt("bem", "BEM file with outer skin surface.", "file");
-    parser.addOption(bemOpt);
+    parser.process(argc, argv, "mne_make_scalp_surfaces", PROGRAM_VERSION);
 
-    QCommandLineOption outOpt("out", "Output directory for decimated surfaces.", "dir");
-    parser.addOption(outOpt);
+    const std::string bemFile = parser.value("bem");
+    const std::string outDir = parser.value("out");
+    const std::string gradesStr = parser.value("grades");
 
-    QCommandLineOption gradesOpt("grades", "Comma-separated target vertex counts (default: 2562,10242,40962).",
-                                 "counts", "2562,10242,40962");
-    parser.addOption(gradesOpt);
-
-    parser.process(app);
-
-    QString bemFile = parser.value(bemOpt);
-    QString outDir = parser.value(outOpt);
-    QString gradesStr = parser.value(gradesOpt);
-
-    if (bemFile.isEmpty()) {
+    if (bemFile.empty()) {
         Log::critical("--bem is required.");
         return 1;
     }
-    if (outDir.isEmpty()) {
+    if (outDir.empty()) {
         Log::critical("--out is required.");
         return 1;
     }
 
     // Parse grades
-    QStringList gradesParts = gradesStr.split(',', Qt::SkipEmptyParts);
-    QList<int> grades;
-    for (const QString& g : gradesParts) {
-        int val = g.trimmed().toInt();
+    std::vector<int> grades;
+    for (const std::string& g : split(gradesStr, ',', true)) {
+        const int val = to_int(g).value_or(0);
         if (val > 0)
-            grades.append(val);
+            grades.push_back(val);
     }
-    if (grades.isEmpty()) {
+    if (grades.empty()) {
         Log::critical("No valid vertex counts specified.");
         return 1;
     }
 
-    const QFileInfo bemFileInfo(bemFile);
-    if (!bemFileInfo.isFile() || !bemFileInfo.isReadable()) {
-        Log::critical("Cannot read BEM from: {}", bemFile.toStdString());
+    const std::filesystem::path bemPath = path_from_utf8(bemFile);
+    std::error_code ec;
+    if (!std::filesystem::is_regular_file(bemPath, ec) || !std::ifstream(bemPath)) {
+        Log::critical("Cannot read BEM from: {}", bemFile);
         return 1;
     }
 
     // Read BEM
-    MNEBem bem(bemFile.toStdU16String());
+    MNEBem bem(bemPath);
     if (bem.size() == 0) {
-        Log::critical("Cannot read BEM from: {}", bemFile.toStdString());
+        Log::critical("Cannot read BEM from: {}", bemFile);
         return 1;
     }
 
-    Log::info("Read BEM with {} surface(s) from {}", bem.size(), bemFile.toStdString());
+    Log::info("Read BEM with {} surface(s) from {}", bem.size(), bemFile);
 
     // Find outer skin surface (typically the last/outermost surface, or id == FIFFV_BEM_SURF_ID_HEAD)
     auto head = std::ranges::find(bem, FIFFV_BEM_SURF_ID_HEAD, &MNEBemSurface::id);
@@ -133,9 +119,10 @@ int main(int argc, char* argv[])
     Log::info("Using surface {}: {} vertices, {} triangles", head - bem.begin(), skin.np, skin.ntri);
 
     // Create output directory
-    QDir dir;
-    if (!dir.mkpath(outDir)) {
-        Log::critical("Cannot create output directory: {}", outDir.toStdString());
+    const std::filesystem::path outDirPath = path_from_utf8(outDir);
+    std::filesystem::create_directories(outDirPath, ec);
+    if (!std::filesystem::is_directory(outDirPath, ec)) {
+        Log::critical("Cannot create output directory: {}", outDir);
         return 1;
     }
 
@@ -151,18 +138,17 @@ int main(int argc, char* argv[])
         const MNEBemSurface& decimated = surfaces.front();
 
         // Write as FIFF BEM surface
-        QString outPath = QDir(outDir).filePath(
-            QString("scalp-%1.fif").arg(targetVerts));
+        const std::filesystem::path outPath = outDirPath / std::format("scalp-{}.fif", targetVerts);
 
         MNEBem outBem;
         outBem.push_back(decimated);
 
-        if (auto written = outBem.write(outPath.toStdU16String()); !written) {
+        if (auto written = outBem.write(outPath); !written) {
             Log::critical("{}", written.error().what());
             return 1;
         }
 
-        Log::info("  Written {} vertices, {} triangles to {}", decimated.np, decimated.ntri, outPath.toStdString());
+        Log::info("  Written {} vertices, {} triangles to {}", decimated.np, decimated.ntri, utf8_from_path(outPath));
     }
 
     Log::info("Done.");

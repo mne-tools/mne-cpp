@@ -18,17 +18,9 @@
 #include <mne/fiff/fiff_cov.h>
 #include <mne/fiff/fiff_raw_data.h>
 #include <mne/fiff/fiff_stream.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCommandLineOption>
-#include <QCommandLineParser>
-#include <QCoreApplication>
-#include <QFile>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -44,6 +36,8 @@
 #include <random>
 #include <cmath>
 #include <numbers>
+#include <print>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -62,65 +56,46 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_simu");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Simulate sensor data from a forward model.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"fwd"}, "Forward solution FIFF file.", "file", {}});
+    parser.add_option({{"raw"}, "Raw FIFF file (for channel info & sampling rate).", "file", {}});
+    parser.add_option({{"cov"}, "Noise covariance FIFF file.", "file", {}});
+    parser.add_option({{"source"}, "Source index to activate.", "idx", "0"});
+    parser.add_option({{"snr"}, "Signal-to-noise ratio in dB.", "value", "20"});
+    parser.add_option({{"duration"}, "Duration of simulation in seconds.", "sec", "1.0"});
+    parser.add_option({{"freq"}, "Signal frequency in Hz.", "Hz", "10.0"});
+    parser.add_option({{"out"}, "Output simulated raw FIFF file.", "file", {}});
+    parser.process(argc, argv, "mne_simu", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Simulate sensor data from a forward model.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string fwdFile = parser.value("fwd");
+    const std::string rawFile = parser.value("raw");
+    const std::string covFile = parser.value("cov");
+    const std::string outFile = parser.value("out");
+    int sourceIdx = to_int(parser.value("source")).value_or(0);
+    double snrDb = to_double(parser.value("snr")).value_or(0.0);
+    double duration = to_double(parser.value("duration")).value_or(0.0);
+    double signalFreq = to_double(parser.value("freq")).value_or(0.0);
 
-    QCommandLineOption fwdOpt("fwd", "Forward solution FIFF file.", "file");
-    parser.addOption(fwdOpt);
-
-    QCommandLineOption rawOpt("raw", "Raw FIFF file (for channel info & sampling rate).", "file");
-    parser.addOption(rawOpt);
-
-    QCommandLineOption covOpt("cov", "Noise covariance FIFF file.", "file");
-    parser.addOption(covOpt);
-
-    QCommandLineOption sourceOpt("source", "Source index to activate.", "idx", "0");
-    parser.addOption(sourceOpt);
-
-    QCommandLineOption snrOpt("snr", "Signal-to-noise ratio in dB.", "value", "20");
-    parser.addOption(snrOpt);
-
-    QCommandLineOption durationOpt("duration", "Duration of simulation in seconds.", "sec", "1.0");
-    parser.addOption(durationOpt);
-
-    QCommandLineOption freqOpt("freq", "Signal frequency in Hz.", "Hz", "10.0");
-    parser.addOption(freqOpt);
-
-    QCommandLineOption outOpt("out", "Output simulated raw FIFF file.", "file");
-    parser.addOption(outOpt);
-
-    parser.process(app);
-
-    QString fwdFile = parser.value(fwdOpt);
-    QString rawFile = parser.value(rawOpt);
-    QString covFile = parser.value(covOpt);
-    QString outFile = parser.value(outOpt);
-    int sourceIdx = parser.value(sourceOpt).toInt();
-    double snrDb = parser.value(snrOpt).toDouble();
-    double duration = parser.value(durationOpt).toDouble();
-    double signalFreq = parser.value(freqOpt).toDouble();
-
-    if (fwdFile.isEmpty()) {
+    if (fwdFile.empty()) {
         Log::critical("--fwd is required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_simu"));
+        return 1;
     }
-    if (rawFile.isEmpty()) {
+    if (rawFile.empty()) {
         Log::critical("--raw is required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_simu"));
+        return 1;
     }
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         Log::critical("--out is required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_simu"));
+        return 1;
     }
 
     // Load forward solution
-    auto fwdRead = MNEForwardSolution::read(fwdFile.toStdU16String());
+    auto fwdRead = MNEForwardSolution::read(path_from_utf8(fwdFile));
     if (!fwdRead) {
         Log::critical("{}", fwdRead.error().what());
         return 1;
@@ -137,9 +112,9 @@ int main(int argc, char* argv[])
     }
 
     // Load raw file for channel info
-    FiffRawData raw(rawFile.toStdU16String());
+    FiffRawData raw(path_from_utf8(rawFile));
     if (raw.info.empty()) {
-        Log::critical("Cannot read raw: {}", rawFile.toStdString());
+        Log::critical("Cannot read raw: {}", rawFile);
         return 1;
     }
 
@@ -162,8 +137,8 @@ int main(int argc, char* argv[])
     Log::info("Signal: source={}, freq={:.1f} Hz, amplitude=1 nAm", sourceIdx, signalFreq);
 
     // Add noise if covariance provided
-    if (!covFile.isEmpty()) {
-        FiffCov cov(covFile.toStdU16String());
+    if (!covFile.empty()) {
+        FiffCov cov(path_from_utf8(covFile));
         if (!cov.empty() && cov.dim == nChan) {
             // Cholesky decomposition for correlated noise
             LLT<MatrixXd> llt(cov.data);
@@ -206,9 +181,9 @@ int main(int argc, char* argv[])
 
     // Write output
     Eigen::RowVectorXd cals;
-    auto stream = FiffStream::start_writing_raw(outFile.toStdU16String(), raw.info, cals);
+    auto stream = FiffStream::start_writing_raw(path_from_utf8(outFile), raw.info, cals);
     if (!stream) {
-        Log::critical("Cannot open output file: {}", outFile.toStdString());
+        Log::critical("Cannot open output file: {}", outFile);
         return 1;
     }
 
@@ -221,6 +196,6 @@ int main(int argc, char* argv[])
     }
 
     stream->finish_writing_raw();
-    Log::info("Written simulated data to: {}", outFile.toStdString());
+    Log::info("Written simulated data to: {}", outFile);
     return 0;
 }

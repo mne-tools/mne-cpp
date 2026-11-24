@@ -37,18 +37,8 @@
 #include <mne/mne/mne.h>
 #include <mne/mne/mne_inverse_operator.h>
 #include <mne/mne/mne_forward_solution.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QFileInfo>
-#include <QTextStream>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -60,9 +50,15 @@
 // STL INCLUDES
 //=============================================================================================================
 
-#include <vector>
 #include <algorithm>
+#include <cmath>
+#include <filesystem>
+#include <fstream>
 #include <iterator>
+#include <print>
+#include <string>
+#include <utility>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -149,7 +145,7 @@ static FiffInfo buildInfoFromForward(const MNEForwardSolution& forward,
             FiffProj eegAvRef;
             eegAvRef.kind = FIFFV_MNE_PROJ_ITEM_EEG_AVREF;
             eegAvRef.active = true;
-            eegAvRef.desc = QString("Average EEG reference").toStdString();
+            eegAvRef.desc = "Average EEG reference";
             eegAvRef.data = FiffNamedMatrix(projData);
             info.projs.push_back(eegAvRef);
         }
@@ -161,13 +157,12 @@ static FiffInfo buildInfoFromForward(const MNEForwardSolution& forward,
 /**
  * Read SSP projectors from a FIFF file.
  */
-static std::vector<FiffProj> readProjFile(const QString& fileName)
+static std::vector<FiffProj> readProjFile(const std::string& fileName)
 {
     std::vector<FiffProj> projs;
-    QFile file(fileName);
-    FiffStream stream(fileName.toStdU16String());
+    FiffStream stream(path_from_utf8(fileName));
     if (!stream.open()) {
-        Log::warning("  WARNING: Could not open projection file {}", fileName.toStdString());
+        Log::warning("  WARNING: Could not open projection file {}", fileName);
         return projs;
     }
     projs = stream.read_proj(stream.dirtree());
@@ -178,22 +173,49 @@ static std::vector<FiffProj> readProjFile(const QString& fileName)
 /**
  * Read bad channel names from a text file (one channel name per line).
  */
-static QStringList readBadFile(const QString& fileName)
+static StringList readBadFile(const std::string& fileName)
 {
-    QStringList bads;
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::warning("  WARNING: Could not open bad channel file {}", fileName.toStdString());
+    StringList bads;
+    std::ifstream file(path_from_utf8(fileName));
+    if (!file) {
+        Log::warning("  WARNING: Could not open bad channel file {}", fileName);
         return bads;
     }
-    QTextStream in(&file);
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (!line.isEmpty() && !line.startsWith('#'))
-            bads << line;
+    std::string rawLine;
+    while (std::getline(file, rawLine)) {
+        const std::string_view line = trimmed(rawLine);
+        if (!line.empty() && !line.starts_with('#'))
+            bads.emplace_back(line);
     }
     file.close();
     return bads;
+}
+
+/**
+ * Parse a number like QString::toFloat(): 0 if the text is not a number.
+ */
+static float toFloat(const std::string& text)
+{
+    return static_cast<float>(to_double(text).value_or(0.0));
+}
+
+/**
+ * The file name without its last extension, like QFileInfo::completeBaseName().
+ */
+static std::string completeBaseName(const std::string& file)
+{
+    const std::string name = utf8_from_path(path_from_utf8(file).filename());
+    const std::size_t dot = name.rfind('.');
+    return dot == std::string::npos ? name : name.substr(0, dot);
+}
+
+/**
+ * The directory of a file, "." if it has none, like QFileInfo::path().
+ */
+static std::string dirPath(const std::string& file)
+{
+    const std::filesystem::path parent = path_from_utf8(file).parent_path();
+    return parent.empty() ? std::string(".") : utf8_from_path(parent);
 }
 
 //=============================================================================================================
@@ -217,16 +239,11 @@ static QStringList readBadFile(const QString& fileName)
  */
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_inverse_operator");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
-
     //=========================================================================================================
     // Command line parser
     //=========================================================================================================
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription(
+    CommandLineParser parser(
         "Assemble an inverse operator from a forward solution and noise covariance.\n"
         "Port of the original MNE-C mne_inverse_operator by Matti Hamalainen.\n\n"
         "Supports MEG-only, EEG-only, or combined MEG+EEG solutions with\n"
@@ -234,165 +251,85 @@ int main(int argc, char* argv[])
         "Channel information is obtained from the forward solution.\n"
         "SSP projectors are read from the noise covariance file (or --proj files).\n"
         "No measurement file is required (same as the original MNE-C tool).");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_help_option();
+    parser.add_version_option();
 
-    // --fwd: Forward solution file
-    QCommandLineOption fwdOpt(QStringList() << "fwd",
-                              "The forward solution file.", "file");
-    parser.addOption(fwdOpt);
+    parser.add_option({{"fwd"}, "The forward solution file.", "file", {}});
+    parser.add_option({{"noisecov", "senscov"}, "The noise (sensor) covariance matrix file.", "file", {}});
+    parser.add_option({{"srccov"}, "Source covariance matrix file (default: identity).", "file", {}});
+    parser.add_option({{"meg"}, "Use MEG channels.", {}, {}});
+    parser.add_option({{"eeg"}, "Use EEG channels (specify both --meg and --eeg for a combined solution).", {}, {}});
+    parser.add_option({{"fixed"}, "Use fixed source orientations normal to the cortical surface.", {}, {}});
+    parser.add_option({{"loose"}, "Amount of loose orientation constraint (0.0-1.0, default: 0.2).", "amount", "0.2"});
+    parser.add_option({{"depth"}, "Enable depth weighting.", {}, {}});
+    parser.add_option({{"weightexp"}, "Depth weighting exponent (0.0-1.0, default: 0.8).", "value", "0.8"});
+    parser.add_option({{"weightlimit"}, "Depth weighting upper limit (default: 10.0).", "value", "10.0"});
+    parser.add_option({{"nodepth"}, "Disable depth weighting.", {}, {}});
+    parser.add_option({{"reg"}, "Regularization factor for all channel types.", "amount", {}});
+    parser.add_option({{"magreg"}, "Regularization factor for magnetometers (default: 0.1).", "amount", "0.1"});
+    parser.add_option({{"gradreg"}, "Regularization factor for gradiometers (default: 0.1).", "amount", "0.1"});
+    parser.add_option({{"eegreg"}, "Regularization factor for EEG channels (default: 0.1).", "amount", "0.1"});
+    parser.add_option({{"diagnoise"}, "Omit off-diagonal terms from the noise covariance matrix.", {}, {}});
+    parser.add_option({{"proj"}, "Load SSP projectors from file (can be repeated).", "file", {}});
+    parser.add_option({{"bad"}, "Bad channels file (one name per line, can be repeated).", "file", {}});
+    parser.add_option({{"inv"}, "Output file for the inverse operator (default: <fwd>-inv.fif).", "file", {}});
 
-    // --noisecov / --senscov: Noise covariance matrix file
-    QCommandLineOption noisecovOpt(QStringList() << "noisecov" << "senscov",
-                                   "The noise (sensor) covariance matrix file.", "file");
-    parser.addOption(noisecovOpt);
-
-    // --srccov: Source covariance matrix file (optional, defaults to identity)
-    QCommandLineOption srccovOpt(QStringList() << "srccov",
-                                 "Source covariance matrix file (default: identity).", "file");
-    parser.addOption(srccovOpt);
-
-    // --meg: Use MEG channels
-    QCommandLineOption megOpt(QStringList() << "meg",
-                              "Use MEG channels.");
-    parser.addOption(megOpt);
-
-    // --eeg: Use EEG channels
-    QCommandLineOption eegOpt(QStringList() << "eeg",
-                              "Use EEG channels (specify both --meg and --eeg for a combined solution).");
-    parser.addOption(eegOpt);
-
-    // --fixed: Use fixed source orientations
-    QCommandLineOption fixedOpt(QStringList() << "fixed",
-                                "Use fixed source orientations normal to the cortical surface.");
-    parser.addOption(fixedOpt);
-
-    // --loose: Loose orientation constraint amount
-    QCommandLineOption looseOpt(QStringList() << "loose",
-                                "Amount of loose orientation constraint (0.0-1.0, default: 0.2).",
-                                "amount", "0.2");
-    parser.addOption(looseOpt);
-
-    // --depth: Enable depth weighting (flag, like SVN MNE-C)
-    QCommandLineOption depthOpt(QStringList() << "depth",
-                                "Enable depth weighting.");
-    parser.addOption(depthOpt);
-
-    // --weightexp: Depth weighting exponent
-    QCommandLineOption weightexpOpt(QStringList() << "weightexp",
-                                    "Depth weighting exponent (0.0-1.0, default: 0.8).",
-                                    "value", "0.8");
-    parser.addOption(weightexpOpt);
-
-    // --weightlimit: Depth weighting maximum
-    QCommandLineOption weightlimitOpt(QStringList() << "weightlimit",
-                                      "Depth weighting upper limit (default: 10.0).",
-                                      "value", "10.0");
-    parser.addOption(weightlimitOpt);
-
-    // --nodepth: Disable depth weighting
-    QCommandLineOption noDepthOpt(QStringList() << "nodepth",
-                                  "Disable depth weighting.");
-    parser.addOption(noDepthOpt);
-
-    // --reg: Regularization factor (same for all channel types)
-    QCommandLineOption regOpt(QStringList() << "reg",
-                              "Regularization factor for all channel types.", "amount");
-    parser.addOption(regOpt);
-
-    // --magreg: Regularization for magnetometers
-    QCommandLineOption magregOpt(QStringList() << "magreg",
-                                 "Regularization factor for magnetometers (default: 0.1).",
-                                 "amount", "0.1");
-    parser.addOption(magregOpt);
-
-    // --gradreg: Regularization for gradiometers
-    QCommandLineOption gradregOpt(QStringList() << "gradreg",
-                                  "Regularization factor for gradiometers (default: 0.1).",
-                                  "amount", "0.1");
-    parser.addOption(gradregOpt);
-
-    // --eegreg: Regularization for EEG channels
-    QCommandLineOption eegregOpt(QStringList() << "eegreg",
-                                 "Regularization factor for EEG channels (default: 0.1).",
-                                 "amount", "0.1");
-    parser.addOption(eegregOpt);
-
-    // --diagnoise: Use only diagonal noise covariance
-    QCommandLineOption diagnoiseOpt(QStringList() << "diagnoise",
-                                    "Omit off-diagonal terms from the noise covariance matrix.");
-    parser.addOption(diagnoiseOpt);
-
-    // --proj: SSP projection file (can be repeated)
-    QCommandLineOption projOpt(QStringList() << "proj",
-                               "Load SSP projectors from file (can be repeated).", "file");
-    parser.addOption(projOpt);
-
-    // --bad: Bad channels file (one channel name per line)
-    QCommandLineOption badOpt(QStringList() << "bad",
-                              "Bad channels file (one name per line, can be repeated).", "file");
-    parser.addOption(badOpt);
-
-    // --inv: Output inverse operator file
-    QCommandLineOption invOpt(QStringList() << "inv",
-                              "Output file for the inverse operator (default: <fwd>-inv.fif).", "file");
-    parser.addOption(invOpt);
-
-    parser.process(app);
+    parser.process(argc, argv, "mne_inverse_operator", PROGRAM_VERSION);
 
     //=========================================================================================================
     // Validate arguments
     //=========================================================================================================
 
-    if (!parser.isSet(fwdOpt)) {
+    if (!parser.is_set("fwd")) {
         Log::critical("Error: --fwd option is required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_inverse_operator"));
+        return 1;
     }
-    if (!parser.isSet(noisecovOpt)) {
+    if (!parser.is_set("noisecov")) {
         Log::critical("Error: --noisecov option is required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_inverse_operator"));
+        return 1;
     }
 
     // Default to MEG+EEG if neither --meg nor --eeg is specified
-    bool useMeg = parser.isSet(megOpt);
-    bool useEeg = parser.isSet(eegOpt);
+    bool useMeg = parser.is_set("meg");
+    bool useEeg = parser.is_set("eeg");
     if (!useMeg && !useEeg) {
         Log::info("Neither --meg nor --eeg specified; using all available channels.");
         useMeg = true;
         useEeg = true;
     }
 
-    bool useFixed = parser.isSet(fixedOpt);
-    float loose = parser.value(looseOpt).toFloat();
-    float depth = parser.isSet(noDepthOpt) ? 0.0f
-        : parser.isSet(depthOpt)           ? parser.value(weightexpOpt).toFloat()
+    bool useFixed = parser.is_set("fixed");
+    float loose = toFloat(parser.value("loose"));
+    float depth = parser.is_set("nodepth") ? 0.0f
+        : parser.is_set("depth")           ? toFloat(parser.value("weightexp"))
                                            : 0.8f;
-    bool diagNoise = parser.isSet(diagnoiseOpt);
+    bool diagNoise = parser.is_set("diagnoise");
 
     // Regularization parameters
-    float magReg = parser.value(magregOpt).toFloat();
-    float gradReg = parser.value(gradregOpt).toFloat();
-    float eegReg = parser.value(eegregOpt).toFloat();
-    if (parser.isSet(regOpt)) {
-        float regAll = parser.value(regOpt).toFloat();
+    float magReg = toFloat(parser.value("magreg"));
+    float gradReg = toFloat(parser.value("gradreg"));
+    float eegReg = toFloat(parser.value("eegreg"));
+    if (parser.is_set("reg")) {
+        float regAll = toFloat(parser.value("reg"));
         magReg = regAll;
         gradReg = regAll;
         eegReg = regAll;
     }
 
     // Output file name
-    QString fwdName = parser.value(fwdOpt);
-    QString invName;
-    if (parser.isSet(invOpt)) {
-        invName = parser.value(invOpt);
+    const std::string fwdName = parser.value("fwd");
+    std::string invName;
+    if (parser.is_set("inv")) {
+        invName = parser.value("inv");
     } else {
         // Derive from forward solution file name
-        QFileInfo fi(fwdName);
-        QString base = fi.completeBaseName();
-        if (base.endsWith("-fwd")) {
-            base.chop(4);
+        std::string base = completeBaseName(fwdName);
+        if (base.ends_with("-fwd")) {
+            base.resize(base.size() - 4);
         }
-        invName = fi.path() + "/" + base + "-inv.fif";
+        invName = dirPath(fwdName) + "/" + base + "-inv.fif";
     }
 
     //=========================================================================================================
@@ -401,9 +338,9 @@ int main(int argc, char* argv[])
 
     Log::info("{}", "");
     Log::info("========================================");
-    Log::info("Reading forward solution from {}...", fwdName.toStdString());
+    Log::info("Reading forward solution from {}...", fwdName);
 
-    auto forwardRead = MNEForwardSolution::read(fwdName.toStdU16String(), {.surf_ori = true});
+    auto forwardRead = MNEForwardSolution::read(path_from_utf8(fwdName), {.surf_ori = true});
     if (!forwardRead) {
         Log::critical("{}", forwardRead.error().what());
         return 1;
@@ -429,12 +366,12 @@ int main(int argc, char* argv[])
     // Read noise covariance
     //=========================================================================================================
 
-    Log::info("\nReading noise covariance from {}...", parser.value(noisecovOpt).toStdString());
+    Log::info("\nReading noise covariance from {}...", parser.value("noisecov"));
 
-    FiffCov noiseCov(parser.value(noisecovOpt).toStdU16String());
+    FiffCov noiseCov(path_from_utf8(parser.value("noisecov")));
 
     if (noiseCov.data.rows() == 0) {
-        Log::critical("Error: Could not read noise covariance from {}", parser.value(noisecovOpt).toStdString());
+        Log::critical("Error: Could not read noise covariance from {}", parser.value("noisecov"));
         return 1;
     }
 
@@ -448,9 +385,9 @@ int main(int argc, char* argv[])
     //=========================================================================================================
 
     std::vector<FiffProj> extraProjs;
-    QStringList projFiles = parser.values(projOpt);
-    for (const QString& projFileName : projFiles) {
-        Log::info("Reading SSP projectors from {}...", projFileName.toStdString());
+    const StringList projFiles = parser.values("proj");
+    for (const std::string& projFileName : projFiles) {
+        Log::info("Reading SSP projectors from {}...", projFileName);
         std::vector<FiffProj> fileProjs = readProjFile(projFileName);
         Log::info("  Found {} projectors.", static_cast<long long>(fileProjs.size()));
         std::ranges::move(fileProjs, std::back_inserter(extraProjs));
@@ -469,13 +406,13 @@ int main(int argc, char* argv[])
     // Merge bad channels from --bad files
     //=========================================================================================================
 
-    QStringList badFiles = parser.values(badOpt);
-    for (const QString& badFileName : badFiles) {
-        Log::info("Reading bad channels from {}...", badFileName.toStdString());
-        QStringList fileBads = readBadFile(badFileName);
-        for (const QString& bad : fileBads) {
-            if (!std::ranges::contains(info.bads, bad.toStdString()))
-                info.bads.push_back(bad.toStdString());
+    const StringList badFiles = parser.values("bad");
+    for (const std::string& badFileName : badFiles) {
+        Log::info("Reading bad channels from {}...", badFileName);
+        const StringList fileBads = readBadFile(badFileName);
+        for (const std::string& bad : fileBads) {
+            if (!std::ranges::contains(info.bads, bad))
+                info.bads.push_back(bad);
         }
     }
     // Also merge bad channels from the noise covariance
@@ -484,7 +421,7 @@ int main(int argc, char* argv[])
             info.bads.push_back(bad);
     }
     if (!info.bads.empty()) {
-        Log::info("  Bad channels ({}): {}", static_cast<long long>(info.bads.size()), QString::fromStdString(mne::join(info.bads, " ")).toStdString());
+        Log::info("  Bad channels ({}): {}", static_cast<long long>(info.bads.size()), mne::join(info.bads, " "));
     }
 
     //=========================================================================================================
@@ -517,7 +454,9 @@ int main(int argc, char* argv[])
         Log::info("  Depth weighting:  no");
     }
 
-    MNEInverseOperator invOp(info, forward, noiseCov, loose, depth, useFixed, true);
+    // The forward solution is not needed afterwards: moving it saves copying its source spaces
+    MNEInverseOperator invOp =
+        MNEInverseOperator::make_inverse_operator(info, std::move(forward), noiseCov, loose, depth, useFixed, true);
 
     if (invOp.nsource <= 0) {
         Log::critical("Error: Failed to assemble inverse operator.");
@@ -530,9 +469,9 @@ int main(int argc, char* argv[])
     // Write the inverse operator
     //=========================================================================================================
 
-    Log::info("\nWriting inverse operator to {}...", invName.toStdString());
+    Log::info("\nWriting inverse operator to {}...", invName);
 
-    if (auto written = invOp.write(invName.toStdU16String()); !written) {
+    if (auto written = invOp.write(path_from_utf8(invName)); !written) {
         Log::critical("{}", written.error().what());
         return 1;
     }

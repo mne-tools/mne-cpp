@@ -35,12 +35,6 @@
 #include <mne/base/log.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-
-//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -67,10 +61,6 @@ using namespace MNEWATERSHEDBEM;
  */
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_watershed_bem");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
-
     MNEWatershedBemSettings settings(&argc, argv);
     WatershedBem watershedBem(settings);
 

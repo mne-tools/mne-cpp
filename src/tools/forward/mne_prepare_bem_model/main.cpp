@@ -19,22 +19,16 @@
 #include <mne/fiff/fiff_stream.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCommandLineOption>
-#include <QCommandLineParser>
-#include <QCoreApplication>
-#include <QFile>
-#include <QFileInfo>
+#include <mne/base/command_line.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <memory>
+#include <print>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -52,33 +46,24 @@ using namespace mne;
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_prepare_bem_model");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Compute the BEM solution matrix for forward modeling.");
+    parser.add_help_option();
+    parser.add_version_option();
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Compute the BEM solution matrix for forward modeling.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_option({{"bem"}, "Input BEM model FIFF file.", "file", ""});
+    parser.add_option({{"sol"}, "Output solution FIFF file (default: derived from --bem).", "file", ""});
+    parser.add_option({{"method"}, "BEM method: linear or constant.", "name", "linear"});
 
-    QCommandLineOption bemOpt("bem", "Input BEM model FIFF file.", "file");
-    parser.addOption(bemOpt);
+    parser.process(argc, argv, "mne_prepare_bem_model", PROGRAM_VERSION);
 
-    QCommandLineOption solOpt("sol", "Output solution FIFF file (default: derived from --bem).", "file");
-    parser.addOption(solOpt);
+    const std::string bemFile = parser.value("bem");
+    std::string solFile = parser.value("sol");
+    const std::string methodStr = to_lower(parser.value("method"));
 
-    QCommandLineOption methodOpt("method", "BEM method: linear or constant.", "name", "linear");
-    parser.addOption(methodOpt);
-
-    parser.process(app);
-
-    QString bemFile = parser.value(bemOpt);
-    QString solFile = parser.value(solOpt);
-    QString methodStr = parser.value(methodOpt).toLower();
-
-    if (bemFile.isEmpty()) {
+    if (bemFile.empty()) {
         Log::critical("--bem is required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_prepare_bem_model"));
+        return 1;
     }
 
     int bemMethod;
@@ -87,29 +72,29 @@ int main(int argc, char* argv[])
     else if (methodStr == "constant")
         bemMethod = FWD_BEM_CONSTANT_COLL;
     else {
-        Log::critical("Unknown method: {} (use 'linear' or 'constant')", methodStr.toStdString());
+        Log::critical("Unknown method: {} (use 'linear' or 'constant')", methodStr);
         return 1;
     }
 
     // Derive solution filename  if not specified
-    if (solFile.isEmpty())
-        solFile = QString::fromStdU16String(FwdBemModel::fwd_bem_make_bem_sol_name(bemFile.toStdU16String()).u16string());
+    if (solFile.empty())
+        solFile = utf8_from_path(FwdBemModel::fwd_bem_make_bem_sol_name(path_from_utf8(bemFile)));
 
-    Log::info("BEM model file:    {}", bemFile.toStdString());
-    Log::info("BEM solution file: {}", solFile.toStdString());
+    Log::info("BEM model file:    {}", bemFile);
+    Log::info("BEM solution file: {}", solFile);
     Log::info("BEM method:        {}", FwdBemModel::fwd_bem_explain_method(bemMethod));
 
     // Determine how many layers we have
     // Try three-layer first, fall back to single-layer
     std::unique_ptr<FwdBemModel> bemModel;
-    bemModel = FwdBemModel::fwd_bem_load_three_layer_surfaces(bemFile.toStdU16String());
+    bemModel = FwdBemModel::fwd_bem_load_three_layer_surfaces(path_from_utf8(bemFile));
     if (!bemModel) {
         Log::info("Not a three-layer model, trying single-layer (homogeneous)...");
-        bemModel = FwdBemModel::fwd_bem_load_homog_surface(bemFile.toStdU16String());
+        bemModel = FwdBemModel::fwd_bem_load_homog_surface(path_from_utf8(bemFile));
     }
 
     if (!bemModel) {
-        Log::critical("Cannot load BEM surfaces from: {}", bemFile.toStdString());
+        Log::critical("Cannot load BEM surfaces from: {}", bemFile);
         return 1;
     }
 
@@ -127,10 +112,10 @@ int main(int argc, char* argv[])
     Log::info("BEM solution computed successfully.");
 
     // Save the solution
-    Log::info("Writing solution to: {}", solFile.toStdString());
+    Log::info("Writing solution to: {}", solFile);
 
-    if (bemModel->fwd_bem_save_model(solFile.toStdU16String()) != 0) {
-        Log::critical("Cannot write output file: {}", solFile.toStdString());
+    if (bemModel->fwd_bem_save_model(path_from_utf8(solFile)) != 0) {
+        Log::critical("Cannot write output file: {}", solFile);
         return 1;
     }
 

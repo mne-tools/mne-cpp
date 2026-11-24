@@ -32,12 +32,6 @@
 #include <mne/base/log.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-
-//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -64,10 +58,6 @@ using namespace MNESETUPMRI;
  */
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_setup_mri");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
-
     MNESetupMriSettings settings(&argc, argv);
     SetupMri setupMri(settings);
 

@@ -31,12 +31,6 @@
 #include <mne/base/log.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-
-//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -63,10 +57,6 @@ using namespace MNEFLASHBEM;
  */
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_flash_bem");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
-
     MNEFlashBemSettings settings(&argc, argv);
     FlashBem flashBem(settings);
 

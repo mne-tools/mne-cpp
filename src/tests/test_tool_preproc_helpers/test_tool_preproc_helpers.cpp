@@ -128,13 +128,13 @@ void TestToolPreprocHelpers::testReadSensorPositionsBasic()
     f.close();
 
     MatrixX3f pos;
-    QStringList names;
-    QVERIFY(readSensorPositions(fname, pos, names));
+    StringList names;
+    QVERIFY(readSensorPositions(fname.toStdString(), pos, names));
     QCOMPARE(pos.rows(), (Eigen::Index)3);
-    QCOMPARE(names.size(), 3);
-    QCOMPARE(names[0], QString("CH01"));
-    QCOMPARE(names[1], QString("CH02"));
-    QCOMPARE(names[2], QString("CH03"));
+    QCOMPARE(static_cast<int>(names.size()), 3);
+    QCOMPARE(names[0], std::string("CH01"));
+    QCOMPARE(names[1], std::string("CH02"));
+    QCOMPARE(names[2], std::string("CH03"));
 }
 
 void TestToolPreprocHelpers::testReadSensorPositionsComments()
@@ -151,10 +151,10 @@ void TestToolPreprocHelpers::testReadSensorPositionsComments()
     f.close();
 
     MatrixX3f pos;
-    QStringList names;
-    QVERIFY(readSensorPositions(fname, pos, names));
+    StringList names;
+    QVERIFY(readSensorPositions(fname.toStdString(), pos, names));
     QCOMPARE(pos.rows(), (Eigen::Index)2);
-    QCOMPARE(names.size(), 2);
+    QCOMPARE(static_cast<int>(names.size()), 2);
 }
 
 void TestToolPreprocHelpers::testReadSensorPositionsMmToMeters()
@@ -167,8 +167,8 @@ void TestToolPreprocHelpers::testReadSensorPositionsMmToMeters()
     f.close();
 
     MatrixX3f pos;
-    QStringList names;
-    QVERIFY(readSensorPositions(fname, pos, names));
+    StringList names;
+    QVERIFY(readSensorPositions(fname.toStdString(), pos, names));
     // mm -> meters conversion: 1000mm = 1.0m
     QVERIFY(qAbs(pos(0, 0) - 1.0f) < 1e-4f);
     QVERIFY(qAbs(pos(0, 1) - 2.0f) < 1e-4f);
@@ -275,7 +275,7 @@ void TestToolPreprocHelpers::testReadRefDataBasic()
 
     MatrixXf refData;
     int nChan, nSamp;
-    QVERIFY(readRefData(fname, refData, nChan, nSamp));
+    QVERIFY(readRefData(fname.toStdString(), refData, nChan, nSamp));
     QCOMPARE(nSamp, 3);
     QCOMPARE(nChan, 3);
 }
@@ -295,7 +295,7 @@ void TestToolPreprocHelpers::testReadRefDataDimensions()
 
     MatrixXf refData;
     int nChan, nSamp;
-    QVERIFY(readRefData(fname, refData, nChan, nSamp));
+    QVERIFY(readRefData(fname.toStdString(), refData, nChan, nSamp));
     // 5 rows (samples), 2 columns (channels)
     QCOMPARE(nSamp, 5);
     QCOMPARE(nChan, 2);
@@ -317,7 +317,7 @@ void TestToolPreprocHelpers::testReadRefDataComments()
 
     MatrixXf refData;
     int nChan, nSamp;
-    QVERIFY(readRefData(fname, refData, nChan, nSamp));
+    QVERIFY(readRefData(fname.toStdString(), refData, nChan, nSamp));
     QCOMPARE(nSamp, 2);
     QCOMPARE(nChan, 2);
 }
@@ -328,42 +328,42 @@ void TestToolPreprocHelpers::testReadRefDataComments()
 
 void TestToolPreprocHelpers::testExplainKindMEG()
 {
-    QCOMPARE(explainKind(FIFFV_MEG_CH), QString("MEG"));
+    QCOMPARE(explainKind(FIFFV_MEG_CH), std::string("MEG"));
 }
 
 void TestToolPreprocHelpers::testExplainKindEEG()
 {
-    QCOMPARE(explainKind(FIFFV_EEG_CH), QString("EEG"));
+    QCOMPARE(explainKind(FIFFV_EEG_CH), std::string("EEG"));
 }
 
 void TestToolPreprocHelpers::testExplainKindEOG()
 {
-    QCOMPARE(explainKind(FIFFV_EOG_CH), QString("EOG"));
+    QCOMPARE(explainKind(FIFFV_EOG_CH), std::string("EOG"));
 }
 
 void TestToolPreprocHelpers::testExplainKindEMG()
 {
-    QCOMPARE(explainKind(FIFFV_EMG_CH), QString("EMG"));
+    QCOMPARE(explainKind(FIFFV_EMG_CH), std::string("EMG"));
 }
 
 void TestToolPreprocHelpers::testExplainKindECG()
 {
-    QCOMPARE(explainKind(FIFFV_ECG_CH), QString("ECG"));
+    QCOMPARE(explainKind(FIFFV_ECG_CH), std::string("ECG"));
 }
 
 void TestToolPreprocHelpers::testExplainKindMISC()
 {
-    QCOMPARE(explainKind(FIFFV_MISC_CH), QString("MISC"));
+    QCOMPARE(explainKind(FIFFV_MISC_CH), std::string("MISC"));
 }
 
 void TestToolPreprocHelpers::testExplainKindSTIM()
 {
-    QCOMPARE(explainKind(FIFFV_STIM_CH), QString("STI"));
+    QCOMPARE(explainKind(FIFFV_STIM_CH), std::string("STI"));
 }
 
 void TestToolPreprocHelpers::testExplainKindUnknown()
 {
-    QCOMPARE(explainKind(9999), QString("Unknown"));
+    QCOMPARE(explainKind(9999), std::string("Unknown"));
 }
 
 //=============================================================================================================
@@ -380,13 +380,13 @@ void TestToolPreprocHelpers::testReadAliasesBasic()
     out << "MEG 0121:MEG0121_new\n";
     f.close();
 
-    QList<ChannelAlias> aliases = readAliases(fname, false);
-    QCOMPARE(aliases.size(), 2);
-    QCOMPARE(aliases[0].from, QString("MEG 0111"));
-    QCOMPARE(aliases[0].to, QString("MEG0111_new"));
+    std::vector<ChannelAlias> aliases = readAliases(fname.toStdString(), false);
+    QCOMPARE(static_cast<int>(aliases.size()), 2);
+    QCOMPARE(aliases[0].from, std::string("MEG 0111"));
+    QCOMPARE(aliases[0].to, std::string("MEG0111_new"));
     QCOMPARE(aliases[0].toKind, -1);
-    QCOMPARE(aliases[1].from, QString("MEG 0121"));
-    QCOMPARE(aliases[1].to, QString("MEG0121_new"));
+    QCOMPARE(aliases[1].from, std::string("MEG 0121"));
+    QCOMPARE(aliases[1].to, std::string("MEG0121_new"));
 }
 
 void TestToolPreprocHelpers::testReadAliasesReverse()
@@ -398,11 +398,11 @@ void TestToolPreprocHelpers::testReadAliasesReverse()
     out << "OLD_NAME:NEW_NAME\n";
     f.close();
 
-    QList<ChannelAlias> aliases = readAliases(fname, true);
-    QCOMPARE(aliases.size(), 1);
+    std::vector<ChannelAlias> aliases = readAliases(fname.toStdString(), true);
+    QCOMPARE(static_cast<int>(aliases.size()), 1);
     // When reversed, from = NEW_NAME, to = OLD_NAME
-    QCOMPARE(aliases[0].from, QString("NEW_NAME"));
-    QCOMPARE(aliases[0].to, QString("OLD_NAME"));
+    QCOMPARE(aliases[0].from, std::string("NEW_NAME"));
+    QCOMPARE(aliases[0].to, std::string("OLD_NAME"));
 }
 
 void TestToolPreprocHelpers::testReadAliasesWithKind()
@@ -414,10 +414,10 @@ void TestToolPreprocHelpers::testReadAliasesWithKind()
     out << "STI 014:TRIGGER:3" << "\n"; // kind = 3 (STIM)
     f.close();
 
-    QList<ChannelAlias> aliases = readAliases(fname, false);
-    QCOMPARE(aliases.size(), 1);
-    QCOMPARE(aliases[0].from, QString("STI 014"));
-    QCOMPARE(aliases[0].to, QString("TRIGGER"));
+    std::vector<ChannelAlias> aliases = readAliases(fname.toStdString(), false);
+    QCOMPARE(static_cast<int>(aliases.size()), 1);
+    QCOMPARE(aliases[0].from, std::string("STI 014"));
+    QCOMPARE(aliases[0].to, std::string("TRIGGER"));
     QCOMPARE(aliases[0].toKind, 3);
 }
 
@@ -430,10 +430,10 @@ void TestToolPreprocHelpers::testReadAliasesTruncation()
     out << "SHORT:VERYLONGCHANNELNAME16\n";
     f.close();
 
-    QList<ChannelAlias> aliases = readAliases(fname, false);
-    QCOMPARE(aliases.size(), 1);
+    std::vector<ChannelAlias> aliases = readAliases(fname.toStdString(), false);
+    QCOMPARE(static_cast<int>(aliases.size()), 1);
     // Name should be truncated to 15 chars
-    QCOMPARE(aliases[0].to.length(), 15);
+    QCOMPARE(static_cast<int>(aliases[0].to.length()), 15);
 }
 
 void TestToolPreprocHelpers::testReadAliasesComments()
@@ -449,8 +449,8 @@ void TestToolPreprocHelpers::testReadAliasesComments()
     out << "CH2:CH2_NEW\n";
     f.close();
 
-    QList<ChannelAlias> aliases = readAliases(fname, false);
-    QCOMPARE(aliases.size(), 2);
+    std::vector<ChannelAlias> aliases = readAliases(fname.toStdString(), false);
+    QCOMPARE(static_cast<int>(aliases.size()), 2);
 }
 
 //=============================================================================================================
@@ -468,7 +468,7 @@ void TestToolPreprocHelpers::testReadBadChannelListBasic()
     out << "MEG 0131\n";
     f.close();
 
-    std::vector<std::string> bads = readBadChannelList(fname);
+    std::vector<std::string> bads = readBadChannelList(fname.toStdString());
     QCOMPARE(static_cast<int>(bads.size()), 3);
     QCOMPARE(bads[0], std::string("MEG 0111"));
     QCOMPARE(bads[1], std::string("MEG 0121"));
@@ -488,7 +488,7 @@ void TestToolPreprocHelpers::testReadBadChannelListComments()
     out << "MEG 0121\n";
     f.close();
 
-    std::vector<std::string> bads = readBadChannelList(fname);
+    std::vector<std::string> bads = readBadChannelList(fname.toStdString());
     QCOMPARE(static_cast<int>(bads.size()), 2);
 }
 
@@ -502,7 +502,7 @@ void TestToolPreprocHelpers::testReadBadChannelListEmpty()
     out << "\n";
     f.close();
 
-    std::vector<std::string> bads = readBadChannelList(fname);
+    std::vector<std::string> bads = readBadChannelList(fname.toStdString());
     QCOMPARE(static_cast<int>(bads.size()), 0);
 }
 
@@ -524,8 +524,8 @@ void TestToolPreprocHelpers::testReadAsciiMatrixBasic()
     f.close();
 
     MatrixXd data;
-    QStringList rowNames, colNames;
-    QVERIFY(readAsciiMatrix(fname, data, rowNames, colNames));
+    StringList rowNames, colNames;
+    QVERIFY(readAsciiMatrix(fname.toStdString(), data, rowNames, colNames));
     QCOMPARE(data.rows(), (Eigen::Index)3);
     QCOMPARE(data.cols(), (Eigen::Index)2);
 }
@@ -543,15 +543,15 @@ void TestToolPreprocHelpers::testReadAsciiMatrixNames()
     f.close();
 
     MatrixXd data;
-    QStringList rowNames, colNames;
-    QVERIFY(readAsciiMatrix(fname, data, rowNames, colNames));
-    QCOMPARE(colNames.size(), 3);
-    QCOMPARE(colNames[0], QString("A"));
-    QCOMPARE(colNames[1], QString("B"));
-    QCOMPARE(colNames[2], QString("C"));
-    QCOMPARE(rowNames.size(), 2);
-    QCOMPARE(rowNames[0], QString("X"));
-    QCOMPARE(rowNames[1], QString("Y"));
+    StringList rowNames, colNames;
+    QVERIFY(readAsciiMatrix(fname.toStdString(), data, rowNames, colNames));
+    QCOMPARE(static_cast<int>(colNames.size()), 3);
+    QCOMPARE(colNames[0], std::string("A"));
+    QCOMPARE(colNames[1], std::string("B"));
+    QCOMPARE(colNames[2], std::string("C"));
+    QCOMPARE(static_cast<int>(rowNames.size()), 2);
+    QCOMPARE(rowNames[0], std::string("X"));
+    QCOMPARE(rowNames[1], std::string("Y"));
 }
 
 void TestToolPreprocHelpers::testReadAsciiMatrixValues()
@@ -567,8 +567,8 @@ void TestToolPreprocHelpers::testReadAsciiMatrixValues()
     f.close();
 
     MatrixXd data;
-    QStringList rowNames, colNames;
-    QVERIFY(readAsciiMatrix(fname, data, rowNames, colNames));
+    StringList rowNames, colNames;
+    QVERIFY(readAsciiMatrix(fname.toStdString(), data, rowNames, colNames));
     QVERIFY(qAbs(data(0, 0) - 1.5) < 1e-10);
     QVERIFY(qAbs(data(0, 1) - (-2.5)) < 1e-10);
     QVERIFY(qAbs(data(1, 0) - 3.14) < 1e-10);

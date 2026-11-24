@@ -14,11 +14,11 @@
 #define MNESURF2BEMSETTINGS_H
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QVector>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNESURF2BEM
@@ -38,14 +38,14 @@ namespace MNESURF2BEM
  */
 struct SurfaceInput
 {
-    QString fileName; /**< Input surface file name. */
-    bool isAsciiTri;  /**< True if ASCII triangle file (.tri), false for FreeSurfer binary. */
-    int id;           /**< BEM surface id (1=brain, 3=skull, 4=head), -1 if not set. */
-    float sigma;      /**< Compartment conductivity [S/m], -1 if not set. */
-    int ico;          /**< Icosahedron subdivision level for downsampling (0-6), -1 if not used. */
-    bool swap;        /**< Swap vertex winding order (ASCII tri files only). */
-    bool mm;          /**< Coordinates in millimeters (true) or meters (false). Default: true. */
-    float shift;      /**< Vertex shift along normals [meters]. 0 = no shift. */
+    std::string fileName; /**< Input surface file name. */
+    bool isAsciiTri;      /**< True if ASCII triangle file (.tri), false for FreeSurfer binary. */
+    int id;               /**< BEM surface id (1=brain, 3=skull, 4=head), -1 if not set. */
+    float sigma;          /**< Compartment conductivity [S/m], -1 if not set. */
+    int ico;              /**< Icosahedron subdivision level for downsampling (0-6), -1 if not used. */
+    bool swap;            /**< Swap vertex winding order (ASCII tri files only). */
+    bool mm;              /**< Coordinates in millimeters (true) or meters (false). Default: true. */
+    float shift;          /**< Vertex shift along normals [meters]. 0 = no shift. */
 
     SurfaceInput()
     : isAsciiTri(false)
@@ -91,7 +91,7 @@ public:
      *
      * @return Vector of SurfaceInput structs.
      */
-    const QVector<SurfaceInput>& surfaces() const;
+    const std::vector<SurfaceInput>& surfaces() const;
 
     //=========================================================================================================
     /**
@@ -99,7 +99,7 @@ public:
      *
      * @return Output file path, empty if no output requested.
      */
-    QString outputFile() const;
+    std::string outputFile() const;
 
     //=========================================================================================================
     /**
@@ -150,14 +150,14 @@ public:
     int exitCode() const;
 
 private:
-    QVector<SurfaceInput> m_surfaces; /**< Input surface specifications. */
-    QString m_sOutputFile;            /**< Output FIF file path. */
-    int m_iCoordFrame;                /**< Coordinate frame for ASCII files. */
-    bool m_bCheck;                    /**< Perform topology checks. */
-    bool m_bCheckMore;                /**< Perform thickness checks. */
-    bool m_bForce;                    /**< Force-load despite defects. */
-    bool m_bShouldExit = false;       /**< True when the app should exit immediately. */
-    int m_iExitCode = 0;              /**< Exit code when m_bShouldExit is true. */
+    std::vector<SurfaceInput> m_surfaces; /**< Input surface specifications. */
+    std::string m_sOutputFile;            /**< Output FIF file path. */
+    int m_iCoordFrame;                    /**< Coordinate frame for ASCII files. */
+    bool m_bCheck;                        /**< Perform topology checks. */
+    bool m_bCheckMore;                    /**< Perform thickness checks. */
+    bool m_bForce;                        /**< Force-load despite defects. */
+    bool m_bShouldExit = false;           /**< True when the app should exit immediately. */
+    int m_iExitCode = 0;                  /**< Exit code when m_bShouldExit is true. */
 };
 
 } // namespace MNESURF2BEM

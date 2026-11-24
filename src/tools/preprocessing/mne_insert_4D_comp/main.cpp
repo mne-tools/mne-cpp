@@ -16,19 +16,9 @@
 
 #include <mne/fiff/fiff.h>
 #include <mne/fiff/fiff_file.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QTextStream>
-#include <QRegularExpression>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -42,6 +32,15 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+#include <format>
+#include <fstream>
+#include <limits>
+#include <optional>
+#include <string>
+#include <string_view>
 #include <vector>
 
 //=============================================================================================================
@@ -59,30 +58,72 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-static bool readSensorPositions(const QString& filename, MatrixX3f& pos, QStringList& names)
+// Parses a number as QString::toDouble: an infinity when it overflows, 0 with @p ok false when it is no number
+static double toDouble(std::string_view text, bool& ok)
 {
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Cannot open sensor position file: {}", filename.toStdString());
+    if (const std::optional<double> value = to_double(text)) {
+        ok = true;
+        return *value;
+    }
+    ok = false;
+    // to_double rejects a number beyond the double range, for which QString returns an infinity
+    const std::string number(trimmed(text));
+    char* end = nullptr;
+    const double parsed = std::strtod(number.c_str(), &end);
+    return !number.empty() && end == number.c_str() + number.size() && std::isinf(parsed) ? parsed : 0.0;
+}
+
+//=============================================================================================================
+
+// Parses a number as QString::toFloat: an infinity when it overflows the float range, a signed 0 when it underflows
+static float toFloat(std::string_view text, bool& ok)
+{
+    const double value = toDouble(text, ok);
+    if (std::isfinite(value) && std::abs(value) > std::numeric_limits<float>::max()) {
+        ok = false;
+        return value > 0 ? std::numeric_limits<float>::infinity() : -std::numeric_limits<float>::infinity();
+    }
+    const auto single = static_cast<float>(value);
+    if (value != 0.0 && single == 0.0f) {
+        ok = false;
+    }
+    return single;
+}
+
+//=============================================================================================================
+
+static float toFloat(std::string_view text)
+{
+    bool ok = false;
+    return toFloat(text, ok);
+}
+
+//=============================================================================================================
+
+static bool readSensorPositions(const std::string& filename, MatrixX3f& pos, StringList& names)
+{
+    std::ifstream file(path_from_utf8(filename));
+    if (!file) {
+        Log::critical("Cannot open sensor position file: {}", filename);
         return false;
     }
-    QTextStream in(&file);
-    QVector<Vector3f> posVec;
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#'))
+    std::vector<Vector3f> posVec;
+    std::string raw;
+    while (std::getline(file, raw)) {
+        const std::string_view line = trimmed(raw);
+        if (line.empty() || line.starts_with('#'))
             continue;
-        QStringList parts = line.split(QRegularExpression("\\s+"));
+        const std::vector<std::string_view> parts = split_whitespace(line);
         if (parts.size() >= 4) {
-            names.append(parts[0]);
+            names.emplace_back(parts[0]);
             // Convert from mm to meters
-            posVec.append(Vector3f(parts[1].toFloat() * 0.001f,
-                                   parts[2].toFloat() * 0.001f,
-                                   parts[3].toFloat() * 0.001f));
+            posVec.emplace_back(toFloat(parts[1]) * 0.001f,
+                                toFloat(parts[2]) * 0.001f,
+                                toFloat(parts[3]) * 0.001f);
         }
     }
-    pos.resize(posVec.size(), 3);
-    for (int i = 0; i < posVec.size(); i++)
+    pos.resize(std::ssize(posVec), 3);
+    for (int i = 0; i < std::ssize(posVec); i++)
         pos.row(i) = posVec[i].transpose();
     return true;
 }
@@ -131,44 +172,43 @@ static Matrix4f procrustes(const MatrixX3f& source, const MatrixX3f& target)
 
 //=============================================================================================================
 
-static bool readRefData(const QString& filename, MatrixXf& refData, int& nChannels, int& nSamples)
+static bool readRefData(const std::string& filename, MatrixXf& refData, int& nChannels, int& nSamples)
 {
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Cannot open reference data file: {}", filename.toStdString());
+    std::ifstream file(path_from_utf8(filename));
+    if (!file) {
+        Log::critical("Cannot open reference data file: {}", filename);
         return false;
     }
-    QTextStream in(&file);
 
     // First pass: count dimensions
-    QVector<QVector<float>> rows;
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#'))
+    std::vector<std::vector<float>> rows;
+    std::string raw;
+    while (std::getline(file, raw)) {
+        const std::string_view line = trimmed(raw);
+        if (line.empty() || line.starts_with('#'))
             continue;
-        QStringList parts = line.split(QRegularExpression("\\s+"));
-        QVector<float> row;
-        for (const QString& p : parts) {
-            bool ok;
-            float val = p.toFloat(&ok);
+        std::vector<float> row;
+        for (const std::string_view p : split_whitespace(line)) {
+            bool ok = false;
+            const float val = toFloat(p, ok);
             if (ok)
-                row.append(val);
+                row.push_back(val);
         }
-        if (!row.isEmpty())
-            rows.append(row);
+        if (!row.empty())
+            rows.push_back(std::move(row));
     }
 
-    if (rows.isEmpty()) {
+    if (rows.empty()) {
         Log::critical("No data in reference file");
         return false;
     }
 
-    nSamples = rows.size();
-    nChannels = rows[0].size();
+    nSamples = static_cast<int>(rows.size());
+    nChannels = static_cast<int>(rows[0].size());
 
     refData.resize(nChannels, nSamples);
     for (int s = 0; s < nSamples; s++) {
-        for (int c = 0; c < qMin(nChannels, rows[s].size()); c++) {
+        for (int c = 0; c < std::min(nChannels, static_cast<int>(rows[s].size())); c++) {
             refData(c, s) = rows[s][c];
         }
     }
@@ -181,35 +221,23 @@ static bool readRefData(const QString& filename, MatrixXf& refData, int& nChanne
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_insert_4D_comp");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Merge 4D Magnes WH3600 compensation data with a FIFF file.\n\nSupports Procrustes alignment of sensor positions.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"in"}, "Input FIFF file with MEG data.", "file", {}});
+    parser.add_option({{"ref"}, "Reference channel data file (text).", "file", {}});
+    parser.add_option({{"refpos"}, "Reference sensor positions file.", "file", {}});
+    parser.add_option({{"out"}, "Output FIFF file.", "file", {}});
+    parser.add_option({{"megpos"}, "MEG sensor positions file (for alignment).", "file", {}});
+    parser.process(argc, argv, "mne_insert_4D_comp", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Merge 4D Magnes WH3600 compensation data with a FIFF file.\n\nSupports Procrustes alignment of sensor positions.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string inFile = parser.value("in");
+    const std::string refFile = parser.value("ref");
+    const std::string refPosFile = parser.value("refpos");
+    const std::string megPosFile = parser.value("megpos");
+    const std::string outFile = parser.value("out");
 
-    QCommandLineOption inOpt("in", "Input FIFF file with MEG data.", "file");
-    parser.addOption(inOpt);
-    QCommandLineOption refOpt("ref", "Reference channel data file (text).", "file");
-    parser.addOption(refOpt);
-    QCommandLineOption refposOpt("refpos", "Reference sensor positions file.", "file");
-    parser.addOption(refposOpt);
-    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
-    parser.addOption(outOpt);
-    QCommandLineOption megposOpt("megpos", "MEG sensor positions file (for alignment).", "file");
-    parser.addOption(megposOpt);
-
-    parser.process(app);
-
-    QString inFile = parser.value(inOpt);
-    QString refFile = parser.value(refOpt);
-    QString refPosFile = parser.value(refposOpt);
-    QString megPosFile = parser.value(megposOpt);
-    QString outFile = parser.value(outOpt);
-
-    if (inFile.isEmpty() || refFile.isEmpty() || outFile.isEmpty()) {
+    if (inFile.empty() || refFile.empty() || outFile.empty()) {
         Log::info("Required: --in, --ref, --out");
         return 1;
     }
@@ -217,11 +245,11 @@ int main(int argc, char* argv[])
     //
     // Read input FIFF
     //
-    FiffRawData raw(inFile.toStdU16String());
+    FiffRawData raw(path_from_utf8(inFile));
     if (!raw.info.empty()) {
         Log::info("Read input: {} channels at {:.1f} Hz", raw.info.nchan, raw.info.sfreq);
     } else {
-        Log::critical("Failed to read input FIFF: {}", inFile.toStdString());
+        Log::critical("Failed to read input FIFF: {}", inFile);
         return 1;
     }
 
@@ -237,15 +265,15 @@ int main(int argc, char* argv[])
     // Read sensor positions for alignment (optional)
     //
     Matrix4f alignTransform = Matrix4f::Identity();
-    if (!refPosFile.isEmpty() && !megPosFile.isEmpty()) {
+    if (!refPosFile.empty() && !megPosFile.empty()) {
         MatrixX3f refPos, megPos;
-        QStringList refNames, megNames;
+        StringList refNames, megNames;
         readSensorPositions(refPosFile, refPos, refNames);
         readSensorPositions(megPosFile, megPos, megNames);
 
         // Use matching positions for Procrustes alignment
-        int nMatch = qMin(static_cast<int>(refPos.rows()),
-                          static_cast<int>(megPos.rows()));
+        int nMatch = std::min(static_cast<int>(refPos.rows()),
+                              static_cast<int>(megPos.rows()));
         if (nMatch >= 3) {
             alignTransform = procrustes(refPos.topRows(nMatch), megPos.topRows(nMatch));
             Log::info("Computed Procrustes alignment from {} matching points", nMatch);
@@ -266,14 +294,14 @@ int main(int argc, char* argv[])
         ch.chpos.coil_type = 4003; // FIFFV_COIL_MAGNES_REF_MAG
         ch.unit = FIFF_UNIT_T;
         ch.unit_mul = FIFF_UNITM_NONE;
-        ch.ch_name = QString("REF%1").arg(k + 1, 3, 10, QChar('0')).toStdString();
+        ch.ch_name = std::format("REF{:03}", k + 1);
         refChs.push_back(ch);
     }
 
     //
     // Write output FIFF with merged channels
     //
-    auto outStream = FiffStream::start_file(outFile.toStdU16String());
+    auto outStream = FiffStream::start_file(path_from_utf8(outFile));
     if (!outStream) {
         Log::critical("Cannot create output file.");
         return 1;
@@ -332,7 +360,7 @@ int main(int argc, char* argv[])
     MatrixXd times;
 
     for (int start = raw.first_samp; start <= raw.last_samp; start += bufSize) {
-        int end = qMin(start + bufSize - 1, static_cast<int>(raw.last_samp));
+        int end = std::min(start + bufSize - 1, static_cast<int>(raw.last_samp));
         if (!raw.read_raw_segment(readData, times, start, end))
             break;
 
@@ -361,7 +389,7 @@ int main(int argc, char* argv[])
     outStream->end_block(FIFFB_MEAS);
     outStream->end_file();
 
-    Log::info("Wrote merged FIFF: {} channels ({} original + {} reference) to {}", totalCh, raw.info.nchan, nRefCh, outFile.toStdString());
+    Log::info("Wrote merged FIFF: {} channels ({} original + {} reference) to {}", totalCh, raw.info.nchan, nRefCh, outFile);
 
     return 0;
 }

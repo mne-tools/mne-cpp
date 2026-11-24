@@ -16,24 +16,28 @@
 
 #include <mne/fs/fs_surface.h>
 #include <mne/fs/fs_label.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCommandLineOption>
-#include <QCommandLineParser>
-#include <QCoreApplication>
-#include <QDir>
-#include <QFile>
-#include <QTextStream>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cmath>
+#include <cstdlib>
+#include <format>
+#include <fstream>
+#include <limits>
+#include <print>
+#include <set>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -47,6 +51,22 @@ using namespace Eigen;
 //=============================================================================================================
 
 #define PROGRAM_VERSION MNE_CPP_VERSION
+
+//=============================================================================================================
+/**
+ * Qt's asprintf, QString::number and QTextStream round exact decimal ties away from zero where std::format rounds
+ * them to even. Moves a tie at @p decimals to the neighbouring double away from zero, so that std::format writes
+ * the digits Qt wrote.
+ */
+static double morphLabelsQtTie(double value, int decimals)
+{
+    const double scaled = std::ldexp(value, decimals + 1);
+    // A tie at decimals is an odd multiple of 2^-(decimals + 1)
+    if (std::isfinite(scaled) && scaled == std::trunc(scaled) && std::fmod(scaled, 2.0) != 0.0) {
+        return std::nextafter(value, value < 0 ? -std::numeric_limits<double>::infinity() : std::numeric_limits<double>::infinity());
+    }
+    return value;
+}
 
 //=============================================================================================================
 /**
@@ -78,80 +98,67 @@ static VectorXi buildNearestMap(const MatrixX3f& srcSphere, const MatrixX3f& dst
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_morph_labels");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    const char* subjectsDirEnv = std::getenv("SUBJECTS_DIR");
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Morph label files between subjects using sphere registration.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    CommandLineParser parser("Morph label files between subjects using sphere registration.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"from"}, "Source subject name.", "subject", {}});
+    parser.add_option({{"to"}, "Destination subject name.", "subject", {}});
+    parser.add_option({{"subjects_dir"}, "Subjects directory.", "dir", subjectsDirEnv ? subjectsDirEnv : ""});
+    parser.add_option({{"hemi"}, "Hemisphere: lh or rh.", "hemi", {}});
+    parser.add_option({{"label"}, "Input label file.", "file", {}});
+    parser.add_option({{"out"}, "Output morphed label file.", "file", {}});
+    parser.process(argc, argv, "mne_morph_labels", PROGRAM_VERSION);
 
-    QCommandLineOption fromOpt("from", "Source subject name.", "subject");
-    parser.addOption(fromOpt);
+    const std::string fromSubject = parser.value("from");
+    const std::string toSubject = parser.value("to");
+    const std::string subjectsDir = parser.value("subjects_dir");
+    const std::string hemi = parser.value("hemi");
+    const std::string labelFile = parser.value("label");
+    const std::string outFile = parser.value("out");
 
-    QCommandLineOption toOpt("to", "Destination subject name.", "subject");
-    parser.addOption(toOpt);
-
-    QCommandLineOption subjectsDirOpt("subjects_dir", "Subjects directory.", "dir",
-                                      qEnvironmentVariable("SUBJECTS_DIR"));
-    parser.addOption(subjectsDirOpt);
-
-    QCommandLineOption hemiOpt("hemi", "Hemisphere: lh or rh.", "hemi");
-    parser.addOption(hemiOpt);
-
-    QCommandLineOption labelOpt("label", "Input label file.", "file");
-    parser.addOption(labelOpt);
-
-    QCommandLineOption outOpt("out", "Output morphed label file.", "file");
-    parser.addOption(outOpt);
-
-    parser.process(app);
-
-    QString fromSubject = parser.value(fromOpt);
-    QString toSubject = parser.value(toOpt);
-    QString subjectsDir = parser.value(subjectsDirOpt);
-    QString hemi = parser.value(hemiOpt);
-    QString labelFile = parser.value(labelOpt);
-    QString outFile = parser.value(outOpt);
-
-    if (fromSubject.isEmpty() || toSubject.isEmpty()) {
+    if (fromSubject.empty() || toSubject.empty()) {
         Log::critical("--from and --to are required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_morph_labels"));
+        return 1;
     }
-    if (hemi.isEmpty()) {
+    if (hemi.empty()) {
         Log::critical("--hemi is required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_morph_labels"));
+        return 1;
     }
-    if (labelFile.isEmpty()) {
+    if (labelFile.empty()) {
         Log::critical("--label is required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_morph_labels"));
+        return 1;
     }
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         Log::critical("--out is required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_morph_labels"));
+        return 1;
     }
-    if (subjectsDir.isEmpty()) {
+    if (subjectsDir.empty()) {
         Log::critical("$SUBJECTS_DIR not set.");
         return 1;
     }
 
     // Load sphere-registered surfaces
-    QString srcSpherePath = QString("%1/%2/surf/%3.sphere.reg").arg(subjectsDir, fromSubject, hemi);
-    QString dstSpherePath = QString("%1/%2/surf/%3.sphere.reg").arg(subjectsDir, toSubject, hemi);
-    QString dstWhitePath = QString("%1/%2/surf/%3.white").arg(subjectsDir, toSubject, hemi);
+    const std::string srcSpherePath = std::format("{}/{}/surf/{}.sphere.reg", subjectsDir, fromSubject, hemi);
+    const std::string dstSpherePath = std::format("{}/{}/surf/{}.sphere.reg", subjectsDir, toSubject, hemi);
+    const std::string dstWhitePath = std::format("{}/{}/surf/{}.white", subjectsDir, toSubject, hemi);
 
     FsSurface srcSphere, dstSphere, dstWhite;
-    if (!FsSurface::read(srcSpherePath.toStdU16String(), srcSphere)) {
-        Log::critical("Cannot read source sphere: {}", srcSpherePath.toStdString());
+    if (!FsSurface::read(path_from_utf8(srcSpherePath), srcSphere)) {
+        Log::critical("Cannot read source sphere: {}", srcSpherePath);
         return 1;
     }
-    if (!FsSurface::read(dstSpherePath.toStdU16String(), dstSphere)) {
-        Log::critical("Cannot read dest sphere: {}", dstSpherePath.toStdString());
+    if (!FsSurface::read(path_from_utf8(dstSpherePath), dstSphere)) {
+        Log::critical("Cannot read dest sphere: {}", dstSpherePath);
         return 1;
     }
-    if (!FsSurface::read(dstWhitePath.toStdU16String(), dstWhite)) {
-        Log::critical("Cannot read dest white surface: {}", dstWhitePath.toStdString());
+    if (!FsSurface::read(path_from_utf8(dstWhitePath), dstWhite)) {
+        Log::critical("Cannot read dest white surface: {}", dstWhitePath);
         return 1;
     }
 
@@ -164,8 +171,8 @@ int main(int argc, char* argv[])
 
     // Read input label
     FsLabel label;
-    if (!FsLabel::read(labelFile.toStdU16String(), label)) {
-        Log::critical("Cannot read label: {}", labelFile.toStdString());
+    if (!FsLabel::read(path_from_utf8(labelFile), label)) {
+        Log::critical("Cannot read label: {}", labelFile);
         return 1;
     }
     Log::info("Input label: {} vertices", static_cast<int>(label.vertices.size()));
@@ -180,24 +187,23 @@ int main(int argc, char* argv[])
     }
 
     // Write morphed label
-    QFile outF(outFile);
-    if (!outF.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        Log::critical("Cannot write: {}", outFile.toStdString());
+    std::ofstream out(path_from_utf8(outFile));
+    if (!out) {
+        Log::critical("Cannot write: {}", outFile);
         return 1;
     }
-    QTextStream out(&outF);
     out << "#Morphed from " << fromSubject << " to " << toSubject << "\n";
     out << morphedSet.size() << "\n";
     for (int v : morphedSet) {
         if (v < dstWhite.rr().rows()) {
-            out << QString::asprintf("%d  %8.4f  %8.4f  %8.4f  %10.6f\n",
-                                     v,
-                                     dstWhite.rr()(v, 0), dstWhite.rr()(v, 1), dstWhite.rr()(v, 2),
-                                     0.0);
+            out << std::format("{}  {:8.4f}  {:8.4f}  {:8.4f}  {:10.6f}\n",
+                               v,
+                               morphLabelsQtTie(dstWhite.rr()(v, 0), 4), morphLabelsQtTie(dstWhite.rr()(v, 1), 4), morphLabelsQtTie(dstWhite.rr()(v, 2), 4),
+                               0.0);
         }
     }
-    outF.close();
+    out.close();
 
-    Log::info("Morphed label: {} vertices -> {}", static_cast<int>(morphedSet.size()), outFile.toStdString());
+    Log::info("Morphed label: {} vertices -> {}", static_cast<int>(morphedSet.size()), outFile);
     return 0;
 }

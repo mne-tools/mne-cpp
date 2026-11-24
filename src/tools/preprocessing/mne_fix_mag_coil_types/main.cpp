@@ -19,16 +19,17 @@
 #include <mne/fiff/fiff_dir_entry.h>
 #include <mne/fiff/fiff_ch_info.h>
 
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
+#include <format>
+#include <print>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -44,12 +45,11 @@ using namespace mne;
 
 //=============================================================================================================
 
-static int processFile(const QString& name, bool doMagnes, QString& summary)
+static int processFile(const std::string& name, bool doMagnes, std::string& summary)
 {
-    QFile file(name);
-    auto stream = FiffStream::open_update(name.toStdU16String());
+    auto stream = FiffStream::open_update(path_from_utf8(name));
     if (!stream) {
-        Log::critical("Cannot open file for update: {}", name.toStdString());
+        Log::critical("Cannot open file for update: {}", name);
         return -1;
     }
 
@@ -101,12 +101,12 @@ static int processFile(const QString& name, bool doMagnes, QString& summary)
         }
     }
 
-    summary = found ? QString("fixed %1 magnetometer coil types").arg(found)
-                    : QString("no magnetometer coil type fixes");
+    summary = found ? std::format("fixed {} magnetometer coil types", found)
+                    : std::string("no magnetometer coil type fixes");
     if (nCoilNone)
-        summary += QString(" / fixed %1 coil_type fields in non MEG/EEG channels").arg(nCoilNone);
+        summary += std::format(" / fixed {} coil_type fields in non MEG/EEG channels", nCoilNone);
     if (doMagnes)
-        summary += QString(" / %1 Magnes fixes").arg(nMagnes);
+        summary += std::format(" / {} Magnes fixes", nMagnes);
 
     stream->close();
     return 0;
@@ -116,42 +116,33 @@ static int processFile(const QString& name, bool doMagnes, QString& summary)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_fix_mag_coil_types");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
-
-    QCommandLineParser parser;
-    parser.setApplicationDescription(
+    CommandLineParser parser(
         "Fix magnetometer coil types in FIFF files.\n\n"
         "Replaces FIFFV_COIL_VV_MAG_T1 with FIFFV_COIL_VV_MAG_T3.\n"
         "Sets FIFFV_COIL_NONE for non-MEG/EEG channels.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"magnes"}, "Also fix Magnes WH magnetometer coil types.", {}, {}});
+    parser.add_positional_argument("files", "FIFF file(s) to process.");
+    parser.process(argc, argv, "mne_fix_mag_coil_types", PROGRAM_VERSION);
 
-    QCommandLineOption magnesOpt("magnes",
-                                 "Also fix Magnes WH magnetometer coil types.");
-    parser.addOption(magnesOpt);
+    bool doMagnes = parser.is_set("magnes");
+    const StringList& files = parser.positional_arguments();
 
-    parser.addPositionalArgument("files", "FIFF file(s) to process.", "<file> ...");
-
-    parser.process(app);
-
-    bool doMagnes = parser.isSet(magnesOpt);
-    QStringList files = parser.positionalArguments();
-
-    if (files.isEmpty()) {
+    if (files.empty()) {
         Log::critical("No input files specified.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_fix_mag_coil_types"));
+        return 1;
     }
 
     int failed = 0;
-    for (const QString& fname : files) {
-        QString summary;
+    for (const std::string& fname : files) {
+        std::string summary;
         if (processFile(fname, doMagnes, summary) != 0) {
-            Log::critical("{} ... [failed]", fname.toStdString());
+            Log::critical("{} ... [failed]", fname);
             ++failed;
         } else {
-            Log::info("{} ... {} [ok]", fname.toStdString(), summary.toStdString());
+            Log::info("{} ... {} [ok]", fname, summary);
         }
     }
 

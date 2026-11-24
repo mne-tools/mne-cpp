@@ -21,17 +21,17 @@
 #include <mne/fiff/fiff_named_matrix.h>
 #include <mne/fiff/fiff_constants.h>
 
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
+#include <format>
+#include <print>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -47,7 +47,7 @@ using namespace mne;
 
 //=============================================================================================================
 
-static QString projKindName(int kind)
+static std::string projKindName(int kind)
 {
     switch (kind) {
         case 1:
@@ -63,7 +63,7 @@ static QString projKindName(int kind)
         case FIFFV_MNE_PROJ_ITEM_EEG_AVREF:
             return "EEG avg ref";
         default:
-            return QString("Unknown (%1)").arg(kind);
+            return std::format("Unknown ({})", kind);
     }
 }
 
@@ -71,36 +71,29 @@ static QString projKindName(int kind)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_list_proj");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("List SSP projectors from a FIFF file.\n\nReads measurement info and prints projector details.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"meas"}, "Measurement FIFF file.", "name", {}});
+    parser.process(argc, argv, "mne_list_proj", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("List SSP projectors from a FIFF file.\n\nReads measurement info and prints projector details.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string measName = parser.value("meas");
 
-    QCommandLineOption measOpt("meas", "Measurement FIFF file.", "name");
-    parser.addOption(measOpt);
-
-    parser.process(app);
-
-    QString measName = parser.value(measOpt);
-
-    if (measName.isEmpty()) {
+    if (measName.empty()) {
         Log::critical("The --meas option is required.");
-        parser.showHelp(1);
-    }
-
-    // Read measurement info
-    FiffRawData raw(measName.toStdU16String());
-
-    if (raw.info.chs.empty()) {
-        Log::critical("No channel information found in {}", measName.toStdString());
+        std::print("{}", parser.help_text("mne_list_proj"));
         return 1;
     }
 
-    Log::info("Opened {} : {} channels", measName.toStdString(), raw.info.nchan);
+    // Read measurement info
+    FiffRawData raw(path_from_utf8(measName));
+
+    if (raw.info.chs.empty()) {
+        Log::critical("No channel information found in {}", measName);
+        return 1;
+    }
+
+    Log::info("Opened {} : {} channels", measName, raw.info.nchan);
 
     const std::vector<FiffProj>& projs = raw.info.projs;
 
@@ -120,7 +113,7 @@ int main(int argc, char* argv[])
 
         const int nVec = proj.data.empty() ? 0 : proj.data.nrow;
 
-        Log::info("{:<6} {:<20} {:<8} {:<8} {}", k + 1, projKindName(proj.kind).toStdString(), nVec, proj.active ? "Yes" : "No", proj.desc);
+        Log::info("{:<6} {:<20} {:<8} {:<8} {}", k + 1, projKindName(proj.kind), nVec, proj.active ? "Yes" : "No", proj.desc);
     }
 
     return 0;

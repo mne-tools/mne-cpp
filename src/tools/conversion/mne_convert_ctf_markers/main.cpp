@@ -14,18 +14,20 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QTextStream>
-#include <QRegularExpression>
+#include <algorithm>
+#include <fstream>
+#include <ostream>
+#include <print>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -42,9 +44,9 @@
 
 struct CtfMarker
 {
-    QString name;
+    std::string name;
     int eventId;
-    QList<int> samples;
+    std::vector<int> samples;
 
     bool operator==(const CtfMarker& other) const
     {
@@ -71,85 +73,85 @@ struct CtfMarker
  *   trial_num           time
  *   ...
  */
-static QList<CtfMarker> parseCtfMarkers(const QString& filename)
+static std::vector<CtfMarker> parseCtfMarkers(const std::string& filename)
 {
-    QList<CtfMarker> markers;
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        mne::Log::critical("Cannot open CTF marker file: {}", filename.toStdString());
+    std::vector<CtfMarker> markers;
+    std::ifstream in(mne::path_from_utf8(filename));
+    if (!in) {
+        mne::Log::critical("Cannot open CTF marker file: {}", filename);
         return markers;
     }
 
-    QTextStream in(&file);
-    CtfMarker current;
+    CtfMarker current{};
     int classId = 0;
     bool inList = false;
     int nMarkers = 0;
 
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
+    std::string rawLine;
+    while (std::getline(in, rawLine)) {
+        const std::string line(mne::trimmed(rawLine));
 
-        if (line.startsWith("NAME:")) {
-            current = CtfMarker();
-            current.name = line.mid(5).trimmed();
+        if (line.starts_with("NAME:")) {
+            current = CtfMarker{};
+            current.name = std::string(mne::trimmed(std::string_view(line).substr(5)));
             inList = false;
             continue;
         }
 
-        if (line.startsWith("CLASSID:")) {
-            classId = line.mid(8).trimmed().toInt();
+        if (line.starts_with("CLASSID:")) {
+            classId = mne::to_int(std::string_view(line).substr(8)).value_or(0);
             current.eventId = classId;
             continue;
         }
 
-        if (line.startsWith("NUMBER OF MARKERS:")) {
-            nMarkers = line.mid(18).trimmed().toInt();
+        if (line.starts_with("NUMBER OF MARKERS:")) {
+            nMarkers = mne::to_int(std::string_view(line).substr(18)).value_or(0);
             continue;
         }
 
-        if (line.startsWith("LIST OF MARKERS:")) {
+        if (line.starts_with("LIST OF MARKERS:")) {
             inList = true;
             // Skip header line
-            if (!in.atEnd())
-                in.readLine();
+            std::string header;
+            std::getline(in, header);
             continue;
         }
 
-        if (inList && !line.isEmpty() && !line.startsWith("MARKER")) {
+        if (inList && !line.empty() && !line.starts_with("MARKER")) {
             // Parse trial_number and time
-            QStringList parts = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+            const std::vector<std::string_view> parts = mne::split_whitespace(line);
             if (parts.size() >= 2) {
                 // The sample is derived from the trial number and time;
                 // for simplicity, we use the time as a sample index if it's an integer,
                 // or store trial_number as sample position
-                int sample = parts[0].toInt();
-                current.samples.append(sample);
+                int sample = mne::to_int(parts[0]).value_or(0);
+                current.samples.push_back(sample);
             }
 
-            if (current.samples.size() >= nMarkers && nMarkers > 0) {
+            if (std::ssize(current.samples) >= nMarkers && nMarkers > 0) {
                 inList = false;
-                if (!current.name.isEmpty()) {
-                    markers.append(current);
-                    current = CtfMarker();
+                if (!current.name.empty()) {
+                    markers.push_back(current);
+                    current = CtfMarker{};
                 }
             }
             continue;
         }
 
         // Start of new marker classification block
-        if (line.startsWith("MARKER CLASSIFICATION")) {
-            if (!current.name.isEmpty() && !current.samples.isEmpty()) {
-                markers.append(current);
+        if (line.starts_with("MARKER CLASSIFICATION")) {
+            if (!current.name.empty() && !current.samples.empty()) {
+                markers.push_back(current);
             }
-            current = CtfMarker();
+            current = CtfMarker{};
             inList = false;
         }
     }
 
     // Add last marker if pending
-    if (!current.name.isEmpty() && !current.samples.isEmpty() &&
-        !markers.contains(current)) {
-        markers.append(current);
+    if (!current.name.empty() && !current.samples.empty() &&
+        std::ranges::find(markers, current) == markers.end()) {
+        markers.push_back(current);
     }
 
     return markers;
@@ -159,63 +161,52 @@ static QList<CtfMarker> parseCtfMarkers(const QString& filename)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_convert_ctf_markers");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    mne::CommandLineParser parser("Convert CTF marker files to MNE event format.\n\n"
+                                  "Output format: sample 0 event_id (one event per line).");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"markers"}, "CTF marker file.", "file", {}});
+    parser.add_option({{"out"}, "Output event file (text format).", "file", {}});
+    parser.process(argc, argv, "mne_convert_ctf_markers", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Convert CTF marker files to MNE event format.\n\n"
-                                     "Output format: sample 0 event_id (one event per line).");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string markersFile = parser.value("markers");
+    const std::string outFile = parser.value("out");
 
-    QCommandLineOption markersOpt("markers", "CTF marker file.", "file");
-    parser.addOption(markersOpt);
-
-    QCommandLineOption outOpt("out", "Output event file (text format).", "file");
-    parser.addOption(outOpt);
-
-    parser.process(app);
-
-    QString markersFile = parser.value(markersOpt);
-    QString outFile = parser.value(outOpt);
-
-    if (markersFile.isEmpty()) {
+    if (markersFile.empty()) {
         mne::Log::critical("--markers is required.");
         return 1;
     }
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         mne::Log::critical("--out is required.");
         return 1;
     }
 
     // Parse CTF markers
-    QList<CtfMarker> markers = parseCtfMarkers(markersFile);
-    if (markers.isEmpty()) {
-        mne::Log::critical("No markers parsed from: {}", markersFile.toStdString());
+    std::vector<CtfMarker> markers = parseCtfMarkers(markersFile);
+    if (markers.empty()) {
+        mne::Log::critical("No markers parsed from: {}", markersFile);
         return 1;
     }
 
     // Write MNE event format
-    QFile fOut(outFile);
-    if (!fOut.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        mne::Log::critical("Cannot open output file: {}", outFile.toStdString());
+    std::ofstream out(mne::path_from_utf8(outFile));
+    if (!out) {
+        mne::Log::critical("Cannot open output file: {}", outFile);
         return 1;
     }
 
-    QTextStream out(&fOut);
     int totalEvents = 0;
 
     for (const CtfMarker& marker : markers) {
-        mne::Log::info("Marker '{}' (id={}): {} events", marker.name.toStdString(), marker.eventId, static_cast<long long>(marker.samples.size()));
+        mne::Log::info("Marker '{}' (id={}): {} events", marker.name, marker.eventId, static_cast<long long>(marker.samples.size()));
 
         for (int sample : marker.samples) {
-            out << sample << " 0 " << marker.eventId << "\n";
+            std::print(out, "{} 0 {}\n", sample, marker.eventId);
             ++totalEvents;
         }
     }
 
-    fOut.close();
-    mne::Log::info("Written {} events to: {}", totalEvents, outFile.toStdString());
+    out.close();
+    mne::Log::info("Written {} events to: {}", totalEvents, outFile);
     return 0;
 }

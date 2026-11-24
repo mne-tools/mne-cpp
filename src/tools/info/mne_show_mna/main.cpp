@@ -21,16 +21,10 @@
 #include <mne/mna/mna_recording.h>
 #include <mne/mna/mna_file_ref.h>
 #include <mne/mna/mna_types.h>
+#include <mne/base/command_line.h>
 #include <mne/base/json.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -70,38 +64,24 @@ static std::string humanSize(std::uintmax_t bytes)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    app.setApplicationName(QStringLiteral("mne_show_mna"));
-    app.setApplicationVersion(QStringLiteral(MNE_CPP_VERSION));
+    CommandLineParser parser("Inspect MNA (.mna) and MNX (.mnx) project files.\n\n"
+                             "Displays the project structure: subjects, sessions, recordings,\n"
+                             "referenced/embedded files, pipeline nodes, and metadata.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_positional_argument("file", "Path to a .mna or .mnx project file.");
+    parser.add_option({{"V", "verbose"}, "Show extended details (SHA-256, format, size).", {}, {}});
+    parser.add_option({{"json"}, "Output the project as formatted JSON to stdout.", {}, {}});
+    parser.process(argc, argv, "mne_show_mna", MNE_CPP_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription(
-        QStringLiteral("Inspect MNA (.mna) and MNX (.mnx) project files.\n\n"
-                       "Displays the project structure: subjects, sessions, recordings,\n"
-                       "referenced/embedded files, pipeline nodes, and metadata."));
-    parser.addHelpOption();
-    parser.addVersionOption();
-
-    parser.addPositionalArgument(QStringLiteral("file"),
-                                 QStringLiteral("Path to a .mna or .mnx project file."));
-
-    QCommandLineOption verboseOpt(QStringList() << QStringLiteral("V") << QStringLiteral("verbose"),
-                                  QStringLiteral("Show extended details (SHA-256, format, size)."));
-    parser.addOption(verboseOpt);
-
-    QCommandLineOption jsonOpt(QStringLiteral("json"),
-                               QStringLiteral("Output the project as formatted JSON to stdout."));
-    parser.addOption(jsonOpt);
-
-    parser.process(app);
-
-    const QStringList args = parser.positionalArguments();
-    if (args.isEmpty()) {
+    const StringList& args = parser.positional_arguments();
+    if (args.empty()) {
         Log::critical("Error: no input file specified.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_show_mna"));
+        return 1;
     }
 
-    const std::filesystem::path filePath = path_from_utf8(args.first().toStdString());
+    const std::filesystem::path filePath = path_from_utf8(args.front());
     const Expected<MnaProject> read = MnaIO::read(filePath);
     if (!read) {
         std::println(stderr, "Error: {}", read.error().what());
@@ -110,13 +90,13 @@ int main(int argc, char* argv[])
     const MnaProject& proj = *read;
 
     // ── JSON dump mode ──────────────────────────────────────────────────
-    if (parser.isSet(jsonOpt)) {
+    if (parser.is_set("json")) {
         std::print("{}", JsonDocument(proj.to_json()).to_json(JsonDocument::Indented));
         return 0;
     }
 
     // ── Human-readable display ──────────────────────────────────────────
-    const bool verbose = parser.isSet(verboseOpt);
+    const bool verbose = parser.is_set("verbose");
     std::error_code ec;
 
     std::println("═══════════════════════════════════════════════════════════════");

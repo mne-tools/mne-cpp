@@ -34,21 +34,9 @@
 
 #include <mne/ml/ml_trainer.h>
 #include <mne/pybridge/python_runner.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QFileInfo>
-#include <QDir>
-#include <QTextStream>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -60,9 +48,14 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstdio>
+#include <filesystem>
 #include <format>
+#include <print>
 #include <string>
 #include <string_view>
+#include <system_error>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -75,40 +68,51 @@ using namespace mne;
 // HELPERS
 //=============================================================================================================
 
-static int methodStringToInt(const QString& method)
+static int methodStringToInt(const std::string& method)
 {
-    if (method.compare(QLatin1String("MNE"), Qt::CaseInsensitive) == 0)
+    if (iequals(method, "MNE"))
         return 0;
-    if (method.compare(QLatin1String("dSPM"), Qt::CaseInsensitive) == 0)
+    if (iequals(method, "dSPM"))
         return 1;
-    if (method.compare(QLatin1String("sLORETA"), Qt::CaseInsensitive) == 0)
+    if (iequals(method, "sLORETA"))
         return 2;
-    if (method.compare(QLatin1String("eLORETA"), Qt::CaseInsensitive) == 0)
+    if (iequals(method, "eLORETA"))
         return 3;
     return 1; // default dSPM
 }
 
 //=============================================================================================================
 
-static QString resolveScriptDir()
+static bool fileExists(const std::filesystem::path& path)
 {
-    const QString relPath = QStringLiteral("scripts/ml/training/cmne");
-    const QString marker = QStringLiteral("pyproject.toml");
+    std::error_code ec;
+    return std::filesystem::exists(path, ec);
+}
+
+//=============================================================================================================
+
+static std::string resolveScriptDir()
+{
+    const std::filesystem::path relPath = "scripts/ml/training/cmne";
+    const std::filesystem::path marker = "pyproject.toml";
 
     // 1) Binary lives in <root>/out/<config>/bin/ → go up 4 levels to repo root
-    QString appDir = QCoreApplication::applicationDirPath();
-    QDir dir(appDir);
-    for (int i = 0; i < 5; ++i) {
-        QString candidate = dir.absoluteFilePath(relPath);
-        if (QFile::exists(QDir(candidate).absoluteFilePath(marker)))
-            return candidate;
-        if (!dir.cdUp())
+    std::filesystem::path dir = executable_dir();
+    for (int i = 0; i < 5 && !dir.empty(); ++i) {
+        const std::filesystem::path candidate = dir / relPath;
+        if (fileExists(candidate / marker))
+            return utf8_from_path(candidate);
+        const std::filesystem::path parent = dir.parent_path();
+        if (parent == dir)
             break;
+        dir = parent;
     }
 
     // 2) Relative to working directory (works when cwd is repo root)
-    if (QFile::exists(QDir(relPath).absoluteFilePath(marker)))
-        return QDir(relPath).absolutePath();
+    if (fileExists(relPath / marker)) {
+        std::error_code ec;
+        return utf8_from_path(std::filesystem::absolute(relPath, ec));
+    }
 
     return {};
 }
@@ -117,60 +121,57 @@ static QString resolveScriptDir()
 // COMPUTE MODE
 //=============================================================================================================
 
-static int doCompute(const QCommandLineParser& parser)
+static int doCompute(const CommandLineParser& parser)
 {
-    QTextStream out(stdout);
-    QTextStream err(stderr);
-
     // ── Validate required arguments ────────────────────────────────────
-    const QString fwdPath = parser.value(QStringLiteral("fwd"));
-    const QString covPath = parser.value(QStringLiteral("cov"));
-    const QString evokedPath = parser.value(QStringLiteral("evoked"));
-    const QString outPrefix = parser.value(QStringLiteral("out"));
+    const std::string fwdPath = parser.value("fwd");
+    const std::string covPath = parser.value("cov");
+    const std::string evokedPath = parser.value("evoked");
+    const std::string outPrefix = parser.value("out");
 
-    if (fwdPath.isEmpty() || covPath.isEmpty() || evokedPath.isEmpty()) {
-        err << "Error: --fwd, --cov, and --evoked are required for compute mode.\n";
+    if (fwdPath.empty() || covPath.empty() || evokedPath.empty()) {
+        std::print(stderr, "Error: --fwd, --cov, and --evoked are required for compute mode.\n");
         return 1;
     }
-    if (outPrefix.isEmpty()) {
-        err << "Error: --out is required for compute mode.\n";
+    if (outPrefix.empty()) {
+        std::print(stderr, "Error: --out is required for compute mode.\n");
         return 1;
     }
 
     // ── Read forward solution ──────────────────────────────────────────
-    out << "Reading forward solution: " << fwdPath << "\n";
-    out.flush();
-    auto fwdRead = MNEForwardSolution::read(fwdPath.toStdU16String(), {.force_fixed = true, .surf_ori = true});
+    std::print("Reading forward solution: {}\n", fwdPath);
+    std::fflush(stdout);
+    auto fwdRead = MNEForwardSolution::read(path_from_utf8(fwdPath), {.force_fixed = true, .surf_ori = true});
     if (!fwdRead) {
-        err << "Error: " << fwdRead.error().what() << "\n";
+        std::print(stderr, "Error: {}\n", fwdRead.error().what());
         return 1;
     }
     const MNEForwardSolution& fwd = *fwdRead;
 
     const MatrixXd matGain = fwd.sol.data;
-    const int nChannels = matGain.rows();
-    const int nSources = matGain.cols();
-    out << "  " << nChannels << " channels x " << nSources << " sources\n";
+    const int nChannels = static_cast<int>(matGain.rows());
+    const int nSources = static_cast<int>(matGain.cols());
+    std::print("  {} channels x {} sources\n", nChannels, nSources);
 
     // ── Read noise covariance ──────────────────────────────────────────
-    out << "Reading noise covariance: " << covPath << "\n";
-    out.flush();
-    FiffCov noiseCov(covPath.toStdU16String());
+    std::print("Reading noise covariance: {}\n", covPath);
+    std::fflush(stdout);
+    FiffCov noiseCov(path_from_utf8(covPath));
     if (noiseCov.empty()) {
-        err << "Error: Failed to read noise covariance from " << covPath << "\n";
+        std::print(stderr, "Error: Failed to read noise covariance from {}\n", covPath);
         return 1;
     }
 
     const MatrixXd matNoiseCov = noiseCov.data;
-    out << "  " << matNoiseCov.rows() << " x " << matNoiseCov.cols() << "\n";
+    std::print("  {} x {}\n", matNoiseCov.rows(), matNoiseCov.cols());
 
     // ── Read evoked data ───────────────────────────────────────────────
-    const int setno = parser.value(QStringLiteral("setno")).toInt();
-    out << "Reading evoked data: " << evokedPath << " (set " << setno << ")\n";
-    out.flush();
-    FiffEvoked evoked(evokedPath.toStdU16String(), setno);
+    const int setno = to_int(parser.value("setno")).value_or(0);
+    std::print("Reading evoked data: {} (set {})\n", evokedPath, setno);
+    std::fflush(stdout);
+    FiffEvoked evoked(path_from_utf8(evokedPath), setno);
     if (evoked.empty()) {
-        err << "Error: Failed to read evoked data from " << evokedPath << "\n";
+        std::print(stderr, "Error: Failed to read evoked data from {}\n", evokedPath);
         return 1;
     }
 
@@ -189,61 +190,57 @@ static int doCompute(const QCommandLineParser& parser)
     const MatrixXd matEvoked = evokedPicked.data;
     const MatrixXd matNoiseCovPicked = noiseCovPicked.data;
 
-    out << "  " << evoked.data.rows() << " channels in file, "
-        << matEvoked.rows() << " channels after picking ("
-        << matEvoked.cols() << " samples, tmin=" << tmin
-        << " s, tstep=" << tstep * 1000.0f << " ms)\n";
+    std::print("  {} channels in file, {} channels after picking ({} samples, tmin={:g} s, tstep={:g} ms)\n",
+               evoked.data.rows(), matEvoked.rows(), matEvoked.cols(), tmin, tstep * 1000.0f);
 
     // ── Source covariance (identity) ───────────────────────────────────
     MatrixXd matSrcCov = MatrixXd::Identity(nSources, nSources);
 
     // ── Configure CMNE settings ────────────────────────────────────────
-    const double snr = parser.value(QStringLiteral("snr")).toDouble();
-    const QString methodStr = parser.value(QStringLiteral("method"));
-    const int lookBack = parser.value(QStringLiteral("look-back")).toInt();
-    const QString onnxPath = parser.value(QStringLiteral("onnx"));
+    const double snr = to_double(parser.value("snr")).value_or(0.0);
+    const std::string methodStr = parser.value("method");
+    const int lookBack = to_int(parser.value("look-back")).value_or(0);
+    const std::string onnxPath = parser.value("onnx");
 
     InvCMNESettings settings;
     settings.lambda2 = 1.0 / (snr * snr);
     settings.method = methodStringToInt(methodStr);
     settings.lookBack = lookBack;
     settings.numSources = nSources;
-    settings.onnxModelPath = onnxPath.toStdString();
+    settings.onnxModelPath = onnxPath;
 
-    out << "Settings: method=" << methodStr << ", SNR=" << snr
-        << ", lambda2=" << settings.lambda2
-        << ", look-back=" << lookBack << "\n";
+    std::print("Settings: method={}, SNR={:g}, lambda2={:g}, look-back={}\n", methodStr, snr, settings.lambda2, lookBack);
 
-    if (!onnxPath.isEmpty()) {
-        if (!QFile::exists(onnxPath)) {
-            err << "Error: ONNX model not found: " << onnxPath << "\n";
+    if (!onnxPath.empty()) {
+        if (!fileExists(path_from_utf8(onnxPath))) {
+            std::print(stderr, "Error: ONNX model not found: {}\n", onnxPath);
             return 1;
         }
-        out << "ONNX model: " << onnxPath << "\n";
+        std::print("ONNX model: {}\n", onnxPath);
     } else {
-        out << "\n"
-            << "NOTE: No ONNX model specified (--onnx).\n"
-            << "  Writing the paper's control estimate (no LSTM) instead of CMNE.\n"
-            << "  For CMNE, train a model first:\n"
-            << "\n"
-            << "    mne_compute_cmne --mode train --fwd <fwd.fif> --cov <cov.fif> \\\n"
-            << "                     --epochs <epo.fif> --onnx-out cmne_lstm.onnx\n"
-            << "\n"
-            << "  Then re-run compute with:\n"
-            << "\n"
-            << "    mne_compute_cmne --mode compute --fwd <fwd.fif> --cov <cov.fif> \\\n"
-            << "                     --evoked <ave.fif> --onnx cmne_lstm.onnx --out <prefix>\n"
-            << "\n";
+        std::print("\n"
+                   "NOTE: No ONNX model specified (--onnx).\n"
+                   "  Writing the paper's control estimate (no LSTM) instead of CMNE.\n"
+                   "  For CMNE, train a model first:\n"
+                   "\n"
+                   "    mne_compute_cmne --mode train --fwd <fwd.fif> --cov <cov.fif> \\\n"
+                   "                     --epochs <epo.fif> --onnx-out cmne_lstm.onnx\n"
+                   "\n"
+                   "  Then re-run compute with:\n"
+                   "\n"
+                   "    mne_compute_cmne --mode compute --fwd <fwd.fif> --cov <cov.fif> \\\n"
+                   "                     --evoked <ave.fif> --onnx cmne_lstm.onnx --out <prefix>\n"
+                   "\n");
     }
 
     // ── Compute CMNE ───────────────────────────────────────────────────
-    out << "Computing CMNE inverse solution …\n";
-    out.flush();
+    std::print("Computing CMNE inverse solution …\n");
+    std::fflush(stdout);
 
     InvCMNEResult result = InvCMNE::compute(
         matEvoked, matGain, matNoiseCovPicked, matSrcCov, settings);
     if (result.stcCmne.empty()) {
-        err << "Error: the model cannot be applied to these data (see warnings above).\n";
+        std::print(stderr, "Error: the model cannot be applied to these data (see warnings above).\n");
         return 1;
     }
 
@@ -258,25 +255,23 @@ static int doCompute(const QCommandLineParser& parser)
         stc->tstep = tstep;
     }
 
-    out << "  dSPM: " << result.stcDspm.data.rows() << " sources x "
-        << result.stcDspm.data.cols() << " samples\n";
-    out << "  CMNE: " << result.stcCmne.data.rows() << " sources x "
-        << result.stcCmne.data.cols() << " samples\n";
+    std::print("  dSPM: {} sources x {} samples\n", result.stcDspm.data.rows(), result.stcDspm.data.cols());
+    std::print("  CMNE: {} sources x {} samples\n", result.stcCmne.data.rows(), result.stcCmne.data.cols());
 
     // ── Write STC files ────────────────────────────────────────────────
-    if (!result.stcDspm.write_hemisphere_pair((outPrefix + QStringLiteral("-dspm")).toStdU16String())) {
-        err << "Error: Failed to write dSPM STC.\n";
+    if (!result.stcDspm.write_hemisphere_pair(path_from_utf8(outPrefix + "-dspm"))) {
+        std::print(stderr, "Error: Failed to write dSPM STC.\n");
         return 1;
     }
-    out << "Wrote dSPM STC: " << outPrefix << "-dspm-{lh,rh}.stc\n";
+    std::print("Wrote dSPM STC: {}-dspm-{{lh,rh}}.stc\n", outPrefix);
 
-    if (!result.stcCmne.write_hemisphere_pair((outPrefix + QStringLiteral("-cmne")).toStdU16String())) {
-        err << "Error: Failed to write CMNE STC.\n";
+    if (!result.stcCmne.write_hemisphere_pair(path_from_utf8(outPrefix + "-cmne"))) {
+        std::print(stderr, "Error: Failed to write CMNE STC.\n");
         return 1;
     }
-    out << "Wrote CMNE STC: " << outPrefix << "-cmne-{lh,rh}.stc\n";
+    std::print("Wrote CMNE STC: {}-cmne-{{lh,rh}}.stc\n", outPrefix);
 
-    out << "Done.\n";
+    std::print("Done.\n");
     return 0;
 }
 
@@ -284,76 +279,70 @@ static int doCompute(const QCommandLineParser& parser)
 // TRAIN / FINETUNE MODE
 //=============================================================================================================
 
-static int doTrain(const QCommandLineParser& parser, bool finetune)
+static int doTrain(const CommandLineParser& parser, bool finetune)
 {
-    QTextStream out(stdout);
-    QTextStream err(stderr);
-
     // ── Validate required arguments ────────────────────────────────────
-    const QString fwdPath = parser.value(QStringLiteral("fwd"));
-    const QString covPath = parser.value(QStringLiteral("cov"));
-    const QString epochsPath = parser.value(QStringLiteral("epochs"));
-    const QString onnxOutPath = parser.value(QStringLiteral("onnx-out"));
+    const std::string fwdPath = parser.value("fwd");
+    const std::string covPath = parser.value("cov");
+    const std::string epochsPath = parser.value("epochs");
+    const std::string onnxOutPath = parser.value("onnx-out");
 
-    if (fwdPath.isEmpty() || covPath.isEmpty() || epochsPath.isEmpty()) {
-        err << "Error: --fwd, --cov, and --epochs are required for "
-            << (finetune ? "finetune" : "train") << " mode.\n";
+    if (fwdPath.empty() || covPath.empty() || epochsPath.empty()) {
+        std::print(stderr, "Error: --fwd, --cov, and --epochs are required for {} mode.\n", finetune ? "finetune" : "train");
         return 1;
     }
-    if (onnxOutPath.isEmpty()) {
-        err << "Error: --onnx-out is required for "
-            << (finetune ? "finetune" : "train") << " mode.\n";
-        return 1;
-    }
-
-    const QString finetuneOnnxPath = finetune
-        ? parser.value(QStringLiteral("finetune"))
-        : QString();
-
-    if (finetune && finetuneOnnxPath.isEmpty()) {
-        err << "Error: --finetune <onnx_path> is required in finetune mode.\n";
+    if (onnxOutPath.empty()) {
+        std::print(stderr, "Error: --onnx-out is required for {} mode.\n", finetune ? "finetune" : "train");
         return 1;
     }
 
-    if (finetune && !QFile::exists(finetuneOnnxPath)) {
-        err << "Error: Fine-tune model not found: " << finetuneOnnxPath << "\n";
+    const std::string finetuneOnnxPath = finetune
+        ? parser.value("finetune")
+        : std::string();
+
+    if (finetune && finetuneOnnxPath.empty()) {
+        std::print(stderr, "Error: --finetune <onnx_path> is required in finetune mode.\n");
+        return 1;
+    }
+
+    if (finetune && !fileExists(path_from_utf8(finetuneOnnxPath))) {
+        std::print(stderr, "Error: Fine-tune model not found: {}\n", finetuneOnnxPath);
         return 1;
     }
 
     // ── Resolve training script ────────────────────────────────────────
-    QString cmneDir = resolveScriptDir();
-    if (cmneDir.isEmpty()) {
-        err << "Error: Cannot find CMNE training package (scripts/ml/training/cmne/).\n";
+    const std::string cmneDir = resolveScriptDir();
+    if (cmneDir.empty()) {
+        std::print(stderr, "Error: Cannot find CMNE training package (scripts/ml/training/cmne/).\n");
         return 1;
     }
 
-    QString scriptPath = QDir(cmneDir).absoluteFilePath(
-        QStringLiteral("train_cmne_lstm.py"));
-    if (!QFile::exists(scriptPath)) {
-        err << "Error: Training script not found: " << scriptPath << "\n";
+    const std::filesystem::path scriptPath = path_from_utf8(cmneDir) / "train_cmne_lstm.py";
+    if (!fileExists(scriptPath)) {
+        std::print(stderr, "Error: Training script not found: {}\n", utf8_from_path(scriptPath));
         return 1;
     }
 
     // ── Read settings from CLI ─────────────────────────────────────────
-    const double snr = parser.value(QStringLiteral("snr")).toDouble();
-    const QString methodStr = parser.value(QStringLiteral("method"));
-    const int lookBack = parser.value(QStringLiteral("look-back")).toInt();
-    const int hiddenSize = parser.value(QStringLiteral("hidden")).toInt();
-    const int numLayers = parser.value(QStringLiteral("layers")).toInt();
-    const int trainEpochs = parser.value(QStringLiteral("train-epochs")).toInt();
-    const double lr = parser.value(QStringLiteral("lr")).toDouble();
-    const int batchSize = parser.value(QStringLiteral("batch")).toInt();
-    const QString gtStcPfx = parser.value(QStringLiteral("gt-stc"));
-    const QString pythonExe = parser.value(QStringLiteral("python"));
+    const double snr = to_double(parser.value("snr")).value_or(0.0);
+    const std::string methodStr = parser.value("method");
+    const int lookBack = to_int(parser.value("look-back")).value_or(0);
+    const int hiddenSize = to_int(parser.value("hidden")).value_or(0);
+    const int numLayers = to_int(parser.value("layers")).value_or(0);
+    const int trainEpochs = to_int(parser.value("train-epochs")).value_or(0);
+    const double lr = to_double(parser.value("lr")).value_or(0.0);
+    const int batchSize = to_int(parser.value("batch")).value_or(0);
+    const std::string gtStcPfx = parser.value("gt-stc");
+    const std::string pythonExe = parser.value("python");
 
     // ── Build Python script arguments ──────────────────────────────────
     mne::StringList args = {
-        "--fwd", fwdPath.toStdString(),
-        "--cov", covPath.toStdString(),
-        "--epochs", epochsPath.toStdString(),
-        "--out", onnxOutPath.toStdString(),
+        "--fwd", fwdPath,
+        "--cov", covPath,
+        "--epochs", epochsPath,
+        "--out", onnxOutPath,
         "--look-back", std::to_string(lookBack),
-        "--method", methodStr.toStdString(),
+        "--method", methodStr,
         "--snr", std::format("{:.6g}", snr),
         "--hidden", std::to_string(hiddenSize),
         "--layers", std::to_string(numLayers),
@@ -361,83 +350,82 @@ static int doTrain(const QCommandLineParser& parser, bool finetune)
         "--lr", std::format("{:.6g}", lr),
         "--batch", std::to_string(batchSize)};
 
-    if (!gtStcPfx.isEmpty()) {
-        args.insert(args.end(), {"--gt-stc", gtStcPfx.toStdString()});
+    if (!gtStcPfx.empty()) {
+        args.insert(args.end(), {"--gt-stc", gtStcPfx});
     }
 
     if (finetune) {
-        args.insert(args.end(), {"--finetune", finetuneOnnxPath.toStdString()});
+        args.insert(args.end(), {"--finetune", finetuneOnnxPath});
     }
 
     // ── Configure PythonRunner with venv ───────────────────────────────
     PythonRunnerConfig config;
-    config.python_exe = pythonExe.toStdString();
-    config.venv_dir = QDir(cmneDir).absoluteFilePath(QStringLiteral(".venv")).toStdString();
-    config.package_dir = cmneDir.toStdString();
+    config.python_exe = pythonExe;
+    config.venv_dir = path_from_utf8(cmneDir) / ".venv";
+    config.package_dir = path_from_utf8(cmneDir);
 
     MLTrainer trainer(config);
 
     // ── Set up live progress reporting ─────────────────────────────────
-    trainer.runner().set_line_callback([&out, &err](PythonChannel channel, std::string_view line) {
-        const QString text = QString::fromUtf8(line.data(), static_cast<qsizetype>(line.size()));
+    trainer.runner().set_line_callback([](PythonChannel channel, std::string_view line) {
         if (channel == PythonChannel::StdOut) {
-            out << text << "\n";
-            out.flush();
+            std::print("{}\n", line);
+            std::fflush(stdout);
         } else {
-            err << text << "\n";
-            err.flush();
+            std::print(stderr, "{}\n", line);
+            std::fflush(stderr);
         }
     });
 
-    trainer.runner().set_progress_callback([&out](float pct, std::string_view msg) {
-        out << "\r[" << QString::number(static_cast<double>(pct), 'f', 1) << "%] " << QString::fromUtf8(msg.data(), static_cast<qsizetype>(msg.size()));
-        out.flush();
+    trainer.runner().set_progress_callback([](float pct, std::string_view msg) {
+        std::print("\r[{:.1f}%] {}", static_cast<double>(pct), msg);
+        std::fflush(stdout);
     });
 
     // ── Print summary ──────────────────────────────────────────────────
-    out << "=== CMNE LSTM " << (finetune ? "Fine-tuning" : "Training") << " ===\n";
-    out << "  Forward   : " << fwdPath << "\n";
-    out << "  Covariance: " << covPath << "\n";
-    out << "  Epochs    : " << epochsPath << "\n";
-    out << "  Output    : " << onnxOutPath << "\n";
-    out << "  Method    : " << methodStr << "  SNR=" << snr << "\n";
-    out << "  LSTM      : hidden=" << hiddenSize << "  layers=" << numLayers
-        << "  look-back=" << lookBack << "\n";
-    out << "  Training  : epochs=" << trainEpochs << "  lr=" << lr
-        << "  batch=" << batchSize << "\n";
+    std::print("=== CMNE LSTM {} ===\n", finetune ? "Fine-tuning" : "Training");
+    std::print("  Forward   : {}\n", fwdPath);
+    std::print("  Covariance: {}\n", covPath);
+    std::print("  Epochs    : {}\n", epochsPath);
+    std::print("  Output    : {}\n", onnxOutPath);
+    std::print("  Method    : {}  SNR={:g}\n", methodStr, snr);
+    std::print("  LSTM      : hidden={}  layers={}  look-back={}\n", hiddenSize, numLayers, lookBack);
+    std::print("  Training  : epochs={}  lr={:g}  batch={}\n", trainEpochs, lr, batchSize);
     if (finetune) {
-        out << "  Fine-tune : " << finetuneOnnxPath << "\n";
+        std::print("  Fine-tune : {}\n", finetuneOnnxPath);
     }
-    if (!gtStcPfx.isEmpty()) {
-        out << "  Ground truth: " << gtStcPfx << "\n";
+    if (!gtStcPfx.empty()) {
+        std::print("  Ground truth: {}\n", gtStcPfx);
     }
-    out << "  Script    : " << scriptPath << "\n";
-    out << "  Venv      : " << QString::fromStdString(config.venv_dir.string()) << "\n";
-    out << "\n";
-    out.flush();
+    std::print("  Script    : {}\n", utf8_from_path(scriptPath));
+    std::print("  Venv      : {}\n", utf8_from_path(config.venv_dir));
+    std::print("\n");
+    std::fflush(stdout);
 
     // ── Run training ───────────────────────────────────────────────────
-    PythonRunnerResult result = trainer.run(scriptPath.toStdString(), args);
+    PythonRunnerResult result = trainer.run(scriptPath, args);
 
-    out << "\n";
+    std::print("\n");
 
     if (result.success) {
-        out << "Training completed successfully.\n";
-        if (QFile::exists(onnxOutPath)) {
-            QFileInfo fi(onnxOutPath);
-            out << "ONNX model: " << fi.absoluteFilePath()
-                << " (" << fi.size() / 1024 << " KB)\n";
+        std::print("Training completed successfully.\n");
+        const std::filesystem::path onnxOut = path_from_utf8(onnxOutPath);
+        std::error_code ec;
+        if (std::filesystem::exists(onnxOut, ec)) {
+            const std::uintmax_t size = std::filesystem::file_size(onnxOut, ec);
+            std::print("ONNX model: {} ({} KB)\n",
+                       utf8_from_path(std::filesystem::absolute(onnxOut, ec).lexically_normal()),
+                       ec ? 0 : size / 1024);
         }
     } else {
-        err << "Training failed";
+        std::print(stderr, "Training failed");
         if (result.timed_out) {
-            err << " (timed out)";
+            std::print(stderr, " (timed out)");
         }
-        err << " with exit code " << result.exit_code << ".\n";
+        std::print(stderr, " with exit code {}.\n", result.exit_code);
 
         if (!result.std_err.empty()) {
-            err << "--- stderr ---\n"
-                << QString::fromStdString(result.std_err) << "\n";
+            std::print(stderr, "--- stderr ---\n{}\n", result.std_err);
         }
     }
 
@@ -450,104 +438,66 @@ static int doTrain(const QCommandLineParser& parser, bool finetune)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName(QStringLiteral("mne_compute_cmne"));
-    QCoreApplication::setApplicationVersion(QStringLiteral(MNE_CPP_VERSION));
-
     // ── Command-line parser ────────────────────────────────────────────
-    QCommandLineParser parser;
-    parser.setApplicationDescription(
-        QStringLiteral("Contextual MNE (CMNE) — compute source estimates or train the LSTM model.\n\n"
-                       "Modes:\n"
-                       "  compute   Compute dSPM + CMNE source estimates from evoked data (default)\n"
-                       "  train     Train the CMNE LSTM from FIFF files and export to ONNX\n"
-                       "  finetune  Continue training from an existing model"));
-    parser.addHelpOption();
-    parser.addVersionOption();
+    CommandLineParser parser("Contextual MNE (CMNE) — compute source estimates or train the LSTM model.\n\n"
+                             "Modes:\n"
+                             "  compute   Compute dSPM + CMNE source estimates from evoked data (default)\n"
+                             "  train     Train the CMNE LSTM from FIFF files and export to ONNX\n"
+                             "  finetune  Continue training from an existing model");
+    parser.add_help_option();
+    parser.add_version_option();
 
     // -- Mode --
-    parser.addOption({QStringLiteral("mode"),
-                      QStringLiteral("Operation mode: compute, train, or finetune."),
-                      QStringLiteral("mode"), QStringLiteral("compute")});
+    parser.add_option({{"mode"}, "Operation mode: compute, train, or finetune.", "mode", "compute"});
 
     // -- Common data inputs --
-    parser.addOption({QStringLiteral("fwd"),
-                      QStringLiteral("Forward solution FIFF file."),
-                      QStringLiteral("file")});
-    parser.addOption({QStringLiteral("cov"),
-                      QStringLiteral("Noise covariance FIFF file."),
-                      QStringLiteral("file")});
-    parser.addOption({QStringLiteral("snr"),
-                      QStringLiteral("Signal-to-noise ratio (default: 3.0)."),
-                      QStringLiteral("value"), QStringLiteral("3.0")});
-    parser.addOption({QStringLiteral("method"),
-                      QStringLiteral("Inverse method: MNE, dSPM, sLORETA, eLORETA (default: dSPM)."),
-                      QStringLiteral("name"), QStringLiteral("dSPM")});
-    parser.addOption({QStringLiteral("look-back"),
-                      QStringLiteral("Number of past time steps k for training and for the control estimate without --onnx; "
-                                     "a model carries its own k (default: 80)."),
-                      QStringLiteral("k"), QStringLiteral("80")});
+    parser.add_option({{"fwd"}, "Forward solution FIFF file.", "file", {}});
+    parser.add_option({{"cov"}, "Noise covariance FIFF file.", "file", {}});
+    parser.add_option({{"snr"}, "Signal-to-noise ratio (default: 3.0).", "value", "3.0"});
+    parser.add_option({{"method"}, "Inverse method: MNE, dSPM, sLORETA, eLORETA (default: dSPM).", "name", "dSPM"});
+    parser.add_option({{"look-back"},
+                       "Number of past time steps k for training and for the control estimate without --onnx; "
+                       "a model carries its own k (default: 80).",
+                       "k",
+                       "80"});
 
     // -- Compute-mode options --
-    parser.addOption({QStringLiteral("evoked"),
-                      QStringLiteral("Evoked data FIFF file (compute mode)."),
-                      QStringLiteral("file")});
-    parser.addOption({QStringLiteral("onnx"),
-                      QStringLiteral("ONNX model with cmne_config metadata (compute mode); without it the control estimate is written."),
-                      QStringLiteral("file")});
-    parser.addOption({QStringLiteral("out"),
-                      QStringLiteral("Output STC prefix; writes <prefix>-dspm-{lh,rh}.stc and <prefix>-cmne-{lh,rh}.stc."),
-                      QStringLiteral("prefix")});
-    parser.addOption({QStringLiteral("setno"),
-                      QStringLiteral("Evoked data set number (default: 0)."),
-                      QStringLiteral("n"), QStringLiteral("0")});
+    parser.add_option({{"evoked"}, "Evoked data FIFF file (compute mode).", "file", {}});
+    parser.add_option({{"onnx"},
+                       "ONNX model with cmne_config metadata (compute mode); without it the control estimate is written.",
+                       "file",
+                       {}});
+    parser.add_option({{"out"},
+                       "Output STC prefix; writes <prefix>-dspm-{lh,rh}.stc and <prefix>-cmne-{lh,rh}.stc.",
+                       "prefix",
+                       {}});
+    parser.add_option({{"setno"}, "Evoked data set number (default: 0).", "n", "0"});
 
     // -- Train / finetune options --
-    parser.addOption({QStringLiteral("epochs"),
-                      QStringLiteral("MNE Epochs FIFF file (train/finetune mode)."),
-                      QStringLiteral("file")});
-    parser.addOption({QStringLiteral("gt-stc"),
-                      QStringLiteral("Ground-truth STC prefix (optional; omit for pseudo-GT mode)."),
-                      QStringLiteral("prefix")});
-    parser.addOption({QStringLiteral("onnx-out"),
-                      QStringLiteral("Output ONNX model path (train/finetune mode)."),
-                      QStringLiteral("file"), QStringLiteral("cmne_lstm.onnx")});
-    parser.addOption({QStringLiteral("hidden"),
-                      QStringLiteral("LSTM hidden dimension (default: 256)."),
-                      QStringLiteral("n"), QStringLiteral("256")});
-    parser.addOption({QStringLiteral("layers"),
-                      QStringLiteral("Number of LSTM layers (default: 1)."),
-                      QStringLiteral("n"), QStringLiteral("1")});
-    parser.addOption({QStringLiteral("train-epochs"),
-                      QStringLiteral("Number of training epochs (default: 50)."),
-                      QStringLiteral("n"), QStringLiteral("50")});
-    parser.addOption({QStringLiteral("lr"),
-                      QStringLiteral("Learning rate (default: 0.001)."),
-                      QStringLiteral("value"), QStringLiteral("0.001")});
-    parser.addOption({QStringLiteral("batch"),
-                      QStringLiteral("Batch size (default: 64)."),
-                      QStringLiteral("n"), QStringLiteral("64")});
-    parser.addOption({QStringLiteral("finetune"),
-                      QStringLiteral("Existing ONNX model to fine-tune from."),
-                      QStringLiteral("file")});
-    parser.addOption({QStringLiteral("python"),
-                      QStringLiteral("Python interpreter (default: python3)."),
-                      QStringLiteral("exe"), QStringLiteral("python3")});
+    parser.add_option({{"epochs"}, "MNE Epochs FIFF file (train/finetune mode).", "file", {}});
+    parser.add_option({{"gt-stc"}, "Ground-truth STC prefix (optional; omit for pseudo-GT mode).", "prefix", {}});
+    parser.add_option({{"onnx-out"}, "Output ONNX model path (train/finetune mode).", "file", "cmne_lstm.onnx"});
+    parser.add_option({{"hidden"}, "LSTM hidden dimension (default: 256).", "n", "256"});
+    parser.add_option({{"layers"}, "Number of LSTM layers (default: 1).", "n", "1"});
+    parser.add_option({{"train-epochs"}, "Number of training epochs (default: 50).", "n", "50"});
+    parser.add_option({{"lr"}, "Learning rate (default: 0.001).", "value", "0.001"});
+    parser.add_option({{"batch"}, "Batch size (default: 64).", "n", "64"});
+    parser.add_option({{"finetune"}, "Existing ONNX model to fine-tune from.", "file", {}});
+    parser.add_option({{"python"}, "Python interpreter (default: python3).", "exe", "python3"});
 
-    parser.process(app);
+    parser.process(argc, argv, "mne_compute_cmne", MNE_CPP_VERSION);
 
     // ── Dispatch ───────────────────────────────────────────────────────
-    const QString mode = parser.value(QStringLiteral("mode")).toLower();
+    const std::string mode = to_lower(parser.value("mode"));
 
-    if (mode == QLatin1String("compute")) {
+    if (mode == "compute") {
         return doCompute(parser);
-    } else if (mode == QLatin1String("train")) {
+    } else if (mode == "train") {
         return doTrain(parser, false);
-    } else if (mode == QLatin1String("finetune")) {
+    } else if (mode == "finetune") {
         return doTrain(parser, true);
     } else {
-        QTextStream(stderr) << "Error: Unknown mode '" << mode
-                            << "'. Use compute, train, or finetune.\n";
+        std::print(stderr, "Error: Unknown mode '{}'. Use compute, train, or finetune.\n", mode);
         return 1;
     }
 }

@@ -260,7 +260,7 @@ void TestToolInverseComputation::testIsRawFileWithRawData()
     if (!QFile::exists(rawPath))
         QSKIP("Raw test data not available");
 
-    QVERIFY(isRawFile(rawPath));
+    QVERIFY(isRawFile(rawPath.toStdString()));
 }
 
 void TestToolInverseComputation::testIsRawFileWithEvokedData()
@@ -269,7 +269,7 @@ void TestToolInverseComputation::testIsRawFileWithEvokedData()
     if (!QFile::exists(avePath))
         QSKIP("Evoked test data not available");
 
-    QVERIFY(!isRawFile(avePath));
+    QVERIFY(!isRawFile(avePath.toStdString()));
 }
 
 void TestToolInverseComputation::testIsRawFileNonexistent()
@@ -283,12 +283,12 @@ void TestToolInverseComputation::testIsRawFileNonexistent()
 
 void TestToolInverseComputation::testSanitizeNormal()
 {
-    QCOMPARE(sanitizeForFilename("hello_world"), QString("hello_world"));
+    QCOMPARE(sanitizeForFilename("hello_world"), std::string("hello_world"));
 }
 
 void TestToolInverseComputation::testSanitizeSpecialChars()
 {
-    QString result = sanitizeForFilename("My File (v2.1)!");
+    const QString result = QString::fromStdString(sanitizeForFilename("My File (v2.1)!"));
     QVERIFY(!result.contains(' '));
     QVERIFY(!result.contains('('));
     QVERIFY(!result.contains(')'));
@@ -297,14 +297,14 @@ void TestToolInverseComputation::testSanitizeSpecialChars()
 
 void TestToolInverseComputation::testSanitizeSpaces()
 {
-    QString result = sanitizeForFilename("hello  world");
+    const QString result = QString::fromStdString(sanitizeForFilename("hello  world"));
     QCOMPARE(result, QString("hello_world"));
 }
 
 void TestToolInverseComputation::testSanitizeEmpty()
 {
-    QCOMPARE(sanitizeForFilename(""), QString("unknown"));
-    QCOMPARE(sanitizeForFilename("!!!"), QString("unknown"));
+    QCOMPARE(sanitizeForFilename(""), std::string("unknown"));
+    QCOMPARE(sanitizeForFilename("!!!"), std::string("unknown"));
 }
 
 //=============================================================================================================
@@ -313,27 +313,27 @@ void TestToolInverseComputation::testSanitizeEmpty()
 
 void TestToolInverseComputation::testComposeOutNameRaw()
 {
-    QString result = composeOutName("/data/lh.V1.label", "dSPM", true);
+    const QString result = QString::fromStdString(composeOutName("/data/lh.V1.label", "dSPM", true));
     QVERIFY(result.endsWith("_raw.fif"));
     QVERIFY(result.contains("dSPM"));
 }
 
 void TestToolInverseComputation::testComposeOutNameStc()
 {
-    QString result = composeOutName("/data/lh.V1.label", "MNE", false);
+    const QString result = QString::fromStdString(composeOutName("/data/lh.V1.label", "MNE", false));
     QVERIFY(result.endsWith("-stc.fif"));
     QVERIFY(result.contains("MNE"));
 }
 
 void TestToolInverseComputation::testComposeOutNameWithTag()
 {
-    QString result = composeOutName("/path/to/my.label", "tag", false);
+    const QString result = QString::fromStdString(composeOutName("/path/to/my.label", "tag", false));
     QVERIFY(result.contains("-tag"));
 }
 
 void TestToolInverseComputation::testComposeOutNameNoTag()
 {
-    QString result = composeOutName("/path/to/my.label", "", false);
+    const QString result = QString::fromStdString(composeOutName("/path/to/my.label", "", false));
     QVERIFY(!result.contains("--"));
     QVERIFY(result.endsWith("-stc.fif"));
 }
@@ -374,8 +374,8 @@ void TestToolInverseComputation::testFindLabelsInDirEmpty()
 {
     QString emptyDir = m_tempDir.path() + "/empty_labels";
     QDir().mkpath(emptyDir);
-    QStringList labels = findLabelsInDir(emptyDir);
-    QCOMPARE(labels.size(), 0);
+    const StringList labels = findLabelsInDir(emptyDir.toStdString());
+    QCOMPARE(labels.size(), std::size_t(0));
 }
 
 void TestToolInverseComputation::testFindLabelsInDirSorted()
@@ -389,8 +389,8 @@ void TestToolInverseComputation::testFindLabelsInDirSorted()
     (void)QFile(labelDir + "/lh.MT.label").open(QIODevice::WriteOnly);
     (void)QFile(labelDir + "/not_a_label.txt").open(QIODevice::WriteOnly);
 
-    QStringList labels = findLabelsInDir(labelDir);
-    QCOMPARE(labels.size(), 3); // Only .label files
+    const StringList labels = findLabelsInDir(labelDir.toStdString());
+    QCOMPARE(labels.size(), std::size_t(3)); // Only .label files
     // Should be sorted
     QVERIFY(labels[0] < labels[1]);
     QVERIFY(labels[1] < labels[2]);
@@ -402,7 +402,7 @@ void TestToolInverseComputation::testFindLabelsInDirRealData()
     if (!QDir(labelDir).exists())
         QSKIP("Label test data not available");
 
-    QStringList labels = findLabelsInDir(labelDir);
+    const StringList labels = findLabelsInDir(labelDir.toStdString());
     QVERIFY(labels.size() >= 1); // At least lh.V1.label
 }
 
@@ -447,7 +447,7 @@ void TestToolInverseComputation::testReadWFileSynthetic()
 
     VectorXd data;
     VectorXi vertices;
-    QVERIFY(readWFile(wPath, data, vertices));
+    QVERIFY(readWFile(wPath.toStdString(), data, vertices));
     QCOMPARE(data.size(), (Eigen::Index)3);
     QCOMPARE(vertices.size(), (Eigen::Index)3);
     QCOMPARE(vertices(0), 0);
@@ -472,7 +472,7 @@ void TestToolInverseComputation::testReadStcFileSynthetic()
     MatrixXd data;
     VectorXi vertices;
     float tminOut, tstepOut;
-    QVERIFY(readStcFile(stcPath, data, vertices, tminOut, tstepOut));
+    QVERIFY(readStcFile(stcPath.toStdString(), data, vertices, tminOut, tstepOut));
     QCOMPARE(vertices.size(), (Eigen::Index)2);
     QCOMPARE(vertices(0), 10);
     QCOMPARE(vertices(1), 20);

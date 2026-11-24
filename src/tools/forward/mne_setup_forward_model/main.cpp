@@ -36,12 +36,6 @@
 #include <mne/base/log.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-
-//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -68,10 +62,6 @@ using namespace MNESETUPFORWARDMODEL;
  */
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_setup_forward_model");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
-
     MNESetupForwardModelSettings settings(&argc, argv);
     SetupForwardModel setupFwdModel(settings);
 

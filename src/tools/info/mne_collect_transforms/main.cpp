@@ -18,6 +18,7 @@
 #include <mne/fiff/fiff_coord_trans.h>
 #include <mne/fiff/fiff_coord_trans_set.h>
 #include <mne/fiff/fiff_stream.h>
+#include <mne/base/command_line.h>
 #include <mne/base/string_utils.h>
 #include <mne/mri/mri_mgh_io.h>
 #include <mne/mri/mri_vol_data.h>
@@ -25,20 +26,19 @@
 #include <mne/base/log.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QFileInfo>
-
-//=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <filesystem>
+#include <print>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -67,37 +67,31 @@ static void printTransform(const FiffCoordTrans& t)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_collect_transforms");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Collect coordinate transforms into one FIFF file.\n\n"
+                             "Reads the device -> head transform of a measurement, the MRI -> head transform "
+                             "of a coregistration, and the surface RAS -> RAS -> MNI Talairach -> Talairach "
+                             "chain of an MRI set or of an mgh/mgz volume with its transforms/talairach.xfm.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"meas"}, "MEG measurement file (device->head transform).", "name", {}});
+    parser.add_option({{"mri"}, "FIFF MRI description or -trans.fif file (MRI->head transform and, without --mgh, the Talairach chain).", "name", {}});
+    parser.add_option({{"mgh"}, "mgh/mgz MRI volume; its centre and transforms/talairach.xfm give the Talairach chain.", "name", {}});
+    parser.add_option({{"out"}, "Output file name.", "name", {}});
+    parser.process(argc, argv, "mne_collect_transforms", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Collect coordinate transforms into one FIFF file.\n\n"
-                                     "Reads the device -> head transform of a measurement, the MRI -> head transform "
-                                     "of a coregistration, and the surface RAS -> RAS -> MNI Talairach -> Talairach "
-                                     "chain of an MRI set or of an mgh/mgz volume with its transforms/talairach.xfm.");
-    parser.addHelpOption();
-    parser.addVersionOption();
-
-    QCommandLineOption measOpt("meas", "MEG measurement file (device->head transform).", "name");
-    QCommandLineOption mriOpt("mri", "FIFF MRI description or -trans.fif file (MRI->head transform and, without --mgh, the Talairach chain).", "name");
-    QCommandLineOption mghOpt("mgh", "mgh/mgz MRI volume; its centre and transforms/talairach.xfm give the Talairach chain.", "name");
-    QCommandLineOption outOpt("out", "Output file name.", "name");
-    parser.addOptions({measOpt, mriOpt, mghOpt, outOpt});
-    parser.process(app);
-
-    const QString measName = parser.value(measOpt);
-    const QString mriName = parser.value(mriOpt);
-    const QString mghName = parser.value(mghOpt);
-    const QString outName = parser.value(outOpt);
-    if (measName.isEmpty() && mriName.isEmpty() && mghName.isEmpty()) {
+    const std::string measName = parser.value("meas");
+    const std::string mriName = parser.value("mri");
+    const std::string mghName = parser.value("mgh");
+    const std::string outName = parser.value("out");
+    if (measName.empty() && mriName.empty() && mghName.empty()) {
         Log::critical("At least one of --meas, --mri or --mgh must be specified.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_collect_transforms"));
+        return 1;
     }
 
     FiffCoordTrans devHeadT;
-    if (!measName.isEmpty()) {
-        const auto read = FiffCoordTrans::read(measName.toStdU16String(), FIFFV_COORD_DEVICE, FIFFV_COORD_HEAD);
+    if (!measName.empty()) {
+        const auto read = FiffCoordTrans::read(path_from_utf8(measName), FIFFV_COORD_DEVICE, FIFFV_COORD_HEAD);
         if (!read) {
             Log::critical("{}", read.error().what());
             return 1;
@@ -106,12 +100,12 @@ int main(int argc, char* argv[])
     }
 
     FiffCoordTransSet chain;
-    if (!mghName.isEmpty()) {
+    if (!mghName.empty()) {
         MriVolData volume;
         std::vector<FiffCoordTrans> volumeTrans;
-        const QString mriDir = QFileInfo(mghName).absolutePath();
-        if (!MriMghIO::read(mghName.toStdString(), volume, volumeTrans, mriDir.toStdString())) {
-            Log::critical("Cannot read {}", mghName.toStdString());
+        const std::filesystem::path mriDir = std::filesystem::absolute(path_from_utf8(mghName)).lexically_normal().parent_path();
+        if (!MriMghIO::read(mghName, volume, volumeTrans, utf8_from_path(mriDir))) {
+            Log::critical("Cannot read {}", mghName);
             return 1;
         }
         for (const FiffCoordTrans& t : volumeTrans) {
@@ -120,18 +114,18 @@ int main(int argc, char* argv[])
             }
         }
         // FreeSurfer keeps the Talairach transform next to the volume (MNE-C mne_mri_get_mgh_xform_file_name).
-        if (!chain.addTalairach((mriDir + "/transforms/talairach.xfm").toStdU16String())) {
-            Log::warning("No Talairach transform found for {}", mghName.toStdString());
+        if (!chain.addTalairach(mriDir / "transforms" / "talairach.xfm")) {
+            Log::warning("No Talairach transform found for {}", mghName);
         }
     }
-    if (!mriName.isEmpty()) {
+    if (!mriName.empty()) {
         FiffCoordTransSet fromFile;
-        if (fromFile.read(mriName.toStdU16String()) < 0 || fromFile.head_surf_RAS_t.empty()) {
-            Log::critical("No MRI->head transform in {}", mriName.toStdString());
+        if (fromFile.read(path_from_utf8(mriName)) < 0 || fromFile.head_surf_RAS_t.empty()) {
+            Log::critical("No MRI->head transform in {}", mriName);
             return 1;
         }
         chain.head_surf_RAS_t = fromFile.head_surf_RAS_t;
-        if (mghName.isEmpty()) {
+        if (mghName.empty()) {
             chain = fromFile;
         }
     }
@@ -145,10 +139,10 @@ int main(int argc, char* argv[])
         }
     }
 
-    if (!outName.isEmpty()) {
-        auto outStream = FiffStream::start_file(outName.toStdU16String());
+    if (!outName.empty()) {
+        auto outStream = FiffStream::start_file(path_from_utf8(outName));
         if (!outStream) {
-            Log::critical("Cannot open output file: {}", outName.toStdString());
+            Log::critical("Cannot open output file: {}", outName);
             return 1;
         }
         if (!devHeadT.empty()) {
@@ -156,7 +150,7 @@ int main(int argc, char* argv[])
         }
         chain.write(*outStream);
         outStream->end_file();
-        Log::info("Written {}", outName.toStdString());
+        Log::info("Written {}", outName);
     }
     return 0;
 }

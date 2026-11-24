@@ -19,23 +19,26 @@
 #include <mne/mne/mne_bem.h>
 #include <mne/mne/mne_bem_surface.h>
 
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QTextStream>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cmath>
+#include <format>
+#include <fstream>
+#include <limits>
+#include <print>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -51,72 +54,69 @@ using namespace Eigen;
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
 //=============================================================================================================
+/**
+ * Qt's asprintf, QString::number and QTextStream round exact decimal ties away from zero where std::format rounds
+ * them to even. Moves a tie at @p decimals to the neighbouring double away from zero, so that std::format writes
+ * the digits Qt wrote.
+ */
+static double listBemQtTie(double value, int decimals)
+{
+    const double scaled = std::ldexp(value, decimals + 1);
+    // A tie at decimals is an odd multiple of 2^-(decimals + 1)
+    if (std::isfinite(scaled) && scaled == std::trunc(scaled) && std::fmod(scaled, 2.0) != 0.0) {
+        return std::nextafter(value, value < 0 ? -std::numeric_limits<double>::infinity() : std::numeric_limits<double>::infinity());
+    }
+    return value;
+}
+
+//=============================================================================================================
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_list_bem");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Produce ASCII data from a BEM FIFF file.\n\nLists vertices and triangles of specified BEM surfaces.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"bem"}, "BEM model file.", "name", {}});
+    parser.add_option({{"out"}, "Output text file.", "name", {}});
+    parser.add_option({{"id"}, "Surface id to list.", "id", "4"});
+    parser.add_option({{"gdipoli"}, "Oostendorp format (vertices + triangles).", {}, {}});
+    parser.add_option({{"xfit"}, "xfit format (same as --gdipoli --meters).", {}, {}});
+    parser.add_option({{"old"}, "Old stream format.", {}, {}});
+    parser.add_option({{"meters"}, "Output in meters (default: millimeters).", {}, {}});
+    parser.process(argc, argv, "mne_list_bem", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Produce ASCII data from a BEM FIFF file.\n\nLists vertices and triangles of specified BEM surfaces.");
-    parser.addHelpOption();
-    parser.addVersionOption();
-
-    QCommandLineOption bemOpt("bem", "BEM model file.", "name");
-    parser.addOption(bemOpt);
-
-    QCommandLineOption outOpt("out", "Output text file.", "name");
-    parser.addOption(outOpt);
-
-    QCommandLineOption idOpt("id", "Surface id to list.", "id", "4");
-    parser.addOption(idOpt);
-
-    QCommandLineOption gdipoliOpt("gdipoli", "Oostendorp format (vertices + triangles).");
-    parser.addOption(gdipoliOpt);
-
-    QCommandLineOption xfitOpt("xfit", "xfit format (same as --gdipoli --meters).");
-    parser.addOption(xfitOpt);
-
-    QCommandLineOption oldOpt("old", "Old stream format.");
-    parser.addOption(oldOpt);
-
-    QCommandLineOption metersOpt("meters", "Output in meters (default: millimeters).");
-    parser.addOption(metersOpt);
-
-    parser.process(app);
-
-    QString bemName = parser.value(bemOpt);
-    QString outName = parser.value(outOpt);
-    int surfId = parser.value(idOpt).toInt();
+    const std::string bemName = parser.value("bem");
+    const std::string outName = parser.value("out");
+    int surfId = to_int(parser.value("id")).value_or(0);
     bool thomOutput = false;
     bool oldOutput = false;
     float lengthMult = 1000.0f;
 
-    if (parser.isSet(gdipoliOpt)) {
+    if (parser.is_set("gdipoli")) {
         thomOutput = true;
         oldOutput = false;
     }
-    if (parser.isSet(xfitOpt)) {
+    if (parser.is_set("xfit")) {
         thomOutput = true;
         oldOutput = false;
         lengthMult = 1.0f;
     }
-    if (parser.isSet(oldOpt)) {
+    if (parser.is_set("old")) {
         thomOutput = false;
         oldOutput = true;
     }
-    if (parser.isSet(metersOpt)) {
+    if (parser.is_set("meters")) {
         lengthMult = 1.0f;
     }
 
-    if (bemName.isEmpty() || outName.isEmpty()) {
+    if (bemName.empty() || outName.empty()) {
         Log::critical("Both --bem and --out are required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_list_bem"));
+        return 1;
     }
 
-    Log::info("input  file : {}", bemName.toStdString());
-    Log::info("output file : {}", outName.toStdString());
+    Log::info("input  file : {}", bemName);
+    Log::info("output file : {}", outName);
     Log::info("surface id  : {}", surfId);
     if (lengthMult == 1.0f)
         Log::info("output in meters.");
@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
         Log::info("output the vertex coordinates only.");
 
     // Read BEM surfaces
-    auto read = MNEBem::read(bemName.toStdU16String());
+    auto read = MNEBem::read(path_from_utf8(bemName));
     if (!read) {
         Log::critical("{}", read.error().what());
         return 1;
@@ -146,67 +146,60 @@ int main(int argc, char* argv[])
         }
     }
     if (surfIdx < 0) {
-        Log::critical("Surface id {} not found in {}", surfId, bemName.toStdString());
+        Log::critical("Surface id {} not found in {}", surfId, bemName);
         return 1;
     }
 
     const MNEBemSurface& surf = bem[surfIdx];
 
     // Write output
-    QFile outFile(outName);
-    if (!outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        Log::critical("Cannot open output file: {}", outName.toStdString());
+    std::ofstream out(path_from_utf8(outName));
+    if (!out) {
+        Log::critical("Cannot open output file: {}", outName);
         return 1;
     }
 
-    //
-    // The layout is fixed-width and consumed by other tools, so keep printf
-    // style formatting rather than reproducing the column widths by hand.
-    //
-    QTextStream out(&outFile);
-
     if (oldOutput) {
-        out << QString::asprintf("%5d\n", surf.np);
+        out << std::format("{:5}\n", surf.np);
         for (int k = 0; k < surf.np; k++)
-            out << QString::asprintf("%5d %9.4f %9.4f %9.4f\n",
-                                     k + 1,
-                                     lengthMult * surf.rr(k, 0),
-                                     lengthMult * surf.rr(k, 1),
-                                     lengthMult * surf.rr(k, 2));
-        out << QString::asprintf("%5d\n", surf.ntri);
+            out << std::format("{:5} {:9.4f} {:9.4f} {:9.4f}\n",
+                               k + 1,
+                               listBemQtTie(lengthMult * surf.rr(k, 0), 4),
+                               listBemQtTie(lengthMult * surf.rr(k, 1), 4),
+                               listBemQtTie(lengthMult * surf.rr(k, 2), 4));
+        out << std::format("{:5}\n", surf.ntri);
         for (int k = 0; k < surf.ntri; k++) {
-            out << QString::asprintf("%5d %4d %4d %4d\n",
-                                     k + 1,
-                                     surf.itris(k, 0) + 1,
-                                     surf.itris(k, 2) + 1,
-                                     surf.itris(k, 1) + 1);
+            out << std::format("{:5} {:4} {:4} {:4}\n",
+                               k + 1,
+                               surf.itris(k, 0) + 1,
+                               surf.itris(k, 2) + 1,
+                               surf.itris(k, 1) + 1);
         }
     } else if (thomOutput) {
-        out << QString::asprintf("%5d\n", surf.np);
+        out << std::format("{:5}\n", surf.np);
         for (int k = 0; k < surf.np; k++)
-            out << QString::asprintf("%5d %9.4f %9.4f %9.4f\n",
-                                     k + 1,
-                                     lengthMult * surf.rr(k, 0),
-                                     lengthMult * surf.rr(k, 1),
-                                     lengthMult * surf.rr(k, 2));
-        out << QString::asprintf("%5d\n", surf.ntri);
+            out << std::format("{:5} {:9.4f} {:9.4f} {:9.4f}\n",
+                               k + 1,
+                               listBemQtTie(lengthMult * surf.rr(k, 0), 4),
+                               listBemQtTie(lengthMult * surf.rr(k, 1), 4),
+                               listBemQtTie(lengthMult * surf.rr(k, 2), 4));
+        out << std::format("{:5}\n", surf.ntri);
         for (int k = 0; k < surf.ntri; k++) {
-            out << QString::asprintf("%5d %4d %4d %4d\n",
-                                     k + 1,
-                                     surf.itris(k, 0) + 1,
-                                     surf.itris(k, 1) + 1,
-                                     surf.itris(k, 2) + 1);
+            out << std::format("{:5} {:4} {:4} {:4}\n",
+                               k + 1,
+                               surf.itris(k, 0) + 1,
+                               surf.itris(k, 1) + 1,
+                               surf.itris(k, 2) + 1);
         }
     } else {
         for (int k = 0; k < surf.np; k++)
-            out << QString::asprintf("%10.3f %10.3f %10.3f\n",
-                                     lengthMult * surf.rr(k, 0),
-                                     lengthMult * surf.rr(k, 1),
-                                     lengthMult * surf.rr(k, 2));
+            out << std::format("{:10.3f} {:10.3f} {:10.3f}\n",
+                               listBemQtTie(lengthMult * surf.rr(k, 0), 3),
+                               listBemQtTie(lengthMult * surf.rr(k, 1), 3),
+                               listBemQtTie(lengthMult * surf.rr(k, 2), 3));
     }
 
-    out.flush();
-    outFile.close();
+    out.close();
     Log::info("done.");
 
     return 0;

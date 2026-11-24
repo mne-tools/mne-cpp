@@ -11,7 +11,6 @@
  * @brief    Definition of the MNEShowFiffSettings class.
  */
 
-//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -20,10 +19,17 @@
 #include "mne_show_fiff_settings.h"
 
 #include <mne/base/base_global.h>
-#include <stdio.h>
+#include <mne/base/string_utils.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cstdlib>
+#include <cstring>
+#include <optional>
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -31,7 +37,6 @@
 using namespace SHOWFIFF;
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // STATIC DEFINITIONS
 //=============================================================================================================
@@ -43,7 +48,6 @@ using namespace SHOWFIFF;
 constexpr auto DEFAULT_INDENT = 3;
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -57,7 +61,7 @@ MNEShowFiffSettings::MNEShowFiffSettings()
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 MNEShowFiffSettings::MNEShowFiffSettings(int* argc, char** argv)
 : indent(-1)
@@ -74,7 +78,7 @@ MNEShowFiffSettings::MNEShowFiffSettings(int* argc, char** argv)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 MNEShowFiffSettings::~MNEShowFiffSettings()
 {
@@ -82,7 +86,7 @@ MNEShowFiffSettings::~MNEShowFiffSettings()
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MNEShowFiffSettings::checkIntegrity()
 {
@@ -91,7 +95,7 @@ void MNEShowFiffSettings::checkIntegrity()
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MNEShowFiffSettings::usage(char* name)
 {
@@ -109,15 +113,15 @@ void MNEShowFiffSettings::usage(char* name)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 bool MNEShowFiffSettings::check_unrecognized_args(int argc, char** argv)
 {
     if (argc > 1) {
-        QStringList unrecognized;
+        mne::StringList unrecognized;
         for (int k = 1; k < argc; k++)
-            unrecognized << QString::fromLocal8Bit(argv[k]);
-        mne::Log::critical("Unrecognized arguments : {}", unrecognized.join(' ').toStdString());
+            unrecognized.emplace_back(argv[k]);
+        mne::Log::critical("Unrecognized arguments : {}", mne::join(unrecognized, " "));
         mne::Log::critical("Check the command line.");
         return false;
     }
@@ -125,7 +129,7 @@ bool MNEShowFiffSettings::check_unrecognized_args(int argc, char** argv)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 bool MNEShowFiffSettings::check_args(int* argc, char** argv)
 {
@@ -147,39 +151,39 @@ bool MNEShowFiffSettings::check_args(int* argc, char** argv)
                 mne::Log::critical("--in: argument required.");
                 return false;
             }
-            inname = QString(argv[k + 1]);
+            inname = argv[k + 1];
         } else if (strcmp(argv[k], "--fif") == 0) {
             found = 2;
             if (k == *argc - 1) {
                 mne::Log::critical("--fif: argument required.");
                 return false;
             }
-            inname = QString(argv[k + 1]);
+            inname = argv[k + 1];
         } else if (strcmp(argv[k], "--tag") == 0) {
             found = 2;
             if (k == *argc - 1) {
                 mne::Log::critical("--tag: argument required.");
                 return false;
             }
-            bool bOk = false;
-            val = QString::fromUtf8(argv[k + 1]).toInt(&bOk);
-            if (!bOk) {
+            const std::optional<int> parsed = mne::to_int(argv[k + 1]);
+            if (!parsed) {
                 mne::Log::critical("Incomprehensible tag number : {}", argv[k + 1]);
                 return false;
             }
-            tags.append(val);
+            val = *parsed;
+            tags.push_back(val);
         } else if (strcmp(argv[k], "--indent") == 0) {
             found = 2;
             if (k == *argc - 1) {
                 mne::Log::critical("--indent: argument required.");
                 return false;
             }
-            bool bOk = false;
-            val = QString::fromUtf8(argv[k + 1]).toInt(&bOk);
-            if (!bOk) {
+            const std::optional<int> parsed = mne::to_int(argv[k + 1]);
+            if (!parsed) {
                 mne::Log::critical("Incomprehensible number : {}", argv[k + 1]);
                 return false;
             }
+            val = *parsed;
             if (val >= 0)
                 indent = val;
         } else if (strcmp(argv[k], "--verbose") == 0) {

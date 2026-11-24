@@ -67,7 +67,11 @@
 //=============================================================================================================
 
 #include <cmath>
+#include <fstream>
 #include <numbers>
+#include <sstream>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 
@@ -138,7 +142,7 @@ void TestToolConversionExtended::testCtfChannelMappingAndData()
 
     FiffChInfo channel;
     mapCtfToFiff(sensor, channel);
-    QCOMPARE(channel.ch_name, QString("MLC11"));
+    QCOMPARE(channel.ch_name, std::string("MLC11"));
     QCOMPARE(channel.kind, FIFFV_MEG_CH);
     QCOMPARE(channel.chpos.coil_type, FIFFV_COIL_CTF_GRAD);
     QCOMPARE(channel.chpos.r0, Vector3f(1.0f, 2.0f, 3.0f));
@@ -153,11 +157,11 @@ void TestToolConversionExtended::testCtfChannelMappingAndData()
     meg4.close();
 
     CtfDatasetInfo info;
-    info.meg4Path = meg4Path;
+    info.meg4Path = meg4Path.toStdString();
     info.nChannels = 1;
     info.nSamples = 2;
     info.nTrials = 1;
-    info.sensors.append(sensor);
+    info.sensors.push_back(sensor);
     MatrixXd data;
     QVERIFY(readMeg4Data(info, data));
     QCOMPARE(data.rows(), 1);
@@ -191,7 +195,7 @@ void TestToolConversionExtended::testKitHeaderLayoutTransformAndData()
     sqd.close();
 
     KitDatasetInfo info;
-    QVERIFY(parseSqdHeader(sqdPath, info));
+    QVERIFY(parseSqdHeader(sqdPath.toStdString(), info));
     QCOMPARE(info.systemId, 1234);
     QCOMPARE(info.nChannels, 2);
     QCOMPARE(info.nSamples, 3);
@@ -202,7 +206,7 @@ void TestToolConversionExtended::testKitHeaderLayoutTransformAndData()
     QVERIFY(sensors.open(QIODevice::WriteOnly | QIODevice::Text));
     sensors.write("# index x y z ox oy oz\n1 10 20 30 0 0 1\n2 -10 0 40 0 1 0\n");
     sensors.close();
-    QVERIFY(readSensorLayout(sensorPath, info));
+    QVERIFY(readSensorLayout(sensorPath.toStdString(), info));
     QCOMPARE(info.sensors[0].coil.position, Vector3d(0.01, 0.02, 0.03));
 
     const QString hpiPath = m_tempDir.filePath("synthetic.hpi");
@@ -211,7 +215,7 @@ void TestToolConversionExtended::testKitHeaderLayoutTransformAndData()
     hpi.write("0 0 0 10 20 30\n10 0 0 20 20 30\n0 10 0 10 30 30\n");
     hpi.close();
     FiffCoordTrans transform;
-    QVERIFY(computeDevHeadTransform(hpiPath, transform));
+    QVERIFY(computeDevHeadTransform(hpiPath.toStdString(), transform));
     QCOMPARE(transform.from, FIFFV_COORD_DEVICE);
     QCOMPARE(transform.to, FIFFV_COORD_HEAD);
     QVERIFY((transform.trans.block<3, 1>(0, 3) - Vector3f(0.01f, 0.02f, 0.03f)).norm() < 1e-6f);
@@ -219,7 +223,7 @@ void TestToolConversionExtended::testKitHeaderLayoutTransformAndData()
     info.sensors[0].gain = 2.0;
     info.sensors[1].gain = 0.5;
     MatrixXd data;
-    QVERIFY(readSqdData(sqdPath, info, data));
+    QVERIFY(readSqdData(sqdPath.toStdString(), info, data));
     QCOMPARE(data(0, 0), 2.0);
     QCOMPARE(data(1, 0), 1.0);
     QCOMPARE(data(0, 2), 10.0);
@@ -230,14 +234,13 @@ void TestToolConversionExtended::testWriteCorDescription()
 {
     const std::vector<std::vector<unsigned char>> slices = {{0, 1, 2, 3}};
     const QString outputPath = m_tempDir.filePath("cor-description.fif");
-    QVERIFY(writeMriDescription(outputPath, slices, 2, 2, 1));
+    QVERIFY(writeMriDescription(outputPath.toStdString(), slices, 2, 2, 1));
     QVERIFY(QFileInfo(outputPath).size() > 0);
 }
 
 void TestToolConversionExtended::testParseLspMatrix()
 {
-    QString valid = "; covariance\n((1 2) (2 4))\n";
-    QTextStream validStream(&valid);
+    std::istringstream validStream("; covariance\n((1 2) (2 4))\n");
     MatrixXd matrix;
     QVERIFY(parseLspMatrix(validStream, matrix));
     QCOMPARE(matrix.rows(), 2);
@@ -245,8 +248,7 @@ void TestToolConversionExtended::testParseLspMatrix()
     QCOMPARE(matrix(0, 1), 2.0);
     QCOMPARE(matrix(1, 1), 4.0);
 
-    QString invalid = "((1 2 3) (4 5))\n";
-    QTextStream invalidStream(&invalid);
+    std::istringstream invalidStream("((1 2 3) (4 5))\n");
     QVERIFY(!parseLspMatrix(invalidStream, matrix));
 }
 
@@ -262,12 +264,12 @@ void TestToolConversionExtended::testParseCtfMarkers()
         "LIST OF MARKERS:\nTRIAL NUMBER TIME\n56 0.3\n");
     markerFile.close();
 
-    const QList<CtfMarker> markers = parseCtfMarkers(markerPath);
-    QCOMPARE(markers.size(), 2);
-    QCOMPARE(markers[0].name, QString("auditory"));
+    const std::vector<CtfMarker> markers = parseCtfMarkers(markerPath.toStdString());
+    QCOMPARE(std::ssize(markers), 2);
+    QCOMPARE(markers[0].name, std::string("auditory"));
     QCOMPARE(markers[0].eventId, 7);
-    QCOMPARE(markers[0].samples, QList<int>({12, 34}));
-    QCOMPARE(markers[1].samples, QList<int>({56}));
+    QVERIFY(markers[0].samples == std::vector<int>({12, 34}));
+    QVERIFY(markers[1].samples == std::vector<int>({56}));
 }
 
 //=============================================================================================================
@@ -282,23 +284,22 @@ void TestToolConversionExtended::testWriteMatrixVariableSmall()
         4.0, 5.0, 6.0;
 
     QString matFile = m_tempDir.path() + "/test_small.mat";
-    QFile file(matFile);
-    QVERIFY(file.open(QIODevice::WriteOnly));
-    QDataStream ds(&file);
-    ds.setByteOrder(QDataStream::LittleEndian);
+    std::ofstream ds(matFile.toStdString(), std::ios::binary);
+    QVERIFY(ds.is_open());
 
     // Write MAT 5.0 header (128 bytes)
-    QByteArray header(128, '\0');
+    std::string header(128, '\0');
     header.replace(0, 19, "MATLAB 5.0 MAT-file");
     header[124] = 0x00;
     header[125] = 0x01; // version
     header[126] = 'I';
     header[127] = 'M'; // endian
-    ds.writeRawData(header.constData(), 128);
+    ds.write(header.data(), 128);
 
     writeMatrixVariable(ds, "testmat", mat);
-    file.close();
+    ds.close();
 
+    QFile file(matFile);
     QVERIFY(file.size() > 128);
 
     // Verify the file is a valid MAT file by checking header
@@ -312,51 +313,45 @@ void TestToolConversionExtended::testWriteMatrixVariableLarger()
 {
     MatrixXd mat = MatrixXd::Random(10, 20);
     QString matFile = m_tempDir.path() + "/test_larger.mat";
-    QFile file(matFile);
-    QVERIFY(file.open(QIODevice::WriteOnly));
-    QDataStream ds(&file);
-    ds.setByteOrder(QDataStream::LittleEndian);
-    QByteArray header(128, '\0');
+    std::ofstream ds(matFile.toStdString(), std::ios::binary);
+    QVERIFY(ds.is_open());
+    std::string header(128, '\0');
     header.replace(0, 19, "MATLAB 5.0 MAT-file");
     header[124] = 0x00;
     header[125] = 0x01;
     header[126] = 'I';
     header[127] = 'M';
-    ds.writeRawData(header.constData(), 128);
+    ds.write(header.data(), 128);
     writeMatrixVariable(ds, "bigmat", mat);
-    file.close();
+    ds.close();
 
     // File should contain at least 128 + tag + dimensions + data
-    QVERIFY(file.size() > 128 + 10 * 20 * 8);
+    QVERIFY(QFile(matFile).size() > 128 + 10 * 20 * 8);
 }
 
 void TestToolConversionExtended::testWriteMatTagFormat()
 {
     // Verify writeMatTag produces correct tag header (type + size)
-    QByteArray buf;
-    QDataStream ds(&buf, QIODevice::WriteOnly);
-    ds.setByteOrder(QDataStream::LittleEndian);
-
+    std::ostringstream ds;
     writeMatTag(ds, miDOUBLE, 24);
 
+    const QByteArray buf = QByteArray::fromStdString(ds.str());
     QCOMPARE(buf.size(), 8); // 4 bytes type + 4 bytes size
     // Read back
-    QDataStream reader(&buf, QIODevice::ReadOnly);
+    QDataStream reader(buf);
     reader.setByteOrder(QDataStream::LittleEndian);
     quint32 type, size;
     reader >> type >> size;
-    QCOMPARE(type, miDOUBLE);
+    QCOMPARE(type, quint32(miDOUBLE));
     QCOMPARE(size, (quint32)24);
 }
 
 void TestToolConversionExtended::testWritePadAlignment()
 {
     // writePad pads to 8-byte boundary: writes (8 - numBytes%8) % 8 zeros
-    QByteArray buf;
-    QDataStream ds(&buf, QIODevice::WriteOnly);
-    ds.setByteOrder(QDataStream::LittleEndian);
-
+    std::ostringstream ds;
     writePad(ds, 5); // (8-5)%8 = 3 padding bytes needed
+    const QByteArray buf = QByteArray::fromStdString(ds.str());
     QCOMPARE(buf.size(), 3);
     for (int i = 0; i < 3; i++)
         QCOMPARE((unsigned char)buf[i], (unsigned char)0);
@@ -381,8 +376,8 @@ void TestToolConversionExtended::testReadCtfDigBasic()
         << "1.0 2.0 3.0\n"; // Extra point
     file.close();
 
-    QList<DigPoint> points = readCtfDig(digPath, true);
-    QCOMPARE(points.size(), 5);
+    std::vector<DigPoint> points = readCtfDig(digPath.toStdString(), true);
+    QCOMPARE(std::ssize(points), 5);
     // First 3 should be fiducials
     QCOMPARE(points[0].kind, FIFFV_POINT_CARDINAL);
     QCOMPARE(points[1].kind, FIFFV_POINT_CARDINAL);
@@ -402,8 +397,8 @@ void TestToolConversionExtended::testReadCtfDigFiducials()
         << "8.0 0.0 0.0\n";
     file.close();
 
-    QList<DigPoint> points = readCtfDig(digPath, true);
-    QCOMPARE(points.size(), 3);
+    std::vector<DigPoint> points = readCtfDig(digPath.toStdString(), true);
+    QCOMPARE(std::ssize(points), 3);
     // Nasion ident = 1, LPA = 2, RPA = 3
     QCOMPARE(points[0].ident, 1); // Nasion
     QCOMPARE(points[1].ident, 2); // LPA
@@ -422,8 +417,8 @@ void TestToolConversionExtended::testReadCtfDigCoordConversion()
         << "5.0 0.0 0.0\n";
     file.close();
 
-    QList<DigPoint> points = readCtfDig(digPath, true);
-    QVERIFY(points.size() >= 1);
+    std::vector<DigPoint> points = readCtfDig(digPath.toStdString(), true);
+    QVERIFY(!points.empty());
     // 10 cm = 0.10 m
     QVERIFY(qAbs(points[0].r[0] - 0.10f) < 1e-4f);
     QVERIFY(qAbs(points[0].r[1] - 0.20f) < 1e-4f);
@@ -522,11 +517,11 @@ void TestToolConversionExtended::testReadElpFileBasic()
     file.close();
 
     MatrixX3f positions;
-    QStringList names;
-    QVERIFY(readElpFile(elpPath, positions, names));
-    QCOMPARE(names.size(), 3);
-    QCOMPARE(names[0], QString("Fp1"));
-    QCOMPARE(names[2], QString("Cz"));
+    StringList names;
+    QVERIFY(readElpFile(elpPath.toStdString(), positions, names));
+    QCOMPARE(std::ssize(names), 3);
+    QCOMPARE(names[0], std::string("Fp1"));
+    QCOMPARE(names[2], std::string("Cz"));
     QCOMPARE(positions.rows(), (Eigen::Index)3);
 }
 
@@ -541,8 +536,8 @@ void TestToolConversionExtended::testReadElpFileCoordinates()
     file.close();
 
     MatrixX3f positions;
-    QStringList names;
-    QVERIFY(readElpFile(elpPath, positions, names));
+    StringList names;
+    QVERIFY(readElpFile(elpPath.toStdString(), positions, names));
     QCOMPARE(positions.rows(), (Eigen::Index)1);
     // readElpFile converts mm to meters (x0.001)
     QVERIFY(qAbs(positions(0, 0) - 10.5f * 0.001f) < 0.001f);
@@ -562,7 +557,7 @@ void TestToolConversionExtended::testReadCalibrationBasic()
     file.close();
 
     VectorXf cals;
-    QVERIFY(readCalibration(calPath, cals));
+    QVERIFY(readCalibration(calPath.toStdString(), cals));
     QCOMPARE(cals.size(), (Eigen::Index)3);
     QVERIFY(qAbs(cals(0) - 1.5f) < 0.01f);
     QVERIFY(qAbs(cals(1) - 2.0f) < 0.01f);
@@ -581,7 +576,7 @@ void TestToolConversionExtended::testReadCalibrationValues()
     file.close();
 
     VectorXf cals;
-    QVERIFY(readCalibration(calPath, cals));
+    QVERIFY(readCalibration(calPath.toStdString(), cals));
     QCOMPARE(cals.size(), (Eigen::Index)2);
     QVERIFY(cals(0) > 0);
     QVERIFY(qAbs(cals(1) - 3.14159f) < 0.001f);

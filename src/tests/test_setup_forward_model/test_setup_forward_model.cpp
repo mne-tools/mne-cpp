@@ -77,7 +77,7 @@ private slots:
         QCOMPARE(settings.outerShift(), 0.0f);
         QCOMPARE(settings.scalpShift(), 0.0f);
         QCOMPARE(settings.overwrite(), false);
-        QVERIFY(settings.modelName().isEmpty());
+        QVERIFY(settings.modelName().empty());
     }
 
     void testSettingsSubject()
@@ -85,7 +85,7 @@ private slots:
         const char* argv[] = {"test", "--subject", "sample"};
         int argc = 3;
         MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
-        QCOMPARE(settings.subject(), QString("sample"));
+        QCOMPARE(settings.subject(), std::string("sample"));
     }
 
     void testSettingsSubjectsDir()
@@ -93,7 +93,7 @@ private slots:
         const char* argv[] = {"test", "--subjects-dir", "/tmp/subjects"};
         int argc = 3;
         MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
-        QCOMPARE(settings.subjectsDir(), QString("/tmp/subjects"));
+        QCOMPARE(settings.subjectsDir(), std::string("/tmp/subjects"));
     }
 
     void testSettingsConductivities()
@@ -111,7 +111,7 @@ private slots:
         const char* argv[] = {"test", "--model", "mymodel"};
         int argc = 3;
         MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
-        QCOMPARE(settings.modelName(), QString("mymodel"));
+        QCOMPARE(settings.modelName(), std::string("mymodel"));
     }
 
     void testSettingsHomog()
@@ -191,8 +191,8 @@ private slots:
                               "--ico", "5", "--surf"};
         int argc = 27;
         MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
-        QCOMPARE(settings.subject(), QString("sample"));
-        QCOMPARE(settings.subjectsDir(), QString("/tmp/sub"));
+        QCOMPARE(settings.subject(), std::string("sample"));
+        QCOMPARE(settings.subjectsDir(), std::string("/tmp/sub"));
         QCOMPARE(settings.homogeneous(), true);
         QCOMPARE(settings.noSolution(), true);
         QCOMPARE(settings.swap(), false);
@@ -201,7 +201,7 @@ private slots:
         QCOMPARE(settings.scalpConductivity(), 0.5f);
         QCOMPARE(settings.skullConductivity(), 0.01f);
         QCOMPARE(settings.brainConductivity(), 0.4f);
-        QCOMPARE(settings.modelName(), QString("mymodel"));
+        QCOMPARE(settings.modelName(), std::string("mymodel"));
         QCOMPARE(settings.innerShift(), 2.0f);
         QCOMPARE(settings.outerShift(), 3.0f);
         QCOMPARE(settings.scalpShift(), 1.0f);

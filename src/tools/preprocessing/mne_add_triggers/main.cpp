@@ -19,25 +19,24 @@
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_ch_info.h>
 #include <mne/fiff/fiff_file.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QTextStream>
-#include <QRegularExpression>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <fstream>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -62,25 +61,25 @@ struct TriggerEvent
 
 //=============================================================================================================
 
-static QList<TriggerEvent> readTriggerFile(const QString& filename)
+static std::vector<TriggerEvent> readTriggerFile(const std::string& filename)
 {
-    QList<TriggerEvent> triggers;
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::critical("Cannot open trigger file: {}", filename.toStdString());
+    std::vector<TriggerEvent> triggers;
+    std::ifstream file(path_from_utf8(filename));
+    if (!file) {
+        Log::critical("Cannot open trigger file: {}", filename);
         return triggers;
     }
-    QTextStream in(&file);
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#'))
+    std::string raw;
+    while (std::getline(file, raw)) {
+        const std::string_view line = trimmed(raw);
+        if (line.empty() || line.starts_with('#'))
             continue;
-        QStringList parts = line.split(QRegularExpression("\\s+"));
+        const std::vector<std::string_view> parts = split_whitespace(line);
         if (parts.size() >= 2) {
             TriggerEvent evt;
-            evt.sample = parts[0].toInt();
-            evt.value = parts[1].toInt();
-            triggers.append(evt);
+            evt.sample = to_int(parts[0]).value_or(0);
+            evt.value = to_int(parts[1]).value_or(0);
+            triggers.push_back(evt);
         }
     }
     return triggers;
@@ -90,55 +89,43 @@ static QList<TriggerEvent> readTriggerFile(const QString& filename)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_add_triggers");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Add trigger events to raw data's STI channel.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"raw"}, "Input raw FIFF file.", "file", {}});
+    parser.add_option({{"trg"}, "Trigger file (sample event_value per line).", "file", {}});
+    parser.add_option({{"out"}, "Output FIFF file.", "file", {}});
+    parser.process(argc, argv, "mne_add_triggers", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Add trigger events to raw data's STI channel.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string rawFile = parser.value("raw");
+    const std::string trgFile = parser.value("trg");
+    const std::string outFile = parser.value("out");
 
-    QCommandLineOption rawOpt("raw", "Input raw FIFF file.", "file");
-    parser.addOption(rawOpt);
-
-    QCommandLineOption trgOpt("trg", "Trigger file (sample event_value per line).", "file");
-    parser.addOption(trgOpt);
-
-    QCommandLineOption outOpt("out", "Output FIFF file.", "file");
-    parser.addOption(outOpt);
-
-    parser.process(app);
-
-    QString rawFile = parser.value(rawOpt);
-    QString trgFile = parser.value(trgOpt);
-    QString outFile = parser.value(outOpt);
-
-    if (rawFile.isEmpty()) {
+    if (rawFile.empty()) {
         Log::critical("--raw is required.");
         return 1;
     }
-    if (trgFile.isEmpty()) {
+    if (trgFile.empty()) {
         Log::critical("--trg is required.");
         return 1;
     }
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         Log::critical("--out is required.");
         return 1;
     }
 
     // Read trigger file
-    QList<TriggerEvent> triggers = readTriggerFile(trgFile);
-    if (triggers.isEmpty()) {
-        Log::critical("No triggers read from: {}", trgFile.toStdString());
+    const std::vector<TriggerEvent> triggers = readTriggerFile(trgFile);
+    if (triggers.empty()) {
+        Log::critical("No triggers read from: {}", trgFile);
         return 1;
     }
-    Log::info("Read {} trigger events from {}", static_cast<long long>(triggers.size()), trgFile.toStdString());
+    Log::info("Read {} trigger events from {}", static_cast<long long>(triggers.size()), trgFile);
 
     // Open raw data
-    FiffRawData raw(rawFile.toStdU16String());
+    FiffRawData raw(path_from_utf8(rawFile));
     if (raw.info.empty()) {
-        Log::critical("Cannot read raw data from: {}", rawFile.toStdString());
+        Log::critical("Cannot read raw data from: {}", rawFile);
         return 1;
     }
 
@@ -182,9 +169,9 @@ int main(int argc, char* argv[])
 
     // Write output
     RowVectorXd cals;
-    auto outStream = FiffStream::start_writing_raw(outFile.toStdU16String(), raw.info, cals);
+    auto outStream = FiffStream::start_writing_raw(path_from_utf8(outFile), raw.info, cals);
     if (!outStream) {
-        Log::critical("Cannot open output file: {}", outFile.toStdString());
+        Log::critical("Cannot open output file: {}", outFile);
         return 1;
     }
 
@@ -199,6 +186,6 @@ int main(int argc, char* argv[])
     }
     outStream->finish_writing_raw();
 
-    Log::info("Written modified raw data to: {}", outFile.toStdString());
+    Log::info("Written modified raw data to: {}", outFile);
     return 0;
 }

@@ -26,11 +26,16 @@
 #define FLASHBEM_H
 
 //=============================================================================================================
-// QT INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QStringList>
+#include <mne/base/string_utils.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <string>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNEFLASHBEM
@@ -92,8 +97,8 @@ private:
      *
      * @return true on success (exit code 0), false on failure.
      */
-    bool runCommand(const QString& program, const QStringList& args,
-                    const QString& workDir = QString());
+    bool runCommand(const std::string& program, const mne::StringList& args,
+                    const std::string& workDir = {});
 
     //=========================================================================================================
     /**
@@ -108,7 +113,7 @@ private:
      *
      * @return true on success.
      */
-    bool convertImages(const QString& flashDir, const QString& mriFlashDir,
+    bool convertImages(const std::string& flashDir, const std::string& mriFlashDir,
                        int& echosConverted);
 
     //=========================================================================================================
@@ -119,7 +124,7 @@ private:
      *
      * @return true on success.
      */
-    bool unwarpImages(const QString& mriFlashDir);
+    bool unwarpImages(const std::string& mriFlashDir);
 
     //=========================================================================================================
     /**
@@ -130,7 +135,7 @@ private:
      *
      * @return true on success.
      */
-    bool createParameterMaps(const QString& mriFlashDir, const QString& paramDir);
+    bool createParameterMaps(const std::string& mriFlashDir, const std::string& paramDir);
 
     //=========================================================================================================
     /**
@@ -144,7 +149,7 @@ private:
      *
      * @return true on success.
      */
-    bool createFlash5Volume(const QString& mriFlashDir, const QString& paramDir);
+    bool createFlash5Volume(const std::string& mriFlashDir, const std::string& paramDir);
 
     //=========================================================================================================
     /**
@@ -155,7 +160,7 @@ private:
      *
      * @return true on success.
      */
-    bool registerWithMprage(const QString& paramDir, const QString& mriDir);
+    bool registerWithMprage(const std::string& paramDir, const std::string& mriDir);
 
     //=========================================================================================================
     /**
@@ -172,7 +177,7 @@ private:
      *
      * @return true on success.
      */
-    bool convertToCor(const QString& paramDir, const QString& mriDir,
+    bool convertToCor(const std::string& paramDir, const std::string& mriDir,
                       bool& convertedT1, bool& convertedBrain);
 
     //=========================================================================================================
@@ -196,7 +201,7 @@ private:
      *
      * @return true on success.
      */
-    bool convertTriToSurf(const QString& bemDir, const QString& paramDir);
+    bool convertTriToSurf(const std::string& bemDir, const std::string& paramDir);
 
     //=========================================================================================================
     /**
@@ -207,7 +212,7 @@ private:
      * @param[in] convertedT1    Whether T1 COR was created by us.
      * @param[in] convertedBrain Whether brain COR was created by us.
      */
-    void cleanup(const QString& bemDir, const QString& mriDir,
+    void cleanup(const std::string& bemDir, const std::string& mriDir,
                  bool convertedT1, bool convertedBrain);
 
     //=========================================================================================================

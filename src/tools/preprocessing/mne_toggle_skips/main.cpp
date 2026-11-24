@@ -18,16 +18,16 @@
 #include <mne/fiff/fiff_tag.h>
 #include <mne/fiff/fiff_dir_entry.h>
 #include <mne/fiff/fiff_types.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
+#include <optional>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -45,33 +45,24 @@ using namespace mne;
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_toggle_skips");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Toggle skip tags in raw FIFF data.\n\n"
+                             "This modifies the file in-place, toggling FIFF_DATA_SKIP tags\n"
+                             "between active (skip) and inactive (unskip) states.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"raw"}, "Input raw FIFF file (modified in-place).", "file", {}});
+    parser.process(argc, argv, "mne_toggle_skips", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Toggle skip tags in raw FIFF data.\n\n"
-                                     "This modifies the file in-place, toggling FIFF_DATA_SKIP tags\n"
-                                     "between active (skip) and inactive (unskip) states.");
-    parser.addHelpOption();
-    parser.addVersionOption();
-
-    QCommandLineOption rawOpt("raw", "Input raw FIFF file (modified in-place).", "file");
-    parser.addOption(rawOpt);
-
-    parser.process(app);
-
-    QString rawFile = parser.value(rawOpt);
-    if (rawFile.isEmpty()) {
+    const std::string rawFile = parser.value("raw");
+    if (rawFile.empty()) {
         Log::critical("--raw is required.");
         return 1;
     }
 
     // Open file for update
-    QFile file(rawFile);
-    auto stream = FiffStream::open_update(rawFile.toStdU16String());
+    auto stream = FiffStream::open_update(path_from_utf8(rawFile));
     if (!stream) {
-        Log::critical("Cannot open FIFF file for update: {}", rawFile.toStdString());
+        Log::critical("Cannot open FIFF file for update: {}", rawFile);
         return 1;
     }
 
@@ -94,6 +85,6 @@ int main(int argc, char* argv[])
     }
     stream->close();
 
-    Log::info("{} skips turned off, {} skips turned on in {}", turnedOff, turnedOn, rawFile.toStdString());
+    Log::info("{} skips turned off, {} skips turned on in {}", turnedOff, turnedOn, rawFile);
     return 0;
 }

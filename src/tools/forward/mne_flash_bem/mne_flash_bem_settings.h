@@ -14,11 +14,10 @@
 #define MNEFLASHBEMSETTINGS_H
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QCommandLineParser>
-#include <QString>
+#include <string>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNEFLASHBEM
@@ -57,7 +56,7 @@ public:
      *
      * @return Subject name string.
      */
-    QString subject() const;
+    std::string subject() const;
 
     //=========================================================================================================
     /**
@@ -65,7 +64,7 @@ public:
      *
      * @return Subjects directory path.
      */
-    QString subjectsDir() const;
+    std::string subjectsDir() const;
 
     //=========================================================================================================
     /**
@@ -73,7 +72,7 @@ public:
      *
      * @return FreeSurfer home path.
      */
-    QString freeSurferHome() const;
+    std::string freeSurferHome() const;
 
     //=========================================================================================================
     /**
@@ -97,7 +96,7 @@ public:
      *
      * @return Unwarp option string, empty if not set.
      */
-    QString unwarp() const;
+    std::string unwarp() const;
 
     //=========================================================================================================
     /**
@@ -106,16 +105,16 @@ public:
      *
      * @return Flash data directory path.
      */
-    QString flashDir() const;
+    std::string flashDir() const;
 
 private:
-    QString m_sSubject;        /**< Subject name. */
-    QString m_sSubjectsDir;    /**< Subjects directory path. */
-    QString m_sFreeSurferHome; /**< FreeSurfer home path. */
-    bool m_bNoConvert;         /**< Skip DICOM conversion. */
-    bool m_bNoFlash30;         /**< No 30-degree flash data. */
-    QString m_sUnwarp;         /**< Gradient unwarp option. */
-    QString m_sFlashDir;       /**< Flash data directory. */
+    std::string m_sSubject;        /**< Subject name. */
+    std::string m_sSubjectsDir;    /**< Subjects directory path. */
+    std::string m_sFreeSurferHome; /**< FreeSurfer home path. */
+    bool m_bNoConvert;             /**< Skip DICOM conversion. */
+    bool m_bNoFlash30;             /**< No 30-degree flash data. */
+    std::string m_sUnwarp;         /**< Gradient unwarp option. */
+    std::string m_sFlashDir;       /**< Flash data directory. */
 };
 
 } // namespace MNEFLASHBEM

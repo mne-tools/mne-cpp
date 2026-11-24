@@ -20,18 +20,9 @@
 #include <mne/fiff/fiff_coord_trans.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_dir_node.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QTextStream>
-#include <QDebug>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -43,7 +34,13 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cmath>
+#include <format>
+#include <fstream>
+#include <limits>
 #include <memory>
+#include <print>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -59,38 +56,43 @@ using namespace Eigen;
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
 //=============================================================================================================
+/**
+ * Qt's asprintf, QString::number and QTextStream round exact decimal ties away from zero where std::format rounds
+ * them to even. Moves a tie at @p decimals to the neighbouring double away from zero, so that std::format writes
+ * the digits Qt wrote.
+ */
+static double sensorQtTie(double value, int decimals)
+{
+    const double scaled = std::ldexp(value, decimals + 1);
+    // A tie at decimals is an odd multiple of 2^-(decimals + 1)
+    if (std::isfinite(scaled) && scaled == std::trunc(scaled) && std::fmod(scaled, 2.0) != 0.0) {
+        return std::nextafter(value, value < 0 ? -std::numeric_limits<double>::infinity() : std::numeric_limits<double>::infinity());
+    }
+    return value;
+}
+
+//=============================================================================================================
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_sensor_locations");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Export sensor locations to text.\n\n"
+                             "Reads channel locations from a measurement FIFF file and writes\n"
+                             "channel_name x y z (one per line) for MEG and EEG channels.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"meas"}, "Measurement FIFF file.", "file", {}});
+    parser.add_option({{"out"}, "Output text file.", "file", {}});
+    parser.add_option({{"frame"}, "Coordinate frame: \"head\" (default) or \"device\".", "frame", "head"});
+    parser.process(argc, argv, "mne_sensor_locations", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Export sensor locations to text.\n\n"
-                                     "Reads channel locations from a measurement FIFF file and writes\n"
-                                     "channel_name x y z (one per line) for MEG and EEG channels.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string measFile = parser.value("meas");
+    const std::string outFile = parser.value("out");
+    const std::string frame = to_lower(parser.value("frame"));
 
-    QCommandLineOption measOpt("meas", "Measurement FIFF file.", "file");
-    parser.addOption(measOpt);
-
-    QCommandLineOption outOpt("out", "Output text file.", "file");
-    parser.addOption(outOpt);
-
-    QCommandLineOption frameOpt("frame", "Coordinate frame: \"head\" (default) or \"device\".", "frame", "head");
-    parser.addOption(frameOpt);
-
-    parser.process(app);
-
-    QString measFile = parser.value(measOpt);
-    QString outFile = parser.value(outOpt);
-    QString frame = parser.value(frameOpt).toLower();
-
-    if (measFile.isEmpty() || outFile.isEmpty()) {
+    if (measFile.empty() || outFile.empty()) {
         Log::critical("Both --meas and --out are required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_sensor_locations"));
+        return 1;
     }
     if (frame != "head" && frame != "device") {
         Log::critical("--frame must be \"head\" or \"device\".");
@@ -98,16 +100,16 @@ int main(int argc, char* argv[])
     }
 
     // Read measurement info
-    FiffStream stream(measFile.toStdU16String());
+    FiffStream stream(path_from_utf8(measFile));
     if (!stream.open()) {
-        Log::critical("Cannot open FIFF file: {}", measFile.toStdString());
+        Log::critical("Cannot open FIFF file: {}", measFile);
         return 1;
     }
 
     FiffInfo info;
     std::shared_ptr<FiffDirNode> infoNode;
     if (!stream.read_meas_info(stream.dirtree(), info, infoNode)) {
-        Log::critical("Cannot read measurement info from: {}", measFile.toStdString());
+        Log::critical("Cannot read measurement info from: {}", measFile);
         return 1;
     }
     stream.close();
@@ -123,12 +125,11 @@ int main(int argc, char* argv[])
     }
 
     // Open output file
-    QFile outputFile(outFile);
-    if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        Log::critical("Cannot open output file: {}", outFile.toStdString());
+    std::ofstream out(path_from_utf8(outFile));
+    if (!out) {
+        Log::critical("Cannot open output file: {}", outFile);
         return 1;
     }
-    QTextStream out(&outputFile);
 
     int nWritten = 0;
     for (int k = 0; k < std::ssize(info.chs); ++k) {
@@ -172,19 +173,12 @@ int main(int argc, char* argv[])
             continue;
         }
 
-        out << qSetFieldWidth(20) << Qt::left << QString::fromStdString(ch.ch_name)
-            << qSetFieldWidth(0) << Qt::right
-            << Qt::fixed << qSetRealNumberPrecision(6)
-            << ' ' << qSetFieldWidth(12) << x
-            << qSetFieldWidth(0) << ' ' << qSetFieldWidth(12) << y
-            << qSetFieldWidth(0) << ' ' << qSetFieldWidth(12) << z
-            << qSetFieldWidth(0) << '\n';
+        out << std::format("{:<20} {:12.6f} {:12.6f} {:12.6f}\n", ch.ch_name, sensorQtTie(x, 6), sensorQtTie(y, 6), sensorQtTie(z, 6));
         ++nWritten;
     }
 
-    out.flush();
-    outputFile.close();
-    Log::info("Wrote {} sensor locations to {} (frame: {})", nWritten, outFile.toStdString(), frame.toStdString());
+    out.close();
+    Log::info("Wrote {} sensor locations to {} (frame: {})", nWritten, outFile, frame);
 
     return 0;
 }

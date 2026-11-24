@@ -17,21 +17,16 @@
 #include <mne/fiff/fiff_stream.h>
 #include <mne/fiff/fiff_tag.h>
 #include <mne/fiff/fiff_dir_entry.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <print>
+#include <string>
 #include <vector>
 
 //=============================================================================================================
@@ -50,38 +45,29 @@ using namespace mne;
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_add_to_meas_info");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Add tags from one FIFF file to the meas_info block of another.");
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"add"}, "FIFF file containing tags to add.", "name", {}});
+    parser.add_option({{"dest"}, "Destination FIFF file to receive additional tags.", "name", {}});
+    parser.process(argc, argv, "mne_add_to_meas_info", PROGRAM_VERSION);
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Add tags from one FIFF file to the meas_info block of another.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    const std::string addName = parser.value("add");
+    const std::string destName = parser.value("dest");
 
-    QCommandLineOption addOpt("add", "FIFF file containing tags to add.", "name");
-    parser.addOption(addOpt);
-
-    QCommandLineOption destOpt("dest", "Destination FIFF file to receive additional tags.", "name");
-    parser.addOption(destOpt);
-
-    parser.process(app);
-
-    QString addName = parser.value(addOpt);
-    QString destName = parser.value(destOpt);
-
-    if (addName.isEmpty() || destName.isEmpty()) {
+    if (addName.empty() || destName.empty()) {
         Log::critical("Both --add and --dest are required.");
-        parser.showHelp(1);
+        std::print("{}", parser.help_text("mne_add_to_meas_info"));
+        return 1;
     }
 
-    Log::info("Source file      : {}", addName.toStdString());
-    Log::info("Destination file : {}", destName.toStdString());
+    Log::info("Source file      : {}", addName);
+    Log::info("Destination file : {}", destName);
 
     // Read all tags from the source file
-    FiffStream addStream(addName.toStdU16String());
+    FiffStream addStream(path_from_utf8(addName));
     if (!addStream.open()) {
-        Log::critical("Cannot open source file: {}", addName.toStdString());
+        Log::critical("Cannot open source file: {}", addName);
         return 1;
     }
 
@@ -108,9 +94,9 @@ int main(int argc, char* argv[])
     }
 
     // Open destination file for update and append tags
-    auto destStream = FiffStream::open_update(destName.toStdU16String());
+    auto destStream = FiffStream::open_update(path_from_utf8(destName));
     if (!destStream) {
-        Log::critical("Cannot open destination file for update: {}", destName.toStdString());
+        Log::critical("Cannot open destination file for update: {}", destName);
         return 1;
     }
 
@@ -123,7 +109,7 @@ int main(int argc, char* argv[])
 
     destStream->close();
 
-    Log::info("{} tags added to {}", nAdded, destName.toStdString());
+    Log::info("{} tags added to {}", nAdded, destName);
     Log::info("done.");
 
     return 0;

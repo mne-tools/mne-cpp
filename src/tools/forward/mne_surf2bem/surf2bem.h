@@ -33,11 +33,11 @@
 #include <mne/mne/mne_bem_surface.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QVector>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNESURF2BEM
@@ -131,7 +131,7 @@ private:
      *
      * @param[in,out] surfs  Vector of BEM surfaces to reorder.
      */
-    void orderSurfaces(QVector<mne::MNEBemSurface>& surfs);
+    void orderSurfaces(std::vector<mne::MNEBemSurface>& surfs);
 
     //=========================================================================================================
 

@@ -16,24 +16,23 @@
 
 #include <mne/mne/mne_forward_solution.h>
 #include <mne/fiff/fiff_stream.h>
+#include <mne/base/command_line.h>
 #include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QFileInfo>
-#include <QTextStream>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <fstream>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -52,46 +51,34 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_average_forward_solutions");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
+    CommandLineParser parser("Average multiple forward solutions.\n\nUse --fwd multiple times or --listfile to specify input files.");
+    parser.add_help_option();
+    parser.add_version_option();
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Average multiple forward solutions.\n\nUse --fwd multiple times or --listfile to specify input files.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_option({{"fwd"}, "Forward solution FIFF file (repeat for each).", "file", ""});
+    parser.add_option({{"weights"}, "Comma-separated weights (default: equal).", "w1,w2,...", ""});
+    parser.add_option({{"listfile"}, "Text file with one fwd filename per line.", "file", ""});
+    parser.add_option({{"out"}, "Output averaged forward solution FIFF file.", "file", ""});
 
-    QCommandLineOption fwdOpt("fwd", "Forward solution FIFF file (repeat for each).", "file");
-    parser.addOption(fwdOpt);
+    parser.process(argc, argv, "mne_average_forward_solutions", PROGRAM_VERSION);
 
-    QCommandLineOption weightsOpt("weights", "Comma-separated weights (default: equal).", "w1,w2,...");
-    parser.addOption(weightsOpt);
-
-    QCommandLineOption listfileOpt("listfile", "Text file with one fwd filename per line.", "file");
-    parser.addOption(listfileOpt);
-
-    QCommandLineOption outOpt("out", "Output averaged forward solution FIFF file.", "file");
-    parser.addOption(outOpt);
-
-    parser.process(app);
-
-    QStringList fwdFiles = parser.values(fwdOpt);
-    QString weightStr = parser.value(weightsOpt);
-    QString listFile = parser.value(listfileOpt);
-    QString outFile = parser.value(outOpt);
+    StringList fwdFiles = parser.is_set("fwd") ? parser.values("fwd") : StringList{};
+    const std::string weightStr = parser.value("weights");
+    const std::string listFile = parser.value("listfile");
+    const std::string outFile = parser.value("out");
 
     // Read files from listfile if specified
-    if (!listFile.isEmpty()) {
-        QFile lf(listFile);
-        if (!lf.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            Log::critical("Cannot open list file: {}", listFile.toStdString());
+    if (!listFile.empty()) {
+        std::ifstream lf(path_from_utf8(listFile));
+        if (!lf) {
+            Log::critical("Cannot open list file: {}", listFile);
             return 1;
         }
-        QTextStream in(&lf);
-        while (!in.atEnd()) {
-            QString line = in.readLine().trimmed();
-            if (!line.isEmpty() && !line.startsWith('#'))
-                fwdFiles.append(line);
+        std::string rawLine;
+        while (std::getline(lf, rawLine)) {
+            const std::string_view line = trimmed(rawLine);
+            if (!line.empty() && !line.starts_with('#'))
+                fwdFiles.emplace_back(line);
         }
     }
 
@@ -99,53 +86,51 @@ int main(int argc, char* argv[])
         Log::critical("At least 2 forward solutions are required.");
         return 1;
     }
-    if (outFile.isEmpty()) {
+    if (outFile.empty()) {
         Log::critical("--out is required.");
         return 1;
     }
 
     // Parse weights
-    QList<double> weights;
-    if (!weightStr.isEmpty()) {
-        QStringList parts = weightStr.split(',');
-        for (const QString& p : parts)
-            weights.append(p.toDouble());
+    std::vector<double> weights;
+    if (!weightStr.empty()) {
+        for (const std::string& p : split(weightStr, ','))
+            weights.push_back(to_double(p).value_or(0.0));
         if (weights.size() != fwdFiles.size()) {
             Log::critical("Number of weights ({}) doesn't match number of files ({})", static_cast<long long>(weights.size()), static_cast<long long>(fwdFiles.size()));
             return 1;
         }
     } else {
         // Equal weights
-        for (int i = 0; i < fwdFiles.size(); ++i)
-            weights.append(1.0);
+        weights.assign(fwdFiles.size(), 1.0);
     }
 
     // Normalize weights
     double wSum = 0;
     for (double w : weights)
         wSum += w;
-    for (int i = 0; i < weights.size(); ++i)
-        weights[i] /= wSum;
+    for (double& w : weights)
+        w /= wSum;
 
     // Load first forward solution as template
     Log::info("Loading {} forward solutions...", static_cast<long long>(fwdFiles.size()));
 
-    auto fwd0Read = MNEForwardSolution::read(fwdFiles[0].toStdU16String());
+    auto fwd0Read = MNEForwardSolution::read(path_from_utf8(fwdFiles[0]));
     if (!fwd0Read) {
         Log::critical("{}", fwd0Read.error().what());
         return 1;
     }
     MNEForwardSolution& fwd0 = *fwd0Read;
-    Log::info("  [1] {}: {} channels x {} sources (weight={:.4f})", fwdFiles[0].toStdString(), static_cast<int>(fwd0.sol.data.rows()), static_cast<int>(fwd0.sol.data.cols()), weights[0]);
+    Log::info("  [1] {}: {} channels x {} sources (weight={:.4f})", fwdFiles[0], static_cast<int>(fwd0.sol.data.rows()), static_cast<int>(fwd0.sol.data.cols()), weights[0]);
 
-    int nChan = fwd0.sol.data.rows();
-    int nSrc = fwd0.sol.data.cols();
+    const auto nChan = static_cast<int>(fwd0.sol.data.rows());
+    const auto nSrc = static_cast<int>(fwd0.sol.data.cols());
 
     // Weighted sum
     MatrixXd avgSol = weights[0] * fwd0.sol.data;
 
-    for (int i = 1; i < fwdFiles.size(); ++i) {
-        auto fwdiRead = MNEForwardSolution::read(fwdFiles[i].toStdU16String());
+    for (std::size_t i = 1; i < fwdFiles.size(); ++i) {
+        auto fwdiRead = MNEForwardSolution::read(path_from_utf8(fwdFiles[i]));
         if (!fwdiRead) {
             Log::critical("{}", fwdiRead.error().what());
             return 1;
@@ -153,11 +138,11 @@ int main(int argc, char* argv[])
         MNEForwardSolution& fwdi = *fwdiRead;
 
         if (fwdi.sol.data.rows() != nChan || fwdi.sol.data.cols() != nSrc) {
-            Log::critical("Forward solution dimension mismatch in {}: {}x{} vs {}x{}", fwdFiles[i].toStdString(), static_cast<int>(fwdi.sol.data.rows()), static_cast<int>(fwdi.sol.data.cols()), nChan, nSrc);
+            Log::critical("Forward solution dimension mismatch in {}: {}x{} vs {}x{}", fwdFiles[i], static_cast<int>(fwdi.sol.data.rows()), static_cast<int>(fwdi.sol.data.cols()), nChan, nSrc);
             return 1;
         }
 
-        Log::info("  [{}] {}: {} channels x {} sources (weight={:.4f})", i + 1, fwdFiles[i].toStdString(), nChan, nSrc, weights[i]);
+        Log::info("  [{}] {}: {} channels x {} sources (weight={:.4f})", i + 1, fwdFiles[i], nChan, nSrc, weights[i]);
 
         avgSol += weights[i] * fwdi.sol.data;
     }
@@ -167,11 +152,11 @@ int main(int argc, char* argv[])
     // Write averaged forward solution
     fwd0.sol.data = avgSol;
 
-    if (auto written = fwd0.write(outFile.toStdU16String()); !written) {
+    if (auto written = fwd0.write(path_from_utf8(outFile)); !written) {
         Log::critical("{}", written.error().what());
         return 1;
     }
 
-    Log::info("Written averaged forward solution to: {}", outFile.toStdString());
+    Log::info("Written averaged forward solution to: {}", outFile);
     return 0;
 }
