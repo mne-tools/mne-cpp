@@ -81,6 +81,9 @@ VectorXd Linalg::combine_xyz(const VectorXd& vec)
 namespace
 {
 
+// Blocks the parallel routines split their work into; independent of the core count, so that results are reproducible
+constexpr Index kBlocks = 8;
+
 // Thin SVD of a matrix with at least as many rows as columns
 Linalg::ThinSvd thin_svd_tall(const MatrixXd& A)
 {
@@ -88,7 +91,8 @@ Linalg::ThinSvd thin_svd_tall(const MatrixXd& A)
     const Index n = A.cols();
     ThreadPool& pool = ThreadPool::global();
     // Each block must hold at least two square factors' worth of rows to pay for the extra reduction
-    const Index blocks = std::min<Index>(static_cast<Index>(pool.thread_count()) + 1, n > 0 ? m / (2 * n) : 1);
+    // A fixed number of blocks, not one per core, so every machine computes the same result
+    const Index blocks = std::min<Index>(kBlocks, n > 0 ? m / (2 * n) : 1);
 
     Linalg::ThinSvd result;
     if (blocks < 2 || m * n < 1000000) {
@@ -160,7 +164,7 @@ MatrixXd Linalg::parallel_product(const MatrixXd& A, const MatrixXd& B)
     // Below a few million multiply-adds the hand-over costs more than it saves
     const Index blocks = A.rows() * A.cols() * B.cols() < 4000000
         ? 1
-        : std::min<Index>(static_cast<Index>(pool.thread_count()) + 1, B.cols());
+        : std::min<Index>(kBlocks, B.cols());
     if (blocks < 2)
         return A * B;
     MatrixXd C(A.rows(), B.cols());

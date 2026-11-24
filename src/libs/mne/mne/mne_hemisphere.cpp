@@ -25,14 +25,16 @@
 
 #include "mne_nearest.h"
 #include <mne/base/log.h>
+#include <mne/base/thread_pool.h>
 #include <mne/math/linalg.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
-#include <memory>
 #include <algorithm>
+#include <cmath>
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -43,6 +45,63 @@ using namespace Eigen;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
+namespace
+{
+
+// Chunks of a loop over n items for ThreadPool::parallel_for; small loops stay on the calling thread
+std::size_t chunk_count(int n)
+{
+    return static_cast<std::size_t>(std::clamp(n / 4096, 1, 64));
+}
+
+// Centroid, normal (unit length if normalize) and area of the first n triangles, in parallel chunks
+void triangle_geometry(const MNESurfaceOrVolume::PointsT& rr,
+                       const MNESurfaceOrVolume::TrianglesT& tris,
+                       int n,
+                       MatrixX3d& cent,
+                       MatrixX3d& nn,
+                       VectorXd& area,
+                       bool normalize)
+{
+    cent = MatrixX3d::Zero(n, 3);
+    nn = MatrixX3d::Zero(n, 3);
+    area = VectorXd::Zero(n);
+    const std::size_t chunks = chunk_count(n);
+    ThreadPool::global().parallel_for(0, chunks, [&](std::size_t chunk) {
+        const int first = static_cast<int>(chunk * static_cast<std::size_t>(n) / chunks);
+        const int last = static_cast<int>((chunk + 1) * static_cast<std::size_t>(n) / chunks);
+        Matrix3d r;
+        Vector3d a, b;
+        for (int i = first; i < last; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                const int k = tris(i, j);
+                r(j, 0) = rr(k, 0);
+                r(j, 1) = rr(k, 1);
+                r(j, 2) = rr(k, 2);
+                cent(i, 0) += rr(k, 0);
+                cent(i, 1) += rr(k, 1);
+                cent(i, 2) += rr(k, 2);
+            }
+            cent.row(i) /= 3.0f;
+
+            // cross((r2 - r1), (r3 - r1))
+            a = (r.row(1) - r.row(0)).transpose();
+            b = (r.row(2) - r.row(0)).transpose();
+            nn(i, 0) = a(1) * b(2) - a(2) * b(1);
+            nn(i, 1) = a(2) * b(0) - a(0) * b(2);
+            nn(i, 2) = a(0) * b(1) - a(1) * b(0);
+
+            float size = nn.row(i) * nn.row(i).transpose();
+            size = std::pow(size, 0.5f);
+            area(i) = size / 2.0f;
+            if (normalize)
+                nn.row(i) /= size;
+        }
+    });
+}
+
+} // namespace
+
 //=============================================================================================================
 
 MNEHemisphere::MNEHemisphere()
@@ -99,6 +158,51 @@ MNEHemisphere::MNEHemisphere(const MNEHemisphere& p_MNEHemisphere)
     this->nearest = p_MNEHemisphere.nearest;
     this->neighbor_tri = p_MNEHemisphere.neighbor_tri;
     this->neighbor_vert = p_MNEHemisphere.neighbor_vert;
+}
+
+//=============================================================================================================
+
+MNEHemisphere::MNEHemisphere(MNEHemisphere&& other) noexcept
+: MNESourceSpace(0)
+{
+    *this = std::move(other);
+}
+
+//=============================================================================================================
+
+MNEHemisphere& MNEHemisphere::operator=(MNEHemisphere&& other) noexcept
+{
+    if (this != &other) {
+        // The fields the copy operations copy
+        this->type = other.type;
+        this->id = other.id;
+        this->np = other.np;
+        this->ntri = other.ntri;
+        this->coord_frame = other.coord_frame;
+        this->rr = std::move(other.rr);
+        this->nn = std::move(other.nn);
+        this->nuse = other.nuse;
+        this->inuse = std::move(other.inuse);
+        this->vertno = std::move(other.vertno);
+        this->itris = std::move(other.itris);
+        this->use_itris = std::move(other.use_itris);
+        this->nuse_tri = other.nuse_tri;
+        this->dist_limit = other.dist_limit;
+        this->dist = std::move(other.dist);
+        this->nearest = std::move(other.nearest);
+        this->neighbor_tri = std::move(other.neighbor_tri);
+        this->neighbor_vert = std::move(other.neighbor_vert);
+        this->pinfo = std::move(other.pinfo);
+        this->patch_inds = std::move(other.patch_inds);
+        this->tri_cent = std::move(other.tri_cent);
+        this->tri_nn = std::move(other.tri_nn);
+        this->tri_area = std::move(other.tri_area);
+        this->use_tri_cent = std::move(other.use_tri_cent);
+        this->use_tri_nn = std::move(other.use_tri_nn);
+        this->use_tri_area = std::move(other.use_tri_area);
+        this->cluster_info = std::move(other.cluster_info);
+    }
+    return *this;
 }
 
 //=============================================================================================================
@@ -165,42 +269,7 @@ bool MNEHemisphere::complete_source_space_info()
     //   Main triangulation
     //
     Log::info("\tCompleting triangulation info...");
-    tri_cent = MatrixX3d::Zero(ntri, 3);
-    tri_nn = MatrixX3d::Zero(ntri, 3);
-    tri_area = VectorXd::Zero(ntri);
-
-    Matrix3d r;
-    Vector3d a, b;
-    int k = 0;
-    float size = 0;
-    for (int i = 0; i < ntri; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            k = itris(i, j);
-
-            r(j, 0) = rr(k, 0);
-            r(j, 1) = rr(k, 1);
-            r(j, 2) = rr(k, 2);
-
-            tri_cent(i, 0) += rr(k, 0);
-            tri_cent(i, 1) += rr(k, 1);
-            tri_cent(i, 2) += rr(k, 2);
-        }
-        tri_cent.row(i) /= 3.0f;
-
-        //cross product {cross((r2-r1),(r3-r1))}
-        a = (r.row(1) - r.row(0)).transpose();
-        b = (r.row(2) - r.row(0)).transpose();
-        tri_nn(i, 0) = a(1) * b(2) - a(2) * b(1);
-        tri_nn(i, 1) = a(2) * b(0) - a(0) * b(2);
-        tri_nn(i, 2) = a(0) * b(1) - a(1) * b(0);
-
-        //area
-        size = tri_nn.row(i) * tri_nn.row(i).transpose();
-        size = std::pow(size, 0.5f);
-
-        tri_area(i) = size / 2.0f;
-        tri_nn.row(i) /= size;
-    }
+    triangle_geometry(rr, itris, ntri, tri_cent, tri_nn, tri_area, true);
     Log::info("[done]\n");
 
     //
@@ -208,37 +277,7 @@ bool MNEHemisphere::complete_source_space_info()
     //
     Log::info("\tCompleting selection triangulation info...");
     if (nuse_tri > 0) {
-        use_tri_cent = MatrixX3d::Zero(nuse_tri, 3);
-        use_tri_nn = MatrixX3d::Zero(nuse_tri, 3);
-        use_tri_area = VectorXd::Zero(nuse_tri);
-
-        for (int i = 0; i < nuse_tri; ++i) {
-            for (int j = 0; j < 3; ++j) {
-                k = use_itris(i, j);
-
-                r(j, 0) = rr(k, 0);
-                r(j, 1) = rr(k, 1);
-                r(j, 2) = rr(k, 2);
-
-                use_tri_cent(i, 0) += rr(k, 0);
-                use_tri_cent(i, 1) += rr(k, 1);
-                use_tri_cent(i, 2) += rr(k, 2);
-            }
-            use_tri_cent.row(i) /= 3.0f;
-
-            //cross product {cross((r2-r1),(r3-r1))}
-            a = r.row(1) - r.row(0);
-            b = r.row(2) - r.row(0);
-            use_tri_nn(i, 0) = a(1) * b(2) - a(2) * b(1);
-            use_tri_nn(i, 1) = a(2) * b(0) - a(0) * b(2);
-            use_tri_nn(i, 2) = a(0) * b(1) - a(1) * b(0);
-
-            //area
-            size = use_tri_nn.row(i) * use_tri_nn.row(i).transpose();
-            size = std::pow(size, 0.5f);
-
-            use_tri_area(i) = size / 2.0f;
-        }
+        triangle_geometry(rr, use_itris, nuse_tri, use_tri_cent, use_tri_nn, use_tri_area, false);
     }
     Log::info("[done]\n");
 
@@ -315,54 +354,42 @@ bool MNEHemisphere::compute_patch_info()
 
 bool MNEHemisphere::add_geometry_info()
 {
-    int k, c, p, q;
-    bool found;
-
-    //Create neighboring triangle vector using temporary std::vector for efficient appending
-    {
-        std::vector<std::vector<int>> temp_ntri(this->itris.rows());
-        for (p = 0; p < this->itris.rows(); p++) {
-            for (k = 0; k < 3; k++) {
-                temp_ntri[this->itris(p, k)].push_back(p);
-            }
-        }
-        neighbor_tri.resize(this->itris.rows());
-        for (k = 0; k < static_cast<int>(temp_ntri.size()); k++) {
-            neighbor_tri[k] = Eigen::Map<Eigen::VectorXi>(temp_ntri[k].data(), temp_ntri[k].size());
+    // The triangles of each vertex in increasing order; like the triangle list, it has ntri entries
+    const auto ntris = static_cast<int>(this->itris.rows());
+    std::vector<int> counts(static_cast<std::size_t>(ntris), 0);
+    for (int t = 0; t < ntris; ++t)
+        for (int corner = 0; corner < 3; ++corner)
+            ++counts[static_cast<std::size_t>(this->itris(t, corner))];
+    neighbor_tri.assign(static_cast<std::size_t>(ntris), Eigen::VectorXi());
+    for (int vertex = 0; vertex < ntris; ++vertex)
+        neighbor_tri[static_cast<std::size_t>(vertex)].resize(counts[static_cast<std::size_t>(vertex)]);
+    std::ranges::fill(counts, 0);
+    for (int t = 0; t < ntris; ++t) {
+        for (int corner = 0; corner < 3; ++corner) {
+            const auto vertex = static_cast<std::size_t>(this->itris(t, corner));
+            neighbor_tri[vertex][counts[vertex]++] = t;
         }
     }
 
-    //Create the neighboring vertices vector using temporary std::vector
-    {
-        std::vector<std::vector<int>> temp_nvert(this->np);
-        for (k = 0; k < this->np; k++) {
-            for (p = 0; p < neighbor_tri[k].size(); p++) {
-                //Fit in the other vertices of the neighboring triangle
-                for (c = 0; c < 3; c++) {
-                    int vert = this->itris(neighbor_tri[k][p], c);
-
-                    if (vert != k) {
-                        found = false;
-
-                        for (q = 0; q < static_cast<int>(temp_nvert[k].size()); q++) {
-                            if (temp_nvert[k][q] == vert) {
-                                found = true;
-                                break;
-                            }
-                        }
-
-                        if (!found) {
-                            temp_nvert[k].push_back(vert);
-                        }
-                    }
+    // The neighboring vertices of each vertex, in the order its triangles name them; vertices are independent
+    neighbor_vert.resize(this->np);
+    const std::size_t chunks = chunk_count(this->np);
+    ThreadPool::global().parallel_for(0, chunks, [&](std::size_t chunk) {
+        const int first = static_cast<int>(chunk * static_cast<std::size_t>(this->np) / chunks);
+        const int last = static_cast<int>((chunk + 1) * static_cast<std::size_t>(this->np) / chunks);
+        std::vector<int> verts;
+        for (int vertex = first; vertex < last; ++vertex) {
+            verts.clear();
+            for (Eigen::Index t = 0; t < neighbor_tri[vertex].size(); ++t) {
+                for (int corner = 0; corner < 3; ++corner) {
+                    const int vert = this->itris(neighbor_tri[vertex][t], corner);
+                    if (vert != vertex && std::find(verts.begin(), verts.end(), vert) == verts.end())
+                        verts.push_back(vert);
                 }
             }
+            neighbor_vert[vertex] = Eigen::Map<Eigen::VectorXi>(verts.data(), static_cast<Eigen::Index>(verts.size()));
         }
-        neighbor_vert.resize(this->np);
-        for (k = 0; k < this->np; k++) {
-            neighbor_vert[k] = Eigen::Map<Eigen::VectorXi>(temp_nvert[k].data(), temp_nvert[k].size());
-        }
-    }
+    });
 
     return true;
 }

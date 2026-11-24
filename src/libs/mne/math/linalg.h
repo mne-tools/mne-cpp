@@ -205,7 +205,8 @@ public:
      * The long dimension is split into blocks that are QR-factorised in parallel (tall-skinny QR); the stacked
      * triangular factors are reduced by a second QR, whose small square factor goes to a divide-and-conquer SVD.
      * Every step is Householder based, so the result is as accurate as a direct divide-and-conquer SVD; only the
-     * signs of singular vector pairs may differ. Nearly square or small matrices use the direct SVD.
+     * signs of singular vector pairs may differ. Nearly square or small matrices use the direct SVD. The number of
+     * blocks does not depend on the number of cores, so every machine computes the same result.
      *
      * @param[in] A   Matrix to decompose.
      *
@@ -217,7 +218,8 @@ public:
 
     //=========================================================================================================
     /**
-     * Matrix product A * B computed on all cores, by splitting B into column blocks.
+     * Matrix product A * B computed on all cores, by splitting B into a fixed number of column blocks, so the
+     * result does not depend on the number of cores.
      *
      * @param[in] A   Left factor.
      * @param[in] B   Right factor; A.cols() must equal B.rows().

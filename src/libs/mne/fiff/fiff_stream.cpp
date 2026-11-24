@@ -1530,8 +1530,9 @@ bool FiffStream::read_named_matrix(const std::shared_ptr<FiffDirNode>& p_Node, f
         Log::warning("Matrix data missing.\n");
         return false;
     } else {
-        mat.data = t_pTag->to_float_matrix().cast<double>();
-        mat.data.transposeInPlace();
+        // FIFF stores matrices row by row; transpose while widening, in one pass
+        const MatrixXf stored = t_pTag->to_float_matrix();
+        mat.data = stored.transpose().cast<double>();
     }
 
     mat.nrow = mat.data.rows();

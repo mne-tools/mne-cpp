@@ -228,6 +228,13 @@ aliases; replace the old spelling as below.
   MEG and EEG, three-layer BEM) takes 3.5 s instead of 19 s and 7 s of CPU
   time instead of 93 s; MNE-Python takes 13 s. With `--accurate`, the coil
   definitions MNE-Python uses, both agree to 2e-5; the benchmark passes it.
+- Reading source spaces computes the triangle geometry and the vertex and
+  triangle neighbours on all cores and moves each hemisphere into place
+  instead of copying it; named matrices are transposed while they are
+  widened, and the inverse operator writes its eigenleads with one copy
+  instead of three. `thin_svd()` and `parallel_product()` split their work
+  into a fixed number of blocks, so the result no longer depends on the
+  number of cores.
 - Comparing two hemispheres (`==`) turned the sparse source-space distance
   matrix into a dense np x np matrix, which for a full cortical surface does
   not fit in memory. It compares the sparse matrices.

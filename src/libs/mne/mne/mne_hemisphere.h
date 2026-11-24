@@ -86,6 +86,16 @@ public:
 
     //=========================================================================================================
     /**
+     * Move constructor: takes over the fields the copy constructor copies.
+     *
+     * @param[in] other   Hemisphere to move from; left valid but unspecified.
+     *
+     * @since 3.0.0
+     */
+    MNEHemisphere(MNEHemisphere&& other) noexcept;
+
+    //=========================================================================================================
+    /**
      * Destroys the hemisphere source space.
      */
     ~MNEHemisphere() override;
@@ -175,6 +185,18 @@ public:
      * @return Reference to this object.
      */
     MNEHemisphere& operator=(const MNEHemisphere& other);
+
+    //=========================================================================================================
+    /**
+     * Move assignment: takes over the fields the copy assignment copies.
+     *
+     * @param[in] other   Hemisphere to move from; left valid but unspecified.
+     *
+     * @return Reference to this object.
+     *
+     * @since 3.0.0
+     */
+    MNEHemisphere& operator=(MNEHemisphere&& other) noexcept;
 
     //ToDo write(IODevice &)
 

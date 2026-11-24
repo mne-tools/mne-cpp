@@ -1059,15 +1059,14 @@ void MNEInverseOperator::write_to_stream(FiffStream& stream) const
     //
     //   The eigenleads and eigenfields
     //
-    if (this->eigen_leads_weighted) {
-        FiffNamedMatrix tmpMatrix(eigen_leads);
-        tmpMatrix.transpose_named_matrix();
-        stream.write_named_matrix(FIFF_MNE_INVERSE_LEADS_WEIGHTED, tmpMatrix);
-    } else {
-        FiffNamedMatrix tmpMatrix(eigen_leads);
-        tmpMatrix.transpose_named_matrix();
-        stream.write_named_matrix(FIFF_MNE_INVERSE_LEADS, tmpMatrix);
-    }
+    // The file stores the eigenleads as rows; transpose them in a single copy
+    FiffNamedMatrix leads;
+    leads.row_names = eigen_leads.col_names;
+    leads.col_names = eigen_leads.row_names;
+    leads.data = eigen_leads.data.transpose();
+    leads.nrow = static_cast<fiff_int_t>(leads.data.rows());
+    leads.ncol = static_cast<fiff_int_t>(leads.data.cols());
+    stream.write_named_matrix(this->eigen_leads_weighted ? FIFF_MNE_INVERSE_LEADS_WEIGHTED : FIFF_MNE_INVERSE_LEADS, leads);
 
     stream.write_named_matrix(FIFF_MNE_INVERSE_FIELDS, eigen_fields);
     Log::info("\t[done]\n");

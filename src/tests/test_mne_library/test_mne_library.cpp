@@ -67,6 +67,7 @@
 #include <mne/mne/mne_msh_picked.h>
 
 #include <mne/fwd/fwd_bem_model.h>
+#include <algorithm>
 #include <cmath>
 #include <numbers>
 
@@ -142,7 +143,9 @@ private slots:
     void sourceSpaces_readWithGeometry();
     void sourceSpaces_filterAndTransform();
     void sourceSpaces_readAddGeom();
+    void sourceSpaces_geometryMatchesDirectComputation();
     void hemisphere_copyComparesEqual();
+    void hemisphere_moveKeepsEverything();
 
     // ── InvSourceEstimate ──
     void sourceEstimate_fullLifecycle();
@@ -469,6 +472,53 @@ void TestMneLibrary::sourceSpaces_readAddGeom()
 
 //=============================================================================================================
 
+void TestMneLibrary::sourceSpaces_geometryMatchesDirectComputation()
+{
+    if (!hasData())
+        QSKIP("No test data");
+
+    MNESourceSpaces srcSpaces(srcPath().toStdU16String());
+    const MNEHemisphere* hemi = srcSpaces.hemisphereAt(0);
+    QVERIFY(hemi != nullptr && hemi->ntri > 0);
+
+    // Triangle by triangle, vertex by vertex, as the geometry was computed before it ran in parallel
+    for (int i = 0; i < hemi->ntri; ++i) {
+        Matrix3d r;
+        Vector3d cent = Vector3d::Zero();
+        for (int j = 0; j < 3; ++j) {
+            const int k = hemi->itris(i, j);
+            r.row(j) = hemi->rr.row(k).cast<double>();
+            cent += hemi->rr.row(k).cast<double>().transpose();
+        }
+        cent /= 3.0f;
+        const Vector3d a = (r.row(1) - r.row(0)).transpose();
+        const Vector3d b = (r.row(2) - r.row(0)).transpose();
+        Vector3d nn(a(1) * b(2) - a(2) * b(1), a(2) * b(0) - a(0) * b(2), a(0) * b(1) - a(1) * b(0));
+        float size = nn.transpose() * nn;
+        size = std::pow(size, 0.5f);
+        QCOMPARE(hemi->tri_area(i), static_cast<double>(size / 2.0f));
+        QVERIFY(hemi->tri_cent.row(i) == cent.transpose());
+        QVERIFY(hemi->tri_nn.row(i) == (nn / size).transpose());
+    }
+    std::vector<std::vector<int>> tris(static_cast<std::size_t>(hemi->ntri));
+    for (int t = 0; t < hemi->ntri; ++t)
+        for (int c = 0; c < 3; ++c)
+            tris[static_cast<std::size_t>(hemi->itris(t, c))].push_back(t);
+    QCOMPARE(hemi->neighbor_tri.size(), tris.size());
+    for (int v = 0; v < hemi->np; ++v) {
+        const auto vertex = static_cast<std::size_t>(v);
+        QVERIFY(std::vector<int>(hemi->neighbor_tri[vertex].begin(), hemi->neighbor_tri[vertex].end()) == tris[vertex]);
+        std::vector<int> verts;
+        for (const int t : tris[vertex])
+            for (int c = 0; c < 3; ++c)
+                if (const int w = hemi->itris(t, c); w != v && std::ranges::find(verts, w) == verts.end())
+                    verts.push_back(w);
+        QVERIFY(std::vector<int>(hemi->neighbor_vert[vertex].begin(), hemi->neighbor_vert[vertex].end()) == verts);
+    }
+}
+
+//=============================================================================================================
+
 void TestMneLibrary::hemisphere_copyComparesEqual()
 {
     if (!hasData())
@@ -480,6 +530,24 @@ void TestMneLibrary::hemisphere_copyComparesEqual()
     QVERIFY(original.dist.eigen().rows() == original.np);
     const MNEHemisphere copy(original);
     QVERIFY(copy == original);
+}
+
+//=============================================================================================================
+
+void TestMneLibrary::hemisphere_moveKeepsEverything()
+{
+    if (!hasData())
+        QSKIP("No test data");
+
+    MNESourceSpaces srcSpaces(srcPath().toStdU16String());
+    const MNEHemisphere original(*srcSpaces.hemisphereAt(0));
+    MNEHemisphere source(original);
+    const MNEHemisphere moved(std::move(source));
+    QVERIFY(moved == original);
+    MNEHemisphere assigned;
+    MNEHemisphere again(original);
+    assigned = std::move(again);
+    QVERIFY(assigned == original);
 }
 
 //=============================================================================================================
