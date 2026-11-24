@@ -9,7 +9,8 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Ruben Doerfel <doerfelruben@aol.com>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     August 2016
  * @brief    Implementation of @ref mne::MNEProjectToSurface.

@@ -8,7 +8,8 @@
  *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Andreas Griesshammer <ag@fieldlineinc.com>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Implementation of @ref FiffChInfo: read / write of the FIFF_CH_INFO record and the conversion helpers used by the channel-picking path.

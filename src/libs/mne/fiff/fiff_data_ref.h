@@ -4,7 +4,8 @@
  * Copyright (c) 2026 MNE-CPP Authors
  *
  * @file     fiff_data_ref.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    2.0.0
  * @date     February 2026
  * @brief    External-data reference record describing type, endianness, size and offset of an out-of-file FIFF payload.

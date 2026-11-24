@@ -10,7 +10,8 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Ruben Doerfel <doerfelruben@aol.com>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     August 2012
  * @brief    4x4 affine FIFF coordinate transform (FIFF_COORD_TRANS) annotated with source/destination coordinate-frame IDs.

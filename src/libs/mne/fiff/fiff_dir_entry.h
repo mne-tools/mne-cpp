@@ -8,7 +8,8 @@
  *           Christof Pieloth <pieloth@labp.htwk-leipzig.de>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     September 2012
  * @brief    Single entry of the FIFF tag directory: kind, type, byte size and absolute file position.

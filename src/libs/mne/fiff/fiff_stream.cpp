@@ -12,7 +12,8 @@
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Ruben Doerfel <doerfelruben@aol.com>;
- *           Andreas Griesshammer <ag@fieldlineinc.com>
+ *           Andreas Griesshammer <ag@fieldlineinc.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Implementation of @ref FiffStream: FIFF tag I/O, directory and block-tree construction, and the typed read_* / write_* methods.

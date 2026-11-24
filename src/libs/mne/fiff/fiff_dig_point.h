@@ -11,7 +11,8 @@
  *           doerfelruben@aol.com <rdorfel@mgh.harvard.edu>;
  *           Ruben Doerfel <doerfelruben@aol.com>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Single digitization point (FIFF_DIG_POINT) with kind (cardinal/HPI/EEG/extra), identifier and 3D coordinates.

@@ -9,7 +9,8 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Andreas Griesshammer <ag@fieldlineinc.com>
+ *           Andreas Griesshammer <ag@fieldlineinc.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Pre-computed inverse operator (whitened SVD of the forward model) for MNE/dSPM/sLORETA.

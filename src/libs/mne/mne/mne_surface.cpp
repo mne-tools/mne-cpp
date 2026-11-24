@@ -7,7 +7,8 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Christof Pieloth <pieloth@labp.htwk-leipzig.de>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     August 2013
  * @brief    Implementation of @ref mne::MNESurface.

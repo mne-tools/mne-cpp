@@ -6,7 +6,8 @@
  * @file     fiff_ch_pos.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Implementation of @ref FiffChPos: streaming of the coil-frame origin and (ex, ey, ez) orientation triad sub-record.

@@ -8,7 +8,8 @@
  *           Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Ruben Doerfel <doerfelruben@aol.com>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Implementation of @ref FiffCoordTrans: 4x4 FIFF affine I/O, composition, inversion and (from, to) frame lookup.

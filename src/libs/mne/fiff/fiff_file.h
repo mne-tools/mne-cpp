@@ -8,7 +8,8 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Ruben Doerfel <doerfelruben@aol.com>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     September 2012
  * @brief    FIFF tag-kind, block-kind and type-code numerical definitions, authoritative for mne_fiff.

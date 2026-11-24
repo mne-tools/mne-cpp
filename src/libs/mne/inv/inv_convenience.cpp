@@ -4,7 +4,8 @@
  * Copyright (c) 2026 MNE-CPP Authors
  *
  * @file     inv_convenience.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    2.2.1
  * @date     May 2026
  * @brief    Implementation of the apply-inverse / compute-PSD convenience helpers declared in @c inv_convenience.h.

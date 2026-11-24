@@ -9,7 +9,8 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Ruben Doerfel <doerfelruben@aol.com>;
- *           Andreas Griesshammer <ag@fieldlineinc.com>
+ *           Andreas Griesshammer <ag@fieldlineinc.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     June 2015
  * @brief    Implementation of @ref mne::MNEBem.

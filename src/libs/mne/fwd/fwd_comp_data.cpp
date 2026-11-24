@@ -7,7 +7,8 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Johannes Behrens <behrens@neoscan-solutions.com>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     March 2017
  * @brief    FwdCompData implementation — wraps a base field/grad function pair, evaluates it on both primary and reference coils, and emits the CTF/4D software-gradiometer compensated result.

@@ -6,7 +6,8 @@
  * @file     fwd_thread_arg.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     March 2017
  * @brief    FwdThreadArg implementation — trivial allocation/cleanup of the per-thread work packet (dipole range, coil set, callback pointers, output view) dispatched by the parallel source-space loop.

@@ -8,7 +8,8 @@
  *           Florian Schlembach <fschlembach@web.de>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Ruben Doerfel <doerfelruben@aol.com>
+ *           Ruben Doerfel <doerfelruben@aol.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Implementation of @ref FiffRawData: continuous-recording representation backed by a directory of FIFF_DATA_BUFFER tags.

@@ -8,7 +8,8 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           sheinke <simon.j.w.heinke@gmail.com>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     June 2015
  * @brief    Implementation of @ref mne::MNEBemSurface.

@@ -9,7 +9,8 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Ruben Doerfel <doerfelruben@aol.com>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     March 2017
  * @brief    BEM model implementation — FIFF I/O for layered surfaces and pre-inverted potential-solution matrices, IP-approach setup, and the dipole-field/potential evaluators that drive the BEM forward solver.

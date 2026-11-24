@@ -9,7 +9,8 @@
  *           sheinke <simon.j.w.heinke@gmail.com>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     June 2015
  * @brief    Single closed BEM surface (triangulation, normals, conductivity).

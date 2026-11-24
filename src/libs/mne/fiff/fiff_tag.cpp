@@ -7,7 +7,8 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Florian Schlembach <fschlembach@web.de>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Implementation of @ref FiffTag: the 16-byte FIFF tag header plus payload, with typed decoders for every FIFFT_* type.
