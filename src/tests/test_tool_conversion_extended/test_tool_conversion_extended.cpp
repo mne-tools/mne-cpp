@@ -67,6 +67,9 @@
 //=============================================================================================================
 
 #include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <fstream>
 #include <numbers>
 #include <sstream>
@@ -106,6 +109,7 @@ private slots:
     void testCtfChannelMappingAndData();
     void testKitHeaderLayoutTransformAndData();
     void testWriteCorDescription();
+    void testReadMghFloatAndMgz();
     void testParseLspMatrix();
     void testParseCtfMarkers();
 
@@ -229,6 +233,76 @@ void TestToolConversionExtended::testKitHeaderLayoutTransformAndData()
     QCOMPARE(data(0, 2), 10.0);
     QCOMPARE(data(1, 2), 3.0);
 }
+
+namespace
+{
+
+// A 2 x 2 x 1 mgh volume of 4-byte big-endian floats
+std::vector<std::byte> floatMgh(const std::vector<float>& voxels)
+{
+    std::vector<std::byte> bytes(284 + 4 * voxels.size());
+    std::size_t pos = 0;
+    const auto put = [&bytes, &pos](auto value) {
+        value = mne::to_big_endian(value);
+        std::memcpy(bytes.data() + pos, &value, sizeof(value));
+        pos += sizeof(value);
+    };
+    for (const std::int32_t field : {1, 2, 2, 1, 1, 3}) // version, width, height, depth, frames, MRI_FLOAT
+        put(field);
+    pos = 284;
+    for (const float voxel : voxels)
+        put(voxel);
+    return bytes;
+}
+
+// The bytes as a gzip member with one stored (uncompressed) deflate block
+std::vector<std::byte> gzipStored(const std::vector<std::byte>& data)
+{
+    std::uint32_t crc = 0xffffffffu;
+    for (const std::byte b : data) {
+        crc ^= static_cast<std::uint32_t>(b);
+        for (int bit = 0; bit < 8; ++bit)
+            crc = (crc >> 1) ^ (0xedb88320u & (0u - (crc & 1u)));
+    }
+    crc = ~crc;
+    const auto size = static_cast<std::uint16_t>(data.size());
+    std::vector<std::byte> gz = {std::byte{0x1f}, std::byte{0x8b}, std::byte{8}, std::byte{0}, std::byte{0},
+                                 std::byte{0}, std::byte{0}, std::byte{0}, std::byte{0}, std::byte{255},
+                                 std::byte{1},
+                                 std::byte(size & 0xff), std::byte(size >> 8),
+                                 std::byte(~size & 0xff), std::byte((~size >> 8) & 0xff)};
+    gz.insert(gz.end(), data.begin(), data.end());
+    for (const std::uint32_t word : {crc, static_cast<std::uint32_t>(data.size())})
+        for (int shift = 0; shift < 32; shift += 8)
+            gz.push_back(std::byte((word >> shift) & 0xff));
+    return gz;
+}
+
+} // namespace
+
+//=============================================================================================================
+
+void TestToolConversionExtended::testReadMghFloatAndMgz()
+{
+    const std::vector<std::byte> mgh = floatMgh({0.0f, 100.0f, 254.0f, 400.0f});
+    const QString mghPath = m_tempDir.filePath("float.mgh");
+    const QString mgzPath = m_tempDir.filePath("float.mgz");
+    QVERIFY(mne::write_file_bytes(mghPath.toStdString(), mgh).has_value());
+    QVERIFY(mne::write_file_bytes(mgzPath.toStdString(), gzipStored(mgh)).has_value());
+
+    const std::vector<unsigned char> expected = {0, 100, 254, 255};
+    for (const QString& path : {mghPath, mgzPath}) {
+        std::vector<std::vector<unsigned char>> slices;
+        int width = 0, height = 0, nslice = 0;
+        QVERIFY2(readMghVolume(path.toStdString(), slices, width, height, nslice), qPrintable(path));
+        QCOMPARE(width, 2);
+        QCOMPARE(height, 2);
+        QCOMPARE(nslice, 1);
+        QVERIFY(slices.size() == 1 && slices[0] == expected);
+    }
+}
+
+//=============================================================================================================
 
 void TestToolConversionExtended::testWriteCorDescription()
 {

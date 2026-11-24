@@ -252,6 +252,9 @@ aliases; replace the old spelling as below.
 - A default-constructed `FiffInfo` left `proj_id` and the microseconds of
   `meas_date` uninitialised, so the raw files the converters write differed
   from run to run in `FIFF_PROJ_ID`. They start as -1 and 0.
+- `mne_make_cor_set` read float (`MRI_FLOAT`) mgh voxels as 8-byte doubles
+  and could not read gzipped `.mgz` volumes; it reads 4-byte floats and
+  decompresses `.mgz`.
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and

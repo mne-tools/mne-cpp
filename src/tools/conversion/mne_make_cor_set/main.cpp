@@ -17,6 +17,7 @@
 
 #include <mne/fiff/fiff.h>
 #include <mne/fiff/fiff_file.h>
+#include <mne/base/byte_stream.h>
 #include <mne/base/command_line.h>
 #include <mne/base/endian.h>
 #include <mne/base/log.h>
@@ -212,6 +213,84 @@ static bool writeMriDescription(const std::string& filename,
 
 //=============================================================================================================
 
+/**
+ * Reads a FreeSurfer mgh volume, or an mgz one (gzip-compressed mgh), into 8-bit slices; values outside [0, 255]
+ * are clipped.
+ *
+ * @param[in] mghFile    The .mgh, .mgz or .mgh.gz file.
+ * @param[out] slices    One vector of width * height bytes per slice.
+ * @param[out] width     Voxels per row.
+ * @param[out] height    Rows per slice.
+ * @param[out] nslice    Slices.
+ *
+ * @return false if the file cannot be read or has an unsupported version or voxel type.
+ */
+static bool readMghVolume(const std::string& mghFile,
+                          std::vector<std::vector<unsigned char>>& slices,
+                          int& width,
+                          int& height,
+                          int& nslice)
+{
+    const bool isGz = mghFile.ends_with(".mgz") || mghFile.ends_with(".mgh.gz");
+    const auto bytes = mne::read_file_bytes(mne::path_from_utf8(mghFile),
+                                            isGz ? mne::Compression::Gzip : mne::Compression::None);
+    if (!bytes) {
+        Log::critical("Cannot read mgh file {}: {}", mghFile, bytes.error().what());
+        return false;
+    }
+    const std::vector<char> data(reinterpret_cast<const char*>(bytes->data()),
+                                 reinterpret_cast<const char*>(bytes->data()) + bytes->size());
+
+    // Parse MGH header (big-endian)
+    CorBigEndianCursor in(data);
+
+    const std::int32_t version = in.read<std::int32_t>();
+    const std::int32_t w = in.read<std::int32_t>();
+    const std::int32_t h = in.read<std::int32_t>();
+    const std::int32_t d = in.read<std::int32_t>();
+    [[maybe_unused]] const std::int32_t nframes = in.read<std::int32_t>();
+    const std::int32_t type = in.read<std::int32_t>();
+
+    if (version != 1) {
+        Log::info("Unsupported MGH version: {}", version);
+        return false;
+    }
+
+    width = w;
+    height = h;
+    nslice = d;
+
+    // Skip rest of header (284 bytes total - 24 already read)
+    in.skip(284 - 24);
+
+    Log::info("Read MGH: {}x{}x{}, type={}", width, height, nslice, type);
+
+    slices.assign(static_cast<std::size_t>(nslice), {});
+    const int sliceSize = width * height;
+
+    for (auto& slice : slices) {
+        slice.resize(static_cast<std::size_t>(sliceSize));
+        if (type == 0) { // MRI_UCHAR
+            in.readRaw(reinterpret_cast<char*>(slice.data()), static_cast<std::size_t>(sliceSize));
+        } else if (type == 1) { // MRI_INT
+            for (auto& voxel : slice)
+                voxel = static_cast<unsigned char>(corBound(0, in.read<std::int32_t>(), 255));
+        } else if (type == 3) { // MRI_FLOAT: 4-byte floats
+            for (auto& voxel : slice)
+                voxel = static_cast<unsigned char>(corBound(0.0f, in.read<float>(), 255.0f));
+        } else if (type == 4) { // MRI_SHORT
+            for (auto& voxel : slice)
+                voxel = static_cast<unsigned char>(corBound(0, static_cast<int>(in.read<std::int16_t>()), 255));
+        } else {
+            Log::info("Unsupported MGH data type: {}", type);
+            return false;
+        }
+    }
+    return true;
+}
+
+//=============================================================================================================
+
 int main(int argc, char* argv[])
 {
     CommandLineParser parser("Create MRI description FIFF from FreeSurfer COR or mgh/mgz data.");
@@ -242,76 +321,8 @@ int main(int argc, char* argv[])
         if (!readCorDirectory(corDir, slices))
             return 1;
     } else if (!mghFile.empty()) {
-        // Read mgh/mgz file
-        std::ifstream file(mne::path_from_utf8(mghFile), std::ios::binary);
-        bool isGz = mghFile.ends_with(".mgz") || mghFile.ends_with(".mgh.gz");
-
-        if (!file) {
-            Log::critical("Cannot open mgh file: {}", mghFile);
+        if (!readMghVolume(mghFile, slices, width, height, nslice))
             return 1;
-        }
-
-        const std::vector<char> data((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-        file.close();
-
-        // The tool only ever decompressed zlib streams with a Qt length prefix, which gzipped mgz files are not
-        if (isGz) {
-            Log::critical("Failed to decompress mgz file. Try using an uncompressed .mgh file.");
-            return 1;
-        }
-
-        // Parse MGH header (big-endian)
-        CorBigEndianCursor in(data);
-
-        const std::int32_t version = in.read<std::int32_t>();
-        const std::int32_t w = in.read<std::int32_t>();
-        const std::int32_t h = in.read<std::int32_t>();
-        const std::int32_t d = in.read<std::int32_t>();
-        [[maybe_unused]] const std::int32_t nframes = in.read<std::int32_t>();
-        const std::int32_t type = in.read<std::int32_t>();
-
-        if (version != 1) {
-            Log::info("Unsupported MGH version: {}", version);
-            return 1;
-        }
-
-        width = w;
-        height = h;
-        nslice = d;
-
-        // Skip rest of header (284 bytes total - 24 already read)
-        in.skip(284 - 24);
-
-        Log::info("Read MGH: {}x{}x{}, type={}", width, height, nslice, type);
-
-        slices.resize(nslice);
-        int sliceSize = width * height;
-
-        for (int k = 0; k < nslice; k++) {
-            slices[k].resize(sliceSize);
-            if (type == 0) { // MRI_UCHAR
-                in.readRaw(reinterpret_cast<char*>(slices[k].data()), static_cast<std::size_t>(sliceSize));
-            } else if (type == 1) { // MRI_INT
-                for (int j = 0; j < sliceSize; j++) {
-                    const std::int32_t val = in.read<std::int32_t>();
-                    slices[k][j] = static_cast<unsigned char>(corBound(0, val, 255));
-                }
-            } else if (type == 3) { // MRI_FLOAT
-                for (int j = 0; j < sliceSize; j++) {
-                    // Read as 8-byte doubles, as the tool always has
-                    const float val = static_cast<float>(in.read<double>());
-                    slices[k][j] = static_cast<unsigned char>(corBound(0.0f, val, 255.0f));
-                }
-            } else if (type == 4) { // MRI_SHORT
-                for (int j = 0; j < sliceSize; j++) {
-                    const std::int16_t val = in.read<std::int16_t>();
-                    slices[k][j] = static_cast<unsigned char>(corBound(0, static_cast<int>(val), 255));
-                }
-            } else {
-                Log::info("Unsupported MGH data type: {}", type);
-                return 1;
-            }
-        }
     }
 
     return writeMriDescription(outFile, slices, width, height, nslice) ? 0 : 1;
