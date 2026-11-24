@@ -52,6 +52,7 @@ set(SOURCES
   base_global.cpp
   byte_stream.cpp
   cbor.cpp
+  command_line.cpp
   json.cpp
   json_stream_parser.cpp
   xml.cpp
@@ -69,6 +70,7 @@ set(HEADERS
   error.h
   circular_buffer.h
   cbor.h
+  command_line.h
   json.h
   json_stream_parser.h
   xml.h

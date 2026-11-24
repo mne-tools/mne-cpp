@@ -18,25 +18,14 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <mne/base/command_line.h>
+#include <mne/base/json.h>
 #include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 #include <mne/acq/acq.h>
 #if defined(MNE_ACQ_BENCH_RECORDING) // the standalone A/B build has no FIFF bridge
 #include <mne/acq/fiff/acq_recorder.h>
-
-#include <QTemporaryDir>
 #endif
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCommandLineParser>
-#include <QCoreApplication>
-#include <QFile>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QTextStream>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -49,9 +38,14 @@
 #include <chrono>
 #include <complex>
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
+#include <print>
 #include <ctime>
+#include <filesystem>
+#include <fstream>
 #include <optional>
+#include <random>
 #include <string>
 #include <thread>
 #include <vector>
@@ -467,9 +461,48 @@ struct RecordResult
  * sample at the full rate; unpaced runs push @p bytes as fast as the ring allows, so they show that the recorder's
  * reader never slows the producer and how fast the recorder writes.
  */
+/** A new directory in the system's temporary directory, removed with everything in it at the end of the scope. */
+class TemporaryDir
+{
+public:
+    TemporaryDir()
+    {
+        std::random_device random;
+        std::error_code error;
+        const std::filesystem::path base = std::filesystem::temp_directory_path(error);
+        for (int attempt = 0; !error && attempt < 16; ++attempt) {
+            const std::filesystem::path candidate = base / ("mne_acq_bench_" + std::to_string(random()));
+            if (std::filesystem::create_directory(candidate, error)) {
+                m_path = candidate;
+                return;
+            }
+        }
+    }
+    ~TemporaryDir()
+    {
+        std::error_code error;
+        if (!m_path.empty())
+            std::filesystem::remove_all(m_path, error);
+    }
+    TemporaryDir(const TemporaryDir&) = delete;
+    TemporaryDir& operator=(const TemporaryDir&) = delete;
+
+    bool isValid() const
+    {
+        return !m_path.empty();
+    }
+    std::filesystem::path filePath(const std::string& name) const
+    {
+        return m_path / name;
+    }
+
+private:
+    std::filesystem::path m_path;
+};
+
 RecordResult recordRun(std::size_t channels, AcqSampleFormat format, double rate, std::uint64_t bytes)
 {
-    QTemporaryDir dir;
+    TemporaryDir dir;
     AcqStreamInfo info = streamInfo(channels, format);
     for (AcqChannelInfo& ch : info.channels) {
         ch.offset = 0.0; // native samples, no physical conversion
@@ -484,7 +517,7 @@ RecordResult recordRun(std::size_t channels, AcqSampleFormat format, double rate
     }
     AcqRecorderOptions options;
     options.bufferSamples = rate > 0.0 ? static_cast<std::size_t>(rate / 4.0) : 16 * block;
-    auto recorder = AcqRecorder::start(writer->stream(), dir.filePath("bench_raw.fif").toStdString(), options);
+    auto recorder = AcqRecorder::start(writer->stream(), utf8_from_path(dir.filePath("bench_raw.fif")), options);
     if (!recorder) {
         return {};
     }
@@ -706,27 +739,27 @@ std::vector<Metric> run(const Settings& s)
     return metrics;
 }
 
-bool writeJson(const QString& path, const std::vector<Metric>& metrics, const Settings& s)
+bool writeJson(const std::string& path, const std::vector<Metric>& metrics, const Settings& s)
 {
-    QJsonArray list;
+    JsonArray list;
     for (const Metric& m : metrics) {
-        list.append(QJsonObject{{"name", QString::fromStdString(m.name)},
-                                {"value", m.value},
-                                {"unit", QString::fromLatin1(m.unit)},
-                                {"better", m.higherIsBetter ? "higher" : "lower"},
-                                {"target", m.target}});
+        list.append(JsonObject{{"name", m.name},
+                               {"value", m.value},
+                               {"unit", m.unit},
+                               {"better", m.higherIsBetter ? "higher" : "lower"},
+                               {"target", m.target}});
     }
-    const QJsonObject report{{"tool", "mne_acq_bench"},
-                             {"version", MNE_CPP_VERSION},
-                             {"build", acq_build_hash()},
-                             {"quick", s.quick},
-                             {"repeats", s.repeats},
-                             {"paced_seconds", s.pacedSeconds},
-                             {"threads", static_cast<int>(std::thread::hardware_concurrency())},
-                             {"metrics", list}};
-    QFile file(path);
-    return file.open(QIODevice::WriteOnly | QIODevice::Truncate) &&
-        file.write(QJsonDocument(report).toJson()) > 0;
+    const JsonObject report{{"tool", "mne_acq_bench"},
+                            {"version", MNE_CPP_VERSION},
+                            {"build", acq_build_hash()},
+                            {"quick", s.quick},
+                            {"repeats", s.repeats},
+                            {"paced_seconds", s.pacedSeconds},
+                            {"threads", static_cast<int>(std::thread::hardware_concurrency())},
+                            {"metrics", list}};
+    std::ofstream file(path_from_utf8(path), std::ios::binary | std::ios::trunc);
+    file << JsonDocument(report).to_json();
+    return static_cast<bool>(file.flush());
 }
 } // namespace
 
@@ -736,12 +769,7 @@ bool writeJson(const QString& path, const std::vector<Metric>& metrics, const Se
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_acq_bench");
-    QCoreApplication::setApplicationVersion(MNE_CPP_VERSION);
-
-    QCommandLineParser parser;
-    parser.setApplicationDescription(
+    CommandLineParser parser(
         "Performance suite of the MNE-CPP acquisition library: per-call cost of the stream protocol, commit-to-wake "
         "latency (spinning, blocking and output readers), verified throughput over a channel sweep, with ring knobs, "
         "a DMA card, an output stream and 1,000 channels with a recorder and a display, paced runs from 1 kHz to "
@@ -749,53 +777,51 @@ int main(int argc, char* argv[])
         "decode/encode converters. Where threads can be pinned, the "
         "spinning wake-up and the 1,000-channel stream are repeated with producer and consumer pinned to two CPUs of "
         "the ring's NUMA node. Every value is the best of --repeats runs.");
-    parser.addHelpOption();
-    parser.addVersionOption();
-    const QCommandLineOption quickOpt("quick", "Short runs (about 10 s), for CI regression checks.");
-    const QCommandLineOption repeatsOpt("repeats", "Runs per measurement (default 3).", "n", "3");
-    const QCommandLineOption jsonOpt("json", "Also write the results as JSON.", "file");
-    const QCommandLineOption pacedOpt("paced-seconds",
-                                      "Duration of each paced run, e.g. 600 for a soak test "
-                                      "(default 10, or 2 with --quick).",
-                                      "s");
-    parser.addOptions({quickOpt, repeatsOpt, jsonOpt, pacedOpt});
-    parser.process(app);
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_option({{"quick"}, "Short runs (about 10 s), for CI regression checks.", {}, {}});
+    parser.add_option({{"repeats"}, "Runs per measurement.", "n", "3"});
+    parser.add_option({{"json"}, "Also write the results as JSON.", "file", {}});
+    parser.add_option({{"paced-seconds"},
+                       "Duration of each paced run, e.g. 600 for a soak test (default 10, or 2 with --quick).",
+                       "s",
+                       {}});
+    parser.process(argc, argv, "mne_acq_bench", MNE_CPP_VERSION);
 
     Settings settings;
-    settings.quick = parser.isSet(quickOpt);
-    bool ok = false;
-    settings.repeats = parser.value(repeatsOpt).toInt(&ok);
-    if (!ok || settings.repeats < 1) {
-        Log::critical("--repeats needs a positive integer, got '{}'", parser.value(repeatsOpt).toStdString());
+    settings.quick = parser.is_set("quick");
+    const std::optional<int> repeats = to_int(parser.value("repeats"));
+    if (!repeats || *repeats < 1) {
+        Log::critical("--repeats needs a positive integer, got '{}'", parser.value("repeats"));
         return 1;
     }
-    if (parser.isSet(pacedOpt)) {
-        settings.pacedSeconds = parser.value(pacedOpt).toDouble(&ok);
-        if (!ok || settings.pacedSeconds <= 0.0) {
-            Log::critical("--paced-seconds needs a positive number, got '{}'", parser.value(pacedOpt).toStdString());
+    settings.repeats = *repeats;
+    if (parser.is_set("paced-seconds")) {
+        const std::optional<double> seconds = to_double(parser.value("paced-seconds"));
+        if (!seconds || *seconds <= 0.0) {
+            Log::critical("--paced-seconds needs a positive number, got '{}'", parser.value("paced-seconds"));
             return 1;
         }
+        settings.pacedSeconds = *seconds;
     }
 
-    QTextStream out(stdout);
-    out << "mne_acq_bench " << MNE_CPP_VERSION << " (mne_acq " << acq_build_hash() << "), "
-        << std::thread::hardware_concurrency() << " hardware threads\n";
-    out.flush();
+    std::println("mne_acq_bench {} (mne_acq {}), {} hardware threads", MNE_CPP_VERSION, acq_build_hash(),
+                 std::thread::hardware_concurrency());
+    std::fflush(stdout);
     const std::vector<Metric> metrics = run(settings);
     bool lost = false;
     for (const Metric& m : metrics) {
-        out << "  " << QString::fromStdString(m.name).leftJustified(38) << QString::number(m.value, 'g', 4).rightJustified(12)
-            << ' ' << QString::fromLatin1(m.unit).leftJustified(12);
+        std::print("  {:<38} {:>12.4g} {:<12}", m.name, m.value, m.unit);
         if (m.target > 0.0) {
             const bool met = m.value >= 0.0 && (m.higherIsBetter ? m.value >= m.target : m.value <= m.target);
-            out << (m.higherIsBetter ? " target >= " : " target <= ") << m.target << (met ? "  met" : "  MISSED");
+            std::print("{}{}{}", m.higherIsBetter ? " target >= " : " target <= ", m.target, met ? "  met" : "  MISSED");
         }
-        out << '\n';
+        std::println("");
         lost |= m.value < 0.0;
     }
-    out.flush();
-    if (parser.isSet(jsonOpt) && !writeJson(parser.value(jsonOpt), metrics, settings)) {
-        Log::critical("Cannot write {}", parser.value(jsonOpt).toStdString());
+    std::fflush(stdout);
+    if (parser.is_set("json") && !writeJson(parser.value("json"), metrics, settings)) {
+        Log::critical("Cannot write {}", parser.value("json"));
         return 1;
     }
     if (lost) {

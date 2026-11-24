@@ -66,6 +66,7 @@ aliases; replace the old spelling as below.
 | `T::UPtr` | `std::unique_ptr<T>` |
 | `ptr.data()`, `ptr.isNull()`, `ptr.clear()` | `ptr.get()`, `!ptr`, `ptr.reset()` |
 | `QJsonDocument`, `QJsonObject`, `QJsonArray`, `QJsonValue`, `QJsonParseError` | `BASELIB::JsonDocument`, `JsonObject`, `JsonArray`, `JsonValue`, `JsonParseError` in `base/json.h`, with snake_case methods (`from_json()`, `to_json()`, `to_int()`, `is_undefined()`, ...); incremental NDJSON / SAX parsing with `BASELIB::JsonStreamParser` in `base/json_stream_parser.h` |
+| `QCommandLineParser`, `QCommandLineOption` | `mne::CommandLineParser`, `CommandLineOption` in `base/command_line.h` (`add_option()`, `process()`, `is_set()`, `value()`, `positional_arguments()`) |
 | `qInstallMessageHandler(MNELogger::customLogWriter)` | nothing: programs log through `mne::Log` (`qDebug()` / `qWarning()` → `mne::Log::debug()` / `warning()`); a log window installs `mne::Log::set_sink()` |
 | `MNELogger::setLogFile(QString)`, `logFile()` | `BASELIB::Log::set_file(path)`, `Log::file()` |
 | `utils/generics/mne_logger.h`, `utils/generics/log.h` | `base/log.h` |
@@ -204,6 +205,10 @@ aliases; replace the old spelling as below.
   The forward comparison runs MNE-Python both serially and with one job per
   core. On every push to staging, CI measures the acquisition suite and keeps
   results and charts as the `benchmarks` artifact.
+- `mne::CommandLineParser` (`base/command_line.h`) parses a tool's options
+  in standard C++ and agrees with `QCommandLineParser` on the forms the tools
+  use. `mne_acq_bench` uses it and no longer needs Qt, so the benchmark job
+  builds without downloading Qt.
 - The inverse operator's decomposition of the whitened lead field uses Eigen's
   divide-and-conquer SVD, as MNE-Python uses LAPACK's: about 2.5 times less
   CPU time for the MNE sample data, with the same source estimates to single

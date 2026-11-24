@@ -307,25 +307,13 @@ jobs:
         echo "CC=gcc-14" >> "$GITHUB_ENV"
         echo "CXX=g++-14" >> "$GITHUB_ENV"
 
-    - name: Load external dependency versions
-      run: ./scripts/ci/load_external_deps.sh max
-
-    - name: Download Qt toolchain
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        ./scripts/ci/download_toolchain.sh --kind qt --version "$QT_BUILD_VERSION" --linkage dynamic \
-          --output-dir "$RUNNER_TEMP/qt"
-
     - name: Build mne_acq_bench
       run: |
-        cmake -S scripts/ci/acq_bench -B build-bench -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/qt" -DACQ_ROOT="$GITHUB_WORKSPACE"
+        cmake -S scripts/ci/acq_bench -B build-bench -DCMAKE_BUILD_TYPE=Release -DACQ_ROOT="$GITHUB_WORKSPACE"
         cmake --build build-bench -j "$(nproc)"
 
     - name: Measure and render
       run: |
-        export LD_LIBRARY_PATH="$RUNNER_TEMP/qt/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
         python3 scripts/bench/run_benchmarks.py --build build-bench --suites acq --repeats 3 --python none \
           --out bench/results.json
         python3 scripts/bench/render_charts.py bench/results.json bench

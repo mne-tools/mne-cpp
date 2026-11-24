@@ -8152,6 +8152,48 @@
       "python_url": null
     },
     {
+      "name": "CommandLineParser",
+      "module": "base",
+      "header": "base/command_line.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_base_command_line",
+      "example": "ex_base",
+      "example_snippet": [
+        "ex_base/main.cpp#command_line_usage"
+      ],
+      "example_mode": "run",
+      "status": "documented",
+      "documented": true,
+      "sidebar_position": 90,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
+    },
+    {
+      "name": "CommandLineOption",
+      "module": "base",
+      "header": "base/command_line.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_base_command_line",
+      "example": "ex_base",
+      "example_snippet": [
+        "ex_base/main.cpp#command_line_usage"
+      ],
+      "example_mode": "run",
+      "status": "documented",
+      "documented": true,
+      "sidebar_position": 91,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
+    },
+    {
       "name": "JsonDocument",
       "module": "base",
       "header": "base/json.h",

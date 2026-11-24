@@ -14,8 +14,6 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(BUILD_SHARED_LIBS OFF)
 
-find_package(Qt6 REQUIRED COMPONENTS Core)
-
 # Commits before the move to src/libs/mne compare against this one
 if(EXISTS "${ACQ_ROOT}/src/libs/mne/acq")
   add_subdirectory("${ACQ_ROOT}/src/libs/mne/acq" acq)
@@ -23,7 +21,14 @@ else()
   add_subdirectory("${ACQ_ROOT}/src/libraries/acq" acq)
 endif()
 add_executable(mne_acq_bench "${ACQ_ROOT}/src/tools/acquisition/mne_acq_bench/main.cpp")
-target_link_libraries(mne_acq_bench PRIVATE Qt6::Core mne_acq)
+target_link_libraries(mne_acq_bench PRIVATE mne_acq)
+# The tool is standard C++ since 3.0; older commits need Qt Core
+file(READ "${ACQ_ROOT}/src/tools/acquisition/mne_acq_bench/main.cpp" _bench_source)
+if(_bench_source MATCHES "QCoreApplication")
+  find_package(Qt6 REQUIRED COMPONENTS Core)
+  target_link_libraries(mne_acq_bench PRIVATE Qt6::Core)
+endif()
+unset(_bench_source)
 # The tool logs through mne_base since 3.0; older commits do not need it
 if(EXISTS "${ACQ_ROOT}/src/libs/mne/base")
   add_subdirectory("${ACQ_ROOT}/src/libs/mne/base" base)
