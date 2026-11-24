@@ -249,6 +249,9 @@ aliases; replace the old spelling as below.
   zero as before. Still on Qt: `mne_acq`, `mne_anonymize` and `mne_rt_server`
   (graphical or networked), `mne_make_movie` and `mne_screenshot_regression`
   (rendering).
+- A default-constructed `FiffInfo` left `proj_id` and the microseconds of
+  `meas_date` uninitialised, so the raw files the converters write differed
+  from run to run in `FIFF_PROJ_ID`. They start as -1 and 0.
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and

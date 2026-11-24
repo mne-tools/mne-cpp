@@ -62,11 +62,13 @@ FiffInfo::FiffInfo()
 , linefreq(-1.0)
 , highpass(-1.0)
 , lowpass(-1.0)
+, proj_id(-1)
 , gantry_angle(-1)
 , acq_pars("")
 , acq_stim("")
 {
     meas_date[0] = -1;
+    meas_date[1] = 0;
 }
 
 //=============================================================================================================
@@ -112,6 +114,7 @@ void FiffInfo::clear()
     FiffInfoBase::clear();
     file_id = FiffId();
     meas_date[0] = -1;
+    meas_date[1] = 0;
     sfreq = -1.0;
     linefreq = -1.0;
     highpass = -1.0;

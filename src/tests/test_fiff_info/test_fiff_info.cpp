@@ -221,6 +221,23 @@ private slots:
         pos->~FiffChPos();
     }
 
+    void info_defaultIsDeterministic()
+    {
+        // proj_id and the microseconds of meas_date were left uninitialized, so writers stored stack garbage
+        alignas(FiffInfo) unsigned char storage[sizeof(FiffInfo)];
+        std::memset(storage, 0xab, sizeof(storage));
+        FiffInfo* info = new (storage) FiffInfo;
+        QCOMPARE(info->proj_id, -1);
+        QCOMPARE(info->meas_date[0], -1);
+        QCOMPARE(info->meas_date[1], 0);
+        info->~FiffInfo();
+
+        FiffInfo cleared;
+        cleared.meas_date[1] = 7;
+        cleared.clear();
+        QCOMPARE(cleared.meas_date[1], 0);
+    }
+
     void infoBase_pickTypes()
     {
         FiffInfoBase info = makeSyntheticInfoBase(4);
