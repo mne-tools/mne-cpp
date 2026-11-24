@@ -37,7 +37,6 @@
 // STL INCLUDES
 //=============================================================================================================
 
-#include <bit>
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
@@ -81,8 +80,7 @@ static const std::uint32_t mxDOUBLE_CLASS = 6;
 template<typename T>
 static void writeLittleEndian(std::ostream& ds, T value)
 {
-    if constexpr (std::endian::native == std::endian::big)
-        value = mne::byte_swap(value);
+    value = mne::to_little_endian(value);
     ds.write(reinterpret_cast<const char*>(&value), sizeof(T));
 }
 

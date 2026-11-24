@@ -86,6 +86,38 @@ template<Swappable T>
 
 //=============================================================================================================
 /**
+ * @param[in] value   A value in host byte order.
+ *
+ * @return @p value in little-endian byte order, as most acquisition systems and MATLAB files store it.
+ *
+ * @since 3.0.0
+ */
+template<Swappable T>
+[[nodiscard]] constexpr T to_little_endian(T value) noexcept
+{
+    if constexpr (std::endian::native == std::endian::little) {
+        return value;
+    } else {
+        return byte_swap(value);
+    }
+}
+
+//=============================================================================================================
+/**
+ * @param[in] value   A value in little-endian byte order.
+ *
+ * @return @p value in host byte order.
+ *
+ * @since 3.0.0
+ */
+template<Swappable T>
+[[nodiscard]] constexpr T from_little_endian(T value) noexcept
+{
+    return to_little_endian(value);
+}
+
+//=============================================================================================================
+/**
  * Reverses the bytes of every element of @p data.
  *
  * @param[in, out] data    The values.

@@ -34,7 +34,6 @@
 //=============================================================================================================
 
 #include <algorithm>
-#include <bit>
 #include <chrono>
 #include <cstdint>
 #include <cstring>
@@ -244,8 +243,7 @@ static T readBVLittleEndian(const std::vector<char>& bytes, std::size_t offset)
     T value{};
     if (offset + sizeof(T) <= bytes.size()) {
         std::memcpy(&value, bytes.data() + offset, sizeof(T));
-        if constexpr (std::endian::native == std::endian::big)
-            value = mne::byte_swap(value);
+        value = mne::from_little_endian(value);
     }
     return value;
 }

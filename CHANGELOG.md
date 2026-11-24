@@ -213,6 +213,9 @@ aliases; replace the old spelling as below.
   `mne::tie_away_from_zero()` lets `std::format` round decimal ties away from
   zero as Qt does (`base/string_utils.h`). They replace eleven copies in the
   ported command-line tools.
+- `mne::to_little_endian()`, `from_little_endian()` (`base/endian.h`) and
+  `ByteStream::read_little_endian()` replace the byte-order code of six
+  conversion tools.
 - The inverse operator's decomposition of the whitened lead field uses Eigen's
   divide-and-conquer SVD, as MNE-Python uses LAPACK's: about 2.5 times less
   CPU time for the MNE sample data, with the same source estimates to single

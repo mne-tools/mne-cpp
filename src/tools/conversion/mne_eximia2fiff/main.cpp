@@ -37,7 +37,6 @@
 //=============================================================================================================
 
 #include <algorithm>
-#include <bit>
 #include <cmath>
 #include <cstdint>
 #include <cstring>
@@ -228,9 +227,7 @@ int main(int argc, char* argv[])
         for (int c = 0; c < kChannels; ++c) {
             std::int16_t value = 0;
             std::memcpy(&value, bytes.data() + (s * kChannels + c) * static_cast<std::int64_t>(sizeof(std::int16_t)), sizeof(value));
-            if constexpr (std::endian::native == std::endian::big)
-                value = mne::byte_swap(value);
-            data(c, s) = value * double(info.chs[c].cal);
+            data(c, s) = mne::from_little_endian(value) * double(info.chs[c].cal);
         }
     }
 

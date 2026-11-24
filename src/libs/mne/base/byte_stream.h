@@ -146,6 +146,42 @@ public:
 
     //=========================================================================================================
     /**
+     * Reads @p count little-endian values and converts them to host byte order.
+     *
+     * @param[out] values   Destination of @p count values.
+     * @param[in]  count    Number of values.
+     *
+     * @return Whether all values were read.
+     *
+     * @since 3.0.0
+     */
+    template<Swappable T>
+    bool read_little_endian(T* values, std::size_t count)
+    {
+        if (read(values, count * sizeof(T)) != count * sizeof(T)) {
+            return false;
+        }
+        if constexpr (std::endian::native != std::endian::little) {
+            byte_swap_in_place(values, count);
+        }
+        return true;
+    }
+
+    /**
+     * @param[out] value   Receives one value converted from little-endian byte order.
+     *
+     * @return Whether the value was read.
+     *
+     * @since 3.0.0
+     */
+    template<Swappable T>
+    bool read_little_endian(T& value)
+    {
+        return read_little_endian(&value, 1);
+    }
+
+    //=========================================================================================================
+    /**
      * Writes @p count values in big-endian byte order.
      *
      * @param[in] values   Source of @p count values in host byte order.

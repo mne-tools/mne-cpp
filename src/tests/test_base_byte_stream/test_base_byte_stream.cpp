@@ -94,6 +94,7 @@ private slots:
     void byteSwapReversesBytes();
     void bigEndianMatchesQDataStream();
     void readsWhatQDataStreamWrote();
+    void readsWhatQDataStreamWroteLittleEndian();
     void arraysSwapInPlace();
     void memoryStreamSeeksAndReportsShortReads();
     void memoryStreamOverwritesAndGrows();
@@ -171,6 +172,30 @@ void TestUtilsByteStream::readsWhatQDataStreamWrote()
     QCOMPARE(d, 2.0e-9);
     QVERIFY(stream.at_end());
     QVERIFY(!stream.read_big_endian(d));
+}
+
+//=============================================================================================================
+
+void TestUtilsByteStream::readsWhatQDataStreamWroteLittleEndian()
+{
+    QByteArray buffer;
+    QDataStream out(&buffer, QIODevice::WriteOnly);
+    out.setByteOrder(QDataStream::LittleEndian);
+    out.setFloatingPointPrecision(QDataStream::SinglePrecision);
+    out << qint16(-2) << qint32(70000) << 1.5f;
+    MemoryByteStream stream(toBytes(buffer));
+
+    std::int16_t i16 = 0;
+    QVERIFY(stream.read_little_endian(i16));
+    QCOMPARE(i16, std::int16_t{-2});
+    QCOMPARE(from_little_endian(to_little_endian(std::int32_t{70000})), 70000);
+    std::int32_t i32 = 0;
+    QVERIFY(stream.read_little_endian(&i32, 1));
+    QCOMPARE(i32, 70000);
+    float f = 0.0f;
+    QVERIFY(stream.read_little_endian(f));
+    QCOMPARE(f, 1.5f);
+    QVERIFY(!stream.read_little_endian(f));
 }
 
 //=============================================================================================================

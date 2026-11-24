@@ -34,7 +34,6 @@
 //=============================================================================================================
 
 #include <algorithm>
-#include <bit>
 #include <cmath>
 #include <cstdint>
 #include <format>
@@ -99,11 +98,7 @@ public:
     T read()
     {
         T value{};
-        if (m_stream->read(&value, sizeof(T)) != sizeof(T))
-            return T{};
-        if constexpr (std::endian::native == std::endian::big)
-            value = mne::byte_swap(value);
-        return value;
+        return m_stream->read_little_endian(value) ? value : T{};
     }
 
 private:
