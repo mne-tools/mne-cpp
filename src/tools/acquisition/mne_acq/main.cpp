@@ -32,31 +32,27 @@
 #include <mne/acq/lsl/acq_lsl.h>
 #if defined(MNE_ACQ_VIEW)
 #include "acq_view.h"
-
-#include <QApplication>
 #endif
+#include <mne/base/command_line.h>
+#include <mne/base/string_utils.h>
 #include <mne/lsl/lsl_stream_info.h>
 #include <mne/lsl/lsl_stream_outlet.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCommandLineParser>
-#include <QCoreApplication>
-#include <QTextStream>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <csignal>
-#include <memory>
-#include <string_view>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 #include <optional>
+#include <print>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <vector>
 
@@ -74,20 +70,6 @@ constexpr int kUsageError = 1;
 constexpr int kRunError = 2;
 
 std::atomic<bool> g_interrupted{false};
-
-/** Standard output; flushed when the program ends. */
-QTextStream& out()
-{
-    static QTextStream stream(stdout);
-    return stream;
-}
-
-/** Standard error; flushed when the program ends. */
-QTextStream& err()
-{
-    static QTextStream stream(stderr);
-    return stream;
-}
 
 extern "C" void onInterrupt(int /*signal*/)
 {
@@ -145,12 +127,12 @@ void registerSchemes()
 }
 
 /** Opens @p uri, printing the error; all schemes are registered first. */
-AcqExpected<AcqDevice> openSource(const QString& uri)
+AcqExpected<AcqDevice> openSource(const std::string& uri)
 {
     registerSchemes();
-    auto device = AcqDevice::open(uri.toStdString());
+    auto device = AcqDevice::open(uri);
     if (!device) {
-        err() << QString::asprintf("mne_acq: %s: %s\n", qPrintable(uri), device.error().text().c_str());
+        std::print(stderr, "mne_acq: {}: {}\n", uri, device.error().text());
     }
     return device;
 }
@@ -171,41 +153,39 @@ int list(double timeout)
 {
     registerSchemes();
     AcqDeviceRegistry& registry = AcqDeviceRegistry::instance();
-    out() << QString::asprintf("Schemes:\n");
+    std::print("Schemes:\n");
     for (const AcqSchemeInfo& scheme : registry.schemes()) {
-        out() << QString::asprintf("  %-14s %s\n", (scheme.scheme + "://").c_str(), scheme.description.c_str());
+        std::print("  {:<14} {}\n", scheme.scheme + "://", scheme.description);
     }
-    out() << QString::asprintf("Sources (searched for %.1f s):\n", timeout);
+    std::print("Sources (searched for {:.1f} s):\n", timeout);
     const auto found = registry.discover(std::chrono::milliseconds(static_cast<long long>(timeout * 1000.0)));
     if (found.empty()) {
-        out() << QString::asprintf("  none\n");
+        std::print("  none\n");
     }
     for (const AcqDiscoveredDevice& device : found) {
-        out() << QString::asprintf("  %s  %s (%s)%s\n", device.uri.c_str(), device.label.c_str(), device.detail.c_str(),
-                                   device.available ? "" : " [unavailable]");
+        std::print("  {}  {} ({}){}\n", device.uri, device.label, device.detail, device.available ? "" : " [unavailable]");
     }
     return 0;
 }
 
 //=============================================================================================================
 
-int info(const QString& uri)
+int info(const std::string& uri)
 {
     auto device = openSource(uri);
     if (!device) {
         return kRunError;
     }
     const AcqDeviceDescription description = device->description();
-    out() << QString::asprintf("%s\n  backend   %s%s\n  device    %s\n", description.uri.c_str(), description.backend.c_str(),
-                               description.backendVersion.empty() ? "" : (" (" + description.backendVersion + ")").c_str(),
-                               description.device.c_str());
+    std::print("{}\n  backend   {}{}\n  device    {}\n", description.uri, description.backend,
+               description.backendVersion.empty() ? std::string() : " (" + description.backendVersion + ")", description.device);
     for (const AcqStream& stream : device->streams()) {
         const auto streamInfo = stream.info();
-        out() << QString::asprintf("Stream \"%s\": %zu channels, %s, %g Hz%s%s\n", streamInfo->name.c_str(), streamInfo->channels.size(),
-                                   formatName(streamInfo->format), streamInfo->sfreq,
-                                   streamInfo->clockDomain.empty() ? "" : ", clock ", streamInfo->clockDomain.c_str());
+        std::print("Stream \"{}\": {} channels, {}, {:g} Hz{}{}\n", streamInfo->name, streamInfo->channels.size(),
+                   formatName(streamInfo->format), streamInfo->sfreq, streamInfo->clockDomain.empty() ? "" : ", clock ",
+                   streamInfo->clockDomain);
         for (const AcqChannelInfo& channel : streamInfo->channels) {
-            out() << QString::asprintf("  %-16s %-12s %s\n", channel.name.c_str(), kindName(channel.kind), unitName(channel).c_str());
+            std::print("  {:<16} {:<12} {}\n", channel.name, kindName(channel.kind), unitName(channel));
         }
     }
     device->close();
@@ -214,7 +194,7 @@ int info(const QString& uri)
 
 //=============================================================================================================
 
-int record(const QString& uri, const QString& path, double duration)
+int record(const std::string& uri, const std::string& path, double duration)
 {
     auto device = openSource(uri);
     if (!device) {
@@ -222,27 +202,26 @@ int record(const QString& uri, const QString& path, double duration)
     }
     AcqRecorderOptions options;
     options.device = device->description();
-    auto recorder = AcqRecorder::start(device->stream(), path.toStdString(), options);
+    auto recorder = AcqRecorder::start(device->stream(), path, options);
     if (!recorder) {
-        err() << QString::asprintf("mne_acq: %s: %s\n", qPrintable(path), recorder.error().text().c_str());
+        std::print(stderr, "mne_acq: {}: {}\n", path, recorder.error().text());
         return kRunError;
     }
     if (const AcqError started = device->start(); !started.ok()) {
-        err() << QString::asprintf("mne_acq: %s\n", started.text().c_str());
+        std::print(stderr, "mne_acq: {}\n", started.text());
         return kRunError;
     }
     waitUntil(duration, [&] { return !recorder->isRecording(); });
     device->close();
     const AcqError stopped = recorder->stop();
     const AcqRecorderStats stats = recorder->stats();
-    out() << QString::asprintf("Recorded %llu samples (%llu lost) and %llu events to %zu file(s):\n",
-                               static_cast<unsigned long long>(stats.samples), static_cast<unsigned long long>(stats.lost),
-                               static_cast<unsigned long long>(stats.events), recorder->files().size());
+    std::print("Recorded {} samples ({} lost) and {} events to {} file(s):\n", stats.samples, stats.lost, stats.events,
+               recorder->files().size());
     for (const std::string& file : recorder->files()) {
-        out() << QString::asprintf("  %s\n", file.c_str());
+        std::print("  {}\n", file);
     }
     if (!stopped.ok()) {
-        err() << QString::asprintf("mne_acq: %s\n", stopped.text().c_str());
+        std::print(stderr, "mne_acq: {}\n", stopped.text());
         return kRunError;
     }
     return 0;
@@ -263,7 +242,7 @@ template<typename Sink>
 int pump(AcqDevice& device, AcqReader& reader, double duration, Sink sink)
 {
     if (const AcqError started = device.start(); !started.ok()) {
-        err() << QString::asprintf("mne_acq: %s\n", started.text().c_str());
+        std::print(stderr, "mne_acq: {}\n", started.text());
         return kRunError;
     }
     const std::size_t channels = reader.channelCount();
@@ -283,31 +262,30 @@ int pump(AcqDevice& device, AcqReader& reader, double duration, Sink sink)
         const AcqError decoded = decode(*view, AcqMatrixRef<double>::columnMajor(block.values.data(), channels, block.samples));
         static_cast<void>(reader.release(*view));
         if (!decoded.ok()) {
-            err() << QString::asprintf("mne_acq: %s\n", decoded.text().c_str());
+            std::print(stderr, "mne_acq: {}\n", decoded.text());
             return kRunError;
         }
         sink(block);
         published += block.samples;
     }
     device.close();
-    out() << QString::asprintf("Published %llu samples\n", static_cast<unsigned long long>(published));
+    std::print("Published {} samples\n", published);
     return 0;
 }
 
 //=============================================================================================================
 
-int streamLsl(AcqDevice& device, AcqReader& reader, const QString& name, double duration)
+int streamLsl(AcqDevice& device, AcqReader& reader, const std::string& name, double duration)
 {
     const auto streamInfo = reader.stream().info();
     const std::size_t channels = streamInfo->channels.size();
     const std::string type = channels > 0 ? kindName(streamInfo->channels.front().kind) : "unknown";
-    mne::stream_outlet outlet(mne::stream_info(name.isEmpty() ? streamInfo->name : name.toStdString(), type,
+    mne::stream_outlet outlet(mne::stream_info(name.empty() ? streamInfo->name : name, type,
                                                static_cast<int>(channels), streamInfo->sfreq,
                                                mne::ChannelFormat::Float32, device.description().uri));
-    out() << QString::asprintf("Publishing %s as LSL stream \"%s\" (%zu channels, %g Hz, float32)\n",
-                               device.description().uri.c_str(), outlet.info().name().c_str(), channels,
-                               streamInfo->sfreq);
-    out().flush();
+    std::print("Publishing {} as LSL stream \"{}\" ({} channels, {:g} Hz, float32)\n", device.description().uri,
+               outlet.info().name(), channels, streamInfo->sfreq);
+    std::fflush(stdout);
     std::vector<std::vector<float>> chunk;
     return pump(device, reader, duration, [&](const Block& block) {
         chunk.assign(block.samples, std::vector<float>(channels));
@@ -322,40 +300,40 @@ int streamLsl(AcqDevice& device, AcqReader& reader, const QString& name, double 
 
 //=============================================================================================================
 
-int streamBrainFlow(AcqDevice& device, AcqReader& reader, const QString& target, int board, double duration)
+int streamBrainFlow(AcqDevice& device, AcqReader& reader, const std::string& target, int board, double duration)
 {
-    const std::string address = target.section(QLatin1Char(':'), 0, 0).toStdString();
-    bool portOk = false;
-    const auto port = target.section(QLatin1Char(':'), 1).toUShort(&portOk);
-    bool firstOk = false;
-    const int first = QString::fromStdString(address).section(QLatin1Char('.'), 0, 0).toInt(&firstOk);
-    if (!firstOk || first < 224 || first > 239 || !portOk || port == 0) {
-        err() << QString::asprintf("mne_acq: --brainflow-multicast needs a multicast address:port, e.g. 225.1.1.1:6677\n");
+    const std::size_t colon = target.find(':');
+    const std::string address = target.substr(0, colon);
+    // 0 for a missing or invalid number, which both checks reject.
+    const int port = colon == std::string::npos ? 0 : to_int(std::string_view(target).substr(colon + 1)).value_or(0);
+    const int first = to_int(address.substr(0, address.find('.'))).value_or(0);
+    if (first < 224 || first > 239 || port <= 0 || port > 65535) {
+        std::print(stderr, "mne_acq: --brainflow-multicast needs a multicast address:port, e.g. 225.1.1.1:6677\n");
         return kUsageError;
     }
     auto layout = detail::brainflow_board(std::to_string(board));
     if (!layout) {
-        err() << QString::asprintf("mne_acq: %s\n", layout.error().text().c_str());
+        std::print(stderr, "mne_acq: {}\n", layout.error().text());
         return kRunError;
     }
     const detail::BrainFlowDescription& description = layout->second;
     // STREAMING_BOARD reads packets of BRAINFLOW_BATCH_SIZE samples (default 3), so both sides must agree.
-    const int batchEnv = qEnvironmentVariableIntValue("BRAINFLOW_BATCH_SIZE");
+    const char* batchText = std::getenv("BRAINFLOW_BATCH_SIZE");
+    const int batchEnv = batchText != nullptr ? to_int(batchText).value_or(0) : 0;
     const std::size_t batch = batchEnv > 1 && batchEnv < 100 ? static_cast<std::size_t>(batchEnv) : 3;
-    auto streamer = detail::BrainFlowStreamer::open(description, address, port, batch);
+    auto streamer = detail::BrainFlowStreamer::open(description, address, static_cast<std::uint16_t>(port), batch);
     if (!streamer) {
-        err() << QString::asprintf("mne_acq: %s\n", streamer.error().text().c_str());
+        std::print(stderr, "mne_acq: {}\n", streamer.error().text());
         return kRunError;
     }
 
     const auto streamInfo = reader.stream().info();
     const std::size_t channels = streamInfo->channels.size();
     const std::size_t mapped = std::min(channels, streamer->eeg_rows().size());
-    out() << QString::asprintf("Publishing %s in BrainFlow's format to %s as board %d (%s): channels 1-%zu of %zu on "
-                               "its EEG rows, volts as microvolts, %zu samples per packet\n",
-                               device.description().uri.c_str(), qPrintable(target), board, description.name.c_str(), mapped,
-                               channels, batch);
-    out().flush();
+    std::print("Publishing {} in BrainFlow's format to {} as board {} ({}): channels 1-{} of {} on its EEG rows, volts "
+               "as microvolts, {} samples per packet\n",
+               device.description().uri, target, board, description.name, mapped, channels, batch);
+    std::fflush(stdout);
 
     std::vector<double> scale(mapped, 1.0);
     for (std::size_t c = 0; c < mapped; ++c) {
@@ -387,22 +365,7 @@ int streamBrainFlow(AcqDevice& device, AcqReader& reader, const QString& target,
 
 int main(int argc, char* argv[])
 {
-#if defined(MNE_ACQ_VIEW)
-    // Only view needs a GUI; the other commands also run without a display.
-    bool gui = false;
-    for (int i = 1; i < argc && !gui; ++i) {
-        gui = std::string_view(argv[i]) == "view";
-    }
-    std::unique_ptr<QCoreApplication> app = gui ? std::make_unique<QApplication>(argc, argv)
-                                                : std::make_unique<QCoreApplication>(argc, argv);
-#else
-    auto app = std::make_unique<QCoreApplication>(argc, argv);
-#endif
-    QCoreApplication::setApplicationName("mne_acq");
-    QCoreApplication::setApplicationVersion(MNE_CPP_VERSION);
-
-    QCommandLineParser parser;
-    parser.setApplicationDescription(
+    CommandLineParser parser(
         "List, inspect, record and re-publish acquisition sources.\n\n"
         "  mne_acq list [--timeout s]\n"
         "  mne_acq info <uri>\n"
@@ -411,58 +374,53 @@ int main(int argc, char* argv[])
         "  mne_acq stream <uri> --brainflow-multicast 225.1.1.1:6677 [--master-board id] [--duration s]\n"
         "  mne_acq view <uri> [--window s] [--duration s] [--screenshot file.png]\n\n"
         "URIs: synthetic://?eeg=32&sfreq=1000, fiff:///data/raw.fif?loop=1, lsl://NAME, ... (see mne_acq list).");
-    parser.addHelpOption();
-    parser.addVersionOption();
-    parser.addPositionalArgument("command", "list, info, record, stream or view.");
-    parser.addPositionalArgument("uri", "Source URI.", "[uri]");
-    parser.addPositionalArgument("file", "Output file of record.", "[file]");
-    const QCommandLineOption timeoutOpt("timeout", "Seconds to search for sources (list, default 1).", "s", "1");
-    const QCommandLineOption durationOpt("duration", "Seconds to run (record, stream); 0 until the source ends or Ctrl+C.", "s", "0");
-    const QCommandLineOption lslOpt("lsl", "Publish as a Lab Streaming Layer outlet (stream).");
-    const QCommandLineOption nameOpt("name", "Name of the published stream (stream; default: the stream's name).", "n");
-    const QCommandLineOption brainFlowOpt("brainflow-multicast",
-                                          "Publish in BrainFlow's multicast format for its STREAMING_BOARD (stream).",
-                                          "address:port");
-    const QCommandLineOption boardOpt("master-board",
-                                      "BrainFlow board whose row layout is sent; consumers pass it as master_board "
-                                      "(default -1, the synthetic board).",
-                                      "id", "-1");
-    const QCommandLineOption windowOpt("window", "Visible time window of view in seconds (default 10).", "s", "10");
-    const QCommandLineOption screenshotOpt("screenshot", "PNG of the view window when it closes (view).", "file");
-    parser.addOptions({timeoutOpt, durationOpt, lslOpt, nameOpt, brainFlowOpt, boardOpt, windowOpt, screenshotOpt});
-    parser.process(*app);
+    parser.add_help_option();
+    parser.add_version_option();
+    parser.add_positional_argument("command", "list, info, record, stream or view.");
+    parser.add_positional_argument("[uri]", "Source URI.");
+    parser.add_positional_argument("[file]", "Output file of record.");
+    parser.add_option({{"timeout"}, "Seconds to search for sources (list, default 1).", "s", "1"});
+    parser.add_option({{"duration"}, "Seconds to run (record, stream); 0 until the source ends or Ctrl+C.", "s", "0"});
+    parser.add_option({{"lsl"}, "Publish as a Lab Streaming Layer outlet (stream).", "", ""});
+    parser.add_option({{"name"}, "Name of the published stream (stream; default: the stream's name).", "n", ""});
+    parser.add_option({{"brainflow-multicast"}, "Publish in BrainFlow's multicast format for its STREAMING_BOARD (stream).", "address:port", ""});
+    parser.add_option({{"master-board"},
+                       "BrainFlow board whose row layout is sent; consumers pass it as master_board "
+                       "(default -1, the synthetic board).",
+                       "id",
+                       "-1"});
+    parser.add_option({{"window"}, "Visible time window of view in seconds (default 10).", "s", "10"});
+    parser.add_option({{"screenshot"}, "PNG of the view window when it closes (view).", "file", ""});
+    parser.process(argc, argv, "mne_acq", MNE_CPP_VERSION);
 
-    const QStringList args = parser.positionalArguments();
-    const QString command = args.value(0);
-    bool ok = true;
-    const double timeout = parser.value(timeoutOpt).toDouble(&ok);
-    bool durationOk = true;
-    const double duration = parser.value(durationOpt).toDouble(&durationOk);
-    if (!ok || timeout < 0.0 || !durationOk || duration < 0.0) {
-        err() << QString::asprintf("mne_acq: --timeout and --duration need non-negative seconds\n");
+    const std::vector<std::string>& args = parser.positional_arguments();
+    const std::string command = args.empty() ? std::string() : args[0];
+    const std::optional<double> timeout = to_double(parser.value("timeout"));
+    const std::optional<double> duration = to_double(parser.value("duration"));
+    if (!timeout || *timeout < 0.0 || !duration || *duration < 0.0) {
+        std::print(stderr, "mne_acq: --timeout and --duration need non-negative seconds\n");
         return kUsageError;
     }
     std::signal(SIGINT, onInterrupt);
     std::signal(SIGTERM, onInterrupt);
 
-    if (command == QLatin1String("list") && args.size() == 1) {
-        return list(timeout);
+    if (command == "list" && args.size() == 1) {
+        return list(*timeout);
     }
-    if (command == QLatin1String("info") && args.size() == 2) {
+    if (command == "info" && args.size() == 2) {
         return info(args[1]);
     }
-    if (command == QLatin1String("record") && args.size() == 3) {
-        return record(args[1], args[2], duration);
+    if (command == "record" && args.size() == 3) {
+        return record(args[1], args[2], *duration);
     }
-    if (command == QLatin1String("stream") && args.size() == 2) {
-        if (parser.isSet(lslOpt) == parser.isSet(brainFlowOpt)) {
-            err() << QString::asprintf("mne_acq: stream needs one output, --lsl or --brainflow-multicast\n");
+    if (command == "stream" && args.size() == 2) {
+        if (parser.is_set("lsl") == parser.is_set("brainflow-multicast")) {
+            std::print(stderr, "mne_acq: stream needs one output, --lsl or --brainflow-multicast\n");
             return kUsageError;
         }
-        bool boardOk = false;
-        const int board = parser.value(boardOpt).toInt(&boardOk);
-        if (!boardOk) {
-            err() << QString::asprintf("mne_acq: --master-board needs a BrainFlow board id\n");
+        const std::optional<int> board = to_int(parser.value("master-board"));
+        if (!board) {
+            std::print(stderr, "mne_acq: --master-board needs a BrainFlow board id\n");
             return kUsageError;
         }
         auto device = openSource(args[1]);
@@ -471,18 +429,16 @@ int main(int argc, char* argv[])
         }
         auto reader = device->stream().reader(AcqReader::ReadMode::Lossless);
         if (!reader) {
-            err() << QString::asprintf("mne_acq: %s\n", reader.error().text().c_str());
+            std::print(stderr, "mne_acq: {}\n", reader.error().text());
             return kRunError;
         }
-        return parser.isSet(lslOpt)
-            ? streamLsl(*device, *reader, parser.value(nameOpt), duration)
-            : streamBrainFlow(*device, *reader, parser.value(brainFlowOpt), board, duration);
+        return parser.is_set("lsl") ? streamLsl(*device, *reader, parser.value("name"), *duration)
+                                    : streamBrainFlow(*device, *reader, parser.value("brainflow-multicast"), *board, *duration);
     }
-    if (command == QLatin1String("view") && args.size() == 2) {
-        bool windowOk = false;
-        const double window = parser.value(windowOpt).toDouble(&windowOk);
-        if (!windowOk || window <= 0.0) {
-            err() << QString::asprintf("mne_acq: --window needs positive seconds\n");
+    if (command == "view" && args.size() == 2) {
+        const std::optional<double> window = to_double(parser.value("window"));
+        if (!window || *window <= 0.0) {
+            std::print(stderr, "mne_acq: --window needs positive seconds\n");
             return kUsageError;
         }
 #if defined(MNE_ACQ_VIEW)
@@ -490,13 +446,13 @@ int main(int argc, char* argv[])
         if (!device) {
             return kRunError;
         }
-        err().flush();
-        return runAcqView(*device, window, duration, parser.value(screenshotOpt));
+        std::fflush(stderr);
+        return runAcqView(argc, argv, *device, *window, *duration, parser.value("screenshot"));
 #else
-        err() << QString::asprintf("mne_acq: view needs a build with the display library (mne_disp)\n");
+        std::print(stderr, "mne_acq: view needs a build with the display library (mne_disp)\n");
         return kRunError;
 #endif
     }
-    err() << QString::asprintf("%s\n", qPrintable(parser.helpText()));
+    std::print(stderr, "{}\n", parser.help_text("mne_acq"));
     return kUsageError;
 }

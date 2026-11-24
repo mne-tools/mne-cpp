@@ -5,21 +5,10 @@
 cmake_minimum_required(VERSION 3.14)
 project(mne_acq_tool LANGUAGES CXX)
 
-set(QT_REQUIRED_COMPONENTS Core)
-if(TARGET mne_disp)
-    list(APPEND QT_REQUIRED_COMPONENTS Widgets)
-endif()
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-
 # The target is not called mne_acq: that name is the library.
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION main.cpp)
-else()
-    add_executable(${PROJECT_NAME} main.cpp)
-endif()
+add_executable(${PROJECT_NAME} main.cpp)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core mne_acq mne_acq_devices mne_com mne_acq_fiff mne_acq_lsl mne_lsl)
+target_link_libraries(${PROJECT_NAME} PRIVATE mne_acq mne_acq_devices mne_com mne_acq_fiff mne_acq_lsl mne_lsl mne_base)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     OUTPUT_NAME mne_acq
@@ -27,8 +16,11 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     WIN32_EXECUTABLE FALSE
 )
 
-# view (live traces) needs the display library; the other commands stay headless.
+# view (live traces) needs the display library and Qt Widgets, confined to acq_view.cpp; the other commands stay
+# headless and Qt-free.
 if(TARGET mne_disp)
+    find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
+    find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
     target_sources(${PROJECT_NAME} PRIVATE acq_view.cpp acq_view.h)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets mne_disp mne_fiff Eigen3::Eigen)
     target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_ACQ_VIEW)
@@ -43,7 +35,3 @@ install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin COMPONENT applications
     LIBRARY DESTINATION lib COMPONENT applications
 )
-
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(${PROJECT_NAME})
-endif()

@@ -25,8 +25,6 @@
 //=============================================================================================================
 
 #include <QApplication>
-#include <QElapsedTimer>
-#include <QTextStream>
 #include <QTimer>
 
 //=============================================================================================================
@@ -36,7 +34,10 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstdint>
+#include <cstdio>
 #include <memory>
+#include <print>
 #include <string>
 #include <vector>
 
@@ -52,18 +53,18 @@ using namespace std::chrono_literals;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-int runAcqView(AcqDevice& device, double window, double duration, const QString& screenshot)
+int runAcqView(int& argc, char** argv, AcqDevice& device, double window, double duration, const std::string& screenshot)
 {
-    QTextStream err(stderr);
+    const QApplication app(argc, argv);
     auto reader = device.stream().reader(AcqReader::ReadMode::Lossless);
     if (!reader) {
-        err << "mne_acq: " << reader.error().text().c_str() << "\n";
+        std::print(stderr, "mne_acq: {}\n", reader.error().text());
         return 2;
     }
     const auto streamInfo = reader->stream().info();
     auto fiffInfo = toFiffInfo(*streamInfo);
     if (!fiffInfo) {
-        err << "mne_acq: " << fiffInfo.error().text().c_str() << "\n";
+        std::print(stderr, "mne_acq: {}\n", fiffInfo.error().text());
         return 2;
     }
     const auto channels = static_cast<Eigen::Index>(streamInfo->channels.size());
@@ -83,7 +84,7 @@ int runAcqView(AcqDevice& device, double window, double duration, const QString&
     view.show();
 
     if (const AcqError started = device.start(); !started.ok()) {
-        err << "mne_acq: " << started.text().c_str() << "\n";
+        std::print(stderr, "mne_acq: {}\n", started.text());
         return 2;
     }
 
@@ -92,8 +93,7 @@ int runAcqView(AcqDevice& device, double window, double duration, const QString&
     std::uint64_t next = 0;
     bool ended = false;
     bool shotSaved = true;
-    QElapsedTimer elapsed;
-    elapsed.start();
+    const auto startTime = std::chrono::steady_clock::now();
     QTimer timer;
     QObject::connect(&timer, &QTimer::timeout, [&] {
         bool added = false;
@@ -138,10 +138,10 @@ int runAcqView(AcqDevice& device, double window, double duration, const QString&
             view.setData(sweep, 0);
             view.setEvents(markers);
         }
-        const bool timeUp = duration > 0.0 && elapsed.elapsed() >= static_cast<qint64>(duration * 1000.0);
+        const bool timeUp = duration > 0.0 && std::chrono::steady_clock::now() - startTime >= std::chrono::duration<double>(duration);
         if (ended || timeUp || !view.isVisible()) {
             timer.stop();
-            shotSaved = screenshot.isEmpty() || view.grab().save(screenshot);
+            shotSaved = screenshot.empty() || view.grab().save(QString::fromStdString(screenshot));
             QCoreApplication::quit();
         }
     });
@@ -150,9 +150,9 @@ int runAcqView(AcqDevice& device, double window, double duration, const QString&
     device.close();
 
     if (!shotSaved) {
-        err << "mne_acq: cannot write " << screenshot << "\n";
+        std::print(stderr, "mne_acq: cannot write {}\n", screenshot);
         return 2;
     }
-    QTextStream(stdout) << "Showed " << next << " samples\n";
+    std::print("Showed {} samples\n", next);
     return 0;
 }
