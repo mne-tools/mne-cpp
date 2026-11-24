@@ -57,22 +57,6 @@ using namespace Eigen;
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
 //=============================================================================================================
-/**
- * Qt's asprintf, QString::number and QTextStream round exact decimal ties away from zero where std::format rounds
- * them to even. Moves a tie at @p decimals to the neighbouring double away from zero, so that std::format writes
- * the digits Qt wrote.
- */
-static double sensorQtTie(double value, int decimals)
-{
-    const double scaled = std::ldexp(value, decimals + 1);
-    // A tie at decimals is an odd multiple of 2^-(decimals + 1)
-    if (std::isfinite(scaled) && scaled == std::trunc(scaled) && std::fmod(scaled, 2.0) != 0.0) {
-        return std::nextafter(value, value < 0 ? -std::numeric_limits<double>::infinity() : std::numeric_limits<double>::infinity());
-    }
-    return value;
-}
-
-//=============================================================================================================
 
 int main(int argc, char* argv[])
 {
@@ -174,7 +158,7 @@ int main(int argc, char* argv[])
             continue;
         }
 
-        out << std::format("{:<20} {:12.6f} {:12.6f} {:12.6f}\n", ch.ch_name, sensorQtTie(x, 6), sensorQtTie(y, 6), sensorQtTie(z, 6));
+        out << std::format("{:<20} {:12.6f} {:12.6f} {:12.6f}\n", ch.ch_name, mne::tie_away_from_zero(x, 6), mne::tie_away_from_zero(y, 6), mne::tie_away_from_zero(z, 6));
         ++nWritten;
     }
 

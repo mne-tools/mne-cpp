@@ -61,32 +61,13 @@ static std::string explained(const std::string& name)
     return name.empty() ? std::string("Not explained") : name;
 }
 
-// Qt's asprintf rounds exact decimal ties away from zero where std::format rounds them to even. Moves a tie at
-// decimals to the neighbouring double away from zero, so that std::format writes the digits Qt wrote.
-static double qtTie(double value, int decimals)
-{
-    if (!std::isfinite(value)) {
-        return value;
-    }
-    bool tie = false;
-    if (decimals >= 0) {
-        // A tie at decimals is an odd multiple of 2^-(decimals + 1)
-        const double scaled = std::ldexp(value, decimals + 1);
-        tie = std::isfinite(scaled) && scaled == std::trunc(scaled) && std::fmod(scaled, 2.0) != 0.0;
-    } else if (std::abs(value) < 0x1p53) {
-        const double unit = std::pow(10.0, -decimals);
-        tie = std::fmod(std::abs(value), unit) == unit / 2;
-    }
-    return tie ? std::nextafter(value, value < 0 ? -std::numeric_limits<double>::infinity() : std::numeric_limits<double>::infinity()) : value;
-}
-
-// qtTie() for %g, which keeps six significant digits
+// mne::tie_away_from_zero() for %g, which keeps six significant digits
 static double qtTieG(double value)
 {
     if (value == 0.0 || !std::isfinite(value)) {
         return value;
     }
-    return qtTie(value, 5 - static_cast<int>(std::floor(std::log10(std::abs(value)))));
+    return mne::tie_away_from_zero(value, 5 - static_cast<int>(std::floor(std::log10(std::abs(value)))));
 }
 
 // The local time like QDateTime::toString() (Qt::TextDate), e.g. "Tue Dec 3 14:36:19 2002"
@@ -207,7 +188,7 @@ void MNEFiffContents::print_transform(std::FILE* out, const FiffTag& tag)
         } else {
             std::print(out, "\n");
             for (p = 0; p < 3; p++)
-                std::print(out, "{:>24}\t{:8.5f} {:8.5f} {:8.5f} {:8.2f}\n", " ", qtTie(t.trans(p, 0), 5), qtTie(t.trans(p, 1), 5), qtTie(t.trans(p, 2), 5), qtTie(1000 * t.trans(p, 3), 2));
+                std::print(out, "{:>24}\t{:8.5f} {:8.5f} {:8.5f} {:8.2f}\n", " ", mne::tie_away_from_zero(t.trans(p, 0), 5), mne::tie_away_from_zero(t.trans(p, 1), 5), mne::tie_away_from_zero(t.trans(p, 2), 5), mne::tie_away_from_zero(1000 * t.trans(p, 3), 2));
             std::print(out, "{:>24}\t{:8.5f} {:8.5f} {:8.5f} {:8.2f}", " ", 0.0, 0.0, 0.0, 1.0);
         }
     }
@@ -235,7 +216,7 @@ void MNEFiffContents::print_dig_point(std::FILE* out, const FiffTag& tag)
         default:
             break;
     }
-    std::print(out, "({:6.1f},{:6.1f},{:6.1f})", qtTie(1000 * point.r[0], 1), qtTie(1000 * point.r[1], 1), qtTie(1000 * point.r[2], 1));
+    std::print(out, "({:6.1f},{:6.1f},{:6.1f})", mne::tie_away_from_zero(1000 * point.r[0], 1), mne::tie_away_from_zero(1000 * point.r[1], 1), mne::tie_away_from_zero(1000 * point.r[2], 1));
 }
 
 

@@ -209,6 +209,10 @@ aliases; replace the old spelling as below.
   in standard C++ and agrees with `QCommandLineParser` on the forms the tools
   use. `mne_acq_bench` uses it and no longer needs Qt, so the benchmark job
   builds without downloading Qt.
+- `mne::format_number()` formats a number like `QString::number()`, and
+  `mne::tie_away_from_zero()` lets `std::format` round decimal ties away from
+  zero as Qt does (`base/string_utils.h`). They replace eleven copies in the
+  ported command-line tools.
 - The inverse operator's decomposition of the whitened lead field uses Eigen's
   divide-and-conquer SVD, as MNE-Python uses LAPACK's: about 2.5 times less
   CPU time for the MNE sample data, with the same source estimates to single

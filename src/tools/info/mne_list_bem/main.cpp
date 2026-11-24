@@ -55,22 +55,6 @@ using namespace Eigen;
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
 //=============================================================================================================
-/**
- * Qt's asprintf, QString::number and QTextStream round exact decimal ties away from zero where std::format rounds
- * them to even. Moves a tie at @p decimals to the neighbouring double away from zero, so that std::format writes
- * the digits Qt wrote.
- */
-static double listBemQtTie(double value, int decimals)
-{
-    const double scaled = std::ldexp(value, decimals + 1);
-    // A tie at decimals is an odd multiple of 2^-(decimals + 1)
-    if (std::isfinite(scaled) && scaled == std::trunc(scaled) && std::fmod(scaled, 2.0) != 0.0) {
-        return std::nextafter(value, value < 0 ? -std::numeric_limits<double>::infinity() : std::numeric_limits<double>::infinity());
-    }
-    return value;
-}
-
-//=============================================================================================================
 
 int main(int argc, char* argv[])
 {
@@ -165,9 +149,9 @@ int main(int argc, char* argv[])
         for (int k = 0; k < surf.np; k++)
             out << std::format("{:5} {:9.4f} {:9.4f} {:9.4f}\n",
                                k + 1,
-                               listBemQtTie(lengthMult * surf.rr(k, 0), 4),
-                               listBemQtTie(lengthMult * surf.rr(k, 1), 4),
-                               listBemQtTie(lengthMult * surf.rr(k, 2), 4));
+                               mne::tie_away_from_zero(lengthMult * surf.rr(k, 0), 4),
+                               mne::tie_away_from_zero(lengthMult * surf.rr(k, 1), 4),
+                               mne::tie_away_from_zero(lengthMult * surf.rr(k, 2), 4));
         out << std::format("{:5}\n", surf.ntri);
         for (int k = 0; k < surf.ntri; k++) {
             out << std::format("{:5} {:4} {:4} {:4}\n",
@@ -181,9 +165,9 @@ int main(int argc, char* argv[])
         for (int k = 0; k < surf.np; k++)
             out << std::format("{:5} {:9.4f} {:9.4f} {:9.4f}\n",
                                k + 1,
-                               listBemQtTie(lengthMult * surf.rr(k, 0), 4),
-                               listBemQtTie(lengthMult * surf.rr(k, 1), 4),
-                               listBemQtTie(lengthMult * surf.rr(k, 2), 4));
+                               mne::tie_away_from_zero(lengthMult * surf.rr(k, 0), 4),
+                               mne::tie_away_from_zero(lengthMult * surf.rr(k, 1), 4),
+                               mne::tie_away_from_zero(lengthMult * surf.rr(k, 2), 4));
         out << std::format("{:5}\n", surf.ntri);
         for (int k = 0; k < surf.ntri; k++) {
             out << std::format("{:5} {:4} {:4} {:4}\n",
@@ -195,9 +179,9 @@ int main(int argc, char* argv[])
     } else {
         for (int k = 0; k < surf.np; k++)
             out << std::format("{:10.3f} {:10.3f} {:10.3f}\n",
-                               listBemQtTie(lengthMult * surf.rr(k, 0), 3),
-                               listBemQtTie(lengthMult * surf.rr(k, 1), 3),
-                               listBemQtTie(lengthMult * surf.rr(k, 2), 3));
+                               mne::tie_away_from_zero(lengthMult * surf.rr(k, 0), 3),
+                               mne::tie_away_from_zero(lengthMult * surf.rr(k, 1), 3),
+                               mne::tie_away_from_zero(lengthMult * surf.rr(k, 2), 3));
     }
 
     out.close();

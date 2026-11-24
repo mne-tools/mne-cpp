@@ -187,6 +187,32 @@ BASESHARED_EXPORT std::string format_iso8601(UtcTime time, bool milliseconds = f
 BASESHARED_EXPORT std::optional<UtcTime> parse_iso8601(std::string_view text);
 
 /**
+ * Moves a decimal tie to the neighbouring double away from zero. std::format rounds exact ties to even, Qt's
+ * QString::number, asprintf and QTextStream round them away from zero; std::format("{:.2f}",
+ * tie_away_from_zero(value, 2)) writes the digits Qt writes.
+ *
+ * @param[in] value      Any value.
+ * @param[in] decimals   Number of decimals that will be written; negative for rounding to tens, hundreds, ...
+ *
+ * @return @p value, or its neighbour away from zero if @p value lies exactly halfway at @p decimals.
+ *
+ * @since 3.0.0
+ */
+BASESHARED_EXPORT double tie_away_from_zero(double value, int decimals);
+
+/**
+ * @param[in] value       Any value.
+ * @param[in] format      'f', 'e' or 'g' as in QString::number.
+ * @param[in] precision   Decimals for 'f' and 'e', significant digits for 'g'.
+ *
+ * @return @p value formatted like QString::number(value, format, precision), which rounds ties away from zero
+ *         where std::format rounds them to even.
+ *
+ * @since 3.0.0
+ */
+BASESHARED_EXPORT std::string format_number(double value, char format, int precision);
+
+/**
  * @return The directory of the running executable with symbolic links resolved, like
  *         QCoreApplication::applicationDirPath() but without an application object; empty if unknown.
  */

@@ -55,22 +55,6 @@ using namespace Eigen;
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
 //=============================================================================================================
-/**
- * Qt's asprintf, QString::number and QTextStream round exact decimal ties away from zero where std::format rounds
- * them to even. Moves a tie at @p decimals to the neighbouring double away from zero, so that std::format writes
- * the digits Qt wrote.
- */
-static double annotQtTie(double value, int decimals)
-{
-    const double scaled = std::ldexp(value, decimals + 1);
-    // A tie at decimals is an odd multiple of 2^-(decimals + 1)
-    if (std::isfinite(scaled) && scaled == std::trunc(scaled) && std::fmod(scaled, 2.0) != 0.0) {
-        return std::nextafter(value, value < 0 ? -std::numeric_limits<double>::infinity() : std::numeric_limits<double>::infinity());
-    }
-    return value;
-}
-
-//=============================================================================================================
 
 static bool writeLabel(const std::string& filename, const std::string& comment,
                        const VectorXi& vertices, const MatrixX3f& positions,
@@ -86,8 +70,8 @@ static bool writeLabel(const std::string& filename, const std::string& comment,
     for (int i = 0; i < vertices.size(); i++) {
         out << std::format("{}  {:8.4f}  {:8.4f}  {:8.4f}  {:10.6f}\n",
                            vertices(i),
-                           annotQtTie(positions(i, 0), 4), annotQtTie(positions(i, 1), 4), annotQtTie(positions(i, 2), 4),
-                           annotQtTie(values(i), 6));
+                           mne::tie_away_from_zero(positions(i, 0), 4), mne::tie_away_from_zero(positions(i, 1), 4), mne::tie_away_from_zero(positions(i, 2), 4),
+                           mne::tie_away_from_zero(values(i), 6));
     }
     return true;
 }

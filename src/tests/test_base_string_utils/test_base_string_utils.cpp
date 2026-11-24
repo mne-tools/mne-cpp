@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <clocale>
 #include <cmath>
+#include <format>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -73,6 +74,10 @@ private slots:
     void iso8601MatchesQDateTime_data();
     void iso8601MatchesQDateTime();
     void iso8601RejectsMalformedText();
+    void formatNumberMatchesQString_data();
+    void formatNumberMatchesQString();
+    void tieAwayFromZeroMatchesQString_data();
+    void tieAwayFromZeroMatchesQString();
     void executableDirIsTheApplicationDir();
     void resourcePathPrefersTheInstalledResources();
 };
@@ -370,6 +375,59 @@ void TestUtilsStringUtils::iso8601RejectsMalformedText()
         QVERIFY2(!parse_iso8601(text), std::string(text).c_str());
     }
     QCOMPARE(parse_iso8601("2026-11-15 09:30:00"), parse_iso8601("2026-11-15T09:30:00Z"));
+}
+
+//=============================================================================================================
+
+void TestUtilsStringUtils::formatNumberMatchesQString_data()
+{
+    QTest::addColumn<double>("value");
+    QTest::addColumn<char>("format");
+    QTest::addColumn<int>("precision");
+    const double values[] = {0.0, 0.125, -0.125, 2.5, -2.5, 0.05, 1234.5678, 9.9996, -9.9996, 1e-7, 6.02214076e23, 0.00012345};
+    const struct
+    {
+        char format;
+        int precision;
+    } formats[] = {{'f', 0}, {'f', 1}, {'f', 2}, {'f', 4}, {'e', 0}, {'e', 2}, {'e', 6}, {'g', 1}, {'g', 3}, {'g', 6}};
+    for (const double value : values) {
+        for (const auto& format : formats) {
+            QTest::addRow("%g %c%d", value, format.format, format.precision) << value << format.format << format.precision;
+        }
+    }
+}
+
+//=============================================================================================================
+
+void TestUtilsStringUtils::formatNumberMatchesQString()
+{
+    QFETCH(double, value);
+    QFETCH(char, format);
+    QFETCH(int, precision);
+    QCOMPARE(QString::fromStdString(mne::format_number(value, format, precision)), QString::number(value, format, precision));
+}
+
+//=============================================================================================================
+
+void TestUtilsStringUtils::tieAwayFromZeroMatchesQString_data()
+{
+    QTest::addColumn<double>("value");
+    QTest::addColumn<int>("decimals");
+    QTest::newRow("0.125 at 2") << 0.125 << 2;
+    QTest::newRow("-0.125 at 2") << -0.125 << 2;
+    QTest::newRow("2.5 at 0") << 2.5 << 0;
+    QTest::newRow("-3.5 at 0") << -3.5 << 0;
+    QTest::newRow("0.1 at 1, no tie") << 0.1 << 1;
+    QTest::newRow("1.0625 at 3") << 1.0625 << 3;
+}
+
+//=============================================================================================================
+
+void TestUtilsStringUtils::tieAwayFromZeroMatchesQString()
+{
+    QFETCH(double, value);
+    QFETCH(int, decimals);
+    QCOMPARE(QString::fromStdString(std::format("{:.{}f}", mne::tie_away_from_zero(value, decimals), decimals)), QString::number(value, 'f', decimals));
 }
 
 //=============================================================================================================

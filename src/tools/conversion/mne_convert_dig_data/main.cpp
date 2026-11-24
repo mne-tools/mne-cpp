@@ -70,110 +70,6 @@ struct DigPt
 
 //=============================================================================================================
 
-/**
- * @param[in] value       Any value.
- * @param[in] format      'f', 'e' or 'g' as in QString::number.
- * @param[in] precision   Decimals for 'f' and 'e', significant digits for 'g'.
- *
- * @return @p value formatted like QString::number(value, format, precision), which rounds ties away from zero
- *         where std::format rounds them to even.
- */
-static std::string digQtNumber(double value, char format, int precision)
-{
-    if (std::isnan(value))
-        return "nan";
-    if (std::isinf(value))
-        return value < 0 ? "-inf" : "inf";
-    const double magnitude = std::abs(value);
-    // Decimal digits d0 d1 d2 ... of magnitude = d0.d1d2... * 10^exponent
-    const auto expand = [magnitude](int decimals, std::string& digits, int& exponent) {
-        const std::string text = std::format("{:.{}e}", magnitude, decimals);
-        const std::size_t ePos = text.find('e');
-        digits = text.substr(0, 1) + text.substr(2, ePos - 2);
-        exponent = std::stoi(text.substr(ePos + 1));
-    };
-    std::string digits;
-    int exponent = 0;
-    expand(17, digits, exponent);
-    const int significant = format == 'e' ? precision + 1 : format == 'g' ? std::max(precision, 1)
-                                                                          : exponent + 1 + precision;
-    expand(std::max(significant, 0) + 40, digits, exponent);
-    const std::string_view tail = std::string_view(digits).substr(static_cast<std::size_t>(std::max(significant, 0)) + 1);
-    if (tail.find_first_not_of('0') == std::string_view::npos || tail.find_first_not_of('9') == std::string_view::npos)
-        expand(std::max(significant, 0) + 1100, digits, exponent); // exact for every double
-
-    std::string rounded;
-    if (significant >= 0) {
-        rounded = digits.substr(0, static_cast<std::size_t>(significant));
-        if (digits[static_cast<std::size_t>(significant)] >= '5') {
-            int i = significant - 1;
-            while (i >= 0 && rounded[static_cast<std::size_t>(i)] == '9')
-                rounded[static_cast<std::size_t>(i--)] = '0';
-            if (i >= 0) {
-                ++rounded[static_cast<std::size_t>(i)];
-            } else {
-                rounded.insert(rounded.begin(), '1');
-                ++exponent;
-                if (format != 'f')
-                    rounded.pop_back();
-            }
-        }
-    }
-    const bool zero = rounded.find_first_not_of('0') == std::string::npos;
-    if (zero)
-        exponent = 0;
-
-    const auto fixed = [&](int decimals) {
-        std::string intPart;
-        std::string fraction;
-        if (zero) {
-            intPart = "0";
-            fraction.assign(static_cast<std::size_t>(decimals), '0');
-        } else if (exponent + 1 <= 0) {
-            intPart = "0";
-            fraction = std::string(static_cast<std::size_t>(-(exponent + 1)), '0') + rounded;
-        } else {
-            const std::size_t intDigits = static_cast<std::size_t>(exponent) + 1;
-            intPart = rounded.substr(0, intDigits);
-            fraction = rounded.substr(intDigits);
-        }
-        fraction.resize(static_cast<std::size_t>(decimals), '0');
-        return decimals > 0 ? intPart + "." + fraction : intPart;
-    };
-    const auto scientific = [&](std::string mantissaDigits) {
-        if (mantissaDigits.empty())
-            mantissaDigits = "0";
-        std::string text(1, mantissaDigits[0]);
-        if (mantissaDigits.size() > 1)
-            text += "." + mantissaDigits.substr(1);
-        return text + std::format("e{}{:02}", exponent < 0 ? '-' : '+', std::abs(exponent));
-    };
-
-    std::string text;
-    if (format == 'f') {
-        text = fixed(precision);
-    } else if (format == 'e') {
-        text = scientific(zero ? std::string(static_cast<std::size_t>(precision + 1), '0') : rounded);
-    } else {
-        const int digitsWanted = std::max(precision, 1);
-        if (!zero && (exponent < -4 || exponent >= digitsWanted)) {
-            std::string mantissa = rounded;
-            mantissa.erase(mantissa.find_last_not_of('0') + 1);
-            text = scientific(mantissa);
-        } else {
-            text = fixed(std::max(digitsWanted - 1 - exponent, 0));
-            if (text.find('.') != std::string::npos) {
-                text.erase(text.find_last_not_of('0') + 1);
-                if (text.back() == '.')
-                    text.pop_back();
-            }
-        }
-    }
-    return value < 0 ? "-" + text : text;
-}
-
-//=============================================================================================================
-
 static std::vector<DigPt> readFifDig(const std::string& filename)
 {
     std::vector<DigPt> points;
@@ -293,9 +189,9 @@ static bool writeHpts(const std::string& filename, const std::vector<DigPt>& poi
             cat = "extra";
 
         std::print(out, "{} {} {} {} {}\n", cat, p.ident,
-                   digQtNumber(static_cast<double>(1000.0f * p.r[0]), 'f', 1),
-                   digQtNumber(static_cast<double>(1000.0f * p.r[1]), 'f', 1),
-                   digQtNumber(static_cast<double>(1000.0f * p.r[2]), 'f', 1));
+                   mne::format_number(static_cast<double>(1000.0f * p.r[0]), 'f', 1),
+                   mne::format_number(static_cast<double>(1000.0f * p.r[1]), 'f', 1),
+                   mne::format_number(static_cast<double>(1000.0f * p.r[2]), 'f', 1));
     }
 
     out.close();

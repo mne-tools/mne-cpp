@@ -54,22 +54,6 @@ using namespace Eigen;
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
 //=============================================================================================================
-/**
- * Qt's asprintf, QString::number and QTextStream round exact decimal ties away from zero where std::format rounds
- * them to even. Moves a tie at @p decimals to the neighbouring double away from zero, so that std::format writes
- * the digits Qt wrote.
- */
-static double listSrcQtTie(double value, int decimals)
-{
-    const double scaled = std::ldexp(value, decimals + 1);
-    // A tie at decimals is an odd multiple of 2^-(decimals + 1)
-    if (std::isfinite(scaled) && scaled == std::trunc(scaled) && std::fmod(scaled, 2.0) != 0.0) {
-        return std::nextafter(value, value < 0 ? -std::numeric_limits<double>::infinity() : std::numeric_limits<double>::infinity());
-    }
-    return value;
-}
-
-//=============================================================================================================
 
 static const char* coordFrameName(int frame)
 {
@@ -227,9 +211,9 @@ int main(int argc, char* argv[])
                 if (!listAll && space.inuse(v) == 0)
                     continue;
                 pnt << std::format("{:10.4f} {:10.4f} {:10.4f}\n",
-                                   listSrcQtTie(space.rr(v, 0) * 1000.0f, 4),
-                                   listSrcQtTie(space.rr(v, 1) * 1000.0f, 4),
-                                   listSrcQtTie(space.rr(v, 2) * 1000.0f, 4));
+                                   mne::tie_away_from_zero(space.rr(v, 0) * 1000.0f, 4),
+                                   mne::tie_away_from_zero(space.rr(v, 1) * 1000.0f, 4),
+                                   mne::tie_away_from_zero(space.rr(v, 2) * 1000.0f, 4));
             }
         }
         Log::info("Wrote point file: {}", pntName);
@@ -251,8 +235,8 @@ int main(int argc, char* argv[])
                     continue;
                 dip << std::format("{:5} {:8.3f} {:8.3f} {:8.3f}  {:7.4f} {:7.4f} {:7.4f}\n",
                                    dipNum++,
-                                   listSrcQtTie(space.rr(v, 0) * 1000.0f, 3), listSrcQtTie(space.rr(v, 1) * 1000.0f, 3), listSrcQtTie(space.rr(v, 2) * 1000.0f, 3),
-                                   listSrcQtTie(space.nn(v, 0), 4), listSrcQtTie(space.nn(v, 1), 4), listSrcQtTie(space.nn(v, 2), 4));
+                                   mne::tie_away_from_zero(space.rr(v, 0) * 1000.0f, 3), mne::tie_away_from_zero(space.rr(v, 1) * 1000.0f, 3), mne::tie_away_from_zero(space.rr(v, 2) * 1000.0f, 3),
+                                   mne::tie_away_from_zero(space.nn(v, 0), 4), mne::tie_away_from_zero(space.nn(v, 1), 4), mne::tie_away_from_zero(space.nn(v, 2), 4));
             }
         }
         Log::info("Wrote dipole file: {}", dipName);
@@ -273,7 +257,7 @@ int main(int argc, char* argv[])
                     continue;
                 vert << std::format("{:6} {:10.4f} {:10.4f} {:10.4f}\n",
                                     v,
-                                    listSrcQtTie(space.rr(v, 0) * 1000.0f, 4), listSrcQtTie(space.rr(v, 1) * 1000.0f, 4), listSrcQtTie(space.rr(v, 2) * 1000.0f, 4));
+                                    mne::tie_away_from_zero(space.rr(v, 0) * 1000.0f, 4), mne::tie_away_from_zero(space.rr(v, 1) * 1000.0f, 4), mne::tie_away_from_zero(space.rr(v, 2) * 1000.0f, 4));
             }
         }
         Log::info("Wrote vertex file: {}", vertName);

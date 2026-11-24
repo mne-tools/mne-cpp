@@ -56,22 +56,6 @@ using namespace Eigen;
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
 //=============================================================================================================
-/**
- * Qt's asprintf, QString::number and QTextStream round exact decimal ties away from zero where std::format rounds
- * them to even. Moves a tie at @p decimals to the neighbouring double away from zero, so that std::format writes
- * the digits Qt wrote.
- */
-static double eegLayoutQtTie(double value, int decimals)
-{
-    const double scaled = std::ldexp(value, decimals + 1);
-    // A tie at decimals is an odd multiple of 2^-(decimals + 1)
-    if (std::isfinite(scaled) && scaled == std::trunc(scaled) && std::fmod(scaled, 2.0) != 0.0) {
-        return std::nextafter(value, value < 0 ? -std::numeric_limits<double>::infinity() : std::numeric_limits<double>::infinity());
-    }
-    return value;
-}
-
-//=============================================================================================================
 
 /**
  * Azimuthal equidistant projection from 3D electrode positions on a sphere.
@@ -202,7 +186,7 @@ int main(int argc, char* argv[])
         float ny = 5.0f + 90.0f * (ys[i] - ymin) / yrange;
 
         // Layout format: channel_number x y width height name
-        out << std::format("{} {:.2f} {:.2f} {:.2f} {:.2f} {}\n", i + 1, eegLayoutQtTie(nx, 2), eegLayoutQtTie(ny, 2), eegLayoutQtTie(width, 2), eegLayoutQtTie(height, 2), eegChannels[i].name);
+        out << std::format("{} {:.2f} {:.2f} {:.2f} {:.2f} {}\n", i + 1, mne::tie_away_from_zero(nx, 2), mne::tie_away_from_zero(ny, 2), mne::tie_away_from_zero(width, 2), mne::tie_away_from_zero(height, 2), eegChannels[i].name);
     }
 
     out.close();

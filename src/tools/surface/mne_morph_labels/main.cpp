@@ -55,22 +55,6 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
- * Qt's asprintf, QString::number and QTextStream round exact decimal ties away from zero where std::format rounds
- * them to even. Moves a tie at @p decimals to the neighbouring double away from zero, so that std::format writes
- * the digits Qt wrote.
- */
-static double morphLabelsQtTie(double value, int decimals)
-{
-    const double scaled = std::ldexp(value, decimals + 1);
-    // A tie at decimals is an odd multiple of 2^-(decimals + 1)
-    if (std::isfinite(scaled) && scaled == std::trunc(scaled) && std::fmod(scaled, 2.0) != 0.0) {
-        return std::nextafter(value, value < 0 ? -std::numeric_limits<double>::infinity() : std::numeric_limits<double>::infinity());
-    }
-    return value;
-}
-
-//=============================================================================================================
-/**
  * For each vertex on the source sphere, find the nearest vertex on the destination sphere.
  * This is the core of the morphing: vertices are matched by proximity on the sphere registration.
  */
@@ -199,7 +183,7 @@ int main(int argc, char* argv[])
         if (v < dstWhite.rr().rows()) {
             out << std::format("{}  {:8.4f}  {:8.4f}  {:8.4f}  {:10.6f}\n",
                                v,
-                               morphLabelsQtTie(dstWhite.rr()(v, 0), 4), morphLabelsQtTie(dstWhite.rr()(v, 1), 4), morphLabelsQtTie(dstWhite.rr()(v, 2), 4),
+                               mne::tie_away_from_zero(dstWhite.rr()(v, 0), 4), mne::tie_away_from_zero(dstWhite.rr()(v, 1), 4), mne::tie_away_from_zero(dstWhite.rr()(v, 2), 4),
                                0.0);
         }
     }
