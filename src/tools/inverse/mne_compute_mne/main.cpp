@@ -1105,8 +1105,8 @@ int main(int argc, char* argv[])
             }
         }
     } else {
-        // Single source space (e.g., volume) — write as single STC
-        const std::string outFile = stcBase + ".stc";
+        // A volume source space goes to one file, named as MNE-Python's VolSourceEstimate expects
+        const std::string outFile = stcBase + "-vl.stc";
         Log::info("\nWriting STC to {}...", outFile);
 
         if (auto written = stc.write(path_from_utf8(outFile)); !written) {

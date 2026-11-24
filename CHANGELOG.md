@@ -282,6 +282,8 @@ aliases; replace the old spelling as below.
   twice, so the `.stc` written by `mne_compute_mne` could not be read back.
   `InvMinimumNorm` takes the vertices of all source spaces, and
   `InvSourceEstimate::write` refuses data whose rows do not match the vertices.
+- `mne_compute_mne` names a volume estimate `<out>-vl.stc`, which MNE-Python
+  reads as a `VolSourceEstimate`.
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and

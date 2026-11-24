@@ -218,7 +218,7 @@ private slots:
     }
 
     //=========================================================================================================
-    // Volume pipeline: the single .stc holds one vertex per source
+    // Volume pipeline: the -vl.stc MNE-Python reads holds one vertex per source
     //=========================================================================================================
 
     void testVolumeEstimateHasOneVertexPerSource()
@@ -245,7 +245,7 @@ private slots:
         runTool("mne_inverse_operator", {"--fwd", fwdFile, "--noisecov", covFile, "--meg", "--inv", invFile}, 120000);
         runTool("mne_compute_mne", {"--inv", invFile, "--meas", aveFile, "--snr", "3", "--out", stcBase, "--nomatch"}, 120000);
 
-        QFile stc(stcBase + ".stc");
+        QFile stc(stcBase + "-vl.stc");
         QVERIFY(stc.open(QIODevice::ReadOnly));
         QDataStream in(&stc);
         in.setByteOrder(QDataStream::BigEndian);
