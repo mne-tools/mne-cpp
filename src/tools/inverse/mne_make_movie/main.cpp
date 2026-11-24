@@ -25,25 +25,27 @@
 #include <mne/fs/fs_label.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCommandLineParser>
-#include <QCommandLineOption>
-#include <QFile>
-#include <QFileInfo>
-#include <QDir>
-#include <QGuiApplication>
-#include <QImage>
-#include <QPainter>
+#include <mne/base/command_line.h>
+#include <mne/base/raster_image.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstdlib>
+#include <filesystem>
+#include <format>
+#include <fstream>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -60,16 +62,16 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-static QColor valueToColor(double value, double fthresh, [[maybe_unused]] double fmid, double fmax, bool isSigned)
+static Rgb valueToColor(double value, double fthresh, [[maybe_unused]] double fmid, double fmax, bool isSigned)
 {
     double absVal = std::abs(value);
     if (absVal < fthresh)
-        return QColor(128, 128, 128);
+        return {128, 128, 128};
 
     // Interpolate between hot colors
     double t = 0.0;
     if (fmax > fthresh) {
-        t = qBound(0.0, (absVal - fthresh) / (fmax - fthresh), 1.0);
+        t = std::clamp((absVal - fthresh) / (fmax - fthresh), 0.0, 1.0);
     }
 
     int r, g, b;
@@ -90,23 +92,19 @@ static QColor valueToColor(double value, double fthresh, [[maybe_unused]] double
         std::swap(r, b);
     }
 
-    return QColor(r, g, b);
+    return {static_cast<std::uint8_t>(r), static_cast<std::uint8_t>(g), static_cast<std::uint8_t>(b)};
 }
 
 //=============================================================================================================
 
-static QImage renderFrame(const FsSurface& surf,
-                          const VectorXd& values,
-                          int width, int height,
-                          double fthresh, double fmid, double fmax,
-                          bool isSigned,
-                          const QString& viewName)
+static RasterImage renderFrame(const FsSurface& surf,
+                               const VectorXd& values,
+                               int width, int height,
+                               double fthresh, double fmid, double fmax,
+                               bool isSigned,
+                               const std::string& viewName)
 {
-    QImage image(width, height, QImage::Format_RGB32);
-    image.fill(QColor(0, 0, 0));
-
-    QPainter painter(&image);
-    painter.setRenderHint(QPainter::Antialiasing, true);
+    RasterImage image(width, height);
 
     const MatrixX3f& rr = surf.rr();
     const MatrixX3i& tris = surf.tris();
@@ -192,22 +190,18 @@ static QImage renderFrame(const FsSurface& surf,
         if (count > 0)
             triVal /= count;
 
-        QColor color = valueToColor(triVal, fthresh, fmid, fmax, isSigned);
+        const Rgb color = valueToColor(triVal, fthresh, fmid, fmax, isSigned);
 
-        auto project = [&](int idx) -> QPointF {
+        auto project = [&](int idx) -> PointF {
             float px = flipX * (rr(idx, xIdx) - (xIdx == 0 ? cx : (xIdx == 1 ? cy : cz)));
             float py = flipY * (rr(idx, yIdx) - (yIdx == 0 ? cx : (yIdx == 1 ? cy : cz)));
-            return QPointF((px - minX) * scale + 10, (py - minY) * scale + 10);
+            return {(px - minX) * scale + 10, (py - minY) * scale + 10};
         };
 
-        QPolygonF tri;
-        tri << project(i0) << project(i1) << project(i2);
-        painter.setPen(Qt::NoPen);
-        painter.setBrush(color);
-        painter.drawPolygon(tri);
+        const std::array<PointF, 3> tri = {project(i0), project(i1), project(i2)};
+        image.fill_polygon(tri, color);
     }
 
-    painter.end();
     return image;
 }
 
@@ -215,116 +209,95 @@ static QImage renderFrame(const FsSurface& surf,
 
 int main(int argc, char* argv[])
 {
-    QGuiApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mne_make_movie");
-    QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
-
-    QCommandLineParser parser;
-    parser.setApplicationDescription(
+    CommandLineParser parser(
         "Export source estimate frames as image sequences from STC data on cortical surfaces.\n\n"
         "This tool renders source activity overlaid on a cortical surface and exports\n"
         "individual frames as PNG images. The frame sequence can be assembled into a\n"
         "movie using external tools (e.g. ffmpeg).\n\n"
         "Port of the MNE-C mne_make_movie utility.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.add_help_option();
+    parser.add_version_option();
 
     // Input options
-    QCommandLineOption stcinOpt("stcin", "Input STC file prefix (left hemisphere assumed; -rh.stc auto-loaded).", "prefix");
-    QCommandLineOption invOpt("inv", "Inverse operator file (alternative to --stcin: compute from data).", "file");
-    QCommandLineOption measOpt("meas", "Measurement file (used with --inv).", "file");
-    QCommandLineOption setOpt("set", "Data set number (default: 0).", "number", "0");
-    QCommandLineOption snrOpt("snr", "SNR for regularization (default: 3).", "value", "3.0");
-    QCommandLineOption methodOpt("method", "Inverse method: MNE, dSPM, sLORETA (default: dSPM).", "name", "dSPM");
+    parser.add_option({{"stcin"}, "Input STC file prefix (left hemisphere assumed; -rh.stc auto-loaded).", "prefix", {}});
+    parser.add_option({{"inv"}, "Inverse operator file (alternative to --stcin: compute from data).", "file", {}});
+    parser.add_option({{"meas"}, "Measurement file (used with --inv).", "file", {}});
+    parser.add_option({{"set"}, "Data set number (default: 0).", "number", "0"});
+    parser.add_option({{"snr"}, "SNR for regularization (default: 3).", "value", "3.0"});
+    parser.add_option({{"method"}, "Inverse method: MNE, dSPM, sLORETA (default: dSPM).", "name", "dSPM"});
 
     // Time windowing
-    QCommandLineOption tminOpt("tmin", "Start time in seconds.", "seconds");
-    QCommandLineOption tmaxOpt("tmax", "End time in seconds.", "seconds");
-    QCommandLineOption tstepOpt("tstep", "Time step between frames in seconds.", "seconds");
+    parser.add_option({{"tmin"}, "Start time in seconds.", "seconds", {}});
+    parser.add_option({{"tmax"}, "End time in seconds.", "seconds", {}});
+    parser.add_option({{"tstep"}, "Time step between frames in seconds.", "seconds", {}});
 
     // Surface options
-    QCommandLineOption subjectOpt("subject", "FreeSurfer subject name.", "name");
-    QCommandLineOption subjectsDirOpt("subjects-dir", "FreeSurfer SUBJECTS_DIR (default: $SUBJECTS_DIR).", "dir");
-    QCommandLineOption surfaceOpt("surface", "Surface to use (default: inflated).", "name", "inflated");
-    QCommandLineOption lhOpt("lh", "Left hemisphere only.");
-    QCommandLineOption rhOpt("rh", "Right hemisphere only.");
-    QCommandLineOption viewOpt("view", "View: lat, med, dor, ven, ros, cau (default: lat).", "name", "lat");
+    parser.add_option({{"subject"}, "FreeSurfer subject name.", "name", {}});
+    parser.add_option({{"subjects-dir"}, "FreeSurfer SUBJECTS_DIR (default: $SUBJECTS_DIR).", "dir", {}});
+    parser.add_option({{"surface"}, "Surface to use (default: inflated).", "name", "inflated"});
+    parser.add_option({{"lh"}, "Left hemisphere only.", {}, {}});
+    parser.add_option({{"rh"}, "Right hemisphere only.", {}, {}});
+    parser.add_option({{"view"}, "View: lat, med, dor, ven, ros, cau (default: lat).", "name", "lat"});
 
     // Color scaling
-    QCommandLineOption fthreshOpt("fthresh", "Activation threshold (default: 3.0).", "value", "3.0");
-    QCommandLineOption fmidOpt("fmid", "Mid-scale value (default: 6.0).", "value", "6.0");
-    QCommandLineOption fmaxOpt("fmax", "Maximum scale value (default: 10.0).", "value", "10.0");
-    QCommandLineOption signedOpt("signed", "Show signed values (positive + negative).");
+    parser.add_option({{"fthresh"}, "Activation threshold (default: 3.0).", "value", "3.0"});
+    parser.add_option({{"fmid"}, "Mid-scale value (default: 6.0).", "value", "6.0"});
+    parser.add_option({{"fmax"}, "Maximum scale value (default: 10.0).", "value", "10.0"});
+    parser.add_option({{"signed"}, "Show signed values (positive + negative).", {}, {}});
 
     // Output options
-    QCommandLineOption pngOpt("png", "Output PNG prefix.", "prefix");
-    QCommandLineOption widthOpt("width", "Image width in pixels (default: 800).", "pixels", "800");
-    QCommandLineOption heightOpt("height", "Image height in pixels (default: 600).", "pixels", "600");
+    parser.add_option({{"png"}, "Output PNG prefix.", "prefix", {}});
+    parser.add_option({{"width"}, "Image width in pixels (default: 800).", "pixels", "800"});
+    parser.add_option({{"height"}, "Image height in pixels (default: 600).", "pixels", "600"});
 
     // Label options
-    QCommandLineOption labelOpt("label", "Label file(s) for ROI extraction.", "file");
-    QCommandLineOption labelOutOpt("labelout", "Output text file for label time courses.", "file");
+    parser.add_option({{"label"}, "Label file(s) for ROI extraction.", "file", {}});
+    parser.add_option({{"labelout"}, "Output text file for label time courses.", "file", {}});
 
-    parser.addOption(stcinOpt);
-    parser.addOption(invOpt);
-    parser.addOption(measOpt);
-    parser.addOption(setOpt);
-    parser.addOption(snrOpt);
-    parser.addOption(methodOpt);
-    parser.addOption(tminOpt);
-    parser.addOption(tmaxOpt);
-    parser.addOption(tstepOpt);
-    parser.addOption(subjectOpt);
-    parser.addOption(subjectsDirOpt);
-    parser.addOption(surfaceOpt);
-    parser.addOption(lhOpt);
-    parser.addOption(rhOpt);
-    parser.addOption(viewOpt);
-    parser.addOption(fthreshOpt);
-    parser.addOption(fmidOpt);
-    parser.addOption(fmaxOpt);
-    parser.addOption(signedOpt);
-    parser.addOption(pngOpt);
-    parser.addOption(widthOpt);
-    parser.addOption(heightOpt);
-    parser.addOption(labelOpt);
-    parser.addOption(labelOutOpt);
+    parser.process(argc, argv, "mne_make_movie", PROGRAM_VERSION);
 
-    parser.process(app);
+    // Numbers as QString::toInt / toDouble read them: 0 when the text is not a number
+    const auto intValue = [&parser](const char* name) {
+        return to_int(parser.value(name)).value_or(0);
+    };
+    const auto doubleValue = [&parser](const char* name) {
+        return to_double(parser.value(name)).value_or(0.0);
+    };
 
     //=========================================================================
     // Resolve subjects directory
     //=========================================================================
-    QString subjectsDir = parser.value(subjectsDirOpt);
-    if (subjectsDir.isEmpty()) {
-        subjectsDir = qEnvironmentVariable("SUBJECTS_DIR");
+    std::string subjectsDir = parser.value("subjects-dir");
+    if (subjectsDir.empty()) {
+        const char* env = std::getenv("SUBJECTS_DIR");
+        subjectsDir = env ? env : "";
     }
 
-    QString subject = parser.value(subjectOpt);
-    QString surfName = parser.value(surfaceOpt);
-    QString viewName = parser.value(viewOpt);
+    std::string subject = parser.value("subject");
+    const std::string surfName = parser.value("surface");
+    const std::string viewName = parser.value("view");
 
-    int width = parser.value(widthOpt).toInt();
-    int height = parser.value(heightOpt).toInt();
-    double fthresh = parser.value(fthreshOpt).toDouble();
-    double fmid = parser.value(fmidOpt).toDouble();
-    double fmax = parser.value(fmaxOpt).toDouble();
-    bool isSigned = parser.isSet(signedOpt);
+    const int width = intValue("width");
+    const int height = intValue("height");
+    const double fthresh = doubleValue("fthresh");
+    const double fmid = doubleValue("fmid");
+    const double fmax = doubleValue("fmax");
+    const bool isSigned = parser.is_set("signed");
 
     //=========================================================================
     // Load source estimate
     //=========================================================================
     InvSourceEstimate stcLH, stcRH;
 
-    if (parser.isSet(stcinOpt)) {
+    if (parser.is_set("stcin")) {
         // Load from STC files (separate lh/rh)
-        QString stcPrefix = parser.value(stcinOpt);
+        const std::string stcPrefix = parser.value("stcin");
 
-        QString lhFile = stcPrefix + "-lh.stc";
-        QString rhFile = stcPrefix + "-rh.stc";
+        const std::filesystem::path lhFile = path_from_utf8(stcPrefix + "-lh.stc");
+        const std::filesystem::path rhFile = path_from_utf8(stcPrefix + "-rh.stc");
 
-        if (QFile::exists(lhFile)) {
-            auto read = InvSourceEstimate::read(lhFile.toStdU16String());
+        if (std::filesystem::exists(lhFile)) {
+            auto read = InvSourceEstimate::read(lhFile);
             if (!read) {
                 Log::critical("{}", read.error().what());
                 return 1;
@@ -333,8 +306,8 @@ int main(int argc, char* argv[])
             Log::info("Read LH STC: {} sources x {} time points (tmin={:.3f}, tstep={:.6f})", static_cast<int>(stcLH.data.rows()), static_cast<int>(stcLH.data.cols()), stcLH.tmin, stcLH.tstep);
         }
 
-        if (QFile::exists(rhFile)) {
-            auto read = InvSourceEstimate::read(rhFile.toStdU16String());
+        if (std::filesystem::exists(rhFile)) {
+            auto read = InvSourceEstimate::read(rhFile);
             if (!read) {
                 Log::critical("{}", read.error().what());
                 return 1;
@@ -344,40 +317,40 @@ int main(int argc, char* argv[])
         }
 
         if (stcLH.empty() && stcRH.empty()) {
-            Log::critical("No STC data loaded from prefix: {}", stcPrefix.toStdString());
+            Log::critical("No STC data loaded from prefix: {}", stcPrefix);
             return 1;
         }
-    } else if (parser.isSet(invOpt) && parser.isSet(measOpt)) {
+    } else if (parser.is_set("inv") && parser.is_set("meas")) {
         // Compute from inverse operator + measurement
-        QString invFile = parser.value(invOpt);
-        QString measFile = parser.value(measOpt);
-        int setNo = parser.value(setOpt).toInt();
-        double snr = parser.value(snrOpt).toDouble();
-        double lambda2 = 1.0 / (snr * snr);
-        QString method = parser.value(methodOpt);
+        const std::string invFile = parser.value("inv");
+        const std::string measFile = parser.value("meas");
+        const int setNo = intValue("set");
+        const double snr = doubleValue("snr");
+        const double lambda2 = 1.0 / (snr * snr);
+        const std::string method = parser.value("method");
 
-        auto invOpRead = MNEInverseOperator::read(invFile.toStdU16String());
+        auto invOpRead = MNEInverseOperator::read(path_from_utf8(invFile));
         if (!invOpRead) {
             Log::critical("{}", invOpRead.error().what());
             return 1;
         }
         MNEInverseOperator& invOp = *invOpRead;
 
-        auto read = FiffEvokedSet::read(measFile.toStdU16String());
+        auto read = FiffEvokedSet::read(path_from_utf8(measFile));
         if (!read) {
             Log::critical("{}", read.error().what());
             return 1;
         }
         FiffEvokedSet& evokedSet = *read;
-        if (setNo >= std::ssize(evokedSet.evoked)) {
+        if (setNo < 0 || setNo >= std::ssize(evokedSet.evoked)) {
             Log::critical("Set number {} out of range (have {} sets).", setNo, static_cast<long long>(evokedSet.evoked.size()));
             return 1;
         }
 
-        FiffEvoked evoked = evokedSet.evoked[setNo];
-        Log::info("Computing inverse: {}, SNR={:.1f}, lambda2={:.4f}", method.toStdString(), snr, lambda2);
+        FiffEvoked evoked = evokedSet.evoked[static_cast<std::size_t>(setNo)];
+        Log::info("Computing inverse: {}, SNR={:.1f}, lambda2={:.4f}", method, snr, lambda2);
 
-        InvMinimumNorm minimumNorm(invOp, lambda2, method.toStdString());
+        InvMinimumNorm minimumNorm(invOp, lambda2, method);
         stcLH = minimumNorm.calculateInverse(evoked);
         if (stcLH.empty()) {
             Log::critical("Inverse computation failed.");
@@ -385,7 +358,7 @@ int main(int argc, char* argv[])
         }
 
         // Resolve subject from inverse operator if not specified
-        if (subject.isEmpty()) {
+        if (subject.empty()) {
             subject = "sample";
         }
 
@@ -405,48 +378,47 @@ int main(int argc, char* argv[])
     int tEndIdx = static_cast<int>(refStc.data.cols()) - 1;
     int tStepIdx = 1;
 
-    if (parser.isSet(tminOpt)) {
-        double tmin = parser.value(tminOpt).toDouble();
-        tStartIdx = qMax(0, static_cast<int>((tmin - refStc.tmin) / refStc.tstep));
+    if (parser.is_set("tmin")) {
+        const double tmin = doubleValue("tmin");
+        tStartIdx = std::max(0, static_cast<int>((tmin - refStc.tmin) / refStc.tstep));
     }
-    if (parser.isSet(tmaxOpt)) {
-        double tmax = parser.value(tmaxOpt).toDouble();
-        tEndIdx = qMin(static_cast<int>(refStc.data.cols()) - 1,
-                       static_cast<int>((tmax - refStc.tmin) / refStc.tstep));
+    if (parser.is_set("tmax")) {
+        const double tmax = doubleValue("tmax");
+        tEndIdx = std::min(static_cast<int>(refStc.data.cols()) - 1,
+                           static_cast<int>((tmax - refStc.tmin) / refStc.tstep));
     }
-    if (parser.isSet(tstepOpt)) {
-        double tstep = parser.value(tstepOpt).toDouble();
-        tStepIdx = qMax(1, static_cast<int>(tstep / refStc.tstep));
+    if (parser.is_set("tstep")) {
+        const double tstep = doubleValue("tstep");
+        tStepIdx = std::max(1, static_cast<int>(tstep / refStc.tstep));
     }
 
     //=========================================================================
     // Label extraction (if requested)
     //=========================================================================
-    if (parser.isSet(labelOpt) && parser.isSet(labelOutOpt)) {
-        QString labelFile = parser.value(labelOpt);
-        QString labelOutFile = parser.value(labelOutOpt);
+    if (parser.is_set("label") && parser.is_set("labelout")) {
+        const std::string labelFile = parser.value("label");
+        const std::string labelOutFile = parser.value("labelout");
 
         FsLabel label;
-        if (!FsLabel::read(labelFile.toStdU16String(), label)) {
-            Log::critical("Cannot read label: {}", labelFile.toStdString());
+        if (!FsLabel::read(path_from_utf8(labelFile), label)) {
+            Log::critical("Cannot read label: {}", labelFile);
             return 1;
         }
 
         Log::info("Extracting label time course for {} vertices", static_cast<long long>(label.vertices.size()));
 
-        QFile outFile(labelOutFile);
-        if (!outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            Log::critical("Cannot open output file: {}", labelOutFile.toStdString());
+        std::ofstream out(path_from_utf8(labelOutFile));
+        if (!out) {
+            Log::critical("Cannot open output file: {}", labelOutFile);
             return 1;
         }
-        QTextStream out(&outFile);
 
         for (int t = tStartIdx; t <= tEndIdx; t += tStepIdx) {
-            double time = refStc.tmin + t * refStc.tstep;
+            const double time = refStc.tmin + t * refStc.tstep;
             double meanVal = 0.0;
             int count = 0;
             for (int v = 0; v < label.vertices.size(); ++v) {
-                int vi = label.vertices(v);
+                const int vi = label.vertices(v);
                 if (vi < refStc.data.rows()) {
                     meanVal += refStc.data(vi, t);
                     count++;
@@ -454,47 +426,46 @@ int main(int argc, char* argv[])
             }
             if (count > 0)
                 meanVal /= count;
-            out << QString::number(time, 'f', 6) << "\t" << QString::number(meanVal, 'e', 6) << "\n";
+            out << format_number(time, 'f', 6) << "\t" << format_number(meanVal, 'e', 6) << "\n";
         }
 
-        outFile.close();
-        Log::info("Written label time course to: {}", labelOutFile.toStdString());
+        Log::info("Written label time course to: {}", labelOutFile);
     }
 
     //=========================================================================
     // Load surface and render frames
     //=========================================================================
-    QString pngPrefix = parser.value(pngOpt);
+    const std::string pngPrefix = parser.value("png");
 
-    if (pngPrefix.isEmpty()) {
+    if (pngPrefix.empty()) {
         Log::info("No --png specified; skipping frame rendering.");
         Log::info("Use --png <prefix> to export image frames.");
         return 0;
     }
 
-    if (subject.isEmpty() || subjectsDir.isEmpty()) {
+    if (subject.empty() || subjectsDir.empty()) {
         Log::critical("--subject and --subjects-dir (or $SUBJECTS_DIR) are required for rendering.");
         return 1;
     }
 
-    bool doLH = !parser.isSet(rhOpt);
-    bool doRH = !parser.isSet(lhOpt);
+    const bool doLH = !parser.is_set("rh");
+    const bool doRH = !parser.is_set("lh");
 
     int frameCount = 0;
 
-    auto renderHemi = [&](const QString& hemi) {
-        QString surfPath = subjectsDir + "/" + subject + "/surf/" + hemi + "." + surfName;
+    auto renderHemi = [&](const std::string& hemi) {
+        const std::string surfPath = subjectsDir + "/" + subject + "/surf/" + hemi + "." + surfName;
         FsSurface surf;
-        if (!FsSurface::read(surfPath.toStdU16String(), surf)) {
-            Log::critical("Cannot read surface: {}", surfPath.toStdString());
+        if (!FsSurface::read(path_from_utf8(surfPath), surf)) {
+            Log::critical("Cannot read surface: {}", surfPath);
             return;
         }
-        Log::info("Loaded surface {}: {} vertices, {} triangles", surfPath.toStdString(), static_cast<int>(surf.rr().rows()), static_cast<int>(surf.tris().rows()));
+        Log::info("Loaded surface {}: {} vertices, {} triangles", surfPath, static_cast<int>(surf.rr().rows()), static_cast<int>(surf.tris().rows()));
 
         // Select the appropriate STC for this hemisphere
         const InvSourceEstimate& hemiStc = (hemi == "lh") ? stcLH : stcRH;
         if (hemiStc.empty()) {
-            Log::info("No STC data for {} hemisphere, skipping.", hemi.toStdString());
+            Log::info("No STC data for {} hemisphere, skipping.", hemi);
             return;
         }
 
@@ -510,20 +481,16 @@ int main(int argc, char* argv[])
                 }
             }
 
-            QImage frame = renderFrame(surf, surfValues, width, height,
-                                       fthresh, fmid, fmax, isSigned, viewName);
+            RasterImage frame = renderFrame(surf, surfValues, width, height,
+                                            fthresh, fmid, fmax, isSigned, viewName);
 
             // Add time annotation
-            double time = refStc.tmin + t * refStc.tstep;
-            QPainter p(&frame);
-            p.setPen(Qt::white);
-            p.setFont(QFont("Helvetica", 14));
-            p.drawText(10, height - 10, QString("t = %1 ms").arg(time * 1000.0, 0, 'f', 1));
-            p.end();
+            const double time = refStc.tmin + t * refStc.tstep;
+            frame.draw_text(10, height - 10, std::format("t = {} ms", format_number(time * 1000.0, 'f', 1)), {255, 255, 255}, 2);
 
-            QString framePath = QString("%1-%2-%3.png").arg(pngPrefix).arg(hemi).arg(frameCount, 5, 10, QChar('0'));
-            if (!frame.save(framePath)) {
-                Log::critical("Cannot save frame: {}", framePath.toStdString());
+            const std::string framePath = std::format("{}-{}-{:05}.png", pngPrefix, hemi, frameCount);
+            if (!frame.save_png(path_from_utf8(framePath))) {
+                Log::critical("Cannot save frame: {}", framePath);
                 return;
             }
             frameCount++;
@@ -535,9 +502,9 @@ int main(int argc, char* argv[])
     if (doRH)
         renderHemi("rh");
 
-    Log::info("Exported {} frame(s) to {}-*.png", frameCount, pngPrefix.toStdString());
+    Log::info("Exported {} frame(s) to {}-*.png", frameCount, pngPrefix);
     Log::info("\nTo create a movie, use:");
-    Log::info("  ffmpeg -framerate 24 -i {}-lh-%05d.png -c:v libx264 -pix_fmt yuv420p movie.mp4", pngPrefix.toStdString());
+    Log::info("  ffmpeg -framerate 24 -i {}-lh-%05d.png -c:v libx264 -pix_fmt yuv420p movie.mp4", pngPrefix);
 
     return 0;
 }
