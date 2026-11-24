@@ -177,6 +177,37 @@ Reads `count` big-endian values and converts them to host byte order.
 
 ---
 
+### read_little_endian(values, count)
+
+Reads `count` little-endian values and converts them to host byte order.
+
+**Parameters:**
+
+- **values** : *T **
+  Destination of `count` values.
+
+- **count** : *std::size_t*
+  Number of values.
+
+**Returns:**
+
+- *bool* — Whether all values were read.
+
+---
+
+### read_little_endian(value)
+
+**Parameters:**
+
+- **value** : *T &*
+  Receives one value converted from little-endian byte order.
+
+**Returns:**
+
+- *bool* — Whether the value was read.
+
+---
+
 ### write_big_endian(values, count)
 
 Writes `count` values in big-endian byte order.
