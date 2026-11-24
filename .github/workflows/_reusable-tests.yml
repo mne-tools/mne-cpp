@@ -550,8 +550,9 @@ jobs:
         path: .coverage-baseline
         key: coverage-baseline-v2-${{ github.ref_name }}-${{ github.run_id }}
 
+    # Also when the coverage gate fails: the per-file report shows which files lost coverage.
     - name: Upload coverage report artifact
-      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage
+      if: ${{ !cancelled() && matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage }}
       uses: actions/upload-artifact@v7
       with:
         name: coverage-report
