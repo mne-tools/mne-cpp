@@ -1,0 +1,115 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @file     main.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    3.0.0
+ * @date     November 2026
+ * @brief    Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+ *
+ * Every step checks its result and the example exits non-zero on a mismatch.
+ * All files are written to a temporary directory.
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <mne/scene/canvas.h>
+#include <mne/scene/line_chart.h>
+#include <mne/scene/raster_renderer.h>
+#include <mne/scene/svg_renderer.h>
+#include <mne/scene/text_metrics.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <array>
+#include <cmath>
+#include <cstdlib>
+#include <filesystem>
+#include <format>
+#include <print>
+#include <string>
+#include <string_view>
+#include <system_error>
+#include <vector>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace mne;
+using namespace mne::scene;
+
+//=============================================================================================================
+// DEFINE GLOBAL METHODS
+//=============================================================================================================
+
+namespace
+{
+
+bool expect(bool condition, std::string_view what)
+{
+    std::println("{} {}", condition ? "  ok  " : "  FAIL", what);
+    return condition;
+}
+
+} // namespace
+
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+/**
+ * Draws a figure and a line plot and writes them as SVG and PNG files.
+ *
+ * @return EXIT_SUCCESS if every step gave the expected result.
+ */
+int main()
+{
+    bool ok = true;
+    const std::filesystem::path dir = std::filesystem::temp_directory_path() / "mne_cpp_ex_scene";
+    std::filesystem::create_directories(dir);
+
+    //! [scene_usage]
+    // Qt:   QPainter p(&widget); p.setPen(...); p.drawRect(...); p.drawText(...);
+    Canvas canvas(200, 120, Color::white());
+    canvas.set_antialiasing(true);
+    canvas.set_pen(Pen{{50, 100, 150}, 1.5});
+    canvas.set_brush(Brush::solid({70, 130, 180}));
+    canvas.draw_rounded_rect({20, 20, 80, 50}, 6, 6);
+    canvas.set_pen(Color::black());
+    canvas.draw_text(Rect{0, 80, 200, 30}, Align::Center, "Hello scene");
+    const DisplayList figure = canvas.take();
+
+    // A plot: the same model a disp widget shows on screen
+    std::vector<double> x;
+    std::vector<double> y;
+    for (int i = 0; i < 100; ++i) {
+        x.push_back(i * 0.01);
+        y.push_back(std::sin(2 * 3.14159265358979 * 5 * x.back()));
+    }
+    LineChart plot;
+    plot.set_title("5 Hz sine");
+    plot.set_x_label("time (s)");
+    plot.add_series(x, y, "signal");
+    const ApproximateTextMetrics metrics;
+    const DisplayList chart = plot.render(480, 320, metrics, Font{"", 0.0, 13.0});
+
+    const Expected<void> svg = write_svg(chart, dir / "plot.svg");
+    const Expected<void> png = to_raster(chart).save_png(dir / "plot.png");
+    //! [scene_usage]
+    ok &= expect(figure.commands.size() == 2 && svg && png && std::filesystem::file_size(dir / "plot.svg") > 0,
+                 "a figure was recorded and a line plot written as SVG and PNG");
+    ok &= expect(to_svg(figure).find("Hello scene") != std::string::npos, "the figure's text is in its SVG document");
+    ok &= expect(to_raster(figure).pixel(60, 45) == Rgb{70, 130, 180}, "the figure's rectangle is filled in its image");
+
+    std::error_code removeError;
+    std::filesystem::remove_all(dir, removeError);
+    ok &= expect(!removeError, std::format("the example's files were removed{}", removeError ? ": " + removeError.message() : std::string()));
+    return ok ? EXIT_SUCCESS : EXIT_FAILURE;
+}

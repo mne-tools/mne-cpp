@@ -141,6 +141,10 @@ component_management:
       name: libs/mne/sts
       paths:
         - src/libs/mne/sts/**
+    - component_id: libs_scene
+      name: libs/mne/scene
+      paths:
+        - src/libs/mne/scene/**
     - component_id: libs_base
       name: libs/mne/base
       paths:

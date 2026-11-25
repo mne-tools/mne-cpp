@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="480" height="320" viewBox="0 0 480 320">
+<rect x="0" y="0" width="480" height="320" fill="#ffffff"/>
+<text x="240" y="24" font-family="sans-serif" font-size="16.25" font-weight="bold" text-anchor="middle" fill="#333333" xml:space="preserve">Line plot</text>
+<line x1="64" y1="263.51" x2="456" y2="263.51" stroke="#e6e6e6" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="56" y="267.01" font-family="sans-serif" font-size="13" text-anchor="end" fill="#333333" xml:space="preserve">-1</text>
+<line x1="64" y1="208.848" x2="456" y2="208.848" stroke="#e6e6e6" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="56" y="212.348" font-family="sans-serif" font-size="13" text-anchor="end" fill="#333333" xml:space="preserve">-0.5</text>
+<line x1="64" y1="154.186" x2="456" y2="154.186" stroke="#e6e6e6" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="56" y="157.686" font-family="sans-serif" font-size="13" text-anchor="end" fill="#333333" xml:space="preserve">0</text>
+<line x1="64" y1="99.524" x2="456" y2="99.524" stroke="#e6e6e6" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="56" y="103.024" font-family="sans-serif" font-size="13" text-anchor="end" fill="#333333" xml:space="preserve">0.5</text>
+<line x1="64" y1="44.862" x2="456" y2="44.862" stroke="#e6e6e6" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="56" y="48.362" font-family="sans-serif" font-size="13" text-anchor="end" fill="#333333" xml:space="preserve">1</text>
+<line x1="64" y1="34" x2="64" y2="274" stroke="#e6e6e6" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="64" y="290" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">0</text>
+<line x1="104" y1="34" x2="104" y2="274" stroke="#e6e6e6" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="104" y="290" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">0.5</text>
+<line x1="144" y1="34" x2="144" y2="274" stroke="#e6e6e6" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="144" y="290" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">1</text>
+<line x1="184" y1="34" x2="184" y2="274" stroke="#e6e6e6" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="184" y="290" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">1.5</text>
+<line x1="224" y1="34" x2="224" y2="274" stroke="#e6e6e6" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="224" y="290" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">2</text>
+<line x1="264" y1="34" x2="264" y2="274" stroke="#e6e6e6" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="264" y="290" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">2.5</text>
+<line x1="304" y1="34" x2="304" y2="274" stroke="#e6e6e6" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="304" y="290" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">3</text>
+<line x1="344" y1="34" x2="344" y2="274" stroke="#e6e6e6" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="344" y="290" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">3.5</text>
+<line x1="384" y1="34" x2="384" y2="274" stroke="#e6e6e6" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="384" y="290" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">4</text>
+<line x1="424" y1="34" x2="424" y2="274" stroke="#e6e6e6" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="424" y="290" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">4.5</text>
+<text x="260" y="311" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">time (s)</text>
+<text x="0" y="10" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" transform="matrix(0 -1 1 0 6 154)" xml:space="preserve">amplitude</text>
+<defs><clipPath id="c0"><rect x="64" y="34" width="392" height="240"/></clipPath></defs>
+<g clip-path="url(#c0)">
+<polyline points="64,154.186 72,132.467 80,111.614 88,92.457 96,75.762 104,62.193 112,52.292 120,46.453 128,44.909 136,47.722 144,54.778 152,65.798 160,80.342 168,97.83 176,117.564 184,138.759 192,160.568 200,182.123 208,202.564 216,221.077 224,236.923 232,249.47 240,258.219 248,262.82 256,263.091 264,259.02 272,250.769 280,238.668 288,223.199 296,204.978 304,184.733 312,163.27 320,141.445 328,120.127 336,100.168 344,82.362 352,67.42 360,55.936 368,48.37 376,45.022 384,46.026 392,51.342 400,60.758 408,73.899 416,90.241 424,109.132 432,129.819 440,151.478 448,173.244 456,194.251" fill="none" stroke="#4682b4" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="64,99.524 72,100.138 80,101.966 88,104.966 96,109.072 104,114.191 112,120.208 120,126.988 128,134.379 136,142.215 144,150.32 152,158.511 160,166.606 168,174.421 176,181.782 184,188.524 192,194.494 200,199.559 208,203.605 216,206.541 224,208.301 232,208.846 240,208.164 248,206.269 256,203.205 264,199.04 272,193.867 280,187.804 288,180.985 296,173.564 304,165.709 312,157.594 320,149.403 328,141.32 336,133.525 344,126.195 352,119.493 360,113.57 368,108.559 376,104.573 384,101.702 392,100.008 400,99.532 408,100.283 416,102.245 424,105.373 432,109.597 440,114.823 448,120.933 456,127.789" fill="none" stroke="#dd8452" stroke-width="1.75" stroke-linecap="butt" stroke-linejoin="round" stroke-dasharray="7 3.5"/>
+</g>
+<rect x="64" y="34" width="392" height="240" fill="none" stroke="#888888" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<rect x="363" y="226" width="85" height="40" rx="4" ry="4" fill="#ffffff" fill-opacity="0.882" stroke="#cccccc" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="371" y1="237.5" x2="389" y2="237.5" stroke="#4682b4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="bevel"/>
+<text x="395" y="241" font-family="sans-serif" font-size="13" fill="#333333" xml:space="preserve">sine</text>
+<line x1="371" y1="252.5" x2="389" y2="252.5" stroke="#dd8452" stroke-width="2.5" stroke-linecap="butt" stroke-linejoin="bevel" stroke-dasharray="10 5"/>
+<text x="395" y="256" font-family="sans-serif" font-size="13" fill="#333333" xml:space="preserve">cosine</text>
+</svg>

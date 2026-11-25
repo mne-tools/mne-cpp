@@ -59,6 +59,7 @@ endif()
 
 add_subdirectory(mne/base)
 add_subdirectory(mne/math)
+add_subdirectory(mne/scene)
 add_subdirectory(mne/channels)
 if(NOT WASM) # WebAssembly cannot start processes
   add_subdirectory(mne/pybridge)

@@ -10,11 +10,12 @@
     },
     {
       "name": "core",
-      "description": "Numerics and transport primitives (TCP, UDP and serial transports among them) built only on the base library or on the standard library alone.",
+      "description": "Numerics, transport primitives (TCP, UDP and serial transports among them) and figures as display lists (mne_scene), built only on the base library or on the standard library alone.",
       "libraries": [
         "mne_math",
         "mne_acq",
-        "mne_com"
+        "mne_com",
+        "mne_scene"
       ]
     },
     {

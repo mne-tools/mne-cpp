@@ -220,6 +220,16 @@ aliases; replace the old spelling as below.
   draws text in a built-in bitmap font and writes PNG files, without a window
   system or Qt. Fills take an opacity, `fill_polygons()` fills overlapping
   polygons as one area and `blend_pixel()` mixes a colour into a pixel.
+- New library `mne_scene` (`mne/scene/`), Qt-free: `mne::scene::Canvas`
+  records drawing calls that follow `QPainter` (pens, brushes with linear
+  gradients, fonts, transforms, clips, opacity, cubic curves, text and images)
+  into a `DisplayList`, which `to_svg()` writes as a deterministic SVG document
+  and `to_raster()` renders into a `RasterImage`. It holds the plot models
+  `LineChart`, `BarChart`, `SplinePlot`, `ImagePlot`, `VectorPlot`,
+  `ButterflyPlot` and `AverageTile`, axis ticks (`nice_ticks()`,
+  `tick_label()`) and the colour maps (`map_color()`, moved from
+  `disp::ColorMap`, which now calls them). `ex_scene` writes a plot as SVG and
+  PNG without Qt.
 - The inverse operator's decomposition of the whitened lead field uses Eigen's
   divide-and-conquer SVD, as MNE-Python uses LAPACK's: about 2.5 times less
   CPU time for the MNE sample data, with the same source estimates to single

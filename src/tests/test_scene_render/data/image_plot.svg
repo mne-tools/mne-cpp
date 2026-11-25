@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="480" height="320" viewBox="0 0 480 320">
+<rect x="0" y="0" width="480" height="320" fill="#ffffff"/>
+<image x="49" y="34" width="337" height="240" preserveAspectRatio="none" style="image-rendering:pixelated" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAUCAIAAAAVyRqTAAAFL0lEQVR4nLWVy9LcRhXHz+lutS4jae6Xz3a+2EnZmIRKsqGKFRtIEVhTBezYsoA1C1iwS6qAyivwDBQPwAsQUyEOCTj+cIxnRjOj0cxopJb6RmviPAKqU126dP90+vT/3433PvwD/H8ufOvPv7EWtSFKEyWpbqmVBAUhLaECSQu0BdeiAqIBTTfGIljahfFAczAcdGANtzYw4BviaeZpSg3+6m8/NZaUmpcy2IpoX0enMlAnTk/UOyE/gleCV1lWGdpaIm2HJg5HVIgyQhm7gDYBlWhIVJSIYa8eBdWA1/iXL96UlhU6Wsv+jRg/LcfPi8FpH9Gd5+8wyCHIjV8o79iSqsVWgbGWURt6KvHbPhMjKobYjKEda28k5sPjvSS/G+3u8ByXz68k2FyzGzX+TFx9fLr92X6WbVKa8SDDKLNRpvyNoPsSTqWtBVgL3MMossNEjqN6ys9zUs+gnalodn59vHuzv/xm+OI1L0O9vN9YuTXiRvYeN7c/Kq8/zm+9yAZk5Ycr7K1ttJL+usTdwRQH06EN4ZwkCQz7apbWc7+8ovUcmoVK5uXDSfZO/8u3wmcPvC2WL66lNblRNyp9LG4/Kq8/yRerrE/WfrjGyKHXDl2R3cF2WdfWWPQYSWKHltO4ngfnRZe1Q/dm5weTzdv95w79ukM/+s8dp4JCh1/K8RMx+7ycPynG+TamWx5sMNhCtNX+rmFFjaWAtu0KQin0Qt0P22FQT1g9QTGBdqr8SX092t9PN9+IVnf5Fj/89HtOIQcd7tp4JdJllWyOcXMI6J7xAvkB/IPlR+OdNRWatPqiEDQ+lTGTMWn6pEmhHYAcaDJoB/3qKj5eRccJL/FHf/2lsm4IFcqrWq8WvK09qBipCDsjq4HWwBqgjVNep2u0F/Exp2jUPqgAdAQqsi4g0jSSQSAj3oZc4qt/ev9iAwCDVmNnCoWovwrnFHROAfMS2nW7XI4O2LUX71j3J3At7VoX7g0Siw9/+8evDAbkZVfXz32znu0emVOxRTeA2I6N8DIPd2fAXjJ4mYpLQnWp4MW0XXznZ793XMOwc62PboIqukRsjJtgqPxQxkHjJhgyybspONOg0KyS/NxwV0BZeXCm1BWwQnYGJoC6aC2+++3fAUXDqQqpTFiTYtPHduhWxtiBTAfVPDndio5z/zjxyog0BG1jPLfsqyZd1v1lmebHSBU+2zO/gMuyG34yXqnwvfkvgDEIfJNEqhMTr6eknkAzMWTaLMaHB4PsQW/9Gt/cYvv0ghaWbXR8007/Vc8/P86e5qPztsc3LNhAuLPhRvm5oIca32U/QUox7uGgryeJmIXnBavmIOaGzeu70923Bst3es8e8uUrzCnNI0AqK9faPpHjf4g7jw7X/9xNiyzxV164ht7KhFnrZSXmBX4ff+zQJI5xkJpJXyyicsGcceuF8RbVvenu7cF/v0brFH2KpDLt2qgv5ODv9asfHV/5dDffr79GL020brzsBA79g+TnriAYhZDGatSrZ341o864YmrovL4zLt4Yrt6IXtz3V7fYcUA0BTxb2OjgRk4/qW4/Pl39ezc5bno888IMosy4gvBNRYoTvvfw15YQGzDd47LPxfCySY6gGRkYtaNReZ0Wd3u7az+fsGNKhbNL5XZZHT1vR8/q0dPTaFWkbR54O+bn4O8hzDUvFDu1+N0fftAphDnZYbe791yATECmxiaKx23SE6PQbe0i9oQTkROfMvSs+bENcnd0nMP67NuTx07EHR3duXE5Oqgw/wOyuPssyXvvjwAAAABJRU5ErkJggg=="/>
+<rect x="49" y="34" width="336" height="239" fill="none" stroke="#888888" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="54.617" y1="273" x2="54.617" y2="277" stroke="#333333" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="54.617" y="289" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">0</text>
+<line x1="110.783" y1="273" x2="110.783" y2="277" stroke="#333333" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="110.783" y="289" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">0.5</text>
+<line x1="166.95" y1="273" x2="166.95" y2="277" stroke="#333333" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="166.95" y="289" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">1</text>
+<line x1="223.117" y1="273" x2="223.117" y2="277" stroke="#333333" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="223.117" y="289" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">1.5</text>
+<line x1="279.283" y1="273" x2="279.283" y2="277" stroke="#333333" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="279.283" y="289" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">2</text>
+<line x1="335.45" y1="273" x2="335.45" y2="277" stroke="#333333" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="335.45" y="289" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">2.5</text>
+<line x1="45" y1="268" x2="49" y2="268" stroke="#333333" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="41" y="271.5" font-family="sans-serif" font-size="13" text-anchor="end" fill="#333333" xml:space="preserve">5</text>
+<line x1="45" y1="235.429" x2="49" y2="235.429" stroke="#333333" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="41" y="238.929" font-family="sans-serif" font-size="13" text-anchor="end" fill="#333333" xml:space="preserve">10</text>
+<line x1="45" y1="202.857" x2="49" y2="202.857" stroke="#333333" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="41" y="206.357" font-family="sans-serif" font-size="13" text-anchor="end" fill="#333333" xml:space="preserve">15</text>
+<line x1="45" y1="170.286" x2="49" y2="170.286" stroke="#333333" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="41" y="173.786" font-family="sans-serif" font-size="13" text-anchor="end" fill="#333333" xml:space="preserve">20</text>
+<line x1="45" y1="137.714" x2="49" y2="137.714" stroke="#333333" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="41" y="141.214" font-family="sans-serif" font-size="13" text-anchor="end" fill="#333333" xml:space="preserve">25</text>
+<line x1="45" y1="105.143" x2="49" y2="105.143" stroke="#333333" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="41" y="108.643" font-family="sans-serif" font-size="13" text-anchor="end" fill="#333333" xml:space="preserve">30</text>
+<line x1="45" y1="72.571" x2="49" y2="72.571" stroke="#333333" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="41" y="76.071" font-family="sans-serif" font-size="13" text-anchor="end" fill="#333333" xml:space="preserve">35</text>
+<line x1="45" y1="40" x2="49" y2="40" stroke="#333333" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="41" y="43.5" font-family="sans-serif" font-size="13" text-anchor="end" fill="#333333" xml:space="preserve">40</text>
+<image x="401" y="34" width="14" height="240" preserveAspectRatio="none" style="image-rendering:pixelated" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEACAIAAAD9XIvPAAADQUlEQVR4nC3S+U/WBRzA8b1brVar1WrJ6fM8PDwIyCWHXHL6PN/vV1NCJURERIE4RA65H+77ep5vllmWWWZZZllmaWZaalGkUaihiAKCAltra22ttbW2Pq5+eP0HL/6Zt/D3vJm/5kz8OWfkj7mF/D7ryW+zHvw6684vs27M33FlVszccWHqtgsTYvy2K2MzrozOuHF5xp2RaQ+Gpz25MG1g6JaRwVsmzk+ZOTtl4cyUD6cmfTk56cfxycUcmwjk6EQwR26GcPhmKIduhHPwxlIOjEeyfzyafddj2Xt9GXvG4tk9lsiua0nsvLYc/aqNgasKfaMa3aMr6Pz5KdqurKblSgqNl1OxX1pD7aV1VI+kUTmSTvlP6yn9MYOS4UyKhjdS8EMW+Rezyb24mZwLOWR/v5WsoVwyh/LI+C6f9G8LSBssZO1gEanfFJPy9TZWnS9h5bntaOdKUc6WYf2qnOQvK0g8s4OE05XEna4i9otqYk7VEPV5LZEn64j4rJ7wE/WEnrCz5HgDwZ82EvRJI4HHmgj4uBn/oy34fdSC74etLDrSho+wfNCO5f12vA93YH6vA69DnXi924XpHXGwC+Pb3Rjf6sZwoAfDm3f1Ytgv3hCv97Fwn3hN7O3H8Kp4RewZwPCyeEnsFi86MO4SL/zH9LzY6cT0nNCdeDmFQww4MfeLPh1zr453j+jWsXSJTtGh49P+vzadRa2iRTTr+DaJRh2/BmEX9Tr+daJW1OgsrhZVOgGVYoeo0Am8q1wnqEyUiu06wSVim05IsSjSWVIoCsSzOqH5Ik8nLNdJ2FYn4VtEjpOIzSLbydJNIstJ5EaR6SBqg8hwEJ0unnEQkybWDRC7VqwZYFmqeLqfuBSxup/4VWJlH/Er+kjQhNpLoiJsvSRZe0hK7iE5qZvkRJHQxfJ4EdeJNVbEdGCN7sAW1Y4tsg1bRBtKeCtKWAtKaDNKSDNqcBNqUCNqYANqgB3V347mV4/mW4fmU4tmqUHzrkYzV6GZKtGMFWiGcjTPMjSPUjR3+ehWguZSjLagCO3JQrQnClAfz0d9LA/10VzUR7agPpyD8lA2yoObUB7IQrk/E9t9G7Ddux7rPelYSfsXfndLek6WI0kAAAAASUVORK5CYII="/>
+<rect x="401" y="34" width="13" height="239" fill="none" stroke="#888888" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="414" y1="213.271" x2="418" y2="213.271" stroke="#333333" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="421" y="216.771" font-family="sans-serif" font-size="13" fill="#333333" xml:space="preserve">-0.5</text>
+<line x1="414" y1="153.08" x2="418" y2="153.08" stroke="#333333" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="421" y="156.58" font-family="sans-serif" font-size="13" fill="#333333" xml:space="preserve">0</text>
+<line x1="414" y1="92.889" x2="418" y2="92.889" stroke="#333333" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="421" y="96.389" font-family="sans-serif" font-size="13" fill="#333333" xml:space="preserve">0.5</text>
+<text x="0" y="10" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" transform="matrix(0 -1 1 0 458 153)" xml:space="preserve">value</text>
+<text x="240" y="24" font-family="sans-serif" font-size="16.25" font-weight="bold" text-anchor="middle" fill="#333333" xml:space="preserve">ImagePlot</text>
+<text x="217.5" y="311" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" xml:space="preserve">Time [s]</text>
+<text x="0" y="10" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#333333" transform="matrix(0 -1 1 0 6 153)" xml:space="preserve">Frequency [Hz]</text>
+</svg>

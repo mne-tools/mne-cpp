@@ -23,6 +23,7 @@ if(NOT WASM)
   add_subdirectory(ex_com)
   add_subdirectory(ex_make_layout)
   add_subdirectory(ex_mna)
+  add_subdirectory(ex_scene)
 endif()
 
 # The other examples are Qt programs.

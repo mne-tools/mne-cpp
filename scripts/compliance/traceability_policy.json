@@ -38,6 +38,7 @@
     "mri": 0,
     "pybridge": 4,
     "report": 1,
+    "scene": 30,
     "sts": 8
   }
 }

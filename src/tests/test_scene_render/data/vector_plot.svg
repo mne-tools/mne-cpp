@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="480" height="320" viewBox="0 0 480 320">
+<rect x="0" y="0" width="480" height="320" fill="#ffffff"/>
+<rect x="100" y="50" width="280" height="220" fill="#ffffff" stroke="none"/>
+<rect x="99" y="49" width="281" height="221" fill="none" stroke="#000000" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="100" y1="160.169" x2="105.714" y2="140.459" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="105.714" y1="140.459" x2="111.429" y2="121.534" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="111.429" y1="121.534" x2="117.143" y2="104.15" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="117.143" y1="104.15" x2="122.857" y2="88.999" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="122.857" y1="88.999" x2="128.571" y2="76.686" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="128.571" y1="76.686" x2="134.286" y2="67.7" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="134.286" y1="67.7" x2="140" y2="62.401" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="140" y1="62.401" x2="145.714" y2="61" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="145.714" y1="61" x2="151.429" y2="63.552" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="151.429" y1="63.552" x2="157.143" y2="69.956" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="157.143" y1="69.956" x2="162.857" y2="79.957" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="162.857" y1="79.957" x2="168.571" y2="93.155" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="168.571" y1="93.155" x2="174.286" y2="109.025" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="174.286" y1="109.025" x2="180" y2="126.934" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="180" y1="126.934" x2="185.714" y2="146.168" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="185.714" y1="146.168" x2="191.429" y2="165.96" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="191.429" y1="165.96" x2="197.143" y2="185.522" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="197.143" y1="185.522" x2="202.857" y2="204.072" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="202.857" y1="204.072" x2="208.571" y2="220.872" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="208.571" y1="220.872" x2="214.286" y2="235.253" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="214.286" y1="235.253" x2="220" y2="246.639" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="220" y1="246.639" x2="225.714" y2="254.579" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="225.714" y1="254.579" x2="231.429" y2="258.755" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="231.429" y1="258.755" x2="237.143" y2="259" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="237.143" y1="259" x2="242.857" y2="255.305" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="242.857" y1="255.305" x2="248.571" y2="247.818" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="248.571" y1="247.818" x2="254.286" y2="236.836" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="254.286" y1="236.836" x2="260" y2="222.798" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="260" y1="222.798" x2="265.714" y2="206.263" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="265.714" y1="206.263" x2="271.429" y2="187.89" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="271.429" y1="187.89" x2="277.143" y2="168.413" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="277.143" y1="168.413" x2="282.857" y2="148.606" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="282.857" y1="148.606" x2="288.571" y2="129.261" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="288.571" y1="129.261" x2="294.286" y2="111.147" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="294.286" y1="111.147" x2="300" y2="94.989" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="300" y1="94.989" x2="305.714" y2="81.428" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="305.714" y1="81.428" x2="311.429" y2="71.007" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="311.429" y1="71.007" x2="317.143" y2="64.14" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="317.143" y1="64.14" x2="322.857" y2="61.102" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="322.857" y1="61.102" x2="328.571" y2="62.013" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="328.571" y1="62.013" x2="334.286" y2="66.838" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="334.286" y1="66.838" x2="340" y2="75.383" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="340" y1="75.383" x2="345.714" y2="87.309" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="345.714" y1="87.309" x2="351.429" y2="102.139" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="351.429" y1="102.139" x2="357.143" y2="119.282" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="357.143" y1="119.282" x2="362.857" y2="138.056" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="362.857" y1="138.056" x2="368.571" y2="157.711" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="368.571" y1="157.711" x2="374.286" y2="177.464" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="374.286" y1="177.464" x2="380" y2="196.528" stroke="#0000ff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="100" y1="270" x2="100" y2="274" stroke="#000000" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="100" y="285" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#000000" xml:space="preserve">0</text>
+<line x1="128.571" y1="270" x2="128.571" y2="274" stroke="#000000" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="128.571" y="285" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#000000" xml:space="preserve">5</text>
+<line x1="157.143" y1="270" x2="157.143" y2="274" stroke="#000000" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="157.143" y="285" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#000000" xml:space="preserve">10</text>
+<line x1="185.714" y1="270" x2="185.714" y2="274" stroke="#000000" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="185.714" y="285" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#000000" xml:space="preserve">15</text>
+<line x1="214.286" y1="270" x2="214.286" y2="274" stroke="#000000" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="214.286" y="285" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#000000" xml:space="preserve">20</text>
+<line x1="242.857" y1="270" x2="242.857" y2="274" stroke="#000000" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="242.857" y="285" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#000000" xml:space="preserve">25</text>
+<line x1="271.429" y1="270" x2="271.429" y2="274" stroke="#000000" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="271.429" y="285" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#000000" xml:space="preserve">30</text>
+<line x1="300" y1="270" x2="300" y2="274" stroke="#000000" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="300" y="285" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#000000" xml:space="preserve">35</text>
+<line x1="328.571" y1="270" x2="328.571" y2="274" stroke="#000000" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="328.571" y="285" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#000000" xml:space="preserve">40</text>
+<line x1="357.143" y1="270" x2="357.143" y2="274" stroke="#000000" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="357.143" y="285" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#000000" xml:space="preserve">45</text>
+<line x1="95" y1="259.381" x2="99" y2="259.381" stroke="#000000" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="92" y="263.381" font-family="sans-serif" font-size="12" text-anchor="end" fill="#000000" xml:space="preserve">-1</text>
+<line x1="95" y1="209.775" x2="99" y2="209.775" stroke="#000000" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="92" y="213.775" font-family="sans-serif" font-size="12" text-anchor="end" fill="#000000" xml:space="preserve">-0.5</text>
+<line x1="95" y1="160.169" x2="99" y2="160.169" stroke="#000000" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="92" y="164.169" font-family="sans-serif" font-size="12" text-anchor="end" fill="#000000" xml:space="preserve">0</text>
+<line x1="95" y1="110.563" x2="99" y2="110.563" stroke="#000000" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="92" y="114.563" font-family="sans-serif" font-size="12" text-anchor="end" fill="#000000" xml:space="preserve">0.5</text>
+<line x1="95" y1="60.958" x2="99" y2="60.958" stroke="#000000" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="92" y="64.958" font-family="sans-serif" font-size="12" text-anchor="end" fill="#000000" xml:space="preserve">1</text>
+<text x="140" y="56" font-family="sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#000000" transform="matrix(1 0 0 1 100 -25)" xml:space="preserve">Plot</text>
+<text x="140" y="54" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#000000" transform="matrix(1 0 0 1 100 258)" xml:space="preserve">x</text>
+<text x="140" y="54" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#000000" transform="matrix(0 -1 1 0 -34 300)" xml:space="preserve">y</text>
+</svg>
