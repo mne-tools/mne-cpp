@@ -31,7 +31,7 @@
 
 #include <mne/disp/viewers/fiffrawviewsettings.h>
 #include <mne/disp/viewers/scalingview.h>
-#include <mne/disp/viewers/helpers/selectionsceneitem.h>
+#include <mne/disp/viewers/helpers/selectionitem.h>
 
 #include <mne/dsp/filterkernel.h>
 

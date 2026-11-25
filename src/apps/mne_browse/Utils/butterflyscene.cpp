@@ -86,23 +86,6 @@ void ButterflyScene::setShowGFP(bool show)
 
 //*************************************************************************************************************
 
-void ButterflyScene::repaintItems(const QList<QGraphicsItem*>& selectedChannelItems)
-{
-    this->clear();
-
-    QListIterator<QGraphicsItem*> i(selectedChannelItems);
-    while (i.hasNext()) {
-        SelectionSceneItem* SelectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
-        auto ButterflySceneItemTemp = std::make_unique<ButterflySceneItem>(SelectionSceneItemTemp->m_sChannelName,
-                                                                           SelectionSceneItemTemp->m_iChannelKind);
-
-        this->addItem(ButterflySceneItemTemp.release());
-    }
-}
-
-
-//*************************************************************************************************************
-
 void ButterflyScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
     m_crosshairPos = event->scenePos();

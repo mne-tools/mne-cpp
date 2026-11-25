@@ -14,7 +14,7 @@
  * @date     September 2014
  * @brief    Interactive 2-D sensor-layout picker for building and saving channel groups.
  *
- * ChannelSelectionView shows a @ref mne::disp::SelectionScene of the active sensor
+ * ChannelSelectionView shows a @ref mne::disp::SensorLayoutWidget of the active sensor
  * layout together with a list of named selection groups (loaded from
  * or saved to MNE @c .sel files). The user lassoes sensors on the
  * scene to define a group; emitted @c showSelectedChannelsOnly /
@@ -38,7 +38,6 @@
 
 #include <QWidget>
 #include <QListWidget>
-#include <QGraphicsItem>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -74,13 +73,13 @@ namespace mne::disp
 //=============================================================================================================
 
 class ChannelInfoModel;
-class SelectionScene;
+class SelectionItem;
 
 //=============================================================================================================
 /**
  * @brief Interactive 2-D sensor-layout picker for building, loading and saving channel groups.
  *
- * Drives a @ref SelectionScene of layout dots; lasso / click selection
+ * Drives a @ref SensorLayoutWidget of layout dots; rubber band / click selection
  * updates the named groups stored in MNE @c .sel files and emits
  * the resulting visible-channel list to the raw and butterfly
  * viewers.
@@ -402,8 +401,6 @@ private:
     std::map<std::string, QPointF> m_layoutMap;                                /**< QMap with the loaded layout. each channel name correspond to a QPointF variable. */
     std::multimap<std::string, std::vector<std::string>> m_selectionGroupsMap; /**< QMultiMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/
 
-    SelectionScene* m_pSelectionScene; /**< Pointer to the selection scene class. */
-
     std::vector<std::string> m_currentlyLoadedFiffChannels; /**< List of currently loaded fiff data channels.*/
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
@@ -420,11 +417,12 @@ signals:
 
     //=========================================================================================================
     /**
-     * emit this signal whenever the selection in the scene has changed
+     * Emitted whenever the user or group selection has changed.
      *
-     * @param[in] selectedChannelItems currently user selected channels.
+     * @param[in] selection   The selected sensors, or without a selection the shown ones, with their layout
+     *                        positions; the channel numbers are 0.
      */
-    void selectionChanged(const QList<QGraphicsItem*>& selectedChannelItems);
+    void selectionChanged(const mne::disp::SelectionItem& selection);
 
     //=========================================================================================================
     /**

@@ -88,11 +88,9 @@ set(SOURCES
     viewers/helpers/rtfiffrawviewmodel.cpp
     viewers/helpers/rtfiffrawviewdelegate.cpp
     viewers/helpers/evokedsetmodel.cpp
-    viewers/helpers/layoutscene.cpp
-    viewers/helpers/averagescene.cpp
-    viewers/helpers/averagesceneitem.cpp
-    viewers/helpers/selectionscene.cpp
-    viewers/helpers/selectionsceneitem.cpp
+    viewers/helpers/sceneviewport.cpp
+    viewers/helpers/averagelayoutwidget.cpp
+    viewers/helpers/sensorlayoutwidget.cpp
     viewers/helpers/channelinfomodel.cpp
     viewers/helpers/mneoperator.cpp
     viewers/helpers/draggableframelesswidget.cpp
@@ -160,11 +158,10 @@ set(HEADERS
     viewers/helpers/rtfiffrawviewdelegate.h
     viewers/helpers/rtfiffrawviewmodel.h
     viewers/helpers/evokedsetmodel.h
-    viewers/helpers/layoutscene.h
-    viewers/helpers/averagescene.h
-    viewers/helpers/averagesceneitem.h
-    viewers/helpers/selectionscene.h
-    viewers/helpers/selectionsceneitem.h
+    viewers/helpers/sceneviewport.h
+    viewers/helpers/averagelayoutwidget.h
+    viewers/helpers/sensorlayoutwidget.h
+    viewers/helpers/selectionitem.h
     viewers/helpers/channelinfomodel.h
     viewers/helpers/mneoperator.h
     viewers/helpers/draggableframelesswidget.h

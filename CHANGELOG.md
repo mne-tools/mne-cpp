@@ -252,6 +252,23 @@ aliases; replace the old spelling as below.
 - The SOUP inventory lists the Qt modules the libraries, applications and
   tools request (also as sub-components in the CycloneDX SBOM) and the system
   `curl` program that MNE Analyze Studio's assistant runs.
+- The sensor-layout views of `mne_disp` no longer use `QGraphicsView`:
+  `mne::scene::SensorLayout` (sensors as labelled dots, with click and
+  rubber-band selection as in a `QGraphicsScene`) and
+  `mne::scene::AverageLayout` (an `AverageTile` per channel at its layout
+  position) are the Qt-free models; `disp::SceneViewport` shows such a model
+  with wheel and pinch zoom, right-button panning, a rubber band and
+  double-click fitting, and keeps it fitted until the user zooms or pans.
+  `ChannelSelectionView` picks sensors in a `SensorLayoutWidget`,
+  `AverageLayoutView` and mne_browse's average window draw an
+  `AverageLayoutWidget`, and their SVG export writes vector graphics.
+  Breaking: `ChannelSelectionView::selectionChanged()` and
+  `AverageLayoutView::channelSelectionManagerChanged()` take a
+  `SelectionItem` instead of a list of `QGraphicsItem`; `SelectionItem` moved
+  to `disp/viewers/helpers/selectionitem.h` and copies all its fields;
+  `LayoutScene`, `SelectionScene`, `SelectionSceneItem`, `AverageScene` and
+  `AverageSceneItem` are removed (mne_browse keeps a private `LayoutScene`
+  for its butterfly plot). Highlighted sensors now show an orange ring.
 - `mne::scene::FilterResponsePlot` draws the magnitude response of a filter
   in dB with its cut-off frequencies; the new `disp::FilterPlot` widget shows
   it, and `FilterDesignView` uses that widget instead of a `QGraphicsView`.

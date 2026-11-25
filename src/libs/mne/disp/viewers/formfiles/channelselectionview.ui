@@ -37,23 +37,7 @@
         <item>
          <layout class="QGridLayout" name="gridLayout_5">
           <item row="0" column="0" colspan="3">
-           <widget class="QGraphicsView" name="m_graphicsView_layoutPlot">
-            <property name="mouseTracking">
-             <bool>true</bool>
-            </property>
-            <property name="dragMode">
-             <enum>QGraphicsView::NoDrag</enum>
-            </property>
-            <property name="transformationAnchor">
-             <enum>QGraphicsView::AnchorUnderMouse</enum>
-            </property>
-            <property name="resizeAnchor">
-             <enum>QGraphicsView::AnchorUnderMouse</enum>
-            </property>
-            <property name="rubberBandSelectionMode">
-             <enum>Qt::IntersectsItemShape</enum>
-            </property>
-           </widget>
+           <widget class="mne::disp::SensorLayoutWidget" name="m_sensorLayout" native="true"/>
           </item>
           <item row="1" column="2">
            <spacer name="horizontalSpacer">
@@ -457,6 +441,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>mne::disp::SensorLayoutWidget</class>
+   <extends>QWidget</extends>
+   <header>mne/disp/viewers/helpers/sensorlayoutwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

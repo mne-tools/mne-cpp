@@ -15,19 +15,13 @@
  *
  * LayoutScene installs gesture recognisers on the active view and
  * translates pan / pinch / swipe events into the same view-zoom /
- * view-pan operations regardless of input device. @ref mne::disp::SelectionScene
- * and @ref mne::disp::AverageScene derive from it to
- * inherit the gesture-driven navigation behaviour.
+ * view-pan operations regardless of input device. ButterflyScene derives from it to
+ * inherit the gesture-driven navigation behaviour. Moved here from mne_disp, whose views no longer use
+ * QGraphicsScene.
  */
 
 #ifndef LAYOUTSCENE_H
 #define LAYOUTSCENE_H
-
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "../../disp_global.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -45,15 +39,11 @@ class QPinchGesture;
 class QSwipeGesture;
 
 //=============================================================================================================
-// DEFINE NAMESPACE mne::disp
+// DEFINE NAMESPACE MNEBROWSE
 //=============================================================================================================
 
-namespace mne::disp
+namespace MNEBROWSE
 {
-
-//=============================================================================================================
-// mne::disp FORWARD DECLARATIONS
-//=============================================================================================================
 
 //=============================================================================================================
 /**
@@ -63,7 +53,7 @@ namespace mne::disp
  * pan / pinch / swipe events into view-zoom / view-pan operations
  * regardless of input device.
  */
-class DISPSHARED_EXPORT LayoutScene : public QGraphicsScene
+class LayoutScene : public QGraphicsScene
 {
     Q_OBJECT
 

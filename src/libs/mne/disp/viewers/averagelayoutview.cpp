@@ -19,26 +19,21 @@
 //=============================================================================================================
 
 #include "averagelayoutview.h"
-#include <mne/base/log.h>
-
-#include "helpers/averagescene.h"
-#include "helpers/evokedsetmodel.h"
+#include "helpers/averagelayoutwidget.h"
 #include "helpers/channelinfomodel.h"
-#include "helpers/averagesceneitem.h"
-#include "helpers/selectionsceneitem.h"
-#include "../plots/helpers/svgwriter.h"
+#include "helpers/evokedsetmodel.h"
+#include "helpers/selectionitem.h"
+#include <mne/base/log.h>
 #include <mne/fiff/fiff_info.h>
+#include <mne/scene/svg_renderer.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QLabel>
-#include <QVBoxLayout>
-#include <QGraphicsView>
-#include <QPainter>
-#include <QGraphicsItem>
+#include <QPixmap>
 #include <QSettings>
+#include <QVBoxLayout>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -68,21 +63,11 @@ AverageLayoutView::AverageLayoutView(const QString& sSettingsPath,
     m_sSettingsPath = sSettingsPath;
     this->setWindowTitle("Average Layout");
 
-    m_pAverageLayoutView = new QGraphicsView(this);
+    m_pAverageLayoutWidget = new AverageLayoutWidget(this);
 
-
-    m_pAverageLayoutView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_pAverageLayoutView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-    m_pAverageScene = std::make_shared<AverageScene>(m_pAverageLayoutView.data(), this);
-    m_pAverageScene->setBackgroundBrush(QBrush(Qt::white));
-
-    m_pAverageLayoutView->setScene(m_pAverageScene.get());
-
-    //set layouts
     QVBoxLayout* neLayout = new QVBoxLayout(this);
     neLayout->setContentsMargins(0, 0, 0, 0);
-    neLayout->addWidget(m_pAverageLayoutView);
+    neLayout->addWidget(m_pAverageLayoutWidget);
     this->setLayout(neLayout);
     loadSettings();
 }
@@ -98,9 +83,8 @@ AverageLayoutView::~AverageLayoutView()
 
 void AverageLayoutView::updateViewport()
 {
-    // The scene items paint with QPainter, so the viewport stays Qt's raster widget
-    if (m_pAverageLayoutView) {
-        m_pAverageLayoutView->viewport()->update();
+    if (m_pAverageLayoutWidget) {
+        m_pAverageLayoutWidget->update();
     }
 }
 
@@ -127,52 +111,30 @@ void AverageLayoutView::setEvokedSetModel(const std::shared_ptr<EvokedSetModel>&
 
 void AverageLayoutView::setBackgroundColor(const QColor& backgroundColor)
 {
-    if (!m_pAverageScene) {
-        mne::Log::debug("AverageLayoutView::setBackgroundColor - m_pAverageScene is NULL. Returning. ");
-        return;
-    }
-
-    QBrush backgroundBrush = m_pAverageScene->backgroundBrush();
-    backgroundBrush.setColor(backgroundColor);
-    m_pAverageScene->setBackgroundBrush(backgroundBrush);
+    m_pAverageLayoutWidget->setBackgroundColor(backgroundColor);
 }
 
 //=============================================================================================================
 
 QColor AverageLayoutView::getBackgroundColor()
 {
-    if (!m_pAverageScene) {
-        mne::Log::debug("AverageLayoutView::getBackgroundColor - m_pAverageScene is NULL. Returning. ");
-        return QColor();
-    }
-
-    return m_pAverageScene->backgroundBrush().color();
+    return m_pAverageLayoutWidget->backgroundColor();
 }
 
 //=============================================================================================================
 
 void AverageLayoutView::takeScreenshot(const QString& fileName)
 {
-    if (!m_pAverageScene) {
-        mne::Log::debug("AverageLayoutView::takeScreenshot - m_pAverageScene is NULL. Returning. ");
-        return;
-    }
-
     if (fileName.contains(".svg", Qt::CaseInsensitive)) {
-        // Generate screenshot
-        SvgWriter svgGen;
-        svgGen.setFileName(fileName.toStdString());
-        QRectF rect = m_pAverageScene->itemsBoundingRect();
-        svgGen.setSize(QSize(rect.width(), rect.height()));
-
-        QPainter painter(&svgGen);
-        m_pAverageScene->render(&painter);
+        // The tiles as vector graphics, at the size they have on screen
+        const scene::DisplayList figure = m_pAverageLayoutWidget->figure(m_pAverageLayoutWidget->size());
+        if (const auto written = scene::write_svg(figure, fileName.toStdU16String()); !written) {
+            mne::Log::warning("{}", written.error().what());
+        }
     }
 
     if (fileName.contains(".png", Qt::CaseInsensitive)) {
-        QRect rect = m_pAverageLayoutView->frameRect();
-        QPixmap pixMap = QWidget::grab(rect);
-        pixMap.save(fileName);
+        m_pAverageLayoutWidget->grab().save(fileName);
     }
 }
 
@@ -180,15 +142,8 @@ void AverageLayoutView::takeScreenshot(const QString& fileName)
 
 void AverageLayoutView::setScaleMap(const std::map<int, float>& scaleMap)
 {
-    if (!m_pAverageScene) {
-        mne::Log::debug("AverageLayoutView::setScaleMap - m_pAverageScene is NULL. Returning. ");
-        return;
-    }
-
     m_scaleMap = scaleMap;
-
-    m_pAverageScene->setScaleMap(scaleMap);
-
+    m_pAverageLayoutWidget->setScaleMap(scaleMap);
     updateData();
 }
 
@@ -210,13 +165,8 @@ std::shared_ptr<std::map<std::string, bool>> AverageLayoutView::getAverageActiva
 
 void AverageLayoutView::setAverageColor(const std::shared_ptr<std::map<std::string, QColor>>& qMapAverageColor)
 {
-    if (!m_pAverageScene) {
-        mne::Log::debug("AverageLayoutView::setAverageColor - m_pAverageScene is NULL. Returning. ");
-        return;
-    }
-
     m_qMapAverageColor = qMapAverageColor;
-    m_pAverageScene->setColorPerAverage(m_qMapAverageColor);
+    m_pAverageLayoutWidget->setAverageColors(*m_qMapAverageColor);
 }
 
 //=============================================================================================================
@@ -227,136 +177,86 @@ void AverageLayoutView::setSingleAverageColor(const QColor& avgColor)
         color = avgColor;
     }
 
-    m_pAverageScene->setColorPerAverage(m_qMapAverageColor);
-    m_pAverageScene->setSignalItemColor(avgColor);
+    m_pAverageLayoutWidget->setAverageColors(*m_qMapAverageColor);
+    m_pAverageLayoutWidget->setSignalColor(avgColor);
 }
 
 //=============================================================================================================
 
 void AverageLayoutView::setAverageActivation(const std::shared_ptr<std::map<std::string, bool>>& qMapAverageActivation)
 {
-    if (!m_pAverageScene) {
-        mne::Log::debug("AverageLayoutView::setAverageActivation - m_pAverageScene is NULL. Returning. ");
-        return;
-    }
-
     m_qMapAverageActivation = qMapAverageActivation;
-    m_pAverageScene->setActivationPerAverage(qMapAverageActivation);
+    m_pAverageLayoutWidget->setAverageActivation(*m_qMapAverageActivation);
 }
 
 //=============================================================================================================
 
-void AverageLayoutView::channelSelectionManagerChanged(const QList<QGraphicsItem*>& selectedChannelItems)
+void AverageLayoutView::channelSelectionManagerChanged(const SelectionItem& selection)
 {
-    if (!m_pAverageScene) {
-        mne::Log::debug("AverageLayoutView::channelSelectionManagerChanged - m_pAverageScene is NULL. Returning. ");
-        return;
-    }
-    //Repaint the average items in the average scene based on the input parameter selectedChannelItems and update them with current data
-    m_pAverageScene->repaintItems(selectedChannelItems);
+    m_pAverageLayoutWidget->setChannels(AverageLayoutWidget::channelsFrom(selection));
     setAverageColor(m_qMapAverageColor);
     setAverageActivation(m_qMapAverageActivation);
     setScaleMap(m_scaleMap);
-    updateData();
 }
 
 //=============================================================================================================
 
 void AverageLayoutView::channelSelectionChanged(const QVariant& selectionData)
 {
-    if (!m_pAverageScene) {
-        mne::Log::debug("AverageLayoutView::channelSelectionManagerChanged - m_pAverageScene is NULL. Returning. ");
+    const SelectionItem* pSelectionItem = selectionData.value<mne::disp::SelectionItem*>();
+    if (!pSelectionItem) {
+        mne::Log::debug("AverageLayoutView::channelSelectionChanged - no SelectionItem. Returning. ");
         return;
     }
-
-    SelectionItem* pSelectionItem = selectionData.value<mne::disp::SelectionItem*>();
-
-    //Repaint the average items in the average scene based on the input parameter selectedChannelItems and update them with current selectionData
-    m_pAverageScene->repaintSelectionItems(*pSelectionItem);
-    setAverageColor(m_qMapAverageColor);
-    setAverageActivation(m_qMapAverageActivation);
-    setScaleMap(m_scaleMap);
-    updateData();
+    channelSelectionManagerChanged(*pSelectionItem);
 }
 
 //=============================================================================================================
 
 void AverageLayoutView::updateData()
 {
-    if (m_pFiffInfo) {
-        QList<QGraphicsItem*> currentAverageSceneItems = m_pAverageScene->items();
-
-        //Set new data for all averageSceneItems
-        for (int i = 0; i < currentAverageSceneItems.size(); i++) {
-            AverageSceneItem* averageSceneItemTemp = static_cast<AverageSceneItem*>(currentAverageSceneItems.at(i));
-
-            averageSceneItemTemp->m_lAverageData.clear();
-
-            if (m_pEvokedSetModel) {
-                //Get only the necessary data from the average model (use column 2)
-                const std::vector<mne::disp::AvrTypeRowVectorPair> averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<std::vector<mne::disp::AvrTypeRowVectorPair>>();
-
-                //Get the averageScenItem specific data row
-                int channelNumber = averageSceneItemTemp->m_iChannelNumber;
-
-                if (channelNumber != -1) {
-                    averageSceneItemTemp->m_iChannelKind = m_pFiffInfo->chs.at(channelNumber).kind;
-                    averageSceneItemTemp->m_iChannelUnit = m_pFiffInfo->chs.at(channelNumber).unit;
-                    averageSceneItemTemp->m_firstLastSample.first = (-1) * m_pEvokedSetModel->getNumPreStimSamples();
-
-                    if (!averageData.empty()) {
-                        averageSceneItemTemp->m_firstLastSample.second = averageData.front().second.second - m_pEvokedSetModel->getNumPreStimSamples();
-                    }
-
-                    averageSceneItemTemp->m_iTotalNumberChannels = m_pEvokedSetModel->rowCount();
-                    averageSceneItemTemp->m_lAverageData = averageData;
-                    averageSceneItemTemp->m_bIsBad = m_pEvokedSetModel->getIsChannelBad(channelNumber);
-                }
-            }
-        }
-
-        m_pAverageScene->updateScene();
+    if (!m_pFiffInfo && (!m_pEvokedSetModel || !m_pChannelInfoModel)) {
+        mne::Log::debug("AverageLayoutView::updateData - m_pEvokedSetModel or m_pChannelInfoModel are NULL. Returning. ");
         return;
     }
 
-    if (!m_pAverageScene || !m_pEvokedSetModel || !m_pChannelInfoModel) {
-        mne::Log::debug("AverageLayoutView::updateData - m_pAverageScene, m_pEvokedSetModel or m_pChannelInfoModel are NULL. Returning. ");
-        return;
+    // Column 2 of the evoked set model holds the averages, each a column-major channels x samples matrix
+    std::vector<AvrTypeRowVectorPair> averageData;
+    if (m_pEvokedSetModel) {
+        averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<std::vector<AvrTypeRowVectorPair>>();
     }
-    //Get current items from the average scene
-    QList<QGraphicsItem*> currentAverageSceneItems = m_pAverageScene->items();
 
-    //Set new data for all averageSceneItems
-    for (int i = 0; i < currentAverageSceneItems.size(); i++) {
-        AverageSceneItem* averageSceneItemTemp = static_cast<AverageSceneItem*>(currentAverageSceneItems.at(i));
+    for (AverageLayoutWidget::Channel& channel : m_pAverageLayoutWidget->channels()) {
+        channel.averages.clear();
+        if (!m_pEvokedSetModel) {
+            continue;
+        }
 
-        averageSceneItemTemp->m_lAverageData.clear();
+        // With a FiffInfo the selection carries the channel numbers, otherwise the names are looked up
+        if (!m_pFiffInfo) {
+            channel.number = m_pChannelInfoModel->getIndexFromMappedChName(channel.name);
+        }
+        const int channelNumber = channel.number;
+        if (channelNumber == -1) {
+            continue;
+        }
 
-        //Get only the necessary data from the average model (use column 2)
-        const std::vector<mne::disp::AvrTypeRowVectorPair> averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<std::vector<mne::disp::AvrTypeRowVectorPair>>();
-
-        //Get the averageScenItem specific data row
-        int channelNumber = m_pChannelInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName.toStdString());
-
-        if (channelNumber != -1) {
-            //qDebug() << "Change data for" << channelNumber << "" << averageSceneItemTemp->m_sChannelName;
-
-            averageSceneItemTemp->m_iChannelKind = m_pChannelInfoModel->data(m_pChannelInfoModel->index(channelNumber, 4), ChannelInfoModelRoles::GetChKind).toInt();
-            averageSceneItemTemp->m_iChannelUnit = m_pChannelInfoModel->data(m_pChannelInfoModel->index(channelNumber, 6), ChannelInfoModelRoles::GetChUnit).toInt();
-            averageSceneItemTemp->m_firstLastSample.first = (-1) * m_pEvokedSetModel->getNumPreStimSamples();
-
-            if (!averageData.empty()) {
-                averageSceneItemTemp->m_firstLastSample.second = averageData.front().second.second - m_pEvokedSetModel->getNumPreStimSamples();
-            }
-
-            averageSceneItemTemp->m_iChannelNumber = channelNumber;
-            averageSceneItemTemp->m_iTotalNumberChannels = m_pEvokedSetModel->rowCount();
-            averageSceneItemTemp->m_lAverageData = averageData;
-            averageSceneItemTemp->m_bIsBad = m_pEvokedSetModel->getIsChannelBad(channelNumber);
+        if (m_pFiffInfo) {
+            channel.kind = m_pFiffInfo->chs.at(channelNumber).kind;
+            channel.unit = m_pFiffInfo->chs.at(channelNumber).unit;
+        } else {
+            channel.kind = m_pChannelInfoModel->data(m_pChannelInfoModel->index(channelNumber, 4), ChannelInfoModelRoles::GetChKind).toInt();
+            channel.unit = m_pChannelInfoModel->data(m_pChannelInfoModel->index(channelNumber, 6), ChannelInfoModelRoles::GetChUnit).toInt();
+        }
+        channel.firstSample = -m_pEvokedSetModel->getNumPreStimSamples();
+        channel.bad = m_pEvokedSetModel->getIsChannelBad(channelNumber);
+        const int channelCount = m_pEvokedSetModel->rowCount();
+        for (const auto& [comment, average] : averageData) {
+            channel.averages.push_back({comment, average.first + channelNumber, average.second, channelCount});
         }
     }
 
-    m_pAverageScene->updateScene();
+    m_pAverageLayoutWidget->update();
 }
 
 //=============================================================================================================

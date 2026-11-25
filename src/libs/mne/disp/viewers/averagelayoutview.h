@@ -13,10 +13,9 @@
  * @date     May 2014
  * @brief    2-D sensor-layout view placing per-channel evoked traces at their physical positions.
  *
- * AverageLayoutView embeds a @c QGraphicsView driven by an
- * @ref mne::disp::AverageScene that draws an @ref mne::disp::AverageSceneItem (one mini
- * evoked-trace plot) at each sensor coordinate read from the active
- * @c Layout. It listens to an @ref mne::disp::EvokedSetModel for new averaged
+ * AverageLayoutView embeds an @ref mne::disp::AverageLayoutWidget that draws one
+ * mini evoked-trace plot (an mne::scene::AverageTile) at each sensor coordinate
+ * read from the active @c Layout. It listens to an @ref mne::disp::EvokedSetModel for new averaged
  * responses and to a @ref mne::disp::ChannelInfoModel for channel-type / bad
  * flags, and supports per-condition colour selection and selective
  * channel display via @ref mne::disp::SelectionItem groups.
@@ -49,9 +48,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QGraphicsView;
-class QGraphicsItem;
-
 namespace mne
 {
 class FiffInfo;
@@ -68,7 +64,7 @@ namespace mne::disp
 // mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
-class AverageScene;
+class AverageLayoutWidget;
 class EvokedSetModel;
 class ChannelInfoModel;
 class SelectionItem;
@@ -77,7 +73,7 @@ class SelectionItem;
 /**
  * @brief Sensor-layout viewer drawing per-channel evoked traces at their physical 2-D positions.
  *
- * Wraps a @c QGraphicsView around an @ref AverageScene fed by an
+ * Wraps an @ref AverageLayoutWidget fed by an
  * @ref EvokedSetModel and a @ref ChannelInfoModel; selection groups
  * are pushed in as @ref SelectionItem to show only a subset of
  * channels.
@@ -218,11 +214,11 @@ public:
 
     //=========================================================================================================
     /**
-     * call this whenever the external channel selection manager changes
+     * Shows the channels picked in the channel selection view.
      *
-     * * @param[in] selectedChannelItems list of selected graphic items
+     * @param[in] selection   The picked channels with their layout positions.
      */
-    void channelSelectionManagerChanged(const QList<QGraphicsItem*>& selectedChannelItems);
+    void channelSelectionManagerChanged(const mne::disp::SelectionItem& selection);
 
     //=========================================================================================================
     /**
@@ -273,13 +269,12 @@ protected:
      */
     void updateProcessingMode(ProcessingMode mode);
 
-    std::shared_ptr<AverageScene> m_pAverageScene;                    /**< The pointer to the average scene. */
     std::shared_ptr<mne::disp::EvokedSetModel> m_pEvokedSetModel;     /**< The data model. */
     std::shared_ptr<mne::disp::ChannelInfoModel> m_pChannelInfoModel; /**< Channel info model. */
 
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< FiffInfo for currently loaded file. */
 
-    QPointer<QGraphicsView> m_pAverageLayoutView; /**< View for 2D average layout scene. */
+    QPointer<AverageLayoutWidget> m_pAverageLayoutWidget; /**< The tiles at their layout positions. */
 
     std::shared_ptr<std::map<std::string, QColor>> m_qMapAverageColor;    /**< Average colors. */
     std::shared_ptr<std::map<std::string, bool>> m_qMapAverageActivation; /**< Average activation status. */

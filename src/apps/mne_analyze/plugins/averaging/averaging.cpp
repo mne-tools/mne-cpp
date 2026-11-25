@@ -34,7 +34,7 @@
 #include <mne/disp/viewers/averagelayoutview.h>
 #include <mne/disp/viewers/butterflyview.h>
 #include <mne/disp/viewers/scalingview.h>
-#include <mne/disp/viewers/helpers/selectionsceneitem.h>
+#include <mne/disp/viewers/helpers/selectionitem.h>
 #include <mne/dsp/filterkernel.h>
 #include <mne/dsp/rt/rt_filter.h>
 #include <mne/mne/mne_epoch_data_list.h>

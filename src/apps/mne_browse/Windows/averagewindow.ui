@@ -90,7 +90,7 @@
              </widget>
             </item>
             <item row="0" column="0" colspan="3">
-             <widget class="QGraphicsView" name="m_graphicsView_layout"/>
+             <widget class="mne::disp::AverageLayoutWidget" name="m_averageLayout" native="true"/>
             </item>
             <item row="1" column="0">
              <spacer name="horizontalSpacer_2">
@@ -258,6 +258,14 @@
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>mne::disp::AverageLayoutWidget</class>
+   <extends>QWidget</extends>
+   <header>mne/disp/viewers/helpers/averagelayoutwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -31,6 +31,7 @@
 #include <mne/disp/viewers/projectsettingsview.h>
 #include <mne/disp/viewers/filterdesignview.h>
 #include <mne/disp/plots/filterplot.h>
+#include <mne/disp/plots/helpers/scenepainter.h>
 #include <mne/disp/viewers/triggerdetectionview.h>
 #include <mne/disp/viewers/averagingsettingsview.h>
 #include <mne/disp/viewers/bidsview.h>
@@ -53,10 +54,10 @@
 #include <mne/disp/viewers/helpers/bidsviewmodel.h>
 #include <mne/disp/viewers/helpers/mneoperator.h>
 #include <mne/disp/viewers/helpers/channelrhiview.h>
-#include <mne/disp/viewers/helpers/selectionsceneitem.h>
-#include <mne/disp/viewers/helpers/averagesceneitem.h>
+#include <mne/disp/viewers/helpers/averagelayoutwidget.h>
+#include <mne/disp/viewers/helpers/selectionitem.h>
+#include <mne/disp/viewers/helpers/sensorlayoutwidget.h>
 #include <mne/disp/viewers/helpers/channeldatamodel.h>
-#include <mne/disp/viewers/helpers/layoutscene.h>
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_ch_info.h>
 #include <mne/fiff/fiff_coord_trans.h>
@@ -77,15 +78,11 @@
 #include <QApplication>
 #include <QFile>
 #include <QLayout>
-#include <QScrollBar>
 #include <QSignalSpy>
 #include <QStringList>
 #include <QDir>
 #include <QHeaderView>
 #include <QMenu>
-#include <QGraphicsScene>
-#include <QGraphicsView>
-#include <QGraphicsSceneMouseEvent>
 #include <QGridLayout>
 #include <QScopeGuard>
 #include <QGroupBox>
@@ -576,9 +573,9 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies LayoutScene wheel zoom, double-click fit, right-drag panning and rubber-band selection.
+     * Verifies SensorLayoutWidget wheel zoom, double-click fit, right-drag panning, click and rubber-band selection.
      */
-    void layoutScene_zoomPanAndSelect();
+    void sensorLayoutWidget_zoomPanAndSelect();
     void channelRhiView_rendersAndDrawsOverlays();
     void channelDataModel_bufferDetrendAndDecimation();
 
@@ -605,10 +602,10 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies AverageSceneItem drawing: stim and zero line, scaling and clamping, per-average color and
+     * Verifies AverageLayoutWidget drawing: stim and zero line, scaling and clamping, per-average color and
      * activation, bad-channel opacity and the press/release label size.
      */
-    void averageSceneItem_paintsScaledClampedCurves();
+    void averageLayoutWidget_paintsScaledClampedCurves();
 
     //=========================================================================================================
     /**
@@ -2325,31 +2322,28 @@ void TestDispViewers2::averageLayoutView_drawsEachChannelsAverage()
     QCOMPARE(mne::disp::detail::valueOr(*view.getAverageColor(), "aud"), QColor(Qt::black));
     QVERIFY(mne::disp::detail::valueOr(*view.getAverageActivation(), "aud"));
 
-    auto* scene = view.findChild<QGraphicsScene*>();
-    QVERIFY(scene != nullptr);
-    QCOMPARE(scene->items().size(), 2);
-    // The scene items paint with QPainter, which a QRhiWidget viewport cannot take
-    auto* graphicsView = view.findChild<QGraphicsView*>();
-    QVERIFY(graphicsView != nullptr);
-    QVERIFY(graphicsView && !qobject_cast<QRhiWidget*>(graphicsView->viewport()));
+    auto* layout = view.findChild<AverageLayoutWidget*>();
+    QVERIFY(layout != nullptr);
+    QCOMPARE(layout->channels().size(), std::size_t{2});
     view.updateViewport();
-    QVERIFY(graphicsView && !qobject_cast<QRhiWidget*>(graphicsView->viewport()));
-    // Recolouring keeps the channel items (name, number and layout position) intact
+    // Recolouring keeps the channels (name, number and layout position) intact
     QStringList names;
-    for (QGraphicsItem* item : scene->items()) {
-        auto* averageItem = static_cast<AverageSceneItem*>(item);
-        names << averageItem->m_sChannelName;
-        QCOMPARE(std::abs(averageItem->pos().x()), 160.0);
+    for (const AverageLayoutWidget::Channel& channel : layout->channels()) {
+        names << QString::fromStdString(channel.name);
+        QCOMPARE(std::abs(channel.position.x()), 1.0);
     }
     names.sort();
     QCOMPARE(names, (QStringList{QStringLiteral("MEG 0111"), QStringLiteral("MEG 0113")}));
 
-    // Item at x = -160 (MEG0111) and x = +160 (MEG0113), 120 x 60 each: 0.8 of full scale is 24 px off centre
+    // Tile at x = -160 (MEG0111) and x = +160 (MEG0113), 120 x 60 each: 0.8 of full scale is 24 px off centre
     QImage image(480, 120, QImage::Format_RGB32);
     image.fill(Qt::white);
     {
+        mne::scene::Canvas canvas(480, 120);
+        canvas.translate(240, 60);
+        layout->averageLayout().draw(canvas, toSceneFont(layout->font()));
         QPainter painter(&image);
-        scene->render(&painter, QRectF(0, 0, 480, 120), QRectF(-240, -60, 480, 120));
+        paintScene(painter, canvas.display_list(), layout->font());
     }
     auto darkAt = [&image](int x, int y) {
         return qGray(image.pixel(x, y)) < 160;
@@ -2441,7 +2435,7 @@ void TestDispViewers2::evokedSetModel_projectionRolesAndAverageMaps()
     const auto matrices = model.data(0, 2, EvokedSetModelRoles::GetAverageData).value<std::vector<AvrTypeRowVectorPair>>();
     QCOMPARE(matrices.size(), 2);
     QCOMPARE(matrices.at(0).second.second, 30);
-    // Column-major (nchan x nsamples), the layout AverageSceneItem indexes with sample * nchan + channel
+    // Column-major (nchan x nsamples), the layout AverageLayoutWidget indexes with sample * nchan + channel
     QCOMPARE(matrices.at(0).second.first[5 * 4 + 3], 5.0);
     QVERIFY(!model.data(0, 1, Qt::BackgroundRole).isValid());
     QVERIFY(!model.data(0, 1, Qt::ToolTipRole).isValid());
@@ -3053,57 +3047,72 @@ void TestDispViewers2::channelRhiView_gpuFrame()
 
 //=============================================================================================================
 
-void TestDispViewers2::layoutScene_zoomPanAndSelect()
+void TestDispViewers2::sensorLayoutWidget_zoomPanAndSelect()
 {
-    QGraphicsView view;
-    LayoutScene scene(&view);
-    view.setScene(&scene);
-    view.resize(200, 200);
-    scene.addRect(0, 0, 1000, 1000);
-    view.show();
+    SensorLayoutWidget widget;
+    QSignalSpy selectionSpy(&widget, &SensorLayoutWidget::selectionChanged);
+    widget.setLayout({{"MEG 0111", QPointF(0, 0)}, {"MEG 0121", QPointF(10, 0)}, {"EEG 001", QPointF(5, -5)}}, {"MEG 0121"});
+    widget.resize(200, 200);
+    widget.show();
     QCoreApplication::processEvents();
+    QVERIFY(widget.isFitted());
+    const double fitted = widget.zoom();
 
-    // Wheel: one notch in zooms by 1.15, one notch out undoes it
-    const auto wheel = [&scene](int delta) {
-        QGraphicsSceneWheelEvent event(QEvent::GraphicsSceneWheel);
-        event.setDelta(delta);
-        QApplication::sendEvent(&scene, &event);
+    // Wheel: one notch in zooms by 1.15 around the pointer, one notch out undoes it
+    const auto wheel = [&widget](int delta, QPointF at) {
+        QWheelEvent event(at, widget.mapToGlobal(at), QPoint(), QPoint(0, delta), Qt::NoButton, Qt::NoModifier, Qt::NoScrollPhase, false);
+        QApplication::sendEvent(&widget, &event);
     };
-    wheel(120);
-    QVERIFY(std::fabs(view.transform().m11() - 1.15) < 1e-9);
-    wheel(-120);
-    QVERIFY(std::fabs(view.transform().m11() - 1.0) < 1e-9);
+    const mne::scene::Point anchor = widget.mapToScene(QPointF(50, 50));
+    wheel(120, QPointF(50, 50));
+    QVERIFY(std::fabs(widget.zoom() - fitted * 1.15) < 1e-9);
+    QVERIFY(!widget.isFitted());
+    QVERIFY((widget.mapFromScene(anchor) - QPointF(50, 50)).manhattanLength() < 1e-9);
+    wheel(-120, QPointF(50, 50));
+    QVERIFY(std::fabs(widget.zoom() - fitted) < 1e-9);
 
-    // Double-click fits all items into the view
-    QGraphicsSceneMouseEvent doubleClick(QEvent::GraphicsSceneMouseDoubleClick);
-    doubleClick.setButton(Qt::LeftButton);
-    QApplication::sendEvent(&scene, &doubleClick);
-    QVERIFY(view.transform().m11() < 0.25);
+    // Right-drag pans with the mouse
+    const QPointF before = widget.mapFromScene({0, 0});
+    QTest::mousePress(&widget, Qt::RightButton, Qt::NoModifier, QPoint(100, 100));
+    QTest::mouseMove(&widget, QPoint(130, 80));
+    QTest::mouseRelease(&widget, Qt::RightButton, Qt::NoModifier, QPoint(130, 80));
+    QVERIFY((widget.mapFromScene({0, 0}) - before - QPointF(30, -20)).manhattanLength() < 1e-9);
 
-    // Right-drag pans the scroll bars against the mouse movement
-    view.resetTransform();
-    view.horizontalScrollBar()->setValue(300);
-    view.verticalScrollBar()->setValue(300);
-    const auto mouse = [&scene](QEvent::Type type, Qt::MouseButton button, const QPoint& screenPos) {
-        QGraphicsSceneMouseEvent event(type);
-        event.setButton(button);
-        event.setButtons(type == QEvent::GraphicsSceneMouseRelease ? Qt::NoButton : Qt::MouseButtons(button));
-        event.setScreenPos(screenPos);
-        QApplication::sendEvent(&scene, &event);
+    // Double-click fits the sensors again
+    QTest::mouseDClick(&widget, Qt::LeftButton, Qt::NoModifier, QPoint(1, 1));
+    QVERIFY(widget.isFitted());
+    QVERIFY(std::fabs(widget.zoom() - fitted) < 1e-9);
+
+    // A click selects one sensor, Ctrl+click adds another, a click beside the sensors clears
+    const auto at = [&widget](double x, double y) {
+        return widget.mapFromScene({10 * x, -10 * y}).toPoint();
     };
-    mouse(QEvent::GraphicsSceneMousePress, Qt::RightButton, QPoint(100, 100));
-    QCOMPARE(view.dragMode(), QGraphicsView::NoDrag);
-    mouse(QEvent::GraphicsSceneMouseMove, Qt::RightButton, QPoint(130, 80));
-    QCOMPARE(view.horizontalScrollBar()->value(), 270);
-    QCOMPARE(view.verticalScrollBar()->value(), 320);
-    mouse(QEvent::GraphicsSceneMouseRelease, Qt::RightButton, QPoint(130, 80));
-    mouse(QEvent::GraphicsSceneMouseMove, Qt::NoButton, QPoint(10, 10));
-    QCOMPARE(view.horizontalScrollBar()->value(), 270);
+    QTest::mouseClick(&widget, Qt::LeftButton, Qt::NoModifier, at(0, 0));
+    QCOMPARE(widget.selectedNames(), std::vector<std::string>({"MEG 0111"}));
+    QTest::mouseClick(&widget, Qt::LeftButton, Qt::ControlModifier, at(10, 0));
+    QCOMPARE(widget.selectedNames(), std::vector<std::string>({"MEG 0111", "MEG 0121"}));
+    QCOMPARE(widget.selection().m_sChannelName, std::vector<std::string>({"MEG 0111", "MEG 0121"}));
+    QTest::mouseClick(&widget, Qt::LeftButton, Qt::NoModifier, at(5, 5));
+    QVERIFY(widget.selectedNames().empty());
+    QCOMPARE(selectionSpy.count(), 3);
 
-    // Left press switches to rubber-band selection
-    mouse(QEvent::GraphicsSceneMousePress, Qt::LeftButton, QPoint(10, 10));
-    QCOMPARE(view.dragMode(), QGraphicsView::RubberBandDrag);
-    mouse(QEvent::GraphicsSceneMouseRelease, Qt::LeftButton, QPoint(10, 10));
+    // A rubber band over the left half selects the sensors it touches
+    QTest::mousePress(&widget, Qt::LeftButton, Qt::NoModifier, at(-3, 4));
+    QTest::mouseMove(&widget, at(6, -7));
+    QTest::mouseRelease(&widget, Qt::LeftButton, Qt::NoModifier, at(6, -7));
+    QCOMPARE(widget.selectedNames(), std::vector<std::string>({"EEG 001", "MEG 0111"}));
+
+    // Only the shown kind remains, and only the named sensors can be picked
+    widget.setChannelKind(FIFFV_MEG_CH);
+    widget.setSelectable({"MEG 0121"});
+    QVERIFY(widget.selectedNames().empty());
+    QCOMPARE(widget.selection().m_sChannelName, std::vector<std::string>({"MEG 0111", "MEG 0121"}));
+    widget.selectNames({"MEG 0121"});
+    QCOMPARE(widget.selection().m_sChannelName, std::vector<std::string>({"MEG 0121"}));
+    widget.highlightNames({"MEG 0111"});
+    QVERIFY(widget.sensorLayout().sensors()[1].highlighted);
+    widget.clear();
+    QVERIFY(widget.sensorLayout().sensors().empty());
 }
 
 //=============================================================================================================
@@ -3974,7 +3983,7 @@ void TestDispViewers2::frequencySpectrumDelegate_paintsSpectrumAndReadout()
 
 //=============================================================================================================
 
-void TestDispViewers2::averageSceneItem_paintsScaledClampedCurves()
+void TestDispViewers2::averageLayoutWidget_paintsScaledClampedCurves()
 {
     // Channel 1 of 2, 120 samples, stimulus at sample 30; "aud" ramps to 2x full scale, "vis" is inactive
     Eigen::MatrixXd aud = Eigen::MatrixXd::Zero(2, 120);
@@ -3983,23 +3992,30 @@ void TestDispViewers2::averageSceneItem_paintsScaledClampedCurves()
         aud(1, s) = (s < 60) ? 0.5e-12 : 2e-12;
         vis(1, s) = -0.5e-12;
     }
-    AverageSceneItem item(QStringLiteral("MEG 0112"), 1, QPointF(0, 0), FIFFV_MEG_CH, FIFF_UNIT_T, Qt::darkGray);
-    item.m_iTotalNumberChannels = 2;
-    item.m_firstLastSample = qMakePair(-30, 90);
-    item.m_scaleMap = {{FIFF_UNIT_T, 1e-12f}};
-    item.m_lAverageData = {{"aud", RowVectorPair(aud.data(), 120)},
-                           {"vis", RowVectorPair(vis.data(), 120)}};
-    item.m_qMapAverageColor = {{"aud", Qt::blue}};
-    item.m_qMapAverageActivation = {{"aud", true}, {"vis", false}};
-    QCOMPARE(item.boundingRect(), QRectF(-60, -30, 120, 60));
+    AverageLayoutWidget widget;
+    AverageLayoutWidget::Channel channel;
+    channel.name = "MEG 0112";
+    channel.number = 1;
+    channel.kind = FIFFV_MEG_CH;
+    channel.unit = FIFF_UNIT_T;
+    channel.firstSample = -30;
+    channel.averages = {{"aud", aud.data() + 1, 120, 2}, {"vis", vis.data() + 1, 120, 2}};
+    widget.setChannels({channel});
+    widget.setSignalColor(Qt::darkGray);
+    widget.setScaleMap({{FIFF_UNIT_T, 1e-12f}});
+    widget.setAverageColors({{"aud", Qt::blue}});
+    widget.setAverageActivation({{"aud", true}, {"vis", false}});
+    QCOMPARE(widget.averageLayout().tiles().front().box, (mne::scene::Rect{-60, -30, 120, 60}));
 
-    // Render the 120 x 60 item 1:1 into an image whose origin is the item's top-left corner
-    auto render = [&item]() {
+    // Render the 120 x 60 tile 1:1 into an image whose origin is the tile's top-left corner
+    auto render = [&widget]() {
+        mne::scene::Canvas canvas(120, 60);
+        canvas.translate(60, 30);
+        widget.averageLayout().draw(canvas, toSceneFont(widget.font()));
         QImage image(120, 60, QImage::Format_RGB32);
         image.fill(Qt::white);
         QPainter painter(&image);
-        painter.translate(60, 30);
-        item.paint(&painter, nullptr, nullptr);
+        paintScene(painter, canvas.display_list(), widget.font());
         return image;
     };
     // Antialiased one-pixel lines fall between pixels and show at half intensity
@@ -4035,33 +4051,34 @@ void TestDispViewers2::averageSceneItem_paintsScaledClampedCurves()
     QVERIFY(rowsWhere(image, 45, isGray).isEmpty());
 
     // Activating "vis" draws it in the default color a quarter below the centre
-    item.m_qMapAverageActivation["vis"] = true;
+    widget.setAverageActivation({{"aud", true}, {"vis", true}});
     image = render();
     const QList<int> gray = rowsWhere(image, 45, isGray);
     QVERIFY2(!gray.isEmpty() && std::abs(gray.first() - 45) <= 1, qPrintable(QString::number(gray.value(0, -1))));
-    item.setDefaultColor(Qt::green);
+    widget.setSignalColor(Qt::green);
     image = render();
     QVERIFY(!rowsWhere(image, 45, [](QRgb c) { return qGreen(c) > 100 && qRed(c) < qGreen(c) - 50 && qBlue(c) < qGreen(c) - 50; }).isEmpty());
 
     // A bad channel is drawn faded
-    item.m_bIsBad = true;
+    widget.channels().front().bad = true;
     image = render();
     blue = rowsWhere(image, 45, [](QRgb c) { return qBlue(c) > qRed(c) + 20; });
     QVERIFY(!blue.isEmpty());
     QVERIFY(qRed(image.pixel(45, blue.first())) > 150);
-    item.m_bIsBad = false;
+    widget.channels().front().bad = false;
 
-    // Press enlarges the label, release restores it, both ask for a scene update
-    QSignalSpy updateSpy(&item, &AverageSceneItem::sceneUpdateRequested);
-    QGraphicsSceneMouseEvent press(QEvent::GraphicsSceneMousePress);
-    item.mousePressEvent(&press);
-    QCOMPARE(item.m_iFontTextSize, 6);
-    item.mouseReleaseEvent(&press);
-    QCOMPARE(item.m_iFontTextSize, 3);
-    QCOMPARE(updateSpy.count(), 2);
+    // Pressing a tile enlarges its label until the button is released
+    widget.resize(240, 120);
+    widget.show();
+    QCoreApplication::processEvents();
+    const QPoint centre = widget.mapFromScene({0, 0}).toPoint();
+    QTest::mousePress(&widget, Qt::LeftButton, Qt::NoModifier, centre);
+    QCOMPARE(widget.averageLayout().tiles().front().name_size, 6.0);
+    QTest::mouseRelease(&widget, Qt::LeftButton, Qt::NoModifier, centre);
+    QCOMPARE(widget.averageLayout().tiles().front().name_size, 3.0);
 
     // Without data nothing but the label is drawn
-    item.m_lAverageData.clear();
+    widget.channels().front().averages.clear();
     image = render();
     QVERIFY(rowsWhere(image, 90, isRed).isEmpty());
 }

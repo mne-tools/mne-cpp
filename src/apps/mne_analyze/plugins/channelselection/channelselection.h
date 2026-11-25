@@ -108,11 +108,11 @@ public:
 private slots:
     //=========================================================================================================
     /**
-     * Receives a list of graphic itemms, stores aparmeters locally and sends them to event manager
+     * Stores the picked channels with their numbers in the loaded data and sends them to the event manager.
      *
-     * @param[in] selectedChannelItems     List of parameters of graphics items.
+     * @param[in] selection     The channels picked in the channel selection view.
      */
-    void onSelectionChanged(const QList<QGraphicsItem*>& selectedChannelItems);
+    void onSelectionChanged(const mne::disp::SelectionItem& selection);
 
 private:
     //=========================================================================================================
@@ -141,7 +141,7 @@ private:
 
     QPointer<mne::analyze::Communicator> m_pCommu; /**< To broadcast signals. */
 
-    std::unique_ptr<mne::disp::SelectionItem> m_pSelectionItem; /**< Stores parameters from list of QGraphicsItems received by channelselectionview. */
+    std::unique_ptr<mne::disp::SelectionItem> m_pSelectionItem; /**< The selection received from the channel selection view, published to the other plugins. */
 
     std::unique_ptr<mne::disp::ChannelSelectionView> m_pChannelSelectionView; /**< View for selecting channels to be displayed. */
     std::shared_ptr<mne::disp::ChannelInfoModel> m_pChannelInfoModel;         /**< Hold channel info - needed to initialize channelselectionview. */

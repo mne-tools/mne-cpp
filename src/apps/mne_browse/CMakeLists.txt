@@ -23,6 +23,7 @@ set(APP_CORE_SOURCES
     Utils/filteroperator.cpp
     Utils/filterplotscene.cpp
     Utils/butterflyscene.cpp
+    Utils/layoutscene.cpp
     Utils/butterflysceneitem.cpp
     Models/averagemodel.cpp
     Models/rawmodel.cpp
@@ -62,6 +63,7 @@ set(HEADERS
     Utils/info.h
     Utils/filterplotscene.h
     Utils/butterflyscene.h
+    Utils/layoutscene.h
     Utils/butterflysceneitem.h
     Models/averagemodel.h
     Models/rawmodel.h

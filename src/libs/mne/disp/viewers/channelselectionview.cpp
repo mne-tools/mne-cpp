@@ -24,9 +24,9 @@
 #include <mne/base/string_utils.h>
 
 #include "ui_channelselectionview.h"
-#include "helpers/selectionsceneitem.h"
 #include "helpers/channelinfomodel.h"
-#include "helpers/selectionscene.h"
+#include "helpers/selectionitem.h"
+#include "helpers/sensorlayoutwidget.h"
 #include <mne/fiff/fiff_constants.h>
 #include <mne/mne/mne_layout.h>
 #include <mne/channels/selectionio.h>
@@ -97,10 +97,7 @@ ChannelSelectionView::ChannelSelectionView(const QString& sSettingsPath,
 
 ChannelSelectionView::~ChannelSelectionView()
 {
-    // The scene is a child of this view and outlives m_pUi; its selection changes while it clears must not reach us
-    if (m_pSelectionScene) {
-        disconnect(m_pSelectionScene, nullptr, this, nullptr);
-    }
+    // The layout widget emits nothing while it is destroyed, so no connection needs cutting here
 }
 
 //=============================================================================================================
@@ -125,11 +122,7 @@ void ChannelSelectionView::initListWidgets()
 
 void ChannelSelectionView::initSelectionSceneView()
 {
-    //Create layout scene and set to view
-    m_pSelectionScene = new SelectionScene(m_pUi->m_graphicsView_layoutPlot, this);
-    m_pUi->m_graphicsView_layoutPlot->setScene(m_pSelectionScene);
-
-    connect(m_pSelectionScene, &QGraphicsScene::selectionChanged,
+    connect(m_pUi->m_sensorLayout, &SensorLayoutWidget::selectionChanged,
             this, &ChannelSelectionView::updateUserDefinedChannelsList);
 }
 
@@ -225,34 +218,14 @@ void ChannelSelectionView::highlightChannels(const QModelIndexList& channelIndex
         channelList.push_back(m_pChannelInfoModel->data(nameIndex, ChannelInfoModelRoles::GetMappedLayoutChName).toString().toStdString());
     }
 
-    QList<QGraphicsItem*> allSceneItems = m_pSelectionScene->items();
-
-    for (int i = 0; i < allSceneItems.size(); i++) {
-        SelectionSceneItem* item = static_cast<SelectionSceneItem*>(allSceneItems.at(i));
-        if (std::ranges::contains(channelList, item->m_sChannelName.toStdString()))
-            item->m_bHighlightItem = true;
-        else
-            item->m_bHighlightItem = false;
-    }
-
-    m_pSelectionScene->update();
+    m_pUi->m_sensorLayout->highlightNames(channelList);
 }
 
 //=============================================================================================================
 
 void ChannelSelectionView::selectChannels(const std::vector<std::string>& channelList)
 {
-    QList<QGraphicsItem*> allSceneItems = m_pSelectionScene->items();
-
-    for (int i = 0; i < allSceneItems.size(); i++) {
-        SelectionSceneItem* item = static_cast<SelectionSceneItem*>(allSceneItems.at(i));
-        if (std::ranges::contains(channelList, item->m_sChannelName.toStdString()))
-            item->setSelected(true);
-        else
-            item->setSelected(false);
-    }
-
-    m_pSelectionScene->update();
+    m_pUi->m_sensorLayout->selectNames(channelList);
 }
 
 //=============================================================================================================
@@ -351,8 +324,7 @@ void ChannelSelectionView::updateBadChannels()
         }
     }
 
-    m_pSelectionScene->repaintItems(m_layoutMap, badChannelMappedNames);
-    m_pSelectionScene->update();
+    m_pUi->m_sensorLayout->setLayout(m_layoutMap, badChannelMappedNames);
 
     updateSceneItems();
     updateDataView();
@@ -385,15 +357,8 @@ void ChannelSelectionView::updateDataView()
 
     emit showSelectedChannelsOnly(selectedChannels);
 
-    //emit signal that selection was changed
-    if (!m_pSelectionScene->selectedItems().empty()) {
-        emit selectionChanged(m_pSelectionScene->selectedItems());
-    } else {
-        //only return visible items (EEG or MEG channels)
-        QList<QGraphicsItem*> visibleItemList = m_pSelectionScene->items();
-        visibleItemList.removeIf([](const QGraphicsItem* item) { return !item->isVisible(); });
-        emit selectionChanged(visibleItemList);
-    }
+    // The selected sensors, or without a selection the shown ones (EEG or MEG)
+    emit selectionChanged(m_pUi->m_sensorLayout->selection());
 }
 
 //=============================================================================================================
@@ -507,12 +472,9 @@ bool ChannelSelectionView::loadLayout(const QString& path)
         }
     }
 
-    m_pSelectionScene->repaintItems(m_layoutMap, {});
-    m_pSelectionScene->update();
+    m_pUi->m_sensorLayout->setLayout(m_layoutMap, {});
     updateSceneItems();
-
-    //Fit to view
-    m_pUi->m_graphicsView_layoutPlot->fitInView(m_pSelectionScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    m_pUi->m_sensorLayout->fitToContents();
 
     if (state)
         emit loadedLayoutMap(m_layoutMap);
@@ -640,10 +602,7 @@ void ChannelSelectionView::updateSelectionGroupsList(QListWidgetItem* current, Q
     if (current == 0) {
         return;
     }
-    if (current->text().contains("EEG"))
-        m_pSelectionScene->m_iChannelTypeMode = FIFFV_EEG_CH;
-    else
-        m_pSelectionScene->m_iChannelTypeMode = FIFFV_MEG_CH;
+    m_pUi->m_sensorLayout->setChannelKind(current->text().contains("EEG") ? FIFFV_EEG_CH : FIFFV_MEG_CH);
 
     //update visible channel list widget
     m_pUi->m_listWidget_visibleChannels->clear();
@@ -671,19 +630,16 @@ void ChannelSelectionView::updateSceneItems()
     for (int i = 0; i < m_pUi->m_listWidget_visibleChannels->count(); i++)
         visibleItems.push_back(m_pUi->m_listWidget_visibleChannels->item(i)->text().toStdString());
 
-    m_pSelectionScene->hideItems(visibleItems);
+    m_pUi->m_sensorLayout->setSelectable(visibleItems);
 }
 
 //=============================================================================================================
 
 void ChannelSelectionView::updateUserDefinedChannelsList()
 {
-    QList<QGraphicsItem*> itemList = m_pSelectionScene->selectedItems();
     QStringList userDefinedChannels;
-
-    for (int i = 0; i < itemList.size(); i++) {
-        SelectionSceneItem* item = static_cast<SelectionSceneItem*>(itemList.at(i));
-        userDefinedChannels << item->m_sChannelName;
+    for (const std::string& name : m_pUi->m_sensorLayout->selectedNames()) {
+        userDefinedChannels << QString::fromStdString(name);
     }
 
     m_pUi->m_listWidget_userDefined->clear();
@@ -759,9 +715,6 @@ void ChannelSelectionView::onComboBoxLayoutChanged()
 void ChannelSelectionView::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
-
-    //Fit scene in view
-    //m_pUi->m_graphicsView_layoutPlot->fitInView(m_pSelectionScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 //=============================================================================================================
@@ -831,5 +784,5 @@ bool ChannelSelectionView::isSelectionEmpty()
 
 void ChannelSelectionView::clearView()
 {
-    m_pSelectionScene->clear();
+    m_pUi->m_sensorLayout->clear();
 }

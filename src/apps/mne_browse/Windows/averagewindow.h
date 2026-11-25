@@ -25,8 +25,7 @@
 #include "../Models/averagemodel.h"
 #include "../Delegates/averagedelegate.h"
 #include <mne/channels/layoutloader.h>
-#include <mne/disp/viewers/helpers/averagescene.h>
-#include <mne/disp/viewers/helpers/selectionsceneitem.h>
+#include <mne/disp/viewers/helpers/selectionitem.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -69,8 +68,6 @@ namespace MNEBROWSE
 //=============================================================================================================
 // DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
-
-class LayoutScene;
 
 
 /**
@@ -121,11 +118,11 @@ public:
 
     //=========================================================================================================
     /**
-     * call this whenever the external channel selection manager changes
+     * Shows the channels picked in the channel selection view, one tile each.
      *
-     * * @param [in] selectedChannelItems list of selected graphic items
+     * @param [in] selection   The picked channels with their layout positions.
      */
-    void channelSelectionManagerChanged(const QList<QGraphicsItem*>& selectedChannelItems);
+    void channelSelectionManagerChanged(const mne::disp::SelectionItem& selection);
 
     //=========================================================================================================
     /**
@@ -278,7 +275,7 @@ private:
 
     /**
      * Populate the 2D layout scene from evoked channel info.
-     * Creates AverageSceneItems at positions derived from channel coordinates.
+     * Creates one tile per channel at a position derived from the channel coordinates.
      *
      * @param[in] selectedRows  The currently selected evoked-set model indices.
      * @return true if items were created, false otherwise.
@@ -322,7 +319,6 @@ private:
 
     AverageModel* m_pAverageModel;       /**< The QAbstractTable average model being part of the model/view framework of Qt. */
     AverageDelegate* m_pAverageDelegate; /**< The QItemDelegateaverage delegate being part of the model/view framework of Qt. */
-    AverageScene* m_pAverageScene;       /**< The pointer to the average scene. */
 
     ButterflyScene* m_pButterflyScene;                   /**< The pointer to the butterfly scene. */
     mne::FiffCov m_noiseCovariance;                      /**< Optional covariance used to whiten butterfly plots. */

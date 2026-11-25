@@ -23,7 +23,7 @@
 #include <anShared/Model/bemdatamodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <mne/disp/viewers/channelselectionview.h>
-#include <mne/disp/viewers/helpers/selectionsceneitem.h>
+#include <mne/disp/viewers/helpers/selectionitem.h>
 
 //=============================================================================================================
 // QT INCLUDES

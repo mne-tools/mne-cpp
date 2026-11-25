@@ -18,9 +18,12 @@
 
 #include "averagewindow.h"
 
+#include <mne/base/log.h>
 #include <mne/base/string_utils.h>
 #include <mne/disp/plots/helpers/svgwriter.h>
-#include <mne/disp/viewers/helpers/averagesceneitem.h>
+#include <mne/disp/plots/helpers/scenepainter.h>
+#include <mne/disp/viewers/helpers/averagelayoutwidget.h>
+#include <mne/scene/svg_renderer.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -243,17 +246,15 @@ AverageModel* AverageWindow::getAverageModel()
 
 //*************************************************************************************************************
 
-void AverageWindow::channelSelectionManagerChanged(const QList<QGraphicsItem*>& selectedChannelItems)
+void AverageWindow::channelSelectionManagerChanged(const mne::disp::SelectionItem& selection)
 {
-    //Repaint the average items in the average scene based on the input parameter
-    m_pAverageScene->repaintItems(selectedChannelItems);
+    // One tile per selected channel
+    ui->m_averageLayout->setChannels(AverageLayoutWidget::channelsFrom(selection));
 
     //call the onSelection function manually to replot the data for the givven average items
     onSelectionChanged(ui->m_tableView_loadedSets->selectionModel()->selection(), QItemSelection());
 
-    //fit everything in the view and update the scene
-    ui->m_graphicsView_layout->fitInView(m_pAverageScene->sceneRect(), Qt::KeepAspectRatio);
-    m_pAverageScene->update(m_pAverageScene->sceneRect());
+    ui->m_averageLayout->fitToContents();
 }
 
 
@@ -273,7 +274,7 @@ void AverageWindow::scaleAveragedData(const QMap<QString, double>& scaleMap)
     newScaleMapIdx[FIFFV_STIM_CH] = scaleMap["MEG_STIM"];
     newScaleMapIdx[FIFFV_MISC_CH] = scaleMap["MEG_MISC"];
 
-    m_pAverageScene->setScaleMap(newScaleMapIdx);
+    ui->m_averageLayout->setScaleMap(newScaleMapIdx);
     m_pButterflyScene->setScaleMap(scaleMap);
 
     // Sync spinboxes with external scale changes
@@ -427,9 +428,7 @@ void AverageWindow::init()
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, [this](int) {
         QTimer::singleShot(0, this, [this]() {
             updateButterflySize();
-            if (m_pAverageScene && !m_pAverageScene->items().isEmpty()) {
-                ui->m_graphicsView_layout->fitInView(m_pAverageScene->itemsBoundingRect(), Qt::KeepAspectRatio);
-            }
+            ui->m_averageLayout->fitToContents();
         });
     });
 }
@@ -481,13 +480,13 @@ void AverageWindow::initTableViewWidgets()
             this, [this](bool loaded) {
                 if (loaded) {
                     ui->m_tableView_loadedSets->resizeColumnsToContents();
-                    m_pAverageScene->clear();
+                    ui->m_averageLayout->setChannels({});
                     m_bAutoScaled = false;
                     m_bButterflyAutoScaled = false;
                     selectLoadedSets();
                     refreshPlots();
                 } else {
-                    m_pAverageScene->update();
+                    ui->m_averageLayout->update();
                     m_pButterflyScene->clear();
                     m_pButterflyScene->update();
                 }
@@ -501,10 +500,6 @@ void AverageWindow::initTableViewWidgets()
 
 void AverageWindow::initAverageSceneView()
 {
-    //Create average scene and set view
-    m_pAverageScene = new AverageScene(ui->m_graphicsView_layout, this);
-    ui->m_graphicsView_layout->setScene(m_pAverageScene);
-
     // Set sensible default scale map so traces are visible before the user
     // opens the Scale window.  The raw defaults in getDefaultScalingValue
     // (MAG=1e-12, GRAD=1e-15) are the unit amplitude, producing extreme
@@ -514,19 +509,19 @@ void AverageWindow::initAverageSceneView()
     defaultScaleMap[FIFF_UNIT_T] = 1e-11f;   // MAG
     defaultScaleMap[FIFF_UNIT_T_M] = 1e-10f; // GRAD
     defaultScaleMap[FIFFV_EEG_CH] = 1e-4f;   // EEG
-    m_pAverageScene->setScaleMap(defaultScaleMap);
+    ui->m_averageLayout->setScaleMap(defaultScaleMap);
 
     // --- Scale controls for the 2D Layout tab ---
     // The graphics view sits in gridLayout (inside gridLayout_2 on the tab page).
     // We add scale spinboxes to gridLayout row 2.
     QGridLayout* layoutGrid = nullptr;
-    if (auto* item = ui->m_graphicsView_layout->parentWidget()->layout()) {
+    if (auto* item = ui->m_averageLayout->parentWidget()->layout()) {
         // gridLayout_2 wraps gridLayout; find the inner one containing the view
         for (int i = 0; i < item->count(); ++i) {
             if (auto* nested = qobject_cast<QGridLayout*>(item->itemAt(i)->layout())) {
                 // Check if this grid contains our graphics view
                 for (int j = 0; j < nested->count(); ++j) {
-                    if (nested->itemAt(j)->widget() == ui->m_graphicsView_layout) {
+                    if (nested->itemAt(j)->widget() == ui->m_averageLayout) {
                         layoutGrid = nested;
                         break;
                     }
@@ -537,7 +532,7 @@ void AverageWindow::initAverageSceneView()
         }
     }
     if (layoutGrid) {
-        QWidget* tabPage = ui->m_graphicsView_layout->parentWidget();
+        QWidget* tabPage = ui->m_averageLayout->parentWidget();
 
         auto makeSpinBox = [&](const QString& labelText, double defaultVal) -> QDoubleSpinBox* {
             QDoubleSpinBox* spin = new QDoubleSpinBox(tabPage);
@@ -567,7 +562,7 @@ void AverageWindow::initAverageSceneView()
             scaleMap[FIFF_UNIT_T] = static_cast<float>(m_pSpinMag->value() * 1e-11);
             scaleMap[FIFF_UNIT_T_M] = static_cast<float>(m_pSpinGrad->value() * 1e-10);
             scaleMap[FIFFV_EEG_CH] = static_cast<float>(m_pSpinEEG->value() * 1e-4);
-            m_pAverageScene->setScaleMap(scaleMap);
+            ui->m_averageLayout->setScaleMap(scaleMap);
 
             // Also propagate to butterfly scene (uses STRING keys)
             QMap<QString, double> butterflyScale;
@@ -643,7 +638,7 @@ void AverageWindow::initComboBoxes()
     // 2D Layout tab combo — clear scene so it re-populates with the new channel type
     connect(ui->m_comboBox_layoutChannelKind, &QComboBox::currentTextChanged,
             this, [this]() {
-                m_pAverageScene->clear();
+                ui->m_averageLayout->setChannels({});
                 refreshPlots();
             });
 }
@@ -694,20 +689,14 @@ void AverageWindow::refreshPlots()
     }
 
     // Auto-populate layout scene if empty but evoked data is available
-    if (m_pAverageScene->items().isEmpty() && !selectedRows.isEmpty()) {
+    if (ui->m_averageLayout->channels().empty() && !selectedRows.isEmpty()) {
         populateLayoutFromEvoked(selectedRows);
     }
 
-    //Get current items from the average scene
-    QList<QGraphicsItem*> currentAverageSceneItems = m_pAverageScene->items();
+    // The averages of each tile, read in place from the evoked sets (column-major channels x samples)
+    for (AverageLayoutWidget::Channel& channel : ui->m_averageLayout->channels()) {
+        channel.averages.clear();
 
-    //Set new data for all averageSceneItems
-    for (int i = 0; i < currentAverageSceneItems.size(); i++) {
-        AverageSceneItem* averageSceneItemTemp = static_cast<AverageSceneItem*>(currentAverageSceneItems.at(i));
-
-        averageSceneItemTemp->m_lAverageData.clear();
-
-        //Do for all selected evoked sets
         for (int u = 0; u < selectedRows.size(); ++u) {
             if (u >= std::ssize(m_layoutDisplayEvokeds)) {
                 continue;
@@ -720,24 +709,16 @@ void AverageWindow::refreshPlots()
             }
 
             const FiffInfo* fiffInfo = &displayEvoked.info;
-            RowVectorPair averageData;
-            averageData.first = displayEvoked.data.data();
-            averageData.second = displayEvoked.data.cols();
-            const int first = displayEvoked.first;
-            const int last = displayEvoked.last;
-
-            //Get the averageScenItem specific data row
-            int channelNumber = mne::index_of(fiffInfo->ch_names, averageSceneItemTemp->m_sChannelName.toStdString());
-
+            const int channelNumber = mne::index_of(fiffInfo->ch_names, channel.name);
             if (channelNumber != -1) {
-                averageSceneItemTemp->m_firstLastSample.first = first;
-                averageSceneItemTemp->m_firstLastSample.second = last;
-                averageSceneItemTemp->m_iChannelKind = fiffInfo->chs.at(channelNumber).kind;
-                averageSceneItemTemp->m_iChannelUnit = fiffInfo->chs.at(channelNumber).unit;
-                ;
-                averageSceneItemTemp->m_iChannelNumber = channelNumber;
-                averageSceneItemTemp->m_iTotalNumberChannels = static_cast<int>(fiffInfo->ch_names.size());
-                averageSceneItemTemp->m_lAverageData.emplace_back(index.data(Qt::DisplayRole).toString().toStdString(), averageData);
+                channel.firstSample = displayEvoked.first;
+                channel.kind = fiffInfo->chs.at(channelNumber).kind;
+                channel.unit = fiffInfo->chs.at(channelNumber).unit;
+                channel.number = channelNumber;
+                channel.averages.push_back({index.data(Qt::DisplayRole).toString().toStdString(),
+                                            displayEvoked.data.data() + channelNumber,
+                                            static_cast<int>(displayEvoked.data.cols()),
+                                            static_cast<int>(displayEvoked.data.rows())});
             }
         }
     }
@@ -770,7 +751,7 @@ void AverageWindow::refreshPlots()
         autoScale[FIFF_UNIT_T_M] = maxGrad > 0 ? static_cast<float>(maxGrad * 1.4) : 1e-10f;
         autoScale[FIFF_UNIT_T] = maxMag > 0 ? static_cast<float>(maxMag * 1.4) : 1e-11f;
         autoScale[FIFFV_EEG_CH] = maxEEG > 0 ? static_cast<float>(maxEEG * 1.4) : 1e-4f;
-        m_pAverageScene->setScaleMap(autoScale);
+        ui->m_averageLayout->setScaleMap(autoScale);
 
         // Also update butterfly scene (STRING keys)
         QMap<QString, double> bfAutoScale;
@@ -790,11 +771,8 @@ void AverageWindow::refreshPlots()
         m_bAutoScaled = true;
     }
 
-    m_pAverageScene->update();
-
-    if (!m_pAverageScene->items().isEmpty()) {
-        ui->m_graphicsView_layout->fitInView(m_pAverageScene->itemsBoundingRect(), Qt::KeepAspectRatio);
-    }
+    ui->m_averageLayout->update();
+    ui->m_averageLayout->fitToContents();
 
     //Draw butterfly plot
     m_pButterflyScene->clear();
@@ -1061,7 +1039,7 @@ bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows
     }
 
     selItem.m_bShowAll = true;
-    m_pAverageScene->repaintSelectionItems(selItem);
+    ui->m_averageLayout->setChannels(AverageLayoutWidget::channelsFrom(selItem));
     return true;
 }
 
@@ -1078,26 +1056,20 @@ void AverageWindow::exportAverageLayoutPlot()
                                                     tr("Vector graphic(*.svg);;Images (*.png)"));
 
     if (!fileName.isEmpty()) {
-        // Generate screenshot
+        // The tiles at their size on screen, as vector graphics or an image
+        const mne::scene::DisplayList figure = ui->m_averageLayout->figure(ui->m_averageLayout->size());
         if (fileName.contains(".svg")) {
-            mne::disp::SvgWriter svgGen;
-
-            svgGen.setFileName(fileName.toStdString());
-            QRectF rect = m_pAverageScene->itemsBoundingRect();
-            svgGen.setSize(QSize(rect.width(), rect.height()));
-            //svgGen.setViewBox(QRect(0, 0, rect.width(), rect.height()));
-
-            QPainter painter(&svgGen);
-            m_pAverageScene->render(&painter);
+            if (const auto written = mne::scene::write_svg(figure, fileName.toStdU16String()); !written) {
+                mne::Log::warning("{}", written.error().what());
+            }
         }
 
         if (fileName.contains(".png")) {
-            m_pAverageScene->setSceneRect(m_pAverageScene->itemsBoundingRect());               // Re-shrink the scene to it's bounding contents
-            QImage image(m_pAverageScene->sceneRect().size().toSize(), QImage::Format_ARGB32); // Create the image with the exact size of the shrunk scene
-            image.fill(Qt::transparent);                                                       // Start all pixels transparent
-
+            QImage image(ui->m_averageLayout->size(), QImage::Format_ARGB32);
+            image.fill(Qt::transparent);
             QPainter painter(&image);
-            m_pAverageScene->render(&painter);
+            paintScene(painter, figure, ui->m_averageLayout->font());
+            painter.end();
             image.save(fileName);
         }
     }
@@ -1148,9 +1120,7 @@ void AverageWindow::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
 
-    if (m_pAverageScene && !m_pAverageScene->items().isEmpty()) {
-        ui->m_graphicsView_layout->fitInView(m_pAverageScene->itemsBoundingRect(), Qt::KeepAspectRatio);
-    }
+    ui->m_averageLayout->fitToContents();
     updateButterflySize();
 }
 

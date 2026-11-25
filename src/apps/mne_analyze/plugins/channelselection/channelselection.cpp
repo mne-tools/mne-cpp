@@ -18,7 +18,7 @@
 #include <mne/base/log.h>
 #include "channelselection.h"
 
-#include <mne/disp/viewers/helpers/selectionsceneitem.h>
+#include <mne/disp/viewers/helpers/selectionitem.h>
 #include <mne/disp/viewers/helpers/channelinfomodel.h>
 #include <mne/disp/viewers/channelselectionview.h>
 #include <mne/disp/viewers/applytoview.h>
@@ -219,25 +219,14 @@ void ChannelSelection::setFiffSettings(std::shared_ptr<mne::FiffInfo> pFiffInfo)
 
 //=============================================================================================================
 
-void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*>& selectedChannelItems)
+void ChannelSelection::onSelectionChanged(const mne::disp::SelectionItem& selection)
 {
-    QListIterator<QGraphicsItem*> i(selectedChannelItems);
-
-    m_pSelectionItem->m_sChannelName.clear();
-    m_pSelectionItem->m_iChannelNumber.clear();
-    m_pSelectionItem->m_iChannelKind.clear();
-    m_pSelectionItem->m_iChannelUnit.clear();
-    m_pSelectionItem->m_qpChannelPosition.clear();
+    *m_pSelectionItem = selection;
     m_pSelectionItem->m_sViewsToApply.clear();
-
-    while (i.hasNext()) {
-        mne::disp::SelectionSceneItem* selectionSceneItemTemp = static_cast<mne::disp::SelectionSceneItem*>(i.next());
-
-        m_pSelectionItem->m_sChannelName.push_back(selectionSceneItemTemp->m_sChannelName.toStdString());
-        m_pSelectionItem->m_iChannelNumber.push_back(m_pChannelInfoModel->getIndexFromOrigChName(selectionSceneItemTemp->m_sChannelName.toStdString()));
-        m_pSelectionItem->m_iChannelKind.push_back(selectionSceneItemTemp->m_iChannelKind);
-        m_pSelectionItem->m_iChannelUnit.push_back(selectionSceneItemTemp->m_iChannelUnit);
-        m_pSelectionItem->m_qpChannelPosition.push_back(selectionSceneItemTemp->m_qpChannelPosition);
+    // The view numbers the sensors of its layout; the other plugins need the rows of the loaded data
+    m_pSelectionItem->m_iChannelNumber.clear();
+    for (const std::string& name : selection.m_sChannelName) {
+        m_pSelectionItem->m_iChannelNumber.push_back(m_pChannelInfoModel->getIndexFromOrigChName(name));
     }
 
     m_pSelectionItem->m_bShowAll = m_pChannelSelectionView->isSelectionEmpty();

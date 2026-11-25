@@ -20,9 +20,7 @@
 //=============================================================================================================
 
 #include "butterflysceneitem.h"
-
-#include <mne/disp/viewers/helpers/layoutscene.h>
-#include <mne/disp/viewers/helpers/selectionsceneitem.h>
+#include "layoutscene.h"
 
 
 //*************************************************************************************************************
@@ -83,13 +81,6 @@ public:
      */
     void setShowGFP(bool show);
 
-    //=========================================================================================================
-    /**
-     * Repaints all items from the layout data in the scene.
-     *
-     *  @param [in] selectedChannelItems items which are to painted to the average scene
-     */
-    void repaintItems(const QList<QGraphicsItem*>& selectedChannelItems);
 
 protected:
     void drawForeground(QPainter* painter, const QRectF& rect) override;
