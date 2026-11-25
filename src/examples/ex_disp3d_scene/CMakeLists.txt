@@ -19,7 +19,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   Qt${QT_VERSION_MAJOR}::Core
   Qt${QT_VERSION_MAJOR}::Gui
   Qt${QT_VERSION_MAJOR}::Widgets
-  mne_disp3D_widgets
+  mne_disp3D
   mne_ieeg
   mne_inv
   mne_connectivity

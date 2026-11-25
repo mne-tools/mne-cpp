@@ -23,9 +23,9 @@
 #include <mne/connectivity/compute_connectivity.h>
 #include <mne/connectivity/connectivitysettings.h>
 #include <mne/connectivity/network/network.h>
-#include <mne/disp_widgets/plots/plot.h>
-#include <mne/disp_widgets/plots/tfplot.h>
-#include <mne/disp_widgets/plots/imagesc.h>
+#include <mne/disp/plots/plot.h>
+#include <mne/disp/plots/tfplot.h>
+#include <mne/disp/plots/imagesc.h>
 #include <mne/dsp/spectrogram.h>
 #include <mne/mne/mne_epoch_data_list.h>
 

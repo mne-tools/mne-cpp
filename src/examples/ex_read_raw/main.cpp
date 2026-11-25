@@ -19,8 +19,8 @@
 #include <mne/fiff/fiff.h>
 #include <mne/mne/mne.h>
 #include <mne/base/log.h>
-#include <mne/disp_widgets/plots/helpers/figureexporter.h>
-#include <mne/disp_widgets/plots/lineplot.h>
+#include <mne/disp/plots/helpers/figureexporter.h>
+#include <mne/disp/plots/lineplot.h>
 
 //=============================================================================================================
 // QT INCLUDES

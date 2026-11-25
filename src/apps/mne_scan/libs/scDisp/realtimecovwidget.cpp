@@ -20,8 +20,8 @@
 
 #include <mne/base/string_utils.h>
 #include <scMeas/realtimecov.h>
-#include <mne/disp_widgets/viewers/modalityselectionview.h>
-#include <mne/disp_widgets/plots/imagesc.h>
+#include <mne/disp/viewers/modalityselectionview.h>
+#include <mne/disp/plots/imagesc.h>
 #include <mne/fiff/fiff_info.h>
 
 //=============================================================================================================

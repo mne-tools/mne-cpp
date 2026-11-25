@@ -21,8 +21,8 @@
 #include <mne/dsp/spectrogram.h>
 #include <mne/base/log.h>
 
-#include <mne/disp_widgets/plots/tfplot.h>
-#include <mne/disp_widgets/plots/helpers/figureexporter.h>
+#include <mne/disp/plots/tfplot.h>
+#include <mne/disp/plots/helpers/figureexporter.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -23,7 +23,7 @@
 #include "mne/mne/mne_bem_surface.h"
 #include "mne/mne/mne_project_to_surface.h"
 #include "mne/mne/mne_icp.h"
-#include <mne/disp3D_widgets/view/brainview.h>
+#include <mne/disp3D/view/brainview.h>
 #include <mne/disp3D/model/braintreemodel.h>
 #include <mne/disp3D/model/items/digitizersettreeitem.h>
 #include <mne/disp3D/model/items/bemtreeitem.h>

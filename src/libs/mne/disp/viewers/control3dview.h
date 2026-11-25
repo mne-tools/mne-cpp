@@ -1,0 +1,336 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2015-2026 MNE-CPP Authors
+ *
+ * @file     control3dview.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     November 2015
+ * @brief    Tree-based control panel for the 3-D scene (visibility, colour, alpha, threshold per tree item).
+ *
+ * Control3DView wraps a @c QTreeView whose model is the same
+ * @c Data3DTreeModel that drives the 3-D scene, so toggling /
+ * editing items here (BEM surfaces, source spaces, sensor positions,
+ * MRI volumes, source estimates …) propagates directly to the
+ * renderer. A custom @c QStyledItemDelegate paints colour swatches,
+ * sliders and combo boxes inline.
+ */
+
+#ifndef DISPLIB_CONTROL3DVIEW_H
+#define DISPLIB_CONTROL3DVIEW_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../disp_global.h"
+#include "abstractview.h"
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <string>
+#include <vector>
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace Ui
+{
+class Control3DViewWidget;
+}
+
+class QStyledItemDelegate;
+class QStandardItemModel;
+
+//=============================================================================================================
+// DEFINE NAMESPACE mne::disp
+//=============================================================================================================
+
+namespace mne::disp
+{
+
+//=============================================================================================================
+// mne::disp FORWARD DECLARATIONS
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * @brief Tree-view control panel for the 3-D scene (visibility, colour, alpha, threshold per item).
+ *
+ * Hosts a @c QTreeView bound to the @c Data3DTreeModel and a custom
+ * @c QStyledItemDelegate that paints colour swatches and slider
+ * editors inline so edits propagate directly to the renderer.
+ */
+class DISPSHARED_EXPORT Control3DView : public AbstractView
+{
+    Q_OBJECT
+
+public:
+    //=========================================================================================================
+    /**
+     * Default constructor.
+     *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
+     * @param[in] parent      The parent of the QObject.
+     * @param[in] slFlags    The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: "Data", "View", "Light".
+     * @param[in] type         Qt window type passed to the QWidget constructor.
+     */
+    explicit Control3DView(const QString& sSettingsPath = "",
+                           QWidget* parent = 0,
+                           const std::vector<std::string>& slFlags = {"Data", "View", "Light"},
+                           Qt::WindowType type = Qt::Widget);
+
+    //=========================================================================================================
+    /**
+     * Destroys the Control3DView.
+     */
+    ~Control3DView();
+
+    //=========================================================================================================
+    /**
+     * Set the flags specifying which part of the GUI should be shown.
+     *
+     * @param[in] slFlags   flags.
+     */
+    void setFlags(const std::vector<std::string>& slFlags);
+
+    //=========================================================================================================
+    /**
+     * Set the delegate for the tree view.
+     *
+     * @param[in] pItemDelegate   The delegate.
+     */
+    void setDelegate(QStyledItemDelegate* pItemDelegate);
+
+    //=========================================================================================================
+    /**
+     * Init the control widget based on the 3D view and data model.
+     *
+     * @param[in] pDataTreeModel   The 3D data tree model.
+     */
+    void setModel(QStandardItemModel* pDataTreeModel);
+
+    //=========================================================================================================
+    /**
+     * Slot called when tree view header visibilty changed.
+     */
+    void onTreeViewHeaderHide();
+
+    //=========================================================================================================
+    /**
+     * Slot called when an item should be removed.
+     *
+     * @param[in] index  Model index of the tree view row to remove; ignored if invalid.
+     */
+    void onTreeViewRemoveItem(const QModelIndex& index);
+
+    //=========================================================================================================
+    /**
+     * Slot called when tree view description visibilty changed.
+     */
+    void onTreeViewDescriptionHide();
+
+    //=========================================================================================================
+    /**
+     * Saves all important settings of this view via QSettings.
+     */
+    void saveSettings();
+
+    //=========================================================================================================
+    /**
+     * Loads and inits all important settings of this view via QSettings.
+     */
+    void loadSettings();
+
+protected:
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
+     *
+     * @param[in] mode     The new mode (Clinical=0, Research=1).
+     */
+    void updateGuiMode(GuiMode mode);
+
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
+     *
+     * @param[in] mode     The new mode (RealTime=0, Offline=1).
+     */
+    void updateProcessingMode(ProcessingMode mode);
+
+    //=========================================================================================================
+    /**
+     * Slot called when opacity slider was changed.
+     *
+     * @param[in] value         opacity value.
+     */
+    void onOpacityChange(qint32 value);
+
+    //=========================================================================================================
+    /**
+     * Slot called when the scene color changed.
+     */
+    void onSceneColorPicker();
+
+    //=========================================================================================================
+    /**
+     * @brief customContextMenuRequested
+     *
+     * @param[in] pos    The position, where the right-click occurred.
+     */
+    void onCustomContextMenuRequested(QPoint pos);
+
+    //=========================================================================================================
+    /**
+     * Slot called when the user wants to change the always on top window flag.
+     *
+     * @param[in] state      The newly picked on top state.
+     */
+    void onAlwaysOnTop(bool state);
+
+    //=========================================================================================================
+    /**
+     * Slot called when the user wants change the color of the scene.
+     *
+     * @param[in] color      The newly picked scene color.
+     *
+     */
+    void onSceneColorChanged(const QColor& color);
+
+    //=========================================================================================================
+    /**
+     * Slot called when the user wants to show the view in full screen.
+     *
+     * @param[in] checked      The newly picked full screen state.
+     */
+    void onShowFullScreen(bool checked);
+
+    //=========================================================================================================
+    /**
+     * Slot called when the user wants to rotate the models.
+     *
+     * @param[in] checked      The newly picked rotation state.
+     */
+    void onRotationClicked(bool checked);
+
+    //=========================================================================================================
+    /**
+     * Slot called when the user wants to toggle the coord axis.
+     *
+     * @param[in] checked  True to show the coordinate axis.
+     */
+    void onCoordAxisClicked(bool checked);
+
+    //=========================================================================================================
+    /**
+     * Slot called when the user wants change the color of the lights.
+     */
+    void onLightColorPicker();
+
+    //=========================================================================================================
+    /**
+     * Slot called when the user wants change the color of the lights.
+     *
+     * @param[in] color      The newly picked light color.
+     */
+    void onLightColorChanged(const QColor& color);
+
+    //=========================================================================================================
+    /**
+     * Slot called when the user wants to change the light intensity.
+     *
+     * @param[in] value      The newly picked light intensity value.
+     */
+    void onLightIntensityChanged(double value);
+
+    //=========================================================================================================
+    /**
+     * Clears the view
+     */
+    void clearView();
+
+    std::unique_ptr<Ui::Control3DViewWidget> m_pUi; /**< The pointer to the QtDesigner ui class. */
+
+    QColor m_colCurrentSceneColor; /**< Current color of the scene in all View3D's. */
+    QColor m_colCurrentLightColor; /**< Current color of the lights in all View3D's. */
+
+signals:
+    //=========================================================================================================
+    /**
+     * Use this signal whenever the scene color was changed by the user.
+     *
+     * @param[in] color      The newly picked color.
+     */
+    void sceneColorChanged(const QColor& color);
+
+    //=========================================================================================================
+    /**
+     * Use this signal whenever the user wants to use full screen mode.
+     *
+     * @param[in] bShowFullScreen      The full screen flag.
+     */
+    void showFullScreen(bool bShowFullScreen);
+
+    //=========================================================================================================
+    /**
+     * Use this signal whenever the user wants to rotate the 3D model.
+     *
+     * @param[in] bRotationChanged      The rotation flag.
+     */
+    void rotationChanged(bool bRotationChanged);
+
+    //=========================================================================================================
+    /**
+     * Use this signal whenever the user wants to show the coordinate axis.
+     *
+     * @param[in] bShowCoordAxis      The coordinate axis flag.
+     */
+    void showCoordAxis(bool bShowCoordAxis);
+
+    //=========================================================================================================
+    /**
+     * Use this signal whenever the light color was changed by the user.
+     *
+     * @param[in] color      The newly picked color.
+     */
+    void lightColorChanged(const QColor& color);
+
+    //=========================================================================================================
+    /**
+     * Use this signal whenever the light intensity was changed by the user.
+     *
+     * @param[in] value      The newly picked intensity.
+     */
+    void lightIntensityChanged(double value);
+
+    //=========================================================================================================
+    /**
+     * Use this signal whenever the take screenshot button was clicked by the user.
+     */
+    void takeScreenshotChanged();
+
+    //=========================================================================================================
+    /**
+     * Notifies the 'Single View' radio button has been checked.
+     */
+    void toggleSingleView();
+
+    //=========================================================================================================
+    /**
+     * Notifies the 'Multiview' radio button has been checked.
+     */
+    void toggleMutiview();
+};
+} // NAMESPACE mne_disp
+
+#endif // DISPLIB_CONTROL3DVIEW_H

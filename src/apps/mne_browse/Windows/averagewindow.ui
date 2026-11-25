@@ -262,7 +262,7 @@
   <customwidget>
    <class>mne::disp::AverageLayoutWidget</class>
    <extends>QWidget</extends>
-   <header>mne/disp_widgets/viewers/helpers/averagelayoutwidget.h</header>
+   <header>mne/disp/viewers/helpers/averagelayoutwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

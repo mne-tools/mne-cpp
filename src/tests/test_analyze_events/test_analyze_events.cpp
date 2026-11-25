@@ -19,7 +19,7 @@
 #include <anShared/Management/event.h>
 #include <anShared/Model/eventmodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <mne/disp_widgets/viewers/triggerdetectionview.h>
+#include <mne/disp/viewers/triggerdetectionview.h>
 #include <mne/base/thread_pool.h>
 
 //=============================================================================================================

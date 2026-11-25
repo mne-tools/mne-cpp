@@ -19,7 +19,7 @@
 #include "covariance.h"
 
 #include "FormFiles/covariancesetupwidget.h"
-#include <mne/disp_widgets/viewers/covariancesettingsview.h>
+#include <mne/disp/viewers/covariancesettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimecov.h>
 #include <mne/dsp/rt/rt_cov.h>

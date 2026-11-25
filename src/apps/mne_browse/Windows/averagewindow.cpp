@@ -22,7 +22,7 @@
 #include <mne/base/string_utils.h>
 #include <mne/disp/plots/helpers/svgwriter.h>
 #include <mne/disp/plots/helpers/scenepainter.h>
-#include <mne/disp_widgets/viewers/helpers/averagelayoutwidget.h>
+#include <mne/disp/viewers/helpers/averagelayoutwidget.h>
 #include <mne/scene/svg_renderer.h>
 
 //=============================================================================================================

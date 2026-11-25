@@ -56,8 +56,8 @@ set(MNE_LIBS_REQUIRED
     mne_base
     mne_math
     mne_events
-    mne_disp_widgets
-    mne_disp3D_widgets
+    mne_disp
+    mne_disp3D
     mne_mna
 )
 

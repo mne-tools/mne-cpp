@@ -17,14 +17,12 @@ on:
     branches: [staging, main]
     paths:
       - 'src/libs/mne/disp3D/**'
-      - 'src/libs/mne/disp3D_widgets/**'
       - 'src/tools/visualization/**'
       - '.github/workflows/screenshot-regression.yml'
   pull_request:
     branches: [staging, main]
     paths:
       - 'src/libs/mne/disp3D/**'
-      - 'src/libs/mne/disp3D_widgets/**'
       - 'src/tools/visualization/**'
       - '.github/workflows/screenshot-regression.yml'
 

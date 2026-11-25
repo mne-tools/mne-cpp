@@ -26,8 +26,8 @@
 #include <mne/acq/acq.h>
 #include <mne/acq/fiff/acq_fiff_replay.h>
 #include <mne/acq/fiff/acq_recorder.h>
-#include <mne/disp_widgets/plots/helpers/figureexporter.h>
-#include <mne/disp_widgets/plots/lineplot.h>
+#include <mne/disp/plots/helpers/figureexporter.h>
+#include <mne/disp/plots/lineplot.h>
 #include <mne/fiff/fiff_raw_data.h>
 
 //=============================================================================================================

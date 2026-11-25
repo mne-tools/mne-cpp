@@ -21,7 +21,7 @@
 #include "rtfwd.h"
 
 #include "FormFiles/rtfwdsetupwidget.h"
-#include <mne/disp_widgets/viewers/fwdsettingsview.h>
+#include <mne/disp/viewers/fwdsettingsview.h>
 #include <mne/fwd/compute_fwd/compute_fwd_settings.h>
 #include <mne/fwd/compute_fwd/compute_fwd.h>
 #include <mne/inv/hpi/inv_hpi_fit.h>

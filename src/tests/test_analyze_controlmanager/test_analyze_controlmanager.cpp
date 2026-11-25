@@ -21,9 +21,9 @@
 #include <anShared/Management/eventmanager.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Utils/types.h>
-#include <mne/disp_widgets/viewers/control3dview.h>
-#include <mne/disp_widgets/viewers/fiffrawviewsettings.h>
-#include <mne/disp_widgets/viewers/scalingview.h>
+#include <mne/disp/viewers/control3dview.h>
+#include <mne/disp/viewers/fiffrawviewsettings.h>
+#include <mne/disp/viewers/scalingview.h>
 
 //=============================================================================================================
 // QT INCLUDES

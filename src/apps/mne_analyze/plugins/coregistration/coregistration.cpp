@@ -23,7 +23,7 @@
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Model/bemdatamodel.h>
-#include <mne/disp_widgets/viewers/coregsettingsview.h>
+#include <mne/disp/viewers/coregsettingsview.h>
 #include <mne/fiff/fiff_dig_point_set.h>
 #include <mne/mne/mne_bem.h>
 #include <mne/mne/mne_project_to_surface.h>

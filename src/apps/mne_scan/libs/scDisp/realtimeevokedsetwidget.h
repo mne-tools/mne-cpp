@@ -21,7 +21,7 @@
 
 #include "scdisp_global.h"
 #include "measurementwidget.h"
-#include <mne/disp_widgets/viewers/butterflyview.h>
+#include <mne/disp/viewers/butterflyview.h>
 
 //=============================================================================================================
 // QT INCLUDES

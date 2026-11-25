@@ -25,9 +25,9 @@
 #include <anShared/Plugins/abstractplugin.h>
 #include <anShared/Management/statusbar.h>
 
-#include <mne/disp_widgets/viewers/multiview.h>
-#include <mne/disp_widgets/viewers/multiviewwindow.h>
-#include <mne/disp_widgets/viewers/abstractview.h>
+#include <mne/disp/viewers/multiview.h>
+#include <mne/disp/viewers/multiviewwindow.h>
+#include <mne/disp/viewers/abstractview.h>
 
 #include <mne/base/base_global.h>
 

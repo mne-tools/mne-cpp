@@ -20,17 +20,17 @@
 #include <mne/base/log.h>
 #include "realtimemultisamplearraywidget.h"
 
-#include <mne/disp_widgets/viewers/filterdesignview.h>
-#include <mne/disp_widgets/viewers/channelselectionview.h>
+#include <mne/disp/viewers/filterdesignview.h>
+#include <mne/disp/viewers/channelselectionview.h>
 #include <mne/disp/viewers/helpers/channelinfomodel.h>
-#include <mne/disp_widgets/viewers/rtfiffrawview.h>
-#include <mne/disp_widgets/viewers/scalingview.h>
-#include <mne/disp_widgets/viewers/projectorsview.h>
-#include <mne/disp_widgets/viewers/filtersettingsview.h>
-#include <mne/disp_widgets/viewers/compensatorview.h>
-#include <mne/disp_widgets/viewers/spharasettingsview.h>
-#include <mne/disp_widgets/viewers/fiffrawviewsettings.h>
-#include <mne/disp_widgets/viewers/triggerdetectionview.h>
+#include <mne/disp/viewers/rtfiffrawview.h>
+#include <mne/disp/viewers/scalingview.h>
+#include <mne/disp/viewers/projectorsview.h>
+#include <mne/disp/viewers/filtersettingsview.h>
+#include <mne/disp/viewers/compensatorview.h>
+#include <mne/disp/viewers/spharasettingsview.h>
+#include <mne/disp/viewers/fiffrawviewsettings.h>
+#include <mne/disp/viewers/triggerdetectionview.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <mne/dsp/filterkernel.h>
 #include <mne/fiff/fiff_info.h>

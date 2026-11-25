@@ -38,10 +38,8 @@ Public API units (exported classes, registered function namespaces and header-on
 | `com` | 5 | 5 | 5 | 5 | 5 | 5 | 5 |
 | `connectivity` | 20 | 20 | 6 | 19 | 19 | 17 | 20 |
 | `decoding` | 5 | 5 | 4 | 5 | 5 | 5 | 5 |
-| `disp` | 15 | 15 | 6 | 2 | 2 | 2 | 2 |
-| `disp3D` | 52 | 52 | 39 | 17 | 17 | 15 | 19 |
-| `disp3D_widgets` | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
-| `disp_widgets` | 58 | 58 | 9 | 9 | 9 | 9 | 9 |
+| `disp` | 73 | 73 | 15 | 11 | 11 | 11 | 11 |
+| `disp3D` | 53 | 53 | 40 | 18 | 18 | 16 | 20 |
 | `dsp` | 78 | 78 | 33 | 78 | 78 | 78 | 78 |
 | `fiff` | 39 | 39 | 13 | 39 | 39 | 37 | 39 |
 | `fs` | 8 | 8 | 4 | 8 | 8 | 8 | 8 |

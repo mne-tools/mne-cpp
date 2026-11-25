@@ -31,7 +31,7 @@
 #include <mne/fiff/fiff_stream.h>
 #include <mne/fiff/fiff_dir_node.h>
 #include <mne/fiff/fiff_constants.h>
-#include <mne/disp_widgets/viewers/progressview.h>
+#include <mne/disp/viewers/progressview.h>
 
 //=============================================================================================================
 // STL INCLUDES

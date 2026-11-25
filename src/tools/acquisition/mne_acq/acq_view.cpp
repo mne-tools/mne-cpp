@@ -18,7 +18,7 @@
 
 #include <mne/acq/acq_eigen.h>
 #include <mne/acq/fiff/acq_fiff.h>
-#include <mne/disp_widgets/viewers/channeldataview.h>
+#include <mne/disp/viewers/channeldataview.h>
 
 //=============================================================================================================
 // QT INCLUDES

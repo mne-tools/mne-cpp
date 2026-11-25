@@ -27,8 +27,8 @@
 #include "../Models/fiffblockreader.h"
 #include "../Utils/sessionfilter.h"
 #include "../Views/rawview.h"
-#include <mne/disp_widgets/viewers/channeldataview.h>
-#include <mne/disp_widgets/viewers/helpers/channelrhiview.h>
+#include <mne/disp/viewers/channeldataview.h>
+#include <mne/disp/viewers/helpers/channelrhiview.h>
 #include <mne/fiff/fiff_cov.h>
 
 //=============================================================================================================

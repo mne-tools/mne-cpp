@@ -20,7 +20,7 @@
 //=============================================================================================================
 
 #include "connectivitysettingsmanager.h"
-#include <mne/disp3D_widgets/view/brainview.h>
+#include <mne/disp3D/view/brainview.h>
 #include <mne/disp3D/model/braintreemodel.h>
 #include <mne/disp3D/model/items/networktreeitem.h>
 #include <mne/connectivity/connectivity.h>
@@ -36,9 +36,9 @@
 #include <mne/inv/minimum_norm/inv_minimum_norm.h>
 #include <mne/base/log.h>
 #include <mne/fiff/fiff_events.h>
-#include <mne/disp_widgets/viewers/connectivitysettingsview.h>
-#include <mne/disp_widgets/viewers/minimumnormsettingsview.h>
-#include <mne/disp_widgets/viewers/tfsettingsview.h>
+#include <mne/disp/viewers/connectivitysettingsview.h>
+#include <mne/disp/viewers/minimumnormsettingsview.h>
+#include <mne/disp/viewers/tfsettingsview.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -29,8 +29,8 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/eventmodel.h>
 
-#include <mne/disp_widgets/viewers/fiffrawviewsettings.h>
-#include <mne/disp_widgets/viewers/scalingview.h>
+#include <mne/disp/viewers/fiffrawviewsettings.h>
+#include <mne/disp/viewers/scalingview.h>
 #include <mne/disp/viewers/helpers/selectionitem.h>
 
 #include <mne/dsp/filterkernel.h>

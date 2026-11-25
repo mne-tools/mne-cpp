@@ -55,7 +55,7 @@ add_subdirectory(extensions/mna_skills)
 add_subdirectory(neuro_kernel)
 add_subdirectory(skill_host)
 
-# These targets use QProcess / mne_disp3D_widgets and cannot be built for WebAssembly.
+# These targets use QProcess / mne_disp3D and cannot be built for WebAssembly.
 if(NOT EMSCRIPTEN AND NOT WASM)
     add_subdirectory(extensions/dummy_3d_extension)
     add_subdirectory(extensions/fiff_browser_extension)

@@ -7,24 +7,16 @@
   },
   "qt_by_design": [
     "disp",
-    "disp3D",
-    "disp_widgets",
-    "disp3D_widgets"
+    "disp3D"
   ],
   "kept": {
     "$comment": "Library -> { use: reason } for Qt kept by decision D16.",
     "disp": {
       "SvgWriter (QPaintEngine)": "Replaces QSvgGenerator so the vector export of widgets needs Qt Gui only; dropping the Qt Svg module raised the disp ceilings once (tokens 6025 -> 6159, public header includes 110 -> 112).",
-      "QWindow hosts and scene viewports (phase 3)": "ChannelWindow (QWindow + QRhi swap chain) next to the ChannelRhiView QRhiWidget host, and SceneViewport replacing the QGraphicsView scenes, raised the disp ceilings once (tokens 4846 -> 4885, public header includes 82 -> 89); phase 4 moved the widgets out (tokens 4885 -> 1624, public header includes 89 -> 25)."
+      "QWindow hosts and scene viewports (phase 3)": "ChannelWindow (QWindow + QRhi swap chain) next to the ChannelRhiView QRhiWidget host, and SceneViewport replacing the QGraphicsView scenes, raised the disp ceilings once (tokens 4846 -> 4885, public header includes 82 -> 89); the QRhiWidget hosts go with phase 4."
     },
     "disp3D": {
-      "BrainWindow host and GPU overlay (phase 3)": "BrainWindow (QWindow + QRhi swap chain), the forwarding BrainView host and the overlay painted into the GPU pass instead of child QLabels raised the disp3D ceilings once (tokens 1633 -> 1961); phase 4 moved the QRhiWidget host to disp3D_widgets (tokens 1961 -> 1857)."
-    },
-    "disp_widgets": {
-      "QRhiWidget hosts (phase 4)": "ChannelRhiView and the other Widgets plots, viewers and panels moved here from disp so the display cores need Qt Gui only; the QRhiWidget hosts stay because widget overlays and WebAssembly embedding need them."
-    },
-    "disp3D_widgets": {
-      "BrainView QRhiWidget host (phase 4)": "Thin QRhiWidget host and context menu of the brain view, moved out of disp3D so the renderer core needs Qt Gui only."
+      "BrainWindow host and GPU overlay (phase 3)": "BrainWindow (QWindow + QRhi swap chain), the forwarding BrainView host and the overlay painted into the GPU pass instead of child QLabels raised the disp3D ceilings once (tokens 1633 -> 1961); the QRhiWidget host goes with phase 4."
     }
   },
   "ceilings": {
@@ -84,79 +76,43 @@
       "modules": []
     },
     "disp": {
-      "tokens": 1624,
-      "public_header_includes": 25,
+      "tokens": 4885,
+      "public_header_includes": 89,
       "modules": [
         "Core",
-        "Gui",
-        "GuiPrivate"
+        "GuiPrivate",
+        "Widgets"
       ],
       "by_category": {
-        "containers": 6,
-        "files": 14,
-        "global": 524,
-        "gui": 377,
-        "objects_signals": 200,
-        "other": 358,
-        "strings": 145
+        "containers": 16,
+        "files": 97,
+        "global": 1083,
+        "gui": 958,
+        "objects_signals": 533,
+        "other": 1369,
+        "strings": 820,
+        "time": 9
       }
     },
     "disp3D": {
-      "tokens": 1857,
-      "public_header_includes": 73,
+      "tokens": 1961,
+      "public_header_includes": 74,
       "modules": [
         "Core",
         "Gui",
         "GuiPrivate",
-        "ShaderTools"
+        "ShaderTools",
+        "Widgets"
       ],
       "by_category": {
-        "containers": 3,
+        "containers": 5,
         "files": 13,
-        "global": 190,
-        "gui": 1104,
-        "objects_signals": 146,
-        "other": 264,
-        "strings": 132,
+        "global": 199,
+        "gui": 1158,
+        "objects_signals": 149,
+        "other": 293,
+        "strings": 139,
         "time": 5
-      }
-    },
-    "disp3D_widgets": {
-      "tokens": 106,
-      "public_header_includes": 2,
-      "modules": [
-        "Core",
-        "Gui",
-        "GuiPrivate",
-        "Widgets"
-      ],
-      "by_category": {
-        "containers": 2,
-        "global": 11,
-        "gui": 54,
-        "objects_signals": 3,
-        "other": 29,
-        "strings": 7
-      }
-    },
-    "disp_widgets": {
-      "tokens": 3263,
-      "public_header_includes": 65,
-      "modules": [
-        "Core",
-        "Gui",
-        "GuiPrivate",
-        "Widgets"
-      ],
-      "by_category": {
-        "containers": 10,
-        "files": 83,
-        "global": 561,
-        "gui": 581,
-        "objects_signals": 333,
-        "other": 1011,
-        "strings": 675,
-        "time": 9
       }
     },
     "dsp": {
@@ -241,7 +197,7 @@
     }
   },
   "qt_modules": {
-    "$comment": "Qt modules each target of disp, disp3D and the applications may request or use (audit_qt_modules.py --check). Entries may only shrink; a new target gets 'default'. Decisions 2026-11-22: disp and disp3D end at Core, Gui, GuiPrivate (QRhi include path only) and ShaderTools (build time), Widgets lives in disp_widgets and disp3D_widgets (phase 4); Concurrent and Network are gone (mne::ThreadPool, mne_com); Svg is gone (mne::disp::SvgWriter).",
+    "$comment": "Qt modules each target of disp, disp3D and the applications may request or use (audit_qt_modules.py --check). Entries may only shrink; a new target gets 'default'. Decisions 2026-11-22: disp and disp3D end at Core, Gui, GuiPrivate (QRhi include path only), ShaderTools (build time) and Widgets; Concurrent and Network are gone (mne::ThreadPool, mne_com); Svg is gone (mne::disp::SvgWriter).",
     "default": [
       "Core",
       "Gui",
@@ -503,24 +459,14 @@
         "Core",
         "Gui",
         "GuiPrivate",
-        "ShaderTools"
+        "ShaderTools",
+        "Widgets"
       ],
       "src/libs/mne/disp3D": [
         "Core",
         "Gui",
         "GuiPrivate",
-        "ShaderTools"
-      ],
-      "src/libs/mne/disp3D_widgets": [
-        "Core",
-        "Gui",
-        "GuiPrivate",
-        "Widgets"
-      ],
-      "src/libs/mne/disp_widgets": [
-        "Core",
-        "Gui",
-        "GuiPrivate",
+        "ShaderTools",
         "Widgets"
       ]
     }

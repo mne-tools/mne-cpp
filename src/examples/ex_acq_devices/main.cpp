@@ -31,7 +31,7 @@
 #include <mne/acq/fiff/acq_fiff_replay.h>
 #include <mne/acq/fiff/acq_recorder.h>
 #include <mne/acq/lsl/acq_lsl.h>
-#include <mne/disp_widgets/viewers/channeldataview.h>
+#include <mne/disp/viewers/channeldataview.h>
 
 //=============================================================================================================
 // QT INCLUDES

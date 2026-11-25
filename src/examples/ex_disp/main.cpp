@@ -16,10 +16,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp_widgets/plots/helpers/figureexporter.h>
-#include <mne/disp_widgets/plots/imagesc.h>
-#include <mne/disp_widgets/plots/plot.h>
-#include <mne/disp_widgets/plots/tfplot.h>
+#include <mne/disp/plots/helpers/figureexporter.h>
+#include <mne/disp/plots/imagesc.h>
+#include <mne/disp/plots/plot.h>
+#include <mne/disp/plots/tfplot.h>
 
 #include <mne/fiff/fiff.h>
 

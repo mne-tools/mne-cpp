@@ -32,7 +32,7 @@
 #include <mne/disp3D/renderable/videooverlay.h>
 #include <mne/disp3D/scene/multimodalscene.h>
 #include <mne/disp3D/scene/sensorfieldmapper.h>
-#include <mne/disp3D_widgets/view/brainview.h>
+#include <mne/disp3D/view/brainview.h>
 #include <mne/disp3D/view/multiviewlayout.h>
 
 #include <mne/connectivity/network/network.h>

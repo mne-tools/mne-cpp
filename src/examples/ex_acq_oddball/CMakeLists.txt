@@ -16,7 +16,7 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   mne_acq
-  mne_disp_widgets
+  mne_disp
   mne_dsp
   Qt${QT_VERSION_MAJOR}::Core
   Qt${QT_VERSION_MAJOR}::Widgets

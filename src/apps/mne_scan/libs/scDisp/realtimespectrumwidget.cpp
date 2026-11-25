@@ -18,8 +18,8 @@
 
 #include "realtimespectrumwidget.h"
 
-#include <mne/disp_widgets/viewers/spectrumsettingsview.h>
-#include <mne/disp_widgets/viewers/spectrumview.h>
+#include <mne/disp/viewers/spectrumsettingsview.h>
+#include <mne/disp/viewers/spectrumview.h>
 #include <scMeas/realtimespectrum.h>
 #include <math.h>
 

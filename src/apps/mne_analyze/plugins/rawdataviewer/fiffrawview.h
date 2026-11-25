@@ -23,7 +23,7 @@
 //=============================================================================================================
 
 #include "rawdataviewer_global.h"
-#include <mne/disp_widgets/viewers/abstractview.h>
+#include <mne/disp/viewers/abstractview.h>
 
 //=============================================================================================================
 // QT INCLUDES
