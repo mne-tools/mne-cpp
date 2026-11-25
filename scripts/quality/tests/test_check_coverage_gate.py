@@ -96,6 +96,39 @@ class TestGate(GateTestCase):
             self.assertEqual(2, gate.main([str(lcov), "--policy", str(self.policy)]))
 
 
+class TestLibraryFloors(GateTestCase):
+    def run_report(self, report: str) -> tuple[int, str]:
+        self.policy.write_text(json.dumps({"line_floor_percent": 50.0, "max_regression_points": 0.1,
+                                           "library_floors": {"$comment": "x", "src/libs/mne/fiff/": 80.0}}),
+                               encoding="utf-8")
+        lcov = self.root / "coverage.info"
+        lcov.write_text(report, encoding="utf-8")
+        out = io.StringIO()
+        with redirect_stdout(out), redirect_stderr(io.StringIO()):
+            code = gate.main([str(lcov), "--policy", str(self.policy)])
+        return code, out.getvalue()
+
+    @staticmethod
+    def record(path: str, hit: int, missed: int) -> str:
+        return _lcov(hit, missed).replace("/src/libs/mne/a.cpp", path)
+
+    def test_weak_library_fails_although_the_total_passes(self) -> None:
+        code, text = self.run_report(self.record("src/libs/mne/fiff/a.cpp", 70, 30)
+                                     + self.record("src/libs/mne/dsp/b.cpp", 900, 0))
+        self.assertEqual(1, code)
+        self.assertIn("src/libs/mne/fiff/ line coverage 70.00% is below its floor of 80.00%", text)
+
+    def test_library_at_its_floor_passes(self) -> None:
+        code, text = self.run_report(self.record("/home/ci/mne-cpp/src/libs/mne/fiff/a.cpp", 80, 20))
+        self.assertEqual(0, code)
+        self.assertIn("(measured 80.00%)", text)
+
+    def test_library_missing_from_the_report_fails(self) -> None:
+        code, text = self.run_report(self.record("src/libs/mne/dsp/b.cpp", 90, 10))
+        self.assertEqual(1, code)
+        self.assertIn("src/libs/mne/fiff/ has a coverage floor but no lines in the report", text)
+
+
 class TestPolicy(unittest.TestCase):
     def test_policy_is_consistent_with_release_gate_g2(self) -> None:
         policy = gate.load_policy(gate.POLICY_FILE)

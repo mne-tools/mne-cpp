@@ -16,6 +16,9 @@ in shell, neither of which matched release gate G2.  The numbers now live in one
 policy file, the CI log prints exactly what is enforced, and the script can be
 tested like any other code.
 
+The libraries listed under ``library_floors`` have their own floors, so a weak
+library on the signal path cannot hide behind the global figure.
+
 The previous run's coverage is read from ``--baseline`` (restored from the
 Actions cache).  Only a passing run writes the current value back, so a failing
 run cannot lower the bar for the next one.
@@ -45,14 +48,40 @@ POLICY_FILE = Path(__file__).resolve().parent / "coverage_policy.json"
 def line_coverage(lcov: Path) -> tuple[int, int]:
     """(hit, found) over every ``DA:`` record, the same count the workflow used."""
     hit = found = 0
+    for file_hit, file_found in file_coverage(lcov).values():
+        hit += file_hit
+        found += file_found
+    return hit, found
+
+
+def file_coverage(lcov: Path) -> dict[str, tuple[int, int]]:
+    """(hit, found) of every source file (``SF:``) of the report."""
+    files: dict[str, list[int]] = {}
+    counts = files.setdefault("", [0, 0])
     with lcov.open(encoding="utf-8", errors="replace") as handle:
         for line in handle:
-            if line.startswith("DA:"):
-                found += 1
+            if line.startswith("SF:"):
+                counts = files.setdefault(line[3:].strip(), [0, 0])
+            elif line.startswith("DA:"):
+                counts[1] += 1
                 fields = line[3:].strip().split(",")
                 if len(fields) >= 2 and fields[1].lstrip("-").isdigit() and int(fields[1]) > 0:
-                    hit += 1
-    return hit, found
+                    counts[0] += 1
+    return {name: (hit, found) for name, (hit, found) in files.items() if found}
+
+
+def library_coverage(files: dict[str, tuple[int, int]], prefixes: list[str]) -> dict[str, tuple[int, int]]:
+    """(hit, found) summed over the files under each path prefix; reports may hold relative or absolute paths."""
+    result = {}
+    for prefix in prefixes:
+        needle = "/" + prefix.strip("/") + "/"
+        matched = [counts for name, counts in files.items() if needle in "/" + name.replace("\\", "/")]
+        result[prefix] = (sum(h for h, _ in matched), sum(f for _, f in matched))
+    return result
+
+
+def library_floors(policy: dict) -> dict[str, float]:
+    return {prefix: float(floor) for prefix, floor in policy.get("library_floors", {}).items() if not prefix.startswith("$")}
 
 
 def load_policy(path: Path) -> dict:
@@ -77,6 +106,17 @@ def evaluate(current: float, previous: float | None, policy: dict) -> list[str]:
     return failures
 
 
+def evaluate_libraries(libraries: dict[str, tuple[int, int]], policy: dict) -> list[str]:
+    failures = []
+    for prefix, floor in library_floors(policy).items():
+        hit, found = libraries.get(prefix, (0, 0))
+        if found == 0:
+            failures.append(f"{prefix} has a coverage floor but no lines in the report")
+        elif hit * 100.0 / found < floor:
+            failures.append(f"{prefix} line coverage {hit * 100.0 / found:.2f}% is below its floor of {floor:.2f}%")
+    return failures
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("lcov", type=Path, help="filtered LCOV report")
@@ -91,10 +131,12 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     try:
-        hit, found = line_coverage(args.lcov)
+        files = file_coverage(args.lcov)
     except OSError as exc:
         print(f"error: cannot read {args.lcov}: {exc}", file=sys.stderr)
         return 2
+    hit = sum(h for h, _ in files.values())
+    found = sum(f for _, f in files.values())
     if found == 0:
         print(f"error: {args.lcov} has no line records", file=sys.stderr)
         return 2
@@ -112,7 +154,13 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Regression tolerance : {float(policy['max_regression_points']):.2f} points")
     print(f"Previous baseline    : {'none' if previous is None else f'{previous:.2f}%'}")
 
-    failures = evaluate(current, previous, policy)
+    libraries = library_coverage(files, list(library_floors(policy)))
+    for prefix, floor in library_floors(policy).items():
+        lib_hit, lib_found = libraries[prefix]
+        measured = f"{lib_hit * 100.0 / lib_found:.2f}%" if lib_found else "no lines"
+        print(f"Floor {prefix:<20}: {floor:.2f}% (measured {measured})")
+
+    failures = evaluate(current, previous, policy) + evaluate_libraries(libraries, policy)
     for failure in failures:
         print(f"FAIL: {failure}")
 

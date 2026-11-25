@@ -2,6 +2,15 @@
   "$comment": "Coverage policy for release gate G2 (doc/dev-notes/v2.4.0-requirements.md). check_coverage_gate.py enforces the floor and regression tolerance on the filtered report; the floor is a ratchet just below the measured combined coverage and may only rise, towards the G2 release minimum of 60%. summarize_coverage.py applies the exclusions: each needs a reason, patterns are fnmatch globs on repository-relative paths ('*' also crosses '/'), and one that matches no tracked or reported file is an error.",
   "line_floor_percent": 60.0,
   "max_regression_points": 0.1,
+  "library_floors": {
+    "$comment": "Line coverage floors of the libraries on the safety-relevant signal path (doc/website/docs/development/medical-device.mdx), so a weak library cannot hide behind the global figure. Keys are path prefixes of the filtered report; each floor is a ratchet about one point below the coverage CI measured (staging 123363ccd7: acq 91.74, dsp 95.55, fiff 91.44, fwd 92.58, inv 93.44, mne 91.59) and may only rise.",
+    "src/libs/mne/acq/": 90.5,
+    "src/libs/mne/dsp/": 94.5,
+    "src/libs/mne/fiff/": 90.5,
+    "src/libs/mne/fwd/": 91.5,
+    "src/libs/mne/inv/": 92.5,
+    "src/libs/mne/mne/": 90.5
+  },
   "exclusions": [
     {
       "pattern": "*_autogen/*",

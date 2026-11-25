@@ -22,13 +22,12 @@ what is still open. MNE-CPP itself is not a certified medical device.
 | Few, contained dependencies | The acquisition, processing and file libraries build and pass their tests without Qt; Qt is confined to the display layers and each target has an allowlist of Qt modules | Qt-free SDK job on Linux, macOS and Windows; `audit_qt_usage.py`, `audit_qt_modules.py`, `audit_dependencies.py` |
 | Pinned dependency versions | `src/3rdparty/external_deps.env` pins Qt, Eigen, ONNX Runtime and Emscripten; zlib is pinned with its SHA-256 | the SOUP check reads the pins |
 | Verification | Unit and integration tests on Linux, macOS and Windows, numerical parity with MNE-Python on shared data, sanitizer builds of the acquisition library, warnings as errors on three compilers | CI on every push |
-| Coverage | Line coverage floor of 60 % that may only rise (`scripts/quality/coverage_policy.json`) | coverage gate in CI |
+| Coverage | Line coverage floor of 60 % overall and per-library floors for acq, dsp, fiff, fwd, inv and mne (90.5 % to 94.5 %), all of which may only rise (`scripts/quality/coverage_policy.json`) | coverage gate in CI (`check_coverage_gate.py`) |
 
 ## Roadmap
 
 | Item | Why | Status |
 |---|---|---|
-| Per-library coverage floors for the safety-relevant libraries | The global floor hides weak libraries on the signal path | open; the coverage report already has per-file data |
 | Full traceability of the safety-relevant libraries | fiff, mne, inv, fwd and dsp name tests for only part of their classes | open; the floors ratchet towards it |
 | Requirement IDs | Trace from a requirement, not only from a class, to its tests and to the risk control it implements | open; extend `doc/api_registry.json` with requirement IDs |
 | Reproducible builds | Rebuild a released binary bit for bit: build stamps from the commit instead of `__DATE__`/`__TIME__`, `-ffile-prefix-map`, fixed archive timestamps | open; the build stamp is already confined to two files |
