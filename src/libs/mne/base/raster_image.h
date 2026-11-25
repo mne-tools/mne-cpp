@@ -138,10 +138,37 @@ public:
     /**
      * Fills a polygon, anti-aliased. Parts outside the image are clipped.
      *
-     * @param[in] points   Corners in order; fewer than three fill nothing.
-     * @param[in] color    Fill colour.
+     * @param[in] points    Corners in order; fewer than three fill nothing.
+     * @param[in] color     Fill colour.
+     * @param[in] opacity   Opacity of the fill, 0 (transparent) to 255 (opaque).
      */
-    void fill_polygon(std::span<const PointF> points, Rgb color);
+    void fill_polygon(std::span<const PointF> points, Rgb color, int opacity = 255);
+
+    //=========================================================================================================
+    /**
+     * Fills the area enclosed by several polygons at once, anti-aliased, with the non-zero winding rule over all
+     * of them: polygons of the same orientation fill their union, so overlapping pieces of a stroke blend once.
+     *
+     * @param[in] polygons   Polygons, each with its corners in order; those with fewer than three are skipped.
+     * @param[in] color      Fill colour.
+     * @param[in] opacity    Opacity of the fill, 0 (transparent) to 255 (opaque).
+     *
+     * @since 3.0.0
+     */
+    void fill_polygons(std::span<const std::vector<PointF>> polygons, Rgb color, int opacity = 255);
+
+    //=========================================================================================================
+    /**
+     * Mixes a colour into one pixel; pixels outside the image are ignored.
+     *
+     * @param[in] x       Column.
+     * @param[in] y       Row.
+     * @param[in] color   Colour to mix in.
+     * @param[in] alpha   Weight of @p color, 0 (none) to 255 (replaces the pixel).
+     *
+     * @since 3.0.0
+     */
+    void blend_pixel(int x, int y, Rgb color, int alpha);
 
     //=========================================================================================================
     /**
@@ -185,6 +212,7 @@ public:
 
 private:
     void blend(int x, int y, Rgb color, int coverage);
+    void fill_contours(std::span<const std::span<const PointF>> polygons, Rgb color, int opacity);
 
     int m_width = 0;
     int m_height = 0;

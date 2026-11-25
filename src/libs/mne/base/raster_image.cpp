@@ -235,23 +235,66 @@ void RasterImage::blend(int x, int y, Rgb color, int coverage)
 
 //=============================================================================================================
 
-void RasterImage::fill_polygon(std::span<const PointF> points, Rgb color)
+void RasterImage::blend_pixel(int x, int y, Rgb color, int alpha)
 {
-    if (points.size() < 3 || m_width == 0 || m_height == 0) {
+    if (x < 0 || y < 0 || x >= m_width || y >= m_height || alpha <= 0) {
+        return;
+    }
+    alpha = std::min(alpha, 255);
+    const std::size_t i = (static_cast<std::size_t>(y) * static_cast<std::size_t>(m_width) + static_cast<std::size_t>(x)) * 3;
+    const auto mix = [alpha](std::uint8_t old, std::uint8_t value) {
+        return static_cast<std::uint8_t>((old * (255 - alpha) + value * alpha + 127) / 255);
+    };
+    m_rgb[i] = mix(m_rgb[i], color.r);
+    m_rgb[i + 1] = mix(m_rgb[i + 1], color.g);
+    m_rgb[i + 2] = mix(m_rgb[i + 2], color.b);
+}
+
+//=============================================================================================================
+
+void RasterImage::fill_polygon(std::span<const PointF> points, Rgb color, int opacity)
+{
+    const std::span<const PointF> contours[1] = {points};
+    fill_contours(contours, color, opacity);
+}
+
+//=============================================================================================================
+
+void RasterImage::fill_polygons(std::span<const std::vector<PointF>> polygons, Rgb color, int opacity)
+{
+    const std::vector<std::span<const PointF>> contours(polygons.begin(), polygons.end());
+    fill_contours(contours, color, opacity);
+}
+
+//=============================================================================================================
+
+void RasterImage::fill_contours(std::span<const std::span<const PointF>> polygons, Rgb color, int opacity)
+{
+    if (m_width == 0 || m_height == 0 || opacity <= 0) {
         return;
     }
     double minX = std::numeric_limits<double>::infinity();
     double maxX = -minX;
     double minY = minX;
     double maxY = -minX;
-    for (const PointF& point : points) {
-        if (!std::isfinite(point.x) || !std::isfinite(point.y)) {
-            return;
+    std::size_t edges = 0;
+    for (const std::span<const PointF> points : polygons) {
+        if (points.size() < 3) {
+            continue;
         }
-        minX = std::min(minX, point.x);
-        maxX = std::max(maxX, point.x);
-        minY = std::min(minY, point.y);
-        maxY = std::max(maxY, point.y);
+        for (const PointF& point : points) {
+            if (!std::isfinite(point.x) || !std::isfinite(point.y)) {
+                return;
+            }
+            minX = std::min(minX, point.x);
+            maxX = std::max(maxX, point.x);
+            minY = std::min(minY, point.y);
+            maxY = std::max(maxY, point.y);
+        }
+        edges += points.size();
+    }
+    if (edges == 0) {
+        return;
     }
     const int x0 = std::max(0, static_cast<int>(std::floor(minX)));
     const int x1 = std::min(m_width - 1, static_cast<int>(std::floor(maxX)));
@@ -264,18 +307,23 @@ void RasterImage::fill_polygon(std::span<const PointF> points, Rgb color)
     // Coverage per pixel of a row, counted in sub-pixel samples
     std::vector<int> coverage(static_cast<std::size_t>(x1 - x0 + 1));
     std::vector<std::pair<double, int>> crossings;
-    crossings.reserve(points.size());
+    crossings.reserve(edges);
     for (int y = y0; y <= y1; ++y) {
         std::fill(coverage.begin(), coverage.end(), 0);
         for (int sub = 0; sub < kSamples; ++sub) {
             const double sampleY = y + (sub + 0.5) / kSamples;
             crossings.clear();
-            for (std::size_t i = 0; i < points.size(); ++i) {
-                const PointF& a = points[i];
-                const PointF& b = points[(i + 1) % points.size()];
-                if ((a.y <= sampleY && sampleY < b.y) || (b.y <= sampleY && sampleY < a.y)) {
-                    const double x = a.x + (sampleY - a.y) * (b.x - a.x) / (b.y - a.y);
-                    crossings.emplace_back(x, a.y < b.y ? 1 : -1);
+            for (const std::span<const PointF> points : polygons) {
+                if (points.size() < 3) {
+                    continue;
+                }
+                for (std::size_t i = 0; i < points.size(); ++i) {
+                    const PointF& a = points[i];
+                    const PointF& b = points[(i + 1) % points.size()];
+                    if ((a.y <= sampleY && sampleY < b.y) || (b.y <= sampleY && sampleY < a.y)) {
+                        const double x = a.x + (sampleY - a.y) * (b.x - a.x) / (b.y - a.y);
+                        crossings.emplace_back(x, a.y < b.y ? 1 : -1);
+                    }
                 }
             }
             std::sort(crossings.begin(), crossings.end());
@@ -296,7 +344,12 @@ void RasterImage::fill_polygon(std::span<const PointF> points, Rgb color)
             }
         }
         for (int x = x0; x <= x1; ++x) {
-            blend(x, y, color, coverage[static_cast<std::size_t>(x - x0)]);
+            const int samples = coverage[static_cast<std::size_t>(x - x0)];
+            if (opacity >= 255) {
+                blend(x, y, color, samples);
+            } else {
+                blend_pixel(x, y, color, (samples * opacity + kFullCoverage / 2) / kFullCoverage);
+            }
         }
     }
 }

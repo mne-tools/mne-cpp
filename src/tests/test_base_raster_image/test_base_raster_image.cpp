@@ -53,6 +53,9 @@ private slots:
     void triangleCoverageMatchesItsArea();
     void overlappingPolygonUsesTheNonZeroRule();
     void textDrawsTheGlyphs();
+    void translucentPolygonBlendsWithWhatIsUnderneath();
+    void blendPixelMixesByAlpha();
+    void overlappingPolygonsBlendOnce();
     void savePngReportsUnwritablePaths();
 };
 
@@ -83,6 +86,50 @@ void TestBaseRasterImage::pngDecodesToTheSamePixels()
             QCOMPARE(qBlue(qt), int(own.b));
         }
     }
+}
+
+//=============================================================================================================
+
+void TestBaseRasterImage::translucentPolygonBlendsWithWhatIsUnderneath()
+{
+    RasterImage image(8, 8, {0, 0, 200});
+    const std::array<PointF, 4> rectangle = {{{2, 2}, {6, 2}, {6, 6}, {2, 6}}};
+    image.fill_polygon(rectangle, {255, 0, 0}, 128);
+    QCOMPARE(image.pixel(3, 3), (Rgb{128, 0, 100}));
+    QCOMPARE(image.pixel(1, 1), (Rgb{0, 0, 200}));
+
+    // Opacity 255 is the opaque fill, 0 leaves the image alone
+    image.fill_polygon(rectangle, {0, 255, 0}, 0);
+    QCOMPARE(image.pixel(3, 3), (Rgb{128, 0, 100}));
+    image.fill_polygon(rectangle, {0, 255, 0}, 255);
+    QCOMPARE(image.pixel(3, 3), (Rgb{0, 255, 0}));
+}
+
+//=============================================================================================================
+
+void TestBaseRasterImage::blendPixelMixesByAlpha()
+{
+    RasterImage image(2, 1, {100, 100, 100});
+    image.blend_pixel(0, 0, {200, 0, 255}, 64);
+    QCOMPARE(image.pixel(0, 0), (Rgb{125, 75, 139}));
+    image.blend_pixel(1, 0, {1, 2, 3}, 255);
+    QCOMPARE(image.pixel(1, 0), (Rgb{1, 2, 3}));
+    // Outside the image and alpha 0 change nothing
+    image.blend_pixel(5, 0, {1, 2, 3}, 255);
+    image.blend_pixel(0, 0, {0, 0, 0}, 0);
+    QCOMPARE(image.pixel(0, 0), (Rgb{125, 75, 139}));
+}
+
+//=============================================================================================================
+
+void TestBaseRasterImage::overlappingPolygonsBlendOnce()
+{
+    RasterImage image(10, 4, {0, 0, 0});
+    const std::vector<std::vector<PointF>> polygons = {{{0, 0}, {6, 0}, {6, 4}, {0, 4}}, {{4, 0}, {10, 0}, {10, 4}, {4, 4}}};
+    image.fill_polygons(polygons, {200, 100, 0}, 128);
+    QCOMPARE(image.pixel(1, 1), (Rgb{100, 50, 0}));
+    QCOMPARE(image.pixel(5, 1), (Rgb{100, 50, 0}));
+    QCOMPARE(image.pixel(8, 1), (Rgb{100, 50, 0}));
 }
 
 //=============================================================================================================

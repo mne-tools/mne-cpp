@@ -218,7 +218,8 @@ aliases; replace the old spelling as below.
   conversion tools.
 - `mne::RasterImage` (`base/raster_image.h`) fills anti-aliased polygons,
   draws text in a built-in bitmap font and writes PNG files, without a window
-  system or Qt.
+  system or Qt. Fills take an opacity, `fill_polygons()` fills overlapping
+  polygons as one area and `blend_pixel()` mixes a colour into a pixel.
 - The inverse operator's decomposition of the whitened lead field uses Eigen's
   divide-and-conquer SVD, as MNE-Python uses LAPACK's: about 2.5 times less
   CPU time for the MNE sample data, with the same source estimates to single
