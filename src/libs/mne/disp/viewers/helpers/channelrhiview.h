@@ -9,13 +9,12 @@
  * @date     March 2026
  * @brief    QRhi-based GPU-accelerated channel time-series renderer used by the modern raw browser.
  *
- * ChannelRhiView replaces the legacy @c QPainter raw-trace painter
- * with a @c QRhiWidget that uploads channel data as vertex buffers
- * and draws every visible trace in a single shader invocation. It
- * manages its own pipeline, samplers, resource bindings and a small
- * @c CrosshairOverlay for the time / amplitude cursor, and exposes
- * callbacks for the host @ref mne::disp::ChannelDataView to push new samples,
- * change scaling or update the visible window.
+ * ChannelRhiView is the @c QRhiWidget host of the Widgets-free @ref mne::disp::ChannelRhiRenderer, which
+ * holds the view state, uploads channel data as vertex buffers, draws every visible trace and paints the
+ * crosshair, scalebar and ruler overlay in the same GPU pass. The widget forwards its input events and
+ * frames to the renderer and exposes the API used by @ref mne::disp::ChannelDataView to push new samples,
+ * change scaling or update the visible window. Applications without Qt Widgets can use
+ * @ref mne::disp::ChannelWindow instead.
  */
 
 #ifndef CHANNELRHIVIEW_H
@@ -27,6 +26,7 @@
 
 #include "../../disp_global.h"
 #include "channeldatamodel.h"
+#include "channelrhirenderer.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -36,8 +36,6 @@
 #include <QImage>
 #include <QMouseEvent>
 #include <QPaintEvent>
-#include <QPointer>
-#include <QPropertyAnimation>
 #include <QRhiWidget>
 #include <QResizeEvent>
 #include <QWheelEvent>
@@ -46,10 +44,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
-#include <chrono>
-#include <cstdint>
 #include <memory>
-#include <string>
 #include <vector>
 
 //=============================================================================================================
@@ -57,15 +52,8 @@
 //=============================================================================================================
 
 class QRhi;
-class QRhiBuffer;
 class QRhiCommandBuffer;
-class QRhiGraphicsPipeline;
-class QRhiResourceUpdateBatch;
-class QRhiSampler;
-class QRhiShaderResourceBindings;
-class QRhiTexture;
-
-class CrosshairOverlay; // defined in .cpp
+class QRhiRenderTarget;
 
 namespace mne::disp
 {
@@ -74,10 +62,8 @@ namespace mne::disp
 /**
  * @brief QRhi-based GPU-accelerated channel time-series renderer used by the modern raw browser.
  *
- * Manages its own pipeline, samplers, resource bindings and a small
- * @c CrosshairOverlay for the time / amplitude cursor; exposes
- * callbacks for the host @ref ChannelDataView to push samples,
- * change scaling or update the visible window.
+ * Thin @c QRhiWidget host of a @ref ChannelRhiRenderer; frames and input events are forwarded to the
+ * renderer and its signals are re-emitted, so the widget keeps the API used by @ref ChannelDataView.
  */
 class DISPSHARED_EXPORT ChannelRhiView : public QRhiWidget
 {
@@ -87,32 +73,24 @@ class DISPSHARED_EXPORT ChannelRhiView : public QRhiWidget
     Q_PROPERTY(float samplesPerPixel READ samplesPerPixel WRITE setSamplesPerPixel NOTIFY samplesPerPixelChanged)
 
 public:
-    //=========================================================================================================
-    /**
-     * @brief Stimulus / event marker — a coloured vertical line at a given sample.
-     */
-    struct EventMarker
-    {
-        int sample = 0;    ///< Absolute sample index of the event onset.
-        int type = 1;      ///< Numeric event type (stimulus code).
-        QColor color;      ///< Display colour of the line and label chip.
-        std::string label; ///< Short text label (shown at the bottom strip); defaults to type number.
-    };
-
-    //=========================================================================================================
-    /**
-     * @brief Time-span annotation overlay.
-     */
-    struct AnnotationSpan
-    {
-        int startSample = 0; ///< Absolute first sample covered by the annotation.
-        int endSample = 0;   ///< Absolute last sample covered by the annotation.
-        QColor color;        ///< Fill / border colour for the highlighted span.
-        std::string label;   ///< Annotation label shown near the top edge.
-    };
+    using EventMarker = ChannelRhiRenderer::EventMarker;       ///< Stimulus / event marker.
+    using AnnotationSpan = ChannelRhiRenderer::AnnotationSpan; ///< Time-span annotation.
 
     explicit ChannelRhiView(QWidget* parent = nullptr);
     ~ChannelRhiView() override;
+
+    //=========================================================================================================
+    /**
+     * Returns the Widgets-free renderer that holds the view state, the GPU resources and the input handling.
+     *
+     * @since 3.0.0
+     *
+     * @return The renderer owned by this widget.
+     */
+    ChannelRhiRenderer* renderer() const
+    {
+        return m_pRenderer.get();
+    }
 
     //=========================================================================================================
     /**
@@ -120,7 +98,10 @@ public:
      *
      * @param[in] model  The channel data model to render.
      */
-    void setModel(ChannelDataModel* model);
+    void setModel(ChannelDataModel* model)
+    {
+        m_pRenderer->setModel(model);
+    }
 
     //=========================================================================================================
     /**
@@ -131,25 +112,40 @@ public:
      *
      * @param[in] events  List of EventMarker objects.
      */
-    void setEvents(const std::vector<EventMarker>& events);
+    void setEvents(const std::vector<EventMarker>& events)
+    {
+        m_pRenderer->setEvents(events);
+    }
 
-    void setEpochMarkers(const std::vector<int>& triggerSamples);
-    void setEpochMarkersVisible(bool visible);
+    void setEpochMarkers(const std::vector<int>& triggerSamples)
+    {
+        m_pRenderer->setEpochMarkers(triggerSamples);
+    }
+    void setEpochMarkersVisible(bool visible)
+    {
+        m_pRenderer->setEpochMarkersVisible(visible);
+    }
     bool epochMarkersVisible() const
     {
-        return m_bShowEpochMarkers;
+        return m_pRenderer->epochMarkersVisible();
     }
 
-    void setClippingVisible(bool visible);
+    void setClippingVisible(bool visible)
+    {
+        m_pRenderer->setClippingVisible(visible);
+    }
     bool clippingVisible() const
     {
-        return m_bShowClipping;
+        return m_pRenderer->clippingVisible();
     }
 
-    void setZScoreMode(bool enabled);
+    void setZScoreMode(bool enabled)
+    {
+        m_pRenderer->setZScoreMode(enabled);
+    }
     bool zScoreMode() const
     {
-        return m_bZScoreMode;
+        return m_pRenderer->zScoreMode();
     }
 
     //=========================================================================================================
@@ -158,7 +154,10 @@ public:
      *
      * @param[in] annotations  List of AnnotationSpan objects.
      */
-    void setAnnotations(const std::vector<AnnotationSpan>& annotations);
+    void setAnnotations(const std::vector<AnnotationSpan>& annotations)
+    {
+        m_pRenderer->setAnnotations(annotations);
+    }
 
     //=========================================================================================================
     /**
@@ -167,23 +166,38 @@ public:
      *
      * @param[in] enabled  True to make Shift+drag select annotation ranges.
      */
-    void setAnnotationSelectionEnabled(bool enabled);
+    void setAnnotationSelectionEnabled(bool enabled)
+    {
+        m_pRenderer->setAnnotationSelectionEnabled(enabled);
+    }
 
-    void setEventsVisible(bool visible);
-    bool eventsVisible() const;
+    void setEventsVisible(bool visible)
+    {
+        m_pRenderer->setEventsVisible(visible);
+    }
+    bool eventsVisible() const
+    {
+        return m_pRenderer->eventsVisible();
+    }
 
-    void setAnnotationsVisible(bool visible);
-    bool annotationsVisible() const;
+    void setAnnotationsVisible(bool visible)
+    {
+        m_pRenderer->setAnnotationsVisible(visible);
+    }
+    bool annotationsVisible() const
+    {
+        return m_pRenderer->annotationsVisible();
+    }
 
     // ── Scroll / zoom ─────────────────────────────────────────────────
 
     float scrollSample() const
     {
-        return m_scrollSample;
+        return m_pRenderer->scrollSample();
     }
     float samplesPerPixel() const
     {
-        return m_samplesPerPixel;
+        return m_pRenderer->samplesPerPixel();
     }
 
     //=========================================================================================================
@@ -193,7 +207,10 @@ public:
      *
      * @param[in] sample  Absolute sample index for the left viewport edge.
      */
-    void setScrollSample(float sample);
+    void setScrollSample(float sample)
+    {
+        m_pRenderer->setScrollSample(sample);
+    }
 
     //=========================================================================================================
     /**
@@ -202,7 +219,10 @@ public:
      *
      * @param[in] spp  Samples per pixel (> 1 = zoomed out, < 1 = zoomed in).
      */
-    void setSamplesPerPixel(float spp);
+    void setSamplesPerPixel(float spp)
+    {
+        m_pRenderer->setSamplesPerPixel(spp);
+    }
 
     //=========================================================================================================
     /**
@@ -211,7 +231,10 @@ public:
      * @param[in] targetSample  Target left-edge sample index.
      * @param[in] durationMs    Animation duration in milliseconds (0 = instant).
      */
-    void scrollTo(float targetSample, int durationMs = 200);
+    void scrollTo(float targetSample, int durationMs = 200)
+    {
+        m_pRenderer->scrollTo(targetSample, durationMs);
+    }
 
     //=========================================================================================================
     /**
@@ -221,7 +244,10 @@ public:
      * @param[in] deltaSamples  Samples to scroll (negative = earlier).
      * @param[in] durationMs    Animation duration in milliseconds (0 = instant).
      */
-    void scrollBy(float deltaSamples, int durationMs = 200);
+    void scrollBy(float deltaSamples, int durationMs = 200)
+    {
+        m_pRenderer->scrollBy(deltaSamples, durationMs);
+    }
 
     //=========================================================================================================
     /**
@@ -230,7 +256,10 @@ public:
      * @param[in] targetSpp   Target samples-per-pixel.
      * @param[in] durationMs  Animation duration in milliseconds (0 = instant).
      */
-    void zoomTo(float targetSpp, int durationMs = 200);
+    void zoomTo(float targetSpp, int durationMs = 200)
+    {
+        m_pRenderer->zoomTo(targetSpp, durationMs);
+    }
 
     //=========================================================================================================
     /**
@@ -238,10 +267,13 @@ public:
      *
      * @param[in] color  The new background colour.
      */
-    void setBackgroundColor(const QColor& color);
+    void setBackgroundColor(const QColor& color)
+    {
+        m_pRenderer->setBackgroundColor(color);
+    }
     QColor backgroundColor() const
     {
-        return m_bgColor;
+        return m_pRenderer->backgroundColor();
     }
 
     //=========================================================================================================
@@ -251,7 +283,10 @@ public:
      *
      * @param[in] factor  Prefetch factor.
      */
-    void setPrefetchFactor(float factor);
+    void setPrefetchFactor(float factor)
+    {
+        m_pRenderer->setPrefetchFactor(factor);
+    }
 
     //=========================================================================================================
     /**
@@ -260,7 +295,10 @@ public:
      *
      * @return Absolute sample index at the left viewport edge.
      */
-    int visibleFirstSample() const;
+    int visibleFirstSample() const
+    {
+        return m_pRenderer->visibleFirstSample();
+    }
 
     //=========================================================================================================
     /**
@@ -268,7 +306,10 @@ public:
      *
      * @return Widget width in pixels times samples per pixel, truncated to int.
      */
-    int visibleSampleCount() const;
+    int visibleSampleCount() const
+    {
+        return m_pRenderer->visibleSampleCount();
+    }
 
     //=========================================================================================================
     /**
@@ -279,7 +320,10 @@ public:
      * @param[in] indices  Ordered list of model channel indices to display.
      *                     Pass an empty vector to clear the filter.
      */
-    void setChannelIndices(const std::vector<int>& indices);
+    void setChannelIndices(const std::vector<int>& indices)
+    {
+        m_pRenderer->setChannelIndices(indices);
+    }
 
     //=========================================================================================================
     /**
@@ -287,7 +331,10 @@ public:
      *
      * @return Number of channels after applying the index filter and bad-channel hiding.
      */
-    int totalLogicalChannels() const;
+    int totalLogicalChannels() const
+    {
+        return m_pRenderer->totalLogicalChannels();
+    }
 
     //=========================================================================================================
     /**
@@ -295,10 +342,13 @@ public:
      *
      * @param[in] ch  Zero-based channel index (within the active filter if any).
      */
-    void setFirstVisibleChannel(int ch);
+    void setFirstVisibleChannel(int ch)
+    {
+        m_pRenderer->setFirstVisibleChannel(ch);
+    }
     int firstVisibleChannel() const
     {
-        return m_firstVisibleChannel;
+        return m_pRenderer->firstVisibleChannel();
     }
 
     //=========================================================================================================
@@ -307,10 +357,13 @@ public:
      *
      * @param[in] count  Number of channels to show (clamped to 1–model count).
      */
-    void setVisibleChannelCount(int count);
+    void setVisibleChannelCount(int count)
+    {
+        m_pRenderer->setVisibleChannelCount(count);
+    }
     int visibleChannelCount() const
     {
-        return m_visibleChannelCount;
+        return m_pRenderer->visibleChannelCount();
     }
 
     //=========================================================================================================
@@ -320,10 +373,13 @@ public:
      *
      * @param[in] frozen  True to disable drag-panning.
      */
-    void setFrozen(bool frozen);
+    void setFrozen(bool frozen)
+    {
+        m_pRenderer->setFrozen(frozen);
+    }
     bool isFrozen() const
     {
-        return m_frozen;
+        return m_pRenderer->isFrozen();
     }
 
     //=========================================================================================================
@@ -332,10 +388,13 @@ public:
      *
      * @param[in] visible  True to draw the grid.
      */
-    void setGridVisible(bool visible);
+    void setGridVisible(bool visible)
+    {
+        m_pRenderer->setGridVisible(visible);
+    }
     bool gridVisible() const
     {
-        return m_gridVisible;
+        return m_pRenderer->gridVisible();
     }
 
     //=========================================================================================================
@@ -345,7 +404,10 @@ public:
      *
      * @param[in] sfreq  Sampling frequency in Hz.
      */
-    void setSfreq(float sfreq);
+    void setSfreq(float sfreq)
+    {
+        m_pRenderer->setSfreq(sfreq);
+    }
 
     //=========================================================================================================
     /**
@@ -354,7 +416,10 @@ public:
      *
      * @param[in] first  Absolute sample index of the file's first sample.
      */
-    void setFirstFileSample(int first);
+    void setFirstFileSample(int first)
+    {
+        m_pRenderer->setFirstFileSample(first);
+    }
 
     //=========================================================================================================
     /**
@@ -364,10 +429,13 @@ public:
      *
      * @param[in] last  Absolute sample index of the file's last sample.
      */
-    void setLastFileSample(int last);
+    void setLastFileSample(int last)
+    {
+        m_pRenderer->setLastFileSample(last);
+    }
     int lastFileSample() const
     {
-        return m_lastFileSample;
+        return m_pRenderer->lastFileSample();
     }
 
     //=========================================================================================================
@@ -378,16 +446,22 @@ public:
      *
      * @param[in] channelsMode  true = vertical wheel → channels, false → time.
      */
-    void setWheelScrollsChannels(bool channelsMode);
+    void setWheelScrollsChannels(bool channelsMode)
+    {
+        m_pRenderer->setWheelScrollsChannels(channelsMode);
+    }
     bool wheelScrollsChannels() const
     {
-        return m_wheelScrollsChannels;
+        return m_pRenderer->wheelScrollsChannels();
     }
 
-    void setScrollSpeedFactor(float factor);
+    void setScrollSpeedFactor(float factor)
+    {
+        m_pRenderer->setScrollSpeedFactor(factor);
+    }
     float scrollSpeedFactor() const
     {
-        return m_scrollSpeedFactor;
+        return m_pRenderer->scrollSpeedFactor();
     }
 
     //=========================================================================================================
@@ -399,10 +473,13 @@ public:
      *
      * @param[in] hide  true = remove bad channels from the visible trace list.
      */
-    void setHideBadChannels(bool hide);
+    void setHideBadChannels(bool hide)
+    {
+        m_pRenderer->setHideBadChannels(hide);
+    }
     bool hideBadChannels() const
     {
-        return m_hideBadChannels;
+        return m_pRenderer->hideBadChannels();
     }
 
     // ── Crosshair ─────────────────────────────────────────────────────
@@ -415,10 +492,13 @@ public:
      *
      * @param[in] enabled  True to show the crosshair overlay.
      */
-    void setCrosshairEnabled(bool enabled);
+    void setCrosshairEnabled(bool enabled)
+    {
+        m_pRenderer->setCrosshairEnabled(enabled);
+    }
     bool crosshairEnabled() const
     {
-        return m_crosshairEnabled;
+        return m_pRenderer->crosshairEnabled();
     }
 
     /**
@@ -428,12 +508,11 @@ public:
      */
     void setClockTimeFormat(bool useClock)
     {
-        m_useClockTime = useClock;
-        update();
+        m_pRenderer->setClockTimeFormat(useClock);
     }
     bool clockTimeFormat() const
     {
-        return m_useClockTime;
+        return m_pRenderer->clockTimeFormat();
     }
 
     // ── Export ────────────────────────────────────────────────────────
@@ -451,7 +530,10 @@ public:
      * @return The rendered image (only the background if no channel is shown), or a null
      *         image if there is no model or the size is empty.
      */
-    QImage renderToImage(const QSize& size = QSize()) const;
+    QImage renderToImage(const QSize& size = QSize()) const
+    {
+        return m_pRenderer->renderToImage(size);
+    }
 
     // ── Scalebars ─────────────────────────────────────────────────────
 
@@ -461,10 +543,13 @@ public:
      *
      * @param[in] visible  True to draw the scalebars.
      */
-    void setScalebarsVisible(bool visible);
+    void setScalebarsVisible(bool visible)
+    {
+        m_pRenderer->setScalebarsVisible(visible);
+    }
     bool scalebarsVisible() const
     {
-        return m_scalebarsVisible;
+        return m_pRenderer->scalebarsVisible();
     }
 
     // ── Butterfly mode ────────────────────────────────────────────────
@@ -475,10 +560,13 @@ public:
      *
      * @param[in] enabled  True to enable butterfly mode.
      */
-    void setButterflyMode(bool enabled);
+    void setButterflyMode(bool enabled)
+    {
+        m_pRenderer->setButterflyMode(enabled);
+    }
     bool butterflyMode() const
     {
-        return m_butterflyMode;
+        return m_pRenderer->butterflyMode();
     }
 
 signals:
@@ -542,22 +630,6 @@ protected:
      */
     void renderFrame(QRhi* rhi, QRhiRenderTarget* target, QRhiCommandBuffer* cb);
 
-    // Overlay access — called by CrosshairOverlay::paintEvent
-    friend class ::CrosshairOverlay;
-    void drawCrosshair(QPainter& p);
-    void drawScalebars(QPainter& p);
-    void drawRulerOverlay(QPainter& p);
-    void drawAnnotationSelectionOverlay(QPainter& p);
-    void emitCursorData();
-    bool rulerActive() const
-    {
-        return m_rulerActive;
-    }
-    bool annotationSelecting() const
-    {
-        return m_annSelecting;
-    }
-
     void resizeEvent(QResizeEvent* event) override;
     void wheelEvent(QWheelEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
@@ -566,175 +638,8 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent* event) override;
 
 private:
-    float clampScrollSample(float sample) const;
-    void stopScrollAnimations();
-
-    // ── GPU resource management ────────────────────────────────────────
-    struct ChannelGpuData
-    {
-        std::unique_ptr<QRhiBuffer> vbo;
-        int vertexCount = 0;
-        int vboFirstSample = 0; // absolute first sample in VBO
-    };
-
-    void ensurePipeline(QRhi* rhi, QRhiRenderTarget* target);
-    void rebuildVBOs(QRhi* rhi, QRhiResourceUpdateBatch* batch);
-    void updateUBO(QRhiResourceUpdateBatch* batch);
-    bool isVboDirty() const;
-
-    // ── Overlay blit (annotations/events baked into texture, bands in shader) ──
-    void ensureOverlayPipeline(QRhi* rhi, QRhiRenderTarget* target);
-    void rebuildOverlayImage(int logicalWidth, int logicalHeight, qreal devicePixelRatio);
-
-    std::unique_ptr<QRhiBuffer> m_overlayVbo; // Static quad
-    std::unique_ptr<QRhiTexture> m_overlayTex;
-    std::unique_ptr<QRhiSampler> m_overlaySampler;
-    std::unique_ptr<QRhiShaderResourceBindings> m_overlaySrb;
-    std::unique_ptr<QRhiGraphicsPipeline> m_overlayPipeline;
-    std::unique_ptr<QRhiBuffer> m_overlayUbo; // OverlayParams UBO
-    bool m_overlayVboNeedsUpload = false;
-    QImage m_overlayImage;
-    bool m_overlayDirty = true;
-    QSize m_overlayTexSize;
-
-    // Overlay prefetch: the texture covers a wider sample range than the viewport.
-    // During scroll, the shader maps screen UVs into this wider texture via uniforms.
-    // Rebuild is only needed when scroll exceeds the prefetch window.
-    static constexpr float kOverlayPrefetchFactor = 1.0f; // extra viewport widths each side
-    float m_overlayFirstSample = 0.f;                     // first sample covered by overlay tex
-    float m_overlayTotalSamples = 0.f;                    // total sample span of overlay tex
-
-
-    std::unique_ptr<QRhiBuffer> m_ubo;
-    std::unique_ptr<QRhiShaderResourceBindings> m_srb;
-    std::unique_ptr<QRhiGraphicsPipeline> m_pipeline;
-    std::vector<ChannelGpuData> m_gpuChannels;
-    int m_uboStride = 256;
-    bool m_pipelineDirty = true;
-    bool m_vboDirty = true;
-
-    // ── Shared browser state ───────────────────────────────────────────
-    QPointer<ChannelDataModel> m_model;
-    float m_scrollSample = 0.f;
-    float m_samplesPerPixel = 1.f;
-    float m_prefetchFactor = 1.0f;
-    QColor m_bgColor{250, 250, 250}; // light default
-
-    bool m_frozen = false;
-    bool m_gridVisible = true;
-    float m_sfreq = 1000.f;
-    int m_firstFileSample = 0;
-    int m_lastFileSample = -1;          // -1 = no limit (file not yet known)
-    bool m_wheelScrollsChannels = true; // default: vertical wheel → channels
-    float m_scrollSpeedFactor = 1.0f;   // multiplier for wheel/keyboard scroll
-    bool m_hideBadChannels = false;
-
-    // ── Vertical channel windowing ────────────────────────────────────
-    int m_firstVisibleChannel = 0;
-    int m_visibleChannelCount = 12;
-
-    // ── Drag scroll support ────────────────────────────────────────────
-    bool m_dragging = false;
-    int m_dragStartX = 0;
-    float m_dragStartScroll = 0.f;
-
-    // ── Left-button drag (panning) + inertial scroll ──────────────────
-    bool m_leftButtonDown = false;
-    int m_leftDownX = 0;
-    float m_leftDownScroll = 0.f;
-    bool m_leftDragActivated = false;
-
-    struct VelocitySample
-    {
-        int x;
-        std::int64_t t;
-    };
-    std::vector<VelocitySample> m_velocityHistory;
-    std::chrono::steady_clock::time_point m_dragStart;
-    QPropertyAnimation* m_pInertialAnim = nullptr;
-    QPointer<QPropertyAnimation> m_pScrollAnim;
-    float m_scrollTarget = 0.f;
-
-    // ── Channel index filter ──────────────────────────────────────────
-    // When non-empty, only these model channel indices are rendered/scrolled.
-    std::vector<int> m_filteredChannels;
-
-    // ── Event / stimulus markers ──────────────────────────────────────
-    std::vector<EventMarker> m_events;
-    std::vector<int> m_epochTriggerSamples;
-    std::vector<AnnotationSpan> m_annotations;
-    bool m_annotationSelectionEnabled = false;
-    bool m_bShowEvents = true;
-    bool m_bShowAnnotations = true;
-    bool m_bShowEpochMarkers = true;
-    bool m_bShowClipping = true;
-    bool m_bZScoreMode = false;
-
-    // ── Annotation boundary drag-resize ───────────────────────────────
-    bool m_annDragging = false;                 ///< True while dragging an annotation boundary.
-    int m_annDragIndex = -1;                    ///< Index of the annotation being resized.
-    bool m_annDragIsStart = true;               ///< True if dragging the start boundary.
-    int m_annHoverIndex = -1;                   ///< Index of annotation whose boundary is under cursor.
-    bool m_annHoverIsStart = true;              ///< True if cursor is near the start boundary.
-    static constexpr int kAnnBoundaryHitPx = 5; ///< Hit-test tolerance in pixels.
-
-    // ── Annotation range selection (right-drag when annotation mode ON) ─
-    bool m_annSelecting = false; ///< True while right-dragging to select a new annotation range.
-    int m_annSelX0 = 0;          ///< Press position (screen px).
-    int m_annSelX1 = 0;          ///< Current cursor position (screen px).
-
-    int hitTestAnnotationBoundary(int px, bool& isStart) const;
-
-    // Helper — use instead of firstCh+i for actual model channel index
-    int actualChannelAt(int logicalIdx) const; // maps logical → model channel index
-    std::vector<int> effectiveChannelIndices() const;
-
-    // ── Prefetch window tracking ───────────────────────────────────────
-    int m_vboWindowFirst = 0;
-    int m_vboWindowLast = 0;
-
-    // ── Ruler / measurement overlay ───────────────────────────────────
-    // Active while right-button is held.
-    enum class RulerSnap
-    {
-        Free,
-        Horizontal,
-        Vertical
-    };
-    bool m_rulerActive = false;
-    RulerSnap m_rulerSnap = RulerSnap::Free;
-    int m_rulerX0 = 0; // press position (screen px)
-    int m_rulerY0 = 0;
-    int m_rulerX1 = 0; // current cursor position (may be snapped)
-    int m_rulerY1 = 0;
-    int m_rulerRawX1 = 0; // raw cursor position (unsnapped)
-    int m_rulerRawY1 = 0;
-
-    // ── Crosshair cursor ──────────────────────────────────────────────
-    bool m_crosshairEnabled = false;
-    int m_crosshairX = -1; // screen px, -1 = not tracking
-    int m_crosshairY = -1;
-    bool m_useClockTime = false;           // mirror of TimeRulerWidget time format
-    CrosshairOverlay* m_overlay = nullptr; // lightweight overlay for crosshair/scalebars
-
-    // ── Scalebars ─────────────────────────────────────────────────────
-    bool m_scalebarsVisible = false;
-
-    // ── Butterfly mode ────────────────────────────────────────────────
-    bool m_butterflyMode = false;
-
-    struct ButterflyTypeGroup
-    {
-        std::string typeLabel;           // e.g. "MEG", "EEG"
-        QColor color;                    // representative type colour
-        float amplitudeMax;              // per-type amplitude scale
-        std::vector<int> channelIndices; // model channel indices in this group
-    };
-
-    std::vector<ButterflyTypeGroup> butterflyTypeGroups() const;
-    int butterflyLaneCount() const;
-
-    void drawOverlays(); // QPainter-based overlays on top of the QRHI-rendered traces
+    std::unique_ptr<ChannelRhiHost> m_pHost;         // widget services for the renderer
+    std::unique_ptr<ChannelRhiRenderer> m_pRenderer; // view state, GPU resources and input handling
 };
 
 } // namespace mne::disp

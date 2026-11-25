@@ -12,7 +12,8 @@
   "kept": {
     "$comment": "Library -> { use: reason } for Qt kept by decision D16.",
     "disp": {
-      "SvgWriter (QPaintEngine)": "Replaces QSvgGenerator so the vector export of widgets needs Qt Gui only; dropping the Qt Svg module raised the disp ceilings once (tokens 6025 -> 6159, public header includes 110 -> 112)."
+      "SvgWriter (QPaintEngine)": "Replaces QSvgGenerator so the vector export of widgets needs Qt Gui only; dropping the Qt Svg module raised the disp ceilings once (tokens 6025 -> 6159, public header includes 110 -> 112).",
+      "QWindow hosts and scene viewports (phase 3)": "ChannelWindow (QWindow + QRhi swap chain) next to the ChannelRhiView QRhiWidget host, and SceneViewport replacing the QGraphicsView scenes, raised the disp ceilings once (tokens 4846 -> 4885, public header includes 82 -> 89); the QRhiWidget hosts go with phase 4."
     }
   },
   "ceilings": {
@@ -72,21 +73,21 @@
       "modules": []
     },
     "disp": {
-      "tokens": 4846,
-      "public_header_includes": 82,
+      "tokens": 4885,
+      "public_header_includes": 89,
       "modules": [
         "Core",
         "GuiPrivate",
         "Widgets"
       ],
       "by_category": {
-        "containers": 33,
-        "files": 99,
-        "global": 1069,
-        "gui": 888,
-        "objects_signals": 528,
-        "other": 1396,
-        "strings": 824,
+        "containers": 16,
+        "files": 97,
+        "global": 1083,
+        "gui": 958,
+        "objects_signals": 533,
+        "other": 1369,
+        "strings": 820,
         "time": 9
       }
     },

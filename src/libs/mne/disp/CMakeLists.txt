@@ -82,6 +82,8 @@ set(SOURCES
     viewers/bidsview.cpp
     viewers/helpers/channeldatamodel.cpp
     viewers/helpers/channelrhiview.cpp
+    viewers/helpers/channelrhirenderer.cpp
+    viewers/helpers/channelwindow.cpp
     viewers/helpers/channellabelpanel.cpp
     viewers/helpers/overviewbarwidget.cpp
     viewers/helpers/timerulerwidget.cpp
@@ -152,6 +154,8 @@ set(HEADERS
     viewers/bidsview.h
     viewers/helpers/channeldatamodel.h
     viewers/helpers/channelrhiview.h
+    viewers/helpers/channelrhirenderer.h
+    viewers/helpers/channelwindow.h
     viewers/helpers/channellabelpanel.h
     viewers/helpers/overviewbarwidget.h
     viewers/helpers/timerulerwidget.h

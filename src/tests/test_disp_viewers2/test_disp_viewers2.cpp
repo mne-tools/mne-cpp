@@ -3247,10 +3247,8 @@ void TestDispViewers2::channelRhiView_overlayValues()
     rhiView->setScrollSample(100.f);
     rhiView->setVisibleChannelCount(4);
     rhiView->setCrosshairEnabled(false);
-    const QList<QWidget*> children = rhiView->findChildren<QWidget*>(Qt::FindDirectChildrenOnly);
-    QCOMPARE(children.size(), 1);
-    QWidget* overlay = children.first();
-    overlay->resize(rhiView->size());
+    // The crosshair, scalebars and ruler are part of the GPU frame, painted by the renderer: no child widget
+    QVERIFY(rhiView->findChildren<QWidget*>(Qt::FindDirectChildrenOnly).isEmpty());
 
     const auto sendMouse = [rhiView](QEvent::Type type, Qt::MouseButton button, const QPoint& pos) {
         QMouseEvent event(type, pos, rhiView->mapToGlobal(pos), type == QEvent::MouseMove ? Qt::NoButton : button,
@@ -3263,11 +3261,11 @@ void TestDispViewers2::channelRhiView_overlayValues()
         QStringList texts;
         QList<QLineF> lines;
     };
-    const auto paintOverlay = [overlay]() {
-        TextRecordingDevice recorder(overlay->size());
+    const auto paintOverlay = [rhiView]() {
+        TextRecordingDevice recorder(rhiView->size());
         {
             QPainter painter(&recorder);
-            overlay->render(&painter);
+            rhiView->renderer()->paintHud(painter);
         }
         // Glyphs from a fallback font (e.g. the ruler's delta) arrive as separate items: rejoin them
         QStringList texts;
