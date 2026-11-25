@@ -13,6 +13,7 @@ set(SOURCES
   butterfly_plot.cpp
   canvas.cpp
   colormap.cpp
+  filter_response_plot.cpp
   image_plot.cpp
   line_chart.cpp
   raster_renderer.cpp
@@ -32,6 +33,7 @@ set(HEADERS
   canvas.h
   colormap.h
   display_list.h
+  filter_response_plot.h
   image_plot.h
   line_chart.h
   geometry.h

@@ -36,6 +36,7 @@ set(SOURCES
     plots/bar.cpp
     plots/spline.cpp
     plots/lineplot.cpp
+    plots/filterplot.cpp
     plots/helpers/colormap.cpp
     plots/helpers/figureexporter.cpp
     plots/helpers/svgwriter.cpp
@@ -90,7 +91,6 @@ set(SOURCES
     viewers/helpers/layoutscene.cpp
     viewers/helpers/averagescene.cpp
     viewers/helpers/averagesceneitem.cpp
-    viewers/helpers/filterplotscene.cpp
     viewers/helpers/selectionscene.cpp
     viewers/helpers/selectionsceneitem.cpp
     viewers/helpers/channelinfomodel.cpp
@@ -110,6 +110,7 @@ set(HEADERS
     plots/bar.h
     plots/spline.h
     plots/lineplot.h
+    plots/filterplot.h
     plots/helpers/colormap.h
     plots/helpers/figureexporter.h
     plots/helpers/svgwriter.h
@@ -162,7 +163,6 @@ set(HEADERS
     viewers/helpers/layoutscene.h
     viewers/helpers/averagescene.h
     viewers/helpers/averagesceneitem.h
-    viewers/helpers/filterplotscene.h
     viewers/helpers/selectionscene.h
     viewers/helpers/selectionsceneitem.h
     viewers/helpers/channelinfomodel.h

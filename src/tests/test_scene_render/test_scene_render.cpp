@@ -20,6 +20,7 @@
 #include <mne/scene/butterfly_plot.h>
 #include <mne/scene/canvas.h>
 #include <mne/scene/colormap.h>
+#include <mne/scene/filter_response_plot.h>
 #include <mne/scene/image_plot.h>
 #include <mne/scene/line_chart.h>
 #include <mne/scene/raster_renderer.h>
@@ -170,6 +171,7 @@ DisplayList plotFigure(const QString& name)
             ButterflyPlot::Channel channel;
             channel.bad = c == 5;
             std::vector<double> samples;
+            samples.reserve(120);
             for (int i = 0; i < 120; ++i) {
                 samples.push_back(i < 30 ? 0.0 : (0.2 + 0.1 * c) * std::sin((i - 30) * 0.08) * std::exp(-(i - 30) * 0.02));
             }
@@ -178,6 +180,22 @@ DisplayList plotFigure(const QString& name)
         }
         plot.set_channels(channels);
         return plot.render(480, 320, font);
+    }
+    if (name == "filter_response_plot") {
+        // Band pass 1 to 40 Hz at 250 Hz sampling: a smooth pass band and a notch above the upper edge
+        std::vector<double> magnitude;
+        magnitude.reserve(2001);
+        for (int i = 0; i <= 2000; ++i) {
+            const double f = i * 125.0 / 2000;
+            const double band = 1.0 / std::sqrt(1.0 + std::pow(1.0 / std::max(f, 1e-3), 8)) / std::sqrt(1.0 + std::pow(f / 40.0, 8));
+            magnitude.push_back(i == 1000 ? 0.0 : band);
+        }
+        FilterResponsePlot plot;
+        plot.set_title("BPF_1_40");
+        plot.set_response(magnitude, 125.0);
+        plot.set_cutoffs({1.0, 40.0, 200.0});
+        plot.set_colors({30, 30, 30});
+        return plot.render(480, 320, metrics, font);
     }
     if (name == "average_tile") {
         Canvas canvas(480, 320, Color::white());
@@ -246,6 +264,7 @@ private slots:
     void plotsMatchGoldenFiles_data();
     void plotsMatchGoldenFiles();
     void linePlotPicksUnusedPaletteColors();
+    void filterResponseIsRelativeToItsMaximum();
     void splinePlotMapsPixelsAndData();
 };
 
@@ -503,7 +522,7 @@ void TestSceneRender::colormapsMatchTheirDefinition()
 void TestSceneRender::plotsMatchGoldenFiles_data()
 {
     QTest::addColumn<QString>("name");
-    for (const char* name : {"line_chart", "bar_chart", "spline_plot", "image_plot", "vector_plot", "butterfly_plot", "average_tile"}) {
+    for (const char* name : {"line_chart", "bar_chart", "spline_plot", "image_plot", "vector_plot", "butterfly_plot", "average_tile", "filter_response_plot"}) {
         QTest::newRow(name) << QString(name);
     }
 }
@@ -534,6 +553,23 @@ void TestSceneRender::linePlotPicksUnusedPaletteColors()
     plot.set_data({4, 5, 6});
     QCOMPARE(plot.series().size(), std::size_t(1));
     QCOMPARE(plot.series()[0].x, (std::vector<double>{0, 1, 2}));
+}
+
+//=============================================================================================================
+
+void TestSceneRender::filterResponseIsRelativeToItsMaximum()
+{
+    FilterResponsePlot plot;
+    plot.set_response({2.0, 1.0, 0.02, 0.0}, 50.0);
+    const std::vector<double> db = plot.magnitude_db();
+    QCOMPARE(db.size(), std::size_t{4});
+    QCOMPARE(db[0], 0.0);
+    QVERIFY(std::abs(db[1] + 20.0 * std::log10(2.0)) < 1e-12);
+    QVERIFY(std::abs(db[2] + 40.0) < 1e-9);
+    QCOMPARE(db[3], -100.0);
+    plot.set_floor_db(-30.0);
+    QCOMPARE(plot.magnitude_db()[2], -30.0);
+    QVERIFY(FilterResponsePlot{}.magnitude_db().empty());
 }
 
 //=============================================================================================================

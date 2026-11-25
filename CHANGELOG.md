@@ -252,6 +252,11 @@ aliases; replace the old spelling as below.
 - The SOUP inventory lists the Qt modules the libraries, applications and
   tools request (also as sub-components in the CycloneDX SBOM) and the system
   `curl` program that MNE Analyze Studio's assistant runs.
+- `mne::scene::FilterResponsePlot` draws the magnitude response of a filter
+  in dB with its cut-off frequencies; the new `disp::FilterPlot` widget shows
+  it, and `FilterDesignView` uses that widget instead of a `QGraphicsView`.
+  Its plot export writes vector SVG. Removed: `FilterPlotScene` and
+  `FilterDesignView::resizeEvent()`.
 - `mne::write_mat_file()` (`math/mat_file.h`) writes matrices to a MATLAB
   Level 5 MAT-file; `mne_raw2mat` and `mne_epochs2mat` use it instead of two
   copies of the writer (their files are byte-identical).

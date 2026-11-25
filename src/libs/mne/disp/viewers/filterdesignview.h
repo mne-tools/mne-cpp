@@ -19,7 +19,7 @@
  * frequencies, the transition bandwidth and the number of taps,
  * preserves the resulting @c FilterKernel in a @c QSettings path and
  * renders the magnitude (and optional group-delay / phase) response
- * in a @ref mne::disp::FilterPlotScene that updates while the user drags the
+ * in a @ref mne::disp::FilterPlot that updates while the user drags the
  * spinboxes. Designed filters are emitted as @c filterChanged signals
  * consumed by the @c rtprocessing filter chain.
  */
@@ -34,12 +34,6 @@
 #include "../disp_global.h"
 #include "abstractview.h"
 #include <mne/dsp/filterkernel.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QPointer>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -69,8 +63,6 @@ namespace mne::disp
 // mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
-class FilterPlotScene;
-
 //=============================================================================================================
 /**
  * @brief Interactive FIR / IIR filter design GUI with a live magnitude / phase preview.
@@ -78,7 +70,7 @@ class FilterPlotScene;
  * Lets the user pick filter type, design family (cosine, Hamming,
  * Blackman, …), cutoff frequencies, transition bandwidth and tap
  * count, then renders the resulting frequency response in an
- * embedded @ref FilterPlotScene and emits the @c FilterKernel as a
+ * embedded @ref FilterPlot and emits the @c FilterKernel as a
  * @c filterChanged signal consumed by the @c rtprocessing chain.
  */
 class DISPSHARED_EXPORT FilterDesignView : public AbstractView
@@ -262,14 +254,6 @@ protected:
 
     //=========================================================================================================
     /**
-     * resizeEvent reimplemented virtual function to handle resize events of the filter window
-     *
-     * @param[in] event  The resize event (unused; the plot is refitted to the view).
-     */
-    void resizeEvent(QResizeEvent* event);
-
-    //=========================================================================================================
-    /**
      * keyPressEvent reimplemented virtual function to handle key events
      *
      * @param[in] event  The key event; Enter/Return, Ctrl+Z and Delete re-emit the filter channel type.
@@ -325,8 +309,6 @@ protected:
     void updateGuiFromFilter(const mne::FilterKernel& filter);
 
     std::unique_ptr<Ui::FilterDesignViewWidget> m_pUi; /**< Pointer to the qt designer generated ui class.*/
-
-    QPointer<FilterPlotScene> m_pFilterPlotScene; /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 
     mne::FilterKernel m_filterKernel; /**< The current filter operator.*/
 

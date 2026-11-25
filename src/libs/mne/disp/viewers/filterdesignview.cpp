@@ -24,11 +24,12 @@
 #include <mne/base/log.h>
 #include "ui_filterdesignview.h"
 
-#include "helpers/filterplotscene.h"
-#include "../plots/helpers/svgwriter.h"
+#include "../plots/filterplot.h"
+#include "../plots/helpers/scenepainter.h"
 
 #include <mne/base/string_utils.h>
 #include <mne/dsp/filterio.h>
+#include <mne/scene/svg_renderer.h>
 
 #include <mne/fiff/fiff_info.h>
 
@@ -309,21 +310,7 @@ void FilterDesignView::initComboBoxes()
 
 void FilterDesignView::initFilterPlot()
 {
-    m_pFilterPlotScene = new FilterPlotScene(m_pUi->m_graphicsView_filterPlot, this);
-
-    m_pUi->m_graphicsView_filterPlot->setScene(m_pFilterPlotScene);
-    m_pUi->m_graphicsView_filterPlot->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_pUi->m_graphicsView_filterPlot->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
     updateFilterPlot();
-}
-
-//=============================================================================================================
-
-void FilterDesignView::resizeEvent(QResizeEvent* event)
-{
-    Q_UNUSED(event);
-    m_pUi->m_graphicsView_filterPlot->fitInView(m_pFilterPlotScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 //=============================================================================================================
@@ -343,13 +330,8 @@ void FilterDesignView::keyPressEvent(QKeyEvent* event)
 
 void FilterDesignView::updateFilterPlot()
 {
-    //Update the filter of the scene
-    m_pFilterPlotScene->updateFilter(m_filterKernel,
-                                     m_filterKernel.sampling_frequency(), //Pass the filters sampling frequency, not the one from the fiff info. Reason: sFreq from a loaded filter could be different
-                                     m_pUi->m_doubleSpinBox_from->value(),
-                                     m_pUi->m_doubleSpinBox_to->value());
-
-    m_pUi->m_graphicsView_filterPlot->fitInView(m_pFilterPlotScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    // The filter's own sampling frequency: a loaded filter can differ from the measurement's
+    m_pUi->m_filterPlot->setFilter(m_filterKernel);
 }
 
 //=============================================================================================================
@@ -450,26 +432,20 @@ void FilterDesignView::onBtnExportFilterPlot()
                                                     tr("Vector graphic(*.svg);;Images (*.png)"));
 
     if (!fileName.isEmpty()) {
-        // Generate screenshot
+        // The plot at its size on screen, as vector graphics or an image
+        const scene::DisplayList figure = m_pUi->m_filterPlot->figure(m_pUi->m_filterPlot->size());
         if (fileName.contains(".svg")) {
-            SvgWriter svgGen;
-
-            svgGen.setFileName(fileName.toStdString());
-            QRectF rect = m_pFilterPlotScene->itemsBoundingRect();
-            svgGen.setSize(QSize(rect.width(), rect.height()));
-            //svgGen.setViewBox(QRect(0, 0, rect.width(), rect.height()));
-
-            QPainter painter(&svgGen);
-            m_pFilterPlotScene->render(&painter);
+            if (const auto written = scene::write_svg(figure, fileName.toStdU16String()); !written) {
+                mne::Log::warning("{}", written.error().what());
+            }
         }
 
         if (fileName.contains(".png")) {
-            m_pFilterPlotScene->setSceneRect(m_pFilterPlotScene->itemsBoundingRect());            // Re-shrink the scene to it's bounding contents
-            QImage image(m_pFilterPlotScene->sceneRect().size().toSize(), QImage::Format_ARGB32); // Create the image with the exact size of the shrunk scene
-            image.fill(Qt::transparent);                                                          // Start all pixels transparent
-
+            QImage image(m_pUi->m_filterPlot->size(), QImage::Format_ARGB32);
+            image.fill(Qt::white);
             QPainter painter(&image);
-            m_pFilterPlotScene->render(&painter);
+            paintScene(painter, figure, m_pUi->m_filterPlot->font());
+            painter.end();
             image.save(fileName);
         }
     }

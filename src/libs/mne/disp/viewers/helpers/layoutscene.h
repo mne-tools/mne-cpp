@@ -15,8 +15,8 @@
  *
  * LayoutScene installs gesture recognisers on the active view and
  * translates pan / pinch / swipe events into the same view-zoom /
- * view-pan operations regardless of input device. @ref mne::disp::SelectionScene,
- * @ref mne::disp::AverageScene and @ref mne::disp::FilterPlotScene derive from it to
+ * view-pan operations regardless of input device. @ref mne::disp::SelectionScene
+ * and @ref mne::disp::AverageScene derive from it to
  * inherit the gesture-driven navigation behaviour.
  */
 

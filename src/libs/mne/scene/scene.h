@@ -23,6 +23,7 @@
 #include "canvas.h"
 #include "colormap.h"
 #include "display_list.h"
+#include "filter_response_plot.h"
 #include "geometry.h"
 #include "image_plot.h"
 #include "line_chart.h"

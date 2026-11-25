@@ -20,6 +20,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   Qt${QT_VERSION_MAJOR}::Gui
   Qt${QT_VERSION_MAJOR}::Widgets
   mne_disp
+  mne_dsp
   Eigen3::Eigen
 )
 

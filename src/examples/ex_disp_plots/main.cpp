@@ -19,6 +19,7 @@
 //=============================================================================================================
 
 #include <mne/disp/plots/bar.h>
+#include <mne/disp/plots/filterplot.h>
 #include <mne/disp/plots/graph.h>
 #include <mne/disp/plots/helpers/colormap.h>
 #include <mne/disp/plots/helpers/figureexporter.h>
@@ -28,6 +29,7 @@
 #include <mne/disp/plots/plot.h>
 #include <mne/disp/plots/spline.h>
 #include <mne/disp/plots/tfplot.h>
+#include <mne/dsp/filterkernel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -55,6 +57,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace mne;
 using namespace mne::disp;
 using namespace Eigen;
 
@@ -223,6 +226,16 @@ int main(int argc, char* argv[])
     ok &= expect(countColor(tfImage, ColorMap::valueToJet(1.0), 10) > 100 && countColor(tfImage, ColorMap::valueToJet(0.0), 10) > countColor(tfImage, ColorMap::valueToJet(1.0), 10),
                  "TFplot draws the 20-30 Hz band in the top colour over a bottom-colour background");
 
+    //! [filter_plot_usage]
+    // Band pass 1-40 Hz at 250 Hz, 256 taps; frequencies are normed to the Nyquist frequency of 125 Hz
+    const FilterKernel bandPass("BPF_1_40", FilterKernel::filter_type_index("BPF"), 256, 20.5 / 125.0, 39.0 / 125.0,
+                                5.0 / 125.0, 250.0, FilterKernel::design_method_index("Cosine"));
+    FilterPlot filterPlot;
+    filterPlot.setFilter(bandPass);
+    //! [filter_plot_usage]
+    ok &= expect(filterPlot.plot().cutoffs().size() == 2 && filterPlot.plot().nyquist() == 125.0 && countColor(render(filterPlot), qRgb(220, 0, 0), 30) > 100,
+                 "FilterPlot marks the two edges of the band pass in red");
+
     //! [figure_export]
     // Written only when MNE_CPP_FIGURE_DIR names a directory
     FigureExporter::save(line, "line_plot", "LinePlot: one period of a sine wave.");
@@ -231,6 +244,7 @@ int main(int argc, char* argv[])
     FigureExporter::save(spline, "spline", "Spline: the same histogram as a smooth curve with three threshold markers.");
     FigureExporter::save(image, "image_sc", "ImageSc: a left-to-right ramp in the viridis colour map.");
     FigureExporter::save(tfPlot, "tf_plot", "TFplot: power confined to the 20-29 Hz bins.");
+    FigureExporter::save(filterPlot, "filter_plot", "FilterPlot: magnitude response of a 1-40 Hz band pass.");
 
     //! [svg_export]
     QBuffer svgBuffer; // or svg.setFileName("line_plot.svg")

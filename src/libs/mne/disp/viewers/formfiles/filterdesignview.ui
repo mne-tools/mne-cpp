@@ -263,7 +263,7 @@
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QGraphicsView" name="m_graphicsView_filterPlot">
+         <widget class="mne::disp::FilterPlot" name="m_filterPlot">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -321,8 +321,14 @@
   <tabstop>m_pushButton_exportFilter</tabstop>
   <tabstop>m_pushButton_loadFilter</tabstop>
   <tabstop>m_pushButton_exportPlot</tabstop>
-  <tabstop>m_graphicsView_filterPlot</tabstop>
  </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>mne::disp::FilterPlot</class>
+   <extends>QWidget</extends>
+   <header>mne/disp/plots/filterplot.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

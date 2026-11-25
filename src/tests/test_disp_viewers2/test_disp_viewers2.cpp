@@ -30,6 +30,7 @@
 #include <mne/disp/viewers/fiffrawviewsettings.h>
 #include <mne/disp/viewers/projectsettingsview.h>
 #include <mne/disp/viewers/filterdesignview.h>
+#include <mne/disp/plots/filterplot.h>
 #include <mne/disp/viewers/triggerdetectionview.h>
 #include <mne/disp/viewers/averagingsettingsview.h>
 #include <mne/disp/viewers/bidsview.h>
@@ -956,9 +957,12 @@ void TestDispViewers2::filterDesignView_designExportLoad()
     QCOMPARE(typeSpy.count(), 3);
 
     // The response plot is drawn
-    auto* pPlot = view.findChild<QGraphicsView*>(QStringLiteral("m_graphicsView_filterPlot"));
-    QVERIFY(pPlot && pPlot->scene());
-    QVERIFY(!pPlot->scene()->items().isEmpty());
+    auto* pPlot = view.findChild<FilterPlot*>(QStringLiteral("m_filterPlot"));
+    QVERIFY(pPlot);
+    QCOMPARE(pPlot->plot().nyquist(), view.getCurrentFilter().sampling_frequency() / 2.0);
+    const std::vector<double> db = pPlot->plot().magnitude_db();
+    QVERIFY(!db.empty());
+    QCOMPARE(*std::max_element(db.begin(), db.end()), 0.0); // relative to the pass band
     view.guiStyleChanged(AbstractView::StyleMode::Dark);
     view.resize(700, 500);
 
@@ -995,6 +999,15 @@ void TestDispViewers2::filterDesignView_designExportLoad()
     chooseFileInNextDialog(sPng);
     QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_exportPlot")), Qt::LeftButton);
     QVERIFY(!QImage(sPng).isNull());
+
+    // and as vector graphics, with the filter's name as text
+    const QString sSvg = dir.filePath(QStringLiteral("plot.svg"));
+    chooseFileInNextDialog(sSvg);
+    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_exportPlot")), Qt::LeftButton);
+    QFile svg(sSvg);
+    QVERIFY(svg.open(QIODevice::ReadOnly));
+    const QByteArray svgText = svg.readAll();
+    QVERIFY(svgText.contains("<svg") && svgText.contains(QByteArray::fromStdString(view.getCurrentFilter().name())));
 }
 
 //=============================================================================================================

@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include <mne/scene/canvas.h>
+#include <mne/scene/filter_response_plot.h>
 #include <mne/scene/line_chart.h>
 #include <mne/scene/raster_renderer.h>
 #include <mne/scene/svg_renderer.h>
@@ -103,6 +104,21 @@ int main()
     const Expected<void> svg = write_svg(chart, dir / "plot.svg");
     const Expected<void> png = to_raster(chart).save_png(dir / "plot.png");
     //! [scene_usage]
+
+    //! [filter_response_usage]
+    // Magnitude of a 5-pole Butterworth low pass at 30 Hz, sampled at 250 Hz
+    std::vector<double> magnitude(501);
+    for (std::size_t i = 0; i < magnitude.size(); ++i) {
+        magnitude[i] = 1.0 / std::sqrt(1.0 + std::pow(static_cast<double>(i) * 0.25 / 30.0, 10));
+    }
+    FilterResponsePlot response;
+    response.set_title("Low pass 30 Hz");
+    response.set_response(magnitude, 125.0);
+    response.set_cutoffs({30.0});
+    const DisplayList responseFigure = response.render(480, 320, metrics, Font{"", 0.0, 13.0});
+    //! [filter_response_usage]
+    ok &= expect(std::abs(response.magnitude_db()[120] + 3.0103) < 1e-3 && !responseFigure.commands.empty(),
+                 "the filter response is -3 dB at its cut-off");
     ok &= expect(figure.commands.size() == 2 && svg && png && std::filesystem::file_size(dir / "plot.svg") > 0,
                  "a figure was recorded and a line plot written as SVG and PNG");
     ok &= expect(to_svg(figure).find("Hello scene") != std::string::npos, "the figure's text is in its SVG document");

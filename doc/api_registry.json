@@ -4163,15 +4163,19 @@
       "python_url": null
     },
     {
-      "name": "FilterPlotScene",
+      "name": "FilterPlot",
       "module": "disp",
-      "header": "disp/viewers/helpers/filterplotscene.h",
+      "header": "disp/plots/filterplot.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
       "sklearn": null,
-      "test": null,
-      "example": null,
+      "test": "test_disp_viewers2",
+      "example": "ex_disp_plots",
+      "example_snippet": [
+        "ex_disp_plots/main.cpp#filter_plot_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "documented": true,
       "sidebar_position": 30,
@@ -13023,6 +13027,27 @@
       "sidebar_position": 13,
       "guide": null,
       "python_equiv": null,
+      "python_url": null
+    },
+    {
+      "name": "FilterResponsePlot",
+      "module": "scene",
+      "header": "scene/filter_response_plot.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_scene_render",
+      "example": "ex_scene",
+      "example_snippet": [
+        "ex_scene/main.cpp#filter_response_usage"
+      ],
+      "example_mode": "run",
+      "status": "documented",
+      "documented": true,
+      "sidebar_position": 31,
+      "guide": null,
+      "python_equiv": "mne.viz.plot_filter",
       "python_url": null
     },
     {
