@@ -173,6 +173,22 @@ class PolicyTests(unittest.TestCase):
         report["units"]["src/apps/tool"] = dict(report["units"]["src/apps/tool"], requested_unused=[])
         self.assertEqual(audit.check_policy(report, policy), [])
 
+    def test_widgets_free_files_must_not_use_widgets(self) -> None:
+        report = {"units": {}, "files": {
+            "src/libs/mne/disp/plots/helpers/colormap.cpp": {"modules": {"Core": {}, "Gui": {}}},
+            "src/libs/mne/disp/plots/helpers/scenepainter.h": {"modules": {"Gui": {}, "Widgets": {"QWidget": 1}}},
+            "src/libs/mne/disp/plots/lineplot.h": {"modules": {"Widgets": {"QWidget": 2}}},
+            "src/libs/mne/disp3D/view/brainview.h": {"modules": {"Widgets": {"QRhiWidget": 1}}},
+            "src/libs/mne/disp3D/view/brainviewcore.cpp": {"modules": {"Widgets": {"<QWidget>": 1}}},
+        }}
+        policy = {"default": ["Core"], "targets": {},
+                  "widgets_free": {"include": ["src/libs/mne/disp/plots/helpers/*", "src/libs/mne/disp3D/*"],
+                                   "exclude": ["src/libs/mne/disp3D/view/brainview.*"]}}
+        self.assertEqual(audit.check_policy(report, policy), [
+            "src/libs/mne/disp/plots/helpers/scenepainter.h: uses Qt Widgets (QWidget) but must stay Widgets-free",
+            "src/libs/mne/disp3D/view/brainviewcore.cpp: uses Qt Widgets (<QWidget>) but must stay Widgets-free",
+        ])
+
     def test_modules_found_for_the_whole_tree_must_be_requested(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

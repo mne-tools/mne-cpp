@@ -32,6 +32,7 @@ Usage
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import json
 import re
 import sys
@@ -581,6 +582,7 @@ def assemble(files: dict[str, dict[str, Any]], units: dict[str, dict[str, Any]],
         "rules": RULES,
         "scopes": dict(sorted(scopes.items())),
         "units": dict(sorted(units.items())),
+        "files": {path: {"modules": info["modules"]} for path, info in sorted(files.items())},
         "gui_private": gui_private,
     }
 
@@ -677,6 +679,25 @@ def check_policy(report: dict[str, Any], policy: dict[str, Any]) -> list[str]:
             problems.append(f"{unit}: requests Qt {module} but does not use it")
     for unit in sorted(set(allowed) - set(report["units"])):
         problems.append(f"{unit}: listed in the allowlist but no such target")
+    problems += widgets_free_violations(report.get("files", {}), policy.get("widgets_free", {}))
+    return problems
+
+
+WIDGET_MODULES = {"Widgets", "WidgetsPrivate", "OpenGLWidgets", "SvgWidgets", "QuickWidgets"}
+
+
+def widgets_free_violations(files: dict[str, dict[str, Any]], rule: dict[str, list[str]]) -> list[str]:
+    """Files matching ``rule["include"]`` but not ``rule["exclude"]`` (fnmatch patterns) that use a widgets module."""
+    problems = []
+    for path, info in sorted(files.items()):
+        if not any(fnmatch.fnmatchcase(path, p) for p in rule.get("include", [])):
+            continue
+        if any(fnmatch.fnmatchcase(path, p) for p in rule.get("exclude", [])):
+            continue
+        used = sorted(name for module in sorted(WIDGET_MODULES & set(info["modules"]))
+                      for name in info["modules"][module])
+        if used:
+            problems.append(f"{path}: uses Qt Widgets ({', '.join(used)}) but must stay Widgets-free")
     return problems
 
 

@@ -262,6 +262,10 @@ aliases; replace the old spelling as below.
   the trace view and the FPS, info and viewport labels and separators of the
   brain view are drawn in the GPU pass instead of by child widgets.
   `LiveMarker` moved to `disp3D/view/brainviewcore.h`.
+- `audit_qt_modules.py --check` keeps the rendering code of `mne_disp` and
+  `mne_disp3D` free of Qt Widgets: the colour maps, scene painter, SVG writer,
+  item models, `ChannelRhiRenderer`, `BrainViewCore` and the `QWindow` hosts
+  (`widgets_free` in `scripts/quality/qt_usage_policy.json`).
 - The sensor-layout views of `mne_disp` no longer use `QGraphicsView`:
   `mne::scene::SensorLayout` (sensors as labelled dots, with click and
   rubber-band selection as in a `QGraphicsScene`) and

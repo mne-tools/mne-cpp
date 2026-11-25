@@ -469,6 +469,30 @@
         "ShaderTools",
         "Widgets"
       ]
+    },
+    "$widgets_free_comment": "Files of disp and disp3D that must not use Qt Widgets (fnmatch on the repository path): the colour maps, scene painter, SVG writer, item models, renderers and QWindow hosts, so the rendering code stays ready for a non-Widgets front end. The widgets themselves live next to them in the same libraries.",
+    "widgets_free": {
+      "include": [
+        "src/libs/mne/disp/disp_global.h",
+        "src/libs/mne/disp/detail/map_value.h",
+        "src/libs/mne/disp/plots/helpers/colormap.*",
+        "src/libs/mne/disp/plots/helpers/scenepainter.*",
+        "src/libs/mne/disp/plots/helpers/svgwriter.*",
+        "src/libs/mne/disp/viewers/helpers/bidsviewmodel.*",
+        "src/libs/mne/disp/viewers/helpers/channeldatamodel.*",
+        "src/libs/mne/disp/viewers/helpers/channelinfomodel.*",
+        "src/libs/mne/disp/viewers/helpers/evokedsetmodel.*",
+        "src/libs/mne/disp/viewers/helpers/frequencyspectrummodel.*",
+        "src/libs/mne/disp/viewers/helpers/rtfiffrawviewmodel.*",
+        "src/libs/mne/disp/viewers/helpers/mneoperator.*",
+        "src/libs/mne/disp/viewers/helpers/channelrhirenderer.*",
+        "src/libs/mne/disp/viewers/helpers/channelwindow.*",
+        "src/libs/mne/disp/viewers/helpers/selectionitem.*",
+        "src/libs/mne/disp3D/*"
+      ],
+      "exclude": [
+        "src/libs/mne/disp3D/view/brainview.*"
+      ]
     }
   }
 }
