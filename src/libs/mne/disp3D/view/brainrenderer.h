@@ -63,6 +63,7 @@ class QRhiResourceUpdateBatch;
 class QRhiTexture;
 class QRhiRenderBuffer;
 class QRhiTextureRenderTarget;
+class QImage;
 
 namespace mne::disp
 {
@@ -140,9 +141,19 @@ public:
 
     //=========================================================================================================
     /**
-     * @return The clearing render target (pass 1).
+     * @return The clearing render target (pass 1): the external target when one is set, else the own one.
      */
     QRhiRenderTarget* rtClear() const;
+
+    //=========================================================================================================
+    /**
+     * Draw into a render target owned by the caller, e.g. the current target of a QRhiSwapChain, instead
+     * of the own targets built by ensureRenderTargets(). beginFrame() then clears and draws into it.
+     *
+     * @param[in] rt         External render target, or nullptr to use the own targets again.
+     * @since 3.0.0
+     */
+    void setExternalRenderTarget(QRhiRenderTarget* rt);
 
     /**
      * @return The preserving render target (passes 2+).
@@ -380,6 +391,35 @@ public:
      * @param[in] cb         Command buffer.
      */
     void endPass(QRhiCommandBuffer* cb);
+
+    //=========================================================================================================
+    /**
+     * Upload a screen-space overlay (text labels, pane separators) that issueScreenOverlayDraw() blends
+     * over the whole render target. The texture is re-uploaded only when the image changed.
+     *
+     * @param[in] rhi        QRhi instance.
+     * @param[in] u          Resource update batch, committed before the pass.
+     * @param[in] overlay    Premultiplied RGBA image of the target's pixel size; a null image draws nothing.
+     * @since 3.0.0
+     */
+    void prepareScreenOverlay(QRhi* rhi, QRhiResourceUpdateBatch* u, const QImage& overlay);
+
+    //=========================================================================================================
+    /**
+     * Alpha-blend the overlay uploaded by prepareScreenOverlay() over the whole render target.
+     * Call inside the pass, after the 3-D scene.
+     *
+     * @param[in] cb         Command buffer.
+     * @since 3.0.0
+     */
+    void issueScreenOverlayDraw(QRhiCommandBuffer* cb);
+
+    //=========================================================================================================
+    /**
+     * @return Whether the last prepareScreenOverlay() call left an overlay to draw.
+     * @since 3.0.0
+     */
+    bool hasScreenOverlay() const;
 
 private:
     /** @brief Private implementation holding QRhi pipelines, shader resources, and uniform buffers (PIMPL). */

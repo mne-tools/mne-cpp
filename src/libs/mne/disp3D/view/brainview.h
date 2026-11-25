@@ -11,11 +11,13 @@
  *
  * BrainView is the public face of disp3D &mdash; the QWidget that
  * any host application embeds to get an interactive cortical /
- * sensor / source scene. It connects @ref mne::disp::BrainTreeModel data
- * changes to scene rebuilds, drives @ref mne::disp::CameraController from the
- * Qt mouse / wheel events, switches between single- and multi-view
- * layouts through @ref mne::disp::MultiViewLayout and delegates the actual
- * drawing to @ref mne::disp::BrainRenderer.
+ * sensor / source scene. It is a thin QRhiWidget host around
+ * @ref mne::disp::BrainViewCore, which connects @ref mne::disp::BrainTreeModel
+ * data changes to scene rebuilds, drives @ref mne::disp::CameraController
+ * from the Qt mouse / wheel events, switches between single- and multi-view
+ * layouts through @ref mne::disp::MultiViewLayout, paints the 2-D overlay and
+ * delegates the actual drawing to @ref mne::disp::BrainRenderer.
+ * @ref mne::disp::BrainWindow hosts the same core in a QWindow.
  *
  * Live overlays such as digitizer tracker markers or AR avatars are
  * exposed through the lightweight @ref mne::disp::LiveMarker struct so the host
@@ -32,6 +34,7 @@
 
 #include "../disp3D_global.h"
 #include "../core/rendertypes.h"
+#include "brainviewcore.h"
 #include "multiviewlayout.h"
 #include "core/viewstate.h"
 #include "input/cameracontroller.h"
@@ -46,9 +49,6 @@
 //=============================================================================================================
 
 #include <QRhiWidget>
-#include <QQuaternion>
-#include <QRect>
-#include <QImage>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -73,10 +73,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QLabel;
 class QStandardItem;
-class QFrame;
-class QTimer;
 namespace mne
 {
 class Network;
@@ -94,24 +91,6 @@ class NetworkObject;
 class PolylineObject;
 class VideoOverlay;
 class SliceObject;
-
-//=============================================================================================================
-/**
- * @brief Lightweight live overlay marker rendered as a single sphere.
- *
- * Used by @ref BrainView::setLiveMarkers to draw transient markers
- * (e.g. digitizer tracker tip, orientation axes) without going through
- * the model pipeline or recalculating scene bounds.
- *
- * @snippet ex_disp3d_scene/main.cpp brain_view_usage
- */
-struct DISP3DSHARED_EXPORT LiveMarker
-{
-    QVector3D position;
-    QColor color;
-    float radius = 0.003f;
-    bool transparent = false; ///< If true, rendered with alpha blending.
-};
 
 //=============================================================================================================
 /**
@@ -150,6 +129,13 @@ public:
      * Destructor
      */
     ~BrainView();
+
+    //=========================================================================================================
+    /**
+     * @return The Widgets-free core holding the scene, camera and overlay state of this view.
+     * @since 3.0.0
+     */
+    BrainViewCore* core() const;
 
     //=========================================================================================================
     /**
@@ -422,10 +408,7 @@ public slots:
     /**
      * @return Current number of visible viewport panes (1–4).
      */
-    int viewCount() const
-    {
-        return m_viewCount;
-    }
+    int viewCount() const;
 
     //=========================================================================================================
     /**
@@ -551,10 +534,7 @@ public slots:
      *
      * @return True if visible.
      */
-    bool isInfoPanelVisible() const
-    {
-        return m_infoPanelVisible;
-    }
+    bool isInfoPanelVisible() const;
 
     //=========================================================================================================
     /**
@@ -562,10 +542,7 @@ public slots:
      *
      * @return Current ViewMode.
      */
-    ViewMode viewMode() const
-    {
-        return m_viewMode;
-    }
+    ViewMode viewMode() const;
 
     //=========================================================================================================
     /**
@@ -1237,48 +1214,6 @@ signals:
      */
     void surfacePointDoubleClicked(const QVector3D& worldPos);
 
-private slots:
-    //=========================================================================================================
-    /**
-     * Called when the SourceEstimateManager finishes loading.
-     * Switches visualisation mode and emits sourceEstimateLoaded().
-     *
-     * @param[in] numTimePoints   Number of loaded time points.
-     */
-    void onSourceEstimateLoaded(int numTimePoints);
-
-    //=========================================================================================================
-    /**
-     * Called when the real-time streaming pipeline produces new per-vertex
-     * colours.  Applies them to the matching brain surfaces.
-     *
-     * @param[in] colorsLh   Per-vertex ABGR colors for the left hemisphere.
-     * @param[in] colorsRh   Per-vertex ABGR colors for the right hemisphere.
-     */
-    void onRealtimeColorsAvailable(const std::vector<uint32_t>& colorsLh,
-                                   const std::vector<uint32_t>& colorsRh);
-
-    //=========================================================================================================
-    /** Repaint after sensor streaming produces new colours. */
-    void onSensorStreamColorsAvailable(const std::string& surfaceKey,
-                                       const std::vector<uint32_t>& colors);
-
-private:
-    // Note: ViewVisibilityProfile and SubView are defined in core/viewstate.h.
-    // SplitterHit is defined in view/multiviewlayout.h.
-
-    /** Return the SubView for a given target (-1 = single, 0..3 = multi). */
-    SubView& subViewForTarget(int target);
-    const SubView& subViewForTarget(int target) const;
-
-    ViewVisibilityProfile& visibilityProfileForTarget(int target);
-    const ViewVisibilityProfile& visibilityProfileForTarget(int target) const;
-
-    void refreshSensorTransforms();
-    QMatrix4x4 itemTransform(const QStandardItem* item) const;
-    const QStandardItem* itemForSurface(const std::shared_ptr<BrainSurface>& surface) const;
-    void removeSurfacesByPrefix(std::initializer_list<std::string_view> prefixes);
-
 protected:
     void initialize(QRhiCommandBuffer* cb) override;
     void render(QRhiCommandBuffer* cb) override;
@@ -1293,127 +1228,9 @@ protected:
     void resizeEvent(QResizeEvent* event) override;
 
 private:
-    // ── Layout helpers (delegate to MultiViewLayout) ───────────────────
-    std::vector<int> enabledViewportIndices() const;
-    int enabledViewportCount() const;
-    int viewportIndexAt(const QPoint& pos) const;
-    QRect multiViewSlotRect(int slot, int numEnabled, const QSize& outputSize) const;
-    SplitterHit hitTestSplitter(const QPoint& pos, int numEnabled, const QSize& outputSize) const;
-
-    // ── Helpers ────────────────────────────────────────────────────────
-    void updateSplitterCursor(const QPoint& pos);
-    void updateViewportSeparators();
-    void updateOverlayLayout();
-    void updateViewportLabelHighlight();
-    void showViewportPresetMenu(int viewport, const QPoint& globalPos);
-    void loadMultiViewSettings();
-    void saveMultiViewSettings() const;
-    void updateInflatedSurfaceTransforms();
-
-    // ── Rendering ───────────────────────────────────────────────────────
-    std::unique_ptr<BrainRenderer> m_renderer; /**< GPU renderer for all surfaces/dipoles. */
-    BrainTreeModel* m_model = nullptr;         /**< Data model driving the scene graph (not owned). */
-
-    std::map<const QStandardItem*, std::shared_ptr<BrainSurface>> m_itemSurfaceMap; /**< Model-item → renderable surface. */
-    std::map<const QStandardItem*, std::shared_ptr<DipoleObject>> m_itemDipoleMap;  /**< Model-item → dipole renderable. */
-
-    std::map<std::string, std::shared_ptr<BrainSurface>> m_surfaces; /**< Key → surface lookup (e.g. "lh_pial", "bem_head"). */
-    std::shared_ptr<BrainSurface> m_activeSurface;                   /**< Currently selected brain surface for stats. */
-    std::string m_activeSurfaceType;                                 /**< Type name of the active surface (e.g. "pial"). */
-
-    // ── SubView state ──────────────────────────────────────────────────
-    static constexpr int kDefaultViewportCount = 4; /**< Default number of multi-view panes. */
-    SubView m_singleView;                           /**< Render state for single-view mode. */
-    std::vector<SubView> m_subViews;                /**< Per-pane render state for multi-view mode. */
-    int m_visualizationEditTarget = -1;             /**< Active pane for UI edits (-1 = single, 0..N-1 = multi). */
-
-    // ── Active (runtime) copies — kept in sync with selected SubView ──
-    ShaderMode m_brainShaderMode = Standard;          /**< Current brain shader mode. */
-    ShaderMode m_bemShaderMode = Standard;            /**< Current BEM shader mode. */
-    VisualizationMode m_currentVisMode = ModeSurface; /**< Current overlay mode. */
-    bool m_lightingEnabled = true;                    /**< Whether per-fragment lighting is active. */
-
-    // ── Extracted components ───────────────────────────────────────────
-    CameraController m_camera;                   /**< Camera maths helper. */
-    MultiViewLayout m_layout;                    /**< Multi-view pane geometry and splitter logic. */
-    SensorFieldMapper m_fieldMapper;             /**< Sensor → surface field mapping helper. */
-    SourceEstimateManager m_sourceManager;       /**< Source estimate lifecycle (load, stream, navigate). */
-    RtSensorStreamManager m_sensorStreamManager; /**< Real-time sensor streaming lifecycle. */
-
-    // ── Camera state ───────────────────────────────────────────────────
-    QQuaternion m_cameraRotation;                 /**< Global camera orientation quaternion. */
-    QVector3D m_sceneCenter = QVector3D(0, 0, 0); /**< Bounding-box centre of the scene. */
-    float m_sceneSize = 0.3f;                     /**< Bounding-box diagonal of the scene (metres). */
-    bool m_cameraFocusOverride = false;           /**< When true, m_sceneCenter/m_sceneSize are user-set. */
-    QVector3D m_cameraFocusCenter;                /**< Override center (valid when m_cameraFocusOverride). */
-    float m_cameraFocusSize = 0.3f;               /**< Override size   (valid when m_cameraFocusOverride). */
-    QPoint m_lastMousePos;                        /**< Previous mouse position for drag deltas. */
-    QTimer* m_pAutoRotateTimer = nullptr;         /**< Drives the automated rotation animation. */
-
-    // ── UI overlays ────────────────────────────────────────────────────
-    int m_frameCount = 0;                             /**< Frames rendered since last FPS sample. */
-    std::chrono::steady_clock::time_point m_fpsStart; /**< Start of the current FPS measurement window. */
-    QLabel* m_fpsLabel = nullptr;                     /**< Overlay label showing FPS and vertex count. */
-    QLabel* m_singleViewInfoLabel = nullptr;          /**< Overlay label for single-view shader/surface info. */
-    bool m_sceneDirty = true;                         /**< Set when scene needs redraw; cleared after render. */
-    qint64 m_cachedVertexCount = 0;                   /**< Cached visible vertex count (invalidated on surface changes). */
-    bool m_vertexCountDirty = true;                   /**< Recount vertices on next FPS update when true. */
-    bool m_infoPanelVisible = true;                   /**< Whether the info overlay panel is shown. */
-
-    // ── Scene objects ──────────────────────────────────────────────────
-    std::unique_ptr<DipoleObject> m_dipoles;                 /**< Standalone dipole set (loaded via file). */
-    std::unique_ptr<NetworkObject> m_network;                /**< Connectivity network visualization. */
-    std::unique_ptr<PolylineObject> m_headPath;              /**< Head movement path over the course of a measurement. */
-    std::unique_ptr<mne::disp::VideoOverlay> m_videoOverlay; /**< Live RGB video overlay decal. */
-
-    // ── MRI slices ─────────────────────────────────────────────────────
-    static constexpr int kMaxSliceSlots = 3;
-    mne::disp::ElectrodeObject* m_electrodes = nullptr;       /**< Non-owning. */
-    mne::disp::SliceObject* m_slices[kMaxSliceSlots] = {};    /**< Non-owning pointers to slice data. */
-    bool m_sliceVisible[kMaxSliceSlots] = {true, true, true}; /**< Per-slot visibility flags. */
-
-    /** Update the scene bounding box based on visible objects. */
-    void updateSceneBounds();
-
-    // ── Coordinate transforms ──────────────────────────────────────────
-    mne::FiffCoordTrans m_headToMriTrans;          /**< Head-to-MRI coordinate transform. */
-    mne::FiffDigPointSet m_cardinalDigPoints;      /**< Cardinal dig points from last sensor load. */
-    bool m_applySensorTrans = true;                /**< Whether to apply the transform to sensors/digitizers. */
-    std::filesystem::path m_megHelmetOverridePath; /**< Optional override path for MEG helmet surface. */
-    QMatrix4x4 m_devHeadTrans;                     /**< Device→Head transformation from last sensor load. */
-    bool m_hasDevHead = false;                     /**< Whether a valid Device→Head transform is available. */
-    bool m_dipolesVisible = true;                  /**< Whether dipoles are rendered. */
-    bool m_networkVisible = false;                 /**< Whether the connectivity network is rendered. */
-
-    // ── Ray-pick hover state ───────────────────────────────────────────
-    QStandardItem* m_hoveredItem = nullptr;    /**< Model item currently under the cursor. */
-    int m_hoveredIndex = -1;                   /**< Vertex index at the hover point. */
-    QString m_hoveredRegion;                   /**< Atlas region name at the hover point. */
-    std::string m_hoveredSurfaceKey;           /**< FsSurface map key at the hover point. */
-    QLabel* m_regionLabel = nullptr;           /**< Overlay label showing the hovered region name. */
-    std::vector<QLabel*> m_viewportNameLabels; /**< Per-viewport name labels (e.g. "Top", "Front"). */
-    std::vector<QLabel*> m_viewportInfoLabels; /**< Per-viewport info labels (shader, surface info). */
-
-    // ── Debug intersection ─────────────────────────────────────────────
-    std::shared_ptr<BrainSurface> m_debugPointerSurface; /**< Semi-transparent sphere at hit point. */
-    QVector3D m_lastIntersectionPoint;                   /**< World-space position of last ray hit. */
-    bool m_hasIntersection = false;                      /**< Whether the last ray cast produced a hit. */
-
-
-    // ── Multi-view support ─────────────────────────────────────────────
-    ViewMode m_viewMode = SingleView;                 /**< Current view mode (single or multi). */
-    int m_viewCount = 1;                              /**< Number of viewports to show (1..kDefaultViewportCount). */
-    float m_multiSplitX = 0.5f;                       /**< Horizontal splitter position (0..1). */
-    float m_multiSplitY = 0.5f;                       /**< Vertical splitter position (0..1). */
-    bool m_isDraggingSplitter = false;                /**< True while the user is dragging a splitter. */
-    SplitterHit m_activeSplitter = SplitterHit::None; /**< Which splitter is being dragged. */
-    int m_splitterHitTolerancePx = 6;                 /**< Pixel tolerance for splitter hit testing. */
-    int m_splitterMinPanePx = 80;                     /**< Minimum pane size in pixels. */
-    int m_separatorLinePx = 2;                        /**< Separator line thickness in pixels. */
-    QFrame* m_verticalSeparator = nullptr;            /**< Visual separator between left/right panes. */
-    QFrame* m_horizontalSeparator = nullptr;          /**< Visual separator between top/bottom panes. */
-    bool m_perspectiveRotatedSincePress = false;      /**< True if mouse drag rotated a perspective pane. */
-    bool m_draggedSincePress = false;                 /**< True if the left-button drag rotated or panned. */
+    class Host;
+    std::unique_ptr<Host> m_pHost;          /**< Adapter through which the core reaches this widget. */
+    std::unique_ptr<BrainViewCore> m_pCore; /**< Scene, camera, overlay and frame recording. */
 };
 
 } // namespace mne::disp

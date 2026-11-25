@@ -121,7 +121,29 @@ struct BrainRenderer::Impl
     std::unique_ptr<QRhiRenderPassDescriptor> rpClear;
     std::unique_ptr<QRhiRenderPassDescriptor> rpPreserve;
     QSize rtSize;
-    QRhiTexture* rtColorTex = nullptr; // Track texture pointer for rebuild
+    QRhiTexture* rtColorTex = nullptr;      // Track texture pointer for rebuild
+    QRhiRenderTarget* externalRt = nullptr; // Caller-owned target (e.g. a swap chain), replaces rtClear
+
+    QRhiRenderTarget* clearTarget() const
+    {
+        return externalRt ? externalRt : static_cast<QRhiRenderTarget*>(rtClear.get());
+    }
+
+    // ── Screen-space overlay (labels and pane separators) ───────────
+    // A premultiplied full-target quad blended over the scene, uploaded
+    // only when the overlay image changes.
+    struct ScreenOverlayResources
+    {
+        std::unique_ptr<QRhiGraphicsPipeline> pipeline;
+        std::unique_ptr<QRhiShaderResourceBindings> srb;
+        std::unique_ptr<QRhiBuffer> vertexBuffer;
+        std::unique_ptr<QRhiTexture> texture;
+        std::unique_ptr<QRhiSampler> sampler;
+        qint64 uploadedKey = 0;
+        bool active = false;
+        bool failed = false;
+    };
+    ScreenOverlayResources screenOverlay;
 
     // ── Generic video overlay ───────────────────────────────────────
     // Camera-facing textured quad rendered last (depth test off) at the
@@ -572,7 +594,14 @@ void BrainRenderer::ensureRenderTargets(QRhi* rhi, QRhiTexture* colorTex, const 
 
 QRhiRenderTarget* BrainRenderer::rtClear() const
 {
-    return d->rtClear.get();
+    return d->clearTarget();
+}
+
+//=============================================================================================================
+
+void BrainRenderer::setExternalRenderTarget(QRhiRenderTarget* rt)
+{
+    d->externalRt = rt;
 }
 
 QRhiRenderTarget* BrainRenderer::rtPreserve() const
@@ -638,7 +667,7 @@ bool BrainRenderer::Impl::insidePass(const char* caller) const
 
 void BrainRenderer::beginFrame(QRhiCommandBuffer* cb, QRhiResourceUpdateBatch* updates)
 {
-    d->beginPass(cb, d->rtClear.get(), updates);
+    d->beginPass(cb, d->clearTarget(), updates);
 }
 
 //=============================================================================================================
@@ -654,6 +683,110 @@ void BrainRenderer::endPass(QRhiCommandBuffer* cb)
 {
     cb->endPass();
     d->passRecording = false;
+}
+
+//=============================================================================================================
+// Screen-space overlay
+//=============================================================================================================
+
+void BrainRenderer::prepareScreenOverlay(QRhi* rhi, QRhiResourceUpdateBatch* u, const QImage& overlay)
+{
+    auto& o = d->screenOverlay;
+    o.active = false;
+    QRhiRenderTarget* rt = d->clearTarget();
+    if (overlay.isNull() || !rhi || !u || !rt || o.failed || d->insidePass("prepareScreenOverlay"))
+        return;
+
+    if (!o.pipeline) {
+        const QShader vShader = loadShader(QStringLiteral(":/screen_overlay.vert.qsb"));
+        const QShader fShader = loadShader(QStringLiteral(":/screen_overlay.frag.qsb"));
+        if (!vShader.isValid() || !fShader.isValid()) {
+            mne::Log::warning("BrainRenderer: could not load screen overlay shaders");
+            o.failed = true;
+            return;
+        }
+
+        // Full-target quad as a strip; image row 0 is the top of the target on every backend
+        const float top = rhi->isYUpInNDC() ? 1.0f : -1.0f;
+        const float quad[16] = {-1.0f, top, 0.0f, 0.0f, -1.0f, -top, 0.0f, 1.0f,
+                                1.0f, top, 1.0f, 0.0f, 1.0f, -top, 1.0f, 1.0f};
+        o.vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, sizeof(quad)));
+        o.vertexBuffer->create();
+        u->uploadStaticBuffer(o.vertexBuffer.get(), quad);
+
+        o.sampler.reset(rhi->newSampler(QRhiSampler::Nearest, QRhiSampler::Nearest, QRhiSampler::None,
+                                        QRhiSampler::ClampToEdge, QRhiSampler::ClampToEdge));
+        o.sampler->create();
+
+        o.texture.reset(rhi->newTexture(QRhiTexture::RGBA8, overlay.size()));
+        o.texture->create();
+        o.srb.reset(rhi->newShaderResourceBindings());
+        o.srb->setBindings({QRhiShaderResourceBinding::sampledTexture(0, QRhiShaderResourceBinding::FragmentStage,
+                                                                      o.texture.get(), o.sampler.get())});
+        o.srb->create();
+
+        QRhiVertexInputLayout layout;
+        layout.setBindings({{4 * sizeof(float)}});
+        layout.setAttributes({{0, 0, QRhiVertexInputAttribute::Float2, 0},
+                              {0, 1, QRhiVertexInputAttribute::Float2, 2 * sizeof(float)}});
+
+        QRhiGraphicsPipeline::TargetBlend blend;
+        blend.enable = true;
+        blend.srcColor = QRhiGraphicsPipeline::One;
+        blend.dstColor = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+        blend.srcAlpha = QRhiGraphicsPipeline::One;
+        blend.dstAlpha = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+
+        o.pipeline.reset(rhi->newGraphicsPipeline());
+        o.pipeline->setShaderStages({{QRhiShaderStage::Vertex, vShader}, {QRhiShaderStage::Fragment, fShader}});
+        o.pipeline->setVertexInputLayout(layout);
+        o.pipeline->setTopology(QRhiGraphicsPipeline::TriangleStrip);
+        o.pipeline->setShaderResourceBindings(o.srb.get());
+        o.pipeline->setRenderPassDescriptor(rt->renderPassDescriptor());
+        o.pipeline->setSampleCount(rt->sampleCount());
+        o.pipeline->setTargetBlends({blend});
+        o.pipeline->setDepthTest(false);
+        o.pipeline->setDepthWrite(false);
+        o.pipeline->create();
+        o.uploadedKey = 0;
+    } else if (o.texture->pixelSize() != overlay.size()) {
+        o.texture->setPixelSize(overlay.size());
+        o.texture->create();
+        o.srb->create();
+        o.uploadedKey = 0;
+    }
+
+    if (o.uploadedKey != overlay.cacheKey()) {
+        // RGBA8 rows are always 4-byte aligned, so the converted image is tightly packed
+        u->uploadTexture(o.texture.get(), overlay.convertToFormat(QImage::Format_RGBA8888_Premultiplied));
+        o.uploadedKey = overlay.cacheKey();
+    }
+    o.active = true;
+}
+
+//=============================================================================================================
+
+void BrainRenderer::issueScreenOverlayDraw(QRhiCommandBuffer* cb)
+{
+    const auto& o = d->screenOverlay;
+    QRhiRenderTarget* rt = d->clearTarget();
+    if (!cb || !o.active || !o.pipeline || !rt)
+        return;
+
+    const QSize size = rt->pixelSize();
+    cb->setGraphicsPipeline(o.pipeline.get());
+    cb->setViewport(QRhiViewport(0, 0, float(size.width()), float(size.height())));
+    cb->setShaderResources(o.srb.get());
+    const QRhiCommandBuffer::VertexInput input(o.vertexBuffer.get(), 0);
+    cb->setVertexInput(0, 1, &input);
+    cb->draw(4);
+}
+
+//=============================================================================================================
+
+bool BrainRenderer::hasScreenOverlay() const
+{
+    return d->screenOverlay.active;
 }
 
 //=============================================================================================================
@@ -745,8 +878,8 @@ void BrainRenderer::prepareVideoOverlay(QRhi* rhi,
                           {0, 1, QRhiVertexInputAttribute::Float2, 3 * sizeof(float)}});
         k.pipeline->setVertexInputLayout(il);
         k.pipeline->setShaderResourceBindings(k.srb.get());
-        k.pipeline->setRenderPassDescriptor(d->rtClear->renderPassDescriptor());
-        k.pipeline->setSampleCount(d->rtClear->sampleCount());
+        k.pipeline->setRenderPassDescriptor(d->clearTarget()->renderPassDescriptor());
+        k.pipeline->setSampleCount(d->clearTarget()->sampleCount());
         k.pipeline->setCullMode(QRhiGraphicsPipeline::None);
         k.pipeline->setTargetBlends({blend});
         k.pipeline->setDepthTest(false);
@@ -773,8 +906,8 @@ void BrainRenderer::prepareVideoOverlay(QRhi* rhi,
                                             {QRhiShaderStage::Fragment, dfShader}});
         k.surfacePipeline->setVertexInputLayout(surfaceInputLayout());
         k.surfacePipeline->setShaderResourceBindings(k.srb.get());
-        k.surfacePipeline->setRenderPassDescriptor(d->rtClear->renderPassDescriptor());
-        k.surfacePipeline->setSampleCount(d->rtClear->sampleCount());
+        k.surfacePipeline->setRenderPassDescriptor(d->clearTarget()->renderPassDescriptor());
+        k.surfacePipeline->setSampleCount(d->clearTarget()->sampleCount());
         k.surfacePipeline->setCullMode(QRhiGraphicsPipeline::None);
         k.surfacePipeline->setTargetBlends({decalBlend});
         k.surfacePipeline->setDepthTest(true);
@@ -833,8 +966,8 @@ void BrainRenderer::prepareVideoOverlay(QRhi* rhi,
                                                          {QRhiShaderStage::Fragment, ddfShader}});
                 k.surfaceDepthPipeline->setVertexInputLayout(surfaceInputLayout());
                 k.surfaceDepthPipeline->setShaderResourceBindings(k.srbDepth.get());
-                k.surfaceDepthPipeline->setRenderPassDescriptor(d->rtClear->renderPassDescriptor());
-                k.surfaceDepthPipeline->setSampleCount(d->rtClear->sampleCount());
+                k.surfaceDepthPipeline->setRenderPassDescriptor(d->clearTarget()->renderPassDescriptor());
+                k.surfaceDepthPipeline->setSampleCount(d->clearTarget()->sampleCount());
                 k.surfaceDepthPipeline->setCullMode(QRhiGraphicsPipeline::None);
                 k.surfaceDepthPipeline->setTargetBlends({depthDecalBlend});
                 k.surfaceDepthPipeline->setDepthTest(false); // inward-displaced vertices must not be culled by brain surface z
@@ -1224,8 +1357,8 @@ void BrainRenderer::prepareSlice(QRhi* rhi,
                           {0, 1, QRhiVertexInputAttribute::Float2, 3 * sizeof(float)}});
         k.pipeline->setVertexInputLayout(il);
         k.pipeline->setShaderResourceBindings(k.srb[0].get());
-        k.pipeline->setRenderPassDescriptor(d->rtClear->renderPassDescriptor());
-        k.pipeline->setSampleCount(d->rtClear->sampleCount());
+        k.pipeline->setRenderPassDescriptor(d->clearTarget()->renderPassDescriptor());
+        k.pipeline->setSampleCount(d->clearTarget()->sampleCount());
         k.pipeline->setCullMode(QRhiGraphicsPipeline::None);
         k.pipeline->setTargetBlends({blend});
         k.pipeline->setDepthTest(true);

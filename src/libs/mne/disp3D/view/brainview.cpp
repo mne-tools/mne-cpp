@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    QRhiWidget event handling, scene-model wiring, camera interaction and live-marker overlay implementation.
+ * @brief    BrainView definition: the QRhiWidget host that forwards events, frames and its API to BrainViewCore.
  */
 
 //=============================================================================================================
@@ -16,57 +16,16 @@
 
 #include "brainview.h"
 
-#include <mne/base/log.h>
-#include <mne/base/string_utils.h>
-
-#include "brainrenderer.h"
-#include "renderable/brainsurface.h"
-#include "renderable/dipoleobject.h"
-#include "renderable/electrodeobject.h"
-#include "renderable/networkobject.h"
-#include "renderable/polylineobject.h"
-#include "renderable/videooverlay.h"
-#include "renderable/sliceobject.h"
-#include "core/surfacekeys.h"
-#include "core/dataloader.h"
-#include "input/raypicker.h"
-#include "geometry/meshfactory.h"
-#include "model/braintreemodel.h"
-#include "model/items/surfacetreeitem.h"
-#include "model/items/bemtreeitem.h"
-#include "model/items/sensortreeitem.h"
-#include "model/items/dipoletreeitem.h"
-#include "model/items/sourcespacetreeitem.h"
-#include "model/items/digitizertreeitem.h"
 #include <rhi/qrhi.h>
-#include <mne/mne/mne_bem.h>
-#include <mne/mne/mne_source_spaces.h>
-#include <mne/fiff/fiff_evoked_set.h>
-#include <mne/fiff/fiff_constants.h>
-#include <mne/connectivity/network/network.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QMatrix4x4>
-#include <QLabel>
-#include <QFrame>
-#include <QMouseEvent>
-#include <QKeyEvent>
-#include <QWheelEvent>
-#include <QResizeEvent>
-#include <QSettings>
-#include <QTimer>
+#include <QAction>
 #include <QMenu>
-#include <QStandardItem>
-#include <QCoreApplication>
-
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Dense>
+#include <QMouseEvent>
+#include <QResizeEvent>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -74,50 +33,115 @@
 
 #include <algorithm>
 #include <array>
-#include <chrono>
-#include <cmath>
-#include <cstdint>
-#include <ctime>
-#include <filesystem>
-#include <format>
-#include <set>
-#include <string>
-#include <vector>
-
-using namespace mne;
 
 namespace mne::disp
 {
 
-namespace
+//=============================================================================================================
+/**
+ * @brief Connects a BrainViewCore to its BrainView widget.
+ */
+class BrainView::Host : public BrainViewHost
 {
+public:
+    explicit Host(BrainView& view)
+    : m_view(view)
+    {
+    }
 
-QColor itemColor(const AbstractTreeItem& item)
-{
-    QColor color = item.color();
-    color.setAlphaF(color.alphaF() * item.alpha());
-    return color;
-}
+    void requestUpdate() override
+    {
+        m_view.update();
+    }
 
-} // namespace
+    QSize logicalSize() const override
+    {
+        return m_view.size();
+    }
 
-// QSettings is constructed with its default ctor below; it picks up the
-// organisation and application names that each host (mne_align,
-// mne_inspect, ex_disp_3D, ...) sets on QCoreApplication in its main(),
-// so persisted view state is naturally scoped per-application.
+    qreal devicePixelRatio() const override
+    {
+        return m_view.devicePixelRatioF();
+    }
+
+    bool isVisible() const override
+    {
+        return m_view.isVisible();
+    }
+
+    void setCursorShape(Qt::CursorShape shape) override
+    {
+        if (shape == Qt::ArrowCursor) {
+            m_view.unsetCursor();
+        } else {
+            m_view.setCursor(shape);
+        }
+    }
+
+    QImage grabFrame() override
+    {
+        // QRhiWidget::grabFramebuffer() renders an offscreen frame and reads the texture back
+        return m_view.grabFramebuffer();
+    }
+
+    void requestViewportPresetMenu(int viewport, const QPoint& pos) override
+    {
+        BrainViewCore* core = m_view.core();
+        if (viewport < 0 || viewport > 3) {
+            return;
+        }
+
+        static constexpr std::array<const char*, 7> kPresetNames = {"Top", "Perspective", "Front", "Left", "Bottom", "Back", "Right"};
+        QMenu menu;
+        const int currentPreset = std::clamp(core->viewportCameraPreset(viewport), 0, 6);
+        std::array<QAction*, kPresetNames.size()> actions{};
+        for (int preset = 0; preset < std::ssize(kPresetNames); ++preset) {
+            if (preset == 4) {
+                menu.addSeparator();
+            }
+            actions[preset] = menu.addAction(QString::fromLatin1(kPresetNames[preset]));
+            actions[preset]->setCheckable(true);
+            actions[preset]->setChecked(preset == currentPreset);
+        }
+
+        QAction* selected = menu.exec(m_view.mapToGlobal(pos));
+        const auto chosen = std::ranges::find(actions, selected);
+        if (selected && chosen != actions.end()) {
+            core->setViewportCameraPreset(viewport, static_cast<int>(chosen - actions.begin()));
+        }
+    }
+
+    bool beginOffscreenCapture(const QSize& size) override
+    {
+        // Realise the widget off-screen: QRhi init still runs because the widget is
+        // technically "shown", but no window-manager surface is created.
+        m_view.setAttribute(Qt::WA_DontShowOnScreen, true);
+        m_view.resize(size);
+        m_view.show();
+        return true;
+    }
+
+    void endOffscreenCapture() override
+    {
+        m_view.hide();
+        m_view.setAttribute(Qt::WA_DontShowOnScreen, false);
+    }
+
+private:
+    BrainView& m_view;
+};
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-//=============================================================================================================
-
 BrainView::BrainView(QWidget* parent)
 : QRhiWidget(parent)
+, m_pHost(std::make_unique<Host>(*this))
 {
     setMinimumSize(800, 600);
     setSampleCount(1);
-    setAutoRenderTarget(false); // We manage our own dual render targets
+    setAutoRenderTarget(false); // The renderer manages its own dual render targets
 
 #if defined(WASMBUILD) || defined(__EMSCRIPTEN__)
     setApi(Api::OpenGL); // WebGL 2 (OpenGL ES 3.0) on WASM
@@ -131,1479 +155,45 @@ BrainView::BrainView(QWidget* parent)
 
     setMouseTracking(true); // Enable hover events
 
-    // No periodic update timer — redraws are demand-driven via update().
-    // Every setter that changes scene state calls m_sceneDirty = true
-    // followed by update(), which coalesces into one render() per frame.
+    m_pCore = std::make_unique<BrainViewCore>(m_pHost.get());
 
-    m_fpsLabel = new QLabel(this);
-    m_fpsLabel->setStyleSheet("color: white; font-weight: bold; font-family: monospace; font-size: 13px; background: transparent; padding: 5px;");
-    m_fpsLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
-    m_fpsLabel->setAlignment(Qt::AlignRight | Qt::AlignTop);
-    m_fpsLabel->setText("FPS: --.-\nVertices: 0");
-    m_fpsLabel->adjustSize();
-    m_fpsLabel->move(width() - m_fpsLabel->width() - 10, 10);
-    m_fpsLabel->raise();
-
-    m_singleViewInfoLabel = new QLabel(this);
-    m_singleViewInfoLabel->setStyleSheet("color: white; font-family: monospace; font-size: 10px; background: rgba(0,0,0,110); border-radius: 3px; padding: 2px 4px;");
-    m_singleViewInfoLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
-    m_singleViewInfoLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    m_singleViewInfoLabel->setText("");
-    m_singleViewInfoLabel->adjustSize();
-    m_singleViewInfoLabel->hide();
-
-    m_fpsStart = std::chrono::steady_clock::now();
-
-    m_regionLabel = new QLabel(this);
-    m_regionLabel->setStyleSheet("color: white; font-weight: bold; font-family: sans-serif; font-size: 16px; background: transparent; padding: 5px;");
-    m_regionLabel->setText("");
-    m_regionLabel->move(10, 10);
-    m_regionLabel->resize(300, 30);
-    m_regionLabel->hide();
-
-    // ── Initialise viewport labels (sized to kDefaultViewportCount) ────────
-    m_subViews.resize(kDefaultViewportCount);
-    m_viewportNameLabels.resize(kDefaultViewportCount, nullptr);
-    m_viewportInfoLabels.resize(kDefaultViewportCount, nullptr);
-    for (int i = 0; i < kDefaultViewportCount; ++i) {
-        m_subViews[i] = SubView::defaultForIndex(i);
-
-        m_viewportNameLabels[i] = new QLabel(this);
-        m_viewportNameLabels[i]->setStyleSheet("color: white; font-weight: bold; font-family: sans-serif; font-size: 12px; background: transparent; padding: 2px 4px;");
-        m_viewportNameLabels[i]->setAttribute(Qt::WA_TransparentForMouseEvents);
-        m_viewportNameLabels[i]->setText(QString::fromStdString(multiViewPresetName(m_subViews[i].preset)));
-        m_viewportNameLabels[i]->adjustSize();
-        m_viewportNameLabels[i]->hide();
-
-        m_viewportInfoLabels[i] = new QLabel(this);
-        m_viewportInfoLabels[i]->setStyleSheet("color: white; font-family: monospace; font-size: 10px; background: rgba(0,0,0,110); border-radius: 3px; padding: 2px 4px;");
-        m_viewportInfoLabels[i]->setAttribute(Qt::WA_TransparentForMouseEvents);
-        m_viewportInfoLabels[i]->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-        m_viewportInfoLabels[i]->setText("");
-        m_viewportInfoLabels[i]->adjustSize();
-        m_viewportInfoLabels[i]->hide();
-    }
-
-    m_verticalSeparator = new QFrame(this);
-    m_verticalSeparator->setFrameShape(QFrame::NoFrame);
-    m_verticalSeparator->setAttribute(Qt::WA_TransparentForMouseEvents);
-    m_verticalSeparator->hide();
-
-    m_horizontalSeparator = new QFrame(this);
-    m_horizontalSeparator->setFrameShape(QFrame::NoFrame);
-    m_horizontalSeparator->setAttribute(Qt::WA_TransparentForMouseEvents);
-    m_horizontalSeparator->hide();
-
-    QColor sepColor = palette().color(QPalette::Midlight);
-    if (sepColor.alpha() == 255) {
-        sepColor.setAlpha(180);
-    }
-    const QString sepStyle = QString("background-color: rgba(%1,%2,%3,%4);")
-                                 .arg(sepColor.red())
-                                 .arg(sepColor.green())
-                                 .arg(sepColor.blue())
-                                 .arg(sepColor.alpha());
-    m_verticalSeparator->setStyleSheet(sepStyle);
-    m_horizontalSeparator->setStyleSheet(sepStyle);
-
-    loadMultiViewSettings();
-    updateViewportSeparators();
-    updateOverlayLayout();
-
-    // Setup Debug Pointer: Semi-transparent sphere for subtle intersection indicator
-    m_debugPointerSurface = MeshFactory::createSphere(QVector3D(0, 0, 0), 0.002f,
-                                                      QColor(200, 255, 255, 160));
-
-    // ── Connect SourceEstimateManager signals ─────────────────────────
-    connect(&m_sourceManager, &SourceEstimateManager::loaded,
-            this, &BrainView::onSourceEstimateLoaded);
-    connect(&m_sourceManager, &SourceEstimateManager::thresholdsUpdated,
-            this, &BrainView::sourceThresholdsUpdated);
-    connect(&m_sourceManager, &SourceEstimateManager::timePointChanged,
-            this, &BrainView::timePointChanged);
-    connect(&m_sourceManager, &SourceEstimateManager::loadingProgress,
-            this, [this](int percent, const std::string& message) { emit stcLoadingProgress(percent, QString::fromStdString(message)); });
-    connect(&m_sourceManager, &SourceEstimateManager::realtimeColorsAvailable,
-            this, &BrainView::onRealtimeColorsAvailable);
-
-    // RtSensorStreamManager → BrainView
-    connect(&m_sensorStreamManager, &RtSensorStreamManager::colorsAvailable,
-            this, &BrainView::onSensorStreamColorsAvailable);
-
-    // Video overlay starts disabled with a default focus point near the
-    // top of a typical FreeSurfer head; the application toggles it on.
-    m_videoOverlay = std::make_unique<mne::disp::VideoOverlay>();
+    // Re-emit the core's signals so connections to BrainView keep working
+    BrainViewCore* core = m_pCore.get();
+    connect(core, &BrainViewCore::timePointChanged, this, &BrainView::timePointChanged);
+    connect(core, &BrainViewCore::sourceEstimateLoaded, this, &BrainView::sourceEstimateLoaded);
+    connect(core, &BrainViewCore::sensorFieldLoaded, this, &BrainView::sensorFieldLoaded);
+    connect(core, &BrainViewCore::sourceThresholdsUpdated, this, &BrainView::sourceThresholdsUpdated);
+    connect(core, &BrainViewCore::stcLoadingProgress, this, &BrainView::stcLoadingProgress);
+    connect(core, &BrainViewCore::sensorFieldTimePointChanged, this, &BrainView::sensorFieldTimePointChanged);
+    connect(core, &BrainViewCore::hoveredRegionChanged, this, &BrainView::hoveredRegionChanged);
+    connect(core, &BrainViewCore::electrodeContactClicked, this, &BrainView::electrodeContactClicked);
+    connect(core, &BrainViewCore::visualizationEditTargetChanged, this, &BrainView::visualizationEditTargetChanged);
+    connect(core, &BrainViewCore::viewCountChanged, this, &BrainView::viewCountChanged);
+    connect(core, &BrainViewCore::shaderModeChanged, this, &BrainView::shaderModeChanged);
+    connect(core, &BrainViewCore::surfacePointClicked, this, &BrainView::surfacePointClicked);
+    connect(core, &BrainViewCore::surfacePointDoubleClicked, this, &BrainView::surfacePointDoubleClicked);
 }
 
 //=============================================================================================================
 
 BrainView::~BrainView()
 {
-    saveMultiViewSettings();
+    // The core persists the layout and frees the GPU resources while the widget's QRhi still exists
+    m_pCore.reset();
 }
 
 //=============================================================================================================
 
-void BrainView::setModel(BrainTreeModel* model)
+BrainViewCore* BrainView::core() const
 {
-    if (model == m_model)
-        return;
-
-    if (m_model) {
-        disconnect(m_model, nullptr, this, nullptr);
-        for (auto it = m_itemSurfaceMap.cbegin(); it != m_itemSurfaceMap.cend(); ++it) {
-            for (auto sit = m_surfaces.begin(); sit != m_surfaces.end();) {
-                sit = (sit->second == it->second) ? m_surfaces.erase(sit) : std::next(sit);
-            }
-        }
-        m_itemSurfaceMap.clear();
-        m_itemDipoleMap.clear();
-        m_hoveredItem = nullptr;
-        m_activeSurface.reset();
-    }
-
-    m_model = model;
-    if (!m_model) {
-        updateSceneBounds();
-        m_sceneDirty = true;
-        update();
-        return;
-    }
-    connect(m_model, &BrainTreeModel::rowsInserted, this, &BrainView::onRowsInserted);
-    connect(m_model, &BrainTreeModel::dataChanged, this, &BrainView::onDataChanged);
-
-    if (m_model->rowCount() > 0) {
-        onRowsInserted(QModelIndex(), 0, m_model->rowCount() - 1);
-    } else {
-        updateSceneBounds();
-        m_sceneDirty = true;
-        update();
-    }
+    return m_pCore.get();
 }
 
 //=============================================================================================================
 
-void BrainView::setInitialCameraRotation(const QQuaternion& rotation)
+BrainView::ViewMode BrainView::viewMode() const
 {
-    m_cameraRotation = rotation;
-    saveMultiViewSettings();
-    m_sceneDirty = true;
-    update();
-}
-
-void BrainView::onRowsInserted(const QModelIndex& parent, int first, int last)
-{
-    if (!m_model)
-        return;
-
-    for (int i = first; i <= last; ++i) {
-        QModelIndex index = m_model->index(i, 0, parent);
-        QStandardItem* item = m_model->itemFromIndex(index);
-
-        AbstractTreeItem* absItem = dynamic_cast<AbstractTreeItem*>(item);
-
-        // Handle FsSurface Items
-        if (absItem && absItem->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::SurfaceItem)) {
-            SurfaceTreeItem* surfItem = static_cast<SurfaceTreeItem*>(absItem);
-            auto brainSurf = std::make_shared<BrainSurface>();
-
-            // Load geometry from item
-            brainSurf->fromSurface(surfItem->surfaceData());
-
-            // Determine Hemisphere from Parent
-            if (absItem->parent()) {
-                QString parentText = absItem->parent()->text();
-                if (parentText == "lh")
-                    brainSurf->setHemi(0);
-                else if (parentText == "rh")
-                    brainSurf->setHemi(1);
-            }
-
-            // Set properties
-            brainSurf->setVisible(surfItem->isVisible());
-
-            // Brain surfaces (pial, white, inflated, etc.) are brain tissue
-            brainSurf->setTissueType(BrainSurface::TissueBrain);
-
-            m_itemSurfaceMap[item] = brainSurf;
-
-            // Key generation: "hemi_type" e.g. "lh_pial"
-            std::string key;
-            if (absItem->parent()) {
-                key = (absItem->parent()->text() + "_" + surfItem->text()).toStdString();
-            } else {
-                key = surfItem->text().toStdString();
-            }
-            m_surfaces[key] = brainSurf;
-
-            // Check for annotations
-            if (!surfItem->annotationData().empty()) {
-                brainSurf->addAnnotation(surfItem->annotationData());
-            }
-
-            // Set active if first
-            if (!m_activeSurface) {
-                m_activeSurface = brainSurf;
-                m_activeSurfaceType = surfItem->text().toStdString();
-            }
-        }
-        // Check for BEM Item (using dynamic_cast for safety)
-        BemTreeItem* bemItem = dynamic_cast<BemTreeItem*>(absItem);
-        if (bemItem) {
-            const mne::MNEBemSurface& bemSurfData = bemItem->bemSurfaceData();
-
-            auto brainSurf = std::make_shared<BrainSurface>();
-
-            // Load BEM geometry with color from item
-            brainSurf->fromBemSurface(bemSurfData, itemColor(*bemItem));
-
-            brainSurf->setVisible(bemItem->isVisible());
-
-            // Set tissue type based on surface name
-            QString surfName = bemItem->text().toLower();
-            if (surfName.contains("head") || surfName.contains("skin") || surfName.contains("scalp")) {
-                brainSurf->setTissueType(BrainSurface::TissueSkin);
-            } else if (surfName.contains("outer") && surfName.contains("skull")) {
-                brainSurf->setTissueType(BrainSurface::TissueOuterSkull);
-            } else if (surfName.contains("inner") && surfName.contains("skull")) {
-                brainSurf->setTissueType(BrainSurface::TissueInnerSkull);
-            } else if (surfName.contains("skull")) {
-                brainSurf->setTissueType(BrainSurface::TissueOuterSkull); // Default skull to outer
-            } else if (surfName.contains("brain")) {
-                brainSurf->setTissueType(BrainSurface::TissueBrain);
-            }
-
-            m_itemSurfaceMap[item] = brainSurf;
-
-            // Legacy map support (Use item text e.g. "bem_head")
-            m_surfaces["bem_" + bemItem->text().toStdString()] = brainSurf;
-        }
-
-        // Handle Sensor Items
-        if (absItem && absItem->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::SensorItem)) {
-            SensorTreeItem* sensItem = static_cast<SensorTreeItem*>(absItem);
-
-            std::shared_ptr<BrainSurface> brainSurf;
-
-            QString parentText = "";
-            if (sensItem->parent())
-                parentText = sensItem->parent()->text();
-
-            if (parentText.contains("MEG/Grad") && sensItem->hasOrientation()) {
-                brainSurf = MeshFactory::createBarbell(sensItem->position(), sensItem->orientation(),
-                                                       itemColor(*sensItem), sensItem->scale());
-            } else if (parentText.contains("MEG/Mag") && sensItem->hasOrientation()) {
-                brainSurf = MeshFactory::createPlate(sensItem->position(), sensItem->orientation(),
-                                                     itemColor(*sensItem), sensItem->scale());
-            } else {
-                // EEG and other sensors: smooth icosphere
-                brainSurf = MeshFactory::createSphere(sensItem->position(), sensItem->scale(),
-                                                      itemColor(*sensItem));
-            }
-
-            brainSurf->setVisible(sensItem->isVisible());
-            m_itemSurfaceMap[item] = brainSurf;
-
-
-            // Legacy map support
-            const std::string keyPrefix = mne::disp::surface_keys::sensorParentToKeyPrefix(parentText.toStdString());
-
-            const std::string key = std::format("{}{}_{}", keyPrefix, sensItem->text().toStdString(), reinterpret_cast<std::uintptr_t>(sensItem));
-            m_surfaces[key] = brainSurf;
-        }
-
-        // Handle Dipole Items
-        if (absItem && absItem->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::DipoleItem)) {
-            DipoleTreeItem* dipItem = static_cast<DipoleTreeItem*>(absItem);
-            auto dipObject = std::make_shared<DipoleObject>();
-            dipObject->load(dipItem->ecdSet());
-            dipObject->setVisible(dipItem->isVisible());
-            dipObject->applyTransform(itemTransform(item));
-
-            m_itemDipoleMap[item] = dipObject;
-        }
-
-        // Handle Source Space Items (one item per hemisphere, batched mesh)
-        if (absItem && absItem->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::SourceSpaceItem)) {
-            SourceSpaceTreeItem* srcItem = static_cast<SourceSpaceTreeItem*>(absItem);
-            const std::vector<QVector3D>& positions = srcItem->positions();
-            if (positions.empty())
-                continue;
-
-            auto brainSurf = MeshFactory::createBatchedSpheres(positions, srcItem->scale(),
-                                                               itemColor(*srcItem));
-            brainSurf->setVisible(srcItem->isVisible());
-            m_itemSurfaceMap[item] = brainSurf;
-
-            const std::string key = "srcsp_" + srcItem->text().toStdString();
-            m_surfaces[key] = brainSurf;
-        }
-
-        // Handle Digitizer Items (batched sphere mesh per category)
-        if (absItem && absItem->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::DigitizerItem)) {
-            DigitizerTreeItem* digItem = static_cast<DigitizerTreeItem*>(absItem);
-            const std::vector<QVector3D>& positions = digItem->positions();
-            if (positions.empty())
-                continue;
-
-            auto brainSurf = MeshFactory::createBatchedSpheres(positions, digItem->scale(),
-                                                               itemColor(*digItem));
-            brainSurf->setVisible(digItem->isVisible());
-
-            m_itemSurfaceMap[item] = brainSurf;
-
-            // Category name for surface-map key.  A monotonic counter
-            // suffix guarantees uniqueness so that multiple items of the
-            // same PointKind each get their own entry in m_surfaces.
-            // shouldRenderSurface() matches by prefix ("dig_cardinal",
-            // "dig_hpi", …) so the suffix is transparent to visibility.
-            static int s_digKeyCounter = 0;
-            std::string catName;
-            switch (digItem->pointKind()) {
-                case DigitizerTreeItem::Cardinal:
-                    catName = "cardinal";
-                    break;
-                case DigitizerTreeItem::HPI:
-                    catName = "hpi";
-                    break;
-                case DigitizerTreeItem::EEG:
-                    catName = "eeg";
-                    break;
-                case DigitizerTreeItem::Extra:
-                    catName = "extra";
-                    break;
-                default:
-                    catName = digItem->text().toLower().replace(' ', '_').toStdString();
-                    break;
-            }
-            const std::string key = std::format("dig_{}_{}", catName, s_digKeyCounter++);
-            m_surfaces[key] = brainSurf;
-        }
-
-        if (m_itemSurfaceMap.contains(item))
-            m_itemSurfaceMap[item]->applyTransform(itemTransform(item));
-
-        // Check children recursively
-        if (m_model->hasChildren(index)) {
-            onRowsInserted(index, 0, m_model->rowCount(index) - 1);
-        }
-    }
-    updateInflatedSurfaceTransforms();
-    updateSceneBounds();
-    m_vertexCountDirty = true;
-    m_sceneDirty = true;
-    update();
-}
-
-void BrainView::onDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QList<int>& roles)
-{
-    bool transformChanged = false;
-    for (int i = topLeft.row(); i <= bottomRight.row(); ++i) {
-        QModelIndex index = m_model->index(i, 0, topLeft.parent());
-        QStandardItem* item = m_model->itemFromIndex(index);
-
-        if (m_itemSurfaceMap.contains(item)) {
-            auto surf = m_itemSurfaceMap[item];
-
-            AbstractTreeItem* absItem = dynamic_cast<AbstractTreeItem*>(item);
-            if (absItem) {
-                if (roles.contains(AbstractTreeItem::VisibleRole)) {
-                    surf->setVisible(absItem->isVisible());
-                    m_vertexCountDirty = true;
-                }
-                if ((roles.contains(AbstractTreeItem::ColorRole) || roles.contains(AbstractTreeItem::AlphaRole)) && absItem->color().isValid()) {
-                    surf->setColor(itemColor(*absItem));
-                }
-                if (roles.contains(AbstractTreeItem::TransformRole)) {
-                    surf->applyTransform(itemTransform(item));
-                    transformChanged = true;
-                }
-                if (roles.contains(SurfaceTreeItem::AnnotationDataRole)) {
-                    SurfaceTreeItem* sItem = static_cast<SurfaceTreeItem*>(absItem);
-                    if (!sItem->annotationData().empty()) {
-                        surf->addAnnotation(sItem->annotationData());
-                    }
-                }
-            }
-        }
-
-        if (m_itemDipoleMap.contains(item)) {
-            auto* absItem = dynamic_cast<AbstractTreeItem*>(item);
-            if (absItem && roles.contains(AbstractTreeItem::VisibleRole))
-                m_itemDipoleMap[item]->setVisible(absItem->isVisible());
-            if (roles.contains(AbstractTreeItem::TransformRole))
-                m_itemDipoleMap[item]->applyTransform(itemTransform(item));
-        }
-    }
-    if (transformChanged) {
-        updateInflatedSurfaceTransforms();
-        m_vertexCountDirty = true;
-    }
-    updateSceneBounds();
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-void BrainView::setActiveSurface(const std::string& type)
-{
-    subViewForTarget(m_visualizationEditTarget).surfaceType = type;
-
-    m_activeSurfaceType = type;
-
-    // Update m_activeSurface pointer to one of the matching surfaces for stats/helpers
-    if (const auto lh = m_surfaces.find("lh_" + type); lh != m_surfaces.end())
-        m_activeSurface = lh->second;
-    else if (const auto rh = m_surfaces.find("rh_" + type); rh != m_surfaces.end())
-        m_activeSurface = rh->second;
-
-    updateInflatedSurfaceTransforms();
-    saveMultiViewSettings();
-
-    updateSceneBounds();
-    m_vertexCountDirty = true;
-    m_sceneDirty = true;
-    update();
-}
-
-void BrainView::updateSceneBounds()
-{
-    QVector3D min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
-    QVector3D max(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
-    bool hasContent = false;
-
-    // Iterate over all surfaces
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-        if (it->second->isVisible()) {
-            QVector3D sMin, sMax;
-            it->second->boundingBox(sMin, sMax);
-
-            min.setX(std::min(min.x(), sMin.x()));
-            min.setY(std::min(min.y(), sMin.y()));
-            min.setZ(std::min(min.z(), sMin.z()));
-
-            max.setX(std::max(max.x(), sMax.x()));
-            max.setY(std::max(max.y(), sMax.y()));
-            max.setZ(std::max(max.z(), sMax.z()));
-            hasContent = true;
-        }
-    }
-
-    for (auto it = m_itemDipoleMap.cbegin(); it != m_itemDipoleMap.cend(); ++it) {
-        QVector3D dMin, dMax;
-        if (it->second->isVisible() && it->second->boundingBox(dMin, dMax)) {
-            min = QVector3D(std::min(min.x(), dMin.x()), std::min(min.y(), dMin.y()), std::min(min.z(), dMin.z()));
-            max = QVector3D(std::max(max.x(), dMax.x()), std::max(max.y(), dMax.y()), std::max(max.z(), dMax.z()));
-            hasContent = true;
-        }
-    }
-
-    if (hasContent) {
-        m_sceneCenter = (min + max) * 0.5f;
-
-        QVector3D diag = max - min;
-        m_sceneSize = std::max(diag.x(), std::max(diag.y(), diag.z()));
-
-        // Ensure non-zero size
-        if (m_sceneSize < 0.01f)
-            m_sceneSize = 0.3f;
-
-    } else {
-        // Default
-        m_sceneCenter = QVector3D(0, 0, 0);
-        m_sceneSize = 0.3f;
-    }
-}
-
-//=============================================================================================================
-
-void BrainView::setShaderMode(const std::string& modeName)
-{
-    const mne::disp::ShaderMode mode = shaderModeFromName(modeName);
-    subViewForTarget(m_visualizationEditTarget).brainShader = mode;
-
-    m_brainShaderMode = mode;
-    saveMultiViewSettings();
-    m_sceneDirty = true;
-    update();
-    emit shaderModeChanged(QString::fromStdString(shaderModeName(mode)));
-}
-
-//=============================================================================================================
-
-void BrainView::setVisualizationEditTarget(int target)
-{
-    const int prev = m_visualizationEditTarget;
-    m_visualizationEditTarget = normalizedVisualizationTarget(target, static_cast<int>(m_subViews.size()) - 1);
-
-    const SubView& sv = subViewForTarget(m_visualizationEditTarget);
-    m_activeSurfaceType = sv.surfaceType;
-    m_brainShaderMode = sv.brainShader;
-    m_bemShaderMode = sv.bemShader;
-    m_currentVisMode = sv.overlayMode;
-    const ViewVisibilityProfile& visibility = sv.visibility;
-
-    const bool remapMegSurface = (m_fieldMapper.megFieldMapOnHead() != visibility.megFieldMapOnHead);
-    m_fieldMapper.setMegFieldMapOnHead(visibility.megFieldMapOnHead);
-    m_dipolesVisible = visibility.dipoles;
-    m_networkVisible = visibility.network;
-
-    // Note: we intentionally do NOT call setVisualizationMode() on surfaces
-    // here.  Each viewport's overlay mode is sent as a per-draw shader
-    // uniform (sceneData.overlayMode), so the surface objects must keep
-    // their vertex data intact — in particular the STC colour channel —
-    // regardless of which viewport is currently selected for editing.
-
-    if (m_fieldMapper.isLoaded()) {
-        if (remapMegSurface) {
-            m_fieldMapper.buildMapping(m_surfaces, m_headToMriTrans, m_applySensorTrans);
-        }
-        m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
-    }
-
-    // Update viewport label highlighting
-    updateViewportLabelHighlight();
-
-    saveMultiViewSettings();
-
-    if (prev != m_visualizationEditTarget) {
-        emit visualizationEditTargetChanged(m_visualizationEditTarget);
-    }
-}
-
-//=============================================================================================================
-
-int BrainView::visualizationEditTarget() const
-{
-    return m_visualizationEditTarget;
-}
-
-//=============================================================================================================
-
-std::string BrainView::activeSurfaceForTarget(int target) const
-{
-    return subViewForTarget(target).surfaceType;
-}
-
-//=============================================================================================================
-
-std::string BrainView::shaderModeForTarget(int target) const
-{
-    return shaderModeName(subViewForTarget(target).brainShader);
-}
-
-//=============================================================================================================
-
-std::string BrainView::bemShaderModeForTarget(int target) const
-{
-    return shaderModeName(subViewForTarget(target).bemShader);
-}
-
-//=============================================================================================================
-
-std::string BrainView::overlayModeForTarget(int target) const
-{
-    return visualizationModeName(subViewForTarget(target).overlayMode);
-}
-
-//=============================================================================================================
-
-ViewVisibilityProfile& BrainView::visibilityProfileForTarget(int target)
-{
-    return subViewForTarget(target).visibility;
-}
-
-//=============================================================================================================
-
-const ViewVisibilityProfile& BrainView::visibilityProfileForTarget(int target) const
-{
-    return subViewForTarget(target).visibility;
-}
-
-//=============================================================================================================
-
-SubView& BrainView::subViewForTarget(int target)
-{
-    const int normalized = normalizedVisualizationTarget(target, static_cast<int>(m_subViews.size()) - 1);
-    return (normalized < 0) ? m_singleView : m_subViews[normalized];
-}
-
-//=============================================================================================================
-
-const SubView& BrainView::subViewForTarget(int target) const
-{
-    const int normalized = normalizedVisualizationTarget(target, static_cast<int>(m_subViews.size()) - 1);
-    return (normalized < 0) ? m_singleView : m_subViews[normalized];
-}
-
-//=============================================================================================================
-
-// Note: SubView::isBrainSurfaceKey, matchesSurfaceType, shouldRenderSurface,
-// and applyOverlayToSurfaces are defined in core/viewstate.cpp.
-
-//=============================================================================================================
-
-bool BrainView::objectVisibleForTarget(const std::string& object, int target) const
-{
-    return visibilityProfileForTarget(target).isObjectVisible(object);
-}
-
-//=============================================================================================================
-
-bool BrainView::megFieldMapOnHeadForTarget(int target) const
-{
-    return visibilityProfileForTarget(target).megFieldMapOnHead;
-}
-
-//=============================================================================================================
-
-void BrainView::updateInflatedSurfaceTransforms()
-{
-    const bool needsInflated = (m_singleView.surfaceType == "inflated") || std::any_of(m_subViews.cbegin(), m_subViews.cend(), [](const SubView& sv) { return sv.surfaceType == "inflated"; });
-
-    const auto lhIt = m_surfaces.find("lh_inflated");
-    const auto rhIt = m_surfaces.find("rh_inflated");
-    if (lhIt == m_surfaces.end() || rhIt == m_surfaces.end()) {
-        return;
-    }
-
-    auto lhSurf = lhIt->second;
-    auto rhSurf = rhIt->second;
-
-    lhSurf->applyTransform(itemTransform(itemForSurface(lhSurf)));
-    rhSurf->applyTransform(itemTransform(itemForSurface(rhSurf)));
-
-    if (!needsInflated) {
-        return;
-    }
-
-    const float lhMaxX = lhSurf->maxX();
-    const float rhMinX = rhSurf->minX();
-
-    const float gap = 0.005f;
-    const float lhOffset = -gap / 2.0f - lhMaxX;
-    const float rhOffset = gap / 2.0f - rhMinX;
-
-    lhSurf->translateX(lhOffset);
-    rhSurf->translateX(rhOffset);
-}
-
-void BrainView::setBemShaderMode(const std::string& modeName)
-{
-    const mne::disp::ShaderMode mode = shaderModeFromName(modeName);
-
-    subViewForTarget(m_visualizationEditTarget).bemShader = mode;
-
-    m_bemShaderMode = mode;
-    saveMultiViewSettings();
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-void BrainView::syncBemShadersToBrainShaders()
-{
-    m_singleView.bemShader = m_singleView.brainShader;
-    for (int i = 0; i < std::ssize(m_subViews); ++i) {
-        m_subViews[i].bemShader = m_subViews[i].brainShader;
-    }
-
-    m_bemShaderMode = subViewForTarget(m_visualizationEditTarget).bemShader;
-
-    saveMultiViewSettings();
-    m_sceneDirty = true;
-    update();
-}
-
-void BrainView::setSensorVisible(const std::string& type, bool visible)
-{
-    const std::string object = mne::disp::surface_keys::sensorTypeToObjectKey(type);
-    if (object.empty())
-        return;
-
-    auto& profile = visibilityProfileForTarget(m_visualizationEditTarget);
-    profile.setObjectVisible(object, visible);
-
-    // Cascade parent toggle to child sub-types so that e.g. "MEG" also
-    // enables/disables MEG/Grad and MEG/Mag sub-types.
-    // Note: MEG Helmet has its own independent checkbox and is NOT cascaded.
-    if (type == "MEG") {
-        profile.sensMegGrad = visible;
-        profile.sensMegMag = visible;
-    } else if (type == "EEG") {
-        // No sub-types for EEG currently, but keep symmetric.
-    } else if (type == "Digitizer") {
-        profile.digCardinal = visible;
-        profile.digHpi = visible;
-        profile.digEeg = visible;
-        profile.digExtra = visible;
-    }
-
-    saveMultiViewSettings();
-    m_sceneDirty = true;
-    update();
-}
-
-void BrainView::setSensorTransEnabled(bool enabled)
-{
-    if (m_applySensorTrans != enabled) {
-        m_applySensorTrans = enabled;
-        refreshSensorTransforms();
-        m_sceneDirty = true;
-        update();
-    }
-}
-
-//=============================================================================================================
-
-void BrainView::setMegHelmetOverride(const std::filesystem::path& path)
-{
-    m_megHelmetOverridePath = path;
-}
-
-void BrainView::setDipoleVisible(bool visible)
-{
-    auto& profile = visibilityProfileForTarget(m_visualizationEditTarget);
-    profile.dipoles = visible;
-    m_dipolesVisible = visible;
-    saveMultiViewSettings();
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-void BrainView::setVisualizationMode(const std::string& modeName)
-{
-    const mne::disp::VisualizationMode mode = visualizationModeFromName(modeName);
-    SubView& sv = subViewForTarget(m_visualizationEditTarget);
-    sv.overlayMode = mode;
-
-    m_currentVisMode = mode;
-
-    // Propagate the mode to brain hemisphere surfaces only (lh_*, rh_*)
-    // so that the primary colour channel holds the right data: curvature
-    // grays for Scientific or STC colours for SourceEstimate.
-    // BEM, sensor, and source-space surfaces are left untouched.
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-        const std::string& key = it->first;
-        if (key.starts_with("lh_") || key.starts_with("rh_")) {
-            it->second->setVisualizationMode(mode);
-        }
-    }
-
-    saveMultiViewSettings();
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-void BrainView::setHemiVisible(int hemiIdx, bool visible)
-{
-    auto& profile = visibilityProfileForTarget(m_visualizationEditTarget);
-    if (hemiIdx == 0) {
-        profile.lh = visible;
-    } else if (hemiIdx == 1) {
-        profile.rh = visible;
-    }
-    saveMultiViewSettings();
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-void BrainView::setBemVisible(const std::string& name, bool visible)
-{
-    auto& profile = visibilityProfileForTarget(m_visualizationEditTarget);
-    profile.setObjectVisible("bem_" + name, visible);
-    saveMultiViewSettings();
-    m_sceneDirty = true;
-    update();
-}
-
-void BrainView::setBemHighContrast(bool enabled)
-{
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-        if (it->first.starts_with("bem_")) {
-            it->second->setUseDefaultColor(enabled);
-        }
-    }
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-void BrainView::setLightingEnabled(bool enabled)
-{
-    m_lightingEnabled = enabled;
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-void BrainView::setAutomatedRotation(bool enabled)
-{
-    if (!enabled) {
-        if (m_pAutoRotateTimer) {
-            m_pAutoRotateTimer->stop();
-        }
-        return;
-    }
-
-    if (!m_pAutoRotateTimer) {
-        m_pAutoRotateTimer = new QTimer(this);
-        m_pAutoRotateTimer->setInterval(33);
-
-        connect(m_pAutoRotateTimer, &QTimer::timeout, this, [this]() {
-            // Rotate the camera rather than the objects, so that every surface
-            // keeps its own coregistration transform and head and sensors stay
-            // aligned with each other.
-            const QPoint step(2, 0);
-
-            if (m_viewMode == MultiView) {
-                for (int i = 0; i < std::ssize(m_subViews); ++i) {
-                    if (multiViewPresetIsPerspective(std::clamp(m_subViews[i].preset, 0, 6))) {
-                        CameraController::applyMouseRotation(step, m_subViews[i].perspectiveRotation);
-                    }
-                }
-            } else {
-                CameraController::applyMouseRotation(step, m_cameraRotation);
-            }
-
-            m_sceneDirty = true;
-            update();
-        });
-    }
-
-    m_pAutoRotateTimer->start();
-}
-
-//=============================================================================================================
-
-bool BrainView::automatedRotation() const
-{
-    return m_pAutoRotateTimer && m_pAutoRotateTimer->isActive();
-}
-
-//=============================================================================================================
-
-void BrainView::setHeadMovementPath(const std::vector<Eigen::Vector3f>& vecPositions)
-{
-    // A path needs at least one segment to be meaningful.
-    if (vecPositions.size() < 2) {
-        clearHeadMovementPath();
-        return;
-    }
-
-    if (!m_headPath) {
-        m_headPath = std::make_unique<PolylineObject>();
-    }
-
-    m_headPath->setPoints(vecPositions);
-    m_headPath->setVisible(true);
-
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-void BrainView::clearHeadMovementPath()
-{
-    if (!m_headPath) {
-        return;
-    }
-
-    m_headPath.reset();
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-bool BrainView::saveSnapshot()
-{
-    const std::time_t seconds = std::time(nullptr);
-    std::tm local{};
-#ifdef _WIN32
-    localtime_s(&local, &seconds);
-#else
-    localtime_r(&seconds, &local);
-#endif
-    std::array<char, 64> name{};
-    std::strftime(name.data(), name.size(), "./Screenshots/%Y_%m_%d-%H_%M_%S-3DView.png", &local);
-    return takeScreenshot(std::filesystem::path(name.data()));
-}
-
-//=============================================================================================================
-
-bool BrainView::takeScreenshot(const std::filesystem::path& fileName)
-{
-    const QImage frame = grabFramebuffer();
-    if (frame.isNull()) {
-        mne::Log::warning("[BrainView::takeScreenshot] No rendered frame - nothing written to {}", mne::utf8_from_path(fileName));
-        return false;
-    }
-    std::error_code error;
-    const std::filesystem::path directory = std::filesystem::absolute(fileName, error).parent_path();
-    std::filesystem::create_directories(directory, error);
-    if (!std::filesystem::is_directory(directory, error) || !frame.save(QString::fromStdU16String(fileName.u16string()))) {
-        mne::Log::warning("[BrainView::takeScreenshot] Cannot write {}", mne::utf8_from_path(fileName));
-        return false;
-    }
-    return true;
-}
-
-//=============================================================================================================
-
-bool BrainView::savePng(const std::filesystem::path& path, int width, int height,
-                        const std::string& surfaceType)
-{
-    // Realise the widget off-screen — QRhi init still runs because
-    // the widget is technically "shown", but no window-manager surface
-    // is created.
-    setAttribute(Qt::WA_DontShowOnScreen, true);
-    resize(width, height);
-
-    // Set the surface type filter so the render loop matches the
-    // loaded surface names (e.g. "white" vs default "pial").
-    m_singleView.surfaceType = surfaceType;
-
-    show();
-
-    // Spin the event loop until QRhi is initialised, at least one
-    // frame has been rendered (m_renderer becomes non-null), and the
-    // surface map is populated.
-    const auto waitStart = std::chrono::steady_clock::now();
-    while (std::chrono::steady_clock::now() - waitStart < std::chrono::seconds(5)) {
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 16);
-        if (m_renderer && !m_surfaces.empty())
-            break;
-    }
-
-    if (!m_renderer) {
-        hide();
-        setAttribute(Qt::WA_DontShowOnScreen, false);
-        return false;
-    }
-
-    // Force a dirty scene so the next grab renders everything.
-    m_sceneDirty = true;
-    updateSceneBounds();
-
-    // Pump a few more frames so pipeline resources are fully created.
-    for (int i = 0; i < 5; ++i)
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 16);
-
-    // QRhiWidget::grabFramebuffer() internally creates an offscreen
-    // frame, calls render(), and reads back the texture.
-    QImage img = grabFramebuffer();
-
-    hide();
-    setAttribute(Qt::WA_DontShowOnScreen, false);
-
-    if (img.isNull())
-        return false;
-
-    return img.save(QString::fromStdU16String(path.u16string()), "PNG");
-}
-
-//=============================================================================================================
-
-void BrainView::showSingleView()
-{
-    m_viewMode = SingleView;
-    m_isDraggingSplitter = false;
-    m_activeSplitter = SplitterHit::None;
-    unsetCursor();
-    saveMultiViewSettings();
-    updateViewportSeparators();
-    updateOverlayLayout();
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-void BrainView::showMultiView()
-{
-    m_viewMode = MultiView;
-    saveMultiViewSettings();
-    updateViewportSeparators();
-    updateOverlayLayout();
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-void BrainView::setViewCount(int count)
-{
-    count = std::clamp(count, 1, static_cast<int>(m_subViews.size()));
-    m_viewCount = count;
-
-    if (count == 1) {
-        m_viewMode = SingleView;
-        m_isDraggingSplitter = false;
-        m_activeSplitter = SplitterHit::None;
-        unsetCursor();
-        setVisualizationEditTarget(-1);
-    } else {
-        m_viewMode = MultiView;
-        // Default edit target to first pane when entering multi-view
-        if (m_visualizationEditTarget < 0)
-            setVisualizationEditTarget(0);
-    }
-
-    // Enable first N sub-views, disable the rest
-    for (int i = 0; i < std::ssize(m_subViews); ++i)
-        m_subViews[i].enabled = (i < count);
-
-    saveMultiViewSettings();
-    updateViewportSeparators();
-    updateOverlayLayout();
-    m_sceneDirty = true;
-    update();
-    emit viewCountChanged(m_viewCount);
-}
-
-//=============================================================================================================
-
-void BrainView::resetMultiViewLayout()
-{
-    m_layout.resetSplits();
-    m_multiSplitX = m_layout.splitX();
-    m_multiSplitY = m_layout.splitY();
-    saveMultiViewSettings();
-    updateViewportSeparators();
-    updateOverlayLayout();
-    m_sceneDirty = true;
-    update();
-}
-
-bool BrainView::isViewportEnabled(int index) const
-{
-    if (index < 0 || index >= std::ssize(m_subViews)) {
-        return false;
-    }
-
-    return m_subViews[index].enabled;
-}
-
-//=============================================================================================================
-
-int BrainView::enabledViewportCount() const
-{
-    if (m_viewMode != MultiView) {
-        return 1;
-    }
-
-    int numEnabled = 0;
-    for (int i = 0; i < std::ssize(m_subViews); ++i) {
-        if (m_subViews[i].enabled) {
-            ++numEnabled;
-        }
-    }
-
-    return numEnabled > 0 ? numEnabled : 1;
-}
-
-//=============================================================================================================
-
-std::vector<int> BrainView::enabledViewportIndices() const
-{
-    std::vector<int> vps;
-    if (m_viewMode == MultiView) {
-        for (int i = 0; i < std::ssize(m_subViews); ++i) {
-            if (m_subViews[i].enabled)
-                vps.push_back(i);
-        }
-        if (vps.empty())
-            vps.push_back(0);
-    } else {
-        vps.push_back(0);
-    }
-    return vps;
-}
-
-//=============================================================================================================
-
-int BrainView::viewportIndexAt(const QPoint& pos) const
-{
-    if (m_viewMode != MultiView) {
-        return 0;
-    }
-
-    const auto enabledViewports = enabledViewportIndices();
-    return m_layout.viewportIndexAt(pos, enabledViewports, size());
-}
-
-//=============================================================================================================
-
-QRect BrainView::multiViewSlotRect(int slot, int numEnabled, const QSize& outputSize) const
-{
-    return m_layout.slotRect(slot, numEnabled, outputSize);
-}
-
-//=============================================================================================================
-
-SplitterHit BrainView::hitTestSplitter(const QPoint& pos, int numEnabled, const QSize& outputSize) const
-{
-    if (m_viewMode != MultiView || numEnabled <= 1) {
-        return SplitterHit::None;
-    }
-    return m_layout.hitTestSplitter(pos, numEnabled, outputSize);
-}
-
-//=============================================================================================================
-
-void BrainView::updateSplitterCursor(const QPoint& pos)
-{
-    const SplitterHit hit = hitTestSplitter(pos, enabledViewportCount(), size());
-    const Qt::CursorShape shape = MultiViewLayout::cursorForHit(hit);
-    if (shape == Qt::ArrowCursor) {
-        unsetCursor();
-    } else {
-        setCursor(shape);
-    }
-}
-
-//=============================================================================================================
-
-void BrainView::updateViewportSeparators()
-{
-    if (!m_verticalSeparator || !m_horizontalSeparator) {
-        return;
-    }
-
-    m_verticalSeparator->hide();
-    m_horizontalSeparator->hide();
-
-    const int numEnabled = enabledViewportCount();
-    if (m_viewMode != MultiView || numEnabled <= 1) {
-        return;
-    }
-
-    QRect vRect, hRect;
-    m_layout.separatorGeometries(numEnabled, size(), vRect, hRect);
-
-    if (!vRect.isEmpty()) {
-        m_verticalSeparator->setGeometry(vRect);
-        m_verticalSeparator->show();
-        m_verticalSeparator->raise();
-    }
-    if (!hRect.isEmpty()) {
-        m_horizontalSeparator->setGeometry(hRect);
-        m_horizontalSeparator->show();
-        m_horizontalSeparator->raise();
-    }
-
-    updateOverlayLayout();
-}
-
-//=============================================================================================================
-
-void BrainView::updateOverlayLayout()
-{
-    const auto enabledViewports = enabledViewportIndices();
-
-    if (m_fpsLabel) {
-        m_fpsLabel->setVisible(m_infoPanelVisible);
-        m_fpsLabel->adjustSize();
-        const int perfBottomMargin = 2;
-
-        if (m_viewMode == MultiView) {
-            m_fpsLabel->move(width() - m_fpsLabel->width() - 10,
-                             height() - m_fpsLabel->height() - perfBottomMargin);
-        } else {
-            m_fpsLabel->move(width() - m_fpsLabel->width() - 10,
-                             height() - m_fpsLabel->height() - perfBottomMargin);
-        }
-
-        m_fpsLabel->raise();
-    }
-
-    if (m_singleViewInfoLabel) {
-        const bool showSingleInfo = (m_viewMode == SingleView) && m_infoPanelVisible;
-        m_singleViewInfoLabel->setVisible(showSingleInfo);
-        if (showSingleInfo) {
-            m_singleViewInfoLabel->adjustSize();
-            m_singleViewInfoLabel->move(width() - m_singleViewInfoLabel->width() - 8, 8);
-            m_singleViewInfoLabel->raise();
-        }
-    }
-
-    if (m_regionLabel) {
-        const int regionY = (m_viewMode == MultiView) ? 38 : 10;
-        m_regionLabel->move(10, regionY);
-        if (!m_regionLabel->text().isEmpty()) {
-            m_regionLabel->raise();
-        }
-    }
-
-    for (int i = 0; i < std::ssize(m_viewportNameLabels); ++i) {
-        if (m_viewportNameLabels[i]) {
-            m_viewportNameLabels[i]->hide();
-        }
-        if (m_viewportInfoLabels[i]) {
-            m_viewportInfoLabels[i]->hide();
-        }
-    }
-
-    if (m_viewMode != MultiView) {
-        return;
-    }
-
-    const int numEnabled = static_cast<int>(enabledViewports.size());
-    const QSize overlaySize = size();
-    for (int slot = 0; slot < numEnabled; ++slot) {
-        const int vp = enabledViewports[slot];
-        QLabel* label = m_viewportNameLabels[vp];
-        QLabel* infoLabel = m_viewportInfoLabels[vp];
-        if (!label) {
-            continue;
-        }
-
-        const int preset = std::clamp(m_subViews[vp].preset, 0, 6);
-        label->setText(QString::fromStdString(multiViewPresetName(preset)));
-
-        const QRect pane = multiViewSlotRect(slot, numEnabled, overlaySize);
-        label->adjustSize();
-        label->move(pane.x() + 8, pane.y() + 8);
-        label->setVisible(true);
-        label->raise();
-
-        if (infoLabel) {
-            infoLabel->adjustSize();
-            infoLabel->move(pane.x() + pane.width() - infoLabel->width() - 8,
-                            pane.y() + 8);
-            infoLabel->setVisible(m_infoPanelVisible);
-            infoLabel->raise();
-        }
-    }
-
-    updateViewportLabelHighlight();
-}
-
-//=============================================================================================================
-
-void BrainView::updateViewportLabelHighlight()
-{
-    static const QString normalStyle =
-        QStringLiteral("color: white; font-weight: bold; font-family: sans-serif; "
-                       "font-size: 12px; background: transparent; padding: 2px 4px;");
-    static const QString selectedStyle =
-        QStringLiteral("color: #FFD54F; font-weight: bold; font-family: sans-serif; "
-                       "font-size: 13px; background: rgba(255,213,79,40); "
-                       "border: 1px solid #FFD54F; border-radius: 3px; padding: 2px 6px;");
-
-    for (int i = 0; i < std::ssize(m_viewportNameLabels); ++i) {
-        if (!m_viewportNameLabels[i])
-            continue;
-        const bool selected = (m_viewMode == MultiView && m_visualizationEditTarget == i);
-        m_viewportNameLabels[i]->setStyleSheet(selected ? selectedStyle : normalStyle);
-        m_viewportNameLabels[i]->adjustSize();
-    }
-}
-
-//=============================================================================================================
-
-void BrainView::loadMultiViewSettings()
-{
-    QSettings settings;
-    settings.beginGroup(QStringLiteral("BrainView"));
-
-    m_multiSplitX = settings.value("multiSplitX", 0.5f).toFloat();
-    m_multiSplitY = settings.value("multiSplitY", 0.5f).toFloat();
-
-    const int savedViewMode = settings.value("viewMode", static_cast<int>(SingleView)).toInt();
-    m_viewCount = std::clamp(settings.value("viewCount", 1).toInt(), 1, static_cast<int>(m_subViews.size()));
-    // showSingleView keeps the pane count for the next showMultiView; one pane is always the single view
-    m_viewMode = (savedViewMode == static_cast<int>(MultiView) && m_viewCount > 1) ? MultiView : SingleView;
-
-    const bool hasCameraQuat = settings.contains("cameraRotW") && settings.contains("cameraRotX") && settings.contains("cameraRotY") && settings.contains("cameraRotZ");
-    if (hasCameraQuat) {
-        const float w = settings.value("cameraRotW", 1.0f).toFloat();
-        const float x = settings.value("cameraRotX", 0.0f).toFloat();
-        const float y = settings.value("cameraRotY", 0.0f).toFloat();
-        const float z = settings.value("cameraRotZ", 0.0f).toFloat();
-        m_cameraRotation = QQuaternion(w, x, y, z);
-        if (m_cameraRotation.lengthSquared() <= std::numeric_limits<float>::epsilon()) {
-            m_cameraRotation = QQuaternion();
-        } else {
-            m_cameraRotation.normalize();
-        }
-    }
-
-    // Reset per-index defaults, then load saved state on top
-    for (int i = 0; i < std::ssize(m_subViews); ++i) {
-        m_subViews[i] = SubView::defaultForIndex(i);
-        m_subViews[i].enabled = (i < m_viewCount);
-    }
-
-    // Delegate per-SubView serialization
-    m_singleView.load(settings, "single_", m_cameraRotation);
-    for (int i = 0; i < std::ssize(m_subViews); ++i)
-        m_subViews[i].load(settings, QStringLiteral("multi%1_").arg(i), m_cameraRotation);
-
-    const int maxIdx = static_cast<int>(m_subViews.size()) - 1;
-    m_visualizationEditTarget = normalizedVisualizationTarget(
-        settings.value("visualizationEditTarget", -1).toInt(), maxIdx);
-
-    m_infoPanelVisible = settings.value("infoPanelVisible", true).toBool();
-
-    settings.endGroup();
-
-    m_multiSplitX = std::clamp(m_multiSplitX, 0.15f, 0.85f);
-    m_multiSplitY = std::clamp(m_multiSplitY, 0.15f, 0.85f);
-    m_layout.setSplitX(m_multiSplitX);
-    m_layout.setSplitY(m_multiSplitY);
-
-    setVisualizationEditTarget(m_visualizationEditTarget);
-
-    // Notify observers that persisted state has been restored. Defer to
-    // the next event-loop tick so that callers constructing BrainView
-    // and connecting to these signals immediately afterwards still
-    // receive the initial state — direct emits from inside the ctor
-    // chain would fire before any external connect() call.
-    QTimer::singleShot(0, this, [this]() {
-        emit viewCountChanged(m_viewCount);
-        emit shaderModeChanged(QString::fromStdString(shaderModeName(m_brainShaderMode)));
-    });
-}
-
-//=============================================================================================================
-
-void BrainView::saveMultiViewSettings() const
-{
-    QSettings settings;
-    settings.beginGroup(QStringLiteral("BrainView"));
-    settings.setValue("multiSplitX", m_multiSplitX);
-    settings.setValue("multiSplitY", m_multiSplitY);
-    settings.setValue("viewMode", static_cast<int>(m_viewMode));
-    settings.setValue("viewCount", m_viewCount);
-    settings.setValue("cameraRotW", m_cameraRotation.scalar());
-    settings.setValue("cameraRotX", m_cameraRotation.x());
-    settings.setValue("cameraRotY", m_cameraRotation.y());
-    settings.setValue("cameraRotZ", m_cameraRotation.z());
-    for (int i = 0; i < std::ssize(m_subViews); ++i)
-        settings.setValue(QStringLiteral("viewportEnabled%1").arg(i), m_subViews[i].enabled);
-    settings.setValue("visualizationEditTarget", m_visualizationEditTarget);
-    settings.setValue("infoPanelVisible", m_infoPanelVisible);
-
-    // Delegate per-SubView serialization
-    m_singleView.save(settings, "single_");
-    for (int i = 0; i < std::ssize(m_subViews); ++i)
-        m_subViews[i].save(settings, QStringLiteral("multi%1_").arg(i));
-
-    settings.endGroup();
-}
-
-//=============================================================================================================
-
-void BrainView::setViewportEnabled(int index, bool enabled)
-{
-    if (index >= 0 && index < std::ssize(m_subViews)) {
-        m_subViews[index].enabled = enabled;
-        saveMultiViewSettings();
-        updateViewportSeparators();
-        updateOverlayLayout();
-        m_sceneDirty = true;
-        update();
-    }
-}
-
-//=============================================================================================================
-
-void BrainView::setViewportCameraPreset(int index, int preset)
-{
-    if (index < 0 || index >= static_cast<int>(m_subViews.size()))
-        return;
-    preset = std::clamp(preset, 0, 6);
-    if (m_subViews[index].preset == preset)
-        return;
-    m_subViews[index].preset = preset;
-    saveMultiViewSettings();
-    updateOverlayLayout();
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-void BrainView::resetSingleViewCameraState()
-{
-    m_cameraRotation = QQuaternion();
-    m_singleView.zoom = 0.0f;
-    saveMultiViewSettings();
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-void BrainView::resetViewportCameraState(int index)
-{
-    if (index < 0 || index >= static_cast<int>(m_subViews.size())) {
-        return;
-    }
-
-    m_subViews[index].zoom = 0.0f;
-    m_subViews[index].pan = QVector2D();
-    m_subViews[index].perspectiveRotation = QQuaternion();
-    saveMultiViewSettings();
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-void BrainView::resetAllSubViewState()
-{
-    m_singleView = SubView{};
-    for (int i = 0; i < std::ssize(m_subViews); ++i) {
-        const bool wasEnabled = m_subViews[i].enabled;
-        m_subViews[i] = SubView::defaultForIndex(i);
-        m_subViews[i].enabled = wasEnabled;
-    }
-    m_cameraRotation = QQuaternion();
-    saveMultiViewSettings();
-    updateOverlayLayout();
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-int BrainView::viewportCameraPreset(int index) const
-{
-    if (index < 0 || index >= static_cast<int>(m_subViews.size()))
-        return -1;
-    return std::clamp(m_subViews[index].preset, 0, 6);
-}
-
-//=============================================================================================================
-
-void BrainView::setInfoPanelVisible(bool visible)
-{
-    m_infoPanelVisible = visible;
-    saveMultiViewSettings();
-    updateOverlayLayout();
-}
-
-//=============================================================================================================
-
-void BrainView::resizeEvent(QResizeEvent* event)
-{
-    QRhiWidget::resizeEvent(event);
-    updateViewportSeparators();
-    updateOverlayLayout();
+    return m_pCore->viewMode() == BrainViewCore::MultiView ? MultiView : SingleView;
 }
 
 //=============================================================================================================
@@ -1611,2178 +201,967 @@ void BrainView::resizeEvent(QResizeEvent* event)
 void BrainView::initialize(QRhiCommandBuffer* cb)
 {
     Q_UNUSED(cb);
-
-    m_renderer = std::make_unique<BrainRenderer>();
-
-    // Create dual render targets (clearing + preserving) sharing this
-    // widget's color texture.  Must be done here because colorTexture()
-    // is only valid inside initialize()/render().
-    m_renderer->ensureRenderTargets(rhi(), colorTexture(), colorTexture()->pixelSize());
-}
-
-//=============================================================================================================
-
-void BrainView::releaseResources()
-{
-    // The renderer owns every GPU resource of the scene, so dropping it frees them all
-    m_renderer.reset();
+    // colorTexture() is only valid inside initialize()/render()
+    m_pCore->initialize(rhi(), colorTexture());
 }
 
 //=============================================================================================================
 
 void BrainView::render(QRhiCommandBuffer* cb)
 {
-    // Check if there is anything to render
-    bool hasSurfaces = !m_surfaces.empty();
-    bool hasDipoles = !m_itemDipoleMap.empty() || m_dipoles; // Check managed dipoles too
-
-    // If absolutely nothing is loaded, render black background
-    if (!hasSurfaces && !hasDipoles && !m_electrodes) {
-        // No surface loaded: render a black background instead of leaving the widget uninitialized
-        if (!m_renderer) {
-            m_renderer = std::make_unique<BrainRenderer>();
-        }
-        m_renderer->ensureRenderTargets(rhi(), colorTexture(), colorTexture()->pixelSize());
-        m_renderer->initialize(rhi(), m_renderer->rtClear()->renderPassDescriptor(), sampleCount());
-        m_renderer->beginFrame(cb);
-        m_renderer->endPass(cb);
-        return;
-    }
-
-    // Ensure active surface pointer is valid if possible, otherwise just use first available for stats
-    if (!m_activeSurface && !m_surfaces.empty()) {
-        m_activeSurface = m_surfaces.begin()->second;
-    }
-
-
-    m_frameCount++;
-    const std::chrono::duration<float> fpsElapsed = std::chrono::steady_clock::now() - m_fpsStart;
-    if (fpsElapsed >= std::chrono::milliseconds(500)) {
-        float fps = m_frameCount / fpsElapsed.count();
-
-        // Recount vertices only when surface list/visibility changed
-        if (m_vertexCountDirty) {
-            auto countVerticesForSubView = [this](const SubView& sv) -> qint64 {
-                qint64 total = 0;
-                for (const auto& [key, surface] : m_surfaces) {
-                    if (!surface)
-                        continue;
-                    if (!sv.shouldRenderSurface(key))
-                        continue;
-                    if (SubView::isBrainSurfaceKey(key)) {
-                        if (!sv.matchesSurfaceType(key))
-                            continue;
-                    } else {
-                        if (!surface->isVisible())
-                            continue;
-                    }
-                    total += surface->vertexCount();
-                }
-                return total;
-            };
-
-            qint64 vCount = 0;
-            if (m_viewMode == MultiView) {
-                for (int vp : enabledViewportIndices()) {
-                    vCount += countVerticesForSubView(m_subViews[vp]);
-                }
-            } else {
-                vCount = countVerticesForSubView(m_singleView);
-            }
-            m_cachedVertexCount = vCount;
-            m_vertexCountDirty = false;
-        }
-
-        m_fpsLabel->setText(QString("FPS: %1\nVertices: %2").arg(fps, 0, 'f', 1).arg(m_cachedVertexCount));
-        updateOverlayLayout();
-        m_fpsLabel->raise();
-        m_frameCount = 0;
-        m_fpsStart = std::chrono::steady_clock::now();
-    }
-
-    // Initialize renderer
-    m_renderer->ensureRenderTargets(rhi(), colorTexture(), colorTexture()->pixelSize());
-    m_renderer->initialize(rhi(), m_renderer->rtClear()->renderPassDescriptor(), sampleCount());
-
-    // Determine viewport configuration
-    QSize outputSize = m_renderer->rtClear()->pixelSize();
-
-    // Build list of enabled viewports
-    const auto enabledViewports = enabledViewportIndices();
-    int numEnabled = static_cast<int>(enabledViewports.size());
-
-    // ── Prepare phase ──────────────────────────────────────────────────
-    // Every upload and uniform of the frame goes into one batch that
-    // beginFrame() commits: QRhi forbids resource updates inside a pass.
-    // The prepare calls upload only the streams that changed, and only for
-    // objects that are drawn. Overlay modes and highlights are per-draw
-    // uniforms, so panes with different overlays share the same buffers.
-    m_renderer->newFrame();
-    QRhiResourceUpdateBatch* updates = rhi()->nextResourceUpdateBatch();
-    if (m_videoOverlay && m_videoOverlay->isEnabled()) {
-        m_renderer->prepareVideoOverlay(rhi(), updates, m_videoOverlay.get());
-    }
-    for (int i = 0; i < kMaxSliceSlots; ++i) {
-        m_renderer->prepareSlice(rhi(), updates, (m_slices[i] && m_sliceVisible[i]) ? m_slices[i] : nullptr, i);
-    }
-
-    BrainSurface* videoOverlayTargetSurface = nullptr;
-    const bool hasVideoOverlay = m_videoOverlay && m_videoOverlay->isEnabled() && m_videoOverlay->hasFrame();
-    if (hasVideoOverlay) {
-        // Target is always the head surface (BEM head or TissueSkin).
-        if (const auto head = m_surfaces.find("bem_head"); head != m_surfaces.end()) {
-            videoOverlayTargetSurface = head->second.get();
-        } else {
-            for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-                if (it->second && it->second->tissueType() == BrainSurface::TissueSkin) {
-                    videoOverlayTargetSurface = it->second.get();
-                    break;
-                }
-            }
-        }
-    }
-
-    struct DrawItem
-    {
-        BrainSurface* surface;
-        mne::disp::ShaderMode mode;
-        float overlayMode;
-        float distSq;      // for transparent back-to-front sort
-        int uniformOffset; // filled by prepareSurfaceDraw
-    };
-
-    // What each pane draws, with the uniform slots prepared for it
-    struct PaneDraws
-    {
-        QRhiViewport viewport;
-        QRhiScissor scissor;
-        std::vector<DrawItem> opaqueDraws;
-        std::vector<DrawItem> transparentDraws;
-        int sliceOffsets[kMaxSliceSlots] = {-1, -1, -1};
-        int videoOverlayOffset = -1;
-        int electrodeOffset = -1;
-        std::vector<std::pair<DipoleObject*, int>> dipoleDraws;
-        int networkOffset = -1;
-        int headPathOffset = -1;
-        int pointerOffset = -1;
-    };
-    std::vector<PaneDraws> panes(static_cast<size_t>(numEnabled));
-
-    for (int slot = 0; slot < numEnabled; ++slot) {
-        PaneDraws& pane = panes[static_cast<size_t>(slot)];
-        int vp = (m_viewMode == MultiView) ? enabledViewports[slot] : 0;
-        const SubView& sv = (m_viewMode == MultiView) ? m_subViews[vp] : m_singleView;
-
-        const QRect paneRect = (m_viewMode == MultiView)
-            ? multiViewSlotRect(slot, numEnabled, outputSize)
-            : QRect(0, 0, outputSize.width(), outputSize.height());
-
-        QRect renderRect = paneRect;
-        if (m_viewMode == MultiView && numEnabled > 1) {
-            constexpr int separatorPx = 2;
-
-            if (numEnabled == 2) {
-                if (slot == 0) {
-                    renderRect.setWidth(std::max(1, renderRect.width() - separatorPx));
-                }
-            } else if (numEnabled == 3) {
-                // 3-view: slot 0 = full top row, slots 1&2 = bottom row
-                if (slot == 0) {
-                    // Top pane: no right neighbor, has bottom neighbor
-                    renderRect.setHeight(std::max(1, renderRect.height() - separatorPx));
-                } else if (slot == 1) {
-                    // Bottom-left: has right neighbor, no bottom neighbor
-                    renderRect.setWidth(std::max(1, renderRect.width() - separatorPx));
-                }
-                // slot 2 (bottom-right): no insets needed
-            } else {
-                const int col = slot % 2;
-                const int row = slot / 2;
-
-                const bool hasRightNeighbor = (col == 0) && (slot + 1 < numEnabled) && ((slot / 2) == ((slot + 1) / 2));
-                const bool hasBottomNeighbor = (row == 0) && (slot + 2 < numEnabled);
-
-                if (hasRightNeighbor) {
-                    renderRect.setWidth(std::max(1, renderRect.width() - separatorPx));
-                }
-                if (hasBottomNeighbor) {
-                    renderRect.setHeight(std::max(1, renderRect.height() - separatorPx));
-                }
-            }
-        }
-
-        const int viewX = renderRect.x();
-        const int viewY = outputSize.height() - (renderRect.y() + renderRect.height());
-        const int viewW = std::max(1, renderRect.width());
-        const int viewH = std::max(1, renderRect.height());
-
-        pane.viewport = QRhiViewport(viewX, viewY, viewW, viewH);
-        pane.scissor = QRhiScissor(viewX, viewY, viewW, viewH);
-        const float aspectRatio = float(viewW) / float(viewH);
-
-        // Calculate camera for this viewport
-        const QVector3D effectiveCenter = m_cameraFocusOverride ? m_cameraFocusCenter : m_sceneCenter;
-        const float effectiveSize = m_cameraFocusOverride ? m_cameraFocusSize : m_sceneSize;
-        m_camera.setSceneCenter(effectiveCenter);
-        m_camera.setSceneSize(effectiveSize);
-        m_camera.setRotation(m_cameraRotation);
-        m_camera.setZoom(m_singleView.zoom);
-        const CameraResult cam = (m_viewMode == MultiView)
-            ? m_camera.computeMultiView(sv, aspectRatio)
-            : m_camera.computeSingleView(aspectRatio);
-
-        BrainRenderer::SceneData sceneData;
-        sceneData.mvp = rhi()->clipSpaceCorrMatrix();
-        sceneData.mvp *= cam.projection;
-        sceneData.mvp *= cam.view;
-        sceneData.mvp *= cam.model;
-
-        sceneData.cameraPos = cam.cameraPos;
-        sceneData.lightDir = cam.cameraPos.normalized();
-        sceneData.lightingEnabled = m_lightingEnabled;
-
-        // Per-draw overlayMode uniform — the shader selects the vertex colour
-        // channel (curvature / annotation) so no per-pane vertex buffer
-        // re-uploads are needed.
-        sceneData.overlayMode = static_cast<float>(sv.overlayMode);
-
-        // Pass 1: Opaque Surfaces (Brain surfaces)
-        // Use viewport-specific shader from subview
-        mne::disp::ShaderMode currentShader = sv.brainShader;
-        const std::string overlayName = visualizationModeName(sv.overlayMode);
-
-        // Collect matched brain surface keys for this pane's info panel
-        mne::StringList drawnKeys;
-
-        for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-            if (!sv.matchesSurfaceType(it->first))
-                continue;
-            if (!sv.shouldRenderSurface(it->first))
-                continue;
-            drawnKeys.push_back(it->first);
-            BrainSurface* surf = it->second.get();
-            pane.opaqueDraws.push_back({surf, currentShader, sceneData.overlayMode, 0.0f,
-                                        m_renderer->prepareSurfaceDraw(updates, sceneData, surf)});
-        }
-
-        // Info panel; set only on change, since setText() relayouts the label
-        QLabel* infoLabel = (m_viewMode == MultiView) ? m_viewportInfoLabels[vp] : m_singleViewInfoLabel;
-        if (infoLabel) {
-            const QString info = QString::fromStdString(std::format("Shader: {}\nSurface: {}\nOverlay: {}\nDrawn: {}",
-                                                                    shaderModeName(currentShader), sv.surfaceType, overlayName,
-                                                                    drawnKeys.empty() ? std::string("none") : mne::join(drawnKeys, ", ")));
-            if (infoLabel->text() != info)
-                infoLabel->setText(info);
-        }
-
-        // Single pass over m_surfaces categorises non-brain items into opaque
-        // and transparent draw lists.
-
-        // Determine per-viewport field-map visibility
-        const bool megFieldVisible = sv.visibility.megFieldMap;
-        const bool eegFieldVisible = sv.visibility.eegFieldMap;
-        const mne::disp::ShaderMode currentBemShader = sv.bemShader;
-        const std::string& megFieldKey = m_fieldMapper.megSurfaceKey();
-        const std::string& eegFieldKey = m_fieldMapper.eegSurfaceKey();
-
-        // Brain surfaces were added above; the other opaque items follow them
-        std::vector<DrawItem> opaqueDraws;
-        std::vector<DrawItem> transparentDraws;
-
-        for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-            const std::string& key = it->first;
-            BrainSurface* surf = it->second.get();
-
-            if (SubView::isBrainSurfaceKey(key)) {
-                // Brain surfaces already rendered above
-                continue;
-            } else if (key.starts_with("srcsp_") || key.starts_with("dig_")) {
-                if (!sv.shouldRenderSurface(key))
-                    continue;
-                if (!surf->isVisible())
-                    continue;
-                if (key.starts_with("dig_live_t_") || key.starts_with("dig_ray_") || key.starts_with("dig_probe_")) {
-                    QVector3D bmin, bmax;
-                    surf->boundingBox(bmin, bmax);
-                    QVector3D ctr = (bmin + bmax) * 0.5f;
-                    float dist = (sceneData.cameraPos - ctr).lengthSquared();
-                    transparentDraws.push_back({surf, mne::disp::Holographic,
-                                                static_cast<float>(mne::disp::ModeScientific),
-                                                dist, -1});
-                } else {
-                    opaqueDraws.push_back({surf, currentShader,
-                                           static_cast<float>(mne::disp::ModeScientific),
-                                           0.0f, -1});
-                }
-            } else {
-                bool isSensor = key.starts_with("sens_");
-                bool isBem = key.starts_with("bem_");
-                if (!isSensor && !isBem)
-                    continue;
-                if (!sv.shouldRenderSurface(key))
-                    continue;
-                if (!surf->isVisible())
-                    continue;
-
-                QVector3D bmin, bmax;
-                surf->boundingBox(bmin, bmax);
-                QVector3D center = (bmin + bmax) * 0.5f;
-                float dist = (sceneData.cameraPos - center).lengthSquared();
-
-                auto mode = isBem ? currentBemShader : mne::disp::Holographic;
-                float itemOverlay = static_cast<float>(mne::disp::ModeScientific);
-                if (key == megFieldKey && !megFieldVisible)
-                    itemOverlay = static_cast<float>(mne::disp::ModeSurface);
-                else if (key == eegFieldKey && !eegFieldVisible)
-                    itemOverlay = static_cast<float>(mne::disp::ModeSurface);
-
-                transparentDraws.push_back({surf, mode, itemOverlay, dist, -1});
-            }
-        }
-
-        // Sort transparent items back-to-front for correct alpha blending
-        std::sort(transparentDraws.begin(), transparentDraws.end(),
-                  [](const DrawItem& a, const DrawItem& b) { return a.distSq > b.distSq; });
-
-        BrainRenderer::SceneData itemData = sceneData;
-        for (auto& item : opaqueDraws) {
-            itemData.overlayMode = item.overlayMode;
-            item.uniformOffset = m_renderer->prepareSurfaceDraw(updates, itemData, item.surface);
-        }
-        pane.opaqueDraws.insert(pane.opaqueDraws.end(), opaqueDraws.begin(), opaqueDraws.end());
-        for (auto& item : transparentDraws) {
-            itemData.overlayMode = item.overlayMode;
-            item.uniformOffset = m_renderer->prepareSurfaceDraw(updates, itemData, item.surface);
-        }
-        pane.transparentDraws = transparentDraws;
-        pane.electrodeOffset = m_renderer->prepareElectrodeDraw(updates, sceneData, m_electrodes);
-
-        if (sv.visibility.mriSlices) {
-            for (int i = 0; i < kMaxSliceSlots; ++i) {
-                if (m_slices[i] && m_sliceVisible[i]) {
-                    pane.sliceOffsets[i] = m_renderer->prepareSliceDraw(updates, sceneData, i);
-                }
-            }
-        }
-
-        if (hasVideoOverlay) {
-            pane.videoOverlayOffset = m_renderer->prepareVideoOverlayDraw(updates, sceneData, m_videoOverlay.get(), videoOverlayTargetSurface);
-        }
-
-        // The head movement path is not connectivity data, so it is not tied to the network
-        // visibility flag.
-        if (sv.visibility.dipoles) {
-            for (auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
-                const int offset = m_renderer->prepareDipoleDraw(updates, sceneData, it->second.get());
-                if (offset >= 0)
-                    pane.dipoleDraws.push_back({it->second.get(), offset});
-            }
-            const int offset = m_renderer->prepareDipoleDraw(updates, sceneData, m_dipoles.get());
-            if (offset >= 0)
-                pane.dipoleDraws.push_back({m_dipoles.get(), offset});
-        }
-        if (sv.visibility.network) {
-            pane.networkOffset = m_renderer->prepareNetworkDraw(updates, sceneData, m_network.get());
-        }
-        pane.headPathOffset = m_renderer->preparePolylineDraw(updates, sceneData, m_headPath.get());
-
-        // Intersection Pointer
-        if (m_hasIntersection && m_debugPointerSurface) {
-            BrainRenderer::SceneData debugSceneData = sceneData;
-            debugSceneData.overlayMode = 0.0f; // pass-through for holographic shell
-
-            QMatrix4x4 translation;
-            translation.translate(m_lastIntersectionPoint);
-
-            debugSceneData.mvp = rhi()->clipSpaceCorrMatrix() * cam.projection * cam.view * cam.model * translation;
-
-            pane.pointerOffset = m_renderer->prepareSurfaceDraw(updates, debugSceneData, m_debugPointerSurface.get());
-        }
-    } // End of viewport loop
-
-    // ── Draw phase: bind and draw only ──────────────────────────────────
-    m_renderer->beginFrame(cb, updates);
-
-    for (const PaneDraws& pane : panes) {
-        cb->setViewport(pane.viewport);
-        cb->setScissor(pane.scissor);
-
-        for (const auto& item : pane.opaqueDraws)
-            m_renderer->issueSurfaceDraw(cb, item.surface, item.mode, item.uniformOffset);
-        m_renderer->issueElectrodeDraw(cb, m_electrodes, pane.electrodeOffset);
-
-        // Issue MRI slice draws after opaque surfaces but before the holographic
-        // brain.  Background voxels are discarded in the shader; remaining anatomy
-        // alpha-blends into the framebuffer.  The subsequent holographic additive
-        // pass (SrcAlpha + One) adds its glow on top without being dimmed.
-        // depthTest=true, depthWrite=false keeps slices behind opaque geometry.
-        for (int i = 0; i < kMaxSliceSlots; ++i) {
-            m_renderer->issueSliceDraw(cb, i, pane.sliceOffsets[i]);
-        }
-
-        // The video overlay goes right after its target surface, or last
-        bool videoOverlayDrawn = false;
-        for (const auto& item : pane.transparentDraws) {
-            m_renderer->issueSurfaceDraw(cb, item.surface, item.mode, item.uniformOffset);
-            if (item.surface == videoOverlayTargetSurface && !videoOverlayDrawn) {
-                m_renderer->issueVideoOverlayDraw(cb, m_videoOverlay.get(), videoOverlayTargetSurface, pane.videoOverlayOffset);
-                videoOverlayDrawn = true;
-            }
-        }
-        if (!videoOverlayDrawn) {
-            m_renderer->issueVideoOverlayDraw(cb, m_videoOverlay.get(), videoOverlayTargetSurface, pane.videoOverlayOffset);
-        }
-
-        for (const auto& [dipoles, offset] : pane.dipoleDraws)
-            m_renderer->issueDipoleDraw(cb, dipoles, offset);
-        m_renderer->issueNetworkDraw(cb, m_network.get(), pane.networkOffset);
-        m_renderer->issuePolylineDraw(cb, m_headPath.get(), pane.headPathOffset);
-
-        m_renderer->issueSurfaceDraw(cb, m_debugPointerSurface.get(), mne::disp::Holographic, pane.pointerOffset);
-    }
-
-    m_renderer->endPass(cb);
+    m_pCore->render(rhi(), colorTexture(), sampleCount(), cb);
 }
 
 //=============================================================================================================
 
-void BrainView::mousePressEvent(QMouseEvent* e)
+void BrainView::releaseResources()
 {
-    if (e->button() == Qt::LeftButton) {
-        m_perspectiveRotatedSincePress = false;
-        m_draggedSincePress = false;
+    if (m_pCore) {
+        m_pCore->releaseResources();
     }
+}
 
-    if (e->button() == Qt::LeftButton && m_viewMode == MultiView) {
-        const int clickedVp = viewportIndexAt(e->pos());
-        if (clickedVp >= 0 && m_viewportNameLabels[clickedVp] && m_viewportNameLabels[clickedVp]->isVisible()) {
-            if (m_viewportNameLabels[clickedVp]->geometry().contains(e->pos())) {
-                if (clickedVp != m_visualizationEditTarget) {
-                    setVisualizationEditTarget(clickedVp);
-                }
-                showViewportPresetMenu(clickedVp, mapToGlobal(e->pos()));
-                m_lastMousePos = e->pos();
-                return;
-            }
-        }
+//=============================================================================================================
 
-        const int numEnabled = enabledViewportCount();
-        const SplitterHit hit = hitTestSplitter(e->pos(), numEnabled, size());
-        if (hit != SplitterHit::None) {
-            m_isDraggingSplitter = true;
-            m_activeSplitter = hit;
-            m_lastMousePos = e->pos();
-            updateSplitterCursor(e->pos());
-            return;
-        }
-
-        // Select the clicked viewport as the active edit target
-        const int clickedVpForSelection = viewportIndexAt(e->pos());
-        if (clickedVpForSelection >= 0 && clickedVpForSelection != m_visualizationEditTarget) {
-            setVisualizationEditTarget(clickedVpForSelection);
-        }
-    }
-
-    m_lastMousePos = e->pos();
+void BrainView::mousePressEvent(QMouseEvent* event)
+{
+    m_pCore->handleMousePress(event);
 }
 
 //=============================================================================================================
 
 void BrainView::mouseMoveEvent(QMouseEvent* event)
 {
-    if (m_isDraggingSplitter && (event->buttons() & Qt::LeftButton)) {
-        m_layout.dragSplitter(event->pos(), m_activeSplitter, size());
-        m_multiSplitX = m_layout.splitX();
-        m_multiSplitY = m_layout.splitY();
-
-        m_lastMousePos = event->pos();
-        updateViewportSeparators();
-        m_sceneDirty = true;
-        update();
-        return;
-    }
-
-    if (event->buttons() & Qt::LeftButton) {
-        if (m_viewMode == MultiView) {
-            const int activeVp = viewportIndexAt(event->pos());
-            const int activePreset = (activeVp >= 0 && activeVp < std::ssize(m_subViews))
-                ? std::clamp(m_subViews[activeVp].preset, 0, 6)
-                : 1;
-
-            if (activeVp >= 0 && !multiViewPresetIsPerspective(activePreset)) {
-                // Planar views (Top/Front/Left): pan along the view plane
-                const QPoint diff = event->pos() - m_lastMousePos;
-                CameraController::applyMousePan(diff, m_subViews[activeVp].pan, m_sceneSize);
-                m_draggedSincePress = true;
-                m_lastMousePos = event->pos();
-                m_sceneDirty = true;
-                update();
-                return;
-            }
-
-            if (activeVp >= 0 && multiViewPresetIsPerspective(activePreset)) {
-                // Perspective view: rotate
-                QPoint diff = event->pos() - m_lastMousePos;
-                CameraController::applyMouseRotation(diff, m_subViews[activeVp].perspectiveRotation);
-
-                m_perspectiveRotatedSincePress = true;
-                m_draggedSincePress = true;
-                m_lastMousePos = event->pos();
-                m_sceneDirty = true;
-                update();
-                return;
-            }
-
-            m_lastMousePos = event->pos();
-            return;
-        }
-
-        // Single-view rotation
-        QPoint diff = event->pos() - m_lastMousePos;
-        CameraController::applyMouseRotation(diff, m_cameraRotation);
-        m_draggedSincePress = true;
-
-        m_lastMousePos = event->pos();
-        m_sceneDirty = true;
-        update();
-    } else {
-        if (m_viewMode == MultiView) {
-            updateSplitterCursor(event->pos());
-        } else {
-            unsetCursor();
-        }
-        castRay(event->pos());
-    }
+    m_pCore->handleMouseMove(event);
 }
 
 //=============================================================================================================
 
 void BrainView::mouseReleaseEvent(QMouseEvent* event)
 {
-    if (event->button() == Qt::LeftButton && m_isDraggingSplitter) {
-        m_isDraggingSplitter = false;
-        m_activeSplitter = SplitterHit::None;
-        saveMultiViewSettings();
-        updateSplitterCursor(event->pos());
-        return;
-    }
-
-    if (event->button() == Qt::LeftButton && m_viewMode == MultiView && m_perspectiveRotatedSincePress) {
-        m_perspectiveRotatedSincePress = false;
-        saveMultiViewSettings();
-    }
-
-    // Save pan offset after dragging in a planar viewport
-    if (event->button() == Qt::LeftButton && m_viewMode == MultiView && !m_perspectiveRotatedSincePress) {
-        saveMultiViewSettings();
-    }
-
-    // Emit surface click if a clean left-click (no rotate or pan drag) landed on geometry
-    if (event->button() == Qt::LeftButton && !m_draggedSincePress) {
-        castRay(event->pos());
-        if (const mne::IeegContact* contact = m_electrodes ? m_electrodes->contactAt(m_electrodes->hoveredContact()) : nullptr) {
-            emit electrodeContactClicked(QString::fromStdString(contact->name), QVector3D(contact->position.x(), contact->position.y(), contact->position.z()));
-        } else if (m_hasIntersection) {
-            emit surfacePointClicked(m_lastIntersectionPoint);
-        }
-    }
-
-    if (m_viewMode == MultiView) {
-        updateSplitterCursor(event->pos());
-    } else {
-        unsetCursor();
-    }
+    m_pCore->handleMouseRelease(event);
 }
 
 //=============================================================================================================
 
 void BrainView::mouseDoubleClickEvent(QMouseEvent* event)
 {
-    if (event->button() == Qt::LeftButton) {
-        castRay(event->pos());
-        if (m_hasIntersection) {
-            emit surfacePointDoubleClicked(m_lastIntersectionPoint);
-            return;
-        }
+    if (!m_pCore->handleMouseDoubleClick(event)) {
+        QRhiWidget::mouseDoubleClickEvent(event);
     }
-    QRhiWidget::mouseDoubleClickEvent(event);
 }
 
 //=============================================================================================================
 
 void BrainView::wheelEvent(QWheelEvent* event)
 {
-    const float delta = event->angleDelta().y() / 120.0f;
-
-    if (m_viewMode == MultiView) {
-        const int vp = viewportIndexAt(event->position().toPoint());
-        if (vp >= 0 && vp < std::ssize(m_subViews)) {
-            m_subViews[vp].zoom += delta;
-            saveMultiViewSettings();
-        }
-    } else {
-        m_singleView.zoom += delta;
-        saveMultiViewSettings();
-    }
-    m_sceneDirty = true;
-    update();
+    m_pCore->handleWheel(event);
 }
 
 //=============================================================================================================
 
 void BrainView::keyPressEvent(QKeyEvent* event)
 {
-    if (event->key() == Qt::Key_S) {
-        saveSnapshot();
-    } else if (event->key() == Qt::Key_R) {
-        m_cameraRotation = QQuaternion();
-        saveMultiViewSettings();
-        m_sceneDirty = true;
-        update();
-    }
+    m_pCore->handleKeyPress(event);
 }
 
 //=============================================================================================================
 
-bool BrainView::loadSourceEstimate(const std::filesystem::path& lhPath, const std::filesystem::path& rhPath)
+void BrainView::resizeEvent(QResizeEvent* event)
 {
-    return m_sourceManager.load(lhPath, rhPath, m_surfaces, m_activeSurfaceType);
+    QRhiWidget::resizeEvent(event);
+    m_pCore->handleResize();
+}
+
+//=============================================================================================================
+// Forwarded API
+//=============================================================================================================
+
+void BrainView::setModel(BrainTreeModel* model)
+{
+    m_pCore->setModel(model);
 }
 
 //=============================================================================================================
 
-void BrainView::onSourceEstimateLoaded(int numTimePoints)
+void BrainView::setInitialCameraRotation(const QQuaternion& rotation)
 {
-    setVisualizationMode("Source Estimate");
-    emit sourceEstimateLoaded(numTimePoints);
-    setTimePoint(0);
+    m_pCore->setInitialCameraRotation(rotation);
 }
 
 //=============================================================================================================
 
-void BrainView::setTimePoint(int index)
+void BrainView::onRowsInserted(const QModelIndex& parent, int first, int last)
 {
-    m_sourceManager.setTimePoint(index, m_surfaces, m_singleView, m_subViews);
-    m_sceneDirty = true;
-    update();
+    m_pCore->onRowsInserted(parent, first, last);
 }
 
 //=============================================================================================================
 
-void BrainView::setSourceColormap(const std::string& name)
+void BrainView::onDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QList<int>& roles)
 {
-    m_sourceManager.setColormap(name);
-    setTimePoint(m_sourceManager.currentTimePoint());
+    m_pCore->onDataChanged(topLeft, bottomRight, roles);
 }
 
 //=============================================================================================================
 
-void BrainView::setSourceThresholds(float min, float mid, float max)
+void BrainView::setActiveSurface(const std::string& type)
 {
-    m_sourceManager.setThresholds(min, mid, max);
-    setTimePoint(m_sourceManager.currentTimePoint());
+    m_pCore->setActiveSurface(type);
 }
 
 //=============================================================================================================
 
-void BrainView::startRealtimeStreaming()
+void BrainView::setShaderMode(const std::string& mode)
 {
-    setVisualizationMode("Source Estimate");
-    m_sourceManager.startStreaming(m_surfaces, m_singleView, m_subViews);
+    m_pCore->setShaderMode(mode);
 }
 
 //=============================================================================================================
 
-void BrainView::stopRealtimeStreaming()
+void BrainView::setBemShaderMode(const std::string& mode)
 {
-    m_sourceManager.stopStreaming();
+    m_pCore->setBemShaderMode(mode);
 }
 
 //=============================================================================================================
 
-bool BrainView::isRealtimeStreaming() const
+void BrainView::syncBemShadersToBrainShaders()
 {
-    return m_sourceManager.isStreaming();
+    m_pCore->syncBemShadersToBrainShaders();
 }
 
 //=============================================================================================================
 
-void BrainView::pushRealtimeSourceData(const Eigen::VectorXd& matData)
+void BrainView::setVisualizationMode(const std::string& mode)
 {
-    m_sourceManager.pushData(matData);
+    m_pCore->setVisualizationMode(mode);
 }
 
 //=============================================================================================================
 
-void BrainView::setRealtimeInterval(int msec)
+void BrainView::setHemiVisible(int hemiIdx, bool visible)
 {
-    m_sourceManager.setInterval(msec);
+    m_pCore->setHemiVisible(hemiIdx, visible);
 }
 
 //=============================================================================================================
 
-void BrainView::setRealtimeLooping(bool enabled)
+void BrainView::setBemVisible(const std::string& name, bool visible)
 {
-    m_sourceManager.setLooping(enabled);
+    m_pCore->setBemVisible(name, visible);
 }
 
 //=============================================================================================================
 
-void BrainView::onRealtimeColorsAvailable(const std::vector<uint32_t>& colorsLh,
-                                          const std::vector<uint32_t>& colorsRh)
+void BrainView::setBemHighContrast(bool enabled)
 {
-    // Apply colors to all brain surfaces matching active surface types
-    std::set<std::string> activeTypes;
-    activeTypes.insert(m_singleView.surfaceType);
-    for (const SubView& subView : m_subViews) {
-        activeTypes.insert(subView.surfaceType);
-    }
-
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-        if (!it->second || it->second->tissueType() != BrainSurface::TissueBrain)
-            continue;
-
-        for (const std::string& type : activeTypes) {
-            if (it->first.ends_with(type)) {
-                int hemi = it->second->hemi();
-                const std::vector<uint32_t>& colors = (hemi == 0) ? colorsLh : colorsRh;
-                if (!colors.empty()) {
-                    it->second->applySourceEstimateColors(colors);
-                }
-                break;
-            }
-        }
-    }
-
-    m_sceneDirty = true;
-    update();
+    m_pCore->setBemHighContrast(enabled);
 }
 
 //=============================================================================================================
 
-bool BrainView::loadSensorField(const std::filesystem::path& evokedPath, int aveIndex)
+void BrainView::setSensorVisible(const std::string& type, bool visible)
 {
-    auto evoked = DataLoader::loadEvoked(evokedPath, aveIndex);
-    if (evoked.empty())
-        return false;
-
-    // Preserve the current time point when switching between evoked sets
-    // that share the same sensor configuration (same file, different condition).
-    const int previousTimePoint = m_fieldMapper.timePoint();
-    const bool canReuse = m_fieldMapper.hasMappingFor(evoked);
-
-    m_fieldMapper.setEvoked(evoked);
-
-    if (!canReuse) {
-        // Sensor config changed — full rebuild required (also precomputes global range)
-        if (!m_fieldMapper.buildMapping(m_surfaces, m_headToMriTrans, m_applySensorTrans)) {
-            m_fieldMapper.setEvoked(mne::FiffEvoked()); // Clear state on failure
-            return false;
-        }
-    } else {
-        // Mapping reused — recompute normalization for new evoked data
-        m_fieldMapper.computeNormRange();
-    }
-
-    // Clamp preserved time point to the range of the new evoked data
-    const int numTimes = static_cast<int>(m_fieldMapper.evoked().times.size());
-    const int tp = std::clamp(previousTimePoint, 0, std::max(0, numTimes - 1));
-
-    emit sensorFieldLoaded(numTimes, tp);
-    setSensorFieldTimePoint(tp);
-    return true;
+    m_pCore->setSensorVisible(type, visible);
 }
 
 //=============================================================================================================
 
-std::vector<std::string> BrainView::probeEvokedSets(const std::filesystem::path& evokedPath)
+void BrainView::setSensorTransEnabled(bool enabled)
 {
-    return DataLoader::probeEvokedSets(evokedPath);
+    m_pCore->setSensorTransEnabled(enabled);
 }
 
 //=============================================================================================================
 
-void BrainView::setSensorFieldTimePoint(int index)
+void BrainView::setMegHelmetOverride(const std::filesystem::path& path)
 {
-    if (!m_fieldMapper.isLoaded() || m_fieldMapper.evoked().empty()) {
-        return;
-    }
-
-    int maxIdx = static_cast<int>(m_fieldMapper.evoked().times.size()) - 1;
-    if (maxIdx < 0) {
-        return;
-    }
-
-    m_fieldMapper.setTimePoint(std::clamp(index, 0, maxIdx));
-    m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
-    emit sensorFieldTimePointChanged(m_fieldMapper.timePoint(), m_fieldMapper.evoked().times(m_fieldMapper.timePoint()));
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-void BrainView::setSensorFieldVisible(const std::string& type, bool visible)
-{
-    auto& profile = visibilityProfileForTarget(m_visualizationEditTarget);
-    if (type == "MEG") {
-        profile.megFieldMap = visible;
-    } else if (type == "EEG") {
-        profile.eegFieldMap = visible;
-    } else {
-        return;
-    }
-
-    saveMultiViewSettings();
-    m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-void BrainView::setSensorFieldContourVisible(const std::string& type, bool visible)
-{
-    auto& profile = visibilityProfileForTarget(m_visualizationEditTarget);
-    if (type == "MEG") {
-        profile.megFieldContours = visible;
-    } else if (type == "EEG") {
-        profile.eegFieldContours = visible;
-    } else {
-        return;
-    }
-
-    saveMultiViewSettings();
-    m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-void BrainView::setMegFieldMapOnHead(bool useHead)
-{
-    auto& profile = visibilityProfileForTarget(m_visualizationEditTarget);
-    if (profile.megFieldMapOnHead == useHead && m_fieldMapper.megFieldMapOnHead() == useHead) {
-        return;
-    }
-
-    profile.megFieldMapOnHead = useHead;
-    m_fieldMapper.setMegFieldMapOnHead(useHead);
-    saveMultiViewSettings();
-    if (m_fieldMapper.isLoaded()) {
-        m_fieldMapper.buildMapping(m_surfaces, m_headToMriTrans, m_applySensorTrans);
-        m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
-        m_sceneDirty = true;
-        update();
-    }
-}
-
-//=============================================================================================================
-
-void BrainView::setSensorFieldColormap(const std::string& name)
-{
-    if (m_fieldMapper.colormap() == name) {
-        return;
-    }
-    m_fieldMapper.setColormap(name);
-    m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-float BrainView::stcStep() const
-{
-    return m_sourceManager.tstep();
-}
-
-//=============================================================================================================
-
-float BrainView::stcTmin() const
-{
-    return m_sourceManager.tmin();
-}
-
-//=============================================================================================================
-
-int BrainView::stcNumTimePoints() const
-{
-    return m_sourceManager.numTimePoints();
-}
-
-//=============================================================================================================
-
-int BrainView::closestSensorFieldIndex(float timeSec) const
-{
-    if (!m_fieldMapper.isLoaded() || m_fieldMapper.evoked().nave == -1 || m_fieldMapper.evoked().times.size() == 0) {
-        return -1;
-    }
-
-    int bestIdx = 0;
-    float bestDist = std::abs(m_fieldMapper.evoked().times(0) - timeSec);
-    for (int i = 1; i < m_fieldMapper.evoked().times.size(); ++i) {
-        float dist = std::abs(m_fieldMapper.evoked().times(i) - timeSec);
-        if (dist < bestDist) {
-            bestDist = dist;
-            bestIdx = i;
-        }
-    }
-    return bestIdx;
-}
-
-//=============================================================================================================
-
-int BrainView::closestStcIndex(float timeSec) const
-{
-    return m_sourceManager.closestIndex(timeSec);
-}
-
-//=============================================================================================================
-
-bool BrainView::sensorFieldTimeRange(float& tmin, float& tmax) const
-{
-    if (!m_fieldMapper.isLoaded() || m_fieldMapper.evoked().nave == -1 || m_fieldMapper.evoked().times.size() == 0) {
-        return false;
-    }
-    tmin = m_fieldMapper.evoked().times(0);
-    tmax = m_fieldMapper.evoked().times(m_fieldMapper.evoked().times.size() - 1);
-    return true;
-}
-
-//=============================================================================================================
-// ── Real-time sensor data streaming ────────────────────────────────────
-//=============================================================================================================
-
-void BrainView::startRealtimeSensorStreaming(const std::string& modality)
-{
-    m_sensorStreamManager.startStreaming(modality, m_fieldMapper, m_surfaces);
-}
-
-//=============================================================================================================
-
-void BrainView::stopRealtimeSensorStreaming()
-{
-    m_sensorStreamManager.stopStreaming();
-}
-
-//=============================================================================================================
-
-bool BrainView::isRealtimeSensorStreaming() const
-{
-    return m_sensorStreamManager.isStreaming();
-}
-
-//=============================================================================================================
-
-void BrainView::pushRealtimeSensorData(const Eigen::VectorXf& vecData)
-{
-    m_sensorStreamManager.pushData(vecData);
-}
-
-//=============================================================================================================
-
-void BrainView::setRealtimeSensorInterval(int msec)
-{
-    m_sensorStreamManager.setInterval(msec);
-}
-
-//=============================================================================================================
-
-void BrainView::setRealtimeSensorLooping(bool enabled)
-{
-    m_sensorStreamManager.setLooping(enabled);
-}
-
-//=============================================================================================================
-
-void BrainView::setRealtimeSensorAverages(int numAvr)
-{
-    m_sensorStreamManager.setAverages(numAvr);
-}
-
-//=============================================================================================================
-
-void BrainView::setRealtimeSensorColormap(const std::string& name)
-{
-    m_sensorStreamManager.setColormap(name);
-}
-
-//=============================================================================================================
-
-void BrainView::onSensorStreamColorsAvailable(const std::string& surfaceKey,
-                                              const std::vector<uint32_t>& colors)
-{
-    const auto it = m_surfaces.find(surfaceKey);
-    if (surfaceKey.empty() || it == m_surfaces.end()) {
-        return;
-    }
-
-    auto surface = it->second;
-    if (surface && !colors.empty()) {
-        surface->applySourceEstimateColors(colors);
-    }
-
-    m_sceneDirty = true;
-    update();
-}
-
-//=============================================================================================================
-
-bool BrainView::loadSensors(const std::filesystem::path& fifPath)
-{
-    if (!m_model)
-        return false;
-
-    auto r = DataLoader::loadSensors(fifPath, m_megHelmetOverridePath);
-    if (!r.hasInfo && !r.hasDigitizer)
-        return false;
-
-    // Store Device→Head transform for later helmet surface reloads
-    m_devHeadTrans = r.devHeadTrans;
-    m_hasDevHead = r.hasDevHead;
-
-    if (!r.megGradItems.empty())
-        m_model->addSensors("MEG/Grad", std::move(r.megGradItems));
-    if (!r.megMagItems.empty())
-        m_model->addSensors("MEG/Mag", std::move(r.megMagItems));
-    if (!r.eegItems.empty())
-        m_model->addSensors("EEG", std::move(r.eegItems));
-
-    if (r.helmetSurface) {
-        m_surfaces["sens_surface_meg"] = r.helmetSurface;
-    } else {
-        mne::Log::warning("BrainView::loadSensors: NO helmet surface returned from DataLoader!");
-    }
-
-    if (!r.digitizerPoints.empty())
-        m_model->addDigitizerData(r.digitizerPoints.points());
-
-    // Extract cardinal dig points for later fiducial queries
-    m_cardinalDigPoints = r.digitizerPoints.pick_types({FIFFV_POINT_CARDINAL});
-
-    return true;
-}
-
-//=============================================================================================================
-
-std::map<int, QVector3D> BrainView::cardinalFiducialsInMri() const
-{
-    std::map<int, QVector3D> result;
-    if (m_cardinalDigPoints.empty())
-        return result;
-
-    // Cardinal points are in Head coordinates; transform to MRI if available
-    const bool haveTrans = (m_headToMriTrans.from != 0 || m_headToMriTrans.to != 0);
-    QMatrix4x4 headToMri;
-    headToMri.setToIdentity();
-    if (haveTrans)
-        headToMri = mne::disp::surface_keys::toQMatrix4x4(m_headToMriTrans.trans);
-
-    for (const auto& dp : m_cardinalDigPoints) {
-        const QVector3D posHead(dp.r[0], dp.r[1], dp.r[2]);
-        result[dp.ident] = haveTrans ? headToMri.map(posHead) : posHead;
-    }
-    return result;
-}
-
-//=============================================================================================================
-
-bool BrainView::bemTopVertexInMri(QVector3D& pos) const
-{
-    auto it = m_surfaces.find("bem_head");
-    if (it == m_surfaces.end() || !it->second)
-        return false;
-
-    const BrainSurface* surf = it->second.get();
-    QVector3D bmin, bmax;
-    surf->boundingBox(bmin, bmax);
-
-    // Top of head = max Z in MRI/surface-RAS (Z = superior)
-    pos = QVector3D((bmin.x() + bmax.x()) * 0.5f,
-                    (bmin.y() + bmax.y()) * 0.5f,
-                    bmax.z());
-    return true;
+    m_pCore->setMegHelmetOverride(path);
 }
 
 //=============================================================================================================
 
 bool BrainView::loadMegHelmetSurface(const std::filesystem::path& helmetFilePath)
 {
-    auto surface = DataLoader::loadHelmetSurface(helmetFilePath, m_devHeadTrans, m_hasDevHead);
-    if (!surface) {
-        mne::Log::warning("BrainView::loadMegHelmetSurface: DataLoader returned nullptr!");
-        return false;
-    }
-
-    m_surfaces["sens_surface_meg"] = surface;
-    refreshSensorTransforms();
-    updateSceneBounds();
-    m_sceneDirty = true;
-    update();
-    return true;
+    return m_pCore->loadMegHelmetSurface(helmetFilePath);
 }
 
 //=============================================================================================================
 
-bool BrainView::loadDipoles(const std::filesystem::path& dipPath)
+void BrainView::setDipoleVisible(bool visible)
 {
-    if (!m_model)
-        return false;
-
-    auto ecdSet = DataLoader::loadDipoles(dipPath);
-    if (ecdSet.size() == 0)
-        return false;
-    m_model->addDipoles(ecdSet);
-    return true;
+    m_pCore->setDipoleVisible(visible);
 }
 
 //=============================================================================================================
 
 bool BrainView::loadNetwork(const mne::Network& network, const QString& name)
 {
-    if (network.nodes().empty())
-        return false;
-
-    m_network = std::make_unique<NetworkObject>();
-    m_network->load(network);
-    m_network->setVisible(true);
-
-    // Also register in the tree model
-    if (m_model)
-        m_model->addNetwork(network, name);
-
-    m_sceneDirty = true;
-    update();
-    return true;
+    return m_pCore->loadNetwork(network, name);
 }
 
 //=============================================================================================================
 
 void BrainView::setNetworkVisible(bool visible)
 {
-    auto& profile = visibilityProfileForTarget(m_visualizationEditTarget);
-    profile.network = visible;
-    m_networkVisible = visible;
-    if (m_network)
-        m_network->setVisible(visible);
-    saveMultiViewSettings();
-    m_sceneDirty = true;
-    update();
+    m_pCore->setNetworkVisible(visible);
 }
 
 //=============================================================================================================
 
 void BrainView::setNetworkThreshold(double threshold)
 {
-    if (m_network) {
-        m_network->setThreshold(threshold);
-        m_sceneDirty = true;
-        update();
-    }
+    m_pCore->setNetworkThreshold(threshold);
 }
 
 //=============================================================================================================
 
 void BrainView::setNetworkColormap(const std::string& name)
 {
-    if (m_network) {
-        m_network->setColormap(name);
-        m_sceneDirty = true;
-        update();
-    }
+    m_pCore->setNetworkColormap(name);
+}
+
+//=============================================================================================================
+
+void BrainView::setLightingEnabled(bool enabled)
+{
+    m_pCore->setLightingEnabled(enabled);
+}
+
+//=============================================================================================================
+
+void BrainView::setAutomatedRotation(bool enabled)
+{
+    m_pCore->setAutomatedRotation(enabled);
+}
+
+//=============================================================================================================
+
+bool BrainView::automatedRotation() const
+{
+    return m_pCore->automatedRotation();
+}
+
+//=============================================================================================================
+
+void BrainView::setHeadMovementPath(const std::vector<Eigen::Vector3f>& vecPositions)
+{
+    m_pCore->setHeadMovementPath(vecPositions);
+}
+
+//=============================================================================================================
+
+void BrainView::clearHeadMovementPath()
+{
+    m_pCore->clearHeadMovementPath();
+}
+
+//=============================================================================================================
+
+bool BrainView::saveSnapshot()
+{
+    return m_pCore->saveSnapshot();
+}
+
+//=============================================================================================================
+
+bool BrainView::takeScreenshot(const std::filesystem::path& fileName)
+{
+    return m_pCore->takeScreenshot(fileName);
+}
+
+//=============================================================================================================
+
+bool BrainView::savePng(const std::filesystem::path& path, int width, int height, const std::string& surfaceType)
+{
+    return m_pCore->savePng(path, width, height, surfaceType);
+}
+
+//=============================================================================================================
+
+void BrainView::showSingleView()
+{
+    m_pCore->showSingleView();
+}
+
+//=============================================================================================================
+
+void BrainView::showMultiView()
+{
+    m_pCore->showMultiView();
+}
+
+//=============================================================================================================
+
+void BrainView::setViewCount(int count)
+{
+    m_pCore->setViewCount(count);
+}
+
+//=============================================================================================================
+
+int BrainView::viewCount() const
+{
+    return m_pCore->viewCount();
+}
+
+//=============================================================================================================
+
+void BrainView::setViewportEnabled(int index, bool enabled)
+{
+    m_pCore->setViewportEnabled(index, enabled);
+}
+
+//=============================================================================================================
+
+void BrainView::setViewportCameraPreset(int index, int preset)
+{
+    m_pCore->setViewportCameraPreset(index, preset);
+}
+
+//=============================================================================================================
+
+void BrainView::resetSingleViewCameraState()
+{
+    m_pCore->resetSingleViewCameraState();
+}
+
+//=============================================================================================================
+
+void BrainView::resetViewportCameraState(int index)
+{
+    m_pCore->resetViewportCameraState(index);
+}
+
+//=============================================================================================================
+
+void BrainView::resetAllSubViewState()
+{
+    m_pCore->resetAllSubViewState();
+}
+
+//=============================================================================================================
+
+int BrainView::viewportCameraPreset(int index) const
+{
+    return m_pCore->viewportCameraPreset(index);
+}
+
+//=============================================================================================================
+
+void BrainView::resetMultiViewLayout()
+{
+    m_pCore->resetMultiViewLayout();
+}
+
+//=============================================================================================================
+
+void BrainView::setVisualizationEditTarget(int target)
+{
+    m_pCore->setVisualizationEditTarget(target);
+}
+
+//=============================================================================================================
+
+int BrainView::visualizationEditTarget() const
+{
+    return m_pCore->visualizationEditTarget();
+}
+
+//=============================================================================================================
+
+std::string BrainView::activeSurfaceForTarget(int target) const
+{
+    return m_pCore->activeSurfaceForTarget(target);
+}
+
+//=============================================================================================================
+
+std::string BrainView::shaderModeForTarget(int target) const
+{
+    return m_pCore->shaderModeForTarget(target);
+}
+
+//=============================================================================================================
+
+std::string BrainView::bemShaderModeForTarget(int target) const
+{
+    return m_pCore->bemShaderModeForTarget(target);
+}
+
+//=============================================================================================================
+
+std::string BrainView::overlayModeForTarget(int target) const
+{
+    return m_pCore->overlayModeForTarget(target);
+}
+
+//=============================================================================================================
+
+bool BrainView::objectVisibleForTarget(const std::string& object, int target) const
+{
+    return m_pCore->objectVisibleForTarget(object, target);
+}
+
+//=============================================================================================================
+
+bool BrainView::megFieldMapOnHeadForTarget(int target) const
+{
+    return m_pCore->megFieldMapOnHeadForTarget(target);
+}
+
+//=============================================================================================================
+
+bool BrainView::isViewportEnabled(int index) const
+{
+    return m_pCore->isViewportEnabled(index);
+}
+
+//=============================================================================================================
+
+void BrainView::setInfoPanelVisible(bool visible)
+{
+    m_pCore->setInfoPanelVisible(visible);
+}
+
+//=============================================================================================================
+
+bool BrainView::isInfoPanelVisible() const
+{
+    return m_pCore->isInfoPanelVisible();
+}
+
+//=============================================================================================================
+
+bool BrainView::loadSourceEstimate(const std::filesystem::path& lhPath, const std::filesystem::path& rhPath)
+{
+    return m_pCore->loadSourceEstimate(lhPath, rhPath);
+}
+
+//=============================================================================================================
+
+bool BrainView::loadSensors(const std::filesystem::path& fifPath)
+{
+    return m_pCore->loadSensors(fifPath);
+}
+
+//=============================================================================================================
+
+std::map<int, QVector3D> BrainView::cardinalFiducialsInMri() const
+{
+    return m_pCore->cardinalFiducialsInMri();
+}
+
+//=============================================================================================================
+
+bool BrainView::bemTopVertexInMri(QVector3D& pos) const
+{
+    return m_pCore->bemTopVertexInMri(pos);
+}
+
+//=============================================================================================================
+
+bool BrainView::loadDipoles(const std::filesystem::path& dipPath)
+{
+    return m_pCore->loadDipoles(dipPath);
 }
 
 //=============================================================================================================
 
 bool BrainView::loadSourceSpace(const std::filesystem::path& fwdPath)
 {
-    if (!m_model)
-        return false;
+    return m_pCore->loadSourceSpace(fwdPath);
+}
 
-    auto srcSpace = DataLoader::loadSourceSpace(fwdPath);
-    if (srcSpace.empty())
-        return false;
-    m_model->addSourceSpace(srcSpace);
-    return true;
+//=============================================================================================================
+
+std::vector<std::string> BrainView::probeEvokedSets(const std::filesystem::path& evokedPath)
+{
+    return BrainViewCore::probeEvokedSets(evokedPath);
+}
+
+//=============================================================================================================
+
+bool BrainView::loadSensorField(const std::filesystem::path& evokedPath, int aveIndex)
+{
+    return m_pCore->loadSensorField(evokedPath, aveIndex);
 }
 
 //=============================================================================================================
 
 void BrainView::setSourceSpaceVisible(bool visible)
 {
-    auto& profile = visibilityProfileForTarget(m_visualizationEditTarget);
-    profile.sourceSpace = visible;
-    saveMultiViewSettings();
-    m_sceneDirty = true;
-    update();
+    m_pCore->setSourceSpaceVisible(visible);
 }
 
 //=============================================================================================================
 
 bool BrainView::loadTransformation(const std::filesystem::path& transPath)
 {
-    FiffCoordTrans trans;
-    if (!DataLoader::loadHeadToMriTransform(transPath, trans))
-        return false;
-
-    m_headToMriTrans = trans;
-    refreshSensorTransforms();
-    return true;
+    return m_pCore->loadTransformation(transPath);
 }
 
-//==============================================================================
+//=============================================================================================================
 
-const QStandardItem* BrainView::itemForSurface(const std::shared_ptr<BrainSurface>& surface) const
+void BrainView::setTimePoint(int index)
 {
-    const auto it = std::ranges::find_if(m_itemSurfaceMap, [&](const auto& entry) { return entry.second == surface; });
-    return it == m_itemSurfaceMap.end() ? nullptr : it->first;
-}
-
-//==============================================================================
-
-QMatrix4x4 BrainView::itemTransform(const QStandardItem* item) const
-{
-    const auto* absItem = dynamic_cast<const AbstractTreeItem*>(item);
-    if (!absItem)
-        return {};
-    QMatrix4x4 trans = absItem->transform();
-    // Sensors, digitizer points and dipoles are in head coordinates
-    const int type = absItem->type();
-    const bool inHead = type == AbstractTreeItem::itemTypeId(AbstractTreeItem::SensorItem) || type == AbstractTreeItem::itemTypeId(AbstractTreeItem::DigitizerItem) || type == AbstractTreeItem::itemTypeId(AbstractTreeItem::DipoleItem);
-    if (inHead && m_applySensorTrans && !m_headToMriTrans.empty())
-        trans = mne::disp::surface_keys::toQMatrix4x4(m_headToMriTrans.trans) * trans;
-    return trans;
-}
-
-//==============================================================================
-
-void BrainView::refreshSensorTransforms()
-{
-    QMatrix4x4 qmat;
-    if (m_applySensorTrans && !m_headToMriTrans.empty()) {
-        qmat = mne::disp::surface_keys::toQMatrix4x4(m_headToMriTrans.trans);
-    }
-
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-        if ((it->first.starts_with("sens_") || it->first.starts_with("dig_")) && it->second) {
-            const QStandardItem* item = itemForSurface(it->second);
-            it->second->applyTransform(item ? itemTransform(item) : qmat);
-        }
-    }
-    for (auto it = m_itemDipoleMap.cbegin(); it != m_itemDipoleMap.cend(); ++it) {
-        it->second->applyTransform(itemTransform(it->first));
-    }
-
-    if (m_fieldMapper.isLoaded()) {
-        m_fieldMapper.buildMapping(m_surfaces, m_headToMriTrans, m_applySensorTrans);
-        m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
-    }
+    m_pCore->setTimePoint(index);
 }
 
 //=============================================================================================================
 
 void BrainView::castRay(const QPoint& pos)
 {
-    // 1. Setup Matrix Stack (Must match render exactly, including multiview pane layout)
-    const QSize outputSize = size();
-
-    const auto enabledViewports = enabledViewportIndices();
-
-    const int numEnabled = static_cast<int>(enabledViewports.size());
-    int activeSlot = 0;
-    QRect activePane(0, 0, outputSize.width(), outputSize.height());
-
-    bool hasValidPane = true;
-    if (m_viewMode == MultiView && numEnabled > 1) {
-        bool foundSlot = false;
-        for (int slot = 0; slot < numEnabled; ++slot) {
-            const QRect pane = multiViewSlotRect(slot, numEnabled, outputSize);
-            if (pane.contains(pos)) {
-                activeSlot = slot;
-                activePane = pane;
-                foundSlot = true;
-                break;
-            }
-        }
-
-        hasValidPane = foundSlot;
-    }
-
-    const int vp = (m_viewMode == MultiView) ? enabledViewports[activeSlot] : 0;
-    const SubView& sv = (m_viewMode == MultiView) ? m_subViews[vp] : m_singleView;
-
-    const QVector3D effectiveCenter2 = m_cameraFocusOverride ? m_cameraFocusCenter : m_sceneCenter;
-    const float effectiveSize2 = m_cameraFocusOverride ? m_cameraFocusSize : m_sceneSize;
-    m_camera.setSceneCenter(effectiveCenter2);
-    m_camera.setSceneSize(effectiveSize2);
-    m_camera.setRotation(m_cameraRotation);
-    m_camera.setZoom(m_singleView.zoom);
-    const float aspect = float(std::max(1, activePane.width())) / float(std::max(1, activePane.height()));
-    const CameraResult cam = (m_viewMode == MultiView)
-        ? m_camera.computeMultiView(sv, aspect)
-        : m_camera.computeSingleView(aspect);
-    QMatrix4x4 pvm = cam.projection * cam.view * cam.model;
-
-    // ── Unproject screen position to world-space ray ───────────────────
-    QVector3D rayOrigin, rayDir;
-    if (!RayPicker::unproject(pos, activePane, pvm, rayOrigin, rayDir))
-        return;
-
-    // ── Pick against all scene geometry ────────────────────────────────
-    RayHit pickResult;
-    if (hasValidPane) {
-        pickResult = RayPicker::pick(rayOrigin, rayDir, sv, m_surfaces, m_itemSurfaceMap, m_itemDipoleMap);
-    }
-    m_hasIntersection = pickResult.hit;
-    if (pickResult.hit) {
-        m_lastIntersectionPoint = pickResult.hitPoint;
-    }
-
-    // Electrode contacts in front of everything else take the hover
-    int hitContact = -1;
-    if (hasValidPane && m_electrodes && m_electrodes->isVisible()) {
-        float contactDist = 0.0f;
-        hitContact = m_electrodes->intersect(rayOrigin, rayDir, contactDist);
-        if (hitContact >= 0 && pickResult.hit && pickResult.distance < contactDist)
-            hitContact = -1;
-        if (hitContact >= 0) {
-            pickResult = RayHit();
-            m_hasIntersection = true;
-            m_lastIntersectionPoint = rayOrigin + contactDist * rayDir;
-        }
-        m_electrodes->setHoveredContact(hitContact);
-    }
-
-    QStandardItem* hitItem = pickResult.item;
-    int hitIndex = pickResult.vertexIndex;
-
-    // ── Build hover label ──────────────────────────────────────────────
-    const QString displayLabel = QString::fromStdString(hitContact >= 0 ? m_electrodes->contactLabel(hitContact)
-                                                                        : RayPicker::buildLabel(pickResult, m_itemSurfaceMap, m_surfaces));
-    const std::string& hitKey = pickResult.surfaceKey;
-    int currentRegionId = pickResult.regionId;
-
-    if (displayLabel != m_hoveredRegion) {
-        m_hoveredRegion = displayLabel;
-        emit hoveredRegionChanged(m_hoveredRegion);
-        if (m_regionLabel) {
-            if (m_hoveredRegion.isEmpty()) {
-                m_regionLabel->hide();
-            } else {
-                m_regionLabel->setText(m_hoveredRegion);
-                m_regionLabel->show();
-            }
-        }
-    }
-
-    std::string hoveredSurfaceKey;
-    if (hitKey.starts_with("sens_surface_meg")) {
-        hoveredSurfaceKey = hitKey;
-    }
-
-    if (hitItem != m_hoveredItem || hitIndex != m_hoveredIndex || hoveredSurfaceKey != m_hoveredSurfaceKey) {
-        // Deselect previous
-        if (m_hoveredItem) {
-            if (m_itemSurfaceMap.contains(m_hoveredItem)) {
-                m_itemSurfaceMap[m_hoveredItem]->setSelected(false);
-                m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(-1);
-                m_itemSurfaceMap[m_hoveredItem]->setSelectedVertexRange(-1, 0);
-            } else if (m_itemDipoleMap.contains(m_hoveredItem)) {
-                m_itemDipoleMap[m_hoveredItem]->setSelected(m_hoveredIndex, false);
-            }
-        }
-        if (const auto hovered = m_surfaces.find(m_hoveredSurfaceKey); !m_hoveredSurfaceKey.empty() && hovered != m_surfaces.end()) {
-            hovered->second->setSelected(false);
-            hovered->second->setSelectedRegion(-1);
-            hovered->second->setSelectedVertexRange(-1, 0);
-        }
-
-        m_hoveredItem = hitItem;
-        m_hoveredIndex = hitIndex;
-        m_hoveredSurfaceKey = hoveredSurfaceKey;
-
-        if (m_hoveredItem) {
-            // Select new
-            if (m_itemSurfaceMap.contains(m_hoveredItem)) {
-                // Check if this is a digitizer batched mesh — highlight single sphere
-                AbstractTreeItem* absHitSel = dynamic_cast<AbstractTreeItem*>(m_hoveredItem);
-                bool isDigitizer = absHitSel &&
-                    (absHitSel->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::DigitizerItem));
-
-                if (isDigitizer && m_hoveredIndex >= 0) {
-                    const int vertsPerSphere = MeshFactory::sphereVertexCount();
-                    int sphereIdx = m_hoveredIndex / vertsPerSphere;
-                    m_itemSurfaceMap[m_hoveredItem]->setSelectedVertexRange(
-                        sphereIdx * vertsPerSphere, vertsPerSphere);
-                } else if (currentRegionId != -1) {
-                    m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(currentRegionId);
-                    // Keep the surface selected so the shader gold glow
-                    // activates.  The old CPU vertex-color region highlight
-                    // was removed to avoid buffer re-uploads on WASM.
-                    m_itemSurfaceMap[m_hoveredItem]->setSelected(true);
-                } else {
-                    m_itemSurfaceMap[m_hoveredItem]->setSelected(true);
-                    m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(-1);
-                }
-            } else if (m_itemDipoleMap.contains(m_hoveredItem)) {
-                m_itemDipoleMap[m_hoveredItem]->setSelected(m_hoveredIndex, true);
-            }
-        } else if (!m_hoveredSurfaceKey.empty() && m_surfaces.contains(m_hoveredSurfaceKey)) {
-            m_surfaces[m_hoveredSurfaceKey]->setSelected(true);
-            m_surfaces[m_hoveredSurfaceKey]->setSelectedRegion(-1);
-        }
-    } else if (m_hoveredItem && m_itemSurfaceMap.contains(m_hoveredItem)) {
-        AbstractTreeItem* absHitUpd = dynamic_cast<AbstractTreeItem*>(m_hoveredItem);
-        bool isDigitizer = absHitUpd &&
-            (absHitUpd->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::DigitizerItem));
-
-        if (isDigitizer && m_hoveredIndex >= 0) {
-            const int vertsPerSphere = MeshFactory::sphereVertexCount();
-            int sphereIdx = m_hoveredIndex / vertsPerSphere;
-            m_itemSurfaceMap[m_hoveredItem]->setSelectedVertexRange(
-                sphereIdx * vertsPerSphere, vertsPerSphere);
-        } else if (currentRegionId != -1) {
-            m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(currentRegionId);
-            m_itemSurfaceMap[m_hoveredItem]->setSelected(true);
-        } else {
-            m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(-1);
-            m_itemSurfaceMap[m_hoveredItem]->setSelected(true);
-        }
-    } else if (!m_hoveredSurfaceKey.empty() && m_surfaces.contains(m_hoveredSurfaceKey)) {
-        m_surfaces[m_hoveredSurfaceKey]->setSelected(true);
-    }
-    m_sceneDirty = true;
-    update();
+    m_pCore->castRay(pos);
 }
 
 //=============================================================================================================
 
-void BrainView::showViewportPresetMenu(int viewport, const QPoint& globalPos)
+void BrainView::setSourceColormap(const std::string& name)
 {
-    if (viewport < 0 || viewport >= std::ssize(m_subViews)) {
-        return;
-    }
-
-    QMenu menu;
-    QAction* topAction = menu.addAction("Top");
-    QAction* perspectiveAction = menu.addAction("Perspective");
-    QAction* frontAction = menu.addAction("Front");
-    QAction* leftAction = menu.addAction("Left");
-    menu.addSeparator();
-    QAction* bottomAction = menu.addAction("Bottom");
-    QAction* backAction = menu.addAction("Back");
-    QAction* rightAction = menu.addAction("Right");
-
-    const int currentPreset = std::clamp(m_subViews[viewport].preset, 0, 6);
-    topAction->setCheckable(true);
-    perspectiveAction->setCheckable(true);
-    frontAction->setCheckable(true);
-    leftAction->setCheckable(true);
-    bottomAction->setCheckable(true);
-    backAction->setCheckable(true);
-    rightAction->setCheckable(true);
-
-    topAction->setChecked(currentPreset == 0);
-    perspectiveAction->setChecked(currentPreset == 1);
-    frontAction->setChecked(currentPreset == 2);
-    leftAction->setChecked(currentPreset == 3);
-    bottomAction->setChecked(currentPreset == 4);
-    backAction->setChecked(currentPreset == 5);
-    rightAction->setChecked(currentPreset == 6);
-
-    QAction* selected = menu.exec(globalPos);
-    if (!selected) {
-        return;
-    }
-
-    int newPreset = currentPreset;
-    if (selected == topAction) {
-        newPreset = 0;
-    } else if (selected == perspectiveAction) {
-        newPreset = 1;
-    } else if (selected == frontAction) {
-        newPreset = 2;
-    } else if (selected == leftAction) {
-        newPreset = 3;
-    } else if (selected == bottomAction) {
-        newPreset = 4;
-    } else if (selected == backAction) {
-        newPreset = 5;
-    } else if (selected == rightAction) {
-        newPreset = 6;
-    }
-
-    if (newPreset == currentPreset) {
-        return;
-    }
-
-    m_subViews[viewport].preset = newPreset;
-    saveMultiViewSettings();
-    updateOverlayLayout();
-    m_sceneDirty = true;
-    update();
+    m_pCore->setSourceColormap(name);
 }
 
 //=============================================================================================================
-// Data removal
+
+void BrainView::setSourceThresholds(float min, float mid, float max)
+{
+    m_pCore->setSourceThresholds(min, mid, max);
+}
+
 //=============================================================================================================
 
-void BrainView::removeSurfacesByPrefix(std::initializer_list<std::string_view> prefixes)
+void BrainView::setSensorFieldTimePoint(int index)
 {
-    const auto matches = [&prefixes](std::string_view key) {
-        return std::ranges::any_of(prefixes, [key](std::string_view prefix) { return key.starts_with(prefix); });
-    };
+    m_pCore->setSensorFieldTimePoint(index);
+}
 
-    // Remove the tree rows first: they are found through the surfaces being removed
-    for (auto it = m_itemSurfaceMap.begin(); it != m_itemSurfaceMap.end();) {
-        const auto surface = std::ranges::find_if(m_surfaces, [&it](const auto& entry) { return entry.second == it->second; });
-        const bool remove = matches(surface == m_surfaces.end() ? std::string_view() : std::string_view(surface->first));
-        if (!remove) {
-            ++it;
-            continue;
-        }
-        if (m_model) {
-            QStandardItem* item = const_cast<QStandardItem*>(it->first);
-            if (item->parent())
-                item->parent()->removeRow(item->row());
-            else
-                m_model->removeRow(item->row());
-        }
-        it = m_itemSurfaceMap.erase(it);
-    }
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end();) {
-        if (matches(it->first))
-            it = m_surfaces.erase(it);
-        else
-            ++it;
-    }
-    updateSceneBounds();
-    m_sceneDirty = true;
-    update();
+//=============================================================================================================
+
+void BrainView::setSensorFieldVisible(const std::string& type, bool visible)
+{
+    m_pCore->setSensorFieldVisible(type, visible);
+}
+
+//=============================================================================================================
+
+void BrainView::setSensorFieldContourVisible(const std::string& type, bool visible)
+{
+    m_pCore->setSensorFieldContourVisible(type, visible);
+}
+
+//=============================================================================================================
+
+void BrainView::setMegFieldMapOnHead(bool useHead)
+{
+    m_pCore->setMegFieldMapOnHead(useHead);
+}
+
+//=============================================================================================================
+
+void BrainView::setSensorFieldColormap(const std::string& name)
+{
+    m_pCore->setSensorFieldColormap(name);
+}
+
+//=============================================================================================================
+
+float BrainView::stcStep() const
+{
+    return m_pCore->stcStep();
+}
+
+//=============================================================================================================
+
+float BrainView::stcTmin() const
+{
+    return m_pCore->stcTmin();
+}
+
+//=============================================================================================================
+
+int BrainView::stcNumTimePoints() const
+{
+    return m_pCore->stcNumTimePoints();
+}
+
+//=============================================================================================================
+
+int BrainView::closestSensorFieldIndex(float timeSec) const
+{
+    return m_pCore->closestSensorFieldIndex(timeSec);
+}
+
+//=============================================================================================================
+
+int BrainView::closestStcIndex(float timeSec) const
+{
+    return m_pCore->closestStcIndex(timeSec);
+}
+
+//=============================================================================================================
+
+void BrainView::startRealtimeStreaming()
+{
+    m_pCore->startRealtimeStreaming();
+}
+
+//=============================================================================================================
+
+void BrainView::stopRealtimeStreaming()
+{
+    m_pCore->stopRealtimeStreaming();
+}
+
+//=============================================================================================================
+
+bool BrainView::isRealtimeStreaming() const
+{
+    return m_pCore->isRealtimeStreaming();
+}
+
+//=============================================================================================================
+
+void BrainView::pushRealtimeSourceData(const Eigen::VectorXd& matData)
+{
+    m_pCore->pushRealtimeSourceData(matData);
+}
+
+//=============================================================================================================
+
+void BrainView::setRealtimeInterval(int msec)
+{
+    m_pCore->setRealtimeInterval(msec);
+}
+
+//=============================================================================================================
+
+void BrainView::setRealtimeLooping(bool enabled)
+{
+    m_pCore->setRealtimeLooping(enabled);
+}
+
+//=============================================================================================================
+
+bool BrainView::sensorFieldTimeRange(float& tmin, float& tmax) const
+{
+    return m_pCore->sensorFieldTimeRange(tmin, tmax);
+}
+
+//=============================================================================================================
+
+void BrainView::startRealtimeSensorStreaming(const std::string& modality)
+{
+    m_pCore->startRealtimeSensorStreaming(modality);
+}
+
+//=============================================================================================================
+
+void BrainView::stopRealtimeSensorStreaming()
+{
+    m_pCore->stopRealtimeSensorStreaming();
+}
+
+//=============================================================================================================
+
+bool BrainView::isRealtimeSensorStreaming() const
+{
+    return m_pCore->isRealtimeSensorStreaming();
+}
+
+//=============================================================================================================
+
+void BrainView::pushRealtimeSensorData(const Eigen::VectorXf& vecData)
+{
+    m_pCore->pushRealtimeSensorData(vecData);
+}
+
+//=============================================================================================================
+
+void BrainView::setRealtimeSensorInterval(int msec)
+{
+    m_pCore->setRealtimeSensorInterval(msec);
+}
+
+//=============================================================================================================
+
+void BrainView::setRealtimeSensorLooping(bool enabled)
+{
+    m_pCore->setRealtimeSensorLooping(enabled);
+}
+
+//=============================================================================================================
+
+void BrainView::setRealtimeSensorAverages(int numAvr)
+{
+    m_pCore->setRealtimeSensorAverages(numAvr);
+}
+
+//=============================================================================================================
+
+void BrainView::setRealtimeSensorColormap(const std::string& name)
+{
+    m_pCore->setRealtimeSensorColormap(name);
 }
 
 //=============================================================================================================
 
 void BrainView::clearSurfaces()
 {
-    m_activeSurface.reset();
-    m_activeSurfaceType.clear();
-    removeSurfacesByPrefix({"lh_", "rh_"});
+    m_pCore->clearSurfaces();
 }
 
 //=============================================================================================================
 
 void BrainView::clearBem()
 {
-    removeSurfacesByPrefix({"bem_"});
-}
-
-//=============================================================================================================
-
-void BrainView::setElectrodeValues(const std::map<std::string, float>& values)
-{
-    if (!m_electrodes)
-        return;
-    m_electrodes->setContactValues(values);
-
-    const auto surfaceOrNull = [this](const std::string& key) -> std::shared_ptr<BrainSurface> {
-        const auto it = m_surfaces.find(key);
-        return it == m_surfaces.end() ? nullptr : it->second;
-    };
-    for (const std::string hemi : {"lh", "rh"}) {
-        std::shared_ptr<BrainSurface> anatomy = surfaceOrNull(hemi + "_pial");
-        if (!anatomy)
-            anatomy = surfaceOrNull(hemi + "_white");
-        const std::vector<uint32_t> colors = anatomy ? m_electrodes->surfaceColors(anatomy->vertexPositions()) : std::vector<uint32_t>();
-        for (auto it = m_surfaces.cbegin(); it != m_surfaces.cend(); ++it) {
-            if (!it->first.starts_with(hemi + "_") || !it->second || it->second->tissueType() != BrainSurface::TissueBrain)
-                continue;
-            if (colors.size() == it->second->vertexCount())
-                it->second->applySourceEstimateColors(colors);
-            else
-                it->second->clearSourceEstimateColors();
-        }
-    }
-    m_sceneDirty = true;
-    update();
+    m_pCore->clearBem();
 }
 
 //=============================================================================================================
 
 void BrainView::clearSourceEstimate()
 {
-    m_sourceManager.stopStreaming();
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-        if (it->first.starts_with("lh_") || it->first.starts_with("rh_")) {
-            it->second->clearSourceEstimateColors();
-        }
-    }
-    m_sceneDirty = true;
-    update();
+    m_pCore->clearSourceEstimate();
 }
 
 //=============================================================================================================
 
 void BrainView::clearDipoles()
 {
-    m_dipoles.reset();
-
-    // Remove dipole items from model and maps
-    for (auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end();) {
-        if (m_model) {
-            QStandardItem* mutableItem = const_cast<QStandardItem*>(it->first);
-            if (mutableItem->parent())
-                mutableItem->parent()->removeRow(mutableItem->row());
-            else
-                m_model->removeRow(mutableItem->row());
-        }
-        it = m_itemDipoleMap.erase(it);
-    }
-    m_sceneDirty = true;
-    update();
+    m_pCore->clearDipoles();
 }
 
 //=============================================================================================================
 
 void BrainView::clearSourceSpace()
 {
-    removeSurfacesByPrefix({"srcsp_"});
+    m_pCore->clearSourceSpace();
+}
+
+//=============================================================================================================
+
+void BrainView::clearSensors()
+{
+    m_pCore->clearSensors();
 }
 
 //=============================================================================================================
 
 void BrainView::setLiveMarkers(const std::vector<LiveMarker>& markers)
 {
-    // Remove previous live surfaces (no scene-bounds update).
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end();) {
-        if (it->first.starts_with("dig_live_"))
-            it = m_surfaces.erase(it);
-        else
-            ++it;
-    }
-
-    for (std::size_t i = 0; i < markers.size(); ++i) {
-        auto surf = MeshFactory::createBatchedSpheres(
-            {markers[i].position}, markers[i].radius, markers[i].color);
-        surf->setVisible(true);
-        m_surfaces[std::format("{}{}", markers[i].transparent ? "dig_live_t_" : "dig_live_", i)] = surf;
-    }
-
-    // Intentionally NO updateSceneBounds() — the camera stays locked.
-    m_sceneDirty = true;
-    update();
+    m_pCore->setLiveMarkers(markers);
 }
+
+//=============================================================================================================
 
 void BrainView::clearLiveMarkers()
 {
-    bool removed = false;
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end();) {
-        if (it->first.starts_with("dig_live_")) {
-            it = m_surfaces.erase(it);
-            removed = true;
-        } else {
-            ++it;
-        }
-    }
-    if (removed) {
-        m_sceneDirty = true;
-        update();
-    }
+    m_pCore->clearLiveMarkers();
 }
 
-void BrainView::setLiveRay(const QVector3D& from, const QVector3D& to,
-                           const QColor& color, float radius)
+//=============================================================================================================
+
+void BrainView::setLiveRay(const QVector3D& from, const QVector3D& to, const QColor& color, float radius)
 {
-    // Remove previous ray surface
-    m_surfaces.erase("dig_ray_0");
-
-    auto surf = MeshFactory::createCylinder(from, to, radius, color);
-    surf->setVisible(true);
-    m_surfaces["dig_ray_0"] = surf;
-
-    m_sceneDirty = true;
-    update();
+    m_pCore->setLiveRay(from, to, color, radius);
 }
+
+//=============================================================================================================
 
 void BrainView::clearLiveRay()
 {
-    if (m_surfaces.erase("dig_ray_0")) {
-        m_sceneDirty = true;
-        update();
-    }
+    m_pCore->clearLiveRay();
 }
 
-void BrainView::setProbeVisualization(const QVector3D& tip, const QVector3D& direction,
-                                      float length, const QColor& color,
-                                      const QColor& glowColor,
-                                      const QQuaternion& orientation)
+//=============================================================================================================
+
+void BrainView::setProbeVisualization(const QVector3D& tip, const QVector3D& direction, float length, const QColor& color, const QColor& glowColor, const QQuaternion& orientation)
 {
-    // Remove previous probe surfaces
-    m_surfaces.erase("dig_probe_shaft");
-    m_surfaces.erase("dig_probe_tip");
-    m_surfaces.erase("dig_probe_tipglow");
-    m_surfaces.erase("dig_probe_axis_x");
-    m_surfaces.erase("dig_probe_axis_y");
-    m_surfaces.erase("dig_probe_axis_z");
-    m_surfaces.erase("dig_probe_axis_x_tip");
-    m_surfaces.erase("dig_probe_axis_y_tip");
-    m_surfaces.erase("dig_probe_axis_z_tip");
-    m_surfaces.erase("dig_probe_axis_xn_tip");
-    m_surfaces.erase("dig_probe_axis_yn_tip");
-    m_surfaces.erase("dig_probe_axis_zn_tip");
-    m_surfaces.erase("dig_probe_cross_x");
-    m_surfaces.erase("dig_probe_cross_y");
-    m_surfaces.erase("dig_probe_cross_z");
-
-    // Shaft: only drawn when length > 0
-    if (length > 0.0f && !direction.isNull()) {
-        const QVector3D shaftEnd = tip - direction * length;
-        constexpr float kShaftRadius = 0.0015f;
-        auto shaft = MeshFactory::createCylinder(tip, shaftEnd, kShaftRadius, color);
-        shaft->setVisible(true);
-        m_surfaces["dig_probe_shaft"] = shaft;
-    }
-
-    // Tip: the focal point of the probe
-    constexpr float kTipRadius = 0.0010f; // 1.0 mm
-    auto tipSurf = MeshFactory::createBatchedSpheres({tip}, kTipRadius, color);
-    tipSurf->setVisible(true);
-    m_surfaces["dig_probe_tip"] = tipSurf;
-
-    // Glow aura: subtle halo around the tip
-    if (glowColor.alpha() > 0) {
-        constexpr float kGlowTipRadius = 0.003f; // 3 mm glow
-        auto tipGlow = MeshFactory::createBatchedSpheres({tip}, kGlowTipRadius, glowColor);
-        tipGlow->setVisible(true);
-        m_surfaces["dig_probe_tipglow"] = tipGlow;
-    }
-
-    // --- Crosshair rotated with probe orientation (X=red, Y=green, Z=blue) ---
-    if (!orientation.isNull()) {
-        constexpr float kCrossLen = 0.008f;     // 8 mm per arm
-        constexpr float kCrossRadius = 0.0002f; // 0.2 mm — hair-thin
-
-        const QVector3D xDir = orientation.rotatedVector(QVector3D(1, 0, 0)).normalized();
-        const QVector3D yDir = orientation.rotatedVector(QVector3D(0, 1, 0)).normalized();
-        const QVector3D zDir = orientation.rotatedVector(QVector3D(0, 0, 1)).normalized();
-
-        struct CrossDef
-        {
-            QVector3D dir;
-            QColor color;
-            const char* key;
-        };
-        const CrossDef cross[] = {
-            {xDir, QColor(255, 50, 50, 160), "dig_probe_cross_x"},
-            {yDir, QColor(50, 220, 50, 160), "dig_probe_cross_y"},
-            {zDir, QColor(80, 140, 255, 160), "dig_probe_cross_z"},
-        };
-        for (const auto& c : cross) {
-            const QVector3D from = tip - c.dir * kCrossLen;
-            const QVector3D to = tip + c.dir * kCrossLen;
-            auto cyl = MeshFactory::createCylinder(from, to, kCrossRadius, c.color);
-            cyl->setVisible(true);
-            m_surfaces[c.key] = cyl;
-        }
-    }
-
-    // --- Debug coordinate frame (X=red, Y=green, Z=blue) ---
-    if (!orientation.isNull()) {
-        constexpr float kAxisLen = 0.012f;     // 12 mm per axis arm
-        constexpr float kAxisRadius = 0.0004f; // 0.4 mm — thin axis lines
-        constexpr float kPosTipR = 0.0012f;    // 1.2 mm — positive-end sphere
-        constexpr float kNegTipR = 0.0006f;    // 0.6 mm — negative-end dot (smaller)
-
-        const QVector3D xDir = orientation.rotatedVector(QVector3D(1, 0, 0)).normalized();
-        const QVector3D yDir = orientation.rotatedVector(QVector3D(0, 1, 0)).normalized();
-        const QVector3D zDir = orientation.rotatedVector(QVector3D(0, 0, 1)).normalized();
-
-        struct AxisDef
-        {
-            QVector3D dir;
-            QColor color;
-            const char* cylKey;
-            const char* posTipKey;
-            const char* negTipKey;
-        };
-        const AxisDef axes[] = {
-            {xDir, QColor(255, 50, 50), "dig_probe_axis_x",
-             "dig_probe_axis_x_tip", "dig_probe_axis_xn_tip"},
-            {yDir, QColor(50, 220, 50), "dig_probe_axis_y",
-             "dig_probe_axis_y_tip", "dig_probe_axis_yn_tip"},
-            {zDir, QColor(80, 140, 255), "dig_probe_axis_z",
-             "dig_probe_axis_z_tip", "dig_probe_axis_zn_tip"},
-        };
-
-        for (const auto& a : axes) {
-            const QVector3D posEnd = tip + a.dir * kAxisLen;
-            const QVector3D negEnd = tip - a.dir * kAxisLen;
-
-            // Full axis cylinder from -axis to +axis through the tip
-            auto cyl = MeshFactory::createCylinder(negEnd, posEnd, kAxisRadius, a.color);
-            cyl->setVisible(true);
-            m_surfaces[a.cylKey] = cyl;
-
-            // Positive tip: larger sphere (the "+" end)
-            auto posTip = MeshFactory::createBatchedSpheres({posEnd}, kPosTipR, a.color);
-            posTip->setVisible(true);
-            m_surfaces[a.posTipKey] = posTip;
-
-            // Negative tip: smaller dot (the "-" end)
-            QColor dimColor = a.color;
-            dimColor.setAlpha(120);
-            auto negTip = MeshFactory::createBatchedSpheres({negEnd}, kNegTipR, dimColor);
-            negTip->setVisible(true);
-            m_surfaces[a.negTipKey] = negTip;
-        }
-    }
-
-    m_sceneDirty = true;
-    update();
+    m_pCore->setProbeVisualization(tip, direction, length, color, glowColor, orientation);
 }
+
+//=============================================================================================================
 
 void BrainView::clearProbeVisualization()
 {
-    std::size_t nRemoved = 0;
-    for (const char* key : {"dig_probe_shaft",
-                            "dig_probe_tip",
-                            "dig_probe_tipglow",
-                            "dig_probe_axis_x",
-                            "dig_probe_axis_y",
-                            "dig_probe_axis_z",
-                            "dig_probe_axis_x_tip",
-                            "dig_probe_axis_y_tip",
-                            "dig_probe_axis_z_tip",
-                            "dig_probe_axis_xn_tip",
-                            "dig_probe_axis_yn_tip",
-                            "dig_probe_axis_zn_tip",
-                            "dig_probe_cross_x",
-                            "dig_probe_cross_y",
-                            "dig_probe_cross_z"}) {
-        nRemoved += m_surfaces.erase(key);
-    }
-
-    const bool removed = nRemoved > 0;
-    if (removed) {
-        m_sceneDirty = true;
-        update();
-    }
+    m_pCore->clearProbeVisualization();
 }
+
+//=============================================================================================================
 
 void BrainView::setStaticMarkers(const std::vector<LiveMarker>& markers)
 {
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end();) {
-        if (it->first.starts_with("dig_static_"))
-            it = m_surfaces.erase(it);
-        else
-            ++it;
-    }
-
-    for (std::size_t i = 0; i < markers.size(); ++i) {
-        auto surf = MeshFactory::createBatchedSpheres(
-            {markers[i].position}, markers[i].radius, markers[i].color);
-        surf->setVisible(true);
-        m_surfaces[std::format("dig_static_{}", i)] = surf;
-    }
-
-    m_sceneDirty = true;
-    update();
+    m_pCore->setStaticMarkers(markers);
 }
+
+//=============================================================================================================
 
 void BrainView::clearStaticMarkers()
 {
-    bool removed = false;
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end();) {
-        if (it->first.starts_with("dig_static_")) {
-            it = m_surfaces.erase(it);
-            removed = true;
-        } else {
-            ++it;
-        }
-    }
-    if (removed) {
-        m_sceneDirty = true;
-        update();
-    }
+    m_pCore->clearStaticMarkers();
 }
+
+//=============================================================================================================
 
 void BrainView::setCameraFocusOverride(const QVector3D& center, float size)
 {
-    m_cameraFocusOverride = true;
-    m_cameraFocusCenter = center;
-    m_cameraFocusSize = size;
-    m_sceneDirty = true;
-    update();
+    m_pCore->setCameraFocusOverride(center, size);
 }
+
+//=============================================================================================================
 
 void BrainView::clearCameraFocusOverride()
 {
-    if (!m_cameraFocusOverride)
-        return;
-    m_cameraFocusOverride = false;
-    updateSceneBounds();
-    m_sceneDirty = true;
-    update();
-}
-
-void BrainView::clearSensors()
-{
-    m_devHeadTrans = QMatrix4x4();
-    m_hasDevHead = false;
-    removeSurfacesByPrefix({"sens_", "dig_"});
+    m_pCore->clearCameraFocusOverride();
 }
 
 //=============================================================================================================
 
 void BrainView::clearEvoked()
 {
-    m_fieldMapper.setEvoked(mne::FiffEvoked());
-    m_sensorStreamManager.stopStreaming();
-    m_sceneDirty = true;
-    update();
+    m_pCore->clearEvoked();
 }
 
 //=============================================================================================================
 
 void BrainView::clearTransformation()
 {
-    m_headToMriTrans = mne::FiffCoordTrans();
-    refreshSensorTransforms();
-    m_sceneDirty = true;
-    update();
+    m_pCore->clearTransformation();
 }
 
 //=============================================================================================================
 
 void BrainView::clearNetwork()
 {
-    m_network.reset();
-    m_networkVisible = false;
-
-    // Remove network items from model
-    if (m_model) {
-        for (int r = m_model->rowCount() - 1; r >= 0; --r) {
-            QStandardItem* item = m_model->item(r);
-            if (item && item->text() == "Networks") {
-                m_model->removeRow(r);
-                break;
-            }
-        }
-    }
-    m_sceneDirty = true;
-    update();
+    m_pCore->clearNetwork();
 }
 
 //=============================================================================================================
 
 void BrainView::stopAllStreaming()
 {
-    m_sourceManager.cancelLoading();
-    m_sourceManager.stopStreaming();
-    m_sensorStreamManager.stopStreaming();
+    m_pCore->stopAllStreaming();
 }
 
-//=============================================================================================================
-// Video overlay public API
 //=============================================================================================================
 
 void BrainView::setVideoOverlayEnabled(bool enabled)
 {
-    if (!m_videoOverlay)
-        return;
-    if (m_videoOverlay->isEnabled() == enabled)
-        return;
-    m_videoOverlay->setEnabled(enabled);
-    m_sceneDirty = true;
-    update();
-}
-
-bool BrainView::isVideoOverlayEnabled() const
-{
-    return m_videoOverlay && m_videoOverlay->isEnabled();
-}
-
-void BrainView::setVideoOverlayFocusPosition(const QVector3D& position)
-{
-    if (!m_videoOverlay)
-        return;
-    m_videoOverlay->setFocusPosition(position);
-    if (m_videoOverlay->isEnabled()) {
-        m_sceneDirty = true;
-        update();
-    }
-}
-
-void BrainView::setVideoOverlayUpHint(const QVector3D& dir)
-{
-    if (!m_videoOverlay)
-        return;
-    m_videoOverlay->setUpHint(dir);
-    if (m_videoOverlay->isEnabled()) {
-        m_sceneDirty = true;
-        update();
-    }
-}
-
-void BrainView::setVideoOverlaySize(float meters)
-{
-    if (!m_videoOverlay)
-        return;
-    m_videoOverlay->setSizeMeters(std::max(0.001f, meters));
-    if (m_videoOverlay->isEnabled()) {
-        m_sceneDirty = true;
-        update();
-    }
-}
-
-void BrainView::setVideoOverlayOpacity(float opacity)
-{
-    if (!m_videoOverlay)
-        return;
-    m_videoOverlay->setOpacity(std::clamp(opacity, 0.0f, 1.0f));
-    if (m_videoOverlay->isEnabled()) {
-        m_sceneDirty = true;
-        update();
-    }
-}
-
-void BrainView::pushVideoOverlayFrame(const QImage& frame)
-{
-    if (!m_videoOverlay)
-        return;
-    m_videoOverlay->setFrame(frame);
-    if (m_videoOverlay->isEnabled()) {
-        m_sceneDirty = true;
-        update();
-    }
-}
-
-void BrainView::setVideoDepthEnabled(bool enabled)
-{
-    if (!m_videoOverlay)
-        return;
-    m_videoOverlay->setDepthEnabled(enabled);
-    if (m_videoOverlay->isEnabled()) {
-        m_sceneDirty = true;
-        update();
-    }
-}
-
-void BrainView::setVideoDepthScale(float scale)
-{
-    if (!m_videoOverlay)
-        return;
-    m_videoOverlay->setDepthScale(std::clamp(scale, 0.0f, 1.0f));
-    if (m_videoOverlay->isEnabled()) {
-        m_sceneDirty = true;
-        update();
-    }
-}
-
-void BrainView::setVideoDepthSteps(int steps)
-{
-    if (!m_videoOverlay)
-        return;
-    m_videoOverlay->setDepthSteps(std::clamp(steps, 8, 64));
-    if (m_videoOverlay->isEnabled()) {
-        m_sceneDirty = true;
-        update();
-    }
-}
-
-void BrainView::pushVideoDepthFrame(const QImage& depthFrame)
-{
-    if (!m_videoOverlay)
-        return;
-    m_videoOverlay->setDepthFrame(depthFrame);
-    if (m_videoOverlay->isEnabled() && m_videoOverlay->isDepthEnabled()) {
-        m_sceneDirty = true;
-        update();
-    }
-}
-
-bool BrainView::intersectWorldRay(const QVector3D& origin, const QVector3D& direction, QVector3D& hitPoint) const
-{
-    // Test against ALL surfaces (no SubView visibility filter) so
-    // the optical ray always finds the head even if it's hidden in
-    // the first SubView of a multi-view layout.
-    float closestDist = std::numeric_limits<float>::max();
-    bool found = false;
-
-    // Always test the BEM head surface first (even when hidden) — the
-    // optical projection cares about the outermost physical shell.
-    auto headIt = m_surfaces.find("bem_head");
-    if (headIt != m_surfaces.cend() && headIt->second) {
-        float dist = 0.0f;
-        int vertexIdx = -1;
-        if (headIt->second->intersects(origin, direction, dist, vertexIdx) && dist < closestDist) {
-            closestDist = dist;
-            hitPoint = origin + dist * direction;
-            found = true;
-        }
-    }
-
-    // Fall back to any other visible surface if the head wasn't hit.
-    if (!found) {
-        for (auto it = m_surfaces.cbegin(); it != m_surfaces.cend(); ++it) {
-            const auto& surf = it->second;
-            if (!surf || !surf->isVisible())
-                continue;
-            float dist = 0.0f;
-            int vertexIdx = -1;
-            if (surf->intersects(origin, direction, dist, vertexIdx) && dist < closestDist) {
-                closestDist = dist;
-                hitPoint = origin + dist * direction;
-                found = true;
-            }
-        }
-    }
-    return found;
+    m_pCore->setVideoOverlayEnabled(enabled);
 }
 
 //=============================================================================================================
-// MRI slice rendering
+
+bool BrainView::isVideoOverlayEnabled() const
+{
+    return m_pCore->isVideoOverlayEnabled();
+}
+
+//=============================================================================================================
+
+void BrainView::setVideoOverlayFocusPosition(const QVector3D& position)
+{
+    m_pCore->setVideoOverlayFocusPosition(position);
+}
+
+//=============================================================================================================
+
+void BrainView::setVideoOverlayUpHint(const QVector3D& dir)
+{
+    m_pCore->setVideoOverlayUpHint(dir);
+}
+
+//=============================================================================================================
+
+void BrainView::setVideoOverlaySize(float meters)
+{
+    m_pCore->setVideoOverlaySize(meters);
+}
+
+//=============================================================================================================
+
+void BrainView::setVideoOverlayOpacity(float opacity)
+{
+    m_pCore->setVideoOverlayOpacity(opacity);
+}
+
+//=============================================================================================================
+
+void BrainView::pushVideoOverlayFrame(const QImage& frame)
+{
+    m_pCore->pushVideoOverlayFrame(frame);
+}
+
+//=============================================================================================================
+
+void BrainView::setVideoDepthEnabled(bool enabled)
+{
+    m_pCore->setVideoDepthEnabled(enabled);
+}
+
+//=============================================================================================================
+
+void BrainView::setVideoDepthScale(float scale)
+{
+    m_pCore->setVideoDepthScale(scale);
+}
+
+//=============================================================================================================
+
+void BrainView::setVideoDepthSteps(int steps)
+{
+    m_pCore->setVideoDepthSteps(steps);
+}
+
+//=============================================================================================================
+
+void BrainView::pushVideoDepthFrame(const QImage& depthFrame)
+{
+    m_pCore->pushVideoDepthFrame(depthFrame);
+}
+
+//=============================================================================================================
+
+bool BrainView::intersectWorldRay(const QVector3D& origin, const QVector3D& direction, QVector3D& hitPoint) const
+{
+    return m_pCore->intersectWorldRay(origin, direction, hitPoint);
+}
+
 //=============================================================================================================
 
 void BrainView::setSlice(int slotIndex, mne::disp::SliceObject* slice)
 {
-    if (slotIndex < 0 || slotIndex >= kMaxSliceSlots)
-        return;
-    m_slices[slotIndex] = slice;
-    m_sceneDirty = true;
-    update();
-}
-
-void BrainView::setElectrodes(mne::disp::ElectrodeObject* electrodes)
-{
-    if (m_electrodes)
-        m_electrodes->setHoveredContact(-1);
-    m_electrodes = electrodes;
-    update();
+    m_pCore->setSlice(slotIndex, slice);
 }
 
 //=============================================================================================================
 
 void BrainView::setSliceVisible(int slotIndex, bool visible)
 {
-    if (slotIndex < 0 || slotIndex >= kMaxSliceSlots)
-        return;
-    m_sliceVisible[slotIndex] = visible;
-    m_sceneDirty = true;
-    update();
+    m_pCore->setSliceVisible(slotIndex, visible);
 }
 
 //=============================================================================================================
 
 void BrainView::setMriSlicesVisible(bool visible)
 {
-    auto& profile = visibilityProfileForTarget(m_visualizationEditTarget);
-    profile.mriSlices = visible;
-    saveMultiViewSettings();
-    m_sceneDirty = true;
-    update();
+    m_pCore->setMriSlicesVisible(visible);
+}
+
+//=============================================================================================================
+
+void BrainView::setElectrodes(mne::disp::ElectrodeObject* electrodes)
+{
+    m_pCore->setElectrodes(electrodes);
+}
+
+//=============================================================================================================
+
+void BrainView::setElectrodeValues(const std::map<std::string, float>& values)
+{
+    m_pCore->setElectrodeValues(values);
 }
 
 } // namespace mne::disp

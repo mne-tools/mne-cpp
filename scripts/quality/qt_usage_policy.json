@@ -14,6 +14,9 @@
     "disp": {
       "SvgWriter (QPaintEngine)": "Replaces QSvgGenerator so the vector export of widgets needs Qt Gui only; dropping the Qt Svg module raised the disp ceilings once (tokens 6025 -> 6159, public header includes 110 -> 112).",
       "QWindow hosts and scene viewports (phase 3)": "ChannelWindow (QWindow + QRhi swap chain) next to the ChannelRhiView QRhiWidget host, and SceneViewport replacing the QGraphicsView scenes, raised the disp ceilings once (tokens 4846 -> 4885, public header includes 82 -> 89); the QRhiWidget hosts go with phase 4."
+    },
+    "disp3D": {
+      "BrainWindow host and GPU overlay (phase 3)": "BrainWindow (QWindow + QRhi swap chain), the forwarding BrainView host and the overlay painted into the GPU pass instead of child QLabels raised the disp3D ceilings once (tokens 1633 -> 1961); the QRhiWidget host goes with phase 4."
     }
   },
   "ceilings": {
@@ -92,8 +95,8 @@
       }
     },
     "disp3D": {
-      "tokens": 1633,
-      "public_header_includes": 75,
+      "tokens": 1961,
+      "public_header_includes": 74,
       "modules": [
         "Core",
         "Gui",
@@ -102,13 +105,13 @@
         "Widgets"
       ],
       "by_category": {
-        "containers": 3,
+        "containers": 5,
         "files": 13,
-        "global": 166,
-        "gui": 962,
-        "objects_signals": 135,
-        "other": 220,
-        "strings": 129,
+        "global": 199,
+        "gui": 1158,
+        "objects_signals": 149,
+        "other": 293,
+        "strings": 139,
         "time": 5
       }
     },

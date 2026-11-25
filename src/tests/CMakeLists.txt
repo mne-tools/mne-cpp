@@ -226,6 +226,7 @@ add_subdirectory(test_disp_svg_writer)
 add_subdirectory(test_disp3d_viewstate)
 add_subdirectory(test_disp3d_brainsurface)
 add_subdirectory(test_disp3d_brainview)
+add_subdirectory(test_disp3d_brain_window)
 
 # MNE Analyze Studio coverage tests
 add_subdirectory(test_mne_analyze_studio_core_capabilities)

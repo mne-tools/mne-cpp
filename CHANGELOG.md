@@ -252,6 +252,16 @@ aliases; replace the old spelling as below.
 - The SOUP inventory lists the Qt modules the libraries, applications and
   tools request (also as sub-components in the CycloneDX SBOM) and the system
   `curl` program that MNE Analyze Studio's assistant runs.
+- The GPU views run without Qt Widgets in their core: `disp::ChannelRhiRenderer`
+  holds the state, input handling and QRhi rendering of the raw-data trace
+  view, and `disp3D::BrainViewCore` those of the 3-D brain view. Each has two
+  hosts: the existing `ChannelRhiView` and `BrainView` (still `QRhiWidget`s,
+  same API) and the new `QWindow` hosts `ChannelWindow` and `BrainWindow`,
+  which create their own QRhi and swap chain (embed them with
+  `QWidget::createWindowContainer()`). The crosshair, scalebars and ruler of
+  the trace view and the FPS, info and viewport labels and separators of the
+  brain view are drawn in the GPU pass instead of by child widgets.
+  `LiveMarker` moved to `disp3D/view/brainviewcore.h`.
 - The sensor-layout views of `mne_disp` no longer use `QGraphicsView`:
   `mne::scene::SensorLayout` (sensors as labelled dots, with click and
   rubber-band selection as in a `QGraphicsScene`) and

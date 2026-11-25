@@ -54,6 +54,8 @@ set(SOURCES
     scene/rtsensorstreammanager.cpp
     scene/sourceestimatemanager.cpp
     view/brainview.cpp
+    view/brainviewcore.cpp
+    view/brainwindow.cpp
     view/brainrenderer.cpp
     view/multiviewlayout.cpp
     workers/periodictask.cpp
@@ -101,6 +103,8 @@ set(HEADERS
     scene/rtsensorstreammanager.h
     scene/sourceestimatemanager.h
     view/brainview.h
+    view/brainviewcore.h
+    view/brainwindow.h
     view/brainrenderer.h
     view/multiviewlayout.h
     workers/periodictask.h
@@ -140,6 +144,8 @@ qt_add_shaders(${PROJECT_NAME} "disp3d_shaders"
         "shaders/slice.frag"
         "shaders/video_overlay.vert"
         "shaders/video_overlay.frag"
+        "shaders/screen_overlay.vert"
+        "shaders/screen_overlay.frag"
         "shaders/video_decal.vert"
         "shaders/video_decal.frag"
         "shaders/video_decal_depth.vert"
