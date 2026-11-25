@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include "channelrhirenderer.h"
+#include "../../plots/helpers/sceneinput.h"
 #include "../../plots/helpers/scenepainter.h"
 #include <mne/scene/trace_geometry.h>
 #include <mne/base/log.h>
@@ -105,40 +106,6 @@ static QShader loadShader(const QString& filename)
         return {};
     }
     return QShader::fromSerialized(f.readAll());
-}
-
-static scene::Modifier toSceneModifiers(Qt::KeyboardModifiers modifiers)
-{
-    scene::Modifier result = scene::Modifier::None;
-    if (modifiers & Qt::ShiftModifier)
-        result = result | scene::Modifier::Shift;
-    if (modifiers & Qt::ControlModifier)
-        result = result | scene::Modifier::Ctrl;
-    if (modifiers & Qt::AltModifier)
-        result = result | scene::Modifier::Alt;
-    if (modifiers & Qt::MetaModifier)
-        result = result | scene::Modifier::Meta;
-    return result;
-}
-
-static scene::MouseButton toSceneButton(Qt::MouseButton button)
-{
-    switch (button) {
-        case Qt::LeftButton:
-            return scene::MouseButton::Left;
-        case Qt::RightButton:
-            return scene::MouseButton::Right;
-        case Qt::MiddleButton:
-            return scene::MouseButton::Middle;
-        default:
-            return scene::MouseButton::None;
-    }
-}
-
-// Monotonic time of an input event; the drag velocity of TraceView is measured with it
-static std::int64_t monotonicMs()
-{
-    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 }
 
 //=============================================================================================================
@@ -255,11 +222,11 @@ void ChannelRhiRenderer::connectView()
         requestUpdate();
     };
     effects.animate_scroll = [this](const scene::TraceView::ScrollAnimation& animation) {
-        m_animator.start_scroll(animation, monotonicMs());
+        m_animator.start_scroll(animation, sceneTimestampMs());
         startAnimationTimer();
     };
     effects.animate_zoom = [this](const scene::TraceView::ZoomAnimation& animation) {
-        m_animator.start_zoom(animation, monotonicMs());
+        m_animator.start_zoom(animation, sceneTimestampMs());
         startAnimationTimer();
     };
     effects.stop_animations = [this] {
@@ -314,7 +281,7 @@ scene::TraceView& ChannelRhiRenderer::view() const
 
 void ChannelRhiRenderer::tickAnimations()
 {
-    if ((!m_animator.running() || !m_animator.tick(monotonicMs(), view())) && m_animationTimerId != 0) {
+    if ((!m_animator.running() || !m_animator.tick(sceneTimestampMs(), view())) && m_animationTimerId != 0) {
         killTimer(m_animationTimerId);
         m_animationTimerId = 0;
     }
@@ -1342,14 +1309,7 @@ void ChannelRhiRenderer::handleResize()
 
 bool ChannelRhiRenderer::handleWheel(QWheelEvent* event)
 {
-    scene::WheelEvent wheel;
-    wheel.x = event->position().x();
-    wheel.y = event->position().y();
-    wheel.angle_delta_x = event->angleDelta().x();
-    wheel.angle_delta_y = event->angleDelta().y();
-    wheel.modifiers = toSceneModifiers(event->modifiers());
-    wheel.timestamp_ms = monotonicMs();
-    view().handle_wheel(wheel);
+    view().handle_wheel(toSceneWheelEvent(*event));
     event->accept();
     return true;
 }
@@ -1389,14 +1349,7 @@ bool ChannelRhiRenderer::handleMouseDoubleClick(QMouseEvent* event)
 
 bool ChannelRhiRenderer::forwardPointer(QMouseEvent* event, scene::PointerEvent::Type type)
 {
-    scene::PointerEvent pointer;
-    pointer.type = type;
-    pointer.x = event->position().x();
-    pointer.y = event->position().y();
-    pointer.button = toSceneButton(event->button());
-    pointer.modifiers = toSceneModifiers(event->modifiers());
-    pointer.timestamp_ms = monotonicMs();
-    const bool used = view().handle_pointer(pointer);
+    const bool used = view().handle_pointer(toScenePointerEvent(*event, type));
     if (used)
         event->accept();
     return used;

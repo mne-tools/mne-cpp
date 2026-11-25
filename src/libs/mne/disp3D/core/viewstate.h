@@ -32,13 +32,14 @@
 #include "../disp3D_global.h"
 #include "rendertypes.h"
 
+#include <mne/scene/camera.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QString>
 #include <QQuaternion>
-#include <QVector2D>
 #include <QVariant>
 #include <QColor>
 
@@ -145,10 +146,11 @@ struct DISP3DSHARED_EXPORT ViewVisibilityProfile
  * one pane in multi-view).
  *
  * The class stores shader, surface type, overlay mode, visibility flags,
- * zoom, pan, camera rotation, and view preset — everything that can differ
- * between two viewports showing the same scene.
+ * and, through its toolkit-neutral @ref mne::scene::PaneCamera base, the zoom,
+ * pan, camera rotation and view preset — everything that can differ between
+ * two viewports showing the same scene.
  */
-struct DISP3DSHARED_EXPORT SubView
+struct DISP3DSHARED_EXPORT SubView : scene::PaneCamera
 {
     // ── Per-view render configuration ──────────────────────────────────
     std::string surfaceType = "pial";
@@ -157,11 +159,7 @@ struct DISP3DSHARED_EXPORT SubView
     VisualizationMode overlayMode = ModeSurface;
     ViewVisibilityProfile visibility;
 
-    // ── Per-view camera state ─────────────────────────────────────────
-    float zoom = 0.0f;
-    QVector2D pan;
-    QQuaternion perspectiveRotation;
-    int preset = 1; // 0=Top,1=Perspective,...,6=Right
+    // ── Per-view camera state (zoom, pan, rotation, preset in scene::PaneCamera) ──
     bool enabled = true;
 
     // ── Per-viewport timeline state ───────────────────────────────────
@@ -218,7 +216,7 @@ struct DISP3DSHARED_EXPORT SubView
      * @param[in] fallbackRotation  Rotation to use if no saved quaternion exists.
      */
     void load(const QSettings& settings, const QString& prefix,
-              const QQuaternion& fallbackRotation = QQuaternion());
+              const Eigen::Quaternionf& fallbackRotation = Eigen::Quaternionf::Identity());
 
     /**
      * Save this SubView's state to QSettings under the given prefix.

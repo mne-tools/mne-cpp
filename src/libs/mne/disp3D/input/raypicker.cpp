@@ -20,12 +20,9 @@
 #include "renderable/dipoleobject.h"
 #include "model/items/abstracttreeitem.h"
 #include "model/items/digitizertreeitem.h"
+#include "core/qteigen_p.h"
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QVector4D>
+#include <mne/scene/ray_picking.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -36,6 +33,7 @@
 #include <format>
 #include <iterator>
 #include <limits>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -52,29 +50,16 @@ bool RayPicker::unproject(const QPoint& screenPos,
                           QVector3D& rayOrigin,
                           QVector3D& rayDir)
 {
-    bool invertible = false;
-    QMatrix4x4 invPVM = pvm.inverted(&invertible);
-    if (!invertible)
+    const std::optional<scene::Ray> ray = scene::ray_from_pixel(
+        {static_cast<double>(screenPos.x()), static_cast<double>(screenPos.y())},
+        {static_cast<double>(paneRect.x()), static_cast<double>(paneRect.y()), static_cast<double>(paneRect.width()),
+         static_cast<double>(paneRect.height())},
+        toEigen(pvm));
+    if (!ray) {
         return false;
-
-    const float localX = static_cast<float>(screenPos.x() - paneRect.x());
-    const float localY = static_cast<float>(screenPos.y() - paneRect.y());
-    const float paneW = static_cast<float>(std::max(1, paneRect.width()));
-    const float paneH = static_cast<float>(std::max(1, paneRect.height()));
-
-    const float ndcX = (2.0f * localX) / paneW - 1.0f;
-    const float ndcY = 1.0f - (2.0f * localY) / paneH;
-
-    QVector4D vNear(ndcX, ndcY, -1.0f, 1.0f);
-    QVector4D vFar(ndcX, ndcY, 1.0f, 1.0f);
-
-    QVector4D pNear = invPVM * vNear;
-    QVector4D pFar = invPVM * vFar;
-    pNear /= pNear.w();
-    pFar /= pFar.w();
-
-    rayOrigin = pNear.toVector3D();
-    rayDir = (pFar.toVector3D() - pNear.toVector3D()).normalized();
+    }
+    rayOrigin = toQVector3D(ray->origin);
+    rayDir = toQVector3D(ray->direction);
     return true;
 }
 

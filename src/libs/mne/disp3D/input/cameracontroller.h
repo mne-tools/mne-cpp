@@ -9,7 +9,8 @@
  * @date     March 2026
  * @brief    Camera state and projection / view / model matrix computation for single- and multi-view layouts.
  *
- * CameraController is widget-agnostic: it takes the visible scene
+ * CameraController is the Qt-typed adapter of the toolkit-neutral
+ * @ref mne::scene::OrbitCamera, which does the maths. It is widget-agnostic: it takes the visible scene
  * centroid + extent and a per-pane @ref mne::disp::SubView and produces the
  * @ref mne::disp::CameraResult bundle (projection, view, model, eye position,
  * look-at and up vector) consumed by @ref mne::disp::BrainRenderer.
@@ -70,7 +71,8 @@ struct CameraResult
  *
  * This class is independent of any Qt widget — it takes scene geometry
  * parameters and view configuration, and produces camera matrices.
- * It also handles rotation, zoom, and pan from mouse delta values.
+ * It also handles rotation, zoom, and pan from mouse delta values. The
+ * maths lives in @ref mne::scene::OrbitCamera; this class converts to Qt types.
  *
  * @brief    Camera state and matrix computation.
  */
@@ -92,7 +94,7 @@ public:
      */
     void setSceneCenter(const QVector3D& center)
     {
-        m_sceneCenter = center;
+        m_camera.set_scene_center({center.x(), center.y(), center.z()});
     }
 
     /**
@@ -102,16 +104,17 @@ public:
      */
     void setSceneSize(float size)
     {
-        m_sceneSize = (size > 0.01f) ? size : 0.3f;
+        m_camera.set_scene_size(size);
     }
 
     QVector3D sceneCenter() const
     {
-        return m_sceneCenter;
+        const Eigen::Vector3f& center = m_camera.scene_center();
+        return {center.x(), center.y(), center.z()};
     }
     float sceneSize() const
     {
-        return m_sceneSize;
+        return m_camera.scene_size();
     }
 
     // ── Single-view camera state ───────────────────────────────────────
@@ -194,15 +197,8 @@ public:
                               float sceneSize);
 
 private:
-    CameraResult computeForRotation(const QQuaternion& effectiveRotation,
-                                    float zoom,
-                                    const QVector2D& pan,
-                                    bool applyPan,
-                                    float aspectRatio) const;
-
+    scene::OrbitCamera m_camera;
     QQuaternion m_cameraRotation;
-    QVector3D m_sceneCenter = QVector3D(0, 0, 0);
-    float m_sceneSize = 0.3f;
     float m_zoom = 0.0f;
 };
 

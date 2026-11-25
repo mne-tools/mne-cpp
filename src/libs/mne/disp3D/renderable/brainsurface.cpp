@@ -18,6 +18,7 @@
 
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
+#include <mne/scene/ray_picking.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -32,6 +33,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <optional>
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -660,13 +662,12 @@ bool BrainSurface::intersects(const QVector3D& rayOrigin, const QVector3D& rayDi
     const Bvh& tree = bvh();
     const float origin[3] = {rayOrigin.x(), rayOrigin.y(), rayOrigin.z()};
     const float invDir[3] = {1.0f / rayDir.x(), 1.0f / rayDir.y(), 1.0f / rayDir.z()};
-    const double originX = rayOrigin.x(), originY = rayOrigin.y(), originZ = rayOrigin.z();
-    const double dirX = rayDir.x(), dirY = rayDir.y(), dirZ = rayDir.z();
+    const scene::Ray ray{{rayOrigin.x(), rayOrigin.y(), rayOrigin.z()}, {rayDir.x(), rayDir.y(), rayDir.z()}};
 
     double closestDist = std::numeric_limits<double>::max();
     int closestTriangle = -1;
 
-    // Möller–Trumbore in double precision on the triangles of the leaves the ray enters, nearest
+    // Möller–Trumbore (scene::intersect_ray_triangle) on the triangles of the leaves the ray enters, nearest
     // first. Median splits keep the depth near log2(triangles / leaf size), far below the stack size.
     int stack[64];
     int top = 0;
@@ -695,39 +696,13 @@ bool BrainSurface::intersects(const QVector3D& rayOrigin, const QVector3D& rayDi
 
         for (int i = node.first; i < node.first + node.count; ++i) {
             const int t = tree.triangles[size_t(i)];
-            const QVector3D& v0q = m_vertexData[m_indexData[3 * t]].pos;
-            const QVector3D& v1q = m_vertexData[m_indexData[3 * t + 1]].pos;
-            const QVector3D& v2q = m_vertexData[m_indexData[3 * t + 2]].pos;
-
-            const double v0x = v0q.x(), v0y = v0q.y(), v0z = v0q.z();
-            const double edge1x = v1q.x() - v0x, edge1y = v1q.y() - v0y, edge1z = v1q.z() - v0z;
-            const double edge2x = v2q.x() - v0x, edge2y = v2q.y() - v0y, edge2z = v2q.z() - v0z;
-
-            const double hx = dirY * edge2z - dirZ * edge2y;
-            const double hy = dirZ * edge2x - dirX * edge2z;
-            const double hz = dirX * edge2y - dirY * edge2x;
-
-            const double a = edge1x * hx + edge1y * hy + edge1z * hz;
-            if (std::abs(a) < 1e-18)
-                continue; // Parallel to the triangle
-
-            const double f = 1.0 / a;
-            const double sx = originX - v0x, sy = originY - v0y, sz = originZ - v0z;
-            const double u = f * (sx * hx + sy * hy + sz * hz);
-            if (u < -1e-7 || u > 1.0000001)
-                continue;
-
-            const double qx = sy * edge1z - sz * edge1y;
-            const double qy = sz * edge1x - sx * edge1z;
-            const double qz = sx * edge1y - sy * edge1x;
-
-            const double v = f * (dirX * qx + dirY * qy + dirZ * qz);
-            if (v < -1e-7 || u + v > 1.0000001)
-                continue;
-
-            const double hitT = f * (edge2x * qx + edge2y * qy + edge2z * qz);
-            if (hitT > 1e-7 && hitT < closestDist) {
-                closestDist = hitT;
+            const QVector3D& v0 = m_vertexData[m_indexData[3 * t]].pos;
+            const QVector3D& v1 = m_vertexData[m_indexData[3 * t + 1]].pos;
+            const QVector3D& v2 = m_vertexData[m_indexData[3 * t + 2]].pos;
+            const std::optional<double> hitT = scene::intersect_ray_triangle(ray, {v0.x(), v0.y(), v0.z()}, {v1.x(), v1.y(), v1.z()},
+                                                                             {v2.x(), v2.y(), v2.z()});
+            if (hitT && *hitT < closestDist) {
+                closestDist = *hitT;
                 closestTriangle = t;
             }
         }

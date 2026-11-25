@@ -30,6 +30,7 @@
 #include "core/surfacekeys.h"
 #include "core/dataloader.h"
 #include "input/raypicker.h"
+#include "core/qteigen_p.h"
 #include "geometry/meshfactory.h"
 #include "model/braintreemodel.h"
 #include "model/items/surfacetreeitem.h"
@@ -44,22 +45,23 @@
 #include <mne/fiff/fiff_evoked_set.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/connectivity/network/network.h>
+#include <mne/disp/plots/helpers/sceneinput.h>
+#include <mne/disp/plots/helpers/scenepainter.h>
+#include <mne/scene/ray_picking.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QMatrix4x4>
-#include <QMouseEvent>
 #include <QKeyEvent>
-#include <QWheelEvent>
+#include <QMatrix4x4>
 #include <QSettings>
 #include <QTimer>
 #include <QStandardItem>
 #include <QCoreApplication>
 #include <QFont>
 #include <QFontDatabase>
-#include <QFontMetrics>
+#include <QtMath>
 #include <QGuiApplication>
 #include <QPainter>
 #include <QPalette>
@@ -82,6 +84,7 @@
 #include <ctime>
 #include <filesystem>
 #include <format>
+#include <optional>
 #include <set>
 #include <string>
 #include <vector>
@@ -101,103 +104,48 @@ QColor itemColor(const AbstractTreeItem& item)
     return color;
 }
 
-// Look of an overlay label; mirrors the style sheets of the labels BrainView used to show
-struct OverlayLabelStyle
+// The overlay asked for the generic "monospace" / "sans-serif" families, i.e. the system fonts
+scene::BrainViewOverlay::Fonts overlayFonts()
 {
-    QFont font;
-    QColor color = Qt::white;
-    QColor background = Qt::transparent;
-    QColor border = Qt::transparent;
-    int borderPx = 0;
-    int radius = 0;
-    int padX = 0;
-    int padY = 0;
-    Qt::Alignment alignment = Qt::AlignLeft | Qt::AlignVCenter;
-};
-
-// The style sheets asked for the generic "monospace" / "sans-serif" families, i.e. the system fonts
-QFont overlayFont(bool monospace, int pixelSize, bool bold)
-{
-    QFont font = QFontDatabase::systemFont(monospace ? QFontDatabase::FixedFont : QFontDatabase::GeneralFont);
-    font.setPixelSize(pixelSize);
-    font.setBold(bold);
-    return font;
+    scene::BrainViewOverlay::Fonts fonts;
+    fonts.monospace = QFontDatabase::systemFont(QFontDatabase::FixedFont).family().toStdString();
+    fonts.sans_serif = QFontDatabase::systemFont(QFontDatabase::GeneralFont).family().toStdString();
+    return fonts;
 }
 
-OverlayLabelStyle fpsLabelStyle()
+QFont overlayBaseFont()
 {
-    OverlayLabelStyle style;
-    style.font = overlayFont(true, 13, true);
-    style.padX = 5;
-    style.padY = 5;
-    style.alignment = Qt::AlignRight | Qt::AlignTop;
-    return style;
+    return QFontDatabase::systemFont(QFontDatabase::GeneralFont);
 }
 
-OverlayLabelStyle infoLabelStyle()
+Qt::CursorShape toQtCursor(scene::CursorShape shape)
 {
-    OverlayLabelStyle style;
-    style.font = overlayFont(true, 10, false);
-    style.background = QColor(0, 0, 0, 110);
-    style.radius = 3;
-    style.padX = 4;
-    style.padY = 2;
-    style.alignment = Qt::AlignLeft | Qt::AlignTop;
-    return style;
-}
-
-OverlayLabelStyle regionLabelStyle()
-{
-    OverlayLabelStyle style;
-    style.font = overlayFont(false, 16, true);
-    style.padX = 5;
-    style.padY = 5;
-    return style;
-}
-
-OverlayLabelStyle nameLabelStyle(bool selected)
-{
-    OverlayLabelStyle style;
-    if (selected) {
-        style.font = overlayFont(false, 13, true);
-        style.color = QColor(0xFF, 0xD5, 0x4F);
-        style.background = QColor(255, 213, 79, 40);
-        style.border = QColor(0xFF, 0xD5, 0x4F);
-        style.borderPx = 1;
-        style.radius = 3;
-        style.padX = 6;
-        style.padY = 2;
-    } else {
-        style.font = overlayFont(false, 12, true);
-        style.padX = 4;
-        style.padY = 2;
+    switch (shape) {
+        case scene::CursorShape::SizeHorizontal:
+            return Qt::SizeHorCursor;
+        case scene::CursorShape::SizeVertical:
+            return Qt::SizeVerCursor;
+        case scene::CursorShape::SizeAll:
+            return Qt::SizeAllCursor;
+        case scene::CursorShape::Default:
+            break;
     }
-    return style;
+    return Qt::ArrowCursor;
 }
 
-QSize overlayLabelSize(const OverlayLabelStyle& style, const QString& text)
+scene::PixelSize toPixelSize(const QSize& size)
 {
-    const QFontMetrics metrics(style.font);
-    const QSize textSize = text.isEmpty() ? QSize(0, metrics.height()) : metrics.size(0, text);
-    const int frame = style.borderPx;
-    return textSize + QSize(2 * (style.padX + frame), 2 * (style.padY + frame));
+    return {size.width(), size.height()};
 }
 
-void paintOverlayLabel(QPainter& painter, const OverlayLabelStyle& style, const QRect& rect, const QString& text)
+QRect toQRect(const scene::PixelRect& rect)
 {
-    painter.save();
-    painter.setClipRect(rect);
-    if (style.background.alpha() > 0 || style.borderPx > 0) {
-        const qreal inset = style.borderPx * 0.5;
-        painter.setPen(style.borderPx > 0 ? QPen(style.border, style.borderPx) : QPen(Qt::NoPen));
-        painter.setBrush(style.background);
-        painter.drawRoundedRect(QRectF(rect).adjusted(inset, inset, -inset, -inset), style.radius, style.radius);
-    }
-    const int inset = style.borderPx;
-    painter.setPen(style.color);
-    painter.setFont(style.font);
-    painter.drawText(rect.adjusted(style.padX + inset, style.padY + inset, -style.padX - inset, -style.padY - inset), int(style.alignment), text);
-    painter.restore();
+    return {rect.x, rect.y, rect.width, rect.height};
+}
+
+QPoint toQPoint(const scene::Point& point)
+{
+    return {static_cast<int>(point.x), static_cast<int>(point.y)};
 }
 
 } // namespace
@@ -249,25 +197,23 @@ BrainViewCore::BrainViewCore(BrainViewHost* host, QObject* parent)
     // Every setter that changes scene state calls m_sceneDirty = true
     // followed by requestUpdate(), which the host coalesces into one frame.
 
-    m_fpsLabel.text = QStringLiteral("FPS: --.-\nVertices: 0");
     m_fpsStart = std::chrono::steady_clock::now();
 
-    // ── Initialise viewport labels (sized to kDefaultViewportCount) ────────
+    // ── Initialise viewports and their labels (sized to kDefaultViewportCount) ──
     m_subViews.resize(kDefaultViewportCount);
-    m_viewportNameLabels.resize(kDefaultViewportCount);
-    m_viewportInfoLabels.resize(kDefaultViewportCount);
     for (int i = 0; i < kDefaultViewportCount; ++i) {
         m_subViews[i] = SubView::defaultForIndex(i);
-        m_viewportNameLabels[i].text = QString::fromStdString(multiViewPresetName(m_subViews[i].preset));
     }
-
-    m_separatorColor = QGuiApplication::palette().color(QPalette::Midlight);
-    if (m_separatorColor.alpha() == 255) {
-        m_separatorColor.setAlpha(180);
+    m_overlay.set_viewport_count(kDefaultViewportCount);
+    m_overlay.set_fonts(overlayFonts());
+    QColor separatorColor = QGuiApplication::palette().color(QPalette::Midlight);
+    if (separatorColor.alpha() == 255) {
+        separatorColor.setAlpha(180);
     }
+    m_overlay.set_separator_color(toSceneColor(separatorColor));
+    setupInteraction();
 
     loadMultiViewSettings();
-    updateViewportSeparators();
     updateOverlayLayout();
 
     // Setup Debug Pointer: Semi-transparent sphere for subtle intersection indicator
@@ -307,7 +253,6 @@ BrainViewCore::~BrainViewCore()
 void BrainViewCore::setHost(BrainViewHost* host)
 {
     m_host = host;
-    updateViewportSeparators();
     updateOverlayLayout();
     requestUpdate();
 }
@@ -364,11 +309,93 @@ QImage BrainViewCore::grabSceneFrame()
 
 //=============================================================================================================
 
-void BrainViewCore::setHostCursor(Qt::CursorShape shape)
+void BrainViewCore::setHostCursor(scene::CursorShape shape)
 {
     if (m_host) {
-        m_host->setCursorShape(shape);
+        m_host->setCursorShape(toQtCursor(shape));
     }
+}
+
+//=============================================================================================================
+
+void BrainViewCore::setupInteraction()
+{
+    std::vector<scene::PaneCamera*> panes;
+    panes.reserve(m_subViews.size());
+    for (SubView& subView : m_subViews) {
+        panes.push_back(&subView);
+    }
+    m_interaction.attach_cameras(&m_singleView, std::move(panes));
+
+    scene::BrainViewInteraction::Effects effects;
+    effects.redraw = [this] {
+        cameraChanged();
+    };
+    effects.layout_changed = [this] {
+        updateOverlayLayout();
+        cameraChanged();
+    };
+    effects.settings_changed = [this] {
+        saveMultiViewSettings();
+    };
+    effects.cursor_changed = [this](scene::CursorShape shape) {
+        setHostCursor(shape);
+    };
+    effects.viewport_selected = [this](int viewport) {
+        if (viewport != m_visualizationEditTarget) {
+            setVisualizationEditTarget(viewport);
+        }
+    };
+    // A hidden surface shows no labels, so its name labels take no clicks
+    effects.hits_viewport_label = [this](int viewport, scene::Point pos) {
+        const scene::BrainViewOverlay::Label* name = m_overlay.item(scene::BrainViewOverlay::Item::ViewportNameLabel, viewport);
+        return name && name->visible && m_host && m_host->isVisible() && toQRect(name->geometry).contains(toQPoint(pos));
+    };
+    effects.preset_menu_requested = [this](int viewport, scene::Point pos) {
+        if (m_host) {
+            m_host->requestViewportPresetMenu(viewport, toQPoint(pos));
+        }
+    };
+    effects.hovered = [this](scene::Point pos) {
+        castRay(toQPoint(pos));
+    };
+    effects.clicked = [this](scene::Point pos) {
+        castRay(toQPoint(pos));
+        if (const mne::IeegContact* contact = m_electrodes ? m_electrodes->contactAt(m_electrodes->hoveredContact()) : nullptr) {
+            emit electrodeContactClicked(QString::fromStdString(contact->name), QVector3D(contact->position.x(), contact->position.y(), contact->position.z()));
+        } else if (m_hasIntersection) {
+            emit surfacePointClicked(m_lastIntersectionPoint);
+        }
+    };
+    effects.double_clicked = [this](scene::Point pos) {
+        castRay(toQPoint(pos));
+        if (m_hasIntersection) {
+            emit surfacePointDoubleClicked(m_lastIntersectionPoint);
+            return true;
+        }
+        return false;
+    };
+    effects.snapshot_requested = [this] {
+        saveSnapshot();
+    };
+    m_interaction.set_effects(std::move(effects));
+}
+
+//=============================================================================================================
+
+void BrainViewCore::syncInteraction()
+{
+    m_interaction.set_view_size(toPixelSize(hostSize()));
+    m_interaction.set_panes(m_viewMode == MultiView, enabledViewportIndices());
+    m_interaction.set_scene_size(m_sceneSize);
+}
+
+//=============================================================================================================
+
+void BrainViewCore::cameraChanged()
+{
+    m_sceneDirty = true;
+    requestUpdate();
 }
 
 //=============================================================================================================
@@ -414,7 +441,7 @@ void BrainViewCore::setModel(BrainTreeModel* model)
 
 void BrainViewCore::setInitialCameraRotation(const QQuaternion& rotation)
 {
-    m_cameraRotation = rotation;
+    m_singleView.rotation = toEigen(rotation);
     saveMultiViewSettings();
     m_sceneDirty = true;
     requestUpdate();
@@ -792,7 +819,7 @@ void BrainViewCore::setVisualizationEditTarget(int target)
     }
 
     // Update viewport label highlighting
-    updateViewportLabelHighlight();
+    updateOverlayLayout();
 
     saveMultiViewSettings();
 
@@ -1093,20 +1120,8 @@ void BrainViewCore::setAutomatedRotation(bool enabled)
             // Rotate the camera rather than the objects, so that every surface
             // keeps its own coregistration transform and head and sensors stay
             // aligned with each other.
-            const QPoint step(2, 0);
-
-            if (m_viewMode == MultiView) {
-                for (int i = 0; i < std::ssize(m_subViews); ++i) {
-                    if (multiViewPresetIsPerspective(std::clamp(m_subViews[i].preset, 0, 6))) {
-                        CameraController::applyMouseRotation(step, m_subViews[i].perspectiveRotation);
-                    }
-                }
-            } else {
-                CameraController::applyMouseRotation(step, m_cameraRotation);
-            }
-
-            m_sceneDirty = true;
-            requestUpdate();
+            syncInteraction();
+            m_interaction.orbit_perspective_views(2.0, 0.0);
         });
     }
 
@@ -1245,11 +1260,8 @@ bool BrainViewCore::savePng(const std::filesystem::path& path, int width, int he
 void BrainViewCore::showSingleView()
 {
     m_viewMode = SingleView;
-    m_isDraggingSplitter = false;
-    m_activeSplitter = SplitterHit::None;
-    setHostCursor(Qt::ArrowCursor);
+    m_interaction.cancel_splitter_drag();
     saveMultiViewSettings();
-    updateViewportSeparators();
     updateOverlayLayout();
     m_sceneDirty = true;
     requestUpdate();
@@ -1261,7 +1273,6 @@ void BrainViewCore::showMultiView()
 {
     m_viewMode = MultiView;
     saveMultiViewSettings();
-    updateViewportSeparators();
     updateOverlayLayout();
     m_sceneDirty = true;
     requestUpdate();
@@ -1276,9 +1287,7 @@ void BrainViewCore::setViewCount(int count)
 
     if (count == 1) {
         m_viewMode = SingleView;
-        m_isDraggingSplitter = false;
-        m_activeSplitter = SplitterHit::None;
-        setHostCursor(Qt::ArrowCursor);
+        m_interaction.cancel_splitter_drag();
         setVisualizationEditTarget(-1);
     } else {
         m_viewMode = MultiView;
@@ -1292,7 +1301,6 @@ void BrainViewCore::setViewCount(int count)
         m_subViews[i].enabled = (i < count);
 
     saveMultiViewSettings();
-    updateViewportSeparators();
     updateOverlayLayout();
     m_sceneDirty = true;
     requestUpdate();
@@ -1303,11 +1311,8 @@ void BrainViewCore::setViewCount(int count)
 
 void BrainViewCore::resetMultiViewLayout()
 {
-    m_layout.resetSplits();
-    m_multiSplitX = m_layout.splitX();
-    m_multiSplitY = m_layout.splitY();
+    m_interaction.layout().reset_splits();
     saveMultiViewSettings();
-    updateViewportSeparators();
     updateOverlayLayout();
     m_sceneDirty = true;
     requestUpdate();
@@ -1320,24 +1325,6 @@ bool BrainViewCore::isViewportEnabled(int index) const
     }
 
     return m_subViews[index].enabled;
-}
-
-//=============================================================================================================
-
-int BrainViewCore::enabledViewportCount() const
-{
-    if (m_viewMode != MultiView) {
-        return 1;
-    }
-
-    int numEnabled = 0;
-    for (int i = 0; i < std::ssize(m_subViews); ++i) {
-        if (m_subViews[i].enabled) {
-            ++numEnabled;
-        }
-    }
-
-    return numEnabled > 0 ? numEnabled : 1;
 }
 
 //=============================================================================================================
@@ -1360,137 +1347,23 @@ std::vector<int> BrainViewCore::enabledViewportIndices() const
 
 //=============================================================================================================
 
-int BrainViewCore::viewportIndexAt(const QPoint& pos) const
-{
-    if (m_viewMode != MultiView) {
-        return 0;
-    }
-
-    const auto enabledViewports = enabledViewportIndices();
-    return m_layout.viewportIndexAt(pos, enabledViewports, hostSize());
-}
-
-//=============================================================================================================
-
-QRect BrainViewCore::multiViewSlotRect(int slot, int numEnabled, const QSize& outputSize) const
-{
-    return m_layout.slotRect(slot, numEnabled, outputSize);
-}
-
-//=============================================================================================================
-
-SplitterHit BrainViewCore::hitTestSplitter(const QPoint& pos, int numEnabled, const QSize& outputSize) const
-{
-    if (m_viewMode != MultiView || numEnabled <= 1) {
-        return SplitterHit::None;
-    }
-    return m_layout.hitTestSplitter(pos, numEnabled, outputSize);
-}
-
-//=============================================================================================================
-
-void BrainViewCore::updateSplitterCursor(const QPoint& pos)
-{
-    const SplitterHit hit = hitTestSplitter(pos, enabledViewportCount(), hostSize());
-    const Qt::CursorShape shape = MultiViewLayout::cursorForHit(hit);
-    if (shape == Qt::ArrowCursor) {
-        setHostCursor(Qt::ArrowCursor);
-    } else {
-        setHostCursor(shape);
-    }
-}
-
-//=============================================================================================================
-
-void BrainViewCore::updateViewportSeparators()
-{
-    m_verticalSeparator.visible = false;
-    m_horizontalSeparator.visible = false;
-
-    const int numEnabled = enabledViewportCount();
-    if (m_viewMode != MultiView || numEnabled <= 1) {
-        markOverlayDirty();
-        return;
-    }
-
-    QRect vRect, hRect;
-    m_layout.separatorGeometries(numEnabled, hostSize(), vRect, hRect);
-
-    if (!vRect.isEmpty()) {
-        m_verticalSeparator.geometry = vRect;
-        m_verticalSeparator.visible = true;
-    }
-    if (!hRect.isEmpty()) {
-        m_horizontalSeparator.geometry = hRect;
-        m_horizontalSeparator.visible = true;
-    }
-
-    updateOverlayLayout();
-}
-
-//=============================================================================================================
-
 void BrainViewCore::updateOverlayLayout()
 {
-    const auto enabledViewports = enabledViewportIndices();
-    const QSize area = hostSize();
-
-    m_fpsLabel.visible = m_infoPanelVisible;
-    const QSize fpsSize = overlayLabelSize(fpsLabelStyle(), m_fpsLabel.text);
-    const int perfBottomMargin = 2;
-    m_fpsLabel.geometry = QRect(QPoint(area.width() - fpsSize.width() - 10, area.height() - fpsSize.height() - perfBottomMargin), fpsSize);
-
-    const bool showSingleInfo = (m_viewMode == SingleView) && m_infoPanelVisible;
-    m_singleViewInfoLabel.visible = showSingleInfo;
-    if (showSingleInfo) {
-        const QSize infoSize = overlayLabelSize(infoLabelStyle(), m_singleViewInfoLabel.text);
-        m_singleViewInfoLabel.geometry = QRect(QPoint(area.width() - infoSize.width() - 8, 8), infoSize);
+    const std::vector<int> viewports = enabledViewportIndices();
+    std::vector<int> presets;
+    presets.reserve(m_subViews.size());
+    for (const SubView& subView : m_subViews) {
+        presets.push_back(subView.preset);
     }
-
-    // The region label keeps a fixed size; long names are clipped
-    const int regionY = (m_viewMode == MultiView) ? 38 : 10;
-    m_regionLabel.geometry = QRect(10, regionY, 300, 30);
-
-    for (int i = 0; i < std::ssize(m_viewportNameLabels); ++i) {
-        m_viewportNameLabels[i].visible = false;
-        m_viewportInfoLabels[i].visible = false;
-    }
-
-    if (m_viewMode != MultiView) {
-        markOverlayDirty();
-        return;
-    }
-
-    const int numEnabled = static_cast<int>(enabledViewports.size());
-    for (int slot = 0; slot < numEnabled; ++slot) {
-        const int vp = enabledViewports[slot];
-        OverlayLabel& label = m_viewportNameLabels[vp];
-        OverlayLabel& infoLabel = m_viewportInfoLabels[vp];
-
-        const int preset = std::clamp(m_subViews[vp].preset, 0, 6);
-        label.text = QString::fromStdString(multiViewPresetName(preset));
-
-        const QRect pane = multiViewSlotRect(slot, numEnabled, area);
-        label.geometry = QRect(QPoint(pane.x() + 8, pane.y() + 8), overlayLabelSize(nameLabelStyle(label.selected), label.text));
-        label.visible = true;
-
-        const QSize infoSize = overlayLabelSize(infoLabelStyle(), infoLabel.text);
-        infoLabel.geometry = QRect(QPoint(pane.x() + pane.width() - infoSize.width() - 8, pane.y() + 8), infoSize);
-        infoLabel.visible = m_infoPanelVisible;
-    }
-
-    updateViewportLabelHighlight();
-}
-
-//=============================================================================================================
-
-void BrainViewCore::updateViewportLabelHighlight()
-{
-    for (int i = 0; i < std::ssize(m_viewportNameLabels); ++i) {
-        OverlayLabel& label = m_viewportNameLabels[i];
-        label.selected = (m_viewMode == MultiView && m_visualizationEditTarget == i);
-        label.geometry.setSize(overlayLabelSize(nameLabelStyle(label.selected), label.text));
-    }
+    scene::BrainViewOverlay::LayoutInput input;
+    input.size = toPixelSize(hostSize());
+    input.multi_view = m_viewMode == MultiView;
+    input.viewports = viewports;
+    input.presets = presets;
+    input.edit_target = m_visualizationEditTarget;
+    input.info_visible = m_infoPanelVisible;
+    input.layout = &m_interaction.layout();
+    m_overlay.update_layout(input, QtTextMetrics(overlayBaseFont()));
     markOverlayDirty();
 }
 
@@ -1501,25 +1374,26 @@ void BrainViewCore::loadMultiViewSettings()
     QSettings settings;
     settings.beginGroup(QStringLiteral("BrainView"));
 
-    m_multiSplitX = settings.value("multiSplitX", 0.5f).toFloat();
-    m_multiSplitY = settings.value("multiSplitY", 0.5f).toFloat();
+    m_interaction.layout().set_split_x(settings.value("multiSplitX", 0.5f).toFloat());
+    m_interaction.layout().set_split_y(settings.value("multiSplitY", 0.5f).toFloat());
 
     const int savedViewMode = settings.value("viewMode", static_cast<int>(SingleView)).toInt();
     m_viewCount = std::clamp(settings.value("viewCount", 1).toInt(), 1, static_cast<int>(m_subViews.size()));
     // showSingleView keeps the pane count for the next showMultiView; one pane is always the single view
     m_viewMode = (savedViewMode == static_cast<int>(MultiView) && m_viewCount > 1) ? MultiView : SingleView;
 
+    Eigen::Quaternionf cameraRotation = m_singleView.rotation;
     const bool hasCameraQuat = settings.contains("cameraRotW") && settings.contains("cameraRotX") && settings.contains("cameraRotY") && settings.contains("cameraRotZ");
     if (hasCameraQuat) {
         const float w = settings.value("cameraRotW", 1.0f).toFloat();
         const float x = settings.value("cameraRotX", 0.0f).toFloat();
         const float y = settings.value("cameraRotY", 0.0f).toFloat();
         const float z = settings.value("cameraRotZ", 0.0f).toFloat();
-        m_cameraRotation = QQuaternion(w, x, y, z);
-        if (m_cameraRotation.lengthSquared() <= std::numeric_limits<float>::epsilon()) {
-            m_cameraRotation = QQuaternion();
+        cameraRotation = Eigen::Quaternionf(w, x, y, z);
+        if (cameraRotation.squaredNorm() <= std::numeric_limits<float>::epsilon()) {
+            cameraRotation = Eigen::Quaternionf::Identity();
         } else {
-            m_cameraRotation.normalize();
+            cameraRotation.normalize();
         }
     }
 
@@ -1530,9 +1404,11 @@ void BrainViewCore::loadMultiViewSettings()
     }
 
     // Delegate per-SubView serialization
-    m_singleView.load(settings, "single_", m_cameraRotation);
+    m_singleView.load(settings, "single_", cameraRotation);
+    // The single view turns by the camera rotation, which is stored on its own
+    m_singleView.rotation = cameraRotation;
     for (int i = 0; i < std::ssize(m_subViews); ++i)
-        m_subViews[i].load(settings, QStringLiteral("multi%1_").arg(i), m_cameraRotation);
+        m_subViews[i].load(settings, QStringLiteral("multi%1_").arg(i), cameraRotation);
 
     const int maxIdx = static_cast<int>(m_subViews.size()) - 1;
     m_visualizationEditTarget = normalizedVisualizationTarget(
@@ -1541,11 +1417,6 @@ void BrainViewCore::loadMultiViewSettings()
     m_infoPanelVisible = settings.value("infoPanelVisible", true).toBool();
 
     settings.endGroup();
-
-    m_multiSplitX = std::clamp(m_multiSplitX, 0.15f, 0.85f);
-    m_multiSplitY = std::clamp(m_multiSplitY, 0.15f, 0.85f);
-    m_layout.setSplitX(m_multiSplitX);
-    m_layout.setSplitY(m_multiSplitY);
 
     setVisualizationEditTarget(m_visualizationEditTarget);
 
@@ -1566,14 +1437,14 @@ void BrainViewCore::saveMultiViewSettings() const
 {
     QSettings settings;
     settings.beginGroup(QStringLiteral("BrainView"));
-    settings.setValue("multiSplitX", m_multiSplitX);
-    settings.setValue("multiSplitY", m_multiSplitY);
+    settings.setValue("multiSplitX", m_interaction.layout().split_x());
+    settings.setValue("multiSplitY", m_interaction.layout().split_y());
     settings.setValue("viewMode", static_cast<int>(m_viewMode));
     settings.setValue("viewCount", m_viewCount);
-    settings.setValue("cameraRotW", m_cameraRotation.scalar());
-    settings.setValue("cameraRotX", m_cameraRotation.x());
-    settings.setValue("cameraRotY", m_cameraRotation.y());
-    settings.setValue("cameraRotZ", m_cameraRotation.z());
+    settings.setValue("cameraRotW", m_singleView.rotation.w());
+    settings.setValue("cameraRotX", m_singleView.rotation.x());
+    settings.setValue("cameraRotY", m_singleView.rotation.y());
+    settings.setValue("cameraRotZ", m_singleView.rotation.z());
     for (int i = 0; i < std::ssize(m_subViews); ++i)
         settings.setValue(QStringLiteral("viewportEnabled%1").arg(i), m_subViews[i].enabled);
     settings.setValue("visualizationEditTarget", m_visualizationEditTarget);
@@ -1594,7 +1465,6 @@ void BrainViewCore::setViewportEnabled(int index, bool enabled)
     if (index >= 0 && index < std::ssize(m_subViews)) {
         m_subViews[index].enabled = enabled;
         saveMultiViewSettings();
-        updateViewportSeparators();
         updateOverlayLayout();
         m_sceneDirty = true;
         requestUpdate();
@@ -1607,7 +1477,7 @@ void BrainViewCore::setViewportCameraPreset(int index, int preset)
 {
     if (index < 0 || index >= static_cast<int>(m_subViews.size()))
         return;
-    preset = std::clamp(preset, 0, 6);
+    preset = scene::clamp_view_preset(preset);
     if (m_subViews[index].preset == preset)
         return;
     m_subViews[index].preset = preset;
@@ -1621,7 +1491,7 @@ void BrainViewCore::setViewportCameraPreset(int index, int preset)
 
 void BrainViewCore::resetSingleViewCameraState()
 {
-    m_cameraRotation = QQuaternion();
+    m_singleView.rotation = Eigen::Quaternionf::Identity();
     m_singleView.zoom = 0.0f;
     saveMultiViewSettings();
     m_sceneDirty = true;
@@ -1637,8 +1507,8 @@ void BrainViewCore::resetViewportCameraState(int index)
     }
 
     m_subViews[index].zoom = 0.0f;
-    m_subViews[index].pan = QVector2D();
-    m_subViews[index].perspectiveRotation = QQuaternion();
+    m_subViews[index].pan = Eigen::Vector2f::Zero();
+    m_subViews[index].rotation = Eigen::Quaternionf::Identity();
     saveMultiViewSettings();
     m_sceneDirty = true;
     requestUpdate();
@@ -1654,7 +1524,6 @@ void BrainViewCore::resetAllSubViewState()
         m_subViews[i] = SubView::defaultForIndex(i);
         m_subViews[i].enabled = wasEnabled;
     }
-    m_cameraRotation = QQuaternion();
     saveMultiViewSettings();
     updateOverlayLayout();
     m_sceneDirty = true;
@@ -1667,7 +1536,7 @@ int BrainViewCore::viewportCameraPreset(int index) const
 {
     if (index < 0 || index >= static_cast<int>(m_subViews.size()))
         return -1;
-    return std::clamp(m_subViews[index].preset, 0, 6);
+    return scene::clamp_view_preset(m_subViews[index].preset);
 }
 
 //=============================================================================================================
@@ -1683,7 +1552,6 @@ void BrainViewCore::setInfoPanelVisible(bool visible)
 
 void BrainViewCore::handleResize()
 {
-    updateViewportSeparators();
     updateOverlayLayout();
 }
 
@@ -1824,7 +1692,7 @@ void BrainViewCore::renderFrame(QRhi* rhi, int sampleCount, QRhiCommandBuffer* c
             m_vertexCountDirty = false;
         }
 
-        m_fpsLabel.text = QString("FPS: %1\nVertices: %2").arg(fps, 0, 'f', 1).arg(m_cachedVertexCount);
+        m_overlay.set_text(scene::BrainViewOverlay::Item::FpsLabel, std::format("FPS: {:.1f}\nVertices: {}", fps, m_cachedVertexCount));
         updateOverlayLayout();
         m_frameCount = 0;
         m_fpsStart = std::chrono::steady_clock::now();
@@ -1902,43 +1770,12 @@ void BrainViewCore::renderFrame(QRhi* rhi, int sampleCount, QRhiCommandBuffer* c
         int vp = (m_viewMode == MultiView) ? enabledViewports[slot] : 0;
         const SubView& sv = (m_viewMode == MultiView) ? m_subViews[vp] : m_singleView;
 
-        const QRect paneRect = (m_viewMode == MultiView)
-            ? multiViewSlotRect(slot, numEnabled, outputSize)
-            : QRect(0, 0, outputSize.width(), outputSize.height());
-
-        QRect renderRect = paneRect;
-        if (m_viewMode == MultiView && numEnabled > 1) {
-            constexpr int separatorPx = 2;
-
-            if (numEnabled == 2) {
-                if (slot == 0) {
-                    renderRect.setWidth(std::max(1, renderRect.width() - separatorPx));
-                }
-            } else if (numEnabled == 3) {
-                // 3-view: slot 0 = full top row, slots 1&2 = bottom row
-                if (slot == 0) {
-                    // Top pane: no right neighbor, has bottom neighbor
-                    renderRect.setHeight(std::max(1, renderRect.height() - separatorPx));
-                } else if (slot == 1) {
-                    // Bottom-left: has right neighbor, no bottom neighbor
-                    renderRect.setWidth(std::max(1, renderRect.width() - separatorPx));
-                }
-                // slot 2 (bottom-right): no insets needed
-            } else {
-                const int col = slot % 2;
-                const int row = slot / 2;
-
-                const bool hasRightNeighbor = (col == 0) && (slot + 1 < numEnabled) && ((slot / 2) == ((slot + 1) / 2));
-                const bool hasBottomNeighbor = (row == 0) && (slot + 2 < numEnabled);
-
-                if (hasRightNeighbor) {
-                    renderRect.setWidth(std::max(1, renderRect.width() - separatorPx));
-                }
-                if (hasBottomNeighbor) {
-                    renderRect.setHeight(std::max(1, renderRect.height() - separatorPx));
-                }
-            }
-        }
+        // The scene leaves the separator lines to the right and below a pane free
+        const scene::PaneLayout& layout = m_interaction.layout();
+        const scene::PixelRect renderPixels = (m_viewMode == MultiView)
+            ? layout.inset_for_separator(layout.slot_rect(slot, numEnabled, toPixelSize(outputSize)), slot, numEnabled)
+            : scene::PixelRect{0, 0, outputSize.width(), outputSize.height()};
+        const QRect renderRect = toQRect(renderPixels);
 
         const int viewX = renderRect.x();
         const int viewY = outputSize.height() - (renderRect.y() + renderRect.height());
@@ -1950,24 +1787,18 @@ void BrainViewCore::renderFrame(QRhi* rhi, int sampleCount, QRhiCommandBuffer* c
         const float aspectRatio = float(viewW) / float(viewH);
 
         // Calculate camera for this viewport
-        const QVector3D effectiveCenter = m_cameraFocusOverride ? m_cameraFocusCenter : m_sceneCenter;
-        const float effectiveSize = m_cameraFocusOverride ? m_cameraFocusSize : m_sceneSize;
-        m_camera.setSceneCenter(effectiveCenter);
-        m_camera.setSceneSize(effectiveSize);
-        m_camera.setRotation(m_cameraRotation);
-        m_camera.setZoom(m_singleView.zoom);
-        const CameraResult cam = (m_viewMode == MultiView)
-            ? m_camera.computeMultiView(sv, aspectRatio)
-            : m_camera.computeSingleView(aspectRatio);
+        m_camera.set_scene_center(toEigen(m_cameraFocusOverride ? m_cameraFocusCenter : m_sceneCenter));
+        m_camera.set_scene_size(m_cameraFocusOverride ? m_cameraFocusSize : m_sceneSize);
+        const scene::CameraMatrices cam = (m_viewMode == MultiView)
+            ? m_camera.pane_view(sv, aspectRatio)
+            : m_camera.single_view(m_singleView.rotation, m_singleView.zoom, aspectRatio);
+        const Eigen::Matrix4f pvm = cam.pvm();
 
         BrainRenderer::SceneData sceneData;
-        sceneData.mvp = rhi->clipSpaceCorrMatrix();
-        sceneData.mvp *= cam.projection;
-        sceneData.mvp *= cam.view;
-        sceneData.mvp *= cam.model;
+        sceneData.mvp = rhi->clipSpaceCorrMatrix() * toQMatrix(pvm);
 
-        sceneData.cameraPos = cam.cameraPos;
-        sceneData.lightDir = cam.cameraPos.normalized();
+        sceneData.cameraPos = toQVector3D(cam.eye);
+        sceneData.lightDir = sceneData.cameraPos.normalized();
         sceneData.lightingEnabled = m_lightingEnabled;
 
         // Per-draw overlayMode uniform — the shader selects the vertex colour
@@ -1995,12 +1826,12 @@ void BrainViewCore::renderFrame(QRhi* rhi, int sampleCount, QRhiCommandBuffer* c
         }
 
         // Info panel; relayout only on change
-        OverlayLabel& infoLabel = (m_viewMode == MultiView) ? m_viewportInfoLabels[vp] : m_singleViewInfoLabel;
-        const QString info = QString::fromStdString(std::format("Shader: {}\nSurface: {}\nOverlay: {}\nDrawn: {}",
-                                                                shaderModeName(currentShader), sv.surfaceType, overlayName,
-                                                                drawnKeys.empty() ? std::string("none") : mne::join(drawnKeys, ", ")));
-        if (infoLabel.text != info) {
-            infoLabel.text = info;
+        std::string info = std::format("Shader: {}\nSurface: {}\nOverlay: {}\nDrawn: {}", shaderModeName(currentShader),
+                                       sv.surfaceType, overlayName, drawnKeys.empty() ? std::string("none") : mne::join(drawnKeys, ", "));
+        const bool infoChanged = (m_viewMode == MultiView)
+            ? m_overlay.set_text(scene::BrainViewOverlay::Item::ViewportInfoLabel, std::move(info), vp)
+            : m_overlay.set_text(scene::BrainViewOverlay::Item::SingleViewInfoLabel, std::move(info));
+        if (infoChanged) {
             updateOverlayLayout();
         }
 
@@ -2120,10 +1951,7 @@ void BrainViewCore::renderFrame(QRhi* rhi, int sampleCount, QRhiCommandBuffer* c
             BrainRenderer::SceneData debugSceneData = sceneData;
             debugSceneData.overlayMode = 0.0f; // pass-through for holographic shell
 
-            QMatrix4x4 translation;
-            translation.translate(m_lastIntersectionPoint);
-
-            debugSceneData.mvp = rhi->clipSpaceCorrMatrix() * cam.projection * cam.view * cam.model * translation;
+            debugSceneData.mvp = rhi->clipSpaceCorrMatrix() * toQMatrix(pvm * scene::translation_matrix(toEigen(m_lastIntersectionPoint)));
 
             pane.pointerOffset = m_renderer->prepareSurfaceDraw(updates, debugSceneData, m_debugPointerSurface.get());
         }
@@ -2182,201 +2010,57 @@ void BrainViewCore::renderFrame(QRhi* rhi, int sampleCount, QRhiCommandBuffer* c
 
 //=============================================================================================================
 
-void BrainViewCore::handleMousePress(QMouseEvent* e)
+void BrainViewCore::handleMousePress(QMouseEvent* event)
 {
-    if (e->button() == Qt::LeftButton) {
-        m_perspectiveRotatedSincePress = false;
-        m_draggedSincePress = false;
-    }
-
-    if (e->button() == Qt::LeftButton && m_viewMode == MultiView) {
-        const int clickedVp = viewportIndexAt(e->pos());
-        // A hidden surface shows no labels, so its name labels take no clicks
-        if (clickedVp >= 0 && clickedVp < std::ssize(m_viewportNameLabels) && m_viewportNameLabels[clickedVp].visible && m_host && m_host->isVisible()) {
-            if (m_viewportNameLabels[clickedVp].geometry.contains(e->pos())) {
-                if (clickedVp != m_visualizationEditTarget) {
-                    setVisualizationEditTarget(clickedVp);
-                }
-                m_host->requestViewportPresetMenu(clickedVp, e->pos());
-                m_lastMousePos = e->pos();
-                return;
-            }
-        }
-
-        const int numEnabled = enabledViewportCount();
-        const SplitterHit hit = hitTestSplitter(e->pos(), numEnabled, hostSize());
-        if (hit != SplitterHit::None) {
-            m_isDraggingSplitter = true;
-            m_activeSplitter = hit;
-            m_lastMousePos = e->pos();
-            updateSplitterCursor(e->pos());
-            return;
-        }
-
-        // Select the clicked viewport as the active edit target
-        const int clickedVpForSelection = viewportIndexAt(e->pos());
-        if (clickedVpForSelection >= 0 && clickedVpForSelection != m_visualizationEditTarget) {
-            setVisualizationEditTarget(clickedVpForSelection);
-        }
-    }
-
-    m_lastMousePos = e->pos();
+    syncInteraction();
+    m_interaction.handle_pointer(toScenePointerEvent(*event, scene::PointerEvent::Type::Press));
 }
 
 //=============================================================================================================
 
 void BrainViewCore::handleMouseMove(QMouseEvent* event)
 {
-    if (m_isDraggingSplitter && (event->buttons() & Qt::LeftButton)) {
-        m_layout.dragSplitter(event->pos(), m_activeSplitter, hostSize());
-        m_multiSplitX = m_layout.splitX();
-        m_multiSplitY = m_layout.splitY();
-
-        m_lastMousePos = event->pos();
-        updateViewportSeparators();
-        m_sceneDirty = true;
-        requestUpdate();
-        return;
-    }
-
-    if (event->buttons() & Qt::LeftButton) {
-        if (m_viewMode == MultiView) {
-            const int activeVp = viewportIndexAt(event->pos());
-            const int activePreset = (activeVp >= 0 && activeVp < std::ssize(m_subViews))
-                ? std::clamp(m_subViews[activeVp].preset, 0, 6)
-                : 1;
-
-            if (activeVp >= 0 && !multiViewPresetIsPerspective(activePreset)) {
-                // Planar views (Top/Front/Left): pan along the view plane
-                const QPoint diff = event->pos() - m_lastMousePos;
-                CameraController::applyMousePan(diff, m_subViews[activeVp].pan, m_sceneSize);
-                m_draggedSincePress = true;
-                m_lastMousePos = event->pos();
-                m_sceneDirty = true;
-                requestUpdate();
-                return;
-            }
-
-            if (activeVp >= 0 && multiViewPresetIsPerspective(activePreset)) {
-                // Perspective view: rotate
-                QPoint diff = event->pos() - m_lastMousePos;
-                CameraController::applyMouseRotation(diff, m_subViews[activeVp].perspectiveRotation);
-
-                m_perspectiveRotatedSincePress = true;
-                m_draggedSincePress = true;
-                m_lastMousePos = event->pos();
-                m_sceneDirty = true;
-                requestUpdate();
-                return;
-            }
-
-            m_lastMousePos = event->pos();
-            return;
-        }
-
-        // Single-view rotation
-        QPoint diff = event->pos() - m_lastMousePos;
-        CameraController::applyMouseRotation(diff, m_cameraRotation);
-        m_draggedSincePress = true;
-
-        m_lastMousePos = event->pos();
-        m_sceneDirty = true;
-        requestUpdate();
-    } else {
-        if (m_viewMode == MultiView) {
-            updateSplitterCursor(event->pos());
-        } else {
-            setHostCursor(Qt::ArrowCursor);
-        }
-        castRay(event->pos());
-    }
+    syncInteraction();
+    m_interaction.handle_pointer(toScenePointerEvent(*event, scene::PointerEvent::Type::Move));
 }
 
 //=============================================================================================================
 
 void BrainViewCore::handleMouseRelease(QMouseEvent* event)
 {
-    if (event->button() == Qt::LeftButton && m_isDraggingSplitter) {
-        m_isDraggingSplitter = false;
-        m_activeSplitter = SplitterHit::None;
-        saveMultiViewSettings();
-        updateSplitterCursor(event->pos());
-        return;
-    }
-
-    if (event->button() == Qt::LeftButton && m_viewMode == MultiView && m_perspectiveRotatedSincePress) {
-        m_perspectiveRotatedSincePress = false;
-        saveMultiViewSettings();
-    }
-
-    // Save pan offset after dragging in a planar viewport
-    if (event->button() == Qt::LeftButton && m_viewMode == MultiView && !m_perspectiveRotatedSincePress) {
-        saveMultiViewSettings();
-    }
-
-    // Emit surface click if a clean left-click (no rotate or pan drag) landed on geometry
-    if (event->button() == Qt::LeftButton && !m_draggedSincePress) {
-        castRay(event->pos());
-        if (const mne::IeegContact* contact = m_electrodes ? m_electrodes->contactAt(m_electrodes->hoveredContact()) : nullptr) {
-            emit electrodeContactClicked(QString::fromStdString(contact->name), QVector3D(contact->position.x(), contact->position.y(), contact->position.z()));
-        } else if (m_hasIntersection) {
-            emit surfacePointClicked(m_lastIntersectionPoint);
-        }
-    }
-
-    if (m_viewMode == MultiView) {
-        updateSplitterCursor(event->pos());
-    } else {
-        setHostCursor(Qt::ArrowCursor);
-    }
+    syncInteraction();
+    m_interaction.handle_pointer(toScenePointerEvent(*event, scene::PointerEvent::Type::Release));
 }
 
 //=============================================================================================================
 
 bool BrainViewCore::handleMouseDoubleClick(QMouseEvent* event)
 {
-    if (event->button() == Qt::LeftButton) {
-        castRay(event->pos());
-        if (m_hasIntersection) {
-            emit surfacePointDoubleClicked(m_lastIntersectionPoint);
-            return true;
-        }
-    }
-    return false;
+    syncInteraction();
+    return m_interaction.handle_pointer(toScenePointerEvent(*event, scene::PointerEvent::Type::DoubleClick));
 }
 
 //=============================================================================================================
 
 void BrainViewCore::handleWheel(QWheelEvent* event)
 {
-    const float delta = event->angleDelta().y() / 120.0f;
-
-    if (m_viewMode == MultiView) {
-        const int vp = viewportIndexAt(event->position().toPoint());
-        if (vp >= 0 && vp < std::ssize(m_subViews)) {
-            m_subViews[vp].zoom += delta;
-            saveMultiViewSettings();
-        }
-    } else {
-        m_singleView.zoom += delta;
-        saveMultiViewSettings();
-    }
-    m_sceneDirty = true;
-    requestUpdate();
+    syncInteraction();
+    m_interaction.handle_wheel(toSceneWheelEvent(*event));
 }
 
 //=============================================================================================================
 
 void BrainViewCore::handleKeyPress(QKeyEvent* event)
 {
-    if (event->key() == Qt::Key_S) {
-        saveSnapshot();
-    } else if (event->key() == Qt::Key_R) {
-        m_cameraRotation = QQuaternion();
-        saveMultiViewSettings();
-        m_sceneDirty = true;
-        requestUpdate();
+    // Only printable keys have a meaning here; Qt's codes of those are their Latin-1 characters
+    scene::KeyEvent key;
+    if (event->key() >= Qt::Key_Space && event->key() <= Qt::Key_ydiaeresis) {
+        key.key = scene::Key::Character;
+        key.character = static_cast<char32_t>(event->key());
     }
+    key.timestamp_ms = sceneTimestampMs();
+    syncInteraction();
+    m_interaction.handle_key(key);
 }
 
 //=============================================================================================================
@@ -3022,50 +2706,44 @@ void BrainViewCore::refreshSensorTransforms()
 
 void BrainViewCore::castRay(const QPoint& pos)
 {
-    // 1. Setup Matrix Stack (Must match render exactly, including multiview pane layout)
-    const QSize outputSize = hostSize();
-
+    // Same camera and pane layout as the render, in logical pixels
+    const scene::PixelSize outputSize = toPixelSize(hostSize());
     const auto enabledViewports = enabledViewportIndices();
-
     const int numEnabled = static_cast<int>(enabledViewports.size());
-    int activeSlot = 0;
-    QRect activePane(0, 0, outputSize.width(), outputSize.height());
+    const scene::Point point{static_cast<double>(pos.x()), static_cast<double>(pos.y())};
 
+    int activeSlot = 0;
+    scene::PixelRect activePane{0, 0, outputSize.width, outputSize.height};
     bool hasValidPane = true;
     if (m_viewMode == MultiView && numEnabled > 1) {
-        bool foundSlot = false;
+        hasValidPane = false;
         for (int slot = 0; slot < numEnabled; ++slot) {
-            const QRect pane = multiViewSlotRect(slot, numEnabled, outputSize);
-            if (pane.contains(pos)) {
+            const scene::PixelRect pane = m_interaction.layout().slot_rect(slot, numEnabled, outputSize);
+            if (pane.contains(point)) {
                 activeSlot = slot;
                 activePane = pane;
-                foundSlot = true;
+                hasValidPane = true;
                 break;
             }
         }
-
-        hasValidPane = foundSlot;
     }
 
     const int vp = (m_viewMode == MultiView) ? enabledViewports[activeSlot] : 0;
     const SubView& sv = (m_viewMode == MultiView) ? m_subViews[vp] : m_singleView;
 
-    const QVector3D effectiveCenter2 = m_cameraFocusOverride ? m_cameraFocusCenter : m_sceneCenter;
-    const float effectiveSize2 = m_cameraFocusOverride ? m_cameraFocusSize : m_sceneSize;
-    m_camera.setSceneCenter(effectiveCenter2);
-    m_camera.setSceneSize(effectiveSize2);
-    m_camera.setRotation(m_cameraRotation);
-    m_camera.setZoom(m_singleView.zoom);
-    const float aspect = float(std::max(1, activePane.width())) / float(std::max(1, activePane.height()));
-    const CameraResult cam = (m_viewMode == MultiView)
-        ? m_camera.computeMultiView(sv, aspect)
-        : m_camera.computeSingleView(aspect);
-    QMatrix4x4 pvm = cam.projection * cam.view * cam.model;
+    m_camera.set_scene_center(toEigen(m_cameraFocusOverride ? m_cameraFocusCenter : m_sceneCenter));
+    m_camera.set_scene_size(m_cameraFocusOverride ? m_cameraFocusSize : m_sceneSize);
+    const float aspect = float(std::max(1, activePane.width)) / float(std::max(1, activePane.height));
+    const scene::CameraMatrices cam = (m_viewMode == MultiView)
+        ? m_camera.pane_view(sv, aspect)
+        : m_camera.single_view(m_singleView.rotation, m_singleView.zoom, aspect);
 
     // ── Unproject screen position to world-space ray ───────────────────
-    QVector3D rayOrigin, rayDir;
-    if (!RayPicker::unproject(pos, activePane, pvm, rayOrigin, rayDir))
+    const std::optional<scene::Ray> ray = scene::ray_from_pixel(point, activePane.to_rect(), cam.pvm());
+    if (!ray)
         return;
+    const QVector3D rayOrigin = toQVector3D(ray->origin);
+    const QVector3D rayDir = toQVector3D(ray->direction);
 
     // ── Pick against all scene geometry ────────────────────────────────
     RayHit pickResult;
@@ -3104,10 +2782,7 @@ void BrainViewCore::castRay(const QPoint& pos)
     if (displayLabel != m_hoveredRegion) {
         m_hoveredRegion = displayLabel;
         emit hoveredRegionChanged(m_hoveredRegion);
-        if (!m_hoveredRegion.isEmpty()) {
-            m_regionLabel.text = m_hoveredRegion;
-        }
-        m_regionLabel.visible = !m_hoveredRegion.isEmpty();
+        m_overlay.set_region(m_hoveredRegion.toStdString());
         markOverlayDirty();
     }
 
@@ -3857,7 +3532,7 @@ void BrainViewCore::setMriSlicesVisible(bool visible)
 
 QQuaternion BrainViewCore::cameraRotation() const
 {
-    return m_cameraRotation;
+    return toQQuaternion(m_singleView.rotation);
 }
 
 //=============================================================================================================
@@ -3872,29 +3547,25 @@ float BrainViewCore::zoomForTarget(int target) const
 namespace
 {
 
-template<typename Label>
-const Label* overlayLabelFor(const Label& fps, const Label& singleInfo, const Label& region,
-                             const std::vector<Label>& names, const std::vector<Label>& infos,
-                             const Label& vertical, const Label& horizontal,
-                             BrainViewCore::OverlayItem item, int viewport)
+scene::BrainViewOverlay::Item toSceneItem(BrainViewCore::OverlayItem item)
 {
     switch (item) {
         case BrainViewCore::FpsLabel:
-            return &fps;
+            return scene::BrainViewOverlay::Item::FpsLabel;
         case BrainViewCore::SingleViewInfoLabel:
-            return &singleInfo;
+            return scene::BrainViewOverlay::Item::SingleViewInfoLabel;
         case BrainViewCore::RegionLabel:
-            return &region;
+            return scene::BrainViewOverlay::Item::RegionLabel;
         case BrainViewCore::ViewportNameLabel:
-            return (viewport >= 0 && viewport < std::ssize(names)) ? &names[static_cast<size_t>(viewport)] : nullptr;
+            return scene::BrainViewOverlay::Item::ViewportNameLabel;
         case BrainViewCore::ViewportInfoLabel:
-            return (viewport >= 0 && viewport < std::ssize(infos)) ? &infos[static_cast<size_t>(viewport)] : nullptr;
+            return scene::BrainViewOverlay::Item::ViewportInfoLabel;
         case BrainViewCore::VerticalSeparator:
-            return &vertical;
+            return scene::BrainViewOverlay::Item::VerticalSeparator;
         case BrainViewCore::HorizontalSeparator:
-            return &horizontal;
+            break;
     }
-    return nullptr;
+    return scene::BrainViewOverlay::Item::HorizontalSeparator;
 }
 
 } // namespace
@@ -3906,26 +3577,23 @@ QString BrainViewCore::overlayText(OverlayItem item, int viewport) const
     if (item == VerticalSeparator || item == HorizontalSeparator) {
         return {};
     }
-    const OverlayLabel* label = overlayLabelFor(m_fpsLabel, m_singleViewInfoLabel, m_regionLabel, m_viewportNameLabels,
-                                                m_viewportInfoLabels, m_verticalSeparator, m_horizontalSeparator, item, viewport);
-    return label ? label->text : QString();
+    const scene::BrainViewOverlay::Label* label = m_overlay.item(toSceneItem(item), viewport);
+    return label ? QString::fromStdString(label->text) : QString();
 }
 
 //=============================================================================================================
 
 QRect BrainViewCore::overlayGeometry(OverlayItem item, int viewport) const
 {
-    const OverlayLabel* label = overlayLabelFor(m_fpsLabel, m_singleViewInfoLabel, m_regionLabel, m_viewportNameLabels,
-                                                m_viewportInfoLabels, m_verticalSeparator, m_horizontalSeparator, item, viewport);
-    return label ? label->geometry : QRect();
+    const scene::BrainViewOverlay::Label* label = m_overlay.item(toSceneItem(item), viewport);
+    return label ? toQRect(label->geometry) : QRect();
 }
 
 //=============================================================================================================
 
 bool BrainViewCore::isOverlayItemVisible(OverlayItem item, int viewport) const
 {
-    const OverlayLabel* label = overlayLabelFor(m_fpsLabel, m_singleViewInfoLabel, m_regionLabel, m_viewportNameLabels,
-                                                m_viewportInfoLabels, m_verticalSeparator, m_horizontalSeparator, item, viewport);
+    const scene::BrainViewOverlay::Label* label = m_overlay.item(toSceneItem(item), viewport);
     return label && label->visible;
 }
 
@@ -3937,38 +3605,17 @@ QImage BrainViewCore::overlayImage(const QSize& pixelSize, qreal devicePixelRati
         return {};
     }
 
+    const qreal dpr = devicePixelRatio > 0.0 ? devicePixelRatio : 1.0;
     QImage image(pixelSize, QImage::Format_ARGB32_Premultiplied);
-    image.setDevicePixelRatio(devicePixelRatio > 0.0 ? devicePixelRatio : 1.0);
+    image.setDevicePixelRatio(dpr);
     image.fill(Qt::transparent);
 
+    // The overlay is laid out in logical pixels; the image's device pixel ratio scales it
+    const QFont baseFont = overlayBaseFont();
+    const QtTextMetrics metrics(baseFont);
     QPainter painter(&image);
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-
-    // Same stacking as the former child widgets: separators below the labels
-    for (const OverlayLabel* separator : {&m_verticalSeparator, &m_horizontalSeparator}) {
-        if (separator->visible) {
-            painter.fillRect(separator->geometry, m_separatorColor);
-        }
-    }
-    if (m_fpsLabel.visible) {
-        paintOverlayLabel(painter, fpsLabelStyle(), m_fpsLabel.geometry, m_fpsLabel.text);
-    }
-    if (m_singleViewInfoLabel.visible) {
-        paintOverlayLabel(painter, infoLabelStyle(), m_singleViewInfoLabel.geometry, m_singleViewInfoLabel.text);
-    }
-    if (m_regionLabel.visible) {
-        paintOverlayLabel(painter, regionLabelStyle(), m_regionLabel.geometry, m_regionLabel.text);
-    }
-    for (int i = 0; i < std::ssize(m_viewportNameLabels); ++i) {
-        const OverlayLabel& name = m_viewportNameLabels[i];
-        if (name.visible) {
-            paintOverlayLabel(painter, nameLabelStyle(name.selected), name.geometry, name.text);
-        }
-        const OverlayLabel& info = m_viewportInfoLabels[i];
-        if (info.visible) {
-            paintOverlayLabel(painter, infoLabelStyle(), info.geometry, info.text);
-        }
-    }
+    paintScene(painter, m_overlay.draw(qCeil(pixelSize.width() / dpr), qCeil(pixelSize.height() / dpr), metrics), baseFont);
     return image;
 }
 

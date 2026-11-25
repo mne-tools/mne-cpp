@@ -13,9 +13,9 @@
  * any host application embeds to get an interactive cortical /
  * sensor / source scene. It is a thin QRhiWidget host around
  * @ref mne::disp::BrainViewCore, which connects @ref mne::disp::BrainTreeModel
- * data changes to scene rebuilds, drives @ref mne::disp::CameraController
- * from the Qt mouse / wheel events, switches between single- and multi-view
- * layouts through @ref mne::disp::MultiViewLayout, paints the 2-D overlay and
+ * data changes to scene rebuilds, feeds the Qt mouse / wheel / key events to
+ * the toolkit-neutral camera, input and pane layout of mne_scene
+ * (@ref mne::scene::BrainViewInteraction), paints the 2-D overlay and
  * delegates the actual drawing to @ref mne::disp::BrainRenderer.
  * @ref mne::disp::BrainWindow hosts the same core in a QWindow.
  *

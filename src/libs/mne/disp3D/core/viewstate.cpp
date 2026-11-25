@@ -18,6 +18,7 @@
 
 #include "renderable/brainsurface.h"
 #include "view/brainrenderer.h"
+#include "core/qteigen_p.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -303,62 +304,28 @@ void SubView::applyOverlayToSurfaces(
 
 QQuaternion perspectivePresetRotation()
 {
-    return QQuaternion::fromEulerAngles(-45.0f, -40.0f, -130.0f);
+    return toQQuaternion(scene::perspective_preset_rotation());
 }
 
 //=============================================================================================================
 
 std::string multiViewPresetName(int preset)
 {
-    switch (preset) {
-        case 0:
-            return "Top";
-        case 1:
-            return "Perspective";
-        case 2:
-            return "Front";
-        case 3:
-            return "Left";
-        case 4:
-            return "Bottom";
-        case 5:
-            return "Back";
-        case 6:
-            return "Right";
-        default:
-            return "Top";
-    }
+    return std::string(scene::view_preset_name(preset));
 }
 
 //=============================================================================================================
 
 QQuaternion multiViewPresetOffset(int preset)
 {
-    switch (preset) {
-        case 0:
-            return QQuaternion::fromAxisAndAngle(0, 0, 1, 180);
-        case 1:
-            return perspectivePresetRotation();
-        case 2:
-            return QQuaternion::fromAxisAndAngle(0, 1, 0, 180) * QQuaternion::fromAxisAndAngle(0, 0, 1, 180) * QQuaternion::fromAxisAndAngle(1, 0, 0, 90) * QQuaternion::fromAxisAndAngle(0, 0, 1, 180);
-        case 3:
-            return QQuaternion::fromAxisAndAngle(1, 0, 0, 90) * QQuaternion::fromAxisAndAngle(0, 1, 0, -90);
-        case 4:
-            return QQuaternion::fromAxisAndAngle(1, 0, 0, 180) * QQuaternion::fromAxisAndAngle(0, 0, 1, 180);
-        case 5:
-            return QQuaternion::fromAxisAndAngle(1, 0, 0, 90);
-        case 6:
-            return QQuaternion::fromAxisAndAngle(1, 0, 0, 90) * QQuaternion::fromAxisAndAngle(0, 1, 0, 90);
-        default:
-            return QQuaternion::fromAxisAndAngle(0, 0, 1, 180);
-    }
+    return toQQuaternion(scene::view_preset_rotation(preset));
 }
 
 //=============================================================================================================
 
 bool multiViewPresetIsPerspective(int preset)
 {
-    return preset == 1;
+    return scene::view_preset_is_perspective(preset);
 }
 
 //=============================================================================================================
@@ -483,7 +450,7 @@ QRgb mneAnalyzeColor(double v)
 //=============================================================================================================
 
 void SubView::load(const QSettings& settings, const QString& prefix,
-                   const QQuaternion& fallbackRotation)
+                   const Eigen::Quaternionf& fallbackRotation)
 {
     surfaceType = settings.value(prefix + "surfaceType", QString::fromStdString(surfaceType)).toString().toStdString();
     brainShader = shaderModeFromName(settings.value(prefix + "shader", QString::fromStdString(shaderModeName(brainShader))).toString().toStdString());
@@ -493,10 +460,8 @@ void SubView::load(const QSettings& settings, const QString& prefix,
     visibility.load(settings, prefix + "vis_");
 
     zoom = settings.value(prefix + "zoom", zoom).toFloat();
-    pan = QVector2D(
-        settings.value(prefix + "panX", pan.x()).toFloat(),
-        settings.value(prefix + "panY", pan.y()).toFloat());
-    preset = std::clamp(settings.value(prefix + "preset", preset).toInt(), 0, 6);
+    pan = Eigen::Vector2f(settings.value(prefix + "panX", pan.x()).toFloat(), settings.value(prefix + "panY", pan.y()).toFloat());
+    preset = scene::clamp_view_preset(settings.value(prefix + "preset", preset).toInt());
 
     const bool hasQuat = settings.contains(prefix + "perspRotW") && settings.contains(prefix + "perspRotX") && settings.contains(prefix + "perspRotY") && settings.contains(prefix + "perspRotZ");
     if (hasQuat) {
@@ -504,14 +469,14 @@ void SubView::load(const QSettings& settings, const QString& prefix,
         const float x = settings.value(prefix + "perspRotX", 0.0f).toFloat();
         const float y = settings.value(prefix + "perspRotY", 0.0f).toFloat();
         const float z = settings.value(prefix + "perspRotZ", 0.0f).toFloat();
-        perspectiveRotation = QQuaternion(w, x, y, z);
-        if (perspectiveRotation.lengthSquared() <= std::numeric_limits<float>::epsilon()) {
-            perspectiveRotation = QQuaternion();
+        rotation = Eigen::Quaternionf(w, x, y, z);
+        if (rotation.squaredNorm() <= std::numeric_limits<float>::epsilon()) {
+            rotation = Eigen::Quaternionf::Identity();
         } else {
-            perspectiveRotation.normalize();
+            rotation.normalize();
         }
     } else {
-        perspectiveRotation = fallbackRotation;
+        rotation = fallbackRotation;
     }
 }
 
@@ -531,10 +496,10 @@ void SubView::save(QSettings& settings, const QString& prefix) const
     settings.setValue(prefix + "panY", pan.y());
     settings.setValue(prefix + "preset", preset);
 
-    settings.setValue(prefix + "perspRotW", perspectiveRotation.scalar());
-    settings.setValue(prefix + "perspRotX", perspectiveRotation.x());
-    settings.setValue(prefix + "perspRotY", perspectiveRotation.y());
-    settings.setValue(prefix + "perspRotZ", perspectiveRotation.z());
+    settings.setValue(prefix + "perspRotW", rotation.w());
+    settings.setValue(prefix + "perspRotX", rotation.x());
+    settings.setValue(prefix + "perspRotY", rotation.y());
+    settings.setValue(prefix + "perspRotZ", rotation.z());
 }
 
 } // namespace mne::disp

@@ -11,13 +11,18 @@ set(SOURCES
   average_layout.cpp
   average_tile.cpp
   bar_chart.cpp
+  brain_view_interaction.cpp
+  brain_view_overlay.cpp
   butterfly_plot.cpp
+  camera.cpp
   canvas.cpp
   colormap.cpp
   filter_response_plot.cpp
   image_plot.cpp
   line_chart.cpp
+  pane_layout.cpp
   raster_renderer.cpp
+  ray_picking.cpp
   sensor_layout.cpp
   spline_plot.cpp
   svg_renderer.cpp
@@ -36,7 +41,10 @@ set(HEADERS
   average_layout.h
   average_tile.h
   bar_chart.h
+  brain_view_interaction.h
+  brain_view_overlay.h
   butterfly_plot.h
+  camera.h
   canvas.h
   colormap.h
   display_list.h
@@ -45,7 +53,9 @@ set(HEADERS
   input_event.h
   line_chart.h
   geometry.h
+  pane_layout.h
   raster_renderer.h
+  ray_picking.h
   sensor_layout.h
   spline_plot.h
   style.h
@@ -66,8 +76,10 @@ mne_warn_on_narrowing(${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..> $<INSTALL_INTERFACE:include>)
 
+# Eigen carries the vectors, matrices and quaternions of the 3-D camera and picking
 target_link_libraries(${PROJECT_NAME} PUBLIC
-  mne_base)
+  mne_base
+  Eigen3::Eigen)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_SCENE_LIBRARY)
 

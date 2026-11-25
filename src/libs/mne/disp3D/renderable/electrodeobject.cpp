@@ -18,6 +18,7 @@
 
 #include <mne/disp/plots/helpers/colormap.h>
 #include <mne/ieeg/ieeg_surface_map.h>
+#include <mne/scene/ray_picking.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -38,6 +39,7 @@
 #include <limits>
 #include <map>
 #include <numbers>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -415,18 +417,14 @@ int ElectrodeObject::intersect(const QVector3D& rayOrigin, const QVector3D& rayD
     int best = -1;
     float bestT = std::numeric_limits<float>::max();
     const auto& contacts = m_implantation.contacts();
+    const scene::Ray ray{{rayOrigin.x(), rayOrigin.y(), rayOrigin.z()}, {rayDir.x(), rayDir.y(), rayDir.z()}};
     for (int c = 0; c < int(contacts.size()); ++c) {
         const float r = contactRadius(c);
         const Eigen::Vector3f& p = contacts[c].position;
-        const QVector3D oc = rayOrigin - QVector3D(p.x(), p.y(), p.z());
-        const float b = QVector3D::dotProduct(oc, rayDir);
-        const float disc = b * b - (oc.lengthSquared() - r * r);
-        if (disc >= 0.0f) {
-            const float t = -b - std::sqrt(disc);
-            if (t > 0.0f && t < bestT) {
-                bestT = t;
-                best = c;
-            }
+        const std::optional<scene::SphereCrossing> crossing = scene::intersect_ray_sphere(ray, p, r);
+        if (crossing && crossing->entry > 0.0f && crossing->entry < bestT) {
+            bestT = crossing->entry;
+            best = c;
         }
     }
     if (best >= 0)

@@ -221,6 +221,13 @@ and in a PNG written by a tool without Qt. `test_scene_render` compares each plo
 golden files in `src/tests/test_scene_render/data`; run it with `MNE_UPDATE_GOLDEN=1` to rewrite them after an
 intended change.
 
+The interactive views keep their state in `mne_scene` as well, driven by toolkit-neutral input events
+(`scene/input_event.h`): `TraceView` for the raw-data traces, and for the 3-D brain view `OrbitCamera` (camera
+matrices and view presets), `BrainViewInteraction` (orbit, pan, zoom and pane splitters), `MultiViewLayout`,
+the pick rays of `scene/ray_picking.h` and the head-up display `BrainViewOverlay`. The 3-D maths use Eigen,
+which `mne_scene` links like `mne_math`. `test_scene_trace_view` and `test_scene_brain_view` test them
+without Qt.
+
 ### Via Qt Creator
 
 1. Open Qt Creator and select **File > Open File or Project**. Navigate to the `mne-cpp` root folder and select the top-level `CMakeLists.txt`.

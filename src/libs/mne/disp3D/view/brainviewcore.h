@@ -11,12 +11,14 @@
  *
  * BrainViewCore holds everything of the interactive 3-D brain scene that
  * does not need Qt Widgets. It connects @ref mne::disp::BrainTreeModel data
- * changes to scene rebuilds, drives @ref mne::disp::CameraController from
- * QtGui mouse / wheel / key events, lays out single and multi-view panes
- * through @ref mne::disp::MultiViewLayout, paints the 2-D overlay (FPS,
- * per-pane info, pane names, hovered region, pane separators) into a
- * QImage and records a frame through @ref mne::disp::BrainRenderer into a
- * QRhi render target.
+ * changes to scene rebuilds, translates QtGui mouse / wheel / key events for
+ * the toolkit-neutral @ref mne::scene::BrainViewInteraction (orbit, pan, zoom,
+ * pane selection and splitters), takes the camera matrices from
+ * @ref mne::scene::OrbitCamera, paints the 2-D overlay (FPS, per-pane info,
+ * pane names, hovered region, pane separators) of
+ * @ref mne::scene::BrainViewOverlay with paintScene() into a QImage and
+ * records a frame through @ref mne::disp::BrainRenderer into a QRhi render
+ * target.
  *
  * A host surface implements @ref mne::disp::BrainViewHost and forwards its
  * events and frames: @ref mne::disp::BrainView (a QRhiWidget) and
@@ -40,6 +42,9 @@
 #include "scene/rtsensorstreammanager.h"
 #include <mne/fiff/fiff_coord_trans.h>
 #include <mne/fiff/fiff_dig_point_set.h>
+#include <mne/scene/brain_view_interaction.h>
+#include <mne/scene/brain_view_overlay.h>
+#include <mne/scene/camera.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -1555,22 +1560,18 @@ private:
     void removeSurfacesByPrefix(std::initializer_list<std::string_view> prefixes);
 
 private:
-    // ── Layout helpers (delegate to MultiViewLayout) ───────────────────
+    // ── Layout helpers (delegate to scene::PaneLayout) ────────────
     std::vector<int> enabledViewportIndices() const;
-    int enabledViewportCount() const;
-    int viewportIndexAt(const QPoint& pos) const;
-    QRect multiViewSlotRect(int slot, int numEnabled, const QSize& outputSize) const;
-    SplitterHit hitTestSplitter(const QPoint& pos, int numEnabled, const QSize& outputSize) const;
 
     // ── Helpers ────────────────────────────────────────────────────────
-    void updateSplitterCursor(const QPoint& pos);
-    void updateViewportSeparators();
+    void setupInteraction();
+    void syncInteraction();
+    void cameraChanged();
     void updateOverlayLayout();
-    void updateViewportLabelHighlight();
     void requestUpdate();
     void markOverlayDirty();
     QSize hostSize() const;
-    void setHostCursor(Qt::CursorShape shape);
+    void setHostCursor(scene::CursorShape shape);
     QImage grabSceneFrame();
     void renderFrame(QRhi* rhi, int sampleCount, QRhiCommandBuffer* cb);
     void loadMultiViewSettings();
@@ -1601,20 +1602,18 @@ private:
     bool m_lightingEnabled = true;                    /**< Whether per-fragment lighting is active. */
 
     // ── Extracted components ───────────────────────────────────────────
-    CameraController m_camera;                   /**< Camera maths helper. */
-    MultiViewLayout m_layout;                    /**< Multi-view pane geometry and splitter logic. */
+    scene::OrbitCamera m_camera;                 /**< Camera maths. */
+    scene::BrainViewInteraction m_interaction;   /**< Mouse / wheel / key state machine and pane layout. */
     SensorFieldMapper m_fieldMapper;             /**< Sensor → surface field mapping helper. */
     SourceEstimateManager m_sourceManager;       /**< Source estimate lifecycle (load, stream, navigate). */
     RtSensorStreamManager m_sensorStreamManager; /**< Real-time sensor streaming lifecycle. */
 
-    // ── Camera state ───────────────────────────────────────────────────
-    QQuaternion m_cameraRotation;                 /**< Global camera orientation quaternion. */
+    // ── Camera state (the single-view rotation is m_singleView.rotation) ──
     QVector3D m_sceneCenter = QVector3D(0, 0, 0); /**< Bounding-box centre of the scene. */
     float m_sceneSize = 0.3f;                     /**< Bounding-box diagonal of the scene (metres). */
     bool m_cameraFocusOverride = false;           /**< When true, m_sceneCenter/m_sceneSize are user-set. */
     QVector3D m_cameraFocusCenter;                /**< Override center (valid when m_cameraFocusOverride). */
     float m_cameraFocusSize = 0.3f;               /**< Override size   (valid when m_cameraFocusOverride). */
-    QPoint m_lastMousePos;                        /**< Previous mouse position for drag deltas. */
     QTimer* m_pAutoRotateTimer = nullptr;         /**< Drives the automated rotation animation. */
 
     // ── UI overlays ────────────────────────────────────────────────────
@@ -1663,40 +1662,16 @@ private:
 
 
     // ── Multi-view support ─────────────────────────────────────────────
-    ViewMode m_viewMode = SingleView;                 /**< Current view mode (single or multi). */
-    int m_viewCount = 1;                              /**< Number of viewports to show (1..kDefaultViewportCount). */
-    float m_multiSplitX = 0.5f;                       /**< Horizontal splitter position (0..1). */
-    float m_multiSplitY = 0.5f;                       /**< Vertical splitter position (0..1). */
-    bool m_isDraggingSplitter = false;                /**< True while the user is dragging a splitter. */
-    SplitterHit m_activeSplitter = SplitterHit::None; /**< Which splitter is being dragged. */
-    int m_splitterHitTolerancePx = 6;                 /**< Pixel tolerance for splitter hit testing. */
-    int m_splitterMinPanePx = 80;                     /**< Minimum pane size in pixels. */
-    int m_separatorLinePx = 2;                        /**< Separator line thickness in pixels. */
-    bool m_perspectiveRotatedSincePress = false;      /**< True if mouse drag rotated a perspective pane. */
-    bool m_draggedSincePress = false;                 /**< True if the left-button drag rotated or panned. */
+    ViewMode m_viewMode = SingleView; /**< Current view mode (single or multi). */
+    int m_viewCount = 1;              /**< Number of viewports to show (1..kDefaultViewportCount). */
 
     // ── Host and 2-D overlay ───────────────────────────────────────────
-    /** One label or separator of the overlay, in logical surface coordinates. */
-    struct OverlayLabel
-    {
-        QString text;          /**< Label text. */
-        QRect geometry;        /**< Position and size. */
-        bool visible = false;  /**< Whether it is drawn. */
-        bool selected = false; /**< Highlighted pane name label. */
-    };
-    BrainViewHost* m_host = nullptr;                /**< Surface showing the view (not owned). */
-    OverlayLabel m_fpsLabel;                        /**< FPS and vertex count. */
-    OverlayLabel m_singleViewInfoLabel;             /**< Single-view shader/surface info. */
-    OverlayLabel m_regionLabel;                     /**< Hovered region name. */
-    std::vector<OverlayLabel> m_viewportNameLabels; /**< Per-viewport name labels (e.g. "Top", "Front"). */
-    std::vector<OverlayLabel> m_viewportInfoLabels; /**< Per-viewport info labels (shader, surface info). */
-    OverlayLabel m_verticalSeparator;               /**< Separator between left/right panes. */
-    OverlayLabel m_horizontalSeparator;             /**< Separator between top/bottom panes. */
-    QColor m_separatorColor;                        /**< Fill colour of the separators. */
-    mutable QImage m_overlayCache;                  /**< Last painted overlay. */
-    bool m_overlayDirty = true;                     /**< Overlay must be repainted. */
-    bool m_inRender = false;                        /**< True while a frame is recorded. */
-    bool m_overlaySuppressed = false;               /**< Screenshot frames leave the overlay out. */
+    BrainViewHost* m_host = nullptr;   /**< Surface showing the view (not owned). */
+    scene::BrainViewOverlay m_overlay; /**< Labels and pane separators, in logical surface coordinates. */
+    mutable QImage m_overlayCache;     /**< Last painted overlay. */
+    bool m_overlayDirty = true;        /**< Overlay must be repainted. */
+    bool m_inRender = false;           /**< True while a frame is recorded. */
+    bool m_overlaySuppressed = false;  /**< Screenshot frames leave the overlay out. */
 };
 
 } // namespace mne::disp

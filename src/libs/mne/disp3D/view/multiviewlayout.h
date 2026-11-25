@@ -14,7 +14,8 @@
  * orthographic left, Bottom-right orthographic front) inside the
  * owning QRhiWidget, honours user-dragged splitter ratios, and
  * publishes the per-pane @ref mne::disp::SubView so the camera and renderer
- * can set viewport / scissor and pick the right matrix preset.
+ * can set viewport / scissor and pick the right matrix preset. It is the
+ * Qt-typed adapter of the toolkit-neutral @ref mne::scene::PaneLayout.
  */
 
 #ifndef MULTIVIEWLAYOUT_H
@@ -25,6 +26,8 @@
 //=============================================================================================================
 
 #include "../disp3D_global.h"
+
+#include <mne/scene/pane_layout.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -44,17 +47,8 @@
 namespace mne::disp
 {
 
-//=============================================================================================================
-/**
- * Identifies which splitter(s) are hit by a cursor position.
- */
-enum class SplitterHit
-{
-    None,
-    Vertical,
-    Horizontal,
-    Both
-};
+/** Identifies which splitter(s) are hit by a cursor position. */
+using SplitterHit = scene::SplitterHit;
 
 //=============================================================================================================
 /**
@@ -88,39 +82,38 @@ public:
 
     float splitX() const
     {
-        return m_splitX;
+        return m_layout.split_x();
     }
     float splitY() const
     {
-        return m_splitY;
+        return m_layout.split_y();
     }
     void setSplitX(float x)
     {
-        m_splitX = clampSplit(x);
+        m_layout.set_split_x(x);
     }
     void setSplitY(float y)
     {
-        m_splitY = clampSplit(y);
+        m_layout.set_split_y(y);
     }
     void resetSplits()
     {
-        m_splitX = 0.5f;
-        m_splitY = 0.5f;
+        m_layout.reset_splits();
     }
 
     // ── Tolerance / sizing constants ───────────────────────────────────
 
     int hitTolerancePx() const
     {
-        return m_hitTolerancePx;
+        return m_layout.hit_tolerance_px();
     }
     int minPanePx() const
     {
-        return m_minPanePx;
+        return m_layout.min_pane_px();
     }
     int separatorLinePx() const
     {
-        return m_separatorLinePx;
+        return m_layout.separator_line_px();
     }
 
     //=========================================================================================================
@@ -211,17 +204,14 @@ public:
                       SplitterHit activeSplitter,
                       const QSize& widgetSize);
 
-private:
-    static float clampSplit(float v)
+    /** @return The toolkit-neutral layout this adapter converts. */
+    const scene::PaneLayout& layout() const
     {
-        return std::clamp(v, 0.15f, 0.85f);
+        return m_layout;
     }
 
-    float m_splitX = 0.5f;
-    float m_splitY = 0.5f;
-    int m_hitTolerancePx = 6;
-    int m_minPanePx = 80;
-    int m_separatorLinePx = 2;
+private:
+    scene::PaneLayout m_layout;
 };
 
 } // namespace mne::disp

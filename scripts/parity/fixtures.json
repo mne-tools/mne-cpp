@@ -132,6 +132,12 @@
         "src/tests/test_mne_source_space_ops_python/data/sample-vol25-src.fif": "9e31c11f1e9547e7386e3253283a558bef399359b1fd406baae0552b2e1a7f82"
       }
     },
+    "test_scene_brain_view": {
+      "generators": [],
+      "fixtures": {
+        "src/tests/test_scene_brain_view/data/brain_view_overlay.svg": "026f3d6e401752ae57e9d14519d4d9b753f0a8bef62a77680c710fe6b8d46b06"
+      }
+    },
     "test_scene_render": {
       "generators": [],
       "fixtures": {

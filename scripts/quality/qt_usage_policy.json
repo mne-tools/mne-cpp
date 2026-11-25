@@ -13,7 +13,8 @@
     "$comment": "Library -> { use: reason } for Qt kept by decision D16.",
     "disp": {
       "SvgWriter (QPaintEngine)": "Replaces QSvgGenerator so the vector export of widgets needs Qt Gui only; dropping the Qt Svg module raised the disp ceilings once (tokens 6025 -> 6159, public header includes 110 -> 112).",
-      "QWindow hosts and scene viewports (phase 3)": "ChannelWindow (QWindow + QRhi swap chain) next to the ChannelRhiView QRhiWidget host, and SceneViewport replacing the QGraphicsView scenes, raised the disp ceilings once (tokens 4846 -> 4885, public header includes 82 -> 89); the QRhiWidget hosts go with phase 4."
+      "QWindow hosts and scene viewports (phase 3)": "ChannelWindow (QWindow + QRhi swap chain) next to the ChannelRhiView QRhiWidget host, and SceneViewport replacing the QGraphicsView scenes, raised the disp ceilings once (tokens 4846 -> 4885, public header includes 82 -> 89); the QRhiWidget hosts go with phase 4.",
+      "Qt input translation shared with the brain view": "toScenePointerEvent() and toSceneWheelEvent() (plots/helpers/sceneinput.h), which ChannelRhiRenderer and disp3D's BrainViewCore share instead of each translating Qt events, raised the disp ceilings once (tokens 4543 -> 4549); the brain view's camera, input, layout and overlay moving to mne_scene lowered disp3D from 1961 to 1807 tokens."
     },
     "disp3D": {
       "BrainWindow host and GPU overlay (phase 3)": "BrainWindow (QWindow + QRhi swap chain), the forwarding BrainView host and the overlay painted into the GPU pass instead of child QLabels raised the disp3D ceilings once (tokens 1633 -> 1961); the QRhiWidget host goes with phase 4."
@@ -76,7 +77,7 @@
       "modules": []
     },
     "disp": {
-      "tokens": 4543,
+      "tokens": 4549,
       "public_header_includes": 89,
       "modules": [
         "Core",
@@ -89,14 +90,14 @@
         "global": 954,
         "gui": 874,
         "objects_signals": 529,
-        "other": 1310,
+        "other": 1316,
         "strings": 755,
         "time": 9
       }
     },
     "disp3D": {
-      "tokens": 1961,
-      "public_header_includes": 74,
+      "tokens": 1807,
+      "public_header_includes": 73,
       "modules": [
         "Core",
         "Gui",
@@ -107,11 +108,11 @@
       "by_category": {
         "containers": 5,
         "files": 13,
-        "global": 199,
-        "gui": 1158,
+        "global": 177,
+        "gui": 1083,
         "objects_signals": 149,
-        "other": 293,
-        "strings": 139,
+        "other": 244,
+        "strings": 131,
         "time": 5
       }
     },

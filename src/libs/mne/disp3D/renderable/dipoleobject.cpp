@@ -16,6 +16,10 @@
 
 #include "dipoleobject.h"
 
+#include "core/qteigen_p.h"
+
+#include <mne/scene/ray_picking.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -28,6 +32,7 @@
 
 #include <cmath>
 #include <numbers>
+#include <optional>
 #include <random>
 
 namespace mne::disp
@@ -271,36 +276,20 @@ int DipoleObject::intersect(const QVector3D& rayOrigin, const QVector3D& rayDir,
     // Geometry radius ~ 0.005 (base) to 0.01 (height).
     // Let's use a slightly larger hit radius to make selection easier and more accurate.
     const float baseRadius = 0.02f;
+    const scene::Ray ray{toEigen(rayOrigin), toEigen(rayDir)};
 
     for (int i = 0; i < m_instanceCount; ++i) {
-        // Extract translation (last column)
-        QVector3D center(data[i].model[12], data[i].model[13], data[i].model[14]);
+        // Translation (last column) and scale (length of the first column, roughly uniform)
+        const Eigen::Vector3f center(data[i].model[12], data[i].model[13], data[i].model[14]);
+        const float scale = Eigen::Vector3f(data[i].model[0], data[i].model[1], data[i].model[2]).norm();
+        const float radius = baseRadius * scale;
 
-        // Extract scale (length of first column) - assumes uniform scale roughly
-        QVector3D col0(data[i].model[0], data[i].model[1], data[i].model[2]);
-        float scale = col0.length();
-
-        float radius = baseRadius * scale;
-
-        // Ray-Sphere Intersection
-        QVector3D L = center - rayOrigin;
-        float tca = QVector3D::dotProduct(L, rayDir);
-
-        if (tca < 0)
-            continue; // Behind ray
-
-        float d2 = QVector3D::dotProduct(L, L) - tca * tca;
-        if (d2 > radius * radius)
-            continue; // Miss
-
-        float thc = std::sqrt(radius * radius - d2);
-        float t0 = tca - thc;
-        float t1 = tca + thc;
-
-        float t = t0;
-        if (t < 0)
-            t = t1;
-        if (t < 0)
+        // Spheres behind the ray origin do not count; from inside a sphere the exit point is hit
+        const std::optional<scene::SphereCrossing> crossing = scene::intersect_ray_sphere(ray, center, radius);
+        if (!crossing || crossing->entry + crossing->exit < 0.0f)
+            continue;
+        const float t = crossing->entry >= 0.0f ? crossing->entry : crossing->exit;
+        if (t < 0.0f)
             continue;
 
         if (t < closestDist) {

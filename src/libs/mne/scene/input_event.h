@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    3.0.0
  * @date     November 2026
- * @brief    Toolkit-neutral pointer and wheel events for the interactive scene views.
+ * @brief    Toolkit-neutral pointer, wheel and key events for the interactive scene views.
  */
 
 #ifndef SCENE_INPUT_EVENT_H
@@ -44,6 +44,52 @@ enum class MouseButton
     Right, /**< Secondary button. */
     Middle /**< Middle button or wheel click. */
 };
+
+/**
+ * @brief Mouse buttons held during a pointer event; combine with |.
+ *
+ * @since 3.0.0
+ */
+enum class MouseButtons : unsigned
+{
+    None = 0x0,  /**< No button. */
+    Left = 0x1,  /**< Primary button. */
+    Right = 0x2, /**< Secondary button. */
+    Middle = 0x4 /**< Middle button. */
+};
+
+constexpr MouseButtons operator|(MouseButtons a, MouseButtons b)
+{
+    return static_cast<MouseButtons>(static_cast<unsigned>(a) | static_cast<unsigned>(b));
+}
+
+constexpr bool has_flag(MouseButtons buttons, MouseButtons flag)
+{
+    return (static_cast<unsigned>(buttons) & static_cast<unsigned>(flag)) == static_cast<unsigned>(flag) &&
+        flag != MouseButtons::None;
+}
+
+/**
+ * @param[in] button   A button.
+ *
+ * @return The flag of @p button, MouseButtons::None for MouseButton::None.
+ *
+ * @since 3.0.0
+ */
+constexpr MouseButtons button_flag(MouseButton button)
+{
+    switch (button) {
+        case MouseButton::Left:
+            return MouseButtons::Left;
+        case MouseButton::Right:
+            return MouseButtons::Right;
+        case MouseButton::Middle:
+            return MouseButtons::Middle;
+        case MouseButton::None:
+            break;
+    }
+    return MouseButtons::None;
+}
 
 /**
  * @brief Keyboard modifiers held during an input event; combine with |.
@@ -88,12 +134,13 @@ struct PointerEvent
         DoubleClick /**< A button was clicked twice. */
     };
 
-    Type type = Type::Move;                 /**< Kind of event. */
-    double x = 0.0;                         /**< Horizontal position, growing to the right. */
-    double y = 0.0;                         /**< Vertical position, growing downwards. */
-    MouseButton button = MouseButton::None; /**< Button that caused a press, release or double click; None for moves. */
-    Modifier modifiers = Modifier::None;    /**< Modifiers held. */
-    std::int64_t timestamp_ms = 0;          /**< Monotonic time in milliseconds, used for drag velocities. */
+    Type type = Type::Move;                    /**< Kind of event. */
+    double x = 0.0;                            /**< Horizontal position, growing to the right. */
+    double y = 0.0;                            /**< Vertical position, growing downwards. */
+    MouseButton button = MouseButton::None;    /**< Button that caused a press, release or double click; None for moves. */
+    Modifier modifiers = Modifier::None;       /**< Modifiers held. */
+    std::int64_t timestamp_ms = 0;             /**< Monotonic time in milliseconds, used for drag velocities. */
+    MouseButtons buttons = MouseButtons::None; /**< Buttons held after the event, e.g. during a drag. */
 };
 
 /**
@@ -115,14 +162,66 @@ struct WheelEvent
 };
 
 /**
+ * @brief Key of a key event; printable keys are Key::Character with the character in KeyEvent::character.
+ *
+ * @since 3.0.0
+ */
+enum class Key
+{
+    Unknown,   /**< A key without a neutral name. */
+    Character, /**< A printable key, see KeyEvent::character. */
+    Escape,    /**< Escape. */
+    Return,    /**< Return or Enter. */
+    Tab,       /**< Tab. */
+    Backspace, /**< Backspace. */
+    Delete,    /**< Delete. */
+    Left,      /**< Arrow left. */
+    Right,     /**< Arrow right. */
+    Up,        /**< Arrow up. */
+    Down,      /**< Arrow down. */
+    Home,      /**< Home. */
+    End,       /**< End. */
+    PageUp,    /**< Page up. */
+    PageDown   /**< Page down. */
+};
+
+/**
+ * @brief A key press.
+ *
+ * @since 3.0.0
+ */
+struct KeyEvent
+{
+    Key key = Key::Unknown;              /**< The key. */
+    char32_t character = 0;              /**< For Key::Character the character of the key, letters in upper case. */
+    Modifier modifiers = Modifier::None; /**< Modifiers held. */
+    std::int64_t timestamp_ms = 0;       /**< Monotonic time in milliseconds. */
+
+    /**
+     * @param[in] c   A letter or another printable character.
+     *
+     * @return Whether this is the key of @p c, ignoring the case of letters.
+     */
+    constexpr bool is_character(char32_t c) const
+    {
+        const auto upper = [](char32_t x) {
+            return (x >= U'a' && x <= U'z') ? x - U'a' + U'A' : x;
+        };
+        return key == Key::Character && upper(character) == upper(c);
+    }
+};
+
+/**
  * @brief Pointer shape a view asks its host to show.
  *
  * @since 3.0.0
  */
 enum class CursorShape
 {
-    Default,       /**< The host's default cursor. */
-    SizeHorizontal /**< Horizontal resize arrows, e.g. over a draggable boundary. */
+    Default,        /**< The host's default cursor. */
+    SizeHorizontal, /**< Horizontal resize arrows, e.g. over a draggable boundary. */
+    SizeVertical,   /**< Vertical resize arrows. */
+    SizeAll         /**< Arrows in all directions, e.g. over a crossing of boundaries. */
 };
 
 } // namespace mne::scene

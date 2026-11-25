@@ -319,6 +319,31 @@ aliases; replace the old spelling as below.
   instead of using `QPropertyAnimation`; its API and signals are unchanged.
   The dotted guide lines of `renderToImage()` use the scene's dot pattern.
   The Qt usage ceiling of `disp` drops to 4543 tokens.
+- The camera, input handling, pane layout and head-up display of the 3-D brain
+  view moved to `mne_scene` (which now links Eigen): `OrbitCamera`
+  (`scene/camera.h`) computes the projection, view and model matrices, the
+  seven view presets and the orbit and pan of a drag; `PaneCamera` holds the
+  preset, zoom, pan and rotation of a pane (`disp::SubView` derives from it,
+  so its `perspectiveRotation` and `QVector2D pan` are now the Eigen
+  `rotation` and `pan`, and `SubView::load()` takes an `Eigen::Quaternionf`
+  fallback). `ray_from_pixel()`, `intersect_ray_triangle()` and
+  `intersect_ray_sphere()` (`scene/ray_picking.h`) do the picking maths of
+  `BrainSurface`, `DipoleObject`, `ElectrodeObject` and `RayPicker`.
+  `PaneLayout` (`scene/pane_layout.h`) lays out 1 to 4 panes with
+  their separators and splitters. `BrainViewInteraction` is the input state
+  machine (orbit, pan, wheel zoom per pane, pane selection, preset-menu
+  clicks, splitter drags, R and S keys) with effects through callbacks, and
+  `BrainViewOverlay` draws the FPS, info, region and pane-name labels and the
+  separators as a display list. `scene/input_event.h` gains `KeyEvent` and the
+  buttons held during a pointer event; `toScenePointerEvent()` and
+  `toSceneWheelEvent()` (`disp/plots/helpers/sceneinput.h`) translate Qt
+  events for the trace and brain views. `disp::BrainViewCore` translates
+  events, converts the matrices for its QRhi uniforms and paints the overlay
+  with `paintScene()`; the APIs and signals of `BrainViewCore`, `BrainView`
+  and `BrainWindow` are unchanged, and `CameraController`, `RayPicker` and
+  `disp::MultiViewLayout` remain as Qt-typed adapters. `test_scene_brain_view`
+  tests it without Qt, with a golden SVG of the overlay. The Qt usage ceiling
+  of `disp3D` drops to 1807 tokens.
 - `mne::write_mat_file()` (`math/mat_file.h`) writes matrices to a MATLAB
   Level 5 MAT-file; `mne_raw2mat` and `mne_epochs2mat` use it instead of two
   copies of the writer (their files are byte-identical).

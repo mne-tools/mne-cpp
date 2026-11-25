@@ -40,6 +40,7 @@ set(SOURCES
     plots/helpers/colormap.cpp
     plots/helpers/figureexporter.cpp
     plots/helpers/svgwriter.cpp
+    plots/helpers/sceneinput.cpp
     plots/helpers/scenepainter.cpp
     detail/map_value.h
     detail/layout_reset.h
@@ -114,6 +115,7 @@ set(HEADERS
     plots/helpers/colormap.h
     plots/helpers/figureexporter.h
     plots/helpers/svgwriter.h
+    plots/helpers/sceneinput.h
     plots/helpers/scenepainter.h
     viewers/abstractview.h
     viewers/applytoview.h

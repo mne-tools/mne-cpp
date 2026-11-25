@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="640" height="480" viewBox="0 0 640 480">
+<rect x="319" y="0" width="2" height="480" fill="#a0a0a0" fill-opacity="0.706" stroke="none"/>
+<rect x="0" y="239" width="640" height="2" fill="#a0a0a0" fill-opacity="0.706" stroke="none"/>
+<defs><clipPath id="c0"><rect x="485" y="442" width="145" height="36"/></clipPath></defs>
+<g clip-path="url(#c0)">
+<text x="625" y="457" font-family="monospace" font-size="13" font-weight="bold" text-anchor="end" fill="#ffffff" xml:space="preserve">FPS: 60.0</text>
+<text x="625" y="470" font-family="monospace" font-size="13" font-weight="bold" text-anchor="end" fill="#ffffff" xml:space="preserve">Vertices: 327680</text>
+</g>
+<defs><clipPath id="c1"><rect x="10" y="38" width="300" height="30"/></clipPath></defs>
+<g clip-path="url(#c1)">
+<text x="15" y="58" font-family="sans-serif" font-size="16" font-weight="bold" fill="#ffffff" xml:space="preserve">Left Hemisphere</text>
+</g>
+<defs><clipPath id="c2"><rect x="8" y="8" width="31" height="16"/></clipPath></defs>
+<g clip-path="url(#c2)">
+<text x="12" y="20" font-family="sans-serif" font-size="12" font-weight="bold" fill="#ffffff" xml:space="preserve">Top</text>
+</g>
+<defs><clipPath id="c3"><rect x="196" y="8" width="116" height="24"/></clipPath></defs>
+<g clip-path="url(#c3)">
+<rect x="196" y="8" width="116" height="24" rx="3" ry="3" fill="#000000" fill-opacity="0.431" stroke="none"/>
+<text x="200" y="18" font-family="monospace" font-size="10" fill="#ffffff" xml:space="preserve">Shader: Anatomical</text>
+<text x="200" y="28" font-family="monospace" font-size="10" fill="#ffffff" xml:space="preserve">Surface: pial</text>
+</g>
+<defs><clipPath id="c4"><rect x="328" y="8" width="107" height="19"/></clipPath></defs>
+<g clip-path="url(#c4)">
+<rect x="328.5" y="8.5" width="106" height="18" rx="3" ry="3" fill="#ffd54f" fill-opacity="0.157" stroke="#ffd54f" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="335" y="21" font-family="sans-serif" font-size="13" font-weight="bold" fill="#ffd54f" xml:space="preserve">Perspective</text>
+</g>
+<defs><clipPath id="c5"><rect x="516" y="8" width="116" height="24"/></clipPath></defs>
+<g clip-path="url(#c5)">
+<rect x="516" y="8" width="116" height="24" rx="3" ry="3" fill="#000000" fill-opacity="0.431" stroke="none"/>
+<text x="520" y="18" font-family="monospace" font-size="10" fill="#ffffff" xml:space="preserve">Shader: Anatomical</text>
+<text x="520" y="28" font-family="monospace" font-size="10" fill="#ffffff" xml:space="preserve">Surface: pial</text>
+</g>
+<defs><clipPath id="c6"><rect x="8" y="248" width="47" height="16"/></clipPath></defs>
+<g clip-path="url(#c6)">
+<text x="12" y="260" font-family="sans-serif" font-size="12" font-weight="bold" fill="#ffffff" xml:space="preserve">Front</text>
+</g>
+<defs><clipPath id="c7"><rect x="196" y="248" width="116" height="24"/></clipPath></defs>
+<g clip-path="url(#c7)">
+<rect x="196" y="248" width="116" height="24" rx="3" ry="3" fill="#000000" fill-opacity="0.431" stroke="none"/>
+<text x="200" y="258" font-family="monospace" font-size="10" fill="#ffffff" xml:space="preserve">Shader: Anatomical</text>
+<text x="200" y="268" font-family="monospace" font-size="10" fill="#ffffff" xml:space="preserve">Surface: pial</text>
+</g>
+<defs><clipPath id="c8"><rect x="328" y="248" width="39" height="16"/></clipPath></defs>
+<g clip-path="url(#c8)">
+<text x="332" y="260" font-family="sans-serif" font-size="12" font-weight="bold" fill="#ffffff" xml:space="preserve">Left</text>
+</g>
+<defs><clipPath id="c9"><rect x="516" y="248" width="116" height="24"/></clipPath></defs>
+<g clip-path="url(#c9)">
+<rect x="516" y="248" width="116" height="24" rx="3" ry="3" fill="#000000" fill-opacity="0.431" stroke="none"/>
+<text x="520" y="258" font-family="monospace" font-size="10" fill="#ffffff" xml:space="preserve">Shader: Anatomical</text>
+<text x="520" y="268" font-family="monospace" font-size="10" fill="#ffffff" xml:space="preserve">Surface: pial</text>
+</g>
+</svg>
