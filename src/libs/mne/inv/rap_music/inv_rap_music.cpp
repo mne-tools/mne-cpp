@@ -46,6 +46,28 @@
 
 using namespace mne;
 
+namespace
+{
+
+// The vertices of every source space in order: one volume space, two hemispheres, or both in a mixed space
+VectorXi allVertices(const MNESourceSpaces& spaces)
+{
+    const std::vector<VectorXi> spaceVertices = spaces.get_vertno();
+    Eigen::Index count = 0;
+    for (const VectorXi& vertno : spaceVertices) {
+        count += vertno.size();
+    }
+    VectorXi vertices(count);
+    Eigen::Index offset = 0;
+    for (const VectorXi& vertno : spaceVertices) {
+        vertices.segment(offset, vertno.size()) = vertno;
+        offset += vertno.size();
+    }
+    return vertices;
+}
+
+} // namespace
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -197,8 +219,7 @@ InvSourceEstimate InvRapMusic::calculateInverse(const FiffEvoked& p_fiffEvoked, 
     p_sourceEstimate.data = MatrixXd::Zero(m_ForwardSolution.nsource, p_fiffEvoked.data.cols());
 
     //Results
-    p_sourceEstimate.vertices = VectorXi(m_ForwardSolution.src[0].vertno.size() + m_ForwardSolution.src[1].vertno.size());
-    p_sourceEstimate.vertices << m_ForwardSolution.src[0].vertno, m_ForwardSolution.src[1].vertno;
+    p_sourceEstimate.vertices = allVertices(m_ForwardSolution.src);
 
     p_sourceEstimate.times = p_fiffEvoked.times;
     p_sourceEstimate.tmin = p_fiffEvoked.times[0];
@@ -310,8 +331,7 @@ InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd& data, float tmin
     p_sourceEstimate.data = MatrixXd::Zero(m_ForwardSolution.nsource, data.cols());
 
     //Results
-    p_sourceEstimate.vertices = VectorXi(m_ForwardSolution.src[0].vertno.size() + m_ForwardSolution.src[1].vertno.size());
-    p_sourceEstimate.vertices << m_ForwardSolution.src[0].vertno, m_ForwardSolution.src[1].vertno;
+    p_sourceEstimate.vertices = allVertices(m_ForwardSolution.src);
 
     p_sourceEstimate.times = RowVectorXf::Zero(data.cols());
     p_sourceEstimate.times[0] = tmin;

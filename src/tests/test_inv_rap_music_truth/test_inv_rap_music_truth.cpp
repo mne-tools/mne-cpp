@@ -116,6 +116,7 @@ private slots:
     void stopsAtThreshold();
     void rejectsInvalidInput();
     void evokedEstimate();
+    void singleSourceSpace();
 };
 
 //=============================================================================================================
@@ -284,6 +285,26 @@ void TestInvRapMusicTruth::evokedEstimate()
 
     evoked.data.conservativeResize(kChannels - 1, NoChange);
     QVERIFY(rap.calculateInverse(evoked).empty());
+}
+
+//=============================================================================================================
+
+void TestInvRapMusicTruth::singleSourceSpace()
+{
+    // A volume source space is one space, not two hemispheres: the estimate takes its vertices
+    MNEForwardSolution fwd = makeForward(makeLeadField());
+    MNESourceSpace volume;
+    volume.vertno = VectorXi::LinSpaced(kSources, 5, 5 + 3 * (kSources - 1));
+    fwd.src.append(volume);
+    Matrix<double, 6, 1> o;
+    o << 1.0, 0.2, -0.3, 0.0, 0.8, 0.5;
+    const MatrixXd data = makeData(makeLeadField(), {{2, 9}}, {o});
+
+    InvRapMusic rap(fwd, false, 2, 0.5);
+    const InvSourceEstimate estimate = rap.calculateInverse(data, 0.1f, 0.01f);
+    QCOMPARE(static_cast<int>(estimate.data.rows()), kSources);
+    QCOMPARE(estimate.vertices, volume.vertno);
+    QVERIFY(estimate.data(2, 0) > 0.0 && estimate.data(9, 0) > 0.0);
 }
 
 //=============================================================================================================
