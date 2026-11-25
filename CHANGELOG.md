@@ -242,6 +242,9 @@ aliases; replace the old spelling as below.
   `Spline::m_dMinAxisX` and `m_dMaxAxisX`, the protected helpers of
   `ColorMap` and `disp/plots/detail/niceticks.h` (use `scene::nice_ticks()`).
   The Qt usage ceilings of `disp` drop accordingly (tokens 5149 to 4883).
+- `mne::write_mat_file()` (`math/mat_file.h`) writes matrices to a MATLAB
+  Level 5 MAT-file; `mne_raw2mat` and `mne_epochs2mat` use it instead of two
+  copies of the writer (their files are byte-identical).
 - The inverse operator's decomposition of the whitened lead field uses Eigen's
   divide-and-conquer SVD, as MNE-Python uses LAPACK's: about 2.5 times less
   CPU time for the MNE sample data, with the same source estimates to single

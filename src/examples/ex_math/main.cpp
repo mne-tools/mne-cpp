@@ -21,6 +21,7 @@
 
 #include <mne/math/kmeans.h>
 #include <mne/math/linalg.h>
+#include <mne/math/mat_file.h>
 #include <mne/math/matrix_io.h>
 #include <mne/math/numerics.h>
 #include <mne/math/simplex_algorithm.h>
@@ -200,6 +201,16 @@ int main(int argc, char* argv[])
     //! [matrix_io_usage]
     std::filesystem::remove(matrixPath);
     ok &= expect(readBack == matrix, "text matrix round trip is bit-identical");
+
+    //! [mat_file_usage]
+    // MATLAB Level 5 MAT-file: load('ex_math.mat') in MATLAB or scipy.io.loadmat in Python
+    const std::filesystem::path matPath = std::filesystem::temp_directory_path() / "ex_math.mat";
+    MatrixXd sfreq(1, 1);
+    sfreq(0, 0) = 600.0;
+    const auto written = mne::write_mat_file(matPath, "ex_math", {{"data", matrix}, {"sfreq", sfreq}});
+    //! [mat_file_usage]
+    ok &= expect(written.has_value() && std::filesystem::file_size(matPath) == 128 + 104 + 72, "MAT-file holds both variables");
+    std::filesystem::remove(matPath);
 
     std::println("{}", ok ? "All math checks passed." : "Math checks FAILED.");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;

@@ -14,6 +14,7 @@ set(SOURCES
   warp.cpp
   kmeans.cpp
   spectral.cpp
+  mat_file.cpp
 )
 
 set(HEADERS
@@ -26,6 +27,7 @@ set(HEADERS
   matrix_io.h
   kmeans.h
   spectral.h
+  mat_file.h
 )
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})

@@ -14,6 +14,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <mne/math/mat_file.h>
 #include <mne/math/matrix_io.h>
 #include <mne/base/log.h>
 
@@ -35,6 +36,8 @@
 //=============================================================================================================
 
 #include <cmath>
+#include <cstdint>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <limits>
@@ -50,7 +53,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
- * @brief Tests for the Eigen text matrix I/O: round trips, vectors, comments and malformed input.
+ * @brief Tests for the Eigen text matrix I/O (round trips, vectors, comments, malformed input) and the MAT-file writer.
  */
 class TestMatrixIo : public QObject
 {
@@ -63,6 +66,8 @@ private slots:
     void commentsAndBlankLinesAreSkipped();
     void nonFiniteValuesRoundTrip();
     void malformedInputFails();
+    void matFileLayout();
+    void matFileErrors();
 
 private:
     std::filesystem::path file(const std::string& name) const;
@@ -201,6 +206,74 @@ void TestMatrixIo::malformedInputFails()
 
     QVERIFY(untouched == MatrixXd::Ones(1, 1));
     QVERIFY(!write_matrix(untouched, file("no_such_dir") / "out.txt"));
+}
+
+//=============================================================================================================
+
+void TestMatrixIo::matFileLayout()
+{
+    MatrixXd x(2, 3);
+    x << 1, 2, 3, 4, 5, 6;
+    MatrixXd times(1, 2);
+    times << 0.5, -0.25;
+    QVERIFY(write_mat_file(file("out.mat"), "test", {{"x", x}, {"times_long", times}}));
+
+    std::ifstream in(file("out.mat"), std::ios::binary);
+    const std::string bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+    // Header 128, 'x' 8 + 96 (short name packed into its tag), 'times_long' 8 + 80 (name padded to 16)
+    QCOMPARE(bytes.size(), std::size_t{320});
+    QVERIFY(bytes.starts_with("MATLAB 5.0 MAT-file, created by test "));
+    QCOMPARE(bytes.substr(124, 4), std::string("\x00\x01IM", 4));
+
+    auto u32 = [&](std::size_t at) {
+        std::uint32_t v = 0;
+        for (int i = 3; i >= 0; --i) {
+            v = (v << 8) | static_cast<unsigned char>(bytes[at + static_cast<std::size_t>(i)]);
+        }
+        return v;
+    };
+    auto f64 = [&](std::size_t at) {
+        std::uint64_t v = 0;
+        for (int i = 7; i >= 0; --i) {
+            v = (v << 8) | static_cast<unsigned char>(bytes[at + static_cast<std::size_t>(i)]);
+        }
+        double d = 0.0;
+        std::memcpy(&d, &v, sizeof d);
+        return d;
+    };
+    QCOMPARE(u32(128), 14u);             // miMATRIX
+    QCOMPARE(u32(132), 96u);             // payload
+    QCOMPARE(u32(144), 6u);              // mxDOUBLE_CLASS
+    QCOMPARE(u32(160), 2u);              // rows
+    QCOMPARE(u32(164), 3u);              // cols
+    QCOMPARE(u32(168), (1u << 16) | 1u); // small miINT8 element of 1 byte
+    QCOMPARE(bytes[172], 'x');
+    QCOMPARE(u32(176), 9u); // miDOUBLE
+    QCOMPARE(u32(180), 48u);
+    const double columnMajor[] = {1, 4, 2, 5, 3, 6};
+    for (std::size_t i = 0; i < 6; ++i) {
+        QCOMPARE(f64(184 + 8 * i), columnMajor[i]);
+    }
+    QCOMPARE(u32(232), 14u);
+    QCOMPARE(u32(236), 80u);
+    QCOMPARE(u32(272), 1u); // miINT8 with a full tag
+    QCOMPARE(u32(276), 10u);
+    QCOMPARE(bytes.substr(280, 10), std::string("times_long"));
+    QCOMPARE(f64(304), 0.5);
+    QCOMPARE(f64(312), -0.25);
+}
+
+//=============================================================================================================
+
+void TestMatrixIo::matFileErrors()
+{
+    const MatrixXd one = MatrixXd::Ones(1, 1);
+    const auto unnamed = write_mat_file(file("unnamed.mat"), "test", {{"", one}});
+    QVERIFY(!unnamed);
+    QVERIFY(unnamed.error().code == ErrorCode::Format);
+    const auto unwritable = write_mat_file(file("no_such_dir") / "out.mat", "test", {{"one", one}});
+    QVERIFY(!unwritable);
+    QVERIFY(unwritable.error().code == ErrorCode::Io);
 }
 
 //=============================================================================================================

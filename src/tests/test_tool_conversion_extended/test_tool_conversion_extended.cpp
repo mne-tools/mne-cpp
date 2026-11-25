@@ -7,17 +7,12 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     June, 2026
- * @brief    Tests for extended conversion tools (raw2mat, ctf_dig2fiff, tufts2fiff).
+ * @brief    Tests for extended conversion tools (ctf_dig2fiff, tufts2fiff, ctf2fiff, kit2fiff and others).
  */
 
 //=============================================================================================================
 // Include tool sources
 //=============================================================================================================
-
-// --- mne_raw2mat ---
-#define main _raw2mat_main_unused
-#include "../../tools/conversion/mne_raw2mat/main.cpp"
-#undef main
 
 // --- mne_ctf_dig2fiff ---
 #define main _ctf_dig_main_unused
@@ -84,12 +79,6 @@ class TestToolConversionExtended : public QObject
 
 private slots:
     void initTestCase();
-
-    // --- MAT writer tests ---
-    void testWriteMatrixVariableSmall();
-    void testWriteMatrixVariableLarger();
-    void testWriteMatTagFormat();
-    void testWritePadAlignment();
 
     // --- CTF digitizer tests ---
     void testReadCtfDigBasic();
@@ -344,91 +333,6 @@ void TestToolConversionExtended::testParseCtfMarkers()
     QCOMPARE(markers[0].eventId, 7);
     QVERIFY(markers[0].samples == std::vector<int>({12, 34}));
     QVERIFY(markers[1].samples == std::vector<int>({56}));
-}
-
-//=============================================================================================================
-// MAT writer tests
-//=============================================================================================================
-
-void TestToolConversionExtended::testWriteMatrixVariableSmall()
-{
-    // Write a 2x3 matrix as a MAT5 variable
-    MatrixXd mat(2, 3);
-    mat << 1.0, 2.0, 3.0,
-        4.0, 5.0, 6.0;
-
-    QString matFile = m_tempDir.path() + "/test_small.mat";
-    std::ofstream ds(matFile.toStdString(), std::ios::binary);
-    QVERIFY(ds.is_open());
-
-    // Write MAT 5.0 header (128 bytes)
-    std::string header(128, '\0');
-    header.replace(0, 19, "MATLAB 5.0 MAT-file");
-    header[124] = 0x00;
-    header[125] = 0x01; // version
-    header[126] = 'I';
-    header[127] = 'M'; // endian
-    ds.write(header.data(), 128);
-
-    writeMatrixVariable(ds, "testmat", mat);
-    ds.close();
-
-    QFile file(matFile);
-    QVERIFY(file.size() > 128);
-
-    // Verify the file is a valid MAT file by checking header
-    QVERIFY(file.open(QIODevice::ReadOnly));
-    QByteArray hdRead = file.read(128);
-    QVERIFY(hdRead.startsWith("MATLAB 5.0"));
-    file.close();
-}
-
-void TestToolConversionExtended::testWriteMatrixVariableLarger()
-{
-    MatrixXd mat = MatrixXd::Random(10, 20);
-    QString matFile = m_tempDir.path() + "/test_larger.mat";
-    std::ofstream ds(matFile.toStdString(), std::ios::binary);
-    QVERIFY(ds.is_open());
-    std::string header(128, '\0');
-    header.replace(0, 19, "MATLAB 5.0 MAT-file");
-    header[124] = 0x00;
-    header[125] = 0x01;
-    header[126] = 'I';
-    header[127] = 'M';
-    ds.write(header.data(), 128);
-    writeMatrixVariable(ds, "bigmat", mat);
-    ds.close();
-
-    // File should contain at least 128 + tag + dimensions + data
-    QVERIFY(QFile(matFile).size() > 128 + 10 * 20 * 8);
-}
-
-void TestToolConversionExtended::testWriteMatTagFormat()
-{
-    // Verify writeMatTag produces correct tag header (type + size)
-    std::ostringstream ds;
-    writeMatTag(ds, miDOUBLE, 24);
-
-    const QByteArray buf = QByteArray::fromStdString(ds.str());
-    QCOMPARE(buf.size(), 8); // 4 bytes type + 4 bytes size
-    // Read back
-    QDataStream reader(buf);
-    reader.setByteOrder(QDataStream::LittleEndian);
-    quint32 type, size;
-    reader >> type >> size;
-    QCOMPARE(type, quint32(miDOUBLE));
-    QCOMPARE(size, (quint32)24);
-}
-
-void TestToolConversionExtended::testWritePadAlignment()
-{
-    // writePad pads to 8-byte boundary: writes (8 - numBytes%8) % 8 zeros
-    std::ostringstream ds;
-    writePad(ds, 5); // (8-5)%8 = 3 padding bytes needed
-    const QByteArray buf = QByteArray::fromStdString(ds.str());
-    QCOMPARE(buf.size(), 3);
-    for (int i = 0; i < 3; i++)
-        QCOMPARE((unsigned char)buf[i], (unsigned char)0);
 }
 
 //=============================================================================================================
