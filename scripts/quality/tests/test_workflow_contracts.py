@@ -105,6 +105,20 @@ class WorkflowContracts(unittest.TestCase):
                      if "mklink" in line and "cmd //c" in line]
         self.assertEqual([], offending)
 
+    def test_qt_builds_and_packages_leave_out_qt_svg(self) -> None:
+        # MNE-CPP writes SVG with its own writer and uses no SVG icons; Qt Svg is neither built nor shipped. The
+        # configure lines that list -submodules leave it out already; the Installer Framework builds are not ours.
+        configures = [f"{name}:{number}" for name, text in _workflow_texts().items()
+                      for number, line in enumerate(text.splitlines(), 1)
+                      if re.search(r"qt5[/\\]configure", line) and "-skip webengine" in line
+                      and "-submodules" not in line and "-skip qtsvg" not in line]
+        self.assertEqual([], configures)
+        deploy = REPO_ROOT / "scripts" / "deploy"
+        self.assertIn("--exclude-plugins qsvg", (deploy / "deploy.bat").read_text(encoding="utf-8"))
+        shell = (deploy / "deploy.sh").read_text(encoding="utf-8")
+        for removed in ("QtSvg.framework", "libqsvg.dylib", "libqsvg.so", '! -name "libQt6Svg*"'):
+            self.assertIn(removed, shell)
+
     def test_coverage_floor_is_the_release_minimum(self) -> None:
         policy = json.loads((REPO_ROOT / "scripts" / "quality" / "coverage_policy.json").read_text(encoding="utf-8"))
         self.assertGreaterEqual(policy["line_floor_percent"],

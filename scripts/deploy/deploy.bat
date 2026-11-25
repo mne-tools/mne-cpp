@@ -20,6 +20,10 @@ SET "PACK_OPTION=false"
 SET "BUILD_NAME=Release"
 SET "MOCK_BUILD=false"
 SET "MOCK_TEXT="
+REM No Qt Svg: MNE-CPP writes SVG with its own writer and uses no SVG icons, so the svg image format and
+REM icon engine plugins (and Qt6Svg.dll, which they pull in) stay out of the package. Set here, outside the
+REM IF blocks, which expand %VARIABLES% when they are read.
+SET "WINDEPLOYQT_ARGS=--skip-plugin-types iconengines --exclude-plugins qsvg"
 
 :loop
 IF NOT "%1"=="" (
@@ -89,7 +93,7 @@ IF "%LINK_OPTION%"=="dynamic" (
     SET "DLL_COUNT=0"
     for /f %%f in ('dir /b *.dll 2^>nul') do (
       ECHO Running windeployqt on %%f ...
-      %MOCK_TEXT%windeployqt %%f
+      %MOCK_TEXT%windeployqt %WINDEPLOYQT_ARGS% %%f
       SET /A DLL_COUNT+=1
     )
 
@@ -97,9 +101,11 @@ IF "%LINK_OPTION%"=="dynamic" (
     SET "EXE_COUNT=0"
     for /f %%f in ('dir /b *.exe 2^>nul') do (
         ECHO Running windeployqt on %%f ...
-        %MOCK_TEXT%windeployqt %%f
+        %MOCK_TEXT%windeployqt %WINDEPLOYQT_ARGS% %%f
         SET /A EXE_COUNT+=1
     )
+
+    IF EXIST Qt6Svg.dll %MOCK_TEXT%del /q Qt6Svg.dll
 
     ECHO.
     ECHO windeployqt summary: processed DLLs and EXEs

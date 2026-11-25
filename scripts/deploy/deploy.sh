@@ -145,6 +145,13 @@ if [[ ${LinkOption} == "dynamic" ]]; then
         ${MockText}${MACDEPLOYQT} "$f"
     done
 
+    # No Qt Svg: MNE-CPP writes SVG with its own writer and uses no SVG icons. macdeployqt still adds the svg
+    # image format and icon engine plugins, and QtSvg.framework with them.
+    for f in ${BasePath}/out/${BuildName}/bin/*.app; do
+        ${MockText}rm -rf "$f/Contents/PlugIns/iconengines" "$f/Contents/PlugIns/imageformats/libqsvg.dylib" \
+            "$f/Contents/Frameworks/QtSvg.framework"
+    done
+
     # ---------------------------------------------------------------
     # Locate Qt lib directory for framework copying
     # ---------------------------------------------------------------
@@ -273,12 +280,13 @@ if [[ ${LinkOption} == "dynamic" ]]; then
     fi
     if [ -n "${QT_PLUGINS_DIR}" ] && [ -d "${QT_PLUGINS_DIR}" ]; then
         mkdir -p "${BasePath}/out/${BuildName}/lib/plugins"
-        for plugdir in platforms imageformats iconengines multimedia networkinformation tls styles; do
+        for plugdir in platforms imageformats multimedia networkinformation tls styles; do
             if [ -d "${QT_PLUGINS_DIR}/${plugdir}" ]; then
                 echo "  Copying ${plugdir}/ ..."
                 ${MockText}cp -a "${QT_PLUGINS_DIR}/${plugdir}" "${BasePath}/out/${BuildName}/lib/plugins/"
             fi
         done
+        ${MockText}rm -f "${BasePath}/out/${BuildName}/lib/plugins/imageformats/libqsvg.dylib"
     else
         echo "  WARNING: Could not find Qt plugins directory. CLI tools may fail to find platform plugins."
     fi
@@ -675,7 +683,8 @@ if [[ ${LinkOption} == "dynamic" ]]; then
 
         # Copy Qt shared libraries into lib/
         echo "Copying Qt shared libraries..."
-        ${MockText}find "${QT_DIR}/lib" -maxdepth 1 -name "libQt6*.so*" -exec cp -a {} ${BasePath}/out/${BuildName}/lib/ \;
+        # Without Qt Svg: MNE-CPP writes SVG with its own writer and uses no SVG icons
+        ${MockText}find "${QT_DIR}/lib" -maxdepth 1 -name "libQt6*.so*" ! -name "libQt6Svg*" -exec cp -a {} ${BasePath}/out/${BuildName}/lib/ \;
         ${MockText}find "${QT_DIR}/lib" -maxdepth 1 -name "libicu*.so*" -exec cp -a {} ${BasePath}/out/${BuildName}/lib/ \;
 
         # Verify Qt libraries were copied
@@ -695,6 +704,7 @@ if [[ ${LinkOption} == "dynamic" ]]; then
                 ${MockText}cp -a "${QT_DIR}/plugins/${plugdir}" ${BasePath}/out/${BuildName}/plugins/
             fi
         done
+        ${MockText}rm -f ${BasePath}/out/${BuildName}/plugins/imageformats/libqsvg.so
 
         # Manually copy in the libxcb-xinerama library which is needed by plugins/platforms/libqxcb.so
         XCBXINERAMA="/usr/lib/x86_64-linux-gnu/libxcb-xinerama.so.0"
