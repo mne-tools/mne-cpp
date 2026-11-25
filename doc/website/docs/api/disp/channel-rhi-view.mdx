@@ -17,7 +17,7 @@ class mne::disp::ChannelRhiView
 
 QRhi-based GPU-accelerated channel time-series renderer used by the modern raw browser.
 
-Manages its own pipeline, samplers, resource bindings and a small `CrosshairOverlay` for the time / amplitude cursor; exposes callbacks for the host [`ChannelDataView`](/docs/api/disp/channel-data-view) to push samples, change scaling or update the visible window.
+Thin `QRhiWidget` host of a [`ChannelRhiRenderer`](/docs/api/disp/channel-rhi-renderer); frames and input events are forwarded to the renderer and its signals are re-emitted, so the widget keeps the API used by [`ChannelDataView`](/docs/api/disp/channel-data-view).
 
 ### Inheritance
 
@@ -35,6 +35,16 @@ classDiagram
 ---
 
 ### ~ChannelRhiView()
+
+---
+
+### renderer()
+
+Returns the Widgets-free renderer that holds the view state, the GPU resources and the input handling.
+
+**Returns:**
+
+- *[ChannelRhiRenderer](/docs/api/disp/channel-rhi-renderer) ** — The renderer owned by this widget.
 
 ---
 

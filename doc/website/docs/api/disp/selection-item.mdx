@@ -7,31 +7,17 @@ sidebar_position: 56
 
 # SelectionItem
 
-**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/helpers/selectionsceneitem.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/disp/viewers/helpers/selectionsceneitem.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/helpers/selectionitem.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/disp/viewers/helpers/selectionitem.h)
 
-`#include <mne/disp/selectionsceneitem.h>`
+`#include <mne/disp/selectionitem.h>`
 
 ```cpp
 class mne::disp::SelectionItem
 ```
 
-Value type describing one named selection group (label + list of channel names).
+The channels picked in a sensor layout: names, numbers, kinds, units and layout positions, one entry per channel in each vector.
 
-Loaded from / saved to MNE .sel files; consumed by [`AverageScene`](/docs/api/disp/average-scene) and [`ChannelSelectionView`](/docs/api/disp/channel-selection-view) to limit display to a subset of sensors.
-
----
-
-## Public Methods
-
-### SelectionItem()
-
----
-
-### ~SelectionItem()
-
----
-
-### SelectionItem()
+[`ChannelSelectionView`](/docs/api/disp/channel-selection-view) emits it when the selection changes; [`AverageLayoutView`](/docs/api/disp/average-layout-view) and the analysis plugins show only these channels.
 
 ---
 

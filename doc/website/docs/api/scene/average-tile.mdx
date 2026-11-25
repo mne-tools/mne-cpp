@@ -72,6 +72,24 @@ Draws the tile with the current transform of `canvas`.
 - Full source: [`src/examples/ex_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_scene/main.cpp)
 - Build target: `ex_scene` (runs under CTest)
 
+## Used in examples
+
+### [ex_scene](../../examples/scene/ex_scene.mdx)
+
+Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+
+````cpp title="src/examples/ex_scene/main.cpp, line 141"
+// One tile per channel at its layout position, as plot_evoked_topo arranges them
+AverageTile tile;
+tile.box = AverageLayout::box_at({0.5, 0.25});
+tile.name = "EEG 001";
+tile.columns = 100;
+tile.traces.push_back({std::vector<double>(100, 0.5), Color{0, 80, 180}});
+AverageLayout topo;
+topo.set_tiles({tile});
+ok &= expect(topo.tile_at(topo.tiles()[0].box.center()) == 0, "the tile is found at its centre");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -31,18 +31,19 @@ The documented classes this example uses most:
 
 | Class | Library |
 |---|---|
-| [`DisplayList`](../../api/scene/display-list.mdx) | Figures |
 | [`Color`](../../api/scene/color.mdx) | Figures |
+| [`DisplayList`](../../api/scene/display-list.mdx) | Figures |
 | [`Font`](../../api/scene/font.mdx) | Figures |
-| [`ApproximateTextMetrics`](../../api/scene/approximate-text-metrics.mdx) | Figures |
-| [`Brush`](../../api/scene/brush.mdx) | Figures |
+| [`AverageLayout`](../../api/scene/average-layout.mdx) | Figures |
 | [`Canvas`](../../api/scene/canvas.mdx) | Figures |
-| [`FilterResponsePlot`](../../api/scene/filter-response-plot.mdx) | Figures |
-| [`LineChart`](../../api/scene/line-chart.mdx) | Figures |
+| [`ApproximateTextMetrics`](../../api/scene/approximate-text-metrics.mdx) | Figures |
+| [`AverageTile`](../../api/scene/average-tile.mdx) | Figures |
+| [`Brush`](../../api/scene/brush.mdx) | Figures |
 
 ## Used in the API reference
 
 - [ApproximateTextMetrics](../../api/scene/approximate-text-metrics.mdx)
+- [AverageLayout](../../api/scene/average-layout.mdx)
 - [AverageTile](../../api/scene/average-tile.mdx)
 - [BarChart](../../api/scene/bar-chart.mdx)
 - [Brush](../../api/scene/brush.mdx)
@@ -57,6 +58,7 @@ The documented classes this example uses most:
 - [Pen](../../api/scene/pen.mdx)
 - [RasterOptions](../../api/scene/raster-options.mdx)
 - [Rect](../../api/scene/rect.mdx)
+- [SensorLayout](../../api/scene/sensor-layout.mdx)
 - [SplinePlot](../../api/scene/spline-plot.mdx)
 - [SvgOptions](../../api/scene/svg-options.mdx)
 - [TextMetrics](../../api/scene/text-metrics.mdx)
@@ -86,10 +88,12 @@ The documented classes this example uses most:
 // INCLUDES
 //=============================================================================================================
 
+#include <mne/scene/average_layout.h>
 #include <mne/scene/canvas.h>
 #include <mne/scene/filter_response_plot.h>
 #include <mne/scene/line_chart.h>
 #include <mne/scene/raster_renderer.h>
+#include <mne/scene/sensor_layout.h>
 #include <mne/scene/svg_renderer.h>
 #include <mne/scene/text_metrics.h>
 
@@ -192,6 +196,29 @@ int main()
                  "a figure was recorded and a line plot written as SVG and PNG");
     ok &= expect(to_svg(figure).find("Hello scene") != std::string::npos, "the figure's text is in its SVG document");
     ok &= expect(to_raster(figure).pixel(60, 45) == Rgb{70, 130, 180}, "the figure's rectangle is filled in its image");
+
+    //! [sensor_layout_usage]
+    // Three sensors of an .lout layout; the click selects the middle one, as in the channel selection view
+    SensorLayout sensors;
+    sensors.set_sensors({{"MEG 0111", {0.0, 0.0}}, {"MEG 0121", {6.0, 0.0}}, {"MEG 0131", {12.0, 0.0}}});
+    sensors.click(sensors.scene_position(1), false);
+    Canvas sensorCanvas(240, 100, Color::white());
+    sensorCanvas.translate(40, 60);
+    sensors.draw(sensorCanvas, metrics, Font{"", 0.0, 13.0});
+    //! [sensor_layout_usage]
+    ok &= expect(sensors.selected() == std::vector<std::size_t>{1}, "a click selects the sensor under it");
+
+    //! [average_layout_usage]
+    // One tile per channel at its layout position, as plot_evoked_topo arranges them
+    AverageTile tile;
+    tile.box = AverageLayout::box_at({0.5, 0.25});
+    tile.name = "EEG 001";
+    tile.columns = 100;
+    tile.traces.push_back({std::vector<double>(100, 0.5), Color{0, 80, 180}});
+    AverageLayout topo;
+    topo.set_tiles({tile});
+    //! [average_layout_usage]
+    ok &= expect(topo.tile_at(topo.tiles()[0].box.center()) == 0, "the tile is found at its centre");
 
     std::error_code removeError;
     std::filesystem::remove_all(dir, removeError);

@@ -76,15 +76,13 @@
       "missing_tests": []
     },
     "disp": {
-      "classes": 72,
-      "tested": 9,
+      "classes": 73,
+      "tested": 15,
       "untested": [
         "AbstractView",
         "ApplyToView",
         "ArtifactSettingsView",
         "AverageLayoutView",
-        "AverageScene",
-        "AverageSceneItem",
         "AverageSelectionView",
         "AveragingSettingsView",
         "Bar",
@@ -114,7 +112,6 @@
         "Graph",
         "HpiSettingsView",
         "ImageSc",
-        "LayoutScene",
         "LinePlot",
         "MNEOperator",
         "MinimumNormSettingsView",
@@ -130,8 +127,6 @@
         "ScaleControl",
         "ScalingView",
         "SelectionItem",
-        "SelectionScene",
-        "SelectionSceneItem",
         "SpectrumSettingsView",
         "SpectrumView",
         "SpharaSettingsView",
@@ -146,8 +141,8 @@
       "missing_tests": []
     },
     "disp3D": {
-      "classes": 50,
-      "tested": 37,
+      "classes": 53,
+      "tested": 40,
       "untested": [
         "AbstractTreeItem",
         "ElectrodeObject",
@@ -471,8 +466,8 @@
       "missing_tests": []
     },
     "scene": {
-      "classes": 31,
-      "tested": 31,
+      "classes": 33,
+      "tested": 33,
       "untested": [],
       "missing_tests": []
     },

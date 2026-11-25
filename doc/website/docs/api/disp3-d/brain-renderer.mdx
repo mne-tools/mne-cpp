@@ -82,7 +82,20 @@ Qt bakes these flags into native resources at create() time, so calling setFlags
 
 **Returns:**
 
-- *QRhiRenderTarget ** — The clearing render target (pass 1).
+- *QRhiRenderTarget ** — The clearing render target (pass 1): the external target when one is set, else the own one.
+
+---
+
+### setExternalRenderTarget(rt)
+
+Draw into a render target owned by the caller, e.g.
+
+the current target of a QRhiSwapChain, instead of the own targets built by `ensureRenderTargets()`. `beginFrame()` then clears and draws into it.
+
+**Parameters:**
+
+- **rt** : *QRhiRenderTarget **
+  External render target, or nullptr to use the own targets again.
 
 ---
 
@@ -489,9 +502,49 @@ End any render pass (clearing or preserving).
 
 ---
 
+### prepareScreenOverlay(rhi, u, overlay)
+
+Upload a screen-space overlay (text labels, pane separators) that `issueScreenOverlayDraw()` blends over the whole render target.
+
+The texture is re-uploaded only when the image changed.
+
+**Parameters:**
+
+- **rhi** : *QRhi **
+  QRhi instance.
+
+- **u** : *QRhiResourceUpdateBatch **
+  Resource update batch, committed before the pass.
+
+- **overlay** : *const QImage &*
+  Premultiplied RGBA image of the target's pixel size; a null image draws nothing.
+
+---
+
+### issueScreenOverlayDraw(cb)
+
+Alpha-blend the overlay uploaded by `prepareScreenOverlay()` over the whole render target.
+
+Call inside the pass, after the 3-D scene.
+
+**Parameters:**
+
+- **cb** : *QRhiCommandBuffer **
+  Command buffer.
+
+---
+
+### hasScreenOverlay()
+
+**Returns:**
+
+- *bool* — Whether the last `prepareScreenOverlay()` call left an overlay to draw.
+
+---
+
 ## Example
 
-No example of its own: QRhi draw backend owned privately by BrainView; it needs a live GPU device and is driven only through BrainView.
+No example of its own: QRhi draw backend owned privately by BrainViewCore; it needs a live GPU device and is driven only through BrainViewCore.
 
 It is exercised by:
 

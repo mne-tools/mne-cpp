@@ -91,6 +91,45 @@ An axis-aligned rectangle given by its top-left corner and its size.
 
 ---
 
+### contains(p)
+
+**Parameters:**
+
+- **p** : *[Point](/docs/api/scene/point)*
+  [`Point`](/docs/api/scene/point).
+
+**Returns:**
+
+- *bool* — Whether `p` lies inside the rectangle or on its edges.
+
+---
+
+### intersects(other)
+
+**Parameters:**
+
+- **other** : *const [Rect](/docs/api/scene/rect) &*
+  Rectangle.
+
+**Returns:**
+
+- *bool* — Whether the rectangles overlap, touching edges included; never with an empty rectangle.
+
+---
+
+### united(other)
+
+**Parameters:**
+
+- **other** : *const [Rect](/docs/api/scene/rect) &*
+  Rectangle.
+
+**Returns:**
+
+- *[Rect](/docs/api/scene/rect)* — The smallest rectangle holding both, like QRectF::united; an empty rectangle is ignored.
+
+---
+
 ## Example
 
 No example of its own: Rectangle value type taken by Canvas; shown in the ex_scene snippet.
@@ -101,7 +140,7 @@ No example of its own: Rectangle value type taken by Canvas; shown in the ex_sce
 
 Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
 
-````cpp title="src/examples/ex_scene/main.cpp, line 84"
+````cpp title="src/examples/ex_scene/main.cpp, line 86"
 canvas.set_brush(Brush::solid({70, 130, 180}));
 canvas.draw_rounded_rect({20, 20, 80, 50}, 6, 6);
 canvas.set_pen(Color::black());

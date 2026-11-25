@@ -6,9 +6,9 @@
     "commit": "0800c9a1bf606c2df8c44e35fbb42ea13029b549"
   },
   "summary": {
-    "directories": 291,
+    "directories": 293,
     "registration": {
-      "unconditional": 278,
+      "unconditional": 280,
       "conditional": 10,
       "unregistered": 3
     },
@@ -20,10 +20,10 @@
       "freesurfer": 2,
       "python": 13,
       "sample-data": 21,
-      "test-data": 122
+      "test-data": 123
     },
-    "gui": 48,
-    "with_qskip": 100,
+    "gui": 49,
+    "with_qskip": 101,
     "ci_excluded": {},
     "retry_paths": [],
     "ci": {
@@ -57,6 +57,8 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp3d_brain_window",
+          "test_disp_channel_window",
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
@@ -155,6 +157,8 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp3d_brain_window",
+          "test_disp_channel_window",
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
@@ -253,6 +257,8 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp3d_brain_window",
+          "test_disp_channel_window",
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
@@ -351,6 +357,8 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp3d_brain_window",
+          "test_disp_channel_window",
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
@@ -449,6 +457,8 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp3d_brain_window",
+          "test_disp_channel_window",
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
@@ -547,6 +557,8 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp3d_brain_window",
+          "test_disp_channel_window",
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
@@ -2597,6 +2609,45 @@
       "registry_classes": []
     },
     {
+      "name": "test_disp3d_brain_window",
+      "cmake": "src/tests/test_disp3d_brain_window/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_disp3d_brain_window"
+      ],
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": true,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "BrainViewCore",
+        "BrainViewHost",
+        "BrainWindow"
+      ]
+    },
+    {
       "name": "test_disp3d_brainsurface",
       "cmake": "src/tests/test_disp3d_brainsurface/CMakeLists.txt",
       "registration": {
@@ -2764,6 +2815,43 @@
       "registry_classes": [
         "SubView",
         "ViewVisibilityProfile"
+      ]
+    },
+    {
+      "name": "test_disp_channel_window",
+      "cmake": "src/tests/test_disp_channel_window/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_disp_channel_window"
+      ],
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "ChannelRhiHost",
+        "ChannelRhiRenderer",
+        "ChannelWindow"
       ]
     },
     {
@@ -2936,12 +3024,15 @@
         "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
+        "AverageLayoutWidget",
         "ChannelDataView",
         "ChannelRhiView",
         "FilterPlot",
         "RtFiffRawView",
         "RtFiffRawViewDelegate",
-        "RtFiffRawViewModel"
+        "RtFiffRawViewModel",
+        "SceneViewport",
+        "SensorLayoutWidget"
       ]
     },
     {
@@ -9424,6 +9515,7 @@
       },
       "registry_classes": [
         "ApproximateTextMetrics",
+        "AverageLayout",
         "AverageTile",
         "BarChart",
         "Brush",
@@ -9448,6 +9540,7 @@
         "RasterOptions",
         "Rect",
         "RectShape",
+        "SensorLayout",
         "SplinePlot",
         "SvgOptions",
         "TextMetrics",

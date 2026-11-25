@@ -1,0 +1,130 @@
+---
+id: brain-view-host
+title: "mne::disp::BrainViewHost"
+sidebar_label: BrainViewHost
+sidebar_position: 54
+---
+
+# BrainViewHost
+
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/view/brainviewcore.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/disp3D/view/brainviewcore.h)
+
+`#include <mne/disp3D/brainviewcore.h>`
+
+```cpp
+class mne::disp::BrainViewHost
+```
+
+Surface that shows a [`BrainViewCore`](/docs/api/disp3-d/brain-view-core), such as a QRhiWidget, a QWindow or a test double.
+
+The core asks its host for repaints, the logical size, the device pixel ratio and the cursor, and lets it grab the presented frame. The optional hooks let a host pop up the pane preset menu and realise itself off-screen for `BrainViewCore::savePng`.
+
+---
+
+## Public Methods
+
+### ~BrainViewHost()
+
+Destructor.
+
+---
+
+### requestUpdate()
+
+Schedule a new frame; several requests before the next frame coalesce into one.
+
+---
+
+### logicalSize()
+
+**Returns:**
+
+- *QSize* — Size of the surface in logical (device-independent) pixels; event positions use the same units.
+
+---
+
+### devicePixelRatio()
+
+**Returns:**
+
+- *qreal* — Ratio of physical to logical pixels of the surface.
+
+---
+
+### isVisible()
+
+**Returns:**
+
+- *bool* — Whether the surface is shown; hidden surfaces do not open the pane preset menu.
+
+---
+
+### setCursorShape(shape)
+
+Show a cursor over the surface.
+
+**Parameters:**
+
+- **shape** : *Qt::CursorShape*
+  Cursor shape; Qt::ArrowCursor restores the default cursor.
+
+---
+
+### grabFrame()
+
+Render the current scene and read it back.
+
+**Returns:**
+
+- *QImage* — The frame, or a null image when nothing can be rendered.
+
+---
+
+### requestViewportPresetMenu(viewport, pos)
+
+Called when the user clicks the name label of a multi-view pane.
+
+The host may offer the camera presets and apply the choice with `BrainViewCore::setViewportCameraPreset`. Does nothing by default.
+
+**Parameters:**
+
+- **viewport** : *int*
+  Index of the pane (0..3).
+
+- **pos** : *const QPoint &*
+  Click position in logical surface coordinates.
+
+---
+
+### beginOffscreenCapture(size)
+
+Realise the surface off-screen at a size so that frames are rendered without a visible window.
+
+Not supported by default.
+
+**Parameters:**
+
+- **size** : *const QSize &*
+  Logical size to render at.
+
+**Returns:**
+
+- *bool* — Whether the host renders off-screen now; `endOffscreenCapture()` is called in any case.
+
+---
+
+### endOffscreenCapture()
+
+Undo `beginOffscreenCapture()`.
+
+Does nothing by default.
+
+---
+
+## Example
+
+No example of its own: Abstract interface implemented by BrainView, BrainWindow and test doubles; not used directly by applications.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -17,7 +17,7 @@ class mne::disp::AverageLayoutView
 
 Sensor-layout viewer drawing per-channel evoked traces at their physical 2-D positions.
 
-Wraps a `QGraphicsView` around an [`AverageScene`](/docs/api/disp/average-scene) fed by an [`EvokedSetModel`](/docs/api/disp/evoked-set-model) and a [`ChannelInfoModel`](/docs/api/disp/channel-info-model); selection groups are pushed in as [`SelectionItem`](/docs/api/disp/selection-item) to show only a subset of channels.
+Wraps an [`AverageLayoutWidget`](/docs/api/disp/average-layout-widget) fed by an [`EvokedSetModel`](/docs/api/disp/evoked-set-model) and a [`ChannelInfoModel`](/docs/api/disp/channel-info-model); selection groups are pushed in as [`SelectionItem`](/docs/api/disp/selection-item) to show only a subset of channels.
 
 ### Inheritance
 
@@ -203,16 +203,14 @@ Stores [`FiffInfo`](/docs/api/fiff/fiff-info) to local variable to be used for g
 
 ---
 
-### channelSelectionManagerChanged(selectedChannelItems)
+### channelSelectionManagerChanged(selection)
 
-call this whenever the external channel selection manager changes
-
--
+Shows the channels picked in the channel selection view.
 
 **Parameters:**
 
-- **selectedChannelItems** : *const QList&lt; QGraphicsItem * &gt; &*
-  list of selected graphic items
+- **selection** : *const [SelectionItem](/docs/api/disp/selection-item) &*
+  The picked channels with their layout positions.
 
 ---
 

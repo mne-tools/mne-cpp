@@ -1,0 +1,161 @@
+---
+id: scene-viewport
+title: "mne::disp::SceneViewport"
+sidebar_label: SceneViewport
+sidebar_position: 73
+---
+
+# SceneViewport
+
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/helpers/sceneviewport.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/disp/viewers/helpers/sceneviewport.h)
+
+`#include <mne/disp/sceneviewport.h>`
+
+```cpp
+class mne::disp::SceneViewport
+```
+
+Base of the widgets that show a scene model, such as a sensor layout, with zoom, pan and rubber band.
+
+Subclasses report the area of their contents in `sceneBounds()`, draw them in `drawScene()` and react to clicks and bands in `scenePressed()` and `sceneBandSelected()`.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QWidget <|-- SceneViewport
+    SceneViewport <|-- AverageLayoutWidget
+    click AverageLayoutWidget href "../../disp/average-layout-widget/"
+    SceneViewport <|-- SensorLayoutWidget
+    click SensorLayoutWidget href "../../disp/sensor-layout-widget/"
+```
+
+---
+
+## Public Methods
+
+### SceneViewport(parent)
+
+Constructs an empty viewport with a white background.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  Parent widget.
+
+---
+
+### setBackgroundColor(color)
+
+**Parameters:**
+
+- **color** : *const QColor &*
+  Colour behind the contents.
+
+---
+
+### backgroundColor()
+
+**Returns:**
+
+- *QColor* — The colour behind the contents.
+
+---
+
+### fitToContents()
+
+Fits the contents into the widget, keeping their aspect ratio, and keeps them fitted as the widget resizes until the user zooms or pans.
+
+---
+
+### isFitted()
+
+**Returns:**
+
+- *bool* — Whether the contents are kept fitted.
+
+---
+
+### zoom()
+
+**Returns:**
+
+- *double* — Pixels per scene unit.
+
+---
+
+### zoomBy(factor, anchor)
+
+Zooms by `factor`, keeping the scene point under `anchor` in place.
+
+**Parameters:**
+
+- **factor** : *double*
+  Factor, above 1 to zoom in.
+
+- **anchor** : *const QPointF &*
+  Fixed point in widget coordinates.
+
+---
+
+### panBy(pixels)
+
+Moves the contents.
+
+**Parameters:**
+
+- **pixels** : *const QPointF &*
+  Offset in widget pixels.
+
+---
+
+### mapToScene(point)
+
+**Parameters:**
+
+- **point** : *const QPointF &*
+  Point in widget coordinates.
+
+**Returns:**
+
+- *[Point](/docs/api/scene/point)* — The point in scene coordinates.
+
+---
+
+### mapFromScene(point)
+
+**Parameters:**
+
+- **point** : *[Point](/docs/api/scene/point)*
+  Point in scene coordinates.
+
+**Returns:**
+
+- *QPointF* — The point in widget coordinates.
+
+---
+
+### figure(size)
+
+The contents fitted into a figure, e.g.
+
+to export them with `scene::write_svg()`.
+
+**Parameters:**
+
+- **size** : *const QSize &*
+  Size of the figure in pixels.
+
+**Returns:**
+
+- *[DisplayList](/docs/api/scene/display-list)* — The figure on the background colour.
+
+---
+
+## Example
+
+No example of its own: Abstract base of SensorLayoutWidget and AverageLayoutWidget; its zoom, pan and rubber band are tested through them in test_disp_viewers2.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

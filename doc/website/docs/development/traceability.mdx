@@ -8,7 +8,7 @@ sidebar_label: Traceability
 
 # Class-to-test traceability
 
-301 of 620 public classes name the test that covers them in [`doc/api_registry.json`](https://github.com/mne-tools/mne-cpp/blob/staging/doc/api_registry.json). CI checks that every named test exists and that no library's count falls below its floor in `scripts/compliance/traceability_policy.json`. Libraries in the acquisition, processing and file path are marked safety-relevant and come first.
+312 of 626 public classes name the test that covers them in [`doc/api_registry.json`](https://github.com/mne-tools/mne-cpp/blob/staging/doc/api_registry.json). CI checks that every named test exists and that no library's count falls below its floor in `scripts/compliance/traceability_policy.json`. Libraries in the acquisition, processing and file path are marked safety-relevant and come first.
 
 | Library | Safety-relevant | Classes | With a test | Share |
 |---|---|---:|---:|---:|
@@ -27,8 +27,8 @@ sidebar_label: Traceability
 | bids | no | 14 | 5 | 36 % |
 | connectivity | no | 20 | 6 | 30 % |
 | decoding | no | 5 | 4 | 80 % |
-| disp | no | 72 | 9 | 12 % |
-| disp3D | no | 50 | 37 | 74 % |
+| disp | no | 73 | 15 | 21 % |
+| disp3D | no | 53 | 40 | 75 % |
 | fs | no | 8 | 4 | 50 % |
 | ieeg | no | 6 | 6 | 100 % |
 | ml | no | 4 | 4 | 100 % |
@@ -36,7 +36,7 @@ sidebar_label: Traceability
 | mri | no | 8 | 0 | 0 % |
 | pybridge | no | 4 | 4 | 100 % |
 | report | no | 1 | 1 | 100 % |
-| scene | no | 31 | 31 | 100 % |
+| scene | no | 33 | 33 | 100 % |
 
 ## Classes without a named test
 
@@ -51,7 +51,7 @@ sidebar_label: Traceability
 - **bids**: `AbstractFormatReader`, `BidsChannel`, `BidsCoordinateSystem`, `BidsDatasetDescription`, `BidsElectrode`, `BidsEvent`, `BidsTsv`, `BrainVisionChannelInfo`, `BrainVisionMarker`
 - **connectivity**: `AbstractMetric`, `Coherency`, `ConnectivitySettings`, `Correlation`, `CrossCorrelation`, `DebiasedSquaredWeightedPhaseLagIndex`, `ImagCoherence`, `MvarModel`, `Network`, `NetworkEdge`, `NetworkNode`, `UnbiasedSquaredPhaseLagIndex`, `VisualizationInfo`, `WeightedPhaseLagIndex`
 - **decoding**: `IcaLabelResult`
-- **disp**: `AbstractView`, `ApplyToView`, `ArtifactSettingsView`, `AverageLayoutView`, `AverageScene`, `AverageSceneItem`, `AverageSelectionView`, `AveragingSettingsView`, `Bar`, `BidsView`, `BidsViewModel`, `ButterflyView`, `ChannelDataModel`, `ChannelDisplayInfo`, `ChannelInfoModel`, `ChannelLabelPanel`, `ChannelSelectionView`, `ColorMap`, `CompensatorView`, `ConnectivitySettingsView`, `Control3DView`, `CoregSettingsView`, `CovarianceSettingsView`, `DipoleFitView`, `DraggableFramelessWidget`, `EvokedSetModel`, `FiffRawViewSettings`, `FilterDesignView`, `FilterSettingsView`, `FrequencySpectrumDelegate`, `FrequencySpectrumModel`, `FwdSettingsView`, `Graph`, `HpiSettingsView`, `ImageSc`, `LayoutScene`, `LinePlot`, `MNEOperator`, `MinimumNormSettingsView`, `ModalitySelectionView`, `MultiView`, `MultiViewWindow`, `OverviewBarWidget`, `Plot`, `ProgressView`, `ProjectSettingsView`, `ProjectorsView`, `QuickControlView`, `ScaleControl`, `ScalingView`, `SelectionItem`, `SelectionScene`, `SelectionSceneItem`, `SpectrumSettingsView`, `SpectrumView`, `SpharaSettingsView`, `Spline`, `TFplot`, `TfSettingsView`, `TimeRulerEventMark`, `TimeRulerReferenceMark`, `TimeRulerWidget`, `TriggerDetectionView`
+- **disp**: `AbstractView`, `ApplyToView`, `ArtifactSettingsView`, `AverageLayoutView`, `AverageSelectionView`, `AveragingSettingsView`, `Bar`, `BidsView`, `BidsViewModel`, `ButterflyView`, `ChannelDataModel`, `ChannelDisplayInfo`, `ChannelInfoModel`, `ChannelLabelPanel`, `ChannelSelectionView`, `ColorMap`, `CompensatorView`, `ConnectivitySettingsView`, `Control3DView`, `CoregSettingsView`, `CovarianceSettingsView`, `DipoleFitView`, `DraggableFramelessWidget`, `EvokedSetModel`, `FiffRawViewSettings`, `FilterDesignView`, `FilterSettingsView`, `FrequencySpectrumDelegate`, `FrequencySpectrumModel`, `FwdSettingsView`, `Graph`, `HpiSettingsView`, `ImageSc`, `LinePlot`, `MNEOperator`, `MinimumNormSettingsView`, `ModalitySelectionView`, `MultiView`, `MultiViewWindow`, `OverviewBarWidget`, `Plot`, `ProgressView`, `ProjectSettingsView`, `ProjectorsView`, `QuickControlView`, `ScaleControl`, `ScalingView`, `SelectionItem`, `SpectrumSettingsView`, `SpectrumView`, `SpharaSettingsView`, `Spline`, `TFplot`, `TfSettingsView`, `TimeRulerEventMark`, `TimeRulerReferenceMark`, `TimeRulerWidget`, `TriggerDetectionView`
 - **disp3D**: `AbstractTreeItem`, `ElectrodeObject`, `GeometryInfo`, `Interpolation`, `LiveMarker`, `MultimodalScene`, `PickResult`, `RtSensorInterpolationMatWorker`, `RtSourceDataWorker`, `RtSourceInterpolationMatWorker`, `SceneLayer`, `SensorTreeItem`, `VertexData`
 - **fs**: `FsAnnotationSet`, `FsAtlasLookup`, `FsColortable`, `FsSurfaceSet`
 - **mna**: `MnaFileRef`, `MnaGraph`, `MnaGraphExecutor`, `MnaIO`, `MnaNode`, `MnaOpRegistry`, `MnaOpSchema`, `MnaOpSchemaAttr`, `MnaOpSchemaPort`, `MnaParamBinding`, `MnaParamTree`, `MnaPort`, `MnaProject`, `MnaProvenance`, `MnaRecording`, `MnaRegistryLoader`, `MnaScript`, `MnaSession`, `MnaSubject`, `MnaVerification`, `MnaVerificationCheck`, `MnaVerificationResult`

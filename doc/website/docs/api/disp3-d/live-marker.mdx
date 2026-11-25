@@ -7,9 +7,9 @@ sidebar_position: 28
 
 # LiveMarker
 
-**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/view/brainview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/disp3D/view/brainview.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/view/brainviewcore.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/disp3D/view/brainviewcore.h)
 
-`#include <mne/disp3D/brainview.h>`
+`#include <mne/disp3D/brainviewcore.h>`
 
 ```cpp
 struct mne::disp::LiveMarker
@@ -17,7 +17,7 @@ struct mne::disp::LiveMarker
 
 Lightweight live overlay marker rendered as a single sphere.
 
-Used by `BrainView::setLiveMarkers` to draw transient markers (e.g. digitizer tracker tip, orientation axes) without going through the model pipeline or recalculating scene bounds.
+Used by `BrainViewCore::setLiveMarkers` to draw transient markers (e.g. digitizer tracker tip, orientation axes) without going through the model pipeline or recalculating scene bounds.
 
 ```cpp title="src/examples/ex_disp3d_scene/main.cpp"
 BrainView view; // QRhi widget; nothing is rendered until it is shown

@@ -616,8 +616,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/disp/apply-to-view',
         'api/disp/artifact-settings-view',
         'api/disp/average-layout-view',
-        'api/disp/average-scene',
-        'api/disp/average-scene-item',
         'api/disp/average-selection-view',
         'api/disp/averaging-settings-view',
         'api/disp/bar',
@@ -649,7 +647,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/disp/graph',
         'api/disp/hpi-settings-view',
         'api/disp/image-sc',
-        'api/disp/layout-scene',
         'api/disp/line-plot',
         'api/disp/mne-operator',
         'api/disp/minimum-norm-settings-view',
@@ -668,8 +665,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/disp/scale-control',
         'api/disp/scaling-view',
         'api/disp/selection-item',
-        'api/disp/selection-scene',
-        'api/disp/selection-scene-item',
         'api/disp/spectrum-settings-view',
         'api/disp/spectrum-view',
         'api/disp/sphara-settings-view',
@@ -683,7 +678,13 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/disp/time-ruler-reference-mark',
         'api/disp/figure-exporter',
         'api/disp/svg-writer',
-        'api/disp/qt-text-metrics'
+        'api/disp/qt-text-metrics',
+        'api/disp/scene-viewport',
+        'api/disp/sensor-layout-widget',
+        'api/disp/average-layout-widget',
+        'api/disp/channel-rhi-renderer',
+        'api/disp/channel-rhi-host',
+        'api/disp/channel-window'
       ],
     },
     {
@@ -742,7 +743,10 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/disp3-d/gpu-stream',
         'api/disp3-d/instanced-streams',
         'api/disp3-d/render-key',
-        'api/disp3-d/periodic-task'
+        'api/disp3-d/periodic-task',
+        'api/disp3-d/brain-view-core',
+        'api/disp3-d/brain-view-host',
+        'api/disp3-d/brain-window'
       ],
     },
     {
@@ -861,7 +865,9 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/scene/rect-shape',
         'api/scene/text-shape',
         'api/scene/transform',
-        'api/scene/filter-response-plot'
+        'api/scene/filter-response-plot',
+        'api/scene/sensor-layout',
+        'api/scene/average-layout'
       ],
     }
 ];

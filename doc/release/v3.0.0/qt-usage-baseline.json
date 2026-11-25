@@ -8,7 +8,11 @@
   ],
   "kept": {
     "disp": {
-      "SvgWriter (QPaintEngine)": "Replaces QSvgGenerator so the vector export of widgets needs Qt Gui only; dropping the Qt Svg module raised the disp ceilings once (tokens 6025 -> 6159, public header includes 110 -> 112)."
+      "SvgWriter (QPaintEngine)": "Replaces QSvgGenerator so the vector export of widgets needs Qt Gui only; dropping the Qt Svg module raised the disp ceilings once (tokens 6025 -> 6159, public header includes 110 -> 112).",
+      "QWindow hosts and scene viewports (phase 3)": "ChannelWindow (QWindow + QRhi swap chain) next to the ChannelRhiView QRhiWidget host, and SceneViewport replacing the QGraphicsView scenes, raised the disp ceilings once (tokens 4846 -> 4885, public header includes 82 -> 89); the QRhiWidget hosts go with phase 4."
+    },
+    "disp3D": {
+      "BrainWindow host and GPU overlay (phase 3)": "BrainWindow (QWindow + QRhi swap chain), the forwarding BrainView host and the overlay painted into the GPU pass instead of child QLabels raised the disp3D ceilings once (tokens 1633 -> 1961); the QRhiWidget host goes with phase 4."
     }
   },
   "summary": {
@@ -42,7 +46,7 @@
       "scene",
       "sts"
     ],
-    "tokens": 6479,
+    "tokens": 6846,
     "gui_outside_design": []
   },
   "libraries": {
@@ -135,20 +139,20 @@
       "modules": []
     },
     "disp": {
-      "tokens": 4846,
+      "tokens": 4885,
       "by_category": {
-        "containers": 33,
-        "files": 99,
-        "global": 1069,
-        "gui": 888,
-        "objects_signals": 528,
-        "other": 1396,
-        "strings": 824,
+        "containers": 16,
+        "files": 97,
+        "global": 1083,
+        "gui": 958,
+        "objects_signals": 533,
+        "other": 1369,
+        "strings": 820,
         "time": 9
       },
-      "public_header_includes": 82,
-      "q_object": 60,
-      "files": 139,
+      "public_header_includes": 89,
+      "q_object": 61,
+      "files": 140,
       "modules": [
         "Core",
         "GuiPrivate",
@@ -156,20 +160,20 @@
       ]
     },
     "disp3D": {
-      "tokens": 1633,
+      "tokens": 1961,
       "by_category": {
-        "containers": 3,
+        "containers": 5,
         "files": 13,
-        "global": 166,
-        "gui": 962,
-        "objects_signals": 135,
-        "other": 220,
-        "strings": 129,
+        "global": 199,
+        "gui": 1158,
+        "objects_signals": 149,
+        "other": 293,
+        "strings": 139,
         "time": 5
       },
-      "public_header_includes": 75,
-      "q_object": 12,
-      "files": 83,
+      "public_header_includes": 74,
+      "q_object": 14,
+      "files": 87,
       "modules": [
         "Core",
         "Gui",
@@ -295,7 +299,7 @@
       "by_category": {},
       "public_header_includes": 0,
       "q_object": 0,
-      "files": 34,
+      "files": 38,
       "modules": []
     },
     "sts": {
