@@ -220,7 +220,7 @@ struct Brush
      *
      * @return The gradient colour at @p t, interpolated linearly between the stops.
      */
-    Color color_at(double t) const;
+    SCENESHARED_EXPORT Color color_at(double t) const;
 };
 
 /**
