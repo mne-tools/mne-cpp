@@ -67,6 +67,14 @@ class TestRenderCharts(unittest.TestCase):
         self.assertIn("| MNE-CPP commit | `abc1234567` |", page)
         self.assertIn("Reproduce: `run_benchmarks.py --suites forward`", page)
 
+    def test_a_chart_from_an_earlier_run_names_its_commit(self):
+        earlier = {**RESULTS["charts"][0], "environment": {"commit": "old1234567", "date": "2026-11-01"}}
+        results = {**RESULTS, "charts": [earlier]}
+        self.assertIn("commit old1234567 · 2026-11-01", charts.render(results)["forward.svg"])
+        page = charts.render_page(results, "# Performance")
+        self.assertIn("| Earlier run | 2026-11-01, commit `old1234567` (the charts that say so) |", page)
+        self.assertIn("Measured 2026-11-01 at commit `old1234567`.", page)
+
     def test_rendering_is_deterministic(self):
         self.assertEqual(charts.render(RESULTS), charts.render(RESULTS))
 

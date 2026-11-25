@@ -48,6 +48,21 @@ class TestAcqCharts(unittest.TestCase):
         self.assertEqual(paced["notes"], ["Lost samples on this machine: 4 ch × 62.5 MHz int16."])
 
 
+class TestMerge(unittest.TestCase):
+    def test_kept_charts_keep_their_commit_and_date(self):
+        previous = {"environment": {"commit": "old", "date": "2026-11-23"},
+                    "charts": [{"id": "acq", "series": []}, {"id": "inverse", "series": [1]},
+                               {"id": "forward", "series": [], "environment": {"commit": "older", "date": "2026-11-01"}}]}
+        current = {"environment": {"commit": "new", "date": "2026-11-25"},
+                   "charts": [{"id": "inverse", "series": [2]}, {"id": "startup", "series": []}]}
+        merged = bench.merge(previous, current)
+        self.assertEqual(merged["environment"]["commit"], "new")
+        self.assertEqual([c["id"] for c in merged["charts"]], ["acq", "inverse", "forward", "startup"])
+        self.assertEqual(merged["charts"][0]["environment"], {"commit": "old", "date": "2026-11-23"})
+        self.assertEqual(merged["charts"][1], {"id": "inverse", "series": [2]})
+        self.assertEqual(merged["charts"][2]["environment"]["commit"], "older")
+
+
 class TestBinary(unittest.TestCase):
     def test_the_given_build_directory_comes_first(self):
         with tempfile.TemporaryDirectory() as tmp:

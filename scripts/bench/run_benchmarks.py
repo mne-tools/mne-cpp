@@ -27,6 +27,7 @@ startup    wall time and peak memory of a command-line tool's start (--version),
 
     python3 scripts/bench/run_benchmarks.py --build build/developer-dynamic --out results.json
     python3 scripts/bench/run_benchmarks.py --suites acq,startup --quick
+    python3 scripts/bench/run_benchmarks.py --suites inverse --merge   # refresh one suite of results.json
 
 MNE-Python runs with the interpreter given by --python (default: the first python3 on PATH that imports mne).
 Times are the median of --repeats runs; the spread is kept in the results.
@@ -303,6 +304,16 @@ def find_python() -> str | None:
     return None
 
 
+def merge(previous: dict[str, Any], current: dict[str, Any]) -> dict[str, Any]:
+    """``previous`` with the charts of ``current`` replaced or added; a kept chart records the commit and date it
+    was measured at, unless it already does."""
+    fresh = {chart["id"]: chart for chart in current["charts"]}
+    stamp = {key: previous["environment"][key] for key in ("commit", "date")}
+    charts = [fresh.pop(chart["id"]) if chart["id"] in fresh else {**chart, "environment": chart.get("environment", stamp)}
+              for chart in previous["charts"]]
+    return {**current, "charts": charts + list(fresh.values())}
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--build", type=Path, default=REPO_ROOT / "build" / "developer-dynamic")
@@ -313,6 +324,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--python", default=None, help="interpreter with MNE-Python; 'none' skips the comparison")
     parser.add_argument("--quick", action="store_true", help="short runs, for CI")
     parser.add_argument("--out", type=Path, default=REPO_ROOT / "doc" / "website" / "static" / "bench" / "results.json")
+    parser.add_argument("--merge", action="store_true",
+                        help="replace only the charts of --suites in --out; the others keep their commit and date")
     args = parser.parse_args(argv)
     args.python = None if args.python == "none" else (args.python or find_python())
 
@@ -322,6 +335,8 @@ def main(argv: list[str] | None = None) -> int:
         charts += SUITES[name](args.build, args)
     results = {"generated_by": "scripts/bench/run_benchmarks.py", "environment": environment(args.build, args.python),
                "charts": charts}
+    if args.merge and args.out.exists():
+        results = merge(json.loads(args.out.read_text(encoding="utf-8")), results)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(results, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"wrote {args.out}")

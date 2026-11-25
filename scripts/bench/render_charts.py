@@ -61,6 +61,7 @@ def compares_with_reference(chart: dict[str, Any]) -> bool:
 
 def footer(environment: dict[str, str], chart: dict[str, Any], y: float) -> tuple[list[str], float]:
     command = chart["command"]
+    environment = {**environment, **chart.get("environment", {})}
     lines = [f"{environment['machine']} · {environment['os']} · {environment['compiler']} · "
              f"commit {environment['commit']} · {environment['date']}"]
     if environment.get("reference") and compares_with_reference(chart):
@@ -150,12 +151,17 @@ def render_page(results: dict[str, Any], intro: str, image_base: str = "/bench")
              f"| Machine | {env['machine']} |", f"| Operating system | {env['os']} |",
              f"| Compiler | {env['compiler']} |", f"| MNE-CPP commit | `{env['commit']}` |",
              f"| Measured | {env['date']} |"]
+    earlier = sorted({(c["environment"]["date"], c["environment"]["commit"]) for c in results["charts"] if "environment" in c})
+    for date, commit in earlier:
+        lines.append(f"| Earlier run | {date}, commit `{commit}` (the charts that say so) |")
     if env.get("reference"):
         lines.append(f"| Reference | {env['reference']} |")
     for chart in results["charts"]:
         lines += ["", f"## {mdx(chart['title'])}", ""]
         if chart.get("description"):
             lines += [chart["description"], ""]
+        if "environment" in chart:
+            lines += [f"Measured {chart['environment']['date']} at commit `{chart['environment']['commit']}`.", ""]
         lines += [f"![{mdx(chart['title'])}]({image_base}/{chart['id']}.svg)", ""]
         labels = [s["label"] for s in chart["series"]]
         categories = list(dict.fromkeys(p["x"] for s in chart["series"] for p in s["points"]))
