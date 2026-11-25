@@ -1,0 +1,38 @@
+---
+id: camera-matrices
+title: "mne::scene::CameraMatrices"
+sidebar_label: CameraMatrices
+sidebar_position: 77
+---
+
+# CameraMatrices
+
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/camera.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/camera.h)
+
+`#include <mne/scene/camera.h>`
+
+```cpp
+struct mne::scene::CameraMatrices
+```
+
+Projection, view and model matrices of a camera with the derived camera frame.
+
+---
+
+## Public Methods
+
+### pvm()
+
+**Returns:**
+
+- *Eigen::Matrix4f* — projection * view * model.
+
+---
+
+## Example
+
+No example of its own: Result value of OrbitCamera; filled into the QRhi uniforms by disp::BrainViewCore.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -19,7 +19,15 @@ Viewport subdivision holding its own camera, projection, and scissor rectangle.
 
 Encapsulates all per-view state for a single viewport (single view or one pane in multi-view).
 
-The class stores shader, surface type, overlay mode, visibility flags, zoom, pan, camera rotation, and view preset — everything that can differ between two viewports showing the same scene.
+The class stores shader, surface type, overlay mode, visibility flags, and, through its toolkit-neutral [`PaneCamera`](/docs/api/scene/pane-camera) base, the zoom, pan, camera rotation and view preset — everything that can differ between two viewports showing the same scene.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    PaneCamera <|-- SubView
+    click PaneCamera href "../../scene/pane-camera/"
+```
 
 ---
 
@@ -82,7 +90,7 @@ Load this [`SubView`](/docs/api/disp3-d/sub-view)'s state from QSettings under t
 - **prefix** : *const QString &*
   Key prefix (e.g. "multi0_").
 
-- **fallbackRotation** : *const QQuaternion &*
+- **fallbackRotation** : *const Eigen::Quaternionf &*
   Rotation to use if no saved quaternion exists.
 
 ---

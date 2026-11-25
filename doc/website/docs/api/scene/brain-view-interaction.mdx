@@ -1,0 +1,207 @@
+---
+id: brain-view-interaction
+title: "mne::scene::BrainViewInteraction"
+sidebar_label: BrainViewInteraction
+sidebar_position: 83
+---
+
+# BrainViewInteraction
+
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/brain_view_interaction.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/brain_view_interaction.h)
+
+`#include <mne/scene/brain_view_interaction.h>`
+
+```cpp
+class mne::scene::BrainViewInteraction
+```
+
+Input state machine of the 3-D brain view.
+
+Drags follow the buttons held according to the pointer events. In the single view a left-button drag orbits the camera; in the multi view it orbits the perspective pane under the pointer and pans the other panes, and dragging a splitter resizes the panes. The wheel zooms the view (or the pane) under the pointer, R resets the rotation of the single view and S asks for a snapshot. A left click without a drag reports the clicked point, a hover move the hovered point.
+
+The camera states are owned by the host (`attach_cameras()`); the host keeps the pane setup up to date with `set_view_size()` and `set_panes()` before it forwards events. `Effects` go out through `Effects`; positions are rounded to whole logical pixels, as pane hit-testing is done in pixels.
+
+---
+
+## Public Methods
+
+### set_effects(effects)
+
+Sets the reactions of the host.
+
+**Parameters:**
+
+- **effects** : *Effects*
+  Callbacks.
+
+---
+
+### attach_cameras(single, panes)
+
+Attaches the camera states the input changes; they are not owned and must outlive their use.
+
+**Parameters:**
+
+- **single** : *[PaneCamera](/docs/api/scene/pane-camera) **
+  Camera of the single view: rotation and zoom.
+
+- **panes** : *std::vector&lt; [PaneCamera](/docs/api/scene/pane-camera) * &gt;*
+  Camera of each viewport of the multi view, by viewport index.
+
+---
+
+### set_view_size(size)
+
+**Parameters:**
+
+- **size** : *[PixelSize](/docs/api/scene/pixel-size)*
+  Size of the view in logical pixels.
+
+---
+
+### view_size()
+
+**Returns:**
+
+- *[PixelSize](/docs/api/scene/pixel-size)* — The size of the view.
+
+---
+
+### set_panes(multi_view, viewports)
+
+Sets the pane setup.
+
+**Parameters:**
+
+- **multi_view** : *bool*
+  Whether the view is split into panes.
+
+- **viewports** : *std::vector&lt; int &gt;*
+  Viewport index of each pane in slot order (multi view).
+
+---
+
+### multi_view()
+
+**Returns:**
+
+- *bool* — Whether the view is split into panes.
+
+---
+
+### set_scene_size(size)
+
+**Parameters:**
+
+- **size** : *float*
+  Extent of the scene, which sets the pan speed.
+
+---
+
+### layout()
+
+**Returns:**
+
+- *[PaneLayout](/docs/api/scene/pane-layout) &* — The pane layout.
+
+---
+
+### layout()
+
+**Returns:**
+
+- *const [PaneLayout](/docs/api/scene/pane-layout) &* — The pane layout.
+
+---
+
+### viewport_at(pos)
+
+**Parameters:**
+
+- **pos** : *[Point](/docs/api/scene/point)*
+  Pointer position.
+
+**Returns:**
+
+- *int* — The viewport under the pointer: 0 in the single view, -1 between or outside the panes.
+
+---
+
+### dragging_splitter()
+
+**Returns:**
+
+- *bool* — Whether a splitter is being dragged.
+
+---
+
+### cancel_splitter_drag()
+
+Ends a splitter drag, e.g.
+
+when the view leaves the multi view.
+
+---
+
+### handle_pointer(event)
+
+Handles a pointer event.
+
+**Parameters:**
+
+- **event** : *const [PointerEvent](/docs/api/scene/pointer-event) &*
+  Event.
+
+**Returns:**
+
+- *bool* — Whether the event was used; a double click is used when `Effects::double_clicked` says so.
+
+---
+
+### handle_wheel(event)
+
+Zooms the view, or the pane under the pointer, by one step per wheel notch.
+
+**Parameters:**
+
+- **event** : *const [WheelEvent](/docs/api/scene/wheel-event) &*
+  Event.
+
+---
+
+### handle_key(event)
+
+Handles R (reset the single-view rotation) and S (snapshot).
+
+**Parameters:**
+
+- **event** : *const [KeyEvent](/docs/api/scene/key-event) &*
+  Event.
+
+**Returns:**
+
+- *bool* — Whether the key was used.
+
+---
+
+### orbit_perspective_views(dx, dy)
+
+Orbits the single view, or every perspective pane of the multi view, as a pointer drag would; used for the automated rotation.
+
+**Parameters:**
+
+- **dx** : *double*
+  Horizontal drag in pixels.
+
+- **dy** : *double*
+  Vertical drag in pixels.
+
+---
+
+## Example
+
+No example of its own: Input state machine of the 3-D brain view; driven by disp::BrainViewCore and exercised by test_scene_brain_view, it has no standalone use without a 3-D host.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

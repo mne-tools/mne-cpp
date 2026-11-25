@@ -1,0 +1,194 @@
+---
+id: brain-view-overlay
+title: "mne::scene::BrainViewOverlay"
+sidebar_label: BrainViewOverlay
+sidebar_position: 84
+---
+
+# BrainViewOverlay
+
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/brain_view_overlay.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/brain_view_overlay.h)
+
+`#include <mne/scene/brain_view_overlay.h>`
+
+```cpp
+class mne::scene::BrainViewOverlay
+```
+
+Head-up display of the 3-D brain view: FPS, view info, hovered region, pane names and separators.
+
+The overlay keeps the text and geometry of its items in logical pixels; `update_layout()` places them for the current view size and pane layout, and `draw()` renders the visible ones (separators below labels) as a display list that a backend paints over the 3-D scene.
+
+---
+
+## Public Methods
+
+### BrainViewOverlay(viewport_count)
+
+**Parameters:**
+
+- **viewport_count** : *int*
+  Number of viewports that have name and info labels.
+
+---
+
+### set_viewport_count(count)
+
+**Parameters:**
+
+- **count** : *int*
+  Number of viewports that have name and info labels.
+
+---
+
+### viewport_count()
+
+**Returns:**
+
+- *int* — The number of viewports.
+
+---
+
+### set_fonts(fonts)
+
+**Parameters:**
+
+- **fonts** : *Fonts*
+  [`Font`](/docs/api/scene/font) families.
+
+---
+
+### set_separator_color(color)
+
+**Parameters:**
+
+- **color** : *[Color](/docs/api/scene/color)*
+  Fill of the pane separators.
+
+---
+
+### item(item, viewport)
+
+**Parameters:**
+
+- **item** : *Item*
+  `Item`.
+
+- **viewport** : *int*
+  Viewport for the pane labels.
+
+**Returns:**
+
+- *const Label ** — The item, or nullptr for a viewport out of range.
+
+---
+
+### set_text(item, text, viewport)
+
+Sets the text of a label; the next `update_layout()` sizes it.
+
+**Parameters:**
+
+- **item** : *Item*
+  `Label`.
+
+- **text** : *std::string*
+  Text.
+
+- **viewport** : *int*
+  Viewport for the pane labels.
+
+**Returns:**
+
+- *bool* — Whether the text changed.
+
+---
+
+### set_region(name)
+
+Shows the hovered region, or hides the region label for an empty name (keeping the last text).
+
+**Parameters:**
+
+- **name** : *const std::string &*
+  Region name.
+
+---
+
+### style(item, selected)
+
+**Parameters:**
+
+- **item** : *Item*
+  `Label`.
+
+- **selected** : *bool*
+  Whether a pane name is selected.
+
+**Returns:**
+
+- *LabelStyle* — The look of the label.
+
+---
+
+### update_layout(input, metrics)
+
+Places and shows or hides the items.
+
+**Parameters:**
+
+- **input** : *const LayoutInput &*
+  View size and pane layout.
+
+- **metrics** : *const [TextMetrics](/docs/api/scene/text-metrics) &*
+  Text measurement.
+
+---
+
+### draw(width, height, metrics)
+
+**Parameters:**
+
+- **width** : *int*
+  Width of the view in logical pixels.
+
+- **height** : *int*
+  Height of the view in logical pixels.
+
+- **metrics** : *const [TextMetrics](/docs/api/scene/text-metrics) &*
+  Text measurement for the line spacing.
+
+**Returns:**
+
+- *[DisplayList](/docs/api/scene/display-list)* — The visible items as a display list on a transparent background.
+
+---
+
+## Static Methods
+
+### label_size(style, text, metrics)
+
+**Parameters:**
+
+- **style** : *const LabelStyle &*
+  Look.
+
+- **text** : *std::string_view*
+  Text.
+
+- **metrics** : *const [TextMetrics](/docs/api/scene/text-metrics) &*
+  Text measurement.
+
+**Returns:**
+
+- *[PixelSize](/docs/api/scene/pixel-size)* — The size of the label box: the text with padding and outline, rounded up to whole pixels.
+
+---
+
+## Example
+
+No example of its own: Head-up display of the 3-D brain view; painted by disp::BrainViewCore with paintScene() and exercised by test_scene_brain_view with a golden SVG.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

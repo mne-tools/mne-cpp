@@ -1,0 +1,61 @@
+---
+id: pixel-rect
+title: "mne::scene::PixelRect"
+sidebar_label: PixelRect
+sidebar_position: 81
+---
+
+# PixelRect
+
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/pane_layout.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/pane_layout.h)
+
+`#include <mne/scene/pane_layout.h>`
+
+```cpp
+struct mne::scene::PixelRect
+```
+
+Rectangle in whole pixels; it covers the pixels x .
+
+. x + width - 1 and y .. y + height - 1.
+
+---
+
+## Public Methods
+
+### empty()
+
+**Returns:**
+
+- *bool* — Whether the rectangle covers no pixel.
+
+---
+
+### contains(p)
+
+**Parameters:**
+
+- **p** : *[Point](/docs/api/scene/point)*
+  [`Point`](/docs/api/scene/point).
+
+**Returns:**
+
+- *bool* — Whether `p` lies in one of the pixels of the rectangle (right and bottom edges excluded).
+
+---
+
+### to_rect()
+
+**Returns:**
+
+- *[Rect](/docs/api/scene/rect)* — The rectangle in floating-point coordinates.
+
+---
+
+## Example
+
+No example of its own: Integer rectangle value type of MultiViewLayout and BrainViewOverlay.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

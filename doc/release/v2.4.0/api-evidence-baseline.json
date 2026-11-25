@@ -3,23 +3,23 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 508,
-    "exported_free_functions": 233,
-    "registered_classes": 637,
+    "exported_classes": 512,
+    "exported_free_functions": 249,
+    "registered_classes": 648,
     "exported_not_registered": 2,
     "registered_function_modules": 15,
-    "registered_header_only": 116,
+    "registered_header_only": 123,
     "registered_stale": 0,
-    "registered_with_test": 323,
+    "registered_with_test": 334,
     "registered_test_unresolved": 0,
     "registered_with_example": 456,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 102,
     "registered_without_api_page": 0,
     "with_snippet": 498,
-    "public_api_units": 639,
+    "public_api_units": 650,
     "example_eligible": 456,
-    "example_exempt": 183,
+    "example_exempt": 194,
     "eligible_backed_by_registry_example": 454,
     "eligible_used_by_some_example": 388,
     "examples_on_disk": 81,
@@ -234,9 +234,9 @@
       "with_snippet": 1
     },
     "scene": {
-      "public": 44,
-      "registered": 44,
-      "with_test": 44,
+      "public": 55,
+      "registered": 55,
+      "with_test": 55,
       "eligible": 16,
       "eligible_with_registry_example": 16,
       "eligible_used_by_example": 9,
@@ -954,6 +954,21 @@
       "library": "connectivity"
     },
     {
+      "name": "sceneTimestampMs",
+      "header": "disp/plots/helpers/sceneinput.h",
+      "library": "disp"
+    },
+    {
+      "name": "toScenePointerEvent",
+      "header": "disp/plots/helpers/sceneinput.h",
+      "library": "disp"
+    },
+    {
+      "name": "toSceneWheelEvent",
+      "header": "disp/plots/helpers/sceneinput.h",
+      "library": "disp"
+    },
+    {
       "name": "paintScene",
       "header": "disp/plots/helpers/scenepainter.h",
       "library": "disp"
@@ -1349,6 +1364,56 @@
       "library": "report"
     },
     {
+      "name": "clamp_view_preset",
+      "header": "scene/camera.h",
+      "library": "scene"
+    },
+    {
+      "name": "view_preset_name",
+      "header": "scene/camera.h",
+      "library": "scene"
+    },
+    {
+      "name": "view_preset_is_perspective",
+      "header": "scene/camera.h",
+      "library": "scene"
+    },
+    {
+      "name": "perspective_preset_rotation",
+      "header": "scene/camera.h",
+      "library": "scene"
+    },
+    {
+      "name": "view_preset_rotation",
+      "header": "scene/camera.h",
+      "library": "scene"
+    },
+    {
+      "name": "rotation_about_axis",
+      "header": "scene/camera.h",
+      "library": "scene"
+    },
+    {
+      "name": "rotation_from_euler_angles",
+      "header": "scene/camera.h",
+      "library": "scene"
+    },
+    {
+      "name": "perspective_matrix",
+      "header": "scene/camera.h",
+      "library": "scene"
+    },
+    {
+      "name": "look_at_matrix",
+      "header": "scene/camera.h",
+      "library": "scene"
+    },
+    {
+      "name": "translation_matrix",
+      "header": "scene/camera.h",
+      "library": "scene"
+    },
+    {
       "name": "colormap_from_name",
       "header": "scene/colormap.h",
       "library": "scene"
@@ -1366,6 +1431,21 @@
     {
       "name": "to_raster",
       "header": "scene/raster_renderer.h",
+      "library": "scene"
+    },
+    {
+      "name": "ray_from_pixel",
+      "header": "scene/ray_picking.h",
+      "library": "scene"
+    },
+    {
+      "name": "intersect_ray_triangle",
+      "header": "scene/ray_picking.h",
+      "library": "scene"
+    },
+    {
+      "name": "intersect_ray_sphere",
+      "header": "scene/ray_picking.h",
       "library": "scene"
     },
     {
@@ -15097,6 +15177,44 @@
       "exempt_reason": null
     },
     {
+      "name": "BrainViewInteraction",
+      "header": "scene/brain_view_interaction.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_brain_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/brain-view-interaction.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Input state machine of the 3-D brain view; driven by disp::BrainViewCore and exercised by test_scene_brain_view, it has no standalone use without a 3-D host."
+    },
+    {
+      "name": "BrainViewOverlay",
+      "header": "scene/brain_view_overlay.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_brain_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/brain-view-overlay.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Head-up display of the 3-D brain view; painted by disp::BrainViewCore with paintScene() and exercised by test_scene_brain_view with a golden SVG."
+    },
+    {
       "name": "ButterflyPlot",
       "header": "scene/butterfly_plot.h",
       "library": "scene",
@@ -15116,6 +15234,63 @@
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
+    },
+    {
+      "name": "CameraMatrices",
+      "header": "scene/camera.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_brain_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/camera-matrices.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Result value of OrbitCamera; filled into the QRhi uniforms by disp::BrainViewCore."
+    },
+    {
+      "name": "OrbitCamera",
+      "header": "scene/camera.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_brain_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/orbit-camera.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Projection, view and orbit maths of the 3-D brain view; used by disp::BrainViewCore and disp::CameraController and exercised by test_scene_brain_view."
+    },
+    {
+      "name": "PaneCamera",
+      "header": "scene/camera.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_brain_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/pane-camera.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Camera state of a pane of the 3-D brain view; disp::SubView derives from it and test_scene_brain_view covers it."
     },
     {
       "name": "Canvas",
@@ -15452,6 +15627,25 @@
       "exempt_reason": null
     },
     {
+      "name": "KeyEvent",
+      "header": "scene/input_event.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_brain_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/key-event.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Toolkit-neutral input value type passed to BrainViewInteraction::handle_key(); hosts convert their native events to it."
+    },
+    {
       "name": "PointerEvent",
       "header": "scene/input_event.h",
       "library": "scene",
@@ -15513,6 +15707,63 @@
       "exempt_reason": null
     },
     {
+      "name": "PaneLayout",
+      "header": "scene/pane_layout.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_brain_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/pane-layout.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Pane geometry and splitters of the multi-view 3-D brain view; driven by BrainViewInteraction and wrapped by disp::MultiViewLayout."
+    },
+    {
+      "name": "PixelRect",
+      "header": "scene/pane_layout.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_brain_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/pixel-rect.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Integer rectangle value type of MultiViewLayout and BrainViewOverlay."
+    },
+    {
+      "name": "PixelSize",
+      "header": "scene/pane_layout.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_brain_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/pixel-size.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Integer size value type of MultiViewLayout and BrainViewOverlay."
+    },
+    {
       "name": "RasterOptions",
       "header": "scene/raster_renderer.h",
       "library": "scene",
@@ -15535,6 +15786,44 @@
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
+    },
+    {
+      "name": "Ray",
+      "header": "scene/ray_picking.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_brain_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/ray.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Pick ray of the 3-D brain view built by ray_from_pixel(); used by disp::BrainViewCore and the disp3D renderables' picking."
+    },
+    {
+      "name": "SphereCrossing",
+      "header": "scene/ray_picking.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_brain_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/sphere-crossing.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Result value of intersect_ray_sphere(), used for dipole and electrode picking in disp3D."
     },
     {
       "name": "SensorLayout",

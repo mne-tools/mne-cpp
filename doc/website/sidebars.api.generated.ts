@@ -878,7 +878,18 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/scene/trace-style',
         'api/scene/trace-vertices',
         'api/scene/trace-markers',
-        'api/scene/view-animator'
+        'api/scene/view-animator',
+        'api/scene/key-event',
+        'api/scene/orbit-camera',
+        'api/scene/pane-camera',
+        'api/scene/camera-matrices',
+        'api/scene/ray',
+        'api/scene/sphere-crossing',
+        'api/scene/pane-layout',
+        'api/scene/pixel-rect',
+        'api/scene/pixel-size',
+        'api/scene/brain-view-interaction',
+        'api/scene/brain-view-overlay'
       ],
     }
 ];

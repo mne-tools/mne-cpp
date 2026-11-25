@@ -17,7 +17,7 @@ class mne::disp::CameraController
 
 Encapsulates camera state and produces view/projection matrices.
 
-This class is independent of any Qt widget — it takes scene geometry parameters and view configuration, and produces camera matrices. It also handles rotation, zoom, and pan from mouse delta values.
+This class is independent of any Qt widget — it takes scene geometry parameters and view configuration, and produces camera matrices. It also handles rotation, zoom, and pan from mouse delta values. The maths lives in [`OrbitCamera`](/docs/api/scene/orbit-camera); this class converts to Qt types.
 
 Camera state and matrix computation.
 
