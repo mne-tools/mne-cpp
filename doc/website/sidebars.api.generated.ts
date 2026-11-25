@@ -871,7 +871,14 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/scene/trace-view',
         'api/scene/trace-source',
         'api/scene/pointer-event',
-        'api/scene/wheel-event'
+        'api/scene/wheel-event',
+        'api/scene/trace-geometry',
+        'api/scene/trace-uniforms',
+        'api/scene/trace-draw',
+        'api/scene/trace-style',
+        'api/scene/trace-vertices',
+        'api/scene/trace-markers',
+        'api/scene/view-animator'
       ],
     }
 ];

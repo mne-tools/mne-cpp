@@ -9587,8 +9587,15 @@
       },
       "registry_classes": [
         "PointerEvent",
+        "TraceDraw",
+        "TraceGeometry",
+        "TraceMarkers",
         "TraceSource",
+        "TraceStyle",
+        "TraceUniforms",
+        "TraceVertices",
         "TraceView",
+        "ViewAnimator",
         "WheelEvent"
       ]
     },

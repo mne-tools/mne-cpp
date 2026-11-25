@@ -9,10 +9,12 @@
  * @date     November 2026
  * @brief    Widgets-free QRhi renderer and input handler of the raw-data channel trace view.
  *
- * ChannelRhiRenderer holds the GPU raw-trace view: its QRhi pipelines and buffers, events and display
- * options, and records a frame into any QRhi render target. The viewport and interaction state (scroll,
- * zoom, channel window, annotations, crosshair, ruler, scalebars) and the overlay drawing live in the
- * Qt-free @ref mne::scene::TraceView, which the renderer feeds with converted input events. It only depends on QtCore and QtGui: a host (the @c QRhiWidget
+ * ChannelRhiRenderer is the Qt side of the raw-trace view: it owns the QRhi pipelines, buffers and textures,
+ * converts input events, paints display lists into textures and records a frame into any QRhi render target.
+ * The logic is Qt-free in mne_scene: @ref mne::scene::TraceView (viewport, interaction state, HUD overlays),
+ * @ref mne::scene::TraceGeometry (trace vertices and per-trace shader parameters),
+ * @ref mne::scene::TraceMarkers (annotation, event and epoch overlay) and @ref mne::scene::ViewAnimator
+ * (scroll and zoom animations). It only depends on QtCore and QtGui: a host (the @c QRhiWidget
  * @ref mne::disp::ChannelRhiView or the @c QWindow @ref mne::disp::ChannelWindow) implements
  * @ref mne::disp::ChannelRhiHost, forwards its input events and calls renderFrame().
  */
@@ -26,7 +28,10 @@
 
 #include "../../disp_global.h"
 #include "channeldatamodel.h"
+#include <mne/scene/trace_geometry.h>
+#include <mne/scene/trace_markers.h>
 #include <mne/scene/trace_view.h>
+#include <mne/scene/view_animator.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -55,7 +60,6 @@
 
 class QMouseEvent;
 class QPainter;
-class QPropertyAnimation;
 class QRhi;
 class QRhiBuffer;
 class QRhiCommandBuffer;
@@ -65,6 +69,7 @@ class QRhiResourceUpdateBatch;
 class QRhiSampler;
 class QRhiShaderResourceBindings;
 class QRhiTexture;
+class QTimerEvent;
 class QWheelEvent;
 
 namespace mne::disp
@@ -378,7 +383,7 @@ public:
      */
     bool epochMarkersVisible() const
     {
-        return m_bShowEpochMarkers;
+        return m_markers.epoch_markers_visible();
     }
 
     //=========================================================================================================
@@ -451,7 +456,7 @@ public:
      */
     bool eventsVisible() const
     {
-        return m_bShowEvents;
+        return m_markers.events_visible();
     }
 
     //=========================================================================================================
@@ -470,7 +475,7 @@ public:
      */
     bool annotationsVisible() const
     {
-        return m_bShowAnnotations;
+        return m_markers.annotations_visible();
     }
 
     // ── Scroll / zoom ─────────────────────────────────────────────────
@@ -925,6 +930,15 @@ signals:
      */
     void cursorDataChanged(float timeSec, float amplitude, const QString& channelName, const QString& unitLabel);
 
+protected:
+    //=========================================================================================================
+    /**
+     * Advances the scroll and zoom animations.
+     *
+     * @param[in] event  The timer event.
+     */
+    void timerEvent(QTimerEvent* event) override;
+
 private:
     int viewWidth() const;
     int viewHeight() const;
@@ -936,15 +950,15 @@ private:
     void connectView();
     scene::TraceView& view() const; // the TraceView, sized like the host
     bool forwardPointer(QMouseEvent* event, scene::PointerEvent::Type type);
-    void stopScrollAnimations();
-    std::vector<AnnotationSpan> annotationSpans() const;
+    void tickAnimations();
+    void startAnimationTimer();
+    scene::TraceStyle traceStyle() const;
 
     // ── GPU resource management ────────────────────────────────────────
     struct ChannelGpuData
     {
         std::unique_ptr<QRhiBuffer> vbo;
         int vertexCount = 0;
-        int vboFirstSample = 0; // absolute first sample in VBO
     };
 
     void ensurePipeline(QRhi* rhi, QRhiRenderTarget* target);
@@ -988,54 +1002,33 @@ private:
     std::unique_ptr<QRhiBuffer> m_ubo;
     std::unique_ptr<QRhiShaderResourceBindings> m_srb;
     std::unique_ptr<QRhiGraphicsPipeline> m_pipeline;
-    std::vector<ChannelGpuData> m_gpuChannels;
+    std::vector<ChannelGpuData> m_gpuChannels;  // VBO per logical channel, filled from m_geometry
+    std::vector<scene::TraceDraw> m_traceDraws; // traces of the frame; trace i uses UBO slot i
     int m_uboStride = 256;
     bool m_pipelineDirty = true;
-    bool m_vboDirty = true;
 
     // ── Shared browser state ───────────────────────────────────────────
     QPointer<ChannelDataModel> m_model;
     std::unique_ptr<TraceSourceAdapter> m_traceSource; // the model's channels for m_view
     mutable scene::TraceView m_view;                   // viewport, input and overlays; sized by view()
-    float m_prefetchFactor = 1.0f;
-    QColor m_bgColor{250, 250, 250}; // light default
+    scene::TraceGeometry m_geometry;                   // streamed trace vertices and per-trace uniforms
+    scene::TraceMarkers m_markers;                     // events and epoch markers
+    scene::ViewAnimator m_animator;                    // scroll and zoom animations of m_view
+    int m_animationTimerId = 0;                        // ticks m_animator while the host renders no frames
+    QColor m_bgColor{250, 250, 250};                   // light default
 
     bool m_gridVisible = true;
     bool m_hideBadChannels = false;
 
-    // ── Scroll animations started for m_view ──────────────────────────
-    QPropertyAnimation* m_pInertialAnim = nullptr;
-    QPointer<QPropertyAnimation> m_pScrollAnim;
-
     // ── Channel index filter ──────────────────────────────────────────
     std::vector<int> m_filteredChannels;
 
-    // ── Event / stimulus markers ──────────────────────────────────────
-    std::vector<EventMarker> m_events;
-    std::vector<int> m_epochTriggerSamples;
-    bool m_bShowEvents = true;
-    bool m_bShowAnnotations = true;
-    bool m_bShowEpochMarkers = true;
+    // ── Trace style ───────────────────────────────────────────────────
     bool m_bShowClipping = true;
     bool m_bZScoreMode = false;
 
     int actualChannelAt(int logicalIdx) const; // maps logical → model channel index
     std::vector<int> effectiveChannelIndices() const;
-
-    // ── Prefetch window tracking ───────────────────────────────────────
-    int m_vboWindowFirst = 0;
-    int m_vboWindowLast = 0;
-
-    struct ButterflyTypeGroup
-    {
-        std::string typeLabel;           // e.g. "MEG", "EEG"
-        QColor color;                    // representative type colour
-        float amplitudeMax;              // per-type amplitude scale
-        std::vector<int> channelIndices; // model channel indices in this group
-    };
-
-    std::vector<ButterflyTypeGroup> butterflyTypeGroups() const;
-    int butterflyLaneCount() const;
 };
 
 } // namespace mne::disp

@@ -7,15 +7,15 @@ sidebar_position: 64
 
 # TraceSource
 
-**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/trace_view.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/trace_view.h)
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/trace_source.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/trace_source.h)
 
-`#include <mne/scene/trace_view.h>`
+`#include <mne/scene/trace_source.h>`
 
 ```cpp
 class mne::scene::TraceSource
 ```
 
-The channels a [`TraceView`](/docs/api/scene/trace-view) shows, as the view needs them for its overlays and its channel window.
+The channels a trace view shows: their description, values and trace vertices.
 
 Channels are addressed by their logical index: the position in the list of channels the view scrolls through, after any channel filter of the host.
 
@@ -68,7 +68,7 @@ Channels are addressed by their logical index: the position in the list of chann
 
 **Returns:**
 
-- *std::vector&lt; Group &gt;* — The lanes of the butterfly mode, in display order.
+- *std::vector&lt; Group &gt;* — The lanes of the butterfly mode, in display order. By default one lane per channel type in the order of the types' first channels, with the scale of that channel.
 
 ---
 
@@ -77,6 +77,38 @@ Channels are addressed by their logical index: the position in the list of chann
 **Returns:**
 
 - *int* — The first sample that can be scrolled to (the first loaded sample).
+
+---
+
+### sample_count()
+
+**Returns:**
+
+- *int* — The number of loaded samples from `first_sample()` on.
+
+---
+
+### vertices(index, first, last, pixel_width)
+
+Returns the trace of a channel over a sample window, decimated to min/max pairs when the window has more than two samples per pixel (see `decimate_trace()`).
+
+**Parameters:**
+
+- **index** : *int*
+  Logical channel index.
+
+- **first** : *int*
+  Absolute first sample.
+
+- **last** : *int*
+  Absolute end sample (exclusive).
+
+- **pixel_width** : *int*
+  Pixels the window spans.
+
+**Returns:**
+
+- *[TraceVertices](/docs/api/scene/trace-vertices)* — The vertices, empty if there is no data; first_sample is clamped to the loaded data.
 
 ---
 

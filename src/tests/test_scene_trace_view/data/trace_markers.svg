@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="120" viewBox="0 0 600 120">
+<rect x="220" y="0" width="40" height="120" fill="#005ac8" fill-opacity="0.188" stroke="none"/>
+<line x1="220" y1="0" x2="220" y2="120" stroke="#005ac8" stroke-opacity="0.647" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="260" y1="0" x2="260" y2="120" stroke="#005ac8" stroke-opacity="0.647" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<rect x="224" y="4" width="47" height="15" fill="#005ac8" fill-opacity="0.843" stroke="none"/>
+<text x="247.5" y="15" font-family="sans-serif" font-size="10.667" font-weight="bold" text-anchor="middle" fill="#ffffff" xml:space="preserve">blink</text>
+<rect x="180" y="0" width="24" height="120" fill="#00a000" fill-opacity="0.188" stroke="none"/>
+<line x1="180" y1="0" x2="180" y2="120" stroke="#00a000" stroke-opacity="0.647" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="204" y1="0" x2="204" y2="120" stroke="#00a000" stroke-opacity="0.647" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="300" y1="0" x2="300" y2="120" stroke="#dc0000" stroke-opacity="0.706" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="400" y1="0" x2="400" y2="120" stroke="#646464" stroke-opacity="0.549" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="4 2"/>
+<line x1="500" y1="0" x2="500" y2="120" stroke="#646464" stroke-opacity="0.549" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" stroke-dasharray="4 2"/>
+</svg>

@@ -18,6 +18,7 @@
 #include "channeldatamodel.h"
 
 #include <mne/base/string_utils.h>
+#include <mne/scene/trace_geometry.h>
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_constants.h>
 
@@ -31,6 +32,7 @@
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
+#include <span>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -384,96 +386,11 @@ std::vector<float> ChannelDataModel::decimatedVertices(int channelIdx,
     if (bufLast <= bufFirst)
         return {};
 
-    int nSamples = bufLast - bufFirst;
-
-    // ── Detrending: compute offset / trend over the window ────────────
-    float dcOffset = 0.f;
-    float linearSlope = 0.f;
-    float linearIntercept = 0.f;
-    const bool useLinear = (m_detrendMode == DetrendMode::Linear);
-    const bool useMean = (m_detrendMode == DetrendMode::Mean);
-
-    if (useMean) {
-        double sum = 0.0;
-        for (int i = bufFirst; i < bufLast; ++i)
-            sum += src[i];
-        dcOffset = static_cast<float>(sum / nSamples);
-    } else if (useLinear) {
-        // Least-squares fit: y = slope * t + intercept, where t = 0..nSamples-1
-        double sumX = 0.0, sumY = 0.0, sumXX = 0.0, sumXY = 0.0;
-        for (int i = 0; i < nSamples; ++i) {
-            double x = static_cast<double>(i);
-            double y = static_cast<double>(src[bufFirst + i]);
-            sumX += x;
-            sumY += y;
-            sumXX += x * x;
-            sumXY += x * y;
-        }
-        double denom = nSamples * sumXX - sumX * sumX;
-        if (qAbs(denom) > 1e-30) {
-            linearSlope = static_cast<float>((nSamples * sumXY - sumX * sumY) / denom);
-            linearIntercept = static_cast<float>((sumY - linearSlope * sumX) / nSamples);
-        }
-    }
-
-    if (nSamples <= pixelWidth * 2) {
-        // ── Raw path: one vertex per sample ────────────────────────────
-        std::vector<float> result;
-        result.reserve(nSamples * 2);
-        for (int i = 0; i < nSamples; ++i) {
-            float trend = useMean ? dcOffset
-                : useLinear       ? (linearSlope * i + linearIntercept)
-                                  : 0.f;
-            result.push_back(static_cast<float>(i));
-            result.push_back(src[bufFirst + i] - trend);
-        }
-        return result;
-    }
-
-    // ── Decimation path: min/max envelope, 2 vertices per pixel ─────────
-    // Interleaved as (x_at_col, max), (x_at_col, min) per column.
-    // Connected as LINE_STRIP this draws: vertical spike at each column,
-    // diagonals between columns — the classic oscilloscope envelope look.
-
-    std::vector<float> result;
-    result.reserve(pixelWidth * 4); // 2 vertices × 2 floats
-
-    float spp = static_cast<float>(nSamples) / pixelWidth; // samples per pixel
-
-    for (int px = 0; px < pixelWidth; ++px) {
-        int sBegin = bufFirst + static_cast<int>(px * spp);
-        int sEnd = bufFirst + static_cast<int>((px + 1) * spp);
-        sEnd = qMin(sEnd, bufLast);
-        if (sBegin >= sEnd)
-            sBegin = qMax(sEnd - 1, bufFirst);
-
-        float minV = src[sBegin];
-        float maxV = src[sBegin];
-        for (int s = sBegin + 1; s < sEnd; ++s) {
-            if (src[s] < minV)
-                minV = src[s];
-            if (src[s] > maxV)
-                maxV = src[s];
-        }
-
-        // Subtract trend at the center of this pixel bin
-        float tCenter = static_cast<float>(sBegin - bufFirst) + (sEnd - sBegin) * 0.5f;
-        float trend = useMean ? dcOffset
-            : useLinear       ? (linearSlope * tCenter + linearIntercept)
-                              : 0.f;
-        minV -= trend;
-        maxV -= trend;
-
-        float xOffset = px * spp;
-
-        // Emit max first, then min: draws ascending spike first
-        result.push_back(xOffset);
-        result.push_back(maxV);
-        result.push_back(xOffset);
-        result.push_back(minV);
-    }
-
-    return result;
+    const scene::Detrend detrend = m_detrendMode == DetrendMode::Mean ? scene::Detrend::Mean
+        : m_detrendMode == DetrendMode::Linear                        ? scene::Detrend::Linear
+                                                                      : scene::Detrend::None;
+    return scene::decimate_trace(std::span<const float>(src).subspan(static_cast<std::size_t>(bufFirst), static_cast<std::size_t>(bufLast - bufFirst)),
+                                 pixelWidth, detrend);
 }
 
 //=============================================================================================================

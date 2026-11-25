@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    3.0.0
  * @date     November 2026
- * @brief    Tests the viewport, input handling and overlays of mne::scene::TraceView, without Qt.
+ * @brief    Tests TraceView, the trace geometry, TraceMarkers and ViewAnimator of mne_scene, without Qt.
  */
 
 //=============================================================================================================
@@ -17,12 +17,17 @@
 #include <mne/scene/canvas.h>
 #include <mne/scene/svg_renderer.h>
 #include <mne/scene/text_metrics.h>
+#include <mne/scene/trace_geometry.h>
+#include <mne/scene/trace_markers.h>
 #include <mne/scene/trace_view.h>
+#include <mne/scene/view_animator.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -31,6 +36,7 @@
 #include <functional>
 #include <iterator>
 #include <optional>
+#include <span>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -96,11 +102,11 @@ public:
     {
         for (int i = 0; i < 30; ++i) {
             if (i < 3) {
-                m_channels.push_back({"MEG 01" + std::to_string(11 + i), "MEG mag", 2e-12f});
+                m_channels.push_back({"MEG 01" + std::to_string(11 + i), "MEG mag", 2e-12f, Color::black(), false});
             } else if (i < 20) {
-                m_channels.push_back({"MEG 02" + std::to_string(i), "MEG grad", 4e-11f});
+                m_channels.push_back({"MEG 02" + std::to_string(i), "MEG grad", 4e-11f, Color::black(), false});
             } else {
-                m_channels.push_back({"EEG 0" + std::to_string(i), "EEG", 5e-5f});
+                m_channels.push_back({"EEG 0" + std::to_string(i), "EEG", 5e-5f, Color::black(), false});
             }
         }
     }
@@ -603,6 +609,425 @@ void test_overlay_golden()
     CHECK(view.render_overlays(metrics).commands.empty());
 }
 
+//=============================================================================================================
+// Trace geometry
+//=============================================================================================================
+
+// Five channels of 2000 samples from sample 100: MEG mag, MEG grad, MEG mag (bad), EEG, MEG grad
+class GeometrySource : public TraceSource
+{
+public:
+    GeometrySource()
+    {
+        const char* types[] = {"MEG mag", "MEG grad", "MEG mag", "EEG", "MEG grad"};
+        for (int i = 0; i < 5; ++i) {
+            Channel channel{"CH " + std::to_string(i), types[i], 1.f + static_cast<float>(i), Color{static_cast<std::uint8_t>(10 * i), 20, 30}, i == 2};
+            m_channels.push_back(channel);
+            std::vector<float> data;
+            data.reserve(2000);
+            for (int s = 0; s < 2000; ++s) {
+                data.push_back(static_cast<float>(std::sin(0.05 * s + i)) * (1.f + static_cast<float>(i)));
+            }
+            m_data.push_back(std::move(data));
+        }
+        // Channel 3 is clipped: far beyond its scale
+        std::fill(m_data[3].begin() + 1000, m_data[3].end(), -12.f);
+    }
+
+    int channel_count() const override
+    {
+        return static_cast<int>(m_channels.size());
+    }
+
+    std::optional<Channel> channel(int index) const override
+    {
+        if (index < 0 || index >= channel_count()) {
+            return std::nullopt;
+        }
+        return m_channels[static_cast<std::size_t>(index)];
+    }
+
+    float value_at(int index, int sample) const override
+    {
+        return m_data[static_cast<std::size_t>(index)][static_cast<std::size_t>(sample - 100)];
+    }
+
+    int first_sample() const override
+    {
+        return 100;
+    }
+
+    int sample_count() const override
+    {
+        return 2000;
+    }
+
+    TraceVertices vertices(int index, int first, int last, int pixel_width) const override
+    {
+        m_requests.push_back({index, first, last, pixel_width});
+        const int begin = std::clamp(first - 100, 0, 2000);
+        const int end = std::clamp(last - 100, 0, 2000);
+        TraceVertices result{100 + begin, {}};
+        if (end > begin) {
+            const std::vector<float>& data = m_data[static_cast<std::size_t>(index)];
+            result.xy = decimate_trace(std::span<const float>(data).subspan(static_cast<std::size_t>(begin), static_cast<std::size_t>(end - begin)), pixel_width);
+        }
+        return result;
+    }
+
+    std::vector<Channel> m_channels;
+    std::vector<std::vector<float>> m_data;
+    mutable std::vector<std::array<int, 4>> m_requests;
+};
+
+void test_decimation()
+{
+    // Deterministic noise
+    std::vector<float> samples;
+    unsigned state = 12345;
+    for (int i = 0; i < 1003; ++i) {
+        state = state * 1103515245u + 12345u;
+        samples.push_back(static_cast<float>((state >> 8) % 2001) / 1000.f - 1.f);
+    }
+
+    // More than two samples per pixel: max then min of every bin, at the bin start
+    const int pixels = 100;
+    const std::vector<float> envelope = decimate_trace(samples, pixels);
+    CHECK(envelope.size() == static_cast<std::size_t>(pixels) * 4);
+    const float spp = static_cast<float>(samples.size()) / static_cast<float>(pixels);
+    bool allMatch = true;
+    for (int px = 0; px < pixels; ++px) {
+        const int begin = static_cast<int>(static_cast<float>(px) * spp);
+        const int end = std::min(static_cast<int>(static_cast<float>(px + 1) * spp), static_cast<int>(samples.size()));
+        float minV = samples[static_cast<std::size_t>(begin)];
+        float maxV = minV;
+        for (int s = begin; s < end; ++s) {
+            minV = std::min(minV, samples[static_cast<std::size_t>(s)]);
+            maxV = std::max(maxV, samples[static_cast<std::size_t>(s)]);
+        }
+        const std::size_t at = static_cast<std::size_t>(px) * 4;
+        allMatch = allMatch && envelope[at] == static_cast<float>(px) * spp && envelope[at + 1] == maxV && envelope[at + 2] == envelope[at] &&
+            envelope[at + 3] == minV;
+    }
+    CHECK(allMatch);
+    // Every sample lies within the envelope of its bin: the first and last bins cover the window ends
+    CHECK(envelope[1] >= samples[0] && envelope[3] <= samples[0]);
+
+    // Up to two samples per pixel: every sample a vertex at its offset
+    const std::vector<float> raw = decimate_trace(std::span<const float>(samples).first(200), 100);
+    CHECK(raw.size() == 400 && raw[0] == 0.f && raw[1] == samples[0] && raw[398] == 199.f && raw[399] == samples[199]);
+
+    // Detrending removes the mean or a straight line
+    const std::vector<float> line = {3.f, 5.f, 7.f, 9.f, 11.f};
+    const std::vector<float> demeaned = decimate_trace(line, 10, Detrend::Mean);
+    CHECK(demeaned[1] == -4.f && demeaned[9] == 4.f);
+    const std::vector<float> detrended = decimate_trace(line, 10, Detrend::Linear);
+    bool flat = true;
+    for (std::size_t i = 1; i < detrended.size(); i += 2) {
+        flat = flat && std::abs(detrended[i]) < 1e-5f;
+    }
+    CHECK(flat);
+
+    CHECK(decimate_trace(samples, 0).empty());
+    CHECK(decimate_trace({}, 10).empty());
+
+    // Z-scores; constant traces become 0, single vertices stay
+    std::vector<float> xy = {0.f, 1.f, 1.f, 2.f, 2.f, 3.f, 3.f, 4.f};
+    z_score(xy);
+    CHECK(near(xy[1], -1.5 / std::sqrt(1.25), 1e-6) && near(xy[7], 1.5 / std::sqrt(1.25), 1e-6) && xy[0] == 0.f && xy[6] == 3.f);
+    std::vector<float> constant = {0.f, 5.f, 1.f, 5.f};
+    z_score(constant);
+    CHECK(constant[1] == 0.f && constant[3] == 0.f);
+    std::vector<float> single = {0.f, 5.f};
+    z_score(single);
+    CHECK(single[1] == 5.f);
+}
+
+void test_visible_channels()
+{
+    const auto isBad = [](int channel) {
+        return channel == 1 || channel == 3;
+    };
+    CHECK(visible_channels(4, {}, false, isBad) == (std::vector<int>{0, 1, 2, 3}));
+    CHECK(visible_channels(4, {}, true, isBad) == (std::vector<int>{0, 2}));
+    const std::vector<int> filter = {3, -1, 2, 1};
+    CHECK(visible_channels(4, filter, false, isBad) == filter);
+    CHECK(visible_channels(4, filter, true, isBad) == (std::vector<int>{2}));
+}
+
+void test_streaming_window()
+{
+    GeometrySource source;
+    TraceView view;
+    view.set_source(&source);
+    view.set_view_size(400, 300);
+    view.set_samples_per_pixel(0.5);
+    view.set_scroll_sample(1000.0);
+
+    // The window spans one view width of 200 samples on each side, decimated at the view's scale
+    TraceGeometry geometry;
+    CHECK(geometry.needs_stream(view));
+    CHECK(geometry.stream(view, source, false));
+    CHECK(geometry.window_first() == 800 && geometry.window_last() == 1400);
+    CHECK(source.m_requests.size() == 5 && source.m_requests[0] == (std::array<int, 4>{0, 800, 1400, 1200}));
+    CHECK(geometry.channels().size() == 5 && geometry.channels()[4].first_sample == 800 && geometry.channels()[4].vertex_count() == 600);
+    CHECK(!geometry.needs_stream(view));
+
+    // The margin is the prefetch: any scroll leaves it
+    view.set_scroll_sample(1001.0);
+    CHECK(geometry.needs_stream(view));
+    view.set_scroll_sample(1000.0);
+    CHECK(!geometry.needs_stream(view));
+    geometry.invalidate();
+    CHECK(geometry.needs_stream(view));
+
+    // At the data start the window is clamped to the loaded samples
+    view.set_scroll_sample(100.0);
+    geometry.stream(view, source, false);
+    CHECK(geometry.window_first() == 100 && geometry.window_last() == 500);
+    // Near the end, too
+    view.set_scroll_sample(2000.0);
+    geometry.stream(view, source, false);
+    CHECK(geometry.window_first() == 1800 && geometry.window_last() == 2100);
+
+    // Without data in the window nothing is fetched and the old window stays
+    view.set_scroll_sample(5000.0);
+    source.m_requests.clear();
+    CHECK(!geometry.stream(view, source, false));
+    CHECK(source.m_requests.empty() && geometry.window_first() == 1800);
+
+    // Zoomed out beyond two samples per pixel the vertices are min/max pairs; z-scores are applied
+    view.set_samples_per_pixel(4.0);
+    view.set_scroll_sample(800.0);
+    geometry.stream(view, source, true);
+    CHECK(geometry.window_first() == 100 && geometry.window_last() == 2100);
+    CHECK(geometry.channels()[0].vertex_count() == 1000);
+    float maxAbs = 0.f;
+    for (std::size_t i = 1; i < geometry.channels()[0].xy.size(); i += 2) {
+        maxAbs = std::max(maxAbs, std::abs(geometry.channels()[0].xy[i]));
+    }
+    CHECK(maxAbs > 1.f && maxAbs < 2.f);
+}
+
+void test_draws()
+{
+    GeometrySource source;
+    TraceView view;
+    view.set_source(&source);
+    view.set_view_size(400, 300);
+    view.set_samples_per_pixel(0.5);
+    view.set_scroll_sample(1000.0);
+    view.set_visible_channel_count(3);
+    view.set_first_visible_channel(1);
+    TraceGeometry geometry;
+    geometry.stream(view, source, false);
+    TraceStyle style;
+    style.background = {250, 250, 250};
+
+    // Rows 1 .. 3 from the top; the bad channel 2 is red, channel 3's clipping is shown
+    CHECK(TraceGeometry::slot_count(view, source) == 3);
+    std::vector<TraceDraw> draws = geometry.draws(view, source, style);
+    CHECK(draws.size() == 3 && draws[0].channel == 1 && draws[2].channel == 3);
+    const TraceUniforms& top = draws[0].uniforms;
+    CHECK(near(top.channel_y_center, 1.0 - 1.0 / 3.0, 1e-6) && near(top.channel_y_range, 2.0 / 3.0, 1e-6));
+    CHECK(top.color[0] == 10.f / 255.f && top.color[3] == 1.f && top.amplitude_max == 2.f && top.show_clipping == 1.f);
+    CHECK(top.first_sample == 800.f && top.scroll_sample == 1000.f && top.samples_per_pixel == 0.5f && top.view_width == 400.f &&
+          top.view_height == 300.f);
+    CHECK(draws[1].uniforms.color[0] == 200.f / 255.f && draws[1].uniforms.color[3] == 180.f / 255.f && draws[1].uniforms.show_clipping == 0.f);
+    CHECK(near(draws[2].uniforms.channel_y_center, -2.0 / 3.0, 1e-6));
+
+    // Hidden bad channels are flat and of the background colour
+    style.hide_bad_channels = true;
+    draws = geometry.draws(view, source, style);
+    CHECK(draws[1].uniforms.channel_y_range == 0.f && draws[1].uniforms.color[0] == 250.f / 255.f);
+
+    // Z-score: fixed scale, no clipping
+    style.hide_bad_channels = false;
+    style.z_score = true;
+    draws = geometry.draws(view, source, style);
+    CHECK(draws[0].uniforms.amplitude_max == 4.f && draws[0].uniforms.show_clipping == 0.f);
+    style.z_score = false;
+
+    // Butterfly: every channel in the lane of its type (mag, grad, EEG)
+    view.set_butterfly_mode(true);
+    CHECK(TraceGeometry::slot_count(view, source) == 5);
+    draws = geometry.draws(view, source, style);
+    CHECK(draws.size() == 5);
+    const double laneRange = 2.0 / 3.0;
+    const int lanes[] = {0, 1, 0, 2, 1};
+    bool lanesMatch = true;
+    for (int i = 0; i < 5; ++i) {
+        lanesMatch = lanesMatch && draws[static_cast<std::size_t>(i)].channel == i &&
+            near(draws[static_cast<std::size_t>(i)].uniforms.channel_y_center, 1.0 - laneRange * (lanes[i] + 0.5), 1e-6) &&
+            near(draws[static_cast<std::size_t>(i)].uniforms.channel_y_range, laneRange, 1e-6);
+    }
+    CHECK(lanesMatch);
+    const std::vector<TraceSource::Group> groups = source.groups();
+    CHECK(groups.size() == 3 && groups[1].type_label == "MEG grad" && groups[1].amplitude_max == 2.f);
+
+    // No channels: one slot, nothing to draw
+    view.set_source(nullptr);
+    GeometrySource empty;
+    empty.m_channels.clear();
+    CHECK(TraceGeometry::slot_count(view, empty) == 1);
+    CHECK(geometry.draws(view, empty, style).empty());
+}
+
+void test_markers_and_figure_golden()
+{
+    const ApproximateTextMetrics metrics;
+
+    // The overlay texture: 3 view widths from sample 600, at 2 px per sample
+    TraceMarkers markers;
+    markers.set_events({{1050, 1, {220, 0, 0}, "1"}, {5000, 2, {0, 0, 220}, "2"}});
+    markers.set_epoch_markers({1100, 1150});
+    const std::vector<TraceView::Annotation> annotations = {{1010, 1029, {0, 90, 200}, " blink "}, {990, 1001, {0, 160, 0}, ""}};
+    Canvas overlay(600, 120);
+    markers.draw(overlay, metrics, Font{}, annotations, 900.0, 2.0);
+    const std::string svg = to_svg(overlay.take());
+    CHECK(svg.find(">blink<") != std::string::npos);
+    CHECK(matches_golden(svg, GOLDEN_DIR "/trace_markers.svg"));
+
+    // Hidden kinds are left out
+    CHECK(markers.set_events_visible(false) && !markers.set_events_visible(false));
+    markers.set_annotations_visible(false);
+    markers.set_epoch_markers_visible(false);
+    Canvas none(600, 120);
+    markers.draw(none, metrics, Font{}, annotations, 900.0, 2.0);
+    CHECK(none.display_list().commands.empty());
+    markers.set_events_visible(true);
+    markers.set_annotations_visible(true);
+    markers.set_epoch_markers_visible(true);
+
+    // The image export: bands, grid, annotations, traces with a clipped segment, events and epochs
+    GeometrySource source;
+    TraceView view;
+    view.set_source(&source);
+    view.set_view_size(200, 120);
+    view.set_samples_per_pixel(1.0);
+    view.set_sfreq(100.0);
+    view.set_first_file_sample(100);
+    view.set_scroll_sample(960.0);
+    view.set_visible_channel_count(4);
+    view.set_annotations(annotations);
+    TraceStyle style;
+    style.background = Color::white();
+    Canvas figure(200, 120, Color::white());
+    draw_trace_figure(figure, metrics, Font{}, view, source, markers, style);
+    CHECK(matches_golden(to_svg(figure.take()), GOLDEN_DIR "/trace_figure.svg"));
+
+    // No rows: only the background
+    view.set_source(nullptr);
+    GeometrySource empty;
+    empty.m_channels.clear();
+    Canvas blank(200, 120, Color::white());
+    draw_trace_figure(blank, metrics, Font{}, view, empty, markers, style);
+    CHECK(blank.display_list().commands.empty());
+}
+
+//=============================================================================================================
+// Animator
+//=============================================================================================================
+
+void test_animator()
+{
+    using Easing = ViewAnimator::Easing;
+    CHECK(ViewAnimator::ease(Easing::OutCubic, 0.0) == 0.0 && ViewAnimator::ease(Easing::OutCubic, 1.0) == 1.0);
+    CHECK(near(ViewAnimator::ease(Easing::OutCubic, 0.5), 0.875) && near(ViewAnimator::ease(Easing::OutCubic, 0.25), 1.0 - 0.75 * 0.75 * 0.75));
+    CHECK(ViewAnimator::ease(Easing::Linear, 0.3) == 0.3 && ViewAnimator::ease(Easing::Linear, 2.0) == 1.0);
+
+    // The view's animation requests drive the animator
+    ViewAnimator animator;
+    std::int64_t now = 0;
+    TraceView view;
+    TraceView::Effects effects;
+    effects.animate_scroll = [&](const TraceView::ScrollAnimation& a) {
+        animator.start_scroll(a, now);
+    };
+    effects.animate_zoom = [&](const TraceView::ZoomAnimation& a) {
+        animator.start_zoom(a, now);
+    };
+    effects.stop_animations = [&] {
+        animator.stop_scroll();
+    };
+    view.set_effects(effects);
+    view.set_view_size(400, 300);
+    view.set_samples_per_pixel(0.5);
+    view.set_scroll_sample(1000.0);
+
+    // A requested scroll eases out and lands exactly on its target
+    view.scroll_to(1100.0, 100);
+    CHECK(animator.running() && view.scroll_animation_running());
+    now = 50;
+    CHECK(animator.tick(now, view));
+    CHECK(near(view.scroll_sample(), 1087.5));
+    now = 100;
+    CHECK(!animator.tick(now, view));
+    CHECK(view.scroll_sample() == 1100.0 && !view.scroll_animation_running());
+
+    // Wheel steps during a scroll add up to one target
+    view.scroll_by(30.0, 100);
+    now = 120;
+    animator.tick(now, view);
+    view.scroll_by(30.0, 100);
+    CHECK(animator.scroll()->to == 1160.0 && animator.scroll()->start_ms == 120);
+    now = 300;
+    animator.tick(now, view);
+    CHECK(view.scroll_sample() == 1160.0);
+
+    // Interruption: stopping keeps the reached position
+    view.scroll_to(1300.0, 100);
+    now = 350;
+    animator.tick(now, view);
+    const double reached = view.scroll_sample();
+    CHECK(reached > 1160.0 && reached < 1300.0);
+    view.stop_scroll_animations();
+    CHECK(!animator.running());
+    now = 1000;
+    CHECK(!animator.tick(now, view));
+    CHECK(view.scroll_sample() == reached);
+
+    // Inertia: a drag released at 0.75 samples/ms glides on at that speed, slowing down to rest after 500 ms
+    view.set_scroll_sample(1000.0);
+    now = 2000;
+    view.handle_pointer(press(100, 50, MouseButton::Left, 2000));
+    view.handle_pointer(move(90, 50, 2020));
+    view.handle_pointer(move(50, 50, 2040));
+    view.handle_pointer(move(10, 50, 2060));
+    now = 2060;
+    view.handle_pointer(release(10, 50, MouseButton::Left, 2060));
+    CHECK(animator.scroll() && animator.scroll()->inertial && animator.scroll()->duration_ms == 500);
+    const double start = view.scroll_sample();
+    animator.tick(now + 1, view);
+    const double firstStep = view.scroll_sample() - start;
+    CHECK(near(firstStep, 0.75, 0.01));
+    animator.tick(now + 450, view);
+    const double late = view.scroll_sample();
+    animator.tick(now + 451, view);
+    CHECK(view.scroll_sample() - late < 0.01 && view.scroll_sample() - late > 0.0);
+    CHECK(!animator.tick(now + 500, view));
+    CHECK(near(view.scroll_sample(), start + 125.0));
+
+    // A press stops a glide
+    view.handle_pointer(release(10, 50, MouseButton::Left, 2060));
+    animator.start_scroll({view.scroll_sample(), view.scroll_sample() + 100.0, 500, true}, now);
+    view.handle_pointer(press(10, 50, MouseButton::Left, now));
+    CHECK(!animator.running());
+    view.handle_pointer(release(10, 50, MouseButton::Left, now));
+
+    // Zoom eases to its target; a new zoom replaces the running one
+    view.zoom_to(0.4, 150);
+    view.zoom_to(0.25, 150);
+    CHECK(animator.zoom()->to == 0.25);
+    now += 150;
+    CHECK(!animator.tick(now, view));
+    CHECK(view.samples_per_pixel() == 0.25);
+
+    // A zero duration jumps on the first tick
+    animator.start_zoom({0.25, 1.0, 0}, now);
+    CHECK(!animator.tick(now, view) && view.samples_per_pixel() == 1.0);
+}
+
 } // namespace
 
 //=============================================================================================================
@@ -619,6 +1044,12 @@ int main()
         {"annotations", test_annotations},
         {"crosshair_and_double_click", test_crosshair_and_double_click},
         {"overlay_golden", test_overlay_golden},
+        {"decimation", test_decimation},
+        {"visible_channels", test_visible_channels},
+        {"streaming_window", test_streaming_window},
+        {"draws", test_draws},
+        {"markers_and_figure_golden", test_markers_and_figure_golden},
+        {"animator", test_animator},
     };
     for (const auto& [name, test] : tests) {
         const int before = g_failures;

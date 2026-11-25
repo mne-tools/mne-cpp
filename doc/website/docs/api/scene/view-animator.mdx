@@ -1,0 +1,134 @@
+---
+id: view-animator
+title: "mne::scene::ViewAnimator"
+sidebar_label: ViewAnimator
+sidebar_position: 73
+---
+
+# ViewAnimator
+
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/view_animator.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/view_animator.h)
+
+`#include <mne/scene/view_animator.h>`
+
+```cpp
+class mne::scene::ViewAnimator
+```
+
+Runs the scroll and zoom animations a [`TraceView`](/docs/api/scene/trace-view) asks for, without timers.
+
+The host starts the animations from the view's animate_scroll and animate_zoom effects, stops the scroll animation on stop_animations, and calls `tick()` with the current time for every frame (or from a timer) while it returns true. Animations use the cubic ease-out curve f(t) = 1 - (1 - t)^3, whose initial speed is three times the mean speed: an inertial glide of duration T over a distance v T / 3 starts at speed v.
+
+There is at most one scroll animation (a requested scroll or an inertial glide) and one zoom animation; starting one replaces the running one of its kind.
+
+---
+
+## Public Methods
+
+### start_scroll(animation, now_ms)
+
+Starts a scroll animation, replacing a running one.
+
+**Parameters:**
+
+- **animation** : *const [TraceView](/docs/api/scene/trace-view)::ScrollAnimation &*
+  The scroll the view asked for.
+
+- **now_ms** : *std::int64_t*
+  Start time.
+
+---
+
+### start_zoom(animation, now_ms)
+
+Starts a zoom animation, replacing a running one.
+
+**Parameters:**
+
+- **animation** : *const [TraceView](/docs/api/scene/trace-view)::ZoomAnimation &*
+  The zoom the view asked for.
+
+- **now_ms** : *std::int64_t*
+  Start time.
+
+---
+
+### stop_scroll()
+
+Stops the scroll animation where it is.
+
+---
+
+### stop_zoom()
+
+Stops the zoom animation where it is.
+
+---
+
+### scroll()
+
+**Returns:**
+
+- *const std::optional&lt; Animation &gt; &* — The running scroll animation.
+
+---
+
+### zoom()
+
+**Returns:**
+
+- *const std::optional&lt; Animation &gt; &* — The running zoom animation.
+
+---
+
+### running()
+
+**Returns:**
+
+- *bool* — Whether an animation runs.
+
+---
+
+### tick(now_ms, view)
+
+Sets the animated values of `view` for `now_ms` and ends the animations that reached their end; a finished requested scroll (not a glide) is reported with `TraceView::scroll_animation_finished()`.
+
+**Parameters:**
+
+- **now_ms** : *std::int64_t*
+  Time.
+
+- **view** : *[TraceView](/docs/api/scene/trace-view) &*
+  The animated view.
+
+**Returns:**
+
+- *bool* — Whether an animation still runs, i.e. more frames are needed.
+
+---
+
+## Static Methods
+
+### ease(easing, t)
+
+**Parameters:**
+
+- **easing** : *Easing*
+  Curve.
+
+- **t** : *double*
+  Progress, clamped to 0 .. 1.
+
+**Returns:**
+
+- *double* — The eased progress.
+
+---
+
+## Example
+
+No example of its own: Timestamp-driven scroll and zoom animations of a TraceView; ticked by disp::ChannelRhiRenderer and exercised by test_scene_trace_view.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

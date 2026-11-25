@@ -76,7 +76,7 @@
       "modules": []
     },
     "disp": {
-      "tokens": 4680,
+      "tokens": 4543,
       "public_header_includes": 89,
       "modules": [
         "Core",
@@ -84,13 +84,13 @@
         "Widgets"
       ],
       "by_category": {
-        "containers": 16,
+        "containers": 15,
         "files": 97,
-        "global": 1005,
-        "gui": 917,
+        "global": 954,
+        "gui": 874,
         "objects_signals": 529,
-        "other": 1348,
-        "strings": 759,
+        "other": 1310,
+        "strings": 755,
         "time": 9
       }
     },

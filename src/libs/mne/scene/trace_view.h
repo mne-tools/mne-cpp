@@ -21,6 +21,7 @@
 #include "input_event.h"
 #include "scene_global.h"
 #include "style.h"
+#include "trace_source.h"
 
 //=============================================================================================================
 // STL INCLUDES
@@ -40,62 +41,6 @@ namespace mne::scene
 {
 
 class TextMetrics;
-
-/**
- * @brief The channels a @ref TraceView shows, as the view needs them for its overlays and its channel window.
- *
- * Channels are addressed by their logical index: the position in the list of channels the view scrolls
- * through, after any channel filter of the host.
- *
- * @since 3.0.0
- */
-class SCENESHARED_EXPORT TraceSource
-{
-public:
-    /** A channel as the overlays describe it. */
-    struct Channel
-    {
-        std::string name;          /**< Channel name, e.g. "MEG 0111". */
-        std::string type_label;    /**< Channel type, e.g. "MEG grad", "EEG". */
-        float amplitude_max = 0.f; /**< Amplitude that fills 45 % of a row, in physical units. */
-    };
-
-    /** A lane of the butterfly mode: all channels of one type overlaid. */
-    struct Group
-    {
-        std::string type_label;    /**< Channel type of the lane. */
-        float amplitude_max = 0.f; /**< Amplitude that fills 45 % of the lane. */
-    };
-
-    virtual ~TraceSource() = default;
-
-    /** @return The number of logical channels the view scrolls through. */
-    virtual int channel_count() const = 0;
-
-    /**
-     * @param[in] index   Logical channel index.
-     *
-     * @return The channel, or nothing if @p index maps to no channel.
-     */
-    virtual std::optional<Channel> channel(int index) const = 0;
-
-    /**
-     * @param[in] index    Logical channel index.
-     * @param[in] sample   Absolute sample index.
-     *
-     * @return The raw value of the channel at @p sample in physical units, 0 if unknown.
-     */
-    virtual float value_at(int index, int sample) const = 0;
-
-    /** @return The lanes of the butterfly mode, in display order. */
-    virtual std::vector<Group> groups() const = 0;
-
-    /** @return The first sample that can be scrolled to (the first loaded sample). */
-    virtual int first_sample() const
-    {
-        return 0;
-    }
-};
 
 /**
  * @brief Viewport and interaction state of a raw-data trace view, without a GUI toolkit.

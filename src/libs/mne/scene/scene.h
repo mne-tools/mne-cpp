@@ -36,7 +36,11 @@
 #include "svg_renderer.h"
 #include "text_metrics.h"
 #include "ticks.h"
+#include "trace_geometry.h"
+#include "trace_markers.h"
+#include "trace_source.h"
 #include "trace_view.h"
 #include "vector_plot.h"
+#include "view_animator.h"
 
 #endif // SCENE_SCENE_H

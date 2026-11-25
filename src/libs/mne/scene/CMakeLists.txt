@@ -23,8 +23,11 @@ set(SOURCES
   svg_renderer.cpp
   text_metrics.cpp
   ticks.cpp
+  trace_geometry.cpp
+  trace_markers.cpp
   trace_view.cpp
   vector_plot.cpp
+  view_animator.cpp
 )
 
 set(HEADERS
@@ -49,8 +52,12 @@ set(HEADERS
   svg_renderer.h
   text_metrics.h
   ticks.h
+  trace_geometry.h
+  trace_markers.h
+  trace_source.h
   trace_view.h
   vector_plot.h
+  view_animator.h
 )
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} detail/text_layout.h)

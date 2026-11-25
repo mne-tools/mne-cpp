@@ -302,6 +302,23 @@ aliases; replace the old spelling as below.
   signals are unchanged. `test_scene_trace_view` tests it without Qt, with
   golden SVG files of the overlays. The Qt usage ceiling of `disp` drops
   accordingly (tokens 4885 to 4680).
+- The rest of the trace view's logic moved to `mne_scene` as well:
+  `decimate_trace()` (the min/max decimation and detrending that
+  `ChannelDataModel::decimatedVertices()` now calls), `visible_channels()`,
+  and `TraceGeometry` (`scene/trace_geometry.h`), which streams the trace
+  vertices over the prefetch window and lists the traces of a frame with
+  their shader parameters (`TraceUniforms`, the 52-byte uniform block of the
+  trace shader). `TraceSource` (now `scene/trace_source.h`) supplies colours,
+  bad flags and vertices, and computes the butterfly lanes by default.
+  `TraceMarkers` draws the annotation, event and epoch overlay into a
+  `Canvas`; `draw_trace_figure()` draws the whole view as a display list.
+  `ViewAnimator` runs the scroll, inertial and zoom animations (cubic
+  ease-out) over explicit timestamps. `disp::ChannelRhiRenderer` only uploads
+  vertices and uniforms, paints the display lists into its textures and
+  `renderToImage()` result, and ticks the animator per frame and on a timer
+  instead of using `QPropertyAnimation`; its API and signals are unchanged.
+  The dotted guide lines of `renderToImage()` use the scene's dot pattern.
+  The Qt usage ceiling of `disp` drops to 4543 tokens.
 - `mne::write_mat_file()` (`math/mat_file.h`) writes matrices to a MATLAB
   Level 5 MAT-file; `mne_raw2mat` and `mne_epochs2mat` use it instead of two
   copies of the writer (their files are byte-identical).
