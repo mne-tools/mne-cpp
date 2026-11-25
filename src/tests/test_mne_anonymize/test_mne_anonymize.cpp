@@ -65,6 +65,11 @@ public:
         return QString::fromStdString(generateRandomFileName());
     }
 
+    std::string helpText() const
+    {
+        return m_parser.help_text("mne_anonymize");
+    }
+
     bool deleteInputFileAfter() const
     {
         return m_bDeleteInputFileAfter;
@@ -158,6 +163,7 @@ private slots:
     void testDeleteInputFile();
     void testInPlace();
     void testNonAsciiHisId();
+    void testHelpNamesValueKinds();
 
     //test anonymization
     void testDefaultAnonymizationOfTags();
@@ -850,6 +856,20 @@ void TestMneAnonymize::verifyTags(mne::FiffStream& stream,
 
 void TestMneAnonymize::cleanupTestCase()
 {
+}
+
+//=============================================================================================================
+
+void TestMneAnonymize::testHelpNamesValueKinds()
+{
+    // Dates take a date, offsets a number of days
+    const TestSettingsControllerCl controller(toArgs({"mne_anonymize", "--in", "unused.fif"}));
+    const QString help = QString::fromStdString(controller.helpText());
+    QVERIFY(QRegularExpression(R"(--measurement_date <date>\s)").match(help).hasMatch());
+    QVERIFY(QRegularExpression(R"(--measurement_date_offset <days>\s)").match(help).hasMatch());
+    QVERIFY(QRegularExpression(R"(--subject_birthday <date>\s)").match(help).hasMatch());
+    QVERIFY(QRegularExpression(R"(--subject_birthday_offset <days>\s)").match(help).hasMatch());
+    QVERIFY(help.contains("number of days to subtract from the subject's birthday"));
 }
 
 //=============================================================================================================

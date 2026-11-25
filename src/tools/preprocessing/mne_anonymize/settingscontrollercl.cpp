@@ -108,10 +108,10 @@ std::vector<mne::CommandLineOption> options()
          " subject's data. See help above. Default: false",
          {},
          {}},
-        {{"md", "measurement_date"}, "Specify the measurement date. Only when anonymizing a single file. Format: DDMMYYYY. Default: 01012000", "days", {}},
-        {{"mdo", "measurement_date_offset"}, "Specify number of days to subtract to the measurement. Default: 0", "date", {}},
+        {{"md", "measurement_date"}, "Specify the measurement date. Only when anonymizing a single file. Format: DDMMYYYY. Default: 01012000", "date", {}},
+        {{"mdo", "measurement_date_offset"}, "Specify the number of days to subtract from the measurement date. Default: 0", "days", {}},
         {{"sb", "subject_birthday"}, "Specify the subject birthday date. Format: DDMMYYYY. Default: 01012000", "date", {}},
-        {{"sbo", "subject_birthday_offset"}, "Specify number of to subtract to the subject's birthday. Default: 0", "days", {}},
+        {{"sbo", "subject_birthday_offset"}, "Specify the number of days to subtract from the subject's birthday. Default: 0", "days", {}},
         {{"his"}, "Specify the subject ID within the Hospital information system. Default: \"mne_anonymize\"", "id#", {}},
         {{"mne_environment"},
          "Anonymize information related to the MNE environment. "

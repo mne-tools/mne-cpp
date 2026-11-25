@@ -1587,6 +1587,9 @@ aliases; replace the old spelling as below.
 - `mne_anonymize` writes replacement texts with characters outside ASCII
   whole; it cut each of them short by one byte per such character, leaving
   invalid UTF-8 (a HIS ID `Jörg-Müller-ß` became `Jörg-Müller`).
+- `mne_anonymize --help` names the value of `--measurement_date` and
+  `--subject_birthday` a date and of the two offsets a number of days; the
+  first two were swapped.
 - RAP-MUSIC takes the vertices of every source space of the forward solution;
   with a single (volume) space it read a second hemisphere that does not exist
   and returned estimates without vertices.
