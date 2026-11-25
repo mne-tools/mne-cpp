@@ -52,6 +52,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <filesystem>
 
 //=============================================================================================================
@@ -844,7 +845,14 @@ void TestDispPlots::testTFplotWithFreqRange()
     // Rows 1..40 Hz, highest frequency first, normalized to the maximum
     QCOMPARE(tf.data().rows(), 40);
     QCOMPARE(tf.data().row(0).minCoeff(), 1.0);
-    QCOMPARE(tf.data().bottomRows(39).maxCoeff(), 0.0);
+    // Element-wise: GCC 14 flags Eigen's vectorised maxCoeff() over a block as maybe-uninitialized
+    double rest = 0.0;
+    for (Eigen::Index r = 1; r < tf.data().rows(); ++r) {
+        for (Eigen::Index c = 0; c < tf.data().cols(); ++c) {
+            rest = std::max(rest, tf.data()(r, c));
+        }
+    }
+    QCOMPARE(rest, 0.0);
     // Times start at tmin; frequencies are the bin centres, not the requested bounds
     QCOMPARE(tf.extent(), std::vector<double>({-0.2, -0.2 + 99 / 100.0, 1.0, 40.0}));
 
