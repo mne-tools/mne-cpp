@@ -32,12 +32,7 @@
 
 #include "../disp_global.h"
 #include "graph.h"
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QPixmap>
+#include <mne/scene/image_plot.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -64,10 +59,8 @@ namespace mne::disp
 /**
  * @brief False-colour heat-map QWidget visualising an Eigen matrix with selectable colour map.
  *
- * Accepts @c MatrixXd, @c MatrixXf and @c MatrixXi inputs; @c init()
- * rebuilds the cached @c QImage from the current matrix and the
- * active colour map, and @c updateData() / @c paintEvent() keep the
- * rendering in sync with the data.
+ * Accepts @c MatrixXd, @c MatrixXf and @c MatrixXi inputs and draws them
+ * as an mne::scene::ImagePlot, which renders without Qt as well.
  *
  * @snippet ex_disp_plots/main.cpp image_sc_usage
  */
@@ -189,48 +182,13 @@ public:
 protected:
     //=========================================================================================================
     /**
-     * Maps the data to [0, 1] by the colour range, clipping values outside it.
-     */
-    void normalize();
-
-    //=========================================================================================================
-    /**
-     * Updates data and colorbar pixmap
-     */
-    void updateMaps();
-
-    //=========================================================================================================
-    /**
      * The reimplemented paintEvent
      *
      * @param[in] event    The event.
      */
     void paintEvent(QPaintEvent* event) override;
 
-    QPixmap m_pixmapData;     /**< data pixmap. */
-    QPixmap m_pixmapColorbar; /**< colorbar pixmap. */
-
-    QString m_sColorMap; /**< The colorbar. */
-
-    Eigen::MatrixXd m_matData;         /**< The data as given. */
-    Eigen::MatrixXd m_matCentNormData; /**< Data mapped to [0, 1] by the colour range. */
-
-    double m_dMinValue;    /**< Value at the low end of the colour map. */
-    double m_dMaxValue;    /**< Value at the high end of the colour map. */
-    bool m_bColorRangeSet; /**< Whether setColorRange() fixed the colour range. */
-
-    double m_dLeft;    /**< X value of the first column. */
-    double m_dRight;   /**< X value of the last column. */
-    double m_dBottom;  /**< Y value of the last row. */
-    double m_dTop;     /**< Y value of the first row. */
-    bool m_bExtentSet; /**< Whether setExtent() gave data units. */
-
-    bool m_bColorbar;            /**< If colorbar is visible. */
-    QString m_sColorbarLabel;    /**< Quantity shown by the colour bar. */
-    qint32 m_iColorbarWidth;     /**< Colorbar width. */
-    qint32 m_iColorbarGradSteps; /**< Gradient steps of the colorbar. */
-
-    QRgb (*pColorMapper)(double, const QString&); /**< Function pointer to current colormap. */
+    scene::ImagePlot m_plot; /**< The plot, drawn through the QPainter backend. */
 };
 
 //=============================================================================================================

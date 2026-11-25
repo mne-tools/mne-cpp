@@ -33,6 +33,7 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include <mne/scene/spline_plot.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -51,6 +52,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <utility>
 #include <vector>
 
 //=============================================================================================================
@@ -166,8 +168,6 @@ public:
      */
     void setYLabel(const QString& label);
 
-    double m_dMinAxisX; /**< Smallest class limit. */
-    double m_dMaxAxisX; /**< Largest class limit. */
 
 protected:
     //=========================================================================================================
@@ -216,7 +216,7 @@ protected:
      */
     int leftMargin() const
     {
-        return 60;
+        return static_cast<int>(scene::SplinePlot::kLeftMargin);
     }
 
     //=========================================================================================================
@@ -227,7 +227,7 @@ protected:
      */
     int rightMargin() const
     {
-        return 20;
+        return static_cast<int>(scene::SplinePlot::kRightMargin);
     }
 
     //=========================================================================================================
@@ -238,7 +238,7 @@ protected:
      */
     int topMargin() const
     {
-        return 30;
+        return static_cast<int>(scene::SplinePlot::kTopMargin);
     }
 
     //=========================================================================================================
@@ -249,21 +249,11 @@ protected:
      */
     int bottomMargin() const
     {
-        return 60;
+        return static_cast<int>(scene::SplinePlot::kBottomMargin);
     }
 
-    QString m_sTitle;                  /**< Title. */
-    QString m_sXLabel;                 /**< X axis label. */
-    QString m_sYLabel;                 /**< Y axis label. */
-    std::vector<QPointF> m_seriesData; /**< Spline data points (classMark, frequency). */
-    double m_dLeftThreshold;           /**< X-axis value of the left threshold line. */
-    double m_dMiddleThreshold;         /**< X-axis value of the middle threshold line. */
-    double m_dRightThreshold;          /**< X-axis value of the right threshold line. */
-    bool m_bHasData;                   /**< Whether data has been loaded. */
-    bool m_bHasThresholds;             /**< Whether thresholds have been set. */
-    int m_iMaximumFrequency;           /**< Highest value of frequency (y-axis). */
-    QString m_colorMap;                /**< Color map name for background gradient. */
-    QVector3D m_vecReturnVector;       /**< Cached return value for getThreshold. */
+    scene::SplinePlot m_plot;    /**< The plot, drawn through the QPainter backend. */
+    QVector3D m_vecReturnVector; /**< Cached return value for getThreshold. */
 
 signals:
     //=========================================================================================================
@@ -311,25 +301,12 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
                                 static_cast<int>(matClassLimitData.rows()) - 1);
     if (iClassAmount < 1)
         return;
-    m_dMinAxisX = static_cast<double>(matClassLimitData(0));
-    m_dMaxAxisX = static_cast<double>(matClassLimitData(iClassAmount));
-
-    m_seriesData.clear();
-    m_iMaximumFrequency = 0;
-
+    std::vector<scene::Point> classMarks;
     for (int ir = 0; ir < iClassAmount; ++ir) {
-        double classMark = (static_cast<double>(matClassLimitData(ir)) + static_cast<double>(matClassLimitData(ir + 1))) / 2.0;
-        m_seriesData.push_back(QPointF(classMark, matClassFrequencyData(ir)));
-        if (matClassFrequencyData(ir) > m_iMaximumFrequency) {
-            m_iMaximumFrequency = matClassFrequencyData(ir);
-        }
+        const double classMark = (static_cast<double>(matClassLimitData(ir)) + static_cast<double>(matClassLimitData(ir + 1))) / 2.0;
+        classMarks.push_back({classMark, static_cast<double>(matClassFrequencyData(ir))});
     }
-
-    m_bHasData = true;
-    m_dLeftThreshold = m_dMinAxisX;
-    m_dMiddleThreshold = m_dMaxAxisX;
-    m_dRightThreshold = m_dMaxAxisX;
-    m_bHasThresholds = false;
+    m_plot.set_classes(std::move(classMarks), static_cast<double>(matClassLimitData(0)), static_cast<double>(matClassLimitData(iClassAmount)));
 
     QWidget::update();
 }

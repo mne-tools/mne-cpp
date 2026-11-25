@@ -30,6 +30,7 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include <mne/scene/display_list.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -287,13 +288,11 @@ protected:
 
     //=========================================================================================================
     /**
-     * createPlotPath creates the QPointer path for the data plot.
+     * Builds the figure: the selected channels of the shown modalities as an mne::scene::ButterflyPlot.
      *
-     * @param[in] row Model row of the channel to plot.
-     * @param[in, out] painter Painter the channel path is drawn with.
-     *
+     * @return The figure at the size of the view.
      */
-    void createPlotPath(qint32 row, QPainter& painter) const;
+    scene::DisplayList figure() const;
 
     bool m_bShowMAG;  /**< Show Magnetometers channels. */
     bool m_bShowGRAD; /**< Show Gradiometers channels. */

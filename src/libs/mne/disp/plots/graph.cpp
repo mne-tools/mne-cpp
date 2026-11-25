@@ -25,7 +25,6 @@
 //=============================================================================================================
 
 #include <QResizeEvent>
-#include <QPainter>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -93,51 +92,6 @@ void Graph::setYLabel(const QString& p_sYLabel)
 {
     m_sYLabel = p_sYLabel;
     update();
-}
-
-//=============================================================================================================
-
-void Graph::drawLabels(qint32 p_iContentHeight)
-{
-    QPainter painter(this);
-
-    qint32 t_iLabelWidth = m_qSizeWidget.width() - 2 * m_iBorderLeftRight;
-    qint32 t_iLabelHeight = 100;
-
-    // -- Title --
-    if (!m_sTitle.isEmpty()) {
-        painter.save();
-        painter.setPen(m_qPenTitle);
-        painter.setFont(m_qFontTitle);
-
-        painter.translate((m_qSizeWidget.width() - t_iLabelWidth) / 2, (m_qSizeWidget.height() - p_iContentHeight) / 2 - m_iBorderTopBottom * 1.5);
-        painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sTitle);
-
-        painter.restore();
-    }
-
-    // -- Axes --
-    painter.setPen(m_qPenAxes);
-    painter.setFont(m_qFontAxes);
-
-    // X FsLabel
-    if (!m_sXLabel.isEmpty()) {
-        painter.save();
-        // Centred 12 px above the bottom edge, below the tick labels
-        painter.translate((m_qSizeWidget.width() - t_iLabelWidth) / 2, m_qSizeWidget.height() - 12 - t_iLabelHeight / 2);
-        painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sXLabel);
-        painter.restore();
-    }
-
-    //Y FsLabel
-    if (!m_sYLabel.isEmpty()) {
-        painter.save();
-        painter.rotate(270);
-        // Centred 16 px from the left edge, left of the tick labels
-        painter.translate(-(m_qSizeWidget.height() + t_iLabelWidth) / 2, 16 - t_iLabelHeight / 2);
-        painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sYLabel);
-        painter.restore();
-    }
 }
 
 //=============================================================================================================

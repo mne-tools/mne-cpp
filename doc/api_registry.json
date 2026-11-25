@@ -13290,6 +13290,24 @@
       "python_url": null,
       "example_exempt": true,
       "example_exempt_reason": "Affine transform recorded by Canvas::translate(), rotate() and scale(); tested against QTransform in test_scene_render."
+    },
+    {
+      "name": "QtTextMetrics",
+      "module": "disp",
+      "header": "disp/plots/helpers/scenepainter.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_disp_plots",
+      "status": "documented",
+      "documented": true,
+      "sidebar_position": 72,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Measures text for the plot widgets' QPainter backend inside their paintEvent(); not called by applications."
     }
   ],
   "parity": {

@@ -34,6 +34,7 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include <mne/scene/bar_chart.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -53,6 +54,7 @@
 
 #include <format>
 #include <string>
+#include <utility>
 #include <vector>
 
 //=============================================================================================================
@@ -151,12 +153,7 @@ protected:
     void paintEvent(QPaintEvent* event) override;
 
 private:
-    QString m_sTitle;                      /**< Chart title. */
-    QString m_sXLabel;                     /**< X axis label. */
-    QString m_sYLabel;                     /**< Y axis label. */
-    std::vector<std::string> m_categories; /**< Category labels for x-axis. */
-    std::vector<int> m_frequencies;        /**< Frequency values for each bar. */
-    int m_iMaxFrequency;                   /**< Maximum frequency value (for y-axis scaling). */
+    scene::BarChart m_chart; /**< The chart, drawn through the QPainter backend. */
 };
 
 //=============================================================================================================
@@ -196,19 +193,13 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
                                 static_cast<int>(matClassLimitData.rows()) - 1);
     if (iClassAmount < 1)
         return;
-    // Build category labels and frequency list
-    m_categories.clear();
-    m_frequencies.clear();
-    m_iMaxFrequency = 0;
-
+    std::vector<std::string> categories;
+    std::vector<int> counts;
     for (int kr = 0; kr < iClassAmount; ++kr) {
-        int classFreq = matClassFrequencyData(kr);
-        m_categories.push_back(std::format("{:.{}g} to {:.{}g}", static_cast<double>(matClassLimitData(kr)), iPrecisionValue, static_cast<double>(matClassLimitData(kr + 1)), iPrecisionValue));
-        m_frequencies.push_back(classFreq);
-        if (classFreq > m_iMaxFrequency) {
-            m_iMaxFrequency = classFreq;
-        }
+        categories.push_back(std::format("{:.{}g} to {:.{}g}", static_cast<double>(matClassLimitData(kr)), iPrecisionValue, static_cast<double>(matClassLimitData(kr + 1)), iPrecisionValue));
+        counts.push_back(matClassFrequencyData(kr));
     }
+    m_chart.set_bars(std::move(categories), std::move(counts));
 
     QWidget::update();
 }

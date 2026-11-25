@@ -16,7 +16,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp/plots/detail/niceticks.h>
 #include <mne/disp/plots/helpers/colormap.h>
 #include <mne/disp/plots/helpers/figureexporter.h>
 #include <mne/disp/plots/lineplot.h>
@@ -105,7 +104,6 @@ private slots:
     void testImageScIntMatrix();
     void testImageScUpdateData();
     void testImageScColorRangeAndExtent();
-    void testNiceTicks();
 
     // ── Plot ──────────────────────────────────────────────────────────
     void testPlotDefaultCtor();
@@ -639,19 +637,6 @@ void TestDispPlots::testImageScColorRangeAndExtent()
 }
 
 //=============================================================================================================
-
-void TestDispPlots::testNiceTicks()
-{
-    QCOMPARE(detail::niceTicks(0.0, 1.0, 5), std::vector<double>({0.0, 0.2, 0.4, 0.6, 0.8, 1.0}));
-    QCOMPARE(detail::niceTicks(-200.0, 500.0, 8), std::vector<double>({-200.0, -100.0, 0.0, 100.0, 200.0, 300.0, 400.0, 500.0}));
-    // Index axes of a 3 x 3 image span [-0.5, 2.5]: whole numbers only
-    QCOMPARE(detail::niceTicks(-0.5, 2.5, 8, 1.0), std::vector<double>({0.0, 1.0, 2.0}));
-    QVERIFY(detail::niceTicks(1.0, 1.0, 5).empty());
-    // A step of 1 would put ticks closer than minStep: the next nice step up
-    QCOMPARE(detail::niceTicks(0.0, 10.0, 20, 1.43), std::vector<double>({0.0, 2.0, 4.0, 6.0, 8.0, 10.0}));
-}
-
-//=============================================================================================================
 // Plot
 //=============================================================================================================
 
@@ -817,15 +802,22 @@ struct TFplotProbe : public TFplot
     using TFplot::TFplot;
     MatrixXd data() const
     {
-        return m_matData;
+        MatrixXd matrix(m_plot.rows(), m_plot.cols());
+        for (int r = 0; r < m_plot.rows(); ++r) {
+            for (int c = 0; c < m_plot.cols(); ++c) {
+                matrix(r, c) = m_plot.values()[static_cast<std::size_t>(r) * static_cast<std::size_t>(m_plot.cols()) + static_cast<std::size_t>(c)];
+            }
+        }
+        return matrix;
     }
     std::vector<double> extent() const
     {
-        return {m_dLeft, m_dRight, m_dBottom, m_dTop};
+        const auto e = m_plot.extent();
+        return {e[0], e[1], e[2], e[3]};
     }
     QString colorbarLabel() const
     {
-        return m_sColorbarLabel;
+        return QString::fromStdString(m_plot.colorbar_label());
     }
 };
 } // namespace

@@ -29,6 +29,7 @@
 
 #include "../disp_global.h"
 #include "graph.h"
+#include <mne/scene/vector_plot.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -61,9 +62,8 @@ namespace mne::disp
 /**
  * @brief MATLAB-style line plot for an Eigen vector, derived from @ref Graph.
  *
- * Owns a list of @c std::vector<QPointF> trace paths and supports a
- * @c m_bHoldOn flag for overlaying multiple curves. @c updateData()
- * replaces the visible curve in place.
+ * Draws an mne::scene::VectorPlot, which renders without Qt as well.
+ * @c updateData() replaces the visible curve in place.
  *
  * @snippet ex_disp_plots/main.cpp plot_usage
  */
@@ -119,13 +119,7 @@ protected:
      */
     void paintEvent(QPaintEvent* event);
 
-    std::vector<std::vector<QPointF>> m_qListVecPointFPaths; /**< List of point series. */
-
-    bool m_bHoldOn; /**< If multiple plots. */
-    double m_dMinX; /**< Minimal X value. */
-    double m_dMaxX; /**< Maximal X value. */
-    double m_dMinY; /**< Minimal Y value. */
-    double m_dMaxY; /**< Maximal Y value. */
+    scene::VectorPlot m_plot; /**< The plot, drawn through the QPainter backend. */
 };
 
 //=============================================================================================================

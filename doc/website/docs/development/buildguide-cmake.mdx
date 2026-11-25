@@ -200,12 +200,26 @@ cmake --install build-noqt --prefix "$HOME/mne-cpp-sdk"
 ```
 
 This builds all libraries except `mne_disp` and `mne_disp3D`, and the examples that use the libraries only
-(`ex_base`, `ex_channels`, `ex_com`, `ex_mna`, `ex_make_layout`, `ex_acq_performance`, `ex_acq_polhemus`);
+(`ex_base`, `ex_channels`, `ex_com`, `ex_mna`, `ex_make_layout`, `ex_scene`, `ex_acq_performance`, `ex_acq_polhemus`);
 with `BUILD_TESTS=ON` those examples run as tests. The unit tests use QtTest and are built with Qt only.
 The installed `MNE-CPPConfig.cmake` neither looks for Qt nor passes it on to your targets.
 `scripts/ci/qt_free_sdk.sh` does all of this with Qt hidden from CMake, checks that nothing installed
 refers to Qt and builds `scripts/ci/sdk_consumer` against the install tree; CI runs it on Linux, macOS and
 Windows.
+
+### Figures without Qt
+
+The plots are drawn in two layers. `mne_scene` (Qt-free, beside `mne_math` in the layering) describes a
+figure as a display list of lines, paths, rectangles, text and images with their pens, fonts, transforms
+and clips, recorded through `mne::scene::Canvas`, whose calls follow `QPainter`. It renders display lists to
+SVG (`to_svg`, `write_svg`) and, through `mne::RasterImage`, to PNG (`to_raster`), and it holds the plot
+models: `LineChart`, `BarChart`, `SplinePlot`, `ImagePlot`, `VectorPlot`, `ButterflyPlot` and
+`AverageTile`. The widgets of `mne_disp` (`LinePlot`, `Bar`, `Spline`, `ImageSc`, `TFplot`, `Plot`,
+`ButterflyView` and the channel tiles of `AverageLayoutView`) keep such a model and paint it through the
+QPainter backend in `disp/plots/helpers/scenepainter.h`, so a figure looks the same on screen, in an SVG file
+and in a PNG written by a tool without Qt. `test_scene_render` compares each plot's SVG and PNG output with
+golden files in `src/tests/test_scene_render/data`; run it with `MNE_UPDATE_GOLDEN=1` to rewrite them after an
+intended change.
 
 ### Via Qt Creator
 

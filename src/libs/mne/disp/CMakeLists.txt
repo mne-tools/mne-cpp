@@ -39,7 +39,7 @@ set(SOURCES
     plots/helpers/colormap.cpp
     plots/helpers/figureexporter.cpp
     plots/helpers/svgwriter.cpp
-    plots/detail/niceticks.h
+    plots/helpers/scenepainter.cpp
     detail/map_value.h
     detail/layout_reset.h
     viewers/abstractview.cpp
@@ -113,6 +113,7 @@ set(HEADERS
     plots/helpers/colormap.h
     plots/helpers/figureexporter.h
     plots/helpers/svgwriter.h
+    plots/helpers/scenepainter.h
     viewers/abstractview.h
     viewers/applytoview.h
     viewers/coregsettingsview.h
@@ -236,8 +237,8 @@ set(MNE_LIBS_REQUIRED
     mne_dsp
 )
 
-# The public headers include Qt
-target_link_libraries(${PROJECT_NAME} PUBLIC ${QT_REQUIRED_COMPONENT_LIBS})
+# The public headers include Qt and the scene models the plots draw
+target_link_libraries(${PROJECT_NAME} PUBLIC ${QT_REQUIRED_COMPONENT_LIBS} mne_scene)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${MNE_LIBS_REQUIRED}
     Eigen3::Eigen

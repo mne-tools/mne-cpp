@@ -123,14 +123,6 @@ protected:
      */
     void resizeEvent(QResizeEvent* event);
 
-    //=========================================================================================================
-    /**
-     * Draw the labels.
-     *
-     * @param[in] p_iContentHeight   The contents height.
-     */
-    void drawLabels(qint32 p_iContentHeight);
-
     QSize m_qSizeWidget; /**< current widget size. */
 
     QString m_sTitle;   /**< Title. */

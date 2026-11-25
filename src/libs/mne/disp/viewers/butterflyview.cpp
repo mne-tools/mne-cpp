@@ -24,14 +24,15 @@
 #include "scalingview.h"
 #include "helpers/evokedsetmodel.h"
 #include "helpers/channelinfomodel.h"
-#include "../plots/helpers/svgwriter.h"
+#include "../plots/helpers/scenepainter.h"
+#include <mne/scene/butterfly_plot.h>
+#include <mne/scene/svg_renderer.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QPainter>
-#include <QPainterPath>
 #include <QSettings>
 
 //=============================================================================================================
@@ -167,20 +168,14 @@ const QColor& ButterflyView::getBackgroundColor()
 
 void ButterflyView::takeScreenshot(const QString& fileName)
 {
-    const QImage frame = grab().toImage();
-
     if (fileName.contains(".svg", Qt::CaseInsensitive)) {
-        SvgWriter svgGen;
-        svgGen.setFileName(fileName.toStdString());
-        svgGen.setSize(this->size());
-        svgGen.setViewBox(this->rect());
-
-        QPainter painter(&svgGen);
-        painter.drawImage(this->rect(), frame);
+        if (const auto written = scene::write_svg(figure(), fileName.toStdU16String()); !written) {
+            mne::Log::warning("{}", written.error().what());
+        }
     }
 
     if (fileName.contains(".png", Qt::CaseInsensitive)) {
-        frame.save(fileName);
+        grab().toImage().save(fileName);
     }
 }
 
@@ -296,273 +291,62 @@ void ButterflyView::loadSettings()
 void ButterflyView::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
-
-    painter.save();
-    painter.setBrush(QBrush(m_colCurrentBackgroundColor));
-    painter.drawRect(QRect(-1, -1, this->width() + 2, this->height() + 2));
-    painter.restore();
-
-    painter.setRenderHint(QPainter::Antialiasing, true);
-
-    if (m_bIsInit && m_pEvokedSetModel) {
-        //Draw baseline correction area
-        {
-            const auto [from, to] = m_pEvokedSetModel->getBaselineInfo();
-
-            painter.save();
-            painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
-            painter.setBrush(Qt::red);
-            painter.setOpacity(0.1);
-
-            if (m_pEvokedSetModel->getNumSamples() == 0) {
-                mne::Log::debug("Unable to get data. Returning early.");
-                return;
-            }
-
-            float fDx = static_cast<float>(this->width()) / (static_cast<float>(m_pEvokedSetModel->getNumSamples()));
-
-            float fromSamp = ((from)*m_pEvokedSetModel->getSamplingFrequency()) + m_pEvokedSetModel->getNumPreStimSamples();
-            float posX = fDx * (fromSamp);
-            float toSamp = ((to)*m_pEvokedSetModel->getSamplingFrequency()) + m_pEvokedSetModel->getNumPreStimSamples();
-            float width = fDx * (toSamp - fromSamp);
-
-            QRect rect(posX, 0, width, this->height());
-
-            painter.drawRect(rect);
-
-            painter.restore();
-        }
-
-        //Stimulus bar
-        if (m_pEvokedSetModel->getNumSamples() > 0) {
-            painter.save();
-            painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
-
-            float fDx = static_cast<float>(this->width()) / (static_cast<float>(m_pEvokedSetModel->getNumSamples()));
-            float posX = fDx * (static_cast<float>(m_pEvokedSetModel->getNumPreStimSamples()));
-            painter.drawLine(posX, 1, posX, this->height());
-
-            painter.drawText(QPointF(posX + 5, this->rect().bottomRight().y() - 5), QString("0ms / Stimulus"));
-
-            painter.restore();
-        }
-
-        //Vertical time spacers
-        if (m_pEvokedSetModel->getNumberOfTimeSpacers() > 0) {
-            painter.save();
-            QColor colorTimeSpacer = Qt::black;
-            colorTimeSpacer.setAlphaF(0.5);
-            painter.setPen(QPen(colorTimeSpacer, 1, Qt::DashLine));
-
-            float yStart = this->rect().topLeft().y();
-            float yEnd = this->rect().bottomRight().y();
-
-            float fDx = 1;
-            if (m_pEvokedSetModel->getNumSamples() != 0) {
-                fDx = static_cast<float>(this->width()) / (static_cast<float>(m_pEvokedSetModel->getNumSamples()));
-            }
-
-            float sampleCounter = m_pEvokedSetModel->getNumPreStimSamples();
-            int counter = 1;
-            float timeDistanceMSec = 50.0;
-            float timeDistanceSamples = (timeDistanceMSec / 1000.0) * m_pEvokedSetModel->getSamplingFrequency(); //time distance corresponding to sampling frequency
-
-            //spacers before stim
-            while (sampleCounter - timeDistanceSamples > 0) {
-                sampleCounter -= timeDistanceSamples;
-                float x = fDx * sampleCounter;
-                painter.drawLine(x, yStart, x, yEnd);
-                painter.drawText(QPointF(x + 5, yEnd - 5), QString("-%1ms").arg(timeDistanceMSec * counter));
-                counter++;
-            }
-
-            //spacers after stim
-            counter = 1;
-            sampleCounter = m_pEvokedSetModel->getNumPreStimSamples();
-            while (sampleCounter + timeDistanceSamples < m_pEvokedSetModel->getNumSamples()) {
-                sampleCounter += timeDistanceSamples;
-                float x = fDx * sampleCounter;
-                painter.drawLine(x, yStart, x, yEnd);
-                painter.drawText(QPointF(x + 5, yEnd - 5), QString("%1ms").arg(timeDistanceMSec * counter));
-                counter++;
-            }
-
-            painter.restore();
-        }
-
-        //Zero line
-        if (m_pEvokedSetModel->getNumSamples() > 0) {
-            painter.save();
-            painter.setPen(QPen(Qt::black, 1, Qt::DashLine));
-
-            painter.drawLine(0, this->height() / 2, this->width(), this->height() / 2);
-
-            painter.restore();
-        }
-
-        painter.translate(0, this->height() / 2);
-
-        //Actual average data
-        for (qint32 r = 0; r < m_pEvokedSetModel->rowCount(); ++r) {
-            if (std::ranges::contains(m_lSelectedChannels, r)) {
-                qint32 kind = m_pEvokedSetModel->getKind(r);
-
-                //Display only selected kinds
-                switch (kind) {
-                    case FIFFV_MEG_CH: {
-                        qint32 unit = m_pEvokedSetModel->getUnit(r);
-                        if (unit == FIFF_UNIT_T_M) {
-                            if (m_modalityMap["GRAD"])
-                                break;
-                            else
-                                continue;
-                        } else if (unit == FIFF_UNIT_T) {
-                            if (m_modalityMap["MAG"])
-                                break;
-                            else
-                                continue;
-                        }
-                        continue;
-                    }
-                    case FIFFV_EEG_CH: {
-                        if (m_modalityMap["EEG"])
-                            break;
-                        else
-                            continue;
-                    }
-                    case FIFFV_EOG_CH: {
-                        if (m_modalityMap["EOG"])
-                            break;
-                        else
-                            continue;
-                    }
-                    case FIFFV_MISC_CH: {
-                        if (m_modalityMap["MISC"])
-                            break;
-                        else
-                            continue;
-                    }
-                    default:
-                        continue;
-                }
-
-                painter.save();
-
-                createPlotPath(r, painter);
-
-                painter.restore();
-            }
-        }
-    }
+    paintScene(painter, figure(), font());
 }
 
 //=============================================================================================================
 
-void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
+mne::scene::DisplayList ButterflyView::figure() const
 {
-    //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
-    qint32 kind = m_pEvokedSetModel->getKind(row);
-    float fMaxValue = mne::disp::getScalingValue(m_scaleMap, kind, m_pEvokedSetModel->getUnit(row));
-    bool bIsBad = m_pEvokedSetModel->getIsChannelBad(row);
-
-    if (bIsBad) {
-        painter.setOpacity(0.20);
-    } else {
-        painter.setOpacity(0.75);
-    }
-
-    float fValue;
-    float fScaleY = this->height() / (2 * fMaxValue);
-
-    //restrictions for paint performance
-    float fWinMaxVal = (static_cast<float>(this->height()) - 2) / 2.0f;
-    //    qint32 iDownSampling = (m_pEvokedSetModel->getNumSamples() * 4 / (this->width()-2));
-    //    if(iDownSampling < 1) {
-    //        iDownSampling = 1;
-    //    }
-
-    QPointF qSamplePosition;
-
-    float fDx = static_cast<float>(this->width() - 2) / (static_cast<float>(m_pEvokedSetModel->getNumSamples()) - 1.0f); //((float)option.rect.width()) / m_pEvokedSetModel->getMaxSamples();
-
-    const std::vector<mne::disp::AvrTypeRowVector> rowVec = m_pEvokedSetModel->data(row, 1).value<std::vector<mne::disp::AvrTypeRowVector>>();
-
-    //Do for all average types
-    for (int j = 0; j < std::ssize(rowVec); ++j) {
-        const std::string& sAvrComment = rowVec.at(j).first;
-
-        // Select color for each average
-        if (m_pEvokedSetModel->isFreezed()) {
-            QColor freezeColor = detail::valueOr(*m_qMapAverageColor, sAvrComment);
-            freezeColor.setAlphaF(0.5);
-            painter.setPen(QPen(freezeColor, 1));
-        } else {
-            painter.setPen(QPen(detail::valueOr(*m_qMapAverageColor, sAvrComment)));
+    scene::ButterflyPlot plot;
+    plot.set_background(toSceneColor(m_colCurrentBackgroundColor));
+    if (m_bIsInit && m_pEvokedSetModel) {
+        if (m_pEvokedSetModel->getNumSamples() == 0) {
+            mne::Log::debug("Unable to get data. Returning early.");
         }
+        const auto [from, to] = m_pEvokedSetModel->getBaselineInfo();
+        plot.set_timing(m_pEvokedSetModel->getNumSamples(), m_pEvokedSetModel->getNumPreStimSamples(), m_pEvokedSetModel->getSamplingFrequency());
+        plot.set_baseline(from, to);
+        plot.set_time_spacers(m_pEvokedSetModel->getNumberOfTimeSpacers() > 0);
+        plot.set_frozen(m_pEvokedSetModel->isFreezed());
 
-        if (detail::valueOr(*m_qMapAverageActivation, sAvrComment)) {
-            //Calculate downsampling factor of averaged data in respect to the items width
-            int dsFactor;
-            rowVec.at(j).second.cols() / this->width() < 1 ? dsFactor = 1 : dsFactor = rowVec.at(j).second.cols() / this->width();
-            if (dsFactor == 0) {
-                dsFactor = 1;
+        // The selected channels of the shown modalities
+        const auto shown = [this](qint32 row) {
+            switch (m_pEvokedSetModel->getKind(row)) {
+                case FIFFV_MEG_CH: {
+                    const qint32 unit = m_pEvokedSetModel->getUnit(row);
+                    return (unit == FIFF_UNIT_T_M && detail::valueOr(m_modalityMap, std::string("GRAD"))) || (unit == FIFF_UNIT_T && detail::valueOr(m_modalityMap, std::string("MAG")));
+                }
+                case FIFFV_EEG_CH:
+                    return detail::valueOr(m_modalityMap, std::string("EEG"));
+                case FIFFV_EOG_CH:
+                    return detail::valueOr(m_modalityMap, std::string("EOG"));
+                case FIFFV_MISC_CH:
+                    return detail::valueOr(m_modalityMap, std::string("MISC"));
+                default:
+                    return false;
             }
-
-            QPainterPath path(QPointF(1, 0));
-            float y_base = path.currentPosition().y();
-
-            //Move to initial starting point
-            if (rowVec.at(j).second.cols() > 0) {
-                float val = rowVec.at(j).second[0];
-                fValue = (val /*-rowVec.at(j)[m_pEvokedSetModel->getNumPreStimSamples()-1]*/) * fScaleY; //ToDo -> -2 PreStim is one too short
-
-                float newY = y_base + fValue;
-
-                qSamplePosition.setY(-newY);
-                qSamplePosition.setX(path.currentPosition().x());
-
-                path.moveTo(qSamplePosition);
+        };
+        std::vector<scene::ButterflyPlot::Channel> channels;
+        for (qint32 r = 0; r < m_pEvokedSetModel->rowCount(); ++r) {
+            if (!std::ranges::contains(m_lSelectedChannels, r) || !shown(r)) {
+                continue;
             }
-
-            //create lines from one to the next sample
-            qint32 i;
-            for (i = 1; i < rowVec.at(j).second.cols() && path.elementCount() <= this->width(); i += dsFactor) {
-                float val = /*rowVec.at(j)[m_pEvokedSetModel->getNumPreStimSamples()-1] - */ rowVec.at(j).second[i]; //remove first sample data[0] as offset
-                fValue = val * fScaleY;
-
-                //Cut plotting if out of widget area
-                fValue = fValue > fWinMaxVal ? fWinMaxVal : fValue < -fWinMaxVal ? -fWinMaxVal
-                                                                                 : fValue;
-
-                float newY = y_base + fValue;
-
-                qSamplePosition.setY(-newY);
-
-                qSamplePosition.setX(1.0 + fDx * i);
-
-                path.lineTo(qSamplePosition);
+            scene::ButterflyPlot::Channel channel;
+            const qint32 kind = m_pEvokedSetModel->getKind(r);
+            channel.max_value = mne::disp::getScalingValue(m_scaleMap, kind, m_pEvokedSetModel->getUnit(r));
+            channel.bad = m_pEvokedSetModel->getIsChannelBad(r);
+            for (const mne::disp::AvrTypeRowVector& average : m_pEvokedSetModel->data(r, 1).value<std::vector<mne::disp::AvrTypeRowVector>>()) {
+                if (detail::valueOr(*m_qMapAverageActivation, average.first)) {
+                    channel.traces.push_back({std::vector<double>(average.second.data(), average.second.data() + average.second.size()),
+                                              toSceneColor(detail::valueOr(*m_qMapAverageColor, average.first))});
+                }
             }
-
-            //    //create lines from one to the next sample for last path
-            //    qint32 sample_offset = m_pEvokedSetModel->numVLines() + 1;
-            //    qSamplePosition.setX(qSamplePosition.x() + fDx*sample_offset);
-            //    lastPath.moveTo(qSamplePosition);
-
-            //    for(i += sample_offset; i < lastData.size(); ++i) {
-            //        float val = lastData[i] - lastData[0]; //remove first sample lastData[0] as offset
-            //        fValue = val*fScaleY;
-
-            //        float newY = y_base+fValue;
-
-            //        qSamplePosition.setY(newY);
-            //        qSamplePosition.setX(lastPath.currentPosition().x()+fDx);
-
-            //        lastPath.lineTo(qSamplePosition);
-            //    }
-
-            painter.drawPath(path);
+            channels.push_back(std::move(channel));
         }
+        plot.set_channels(std::move(channels));
     }
+    return plot.render(width(), height(), toSceneFont(font()));
 }
 
 //=============================================================================================================

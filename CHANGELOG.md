@@ -230,6 +230,18 @@ aliases; replace the old spelling as below.
   `tick_label()`) and the colour maps (`map_color()`, moved from
   `disp::ColorMap`, which now calls them). `ex_scene` writes a plot as SVG and
   PNG without Qt.
+- The plot widgets of `mne_disp` (`LinePlot`, `Bar`, `Spline`, `ImageSc`,
+  `TFplot`, `Plot`, `ButterflyView` and the channel tiles of
+  `AverageLayoutView`) draw their `mne_scene` model through a QPainter backend
+  (`disp/plots/helpers/scenepainter.h`: `paintScene()`, `QtTextMetrics`). On
+  screen they draw the same pixels as before; `test_scene_render` compares
+  every model's SVG and PNG output with golden files. `ButterflyView` saves
+  SVG screenshots as vector graphics instead of an embedded bitmap. Removed
+  with the move: `Graph::drawLabels()`, the protected data members of `Plot`
+  and `ImageSc` (`ImageSc::normalize()`, `updateMaps()`), the public members
+  `Spline::m_dMinAxisX` and `m_dMaxAxisX`, the protected helpers of
+  `ColorMap` and `disp/plots/detail/niceticks.h` (use `scene::nice_ticks()`).
+  The Qt usage ceilings of `disp` drop accordingly (tokens 5149 to 4883).
 - The inverse operator's decomposition of the whitened lead field uses Eigen's
   divide-and-conquer SVD, as MNE-Python uses LAPACK's: about 2.5 times less
   CPU time for the MNE sample data, with the same source estimates to single

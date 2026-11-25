@@ -23,13 +23,12 @@
 //=============================================================================================================
 
 #include "bar.h"
-#include "detail/niceticks.h"
+#include "helpers/scenepainter.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QFontMetrics>
 #include <QPainter>
 #include <QPaintEvent>
 
@@ -37,8 +36,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace mne;
 using namespace mne::disp;
-using namespace mne::disp::detail;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -47,9 +46,8 @@ using namespace mne::disp::detail;
 Bar::Bar(const QString& title,
          QWidget* parent)
 : QWidget(parent)
-, m_sTitle(title)
-, m_iMaxFrequency(0)
 {
+    m_chart.set_title(title.toStdString());
     setMinimumSize(200, 150);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
@@ -59,7 +57,7 @@ Bar::Bar(const QString& title,
 
 void Bar::setXLabel(const QString& label)
 {
-    m_sXLabel = label;
+    m_chart.set_x_label(label.toStdString());
     update();
 }
 
@@ -67,7 +65,7 @@ void Bar::setXLabel(const QString& label)
 
 void Bar::setYLabel(const QString& label)
 {
-    m_sYLabel = label;
+    m_chart.set_y_label(label.toStdString());
     update();
 }
 
@@ -76,94 +74,8 @@ void Bar::setYLabel(const QString& label)
 void Bar::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    const int w = width();
-    const int h = height();
-    const int marginLeft = 60;
-    const int marginRight = 20;
-    const int marginTop = 40;
-    const int marginBottom = 100;
-    const int plotW = w - marginLeft - marginRight;
-    const int plotH = h - marginTop - marginBottom;
-
-    if (plotW <= 0 || plotH <= 0)
-        return;
-
-    // Title
-    if (!m_sTitle.isEmpty()) {
-        painter.setPen(Qt::black);
-        QFont titleFont = painter.font();
-        titleFont.setBold(true);
-        titleFont.setPointSize(titleFont.pointSize() + 2);
-        painter.setFont(titleFont);
-        painter.drawText(QRect(0, 0, w, marginTop), Qt::AlignCenter, m_sTitle);
-        painter.setFont(QFont());
-    }
-
-    if (m_frequencies.empty())
-        return;
-
-    const int nBars = static_cast<int>(m_frequencies.size());
-    const int maxFreq = (m_iMaxFrequency > 0) ? m_iMaxFrequency : 1;
-
-    // Draw axes
-    painter.setPen(QPen(Qt::black, 1));
-    painter.drawLine(marginLeft, marginTop, marginLeft, marginTop + plotH);
-    painter.drawLine(marginLeft, marginTop + plotH, marginLeft + plotW, marginTop + plotH);
-
-    // Y-axis ticks
-    for (double yVal : niceTicks(0.0, maxFreq, 5, 1.0)) {
-        const double y = marginTop + plotH - plotH * yVal / maxFreq;
-        painter.drawLine(QPointF(marginLeft - 5, y), QPointF(marginLeft, y));
-        painter.drawText(QRectF(0, y - 10, marginLeft - 8, 20), Qt::AlignRight | Qt::AlignVCenter, tickLabel(yVal));
-    }
-
-    // Draw bars
-    double barWidth = static_cast<double>(plotW) / nBars;
-    double barPadding = barWidth * 0.1;
-
-    for (int i = 0; i < nBars; ++i) {
-        double barH = (static_cast<double>(m_frequencies[i]) / maxFreq) * plotH;
-        double x = marginLeft + i * barWidth + barPadding;
-        double bw = barWidth - 2.0 * barPadding;
-        double y = marginTop + plotH - barH;
-
-        painter.setBrush(QColor(70, 130, 180));
-        painter.setPen(QPen(QColor(50, 100, 150), 1));
-        painter.drawRect(QRectF(x, y, bw, barH));
-    }
-
-    // X-axis labels (rotated)
-    painter.setPen(Qt::black);
-    QFont smallFont = painter.font();
-    smallFont.setPointSize(smallFont.pointSize() - 1);
-    painter.setFont(smallFont);
-
-    const QFontMetrics labelMetrics(smallFont);
-    for (int i = 0; i < nBars && i < std::ssize(m_categories); ++i) {
-        const QString category = QString::fromStdString(m_categories[i]);
-        double cx = marginLeft + (i + 0.5) * barWidth;
-        if (labelMetrics.horizontalAdvance(category) < barWidth - 4) {
-            painter.drawText(QRectF(cx - barWidth / 2.0, marginTop + plotH + 6, barWidth, 20), Qt::AlignHCenter | Qt::AlignTop, category);
-            continue;
-        }
-        painter.save();
-        painter.translate(cx, marginTop + plotH + 5);
-        painter.rotate(45);
-        painter.drawText(0, 0, category);
-        painter.restore();
-    }
-
-    painter.setFont(QFont());
-    if (!m_sXLabel.isEmpty()) {
-        painter.drawText(QRect(marginLeft, h - 22, plotW, 20), Qt::AlignCenter, m_sXLabel);
-    }
-    if (!m_sYLabel.isEmpty()) {
-        painter.save();
-        painter.translate(4, marginTop + plotH / 2.0);
-        painter.rotate(-90);
-        painter.drawText(QRectF(-plotH / 2.0, 0, plotH, 20), Qt::AlignCenter, m_sYLabel);
-        painter.restore();
-    }
+    const QtTextMetrics metrics(font());
+    scene::Canvas canvas(width(), height());
+    m_chart.draw(canvas, metrics, toSceneFont(font()));
+    paintScene(painter, canvas.display_list(), font());
 }

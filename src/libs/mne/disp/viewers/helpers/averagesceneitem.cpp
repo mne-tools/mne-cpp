@@ -21,6 +21,8 @@
 //=============================================================================================================
 
 #include "averagesceneitem.h"
+#include "../../plots/helpers/scenepainter.h"
+#include <mne/scene/average_tile.h>
 #include "../scalingview.h"
 
 #include <mne/fiff/fiff_types.h>
@@ -30,12 +32,18 @@
 //=============================================================================================================
 
 #include <QPainter>
-#include <QStaticText>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace mne;
 using namespace mne::disp;
 
 //=============================================================================================================
@@ -95,148 +103,31 @@ void AverageSceneItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    painter->setRenderHint(QPainter::Antialiasing, true);
-
-    if (m_bIsBad) {
-        painter->setOpacity(0.20);
-    }
-
-    //    //Plot bounding rect / drawing region of this item
-    //    painter->drawRect(this->boundingRect());
-
-    //Plot stim time
-    painter->save();
-    paintStimLine(painter);
-    painter->restore();
-
-    //Plot average data
-    painter->save();
-    paintAveragePath(painter);
-    painter->restore();
-
-    // Plot channel name
-    QStaticText staticElectrodeName = QStaticText(m_sChannelName);
-    painter->save();
-    QPen pen;
-    pen.setColor(Qt::red);
-    pen.setWidthF(0);
-    pen.setCosmetic(true);
-
-    QFont f = painter->font();
-    f.setPointSizeF(m_iFontTextSize);
-    painter->setFont(f);
-
-    painter->setPen(pen);
-    painter->drawStaticText(boundingRect().x(), boundingRect().y() - m_iFontTextSize, staticElectrodeName);
-    painter->restore();
-
-    //Plot bounding rect
-    //    painter->save();
-    //    pen.setColor(Qt::red);
-    //    painter->setPen(pen);
-    //    painter->drawRect(this->boundingRect());
-    //    painter->restore();
-}
-
-//=============================================================================================================
-
-void AverageSceneItem::paintAveragePath(QPainter* painter)
-{
-    if (m_lAverageData.size() == 0)
-        return;
-
-    //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
-
-    float fMaxValue = mne::disp::getScalingValue(m_scaleMap, m_iChannelKind, m_iChannelUnit);
-
-    //Plot averaged data
-    QRectF boundingRect = this->boundingRect();
-    double dScaleY = (boundingRect.height()) / (2 * fMaxValue);
-
-    //do for all currently stored evoked set data
-    for (int dataIndex = 0; dataIndex < std::ssize(m_lAverageData); ++dataIndex) {
-        const std::string& sAvrComment = m_lAverageData.at(dataIndex).first;
-
+    scene::AverageTile tile;
+    tile.box = {m_rectBoundingRect.x(), m_rectBoundingRect.y(), m_rectBoundingRect.width(), m_rectBoundingRect.height()};
+    tile.name = m_sChannelName.toStdString();
+    tile.name_size = m_iFontTextSize;
+    tile.bad = m_bIsBad;
+    tile.max_value = mne::disp::getScalingValue(m_scaleMap, m_iChannelKind, m_iChannelUnit);
+    tile.stim_sample = m_firstLastSample.first;
+    tile.columns = m_lAverageData.empty() ? 0 : m_lAverageData.front().second.second;
+    for (const auto& [comment, data] : m_lAverageData) {
         // Default to active when no activation map has been configured
-        if (!m_qMapAverageActivation.contains(sAvrComment) || m_qMapAverageActivation.at(sAvrComment)) {
-            const double* averageData = m_lAverageData.at(dataIndex).second.first;
-            int totalCols = m_lAverageData.at(dataIndex).second.second;
-            if (totalCols <= 0)
-                continue;
-
-            //Calculate X step to fill the full bounding rect width
-            double xStep = boundingRect.width() / static_cast<double>(totalCols);
-
-            //Create path starting at the left-center of the bounding rect
-            double centerY = boundingRect.y() + boundingRect.height() / 2.0;
-            QPainterPath path(QPointF(boundingRect.x(), centerY));
-            QPen pen;
-            pen.setStyle(Qt::SolidLine);
-            pen.setColor(m_colorDefault);
-
-            if (m_qMapAverageColor.contains(sAvrComment)) {
-                pen.setColor(m_qMapAverageColor.at(sAvrComment));
-            }
-
-            pen.setWidthF(0);
-            pen.setCosmetic(true);
-            painter->setPen(pen);
-
-            for (int i = 0; i < totalCols; ++i) {
-                //evoked matrix is stored in column major
-                double val = (*(averageData + (i * m_iTotalNumberChannels) + m_iChannelNumber)) * dScaleY;
-
-                //Clamp to bounding rect height
-                double halfH = boundingRect.height() / 2.0;
-                if (val > halfH)
-                    val = halfH;
-                else if (val < -halfH)
-                    val = -halfH;
-
-                double xPos = boundingRect.x() + i * xStep;
-                path.lineTo(QPointF(xPos, centerY - val));
-            }
-
-            painter->drawPath(path);
+        if (m_qMapAverageActivation.contains(comment) && !m_qMapAverageActivation.at(comment)) {
+            continue;
         }
+        scene::AverageTile::Trace trace;
+        trace.color = toSceneColor(m_qMapAverageColor.contains(comment) ? m_qMapAverageColor.at(comment) : m_colorDefault);
+        // The evoked matrix is stored column by column
+        for (int i = 0; i < data.second; ++i) {
+            trace.samples.push_back(*(data.first + (i * m_iTotalNumberChannels) + m_iChannelNumber));
+        }
+        tile.traces.push_back(std::move(trace));
     }
-}
 
-//=============================================================================================================
-
-void AverageSceneItem::paintStimLine(QPainter* painter)
-{
-    if (m_lAverageData.size() == 0)
-        return;
-
-    //Plot vertical and horizontal lines
-    QRectF boundingRect = this->boundingRect();
-    int totalCols = m_lAverageData.front().second.second;
-    if (totalCols <= 0)
-        return;
-
-    double xStep = boundingRect.width() / static_cast<double>(totalCols);
-
-    QPen pen;
-    pen.setStyle(Qt::SolidLine);
-    pen.setColor(Qt::red);
-    pen.setWidthF(0);
-    pen.setCosmetic(true);
-    painter->setPen(pen);
-
-    QPainterPath path;
-
-    //Stim line (at sample index corresponding to time=0)
-    double stimX = boundingRect.x() + std::abs(m_firstLastSample.first) * xStep;
-    path.moveTo(stimX, boundingRect.y());
-    path.lineTo(stimX, boundingRect.y() + boundingRect.height());
-
-    //Zero line
-    double centerY = boundingRect.y() + boundingRect.height() / 2.0;
-    path.moveTo(boundingRect.x(), centerY);
-    path.lineTo(boundingRect.x() + boundingRect.width(), centerY);
-
-    painter->drawPath(path);
+    scene::Canvas canvas(m_rectBoundingRect.width(), m_rectBoundingRect.height());
+    tile.draw(canvas, toSceneFont(painter->font()));
+    paintScene(*painter, canvas.display_list(), painter->font());
 }
 
 //=============================================================================================================

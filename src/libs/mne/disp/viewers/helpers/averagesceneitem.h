@@ -137,23 +137,6 @@ public:
 
     QColor m_colorDefault; /**< The color for the avergaed signal. */
 
-protected:
-    //=========================================================================================================
-    /**
-     * Create a plot path and paint the average data
-     *
-     * @param[in] painter The painter used to plot in this item.
-     */
-    void paintAveragePath(QPainter* painter);
-
-    //=========================================================================================================
-    /**
-     * Create a plot path and paint the average data
-     *
-     * @param[in] painter The painter used to plot in this item.
-     */
-    void paintStimLine(QPainter* painter);
-
 signals:
     //=========================================================================================================
     /**

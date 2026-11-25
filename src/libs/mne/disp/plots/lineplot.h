@@ -11,7 +11,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
- * @brief    Simple x/y line-series widget drawn with QPainter.
+ * @brief    Simple x/y line-series widget, an mne::scene::LineChart drawn with QPainter.
  *
  * LinePlot accepts one or several @c std::vector<double> y-series (with an
  * optional matching x-series) and renders them as connected polylines
@@ -29,13 +29,13 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
+#include <mne/scene/line_chart.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QColor>
-#include <QRectF>
 #include <QWidget>
 
 //=============================================================================================================
@@ -48,7 +48,6 @@
 // STL INCLUDES
 //=============================================================================================================
 
-#include <functional>
 #include <vector>
 
 //=============================================================================================================
@@ -197,38 +196,7 @@ protected:
     void paintEvent(QPaintEvent* event) override;
 
 private:
-    //=========================================================================================================
-    /**
-     * Returns the length of the lines inside a rectangle.
-     *
-     * @param[in] rect       The rectangle in pixels.
-     * @param[in] toPixelX   Maps an x value to pixels.
-     * @param[in] toPixelY   Maps a y value to pixels.
-     *
-     * @return The length in pixels of the lines inside @p rect.
-     */
-    double hiddenLength(const QRectF& rect,
-                        const std::function<double(double)>& toPixelX,
-                        const std::function<double(double)>& toPixelY) const;
-
-    /** One line of the plot. */
-    struct Series
-    {
-        std::vector<double> x; /**< X data points. */
-        std::vector<double> y; /**< Y data points. */
-        QString label;         /**< Legend entry. */
-        QColor color;          /**< Line colour. */
-        Qt::PenStyle style;    /**< Line style. */
-    };
-
-    QString m_sTitle;             /**< Title. */
-    QString m_sXLabel;            /**< X axis label. */
-    QString m_sYLabel;            /**< Y axis label. */
-    std::vector<Series> m_series; /**< The plotted series. */
-    double m_dMinX;               /**< Minimum X value. */
-    double m_dMaxX;               /**< Maximum X value. */
-    double m_dMinY;               /**< Minimum Y value. */
-    double m_dMaxY;               /**< Maximum Y value. */
+    scene::LineChart m_plot; /**< The plot, drawn through the QPainter backend. */
 };
 
 //=============================================================================================================

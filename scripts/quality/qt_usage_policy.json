@@ -72,8 +72,8 @@
       "modules": []
     },
     "disp": {
-      "tokens": 5149,
-      "public_header_includes": 83,
+      "tokens": 4883,
+      "public_header_includes": 82,
       "modules": [
         "Core",
         "GuiPrivate",
@@ -82,11 +82,11 @@
       "by_category": {
         "containers": 33,
         "files": 99,
-        "global": 1165,
-        "gui": 947,
+        "global": 1079,
+        "gui": 897,
         "objects_signals": 531,
-        "other": 1518,
-        "strings": 847,
+        "other": 1404,
+        "strings": 831,
         "time": 9
       }
     },
