@@ -132,6 +132,27 @@
         "src/tests/test_mne_source_space_ops_python/data/sample-vol25-src.fif": "9e31c11f1e9547e7386e3253283a558bef399359b1fd406baae0552b2e1a7f82"
       }
     },
+    "test_scene_render": {
+      "generators": [],
+      "fixtures": {
+        "src/tests/test_scene_render/data/average_tile.png": "e3dc6dfc107a6aec4530973521fb78c48009c9da64a85396bfa0de7a05088c4d",
+        "src/tests/test_scene_render/data/average_tile.svg": "0a68d54b228906de959e36854ec94c11965f694860f734281153e9f8129db4c0",
+        "src/tests/test_scene_render/data/bar_chart.png": "0a9f311764cfb5bcbae122c0d0a7d1301adcaf0cd5f1a31bfacb8f0d6aa6db16",
+        "src/tests/test_scene_render/data/bar_chart.svg": "863411ee0639bcde18a7375c69875b09ac5585b62e925530fb8203a0d5312b0e",
+        "src/tests/test_scene_render/data/butterfly_plot.png": "dcba6c6c878f4560d5e853724a0df4b3160918bce183eb12210affd5a1f3474e",
+        "src/tests/test_scene_render/data/butterfly_plot.svg": "fc42e41ebe9f6b5368fdf4fd0008de54783a886fbb5f84a4b2df6497408a1a0a",
+        "src/tests/test_scene_render/data/image_plot.png": "e3d6c2fa92684e47d3e8d613c6280d8fbe5b0d02a1548d601606e6b120c5baf3",
+        "src/tests/test_scene_render/data/image_plot.svg": "a3850c1399187015e71e5a61692fd1d3097eec3160a738a3334752624053413a",
+        "src/tests/test_scene_render/data/line_chart.png": "d008d8a0026b5854c619dd46f3dc28c942153abdc70cff2e2aa9fd540c14fc0e",
+        "src/tests/test_scene_render/data/line_chart.svg": "64666ad026e6946cb74bee9deb81a59a585b9a385a0b8ae581806efdeb6e76ef",
+        "src/tests/test_scene_render/data/sample.png": "967dba01d3666923715e336766c74da20f50723b878c3b98966525e20375a4c6",
+        "src/tests/test_scene_render/data/sample.svg": "65c2237c92e95888bfc92b20bf3acc2f8a8e24123fd2a98ef27662671e0265ae",
+        "src/tests/test_scene_render/data/spline_plot.png": "28f35b3158abab418c3ea05f20d9b72736053a4cfefff370cb5df481988dbed0",
+        "src/tests/test_scene_render/data/spline_plot.svg": "bc3de7f9b179cc724b3a6a7b4588db7cae69be849b572b2c550d0a0251df03fe",
+        "src/tests/test_scene_render/data/vector_plot.png": "2541122b219b9b8b270ababab4d880f84c473551ceeb5c6a25eb6910110ede8b",
+        "src/tests/test_scene_render/data/vector_plot.svg": "f4d3fc30fcb7a12d0868364ae0e27bb0187220085c7f1cacd75d38227423a20b"
+      }
+    },
     "test_source_estimate_io": {
       "generators": [
         "src/tests/test_source_estimate_io/make_stc_fixtures.py"
