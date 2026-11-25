@@ -46,7 +46,7 @@
       "scene",
       "sts"
     ],
-    "tokens": 6846,
+    "tokens": 6641,
     "gui_outside_design": []
   },
   "libraries": {
@@ -139,15 +139,15 @@
       "modules": []
     },
     "disp": {
-      "tokens": 4885,
+      "tokens": 4680,
       "by_category": {
         "containers": 16,
         "files": 97,
-        "global": 1083,
-        "gui": 958,
-        "objects_signals": 533,
-        "other": 1369,
-        "strings": 820,
+        "global": 1005,
+        "gui": 917,
+        "objects_signals": 529,
+        "other": 1348,
+        "strings": 759,
         "time": 9
       },
       "public_header_includes": 89,
@@ -299,7 +299,7 @@
       "by_category": {},
       "public_header_includes": 0,
       "q_object": 0,
-      "files": 38,
+      "files": 41,
       "modules": []
     },
     "sts": {

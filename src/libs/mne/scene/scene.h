@@ -27,6 +27,7 @@
 #include "filter_response_plot.h"
 #include "geometry.h"
 #include "image_plot.h"
+#include "input_event.h"
 #include "line_chart.h"
 #include "raster_renderer.h"
 #include "sensor_layout.h"
@@ -35,6 +36,7 @@
 #include "svg_renderer.h"
 #include "text_metrics.h"
 #include "ticks.h"
+#include "trace_view.h"
 #include "vector_plot.h"
 
 #endif // SCENE_SCENE_H

@@ -76,7 +76,7 @@
       "modules": []
     },
     "disp": {
-      "tokens": 4885,
+      "tokens": 4680,
       "public_header_includes": 89,
       "modules": [
         "Core",
@@ -86,11 +86,11 @@
       "by_category": {
         "containers": 16,
         "files": 97,
-        "global": 1083,
-        "gui": 958,
-        "objects_signals": 533,
-        "other": 1369,
-        "strings": 820,
+        "global": 1005,
+        "gui": 917,
+        "objects_signals": 529,
+        "other": 1348,
+        "strings": 759,
         "time": 9
       }
     },

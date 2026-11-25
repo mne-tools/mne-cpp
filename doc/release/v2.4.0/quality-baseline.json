@@ -11,7 +11,7 @@
   },
   "gates": {
     "G1_test_integrity": {
-      "registered": 290,
+      "registered": 291,
       "conditional": 10,
       "unregistered": 3,
       "without_labels": 0,
@@ -76,7 +76,8 @@
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
-          "test_scene_render"
+          "test_scene_render",
+          "test_scene_trace_view"
         ],
         "macos-26-qt-min": [
           "test_acq_convert",
@@ -121,7 +122,8 @@
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
-          "test_scene_render"
+          "test_scene_render",
+          "test_scene_trace_view"
         ],
         "ubuntu-24.04": [
           "test_acq_convert",
@@ -166,7 +168,8 @@
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
-          "test_scene_render"
+          "test_scene_render",
+          "test_scene_trace_view"
         ],
         "ubuntu-24.04-qt-min": [
           "test_acq_convert",
@@ -211,7 +214,8 @@
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
-          "test_scene_render"
+          "test_scene_render",
+          "test_scene_trace_view"
         ],
         "windows-2025-vs2026": [
           "test_acq_convert",
@@ -256,7 +260,8 @@
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
-          "test_scene_render"
+          "test_scene_render",
+          "test_scene_trace_view"
         ],
         "windows-2025-vs2026-qt-min": [
           "test_acq_convert",
@@ -301,7 +306,8 @@
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
-          "test_scene_render"
+          "test_scene_render",
+          "test_scene_trace_view"
         ]
       },
       "ci_failures": 0,
@@ -325,12 +331,12 @@
       }
     },
     "G3_api_documentation": {
-      "public_api_units": 628,
+      "public_api_units": 632,
       "exported_not_registered": 2,
       "example_eligible": 456,
       "eligible_backed_percent": 99.56,
       "snippets": 498,
-      "registered_test_percent": 49.84
+      "registered_test_percent": 50.16
     },
     "G4_screenshots": {
       "referenced_images": 19,

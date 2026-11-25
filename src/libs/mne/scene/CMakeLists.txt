@@ -23,6 +23,7 @@ set(SOURCES
   svg_renderer.cpp
   text_metrics.cpp
   ticks.cpp
+  trace_view.cpp
   vector_plot.cpp
 )
 
@@ -38,6 +39,7 @@ set(HEADERS
   display_list.h
   filter_response_plot.h
   image_plot.h
+  input_event.h
   line_chart.h
   geometry.h
   raster_renderer.h
@@ -47,6 +49,7 @@ set(HEADERS
   svg_renderer.h
   text_metrics.h
   ticks.h
+  trace_view.h
   vector_plot.h
 )
 

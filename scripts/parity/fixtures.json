@@ -159,6 +159,13 @@
         "src/tests/test_scene_render/data/vector_plot.svg": "f4d3fc30fcb7a12d0868364ae0e27bb0187220085c7f1cacd75d38227423a20b"
       }
     },
+    "test_scene_trace_view": {
+      "generators": [],
+      "fixtures": {
+        "src/tests/test_scene_trace_view/data/trace_view_overlays.svg": "0d06988f7b3a675b0d2f4790943062f7219b1c1e62574ef7f6c6ef86f7f2afd5",
+        "src/tests/test_scene_trace_view/data/trace_view_selection.svg": "83cbd091c34813ac658699769e265b33247f6782d9a1c3239bae28cea3a4ba92"
+      }
+    },
     "test_source_estimate_io": {
       "generators": [
         "src/tests/test_source_estimate_io/make_stc_fixtures.py"

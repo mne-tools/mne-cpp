@@ -288,6 +288,20 @@ aliases; replace the old spelling as below.
   it, and `FilterDesignView` uses that widget instead of a `QGraphicsView`.
   Its plot export writes vector SVG. Removed: `FilterPlotScene` and
   `FilterDesignView::resizeEvent()`.
+- `mne::scene::TraceView` (`scene/trace_view.h`) holds the viewport and
+  interaction state of the raw-data trace view without a GUI toolkit: scroll
+  position, zoom, file bounds and clamping, the channel window, wheel zoom and
+  scrolling, drag scrolling with inertia, the ruler with its axis snapping,
+  annotation range selection and boundary resizing, and the crosshair. Input
+  arrives as toolkit-neutral `PointerEvent` and `WheelEvent`
+  (`scene/input_event.h`) with timestamps; what the host has to do (animate a
+  scroll or zoom, change the cursor, redraw, report clicks and edits) comes
+  back through callbacks. `draw_overlays()` draws the crosshair, scalebars,
+  ruler and annotation selection into a `Canvas`. `disp::ChannelRhiRenderer`
+  delegates to it and paints the overlays with `paintScene()`; its API and
+  signals are unchanged. `test_scene_trace_view` tests it without Qt, with
+  golden SVG files of the overlays. The Qt usage ceiling of `disp` drops
+  accordingly (tokens 4885 to 4680).
 - `mne::write_mat_file()` (`math/mat_file.h`) writes matrices to a MATLAB
   Level 5 MAT-file; `mne_raw2mat` and `mne_epochs2mat` use it instead of two
   copies of the writer (their files are byte-identical).

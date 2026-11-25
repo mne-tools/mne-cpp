@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="300" viewBox="0 0 400 300">
+<rect x="274" y="228" width="118" height="64" fill="#ffffff" fill-opacity="0.784" stroke="none"/>
+<line x1="282" y1="243" x2="282" y2="288" stroke="#282828" stroke-width="2" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="278" y1="243" x2="286" y2="243" stroke="#282828" stroke-width="2" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="278" y1="288" x2="286" y2="288" stroke="#282828" stroke-width="2" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="292" y="270" font-family="sans-serif" font-size="10.667" fill="#1e1e1e" xml:space="preserve">MEG mag: 2.0 pT</text>
+<rect x="248" y="156" width="144" height="64" fill="#ffffff" fill-opacity="0.784" stroke="none"/>
+<line x1="256" y1="171" x2="256" y2="216" stroke="#282828" stroke-width="2" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="252" y1="171" x2="260" y2="171" stroke="#282828" stroke-width="2" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="252" y1="216" x2="260" y2="216" stroke="#282828" stroke-width="2" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="266" y="198" font-family="sans-serif" font-size="10.667" fill="#1e1e1e" xml:space="preserve">MEG grad: 40.0 pT/m</text>
+<rect x="293" y="84" width="99" height="64" fill="#ffffff" fill-opacity="0.784" stroke="none"/>
+<line x1="301" y1="99" x2="301" y2="144" stroke="#282828" stroke-width="2" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="297" y1="99" x2="305" y2="99" stroke="#282828" stroke-width="2" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="297" y1="144" x2="305" y2="144" stroke="#282828" stroke-width="2" stroke-linecap="square" stroke-linejoin="bevel"/>
+<text x="311" y="126" font-family="sans-serif" font-size="10.667" fill="#1e1e1e" xml:space="preserve">EEG: 50.0 µV</text>
+<rect x="100" y="0" width="60" height="300" fill="#d23c3c" fill-opacity="0.196" stroke="none"/>
+<line x1="100" y1="0" x2="100" y2="300" stroke="#d23c3c" stroke-opacity="0.706" stroke-width="2" stroke-linecap="square" stroke-linejoin="bevel"/>
+<line x1="160" y1="0" x2="160" y2="300" stroke="#d23c3c" stroke-opacity="0.706" stroke-width="2" stroke-linecap="square" stroke-linejoin="bevel"/>
+<rect x="104" y="4" width="47" height="15" fill="#d23c3c" fill-opacity="0.843" stroke="none"/>
+<text x="127.5" y="15" font-family="sans-serif" font-size="10.667" font-weight="bold" text-anchor="middle" fill="#ffffff" xml:space="preserve">30 ms</text>
+</svg>

@@ -1,0 +1,89 @@
+---
+id: trace-source
+title: "mne::scene::TraceSource"
+sidebar_label: TraceSource
+sidebar_position: 64
+---
+
+# TraceSource
+
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/trace_view.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/trace_view.h)
+
+`#include <mne/scene/trace_view.h>`
+
+```cpp
+class mne::scene::TraceSource
+```
+
+The channels a [`TraceView`](/docs/api/scene/trace-view) shows, as the view needs them for its overlays and its channel window.
+
+Channels are addressed by their logical index: the position in the list of channels the view scrolls through, after any channel filter of the host.
+
+---
+
+## Public Methods
+
+### ~TraceSource()
+
+---
+
+### channel_count()
+
+**Returns:**
+
+- *int* — The number of logical channels the view scrolls through.
+
+---
+
+### channel(index)
+
+**Parameters:**
+
+- **index** : *int*
+  Logical channel index.
+
+**Returns:**
+
+- *std::optional&lt; Channel &gt;* — The channel, or nothing if `index` maps to no channel.
+
+---
+
+### value_at(index, sample)
+
+**Parameters:**
+
+- **index** : *int*
+  Logical channel index.
+
+- **sample** : *int*
+  Absolute sample index.
+
+**Returns:**
+
+- *float* — The raw value of the channel at `sample` in physical units, 0 if unknown.
+
+---
+
+### groups()
+
+**Returns:**
+
+- *std::vector&lt; Group &gt;* — The lanes of the butterfly mode, in display order.
+
+---
+
+### first_sample()
+
+**Returns:**
+
+- *int* — The first sample that can be scrolled to (the first loaded sample).
+
+---
+
+## Example
+
+No example of its own: Interface a trace host implements to feed TraceView; disp::ChannelRhiRenderer adapts its channel model to it.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

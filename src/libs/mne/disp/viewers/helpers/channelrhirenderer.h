@@ -9,9 +9,10 @@
  * @date     November 2026
  * @brief    Widgets-free QRhi renderer and input handler of the raw-data channel trace view.
  *
- * ChannelRhiRenderer holds the complete state of the GPU raw-trace view (scroll, zoom, channel window,
- * events, annotations, crosshair, ruler, scalebars), its QRhi pipelines and buffers, and records a frame
- * into any QRhi render target. It only depends on QtCore and QtGui: a host (the @c QRhiWidget
+ * ChannelRhiRenderer holds the GPU raw-trace view: its QRhi pipelines and buffers, events and display
+ * options, and records a frame into any QRhi render target. The viewport and interaction state (scroll,
+ * zoom, channel window, annotations, crosshair, ruler, scalebars) and the overlay drawing live in the
+ * Qt-free @ref mne::scene::TraceView, which the renderer feeds with converted input events. It only depends on QtCore and QtGui: a host (the @c QRhiWidget
  * @ref mne::disp::ChannelRhiView or the @c QWindow @ref mne::disp::ChannelWindow) implements
  * @ref mne::disp::ChannelRhiHost, forwards its input events and calls renderFrame().
  */
@@ -25,6 +26,7 @@
 
 #include "../../disp_global.h"
 #include "channeldatamodel.h"
+#include <mne/scene/trace_view.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -42,7 +44,6 @@
 // STL INCLUDES
 //=============================================================================================================
 
-#include <chrono>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -482,7 +483,7 @@ public:
      */
     float scrollSample() const
     {
-        return m_scrollSample;
+        return static_cast<float>(m_view.scroll_sample());
     }
 
     //=========================================================================================================
@@ -493,7 +494,7 @@ public:
      */
     float samplesPerPixel() const
     {
-        return m_samplesPerPixel;
+        return static_cast<float>(m_view.samples_per_pixel());
     }
 
     //=========================================================================================================
@@ -614,7 +615,7 @@ public:
      */
     int firstVisibleChannel() const
     {
-        return m_firstVisibleChannel;
+        return m_view.first_visible_channel();
     }
 
     //=========================================================================================================
@@ -633,7 +634,7 @@ public:
      */
     int visibleChannelCount() const
     {
-        return m_visibleChannelCount;
+        return m_view.visible_channel_count();
     }
 
     //=========================================================================================================
@@ -652,7 +653,7 @@ public:
      */
     bool isFrozen() const
     {
-        return m_frozen;
+        return m_view.frozen();
     }
 
     //=========================================================================================================
@@ -706,7 +707,7 @@ public:
      */
     int lastFileSample() const
     {
-        return m_lastFileSample;
+        return m_view.last_file_sample();
     }
 
     //=========================================================================================================
@@ -725,7 +726,7 @@ public:
      */
     bool wheelScrollsChannels() const
     {
-        return m_wheelScrollsChannels;
+        return m_view.wheel_scrolls_channels();
     }
 
     //=========================================================================================================
@@ -744,7 +745,7 @@ public:
      */
     float scrollSpeedFactor() const
     {
-        return m_scrollSpeedFactor;
+        return static_cast<float>(m_view.scroll_speed_factor());
     }
 
     //=========================================================================================================
@@ -782,7 +783,7 @@ public:
      */
     bool crosshairEnabled() const
     {
-        return m_crosshairEnabled;
+        return m_view.crosshair_enabled();
     }
 
     //=========================================================================================================
@@ -801,7 +802,7 @@ public:
      */
     bool clockTimeFormat() const
     {
-        return m_useClockTime;
+        return m_view.clock_time_format();
     }
 
     //=========================================================================================================
@@ -830,7 +831,7 @@ public:
      */
     bool scalebarsVisible() const
     {
-        return m_scalebarsVisible;
+        return m_view.scalebars_visible();
     }
 
     //=========================================================================================================
@@ -849,7 +850,7 @@ public:
      */
     bool butterflyMode() const
     {
-        return m_butterflyMode;
+        return m_view.butterfly_mode();
     }
 
 signals:
@@ -930,14 +931,13 @@ private:
     QFont hostFont() const;
     void requestUpdate();
 
-    float clampScrollSample(float sample) const;
-    void stopScrollAnimations();
+    class TraceSourceAdapter;
 
-    void drawCrosshair(QPainter& p) const;
-    void drawScalebars(QPainter& p) const;
-    void drawRulerOverlay(QPainter& p) const;
-    void drawAnnotationSelectionOverlay(QPainter& p) const;
-    void emitCursorData();
+    void connectView();
+    scene::TraceView& view() const; // the TraceView, sized like the host
+    bool forwardPointer(QMouseEvent* event, scene::PointerEvent::Type type);
+    void stopScrollAnimations();
+    std::vector<AnnotationSpan> annotationSpans() const;
 
     // ── GPU resource management ────────────────────────────────────────
     struct ChannelGpuData
@@ -995,45 +995,17 @@ private:
 
     // ── Shared browser state ───────────────────────────────────────────
     QPointer<ChannelDataModel> m_model;
-    float m_scrollSample = 0.f;
-    float m_samplesPerPixel = 1.f;
+    std::unique_ptr<TraceSourceAdapter> m_traceSource; // the model's channels for m_view
+    mutable scene::TraceView m_view;                   // viewport, input and overlays; sized by view()
     float m_prefetchFactor = 1.0f;
     QColor m_bgColor{250, 250, 250}; // light default
 
-    bool m_frozen = false;
     bool m_gridVisible = true;
-    float m_sfreq = 1000.f;
-    int m_firstFileSample = 0;
-    int m_lastFileSample = -1;          // -1 = no limit (file not yet known)
-    bool m_wheelScrollsChannels = true; // default: vertical wheel → channels
-    float m_scrollSpeedFactor = 1.0f;   // multiplier for wheel/keyboard scroll
     bool m_hideBadChannels = false;
 
-    // ── Vertical channel windowing ────────────────────────────────────
-    int m_firstVisibleChannel = 0;
-    int m_visibleChannelCount = 12;
-
-    // ── Drag scroll support ────────────────────────────────────────────
-    bool m_dragging = false;
-    int m_dragStartX = 0;
-    float m_dragStartScroll = 0.f;
-
-    // ── Left-button drag (panning) + inertial scroll ──────────────────
-    bool m_leftButtonDown = false;
-    int m_leftDownX = 0;
-    float m_leftDownScroll = 0.f;
-    bool m_leftDragActivated = false;
-
-    struct VelocitySample
-    {
-        int x;
-        std::int64_t t;
-    };
-    std::vector<VelocitySample> m_velocityHistory;
-    std::chrono::steady_clock::time_point m_dragStart;
+    // ── Scroll animations started for m_view ──────────────────────────
     QPropertyAnimation* m_pInertialAnim = nullptr;
     QPointer<QPropertyAnimation> m_pScrollAnim;
-    float m_scrollTarget = 0.f;
 
     // ── Channel index filter ──────────────────────────────────────────
     std::vector<int> m_filteredChannels;
@@ -1041,28 +1013,11 @@ private:
     // ── Event / stimulus markers ──────────────────────────────────────
     std::vector<EventMarker> m_events;
     std::vector<int> m_epochTriggerSamples;
-    std::vector<AnnotationSpan> m_annotations;
-    bool m_annotationSelectionEnabled = false;
     bool m_bShowEvents = true;
     bool m_bShowAnnotations = true;
     bool m_bShowEpochMarkers = true;
     bool m_bShowClipping = true;
     bool m_bZScoreMode = false;
-
-    // ── Annotation boundary drag-resize ───────────────────────────────
-    bool m_annDragging = false;                 ///< True while dragging an annotation boundary.
-    int m_annDragIndex = -1;                    ///< Index of the annotation being resized.
-    bool m_annDragIsStart = true;               ///< True if dragging the start boundary.
-    int m_annHoverIndex = -1;                   ///< Index of annotation whose boundary is under cursor.
-    bool m_annHoverIsStart = true;              ///< True if cursor is near the start boundary.
-    static constexpr int kAnnBoundaryHitPx = 5; ///< Hit-test tolerance in pixels.
-
-    // ── Annotation range selection (right-drag when annotation mode ON) ─
-    bool m_annSelecting = false; ///< True while right-dragging to select a new annotation range.
-    int m_annSelX0 = 0;          ///< Press position (screen px).
-    int m_annSelX1 = 0;          ///< Current cursor position (screen px).
-
-    int hitTestAnnotationBoundary(int px, bool& isStart) const;
 
     int actualChannelAt(int logicalIdx) const; // maps logical → model channel index
     std::vector<int> effectiveChannelIndices() const;
@@ -1070,34 +1025,6 @@ private:
     // ── Prefetch window tracking ───────────────────────────────────────
     int m_vboWindowFirst = 0;
     int m_vboWindowLast = 0;
-
-    // ── Ruler / measurement overlay (active while the right button is held) ──
-    enum class RulerSnap
-    {
-        Free,
-        Horizontal,
-        Vertical
-    };
-    bool m_rulerActive = false;
-    RulerSnap m_rulerSnap = RulerSnap::Free;
-    int m_rulerX0 = 0; // press position (screen px)
-    int m_rulerY0 = 0;
-    int m_rulerX1 = 0; // current cursor position (may be snapped)
-    int m_rulerY1 = 0;
-    int m_rulerRawX1 = 0; // raw cursor position (unsnapped)
-    int m_rulerRawY1 = 0;
-
-    // ── Crosshair cursor ──────────────────────────────────────────────
-    bool m_crosshairEnabled = false;
-    int m_crosshairX = -1; // screen px, -1 = not tracking
-    int m_crosshairY = -1;
-    bool m_useClockTime = false; // mirror of TimeRulerWidget time format
-
-    // ── Scalebars ─────────────────────────────────────────────────────
-    bool m_scalebarsVisible = false;
-
-    // ── Butterfly mode ────────────────────────────────────────────────
-    bool m_butterflyMode = false;
 
     struct ButterflyTypeGroup
     {

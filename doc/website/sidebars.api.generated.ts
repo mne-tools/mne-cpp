@@ -867,7 +867,11 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/scene/transform',
         'api/scene/filter-response-plot',
         'api/scene/sensor-layout',
-        'api/scene/average-layout'
+        'api/scene/average-layout',
+        'api/scene/trace-view',
+        'api/scene/trace-source',
+        'api/scene/pointer-event',
+        'api/scene/wheel-event'
       ],
     }
 ];

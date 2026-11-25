@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include "channelrhirenderer.h"
+#include "../../plots/helpers/scenepainter.h"
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
 
@@ -37,12 +38,12 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <chrono>
 #include <cmath>
 #include <cstring>
 #include <map>
 #include <set>
 #include <string>
-#include <string_view>
 #include <unordered_map>
 #include <utility>
 
@@ -51,6 +52,7 @@
 //=============================================================================================================
 
 using namespace mne::disp;
+namespace scene = mne::scene;
 
 //=============================================================================================================
 // Uniform block layout — must match channeldata.vert / channeldata.frag
@@ -134,6 +136,93 @@ static void writeFloats(quint8* base, int byteOffset, const float* data, int cou
     memcpy(base + byteOffset, data, count * sizeof(float));
 }
 
+static scene::Modifier toSceneModifiers(Qt::KeyboardModifiers modifiers)
+{
+    scene::Modifier result = scene::Modifier::None;
+    if (modifiers & Qt::ShiftModifier)
+        result = result | scene::Modifier::Shift;
+    if (modifiers & Qt::ControlModifier)
+        result = result | scene::Modifier::Ctrl;
+    if (modifiers & Qt::AltModifier)
+        result = result | scene::Modifier::Alt;
+    if (modifiers & Qt::MetaModifier)
+        result = result | scene::Modifier::Meta;
+    return result;
+}
+
+static scene::MouseButton toSceneButton(Qt::MouseButton button)
+{
+    switch (button) {
+        case Qt::LeftButton:
+            return scene::MouseButton::Left;
+        case Qt::RightButton:
+            return scene::MouseButton::Right;
+        case Qt::MiddleButton:
+            return scene::MouseButton::Middle;
+        default:
+            return scene::MouseButton::None;
+    }
+}
+
+// Monotonic time of an input event; the drag velocity of TraceView is measured with it
+static std::int64_t monotonicMs()
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
+//=============================================================================================================
+// TRACE SOURCE
+//=============================================================================================================
+
+/**
+ * The channels of the renderer's model as the TraceView sees them: logical (filtered) channel indices.
+ */
+class ChannelRhiRenderer::TraceSourceAdapter : public scene::TraceSource
+{
+public:
+    explicit TraceSourceAdapter(const ChannelRhiRenderer& renderer)
+    : m_renderer(renderer)
+    {
+    }
+
+    int channel_count() const override
+    {
+        return m_renderer.totalLogicalChannels();
+    }
+
+    std::optional<Channel> channel(int index) const override
+    {
+        const int ch = m_renderer.actualChannelAt(index);
+        if (!m_renderer.m_model || ch < 0)
+            return std::nullopt;
+        ChannelDisplayInfo info = m_renderer.m_model->channelInfo(ch);
+        return Channel{std::move(info.name), std::move(info.typeLabel), info.amplitudeMax};
+    }
+
+    float value_at(int index, int sample) const override
+    {
+        const int ch = m_renderer.actualChannelAt(index);
+        return (m_renderer.m_model && ch >= 0) ? m_renderer.m_model->sampleValueAt(ch, sample) : 0.f;
+    }
+
+    std::vector<Group> groups() const override
+    {
+        std::vector<Group> groups;
+        for (const ButterflyTypeGroup& group : m_renderer.butterflyTypeGroups())
+            groups.push_back({group.typeLabel, group.amplitudeMax});
+        return groups;
+    }
+
+    int first_sample() const override
+    {
+        const ChannelDataModel* model = m_renderer.m_model.data();
+        return (model && model->totalSamples() > 0) ? model->firstSample() : 0;
+    }
+
+private:
+    const ChannelRhiRenderer& m_renderer;
+};
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -141,7 +230,11 @@ static void writeFloats(quint8* base, int byteOffset, const float* data, int cou
 ChannelRhiRenderer::ChannelRhiRenderer(ChannelRhiHost* host, QObject* parent)
 : QObject(parent)
 , m_pHost(host)
+, m_traceSource(std::make_unique<TraceSourceAdapter>(*this))
 {
+    m_view.set_source(m_traceSource.get());
+    connectView();
+
     // Repaint when the app regains focus
     if (qGuiApp) {
         connect(qGuiApp, &QGuiApplication::applicationStateChanged,
@@ -150,6 +243,119 @@ ChannelRhiRenderer::ChannelRhiRenderer(ChannelRhiHost* host, QObject* parent)
                         requestUpdate();
                 });
     }
+}
+
+//=============================================================================================================
+
+void ChannelRhiRenderer::connectView()
+{
+    scene::TraceView::Effects effects;
+    effects.scroll_changed = [this](double) {
+        const float sample = scrollSample();
+
+        // Check whether the prefetch window is still valid
+        const float visible = static_cast<float>(viewWidth()) * samplesPerPixel();
+        const float margin = m_prefetchFactor * visible;
+        if (sample < m_vboWindowFirst + margin || sample + visible > m_vboWindowLast - margin) {
+            m_vboDirty = true;
+        }
+
+        // Overlay prefetch: only rebuild when scroll exceeds the cached sample range.
+        // The shader handles bands via uniforms, so we only need to rebuild when
+        // annotations/events would be outside the cached texture.
+        if (m_overlayTotalSamples <= 0.f || sample < m_overlayFirstSample ||
+            sample + visible > m_overlayFirstSample + m_overlayTotalSamples) {
+            m_overlayDirty = true;
+        }
+
+        emit scrollSampleChanged(sample);
+        requestUpdate();
+    };
+    effects.zoom_changed = [this](double) {
+        m_vboDirty = true; // zoom change → decimation changes
+        m_overlayDirty = true;
+        emit samplesPerPixelChanged(samplesPerPixel());
+        requestUpdate();
+    };
+    effects.channel_offset_changed = [this](int firstChannel) {
+        m_vboDirty = true;
+        m_pipelineDirty = true;
+        emit channelOffsetChanged(firstChannel);
+        requestUpdate();
+    };
+    effects.animate_scroll = [this](const scene::TraceView::ScrollAnimation& animation) {
+        auto* anim = new QPropertyAnimation(this, "scrollSample", this);
+        anim->setDuration(animation.duration_ms);
+        anim->setEasingCurve(QEasingCurve::OutCubic);
+        anim->setStartValue(static_cast<float>(animation.from));
+        anim->setEndValue(static_cast<float>(animation.to));
+        if (animation.inertial) {
+            m_pInertialAnim = anim;
+            connect(anim, &QPropertyAnimation::finished, this, [this]() {
+                m_pInertialAnim = nullptr;
+            });
+        } else {
+            m_pScrollAnim = anim;
+            connect(anim, &QPropertyAnimation::finished, this, [this]() {
+                m_view.scroll_animation_finished();
+            });
+        }
+        anim->start(QAbstractAnimation::DeleteWhenStopped);
+    };
+    effects.animate_zoom = [this](const scene::TraceView::ZoomAnimation& animation) {
+        auto* anim = new QPropertyAnimation(this, "samplesPerPixel", this);
+        anim->setDuration(animation.duration_ms);
+        anim->setEasingCurve(QEasingCurve::OutCubic);
+        anim->setStartValue(static_cast<float>(animation.from));
+        anim->setEndValue(static_cast<float>(animation.to));
+        anim->start(QAbstractAnimation::DeleteWhenStopped);
+    };
+    effects.stop_animations = [this] {
+        stopScrollAnimations();
+    };
+    effects.sample_clicked = [this](int sample) {
+        emit sampleClicked(sample);
+    };
+    effects.range_selected = [this](int startSample, int endSample) {
+        emit sampleRangeSelected(startSample, endSample);
+    };
+    effects.annotation_boundary_moved = [this](int index, bool isStart, int sample) {
+        emit annotationBoundaryMoved(index, isStart, sample);
+    };
+    effects.annotations_changed = [this] {
+        m_overlayDirty = true;
+        requestUpdate();
+    };
+    effects.channel_double_clicked = [this](int logicalChannel) {
+        const int ch = actualChannelAt(logicalChannel);
+        if (m_model && ch >= 0) {
+            m_model->setChannelBad(ch, !m_model->channelInfo(ch).bad);
+        }
+    };
+    effects.cursor_changed = [this](scene::CursorShape shape) {
+        if (!m_pHost)
+            return;
+        if (shape == scene::CursorShape::SizeHorizontal)
+            m_pHost->setCursorShape(Qt::SizeHorCursor);
+        else
+            m_pHost->unsetCursorShape();
+    };
+    effects.cursor_data_changed = [this](const scene::TraceView::CursorData& data) {
+        emit cursorDataChanged(data.time_sec, data.amplitude, QString::fromStdString(data.channel_name),
+                               QString::fromStdString(data.unit_label));
+    };
+    effects.redraw = [this] {
+        requestUpdate();
+    };
+    m_view.set_effects(std::move(effects));
+}
+
+//=============================================================================================================
+
+scene::TraceView& ChannelRhiRenderer::view() const
+{
+    m_view.set_view_size(viewWidth(), viewHeight());
+    return m_view;
 }
 
 //=============================================================================================================
@@ -226,87 +432,23 @@ void ChannelRhiRenderer::setModel(ChannelDataModel* model)
 
 //=============================================================================================================
 
-float ChannelRhiRenderer::clampScrollSample(float sample) const
-{
-    // Never scroll before the first available sample
-    if (m_model && m_model->totalSamples() > 0)
-        sample = qMax(sample, static_cast<float>(m_model->firstSample()));
-    else
-        sample = qMax(sample, 0.f);
-
-    // Never scroll past the file end (clamp upper bound when file bounds are known)
-    if (m_lastFileSample >= 0) {
-        float maxScroll = static_cast<float>(m_lastFileSample - visibleSampleCount() + 1);
-        maxScroll = qMax(maxScroll, static_cast<float>(m_firstFileSample));
-        sample = qMin(sample, maxScroll);
-    }
-    return sample;
-}
-
-//=============================================================================================================
-
 void ChannelRhiRenderer::setScrollSample(float sample)
 {
-    sample = clampScrollSample(sample);
-
-    // Exact: a relative fuzzy compare ignores steps below 1e-5 of the position (10 samples at 10^6)
-    if (m_scrollSample == sample)
-        return;
-
-    m_scrollSample = sample;
-
-    // Check whether the prefetch window is still valid
-    float visible = viewWidth() * m_samplesPerPixel;
-    float margin = m_prefetchFactor * visible;
-    if (sample < m_vboWindowFirst + margin ||
-        sample + visible > m_vboWindowLast - margin) {
-        m_vboDirty = true;
-    }
-
-    // Overlay prefetch: only rebuild when scroll exceeds the cached sample range.
-    // The shader handles bands via uniforms, so we only need to rebuild when
-    // annotations/events would be outside the cached texture.
-    if (m_overlayTotalSamples <= 0.f ||
-        sample < m_overlayFirstSample ||
-        sample + visible > m_overlayFirstSample + m_overlayTotalSamples) {
-        m_overlayDirty = true;
-    }
-
-    emit scrollSampleChanged(m_scrollSample);
-    requestUpdate();
+    view().set_scroll_sample(sample);
 }
 
 //=============================================================================================================
 
 void ChannelRhiRenderer::setSamplesPerPixel(float spp)
 {
-    spp = qMax(spp, 1e-4f);
-    if (qFuzzyCompare(m_samplesPerPixel, spp))
-        return;
-    m_samplesPerPixel = spp;
-    m_vboDirty = true; // zoom change → decimation changes
-    m_overlayDirty = true;
-    emit samplesPerPixelChanged(m_samplesPerPixel);
-    requestUpdate();
+    view().set_samples_per_pixel(spp);
 }
 
 //=============================================================================================================
 
 void ChannelRhiRenderer::scrollTo(float targetSample, int durationMs)
 {
-    // A running animation would keep writing scrollSample and fight the new one
-    stopScrollAnimations();
-    if (durationMs <= 0) {
-        setScrollSample(targetSample);
-        return;
-    }
-    m_scrollTarget = clampScrollSample(targetSample);
-    m_pScrollAnim = new QPropertyAnimation(this, "scrollSample", this);
-    m_pScrollAnim->setDuration(durationMs);
-    m_pScrollAnim->setEasingCurve(QEasingCurve::OutCubic);
-    m_pScrollAnim->setStartValue(m_scrollSample);
-    m_pScrollAnim->setEndValue(m_scrollTarget);
-    m_pScrollAnim->start(QAbstractAnimation::DeleteWhenStopped);
+    view().scroll_to(targetSample, durationMs);
 }
 
 //=============================================================================================================
@@ -326,24 +468,14 @@ void ChannelRhiRenderer::stopScrollAnimations()
 
 void ChannelRhiRenderer::scrollBy(float deltaSamples, int durationMs)
 {
-    scrollTo((m_pScrollAnim ? m_scrollTarget : m_scrollSample) + deltaSamples, durationMs);
+    view().scroll_by(deltaSamples, durationMs);
 }
 
 //=============================================================================================================
 
 void ChannelRhiRenderer::zoomTo(float targetSpp, int durationMs)
 {
-    targetSpp = qMax(targetSpp, 1e-4f);
-    if (durationMs <= 0) {
-        setSamplesPerPixel(targetSpp);
-        return;
-    }
-    auto* anim = new QPropertyAnimation(this, "samplesPerPixel", this);
-    anim->setDuration(durationMs);
-    anim->setEasingCurve(QEasingCurve::OutCubic);
-    anim->setStartValue(m_samplesPerPixel);
-    anim->setEndValue(targetSpp);
-    anim->start(QAbstractAnimation::DeleteWhenStopped);
+    view().zoom_to(targetSpp, durationMs);
 }
 
 //=============================================================================================================
@@ -366,39 +498,29 @@ void ChannelRhiRenderer::setPrefetchFactor(float factor)
 
 int ChannelRhiRenderer::visibleFirstSample() const
 {
-    return static_cast<int>(m_scrollSample);
+    return m_view.visible_first_sample();
 }
 
 //=============================================================================================================
 
 int ChannelRhiRenderer::visibleSampleCount() const
 {
-    return static_cast<int>(viewWidth() * m_samplesPerPixel);
+    return view().visible_sample_count();
 }
 
 //=============================================================================================================
 
 void ChannelRhiRenderer::setFirstVisibleChannel(int ch)
 {
-    int maxFirst = qMax(0, totalLogicalChannels() - m_visibleChannelCount);
-    ch = qBound(0, ch, maxFirst);
-    if (ch == m_firstVisibleChannel)
-        return;
-    m_firstVisibleChannel = ch;
-    m_vboDirty = true;
-    m_pipelineDirty = true;
-    emit channelOffsetChanged(m_firstVisibleChannel);
-    requestUpdate();
+    m_view.set_first_visible_channel(ch);
 }
 
 //=============================================================================================================
 
 void ChannelRhiRenderer::setVisibleChannelCount(int count)
 {
-    count = qMax(1, count);
-    if (count == m_visibleChannelCount)
+    if (!m_view.set_visible_channel_count(count))
         return;
-    m_visibleChannelCount = count;
     m_vboDirty = true;
     m_pipelineDirty = true;
     requestUpdate();
@@ -408,10 +530,7 @@ void ChannelRhiRenderer::setVisibleChannelCount(int count)
 
 void ChannelRhiRenderer::setFrozen(bool frozen)
 {
-    m_frozen = frozen;
-    if (m_frozen) {
-        stopScrollAnimations();
-    }
+    m_view.set_frozen(frozen);
 }
 
 //=============================================================================================================
@@ -429,7 +548,7 @@ void ChannelRhiRenderer::setGridVisible(bool visible)
 
 void ChannelRhiRenderer::setSfreq(float sfreq)
 {
-    m_sfreq = qMax(sfreq, 0.f);
+    m_view.set_sfreq(sfreq);
     m_overlayDirty = true;
     requestUpdate();
 }
@@ -438,9 +557,8 @@ void ChannelRhiRenderer::setSfreq(float sfreq)
 
 void ChannelRhiRenderer::setFirstFileSample(int first)
 {
-    if (first == m_firstFileSample)
+    if (!m_view.set_first_file_sample(first))
         return;
-    m_firstFileSample = first;
     m_overlayDirty = true;
     requestUpdate();
 }
@@ -449,7 +567,7 @@ void ChannelRhiRenderer::setFirstFileSample(int first)
 
 void ChannelRhiRenderer::setLastFileSample(int last)
 {
-    m_lastFileSample = last;
+    m_view.set_last_file_sample(last);
 }
 
 //=============================================================================================================
@@ -459,13 +577,9 @@ void ChannelRhiRenderer::setHideBadChannels(bool hide)
     if (m_hideBadChannels == hide)
         return;
 
-    const int previousFirstVisibleChannel = m_firstVisibleChannel;
     m_hideBadChannels = hide;
-    const int maxFirst = qMax(0, totalLogicalChannels() - m_visibleChannelCount);
-    m_firstVisibleChannel = qBound(0, m_firstVisibleChannel, maxFirst);
-    if (m_firstVisibleChannel != previousFirstVisibleChannel) {
-        emit channelOffsetChanged(m_firstVisibleChannel);
-    }
+    // Re-clamp the channel window to the new channel count
+    m_view.set_first_visible_channel(m_view.first_visible_channel());
     m_vboDirty = true;
     m_pipelineDirty = true;
     requestUpdate();
@@ -475,27 +589,24 @@ void ChannelRhiRenderer::setHideBadChannels(bool hide)
 
 void ChannelRhiRenderer::setWheelScrollsChannels(bool channelsMode)
 {
-    m_wheelScrollsChannels = channelsMode;
+    m_view.set_wheel_scrolls_channels(channelsMode);
 }
 
 //=============================================================================================================
 
 void ChannelRhiRenderer::setScrollSpeedFactor(float factor)
 {
-    m_scrollSpeedFactor = qBound(0.25f, factor, 4.0f);
+    m_view.set_scroll_speed_factor(factor);
 }
 
 //=============================================================================================================
 
 void ChannelRhiRenderer::setCrosshairEnabled(bool enabled)
 {
-    if (m_crosshairEnabled == enabled)
+    if (!m_view.set_crosshair_enabled(enabled))
         return;
-    m_crosshairEnabled = enabled;
     if (m_pHost)
         m_pHost->setMouseTracking(enabled);
-    if (!enabled)
-        m_crosshairX = m_crosshairY = -1;
     requestUpdate();
 }
 
@@ -503,7 +614,7 @@ void ChannelRhiRenderer::setCrosshairEnabled(bool enabled)
 
 void ChannelRhiRenderer::setClockTimeFormat(bool useClock)
 {
-    m_useClockTime = useClock;
+    m_view.set_clock_time_format(useClock);
     requestUpdate();
 }
 
@@ -511,9 +622,8 @@ void ChannelRhiRenderer::setClockTimeFormat(bool useClock)
 
 void ChannelRhiRenderer::setScalebarsVisible(bool visible)
 {
-    if (m_scalebarsVisible == visible)
+    if (!m_view.set_scalebars_visible(visible))
         return;
-    m_scalebarsVisible = visible;
     requestUpdate();
 }
 
@@ -521,9 +631,8 @@ void ChannelRhiRenderer::setScalebarsVisible(bool visible)
 
 void ChannelRhiRenderer::setButterflyMode(bool enabled)
 {
-    if (m_butterflyMode == enabled)
+    if (!m_view.set_butterfly_mode(enabled))
         return;
-    m_butterflyMode = enabled;
     m_vboDirty = true;
     m_pipelineDirty = true;
     m_overlayDirty = true;
@@ -583,14 +692,9 @@ int ChannelRhiRenderer::butterflyLaneCount() const
 
 void ChannelRhiRenderer::setChannelIndices(const std::vector<int>& indices)
 {
-    const int previousFirstVisibleChannel = m_firstVisibleChannel;
     m_filteredChannels = indices;
-    // Clamp scroll to new range
-    int maxFirst = qMax(0, totalLogicalChannels() - m_visibleChannelCount);
-    m_firstVisibleChannel = qBound(0, m_firstVisibleChannel, maxFirst);
-    if (m_firstVisibleChannel != previousFirstVisibleChannel) {
-        emit channelOffsetChanged(m_firstVisibleChannel);
-    }
+    // Clamp the channel window to the new range
+    m_view.set_first_visible_channel(m_view.first_visible_channel());
     m_vboDirty = true;
     m_pipelineDirty = true;
     requestUpdate();
@@ -706,16 +810,34 @@ void ChannelRhiRenderer::setZScoreMode(bool enabled)
 
 void ChannelRhiRenderer::setAnnotations(const std::vector<AnnotationSpan>& annotations)
 {
-    m_annotations = annotations;
+    std::vector<scene::TraceView::Annotation> spans;
+    spans.reserve(annotations.size());
+    for (const AnnotationSpan& annotation : annotations) {
+        spans.push_back({annotation.startSample, annotation.endSample, toSceneColor(annotation.color), annotation.label});
+    }
+    m_view.set_annotations(std::move(spans));
     m_overlayDirty = true;
     requestUpdate();
 }
 
 //=============================================================================================================
 
+std::vector<ChannelRhiRenderer::AnnotationSpan> ChannelRhiRenderer::annotationSpans() const
+{
+    std::vector<AnnotationSpan> spans;
+    spans.reserve(m_view.annotations().size());
+    for (const scene::TraceView::Annotation& annotation : m_view.annotations()) {
+        const scene::Color& c = annotation.color;
+        spans.push_back({annotation.start_sample, annotation.end_sample, QColor(c.r, c.g, c.b, c.a), annotation.label});
+    }
+    return spans;
+}
+
+//=============================================================================================================
+
 void ChannelRhiRenderer::setAnnotationSelectionEnabled(bool enabled)
 {
-    m_annotationSelectionEnabled = enabled;
+    m_view.set_annotation_selection_enabled(enabled);
 }
 
 //=============================================================================================================
@@ -738,26 +860,6 @@ void ChannelRhiRenderer::setAnnotationsVisible(bool visible)
     m_bShowAnnotations = visible;
     m_overlayDirty = true;
     requestUpdate();
-}
-
-//=============================================================================================================
-
-int ChannelRhiRenderer::hitTestAnnotationBoundary(int px, bool& isStart) const
-{
-    for (int i = 0; i < std::ssize(m_annotations); ++i) {
-        const float xStart = (static_cast<float>(m_annotations[i].startSample) - m_scrollSample) / m_samplesPerPixel;
-        const float xEnd = (static_cast<float>(m_annotations[i].endSample + 1) - m_scrollSample) / m_samplesPerPixel;
-
-        if (qAbs(px - static_cast<int>(xStart)) <= kAnnBoundaryHitPx) {
-            isStart = true;
-            return i;
-        }
-        if (qAbs(px - static_cast<int>(xEnd)) <= kAnnBoundaryHitPx) {
-            isStart = false;
-            return i;
-        }
-    }
-    return -1;
 }
 
 //=============================================================================================================
@@ -809,10 +911,10 @@ void ChannelRhiRenderer::ensurePipeline(QRhi* rhi, QRhiRenderTarget* target)
     // In butterfly mode, we need a slot for EVERY channel (all overlaid)
     int totalCh = totalLogicalChannels();
     int nCh;
-    if (m_butterflyMode) {
+    if (m_view.butterfly_mode()) {
         nCh = qMin(totalCh, kMaxChannels);
     } else {
-        nCh = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
+        nCh = qMin(m_view.visible_channel_count(), totalCh - m_view.first_visible_channel());
     }
     nCh = qMax(nCh, 1);
     nCh = qMin(nCh, kMaxChannels);
@@ -893,9 +995,9 @@ bool ChannelRhiRenderer::isVboDirty() const
 {
     if (!m_model)
         return false;
-    float visible = viewWidth() * m_samplesPerPixel;
+    float visible = viewWidth() * samplesPerPixel();
     float margin = m_prefetchFactor * visible;
-    return m_vboDirty || m_scrollSample < m_vboWindowFirst + margin || (m_scrollSample + visible) > m_vboWindowLast - margin;
+    return m_vboDirty || scrollSample() < m_vboWindowFirst + margin || (scrollSample() + visible) > m_vboWindowLast - margin;
 }
 
 //=============================================================================================================
@@ -907,11 +1009,11 @@ void ChannelRhiRenderer::rebuildVBOs(QRhi* rhi, QRhiResourceUpdateBatch* batch)
 
     int nCh = totalLogicalChannels();
     int px = viewWidth();
-    float visible = px * m_samplesPerPixel;
+    float visible = px * samplesPerPixel();
 
     // Prefetch window: [scroll - prefetch*visible, scroll + (1+prefetch)*visible]
-    float windowFirst = m_scrollSample - m_prefetchFactor * visible;
-    float windowLast = m_scrollSample + (1.f + m_prefetchFactor) * visible;
+    float windowFirst = scrollSample() - m_prefetchFactor * visible;
+    float windowLast = scrollSample() + (1.f + m_prefetchFactor) * visible;
 
     int iFirst = qMax(static_cast<int>(windowFirst), m_model->firstSample());
     int iLast = qMin(static_cast<int>(windowLast),
@@ -942,7 +1044,7 @@ void ChannelRhiRenderer::rebuildVBOs(QRhi* rhi, QRhiResourceUpdateBatch* batch)
         }
         int vboFirst = 0;
         std::vector<float> verts = m_model->decimatedVertices(
-            ch, iFirst, iLast, static_cast<int>(prefetchedSamples / m_samplesPerPixel), vboFirst);
+            ch, iFirst, iLast, static_cast<int>(prefetchedSamples / samplesPerPixel()), vboFirst);
 
         if (verts.empty()) {
             m_gpuChannels[logCh].vertexCount = 0;
@@ -1003,7 +1105,7 @@ void ChannelRhiRenderer::updateUBO(QRhiResourceUpdateBatch* batch)
     int totalCh = totalLogicalChannels();
 
     // ── Butterfly mode: one UBO slot per channel, type-based lane positions ──
-    if (m_butterflyMode) {
+    if (m_view.butterfly_mode()) {
         const auto groups = butterflyTypeGroups();
         int nLanes = static_cast<int>(groups.size());
         if (nLanes <= 0)
@@ -1051,8 +1153,8 @@ void ChannelRhiRenderer::updateUBO(QRhiResourceUpdateBatch* batch)
             auto* d = buf.data();
             writeFloats(d, kUboOffsetColor, rgba, 4);
             writeFloat(d, kUboOffsetFirstSample, static_cast<float>(logCh < static_cast<int>(m_gpuChannels.size()) ? m_gpuChannels[logCh].vboFirstSample : 0));
-            writeFloat(d, kUboOffsetScrollSample, m_scrollSample);
-            writeFloat(d, kUboOffsetSampPerPixel, m_samplesPerPixel);
+            writeFloat(d, kUboOffsetScrollSample, scrollSample());
+            writeFloat(d, kUboOffsetSampPerPixel, samplesPerPixel());
             writeFloat(d, kUboOffsetViewWidth, vw);
             writeFloat(d, kUboOffsetViewHeight, vh);
             writeFloat(d, kUboOffsetChannelYCenter, yCenter);
@@ -1069,8 +1171,8 @@ void ChannelRhiRenderer::updateUBO(QRhiResourceUpdateBatch* batch)
     }
 
     // ── Normal mode: one UBO slot per visible row ──
-    int firstCh = qBound(0, m_firstVisibleChannel, totalCh);
-    int visCnt = qMin(m_visibleChannelCount, totalCh - firstCh);
+    int firstCh = qBound(0, m_view.first_visible_channel(), totalCh);
+    int visCnt = qMin(m_view.visible_channel_count(), totalCh - firstCh);
     int nCh = qMin(visCnt, kMaxChannels);
     if (nCh <= 0)
         return;
@@ -1107,8 +1209,8 @@ void ChannelRhiRenderer::updateUBO(QRhiResourceUpdateBatch* batch)
         writeFloats(d, kUboOffsetColor, rgba, 4);
         // VBO indexed by logical channel (logCh), not model channel
         writeFloat(d, kUboOffsetFirstSample, static_cast<float>(logCh < static_cast<int>(m_gpuChannels.size()) ? m_gpuChannels[logCh].vboFirstSample : 0));
-        writeFloat(d, kUboOffsetScrollSample, m_scrollSample);
-        writeFloat(d, kUboOffsetSampPerPixel, m_samplesPerPixel);
+        writeFloat(d, kUboOffsetScrollSample, scrollSample());
+        writeFloat(d, kUboOffsetSampPerPixel, samplesPerPixel());
         writeFloat(d, kUboOffsetViewWidth, vw);
         writeFloat(d, kUboOffsetViewHeight, vh);
         writeFloat(d, kUboOffsetChannelYCenter, yCenter);
@@ -1145,7 +1247,7 @@ void ChannelRhiRenderer::rebuildOverlayImage(int logicalWidth, int logicalHeight
     m_overlayImage.setDevicePixelRatio(dpr);
     m_overlayImage.fill(Qt::transparent);
 
-    if (logicalWidth <= 0 || logicalHeight <= 0 || m_sfreq <= 0.f || m_samplesPerPixel <= 0.f) {
+    if (logicalWidth <= 0 || logicalHeight <= 0 || static_cast<float>(m_view.sfreq()) <= 0.f || samplesPerPixel() <= 0.f) {
         m_overlayDirty = false;
         return;
     }
@@ -1165,13 +1267,13 @@ void ChannelRhiRenderer::rebuildOverlayImage(int logicalWidth, int logicalHeight
     // fragment shader — no QPainter band rendering here.
 
     // ── Annotation spans ────────────────────────────────────────────
-    if (m_bShowAnnotations && !m_annotations.empty()) {
+    if (m_bShowAnnotations && !m_view.annotations().empty()) {
         QFont font = p.font();
         font.setPointSizeF(8.0);
         font.setBold(true);
         p.setFont(font);
 
-        for (const AnnotationSpan& annotation : m_annotations) {
+        for (const AnnotationSpan& annotation : annotationSpans()) {
             const float xStart = (static_cast<float>(annotation.startSample) - overlayFirst) * overlayPixelsPerSample;
             const float xEnd = (static_cast<float>(annotation.endSample + 1) - overlayFirst) * overlayPixelsPerSample;
             if (xEnd < -2.f || xStart > logicalWidth + 2.f) {
@@ -1355,7 +1457,7 @@ bool ChannelRhiRenderer::ensureOverlayResources(QRhi* rhi, QRhiRenderTarget* tar
 
 bool ChannelRhiRenderer::hudVisible() const
 {
-    return (m_crosshairEnabled && m_crosshairX >= 0 && m_crosshairY >= 0) || m_scalebarsVisible || m_rulerActive || m_annSelecting;
+    return m_view.overlays_visible();
 }
 
 //=============================================================================================================
@@ -1363,15 +1465,9 @@ bool ChannelRhiRenderer::hudVisible() const
 void ChannelRhiRenderer::paintHud(QPainter& painter) const
 {
     painter.setRenderHint(QPainter::Antialiasing, false);
-
-    if (m_crosshairEnabled)
-        drawCrosshair(painter);
-    if (m_scalebarsVisible)
-        drawScalebars(painter);
-    if (m_rulerActive)
-        drawRulerOverlay(painter);
-    if (m_annSelecting)
-        drawAnnotationSelectionOverlay(painter);
+    const QFont font = hostFont();
+    const QtTextMetrics metrics(font);
+    paintScene(painter, view().render_overlays(metrics), font);
 }
 
 //=============================================================================================================
@@ -1478,9 +1574,9 @@ void ChannelRhiRenderer::renderFrame(QRhi* rhi, QRhiRenderTarget* target, QRhiCo
         // ── Overlay image (annotations + events; bands computed in shader) ──
         if (ensureOverlayResources(rhi, target, batch) && pw > 0 && ph > 0 && logicalW > 0 && logicalH > 0) {
             // Compute the overlay prefetch window (wider than the viewport)
-            const float visibleSamples = static_cast<float>(logicalW) * m_samplesPerPixel;
+            const float visibleSamples = static_cast<float>(logicalW) * samplesPerPixel();
             const float extraSamples = kOverlayPrefetchFactor * visibleSamples;
-            const float overlayFirstSample = m_scrollSample - extraSamples;
+            const float overlayFirstSample = scrollSample() - extraSamples;
             const float overlayTotalSamples = visibleSamples + 2.0f * extraSamples;
             // Width of overlay texture in logical pixels = 1 + 2*prefetch factor times viewport
             const int overlayLogicalW = static_cast<int>(std::ceil(
@@ -1516,11 +1612,11 @@ void ChannelRhiRenderer::renderFrame(QRhi* rhi, QRhiRenderTarget* target, QRhiCo
 
             // Upload per-frame overlay UBO (scroll params for shader-computed bands + UV mapping)
             OverlayParams params;
-            params.scrollSample = m_scrollSample;
-            params.samplesPerPixel = m_samplesPerPixel;
+            params.scrollSample = scrollSample();
+            params.samplesPerPixel = samplesPerPixel();
             params.viewWidth = static_cast<float>(logicalW);
-            params.sfreq = m_sfreq;
-            params.firstFileSample = static_cast<float>(m_firstFileSample);
+            params.sfreq = static_cast<float>(m_view.sfreq());
+            params.firstFileSample = static_cast<float>(m_view.first_file_sample());
             params.gridEnabled = m_gridVisible ? 1.0f : 0.0f;
             params.overlayFirstSample = m_overlayFirstSample;
             params.overlayTotalSamples = m_overlayTotalSamples;
@@ -1547,7 +1643,7 @@ void ChannelRhiRenderer::renderFrame(QRhi* rhi, QRhiRenderTarget* target, QRhiCo
 
         int totalCh = totalLogicalChannels();
 
-        if (m_butterflyMode) {
+        if (m_view.butterfly_mode()) {
             // Butterfly: render ALL channels; UBO slots indexed by logical channel
             int nToRender = qMin(totalCh, kMaxChannels);
             for (int logCh = 0; logCh < nToRender; ++logCh) {
@@ -1567,8 +1663,8 @@ void ChannelRhiRenderer::renderFrame(QRhi* rhi, QRhiRenderTarget* target, QRhiCo
             }
         } else {
             // Normal: render only the visible channel window
-            int firstCh = qBound(0, m_firstVisibleChannel, totalCh);
-            int visCnt = qMin(m_visibleChannelCount, totalCh - firstCh);
+            int firstCh = qBound(0, m_view.first_visible_channel(), totalCh);
+            int visCnt = qMin(m_view.visible_channel_count(), totalCh - firstCh);
             int nToRender = qMin(visCnt, kMaxChannels);
 
             for (int i = 0; i < nToRender; ++i) {
@@ -1617,28 +1713,28 @@ QImage ChannelRhiRenderer::renderToImage(const QSize& size) const
 {
     const int pw = size.isValid() ? size.width() : viewWidth();
     const int ph = size.isValid() ? size.height() : viewHeight();
-    if (!m_model || pw <= 0 || ph <= 0 || m_samplesPerPixel <= 0.f) {
+    if (!m_model || pw <= 0 || ph <= 0 || samplesPerPixel() <= 0.f) {
         return QImage();
     }
 
     // Same rows and horizontal scale as on screen: the time span shown stays the same at any output width
-    const float spp = m_samplesPerPixel * static_cast<float>(qMax(viewWidth(), 1)) / static_cast<float>(pw);
-    const float scrollSample = m_scrollSample;
+    const float spp = samplesPerPixel() * static_cast<float>(qMax(viewWidth(), 1)) / static_cast<float>(pw);
+    const float scrollSample = this->scrollSample();
     const QColor bgColor = m_bgColor;
     const bool gridVisible = m_gridVisible;
-    const float sfreq = m_sfreq;
-    const int firstFileSample = m_firstFileSample;
+    const float sfreq = static_cast<float>(m_view.sfreq());
+    const int firstFileSample = m_view.first_file_sample();
     const bool zScoreMode = m_bZScoreMode;
     const bool showClipping = m_bShowClipping;
     const std::vector<EventMarker> events = m_bShowEvents ? m_events : std::vector<EventMarker>();
-    const std::vector<AnnotationSpan> annotations = m_bShowAnnotations ? m_annotations : std::vector<AnnotationSpan>();
+    const std::vector<AnnotationSpan> annotations = m_bShowAnnotations ? annotationSpans() : std::vector<AnnotationSpan>();
     const std::vector<int> epochMarkers = m_bShowEpochMarkers ? m_epochTriggerSamples : std::vector<int>();
     const ChannelDataModel* model = m_model.data();
 
     // (model channel, lane) for every trace to draw, laid out exactly like updateUBO()
     std::vector<std::pair<int, int>> traces;
     int laneCount = 0;
-    if (m_butterflyMode) {
+    if (m_view.butterfly_mode()) {
         const std::vector<ButterflyTypeGroup> groups = butterflyTypeGroups();
         laneCount = static_cast<int>(groups.size());
         for (int lane = 0; lane < laneCount; ++lane) {
@@ -1648,8 +1744,8 @@ QImage ChannelRhiRenderer::renderToImage(const QSize& size) const
         }
     } else {
         const std::vector<int> channelIndices = effectiveChannelIndices();
-        const int firstCh = qBound(0, m_firstVisibleChannel, static_cast<int>(channelIndices.size()));
-        laneCount = qMin(m_visibleChannelCount, static_cast<int>(channelIndices.size()) - firstCh);
+        const int firstCh = qBound(0, m_view.first_visible_channel(), static_cast<int>(channelIndices.size()));
+        laneCount = qMin(m_view.visible_channel_count(), static_cast<int>(channelIndices.size()) - firstCh);
         for (int lane = 0; lane < laneCount; ++lane) {
             traces.push_back({channelIndices[firstCh + lane], lane});
         }
@@ -1689,7 +1785,10 @@ QImage ChannelRhiRenderer::renderToImage(const QSize& size) const
                               qRound(bgColor.green() * 0.92),
                               qRound(bgColor.blue() * 0.92));
 
-        for (float s = firstBound; s < lastSample; s += samplesPerSec, oddBand = !oddBand) {
+        for (int band = 0;; ++band, oddBand = !oddBand) {
+            const float s = firstBound + static_cast<float>(band) * samplesPerSec;
+            if (s >= static_cast<float>(lastSample))
+                break;
             if (!oddBand)
                 continue; // even seconds use the regular bgColor already filled
             float xStart = (s - scrollSample) / spp;
@@ -1737,7 +1836,10 @@ QImage ChannelRhiRenderer::renderToImage(const QSize& size) const
             float firstTick = std::ceil((scrollSample - origin) / tickSamples) * tickSamples + origin;
 
             p.setPen(QPen(QColor(205, 205, 210), 1));
-            for (float s = firstTick; s < lastSample; s += tickSamples) {
+            for (int tick = 0;; ++tick) {
+                const float s = firstTick + static_cast<float>(tick) * tickSamples;
+                if (s >= static_cast<float>(lastSample))
+                    break;
                 float xPx = (s - scrollSample) / spp;
                 p.drawLine(QPointF(xPx, 0), QPointF(xPx, ph));
             }
@@ -1885,441 +1987,6 @@ QImage ChannelRhiRenderer::renderToImage(const QSize& size) const
     return img;
 }
 
-//=============================================================================================================
-
-static QString formatAmplitude(float amp, const QString& unit)
-{
-    float absAmp = qAbs(amp);
-    if (absAmp == 0.f)
-        return QStringLiteral("0 ") + unit;
-    if (absAmp < 1e-9f)
-        return QString::number(amp * 1e12f, 'f', 1) + QStringLiteral(" p") + unit;
-    if (absAmp < 1e-6f)
-        return QString::number(amp * 1e9f, 'f', 1) + QStringLiteral(" n") + unit;
-    if (absAmp < 1e-3f)
-        return QString::number(amp * 1e6f, 'f', 1) + QStringLiteral(" µ") + unit;
-    if (absAmp < 1.f)
-        return QString::number(amp * 1e3f, 'f', 1) + QStringLiteral(" m") + unit;
-    return QString::number(amp, 'f', 3) + QStringLiteral(" ") + unit;
-}
-
-static QString unitForType(std::string_view typeLabel)
-{
-    if (typeLabel == "MEG grad")
-        return QStringLiteral("T/m");
-    if (typeLabel == "MEG mag" || typeLabel == "MEG")
-        return QStringLiteral("T");
-    if (typeLabel == "EEG" ||
-        typeLabel == "EOG" ||
-        typeLabel == "ECG" ||
-        typeLabel == "EMG")
-        return QStringLiteral("V");
-    return QStringLiteral("AU");
-}
-
-//=============================================================================================================
-
-void ChannelRhiRenderer::drawCrosshair(QPainter& p) const
-{
-    if (m_crosshairX < 0 || m_crosshairY < 0)
-        return;
-    if (!m_model || totalLogicalChannels() == 0)
-        return;
-
-    const int w = viewWidth();
-    const int h = viewHeight();
-
-    // Draw crosshair lines
-    QPen crossPen(QColor(80, 80, 80, 160), 1, Qt::DashLine);
-    p.setPen(crossPen);
-    p.drawLine(m_crosshairX, 0, m_crosshairX, h);
-    p.drawLine(0, m_crosshairY, w, m_crosshairY);
-
-    int sample = static_cast<int>(m_scrollSample + static_cast<float>(m_crosshairX) * m_samplesPerPixel);
-    float timeSec = (m_sfreq > 0.f) ? static_cast<float>(sample - m_firstFileSample) / m_sfreq : 0.f;
-    QString channelLabel;
-    QString unitStr;
-    float value = 0.f;
-
-    if (m_butterflyMode) {
-        // In butterfly mode, lanes correspond to type groups
-        const auto groups = butterflyTypeGroups();
-        int nLanes = static_cast<int>(groups.size());
-        if (nLanes <= 0)
-            return;
-        float laneH = static_cast<float>(h) / nLanes;
-        int lane = qBound(0, static_cast<int>(m_crosshairY / laneH), nLanes - 1);
-        channelLabel = QString::fromStdString(groups[lane].typeLabel);
-        unitStr = unitForType(groups[lane].typeLabel);
-    } else {
-        // Normal mode: determine the channel and sample under the cursor
-        int totalCh = totalLogicalChannels();
-        int visCnt = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
-        if (visCnt <= 0)
-            return;
-
-        float laneH = static_cast<float>(h) / visCnt;
-        int row = qBound(0, static_cast<int>(m_crosshairY / laneH), visCnt - 1);
-        int ch = actualChannelAt(m_firstVisibleChannel + row);
-        if (ch < 0)
-            return;
-
-        auto info = m_model->channelInfo(ch);
-        value = m_model->sampleValueAt(ch, sample);
-        channelLabel = QString::fromStdString(info.name);
-        unitStr = unitForType(info.typeLabel);
-    }
-
-    // Draw info label near cursor
-    QString timeStr;
-    if (m_useClockTime && timeSec >= 0.f) {
-        int totalMs = static_cast<int>(timeSec * 1000.f + 0.5f);
-        int m = totalMs / 60000;
-        int sec = (totalMs % 60000) / 1000;
-        int ms = totalMs % 1000;
-        timeStr = QString("%1:%2.%3")
-                      .arg(m, 2, 10, QChar('0'))
-                      .arg(sec, 2, 10, QChar('0'))
-                      .arg(ms, 3, 10, QChar('0'));
-    } else {
-        timeStr = QString::number(static_cast<double>(timeSec), 'f', 3) + QStringLiteral(" s");
-    }
-    QString label = QString("%1  %2  %3")
-                        .arg(channelLabel,
-                             timeStr,
-                             formatAmplitude(value, unitStr));
-
-    QFont f = hostFont();
-    f.setPointSizeF(8.5);
-    p.setFont(f);
-    QFontMetrics fm(f);
-    QRect labelRect = fm.boundingRect(label);
-    int lx = m_crosshairX + 10;
-    int ly = m_crosshairY - 10;
-    if (lx + labelRect.width() + 8 > w)
-        lx = m_crosshairX - labelRect.width() - 18;
-    if (ly - labelRect.height() < 4)
-        ly = m_crosshairY + labelRect.height() + 6;
-    labelRect.moveTopLeft(QPoint(lx, ly - labelRect.height()));
-    labelRect.adjust(-4, -2, 4, 2);
-    p.fillRect(labelRect, QColor(255, 255, 255, 220));
-    p.setPen(QColor(30, 30, 30));
-    p.drawText(labelRect, Qt::AlignCenter, label);
-}
-
-//=============================================================================================================
-
-void ChannelRhiRenderer::emitCursorData()
-{
-    if (m_crosshairX < 0 || m_crosshairY < 0)
-        return;
-    if (!m_model || totalLogicalChannels() == 0)
-        return;
-
-    const int h = viewHeight();
-    int sample = static_cast<int>(m_scrollSample + static_cast<float>(m_crosshairX) * m_samplesPerPixel);
-    float timeSec = (m_sfreq > 0.f) ? static_cast<float>(sample - m_firstFileSample) / m_sfreq : 0.f;
-
-    if (m_butterflyMode) {
-        const auto groups = butterflyTypeGroups();
-        int nLanes = static_cast<int>(groups.size());
-        if (nLanes <= 0)
-            return;
-        float laneH = static_cast<float>(h) / nLanes;
-        int lane = qBound(0, static_cast<int>(m_crosshairY / laneH), nLanes - 1);
-        emit cursorDataChanged(timeSec, 0.f,
-                               QString::fromStdString(groups[lane].typeLabel),
-                               unitForType(groups[lane].typeLabel));
-    } else {
-        int totalCh = totalLogicalChannels();
-        int visCnt = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
-        if (visCnt <= 0)
-            return;
-        float laneH = static_cast<float>(h) / visCnt;
-        int row = qBound(0, static_cast<int>(m_crosshairY / laneH), visCnt - 1);
-        int ch = actualChannelAt(m_firstVisibleChannel + row);
-        if (ch < 0)
-            return;
-        auto info = m_model->channelInfo(ch);
-        float value = m_model->sampleValueAt(ch, sample);
-        emit cursorDataChanged(timeSec, value, QString::fromStdString(info.name), unitForType(info.typeLabel));
-    }
-}
-
-//=============================================================================================================
-
-void ChannelRhiRenderer::drawScalebars(QPainter& p) const
-{
-    if (!m_model || totalLogicalChannels() == 0)
-        return;
-
-    int visCnt;
-    if (m_butterflyMode) {
-        visCnt = butterflyLaneCount();
-    } else {
-        int totalCh = totalLogicalChannels();
-        visCnt = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
-    }
-    if (visCnt <= 0)
-        return;
-
-    float laneH = static_cast<float>(viewHeight()) / visCnt;
-
-    // Collect unique channel types and their amplitude scales
-    std::map<std::string, float> typeScales;
-    if (m_butterflyMode) {
-        const auto groups = butterflyTypeGroups();
-        for (const auto& g : groups)
-            if (g.amplitudeMax > 0.f)
-                typeScales[g.typeLabel] = g.amplitudeMax;
-    } else {
-        for (int i = 0; i < visCnt; ++i) {
-            int ch = actualChannelAt(m_firstVisibleChannel + i);
-            if (ch < 0)
-                continue;
-            auto info = m_model->channelInfo(ch);
-            if (!typeScales.contains(info.typeLabel) && info.amplitudeMax > 0.f)
-                typeScales[info.typeLabel] = info.amplitudeMax;
-        }
-    }
-
-    if (typeScales.empty())
-        return;
-
-    QFont f = hostFont();
-    f.setPointSizeF(8.0);
-    p.setFont(f);
-    QFontMetrics fm(f);
-
-    // Draw scalebars in the bottom-right corner
-    const int margin = 12;
-    // amplitudeMax spans 45 % of a row (channeldata.vert); label the amplitude the drawn bar length stands for
-    const float scalePx = laneH * 0.45f;
-    const int barHeight = qBound(20, qRound(scalePx), 60);
-    int x = viewWidth() - margin;
-    int y = viewHeight() - margin;
-
-    for (auto it = typeScales.cend(); it != typeScales.cbegin();) {
-        --it;
-        QString unit = unitForType(it->first);
-        float ampValue = it->second * static_cast<float>(barHeight) / scalePx;
-        QString label = QString::fromStdString(it->first) + QStringLiteral(": ") + formatAmplitude(ampValue, unit);
-
-        int textW = fm.horizontalAdvance(label);
-        int barX = x - textW - 14;
-
-        // Background pill
-        QRect bgRect(barX - 4, y - barHeight - fm.height() - 4, textW + 22, barHeight + fm.height() + 8);
-        p.fillRect(bgRect, QColor(255, 255, 255, 200));
-
-        // Draw bar
-        QPen barPen(QColor(40, 40, 40), 2);
-        p.setPen(barPen);
-        int barTop = y - barHeight;
-        p.drawLine(barX + 4, barTop, barX + 4, y);
-        // Tick marks
-        p.drawLine(barX, barTop, barX + 8, barTop);
-        p.drawLine(barX, y, barX + 8, y);
-
-        // Label
-        p.setPen(QColor(30, 30, 30));
-        p.drawText(barX + 14, y - barHeight / 2 + fm.ascent() / 2, label);
-
-        y -= barHeight + fm.height() + 16;
-    }
-}
-
-//=============================================================================================================
-
-void ChannelRhiRenderer::drawRulerOverlay(QPainter& p) const
-{
-    int x0 = m_rulerX0, y0 = m_rulerY0;
-    int x1 = m_rulerX1, y1 = m_rulerY1;
-
-    const bool snapH = (m_rulerSnap == RulerSnap::Horizontal);
-    const bool snapV = (m_rulerSnap == RulerSnap::Vertical);
-
-    const QColor activeColor(40, 120, 200, 220);
-    const QColor dimColor(130, 160, 200, 120);
-    int tickLen = 5;
-
-    // ── Semi-transparent "frozen" overlay over the measured area ──
-    {
-        QRect measured;
-        if (snapH)
-            measured = QRect(QPoint(qMin(x0, x1), 0),
-                             QPoint(qMax(x0, x1), viewHeight()));
-        else if (snapV)
-            measured = QRect(QPoint(0, qMin(y0, y1)),
-                             QPoint(viewWidth(), qMax(y0, y1)));
-        else
-            measured = QRect(QPoint(qMin(x0, x1), qMin(y0, y1)),
-                             QPoint(qMax(x0, x1), qMax(y0, y1)));
-        p.fillRect(measured, QColor(255, 255, 255, 60));
-        // Subtle border around the measured region
-        p.setPen(QPen(QColor(40, 120, 200, 80), 1));
-        p.drawRect(measured);
-    }
-
-    // Vertical guide lines at the two X positions
-    QPen vLinePen(snapV ? dimColor : activeColor, 1, Qt::DashLine);
-    p.setPen(vLinePen);
-    p.drawLine(x0, 0, x0, viewHeight());
-    if (!snapV)
-        p.drawLine(x1, 0, x1, viewHeight());
-
-    // Horizontal guide lines at the two Y positions (only when vertical snap)
-    if (snapV) {
-        QPen hGuidePen(activeColor, 1, Qt::DashLine);
-        p.setPen(hGuidePen);
-        p.drawLine(0, y0, viewWidth(), y0);
-        p.drawLine(0, y1, viewWidth(), y1);
-    }
-
-    // Horizontal span line at y0
-    QPen hLinePen(snapV ? dimColor : activeColor, snapH ? 2 : 1);
-    p.setPen(hLinePen);
-    if (!snapV)
-        p.drawLine(qMin(x0, x1), y0, qMax(x0, x1), y0);
-
-    // Vertical span line at x0
-    QPen vSpanPen(snapH ? dimColor : activeColor, snapV ? 2 : 1);
-    p.setPen(vSpanPen);
-    if (!snapH)
-        p.drawLine(x0, qMin(y0, y1), x0, qMax(y0, y1));
-
-    // End tick marks
-    if (!snapV) {
-        p.setPen(QPen(activeColor, 1));
-        p.drawLine(x0 - tickLen, y0, x0 + tickLen, y0);
-        p.drawLine(x1 - tickLen, y0, x1 + tickLen, y0);
-    }
-    if (!snapH) {
-        p.setPen(QPen(activeColor, 1));
-        p.drawLine(x0, y0 - tickLen, x0, y0 + tickLen);
-        p.drawLine(x0, y1 - tickLen, x0, y1 + tickLen);
-    }
-
-    // ── Measurement labels ────────────────────────────────────────────
-    float deltaSamples = static_cast<float>(x1 - x0) * m_samplesPerPixel;
-    float deltaSec = (m_sfreq > 0.f) ? deltaSamples / m_sfreq : 0.f;
-
-    float deltaAmp = 0.f;
-    QString ampUnit = QStringLiteral("AU");
-    if (m_model && totalLogicalChannels() > 0) {
-        int totalCh = totalLogicalChannels();
-        int visCnt = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
-        if (visCnt > 0) {
-            float laneH = static_cast<float>(viewHeight()) / visCnt;
-            int row = qBound(0, static_cast<int>(y0 / laneH), visCnt - 1);
-            int ch = actualChannelAt(m_firstVisibleChannel + row);
-            if (ch < 0)
-                ch = 0;
-            auto info = m_model->channelInfo(ch);
-            if (info.amplitudeMax > 0.f) {
-                float dyPx = static_cast<float>(y1 - y0);
-                float yScale = info.amplitudeMax / (laneH * 0.45f);
-                deltaAmp = -dyPx * yScale;
-
-                ampUnit = unitForType(info.typeLabel);
-            }
-        }
-    }
-
-    auto fmtTime = [](float sec) -> QString {
-        float absSec = qAbs(sec);
-        if (absSec < 1.f)
-            return QString::number(sec * 1000.f, 'f', 1) + QStringLiteral(" ms");
-        return QString::number(sec, 'f', 3) + QStringLiteral(" s");
-    };
-    auto fmtAmp = [](float amp, const QString& unit) -> QString {
-        float absAmp = qAbs(amp);
-        if (absAmp < 1e-6f)
-            return QString::number(amp * 1e9f, 'f', 3) + QStringLiteral(" n") + unit;
-        if (absAmp < 1e-3f)
-            return QString::number(amp * 1e6f, 'f', 3) + QStringLiteral(" µ") + unit;
-        if (absAmp < 1.f)
-            return QString::number(amp * 1e3f, 'f', 3) + QStringLiteral(" m") + unit;
-        return QString::number(amp, 'f', 3) + QStringLiteral(" ") + unit;
-    };
-
-    QString timeLabel = QStringLiteral("\u0394T = ") + fmtTime(deltaSec);
-    QString ampLabel = QStringLiteral("\u0394A = ") + fmtAmp(deltaAmp, ampUnit);
-
-    QFont f = hostFont();
-    f.setPointSizeF(9.0);
-    f.setBold(true);
-    p.setFont(f);
-    QFontMetrics fm(f);
-
-    // Time label (shown unless vertical snap)
-    if (!snapV) {
-        int labelX = (x0 + x1) / 2;
-        int labelY = y0 - 6;
-        if (labelY < 14)
-            labelY = y0 + 16;
-
-        QRect tRect = fm.boundingRect(timeLabel);
-        tRect.moveCenter(QPoint(labelX, labelY));
-        tRect.adjust(-4, -2, 4, 2);
-        p.fillRect(tRect, QColor(255, 255, 255, 210));
-        p.setPen(QColor(20, 80, 160));
-        p.drawText(tRect, Qt::AlignCenter, timeLabel);
-    }
-
-    // Amplitude label (shown unless horizontal snap)
-    if (!snapH) {
-        int aLabelX = x0 + 8;
-        int aLabelY = (y0 + y1) / 2;
-        QRect aRect = fm.boundingRect(ampLabel);
-        aRect.moveCenter(QPoint(aLabelX + aRect.width() / 2, aLabelY));
-        aRect.adjust(-4, -2, 4, 2);
-        p.fillRect(aRect, QColor(255, 255, 255, 210));
-        p.setPen(QColor(20, 80, 160));
-        p.drawText(aRect, Qt::AlignCenter, ampLabel);
-    }
-}
-
-//=============================================================================================================
-
-void ChannelRhiRenderer::drawAnnotationSelectionOverlay(QPainter& p) const
-{
-    const int x0 = qMin(m_annSelX0, m_annSelX1);
-    const int x1 = qMax(m_annSelX0, m_annSelX1);
-    const int h = viewHeight();
-
-    // Semi-transparent fill matching annotation overlay style
-    p.fillRect(QRect(x0, 0, x1 - x0, h), QColor(210, 60, 60, 50));
-
-    // Left and right borders
-    QPen borderPen(QColor(210, 60, 60, 180), 2);
-    p.setPen(borderPen);
-    p.drawLine(x0, 0, x0, h);
-    p.drawLine(x1, 0, x1, h);
-
-    // Duration label pill at the top
-    if (m_sfreq > 0.f && m_samplesPerPixel > 0.f) {
-        float deltaSamples = static_cast<float>(x1 - x0) * m_samplesPerPixel;
-        float deltaSec = deltaSamples / m_sfreq;
-        QString label;
-        if (deltaSec < 1.f)
-            label = QString::number(deltaSec * 1000.f, 'f', 0) + QStringLiteral(" ms");
-        else
-            label = QString::number(deltaSec, 'f', 2) + QStringLiteral(" s");
-
-        QFont f = hostFont();
-        f.setPointSizeF(8.0);
-        f.setBold(true);
-        p.setFont(f);
-        QFontMetrics fm(f);
-        QRect labelRect = fm.boundingRect(label);
-        labelRect.adjust(-6, -2, 6, 2);
-        labelRect.moveTopLeft(QPoint(x0 + 4, 4));
-        p.fillRect(labelRect, QColor(210, 60, 60, 215));
-        p.setPen(Qt::white);
-        p.drawText(labelRect, Qt::AlignCenter, label);
-    }
-}
 
 //=============================================================================================================
 // Shared event handlers
@@ -2337,33 +2004,14 @@ void ChannelRhiRenderer::handleResize()
 
 bool ChannelRhiRenderer::handleWheel(QWheelEvent* event)
 {
-    const QPoint delta = event->angleDelta();
-
-    if (event->modifiers() & Qt::ControlModifier) {
-        // Ctrl + wheel → zoom time axis
-        float factor = (delta.y() > 0) ? 0.8f : 1.25f;
-        zoomTo(m_samplesPerPixel * factor, 150);
-
-    } else if (qAbs(delta.x()) > qAbs(delta.y())) {
-        // Predominantly horizontal gesture (trackpad swipe left/right) → scroll time
-        if (!m_frozen) {
-            float step = viewWidth() * m_samplesPerPixel * 0.1f * m_scrollSpeedFactor * (delta.x() > 0 ? -1.f : 1.f);
-            scrollBy(step, 100);
-        }
-
-    } else if (m_wheelScrollsChannels) {
-        // Vertical wheel → scroll channels (up = earlier, down = later)
-        int channelStep = (delta.y() > 0) ? -1 : 1;
-        int maxFirst = qMax(0, totalLogicalChannels() - m_visibleChannelCount);
-        setFirstVisibleChannel(qBound(0, m_firstVisibleChannel + channelStep, maxFirst));
-    } else {
-        // Vertical wheel → scroll time
-        if (!m_frozen) {
-            float step = viewWidth() * m_samplesPerPixel * 0.15f * m_scrollSpeedFactor * (delta.y() > 0 ? -1.f : 1.f);
-            scrollBy(step, 100);
-        }
-    }
-
+    scene::WheelEvent wheel;
+    wheel.x = event->position().x();
+    wheel.y = event->position().y();
+    wheel.angle_delta_x = event->angleDelta().x();
+    wheel.angle_delta_y = event->angleDelta().y();
+    wheel.modifiers = toSceneModifiers(event->modifiers());
+    wheel.timestamp_ms = monotonicMs();
+    view().handle_wheel(wheel);
     event->accept();
     return true;
 }
@@ -2372,345 +2020,46 @@ bool ChannelRhiRenderer::handleWheel(QWheelEvent* event)
 
 bool ChannelRhiRenderer::handleMousePress(QMouseEvent* event)
 {
-    // Right-click → annotation range selection (when annotation mode is ON)
-    //            → ruler measurement         (when annotation mode is OFF)
-    if (event->button() == Qt::RightButton) {
-        // Stop any running inertial scroll
-        stopScrollAnimations();
-
-        if (m_annotationSelectionEnabled) {
-            // Annotation mode: right-drag creates a new annotation range
-            m_annSelecting = true;
-            m_annSelX0 = m_annSelX1 = event->position().toPoint().x();
-            requestUpdate();
-        } else {
-            // Normal mode: right-drag starts ruler measurement
-            m_rulerActive = true;
-            m_rulerSnap = RulerSnap::Free;
-            m_rulerX0 = m_rulerX1 = m_rulerRawX1 = event->position().toPoint().x();
-            m_rulerY0 = m_rulerY1 = m_rulerRawY1 = event->position().toPoint().y();
-            requestUpdate();
-        }
-        event->accept();
-        return true;
-    }
-
-    if (!m_frozen &&
-        (event->button() == Qt::MiddleButton ||
-         (event->button() == Qt::LeftButton && (event->modifiers() & Qt::AltModifier)))) {
-        m_dragging = true;
-        m_dragStartX = event->position().toPoint().x();
-        m_dragStartScroll = m_scrollSample;
-        event->accept();
-        return true;
-    }
-    if (event->button() == Qt::LeftButton) {
-        // Stop any running inertial scroll
-        stopScrollAnimations();
-
-        // Check if clicking on an annotation boundary for drag-resize
-        if (m_annotationSelectionEnabled && !m_annotations.empty()) {
-            bool isStart = false;
-            int hitIdx = hitTestAnnotationBoundary(event->position().toPoint().x(), isStart);
-            if (hitIdx >= 0) {
-                m_annDragging = true;
-                m_annDragIndex = hitIdx;
-                m_annDragIsStart = isStart;
-                event->accept();
-                return true;
-            }
-        }
-
-        if (m_frozen) {
-            // Frozen: clicks still emit sampleClicked but no drag
-            float samplePos = m_scrollSample + static_cast<float>(event->position().x()) * m_samplesPerPixel;
-            emit sampleClicked(static_cast<int>(samplePos));
-            event->accept();
-            return true;
-        }
-        // Record start position; activate drag on move (threshold in mouseMoveEvent)
-        m_leftButtonDown = true;
-        m_leftDragActivated = false;
-        m_leftDownX = event->position().toPoint().x();
-        m_leftDownScroll = m_scrollSample;
-        m_velocityHistory.clear();
-        m_dragStart = std::chrono::steady_clock::now();
-        m_velocityHistory.push_back({m_leftDownX, 0});
-        event->accept();
-        return true;
-    }
-    return false;
+    return forwardPointer(event, scene::PointerEvent::Type::Press);
 }
 
 //=============================================================================================================
 
 bool ChannelRhiRenderer::handleMouseMove(QMouseEvent* event)
 {
-    // ── Annotation boundary drag-resize ──────────────────────────────
-    if (m_annDragging) {
-        // Visually update the annotation boundary while dragging
-        int newSample = static_cast<int>(m_scrollSample + static_cast<float>(event->position().toPoint().x()) * m_samplesPerPixel);
-        newSample = qMax(newSample, m_firstFileSample);
-        if (m_lastFileSample >= 0)
-            newSample = qMin(newSample, m_lastFileSample);
-
-        if (m_annDragIndex >= 0 && m_annDragIndex < std::ssize(m_annotations)) {
-            if (m_annDragIsStart)
-                m_annotations[m_annDragIndex].startSample = newSample;
-            else
-                m_annotations[m_annDragIndex].endSample = newSample;
-            m_overlayDirty = true;
-            requestUpdate();
-        }
-        event->accept();
-        return true;
-    }
-
-    // ── Annotation range selection drag (right-button, annotation mode) ─
-    if (m_annSelecting) {
-        m_annSelX1 = event->position().toPoint().x();
-        requestUpdate();
-        event->accept();
-        return true;
-    }
-
-    if (m_rulerActive) {
-        m_rulerRawX1 = event->position().toPoint().x();
-        m_rulerRawY1 = event->position().toPoint().y();
-
-        // Snap logic: if displacement is dominantly horizontal → lock to horizontal,
-        // if dominantly vertical → lock to vertical, otherwise free
-        int dx = qAbs(m_rulerRawX1 - m_rulerX0);
-        int dy = qAbs(m_rulerRawY1 - m_rulerY0);
-        const int kSnapThresh = 8; // minimum movement before snapping
-        if (dx < kSnapThresh && dy < kSnapThresh) {
-            m_rulerSnap = RulerSnap::Free;
-        } else if (dx > dy * 2) {
-            m_rulerSnap = RulerSnap::Horizontal;
-        } else if (dy > dx * 2) {
-            m_rulerSnap = RulerSnap::Vertical;
-        } else {
-            m_rulerSnap = RulerSnap::Free;
-        }
-
-        // Apply snap
-        switch (m_rulerSnap) {
-            case RulerSnap::Horizontal:
-                m_rulerX1 = m_rulerRawX1;
-                m_rulerY1 = m_rulerY0; // lock Y
-                break;
-            case RulerSnap::Vertical:
-                m_rulerX1 = m_rulerX0; // lock X
-                m_rulerY1 = m_rulerRawY1;
-                break;
-            default:
-                m_rulerX1 = m_rulerRawX1;
-                m_rulerY1 = m_rulerRawY1;
-                break;
-        }
-
-        requestUpdate();
-        event->accept();
-        return true;
-    }
-
-    if (m_dragging) {
-        int dx = event->position().toPoint().x() - m_dragStartX;
-        float newScroll = m_dragStartScroll - static_cast<float>(dx) * m_samplesPerPixel;
-        setScrollSample(newScroll);
-        event->accept();
-        return true;
-    }
-    if (m_leftButtonDown) {
-        int x = event->position().toPoint().x();
-        int dx = x - m_leftDownX;
-        if (!m_leftDragActivated && qAbs(dx) > 5)
-            m_leftDragActivated = true;
-        if (m_leftDragActivated) {
-            float newScroll = m_leftDownScroll - static_cast<float>(dx) * m_samplesPerPixel;
-            setScrollSample(newScroll);
-
-            // Record velocity sample; keep only the last 100 ms
-            const std::int64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_dragStart).count();
-            m_velocityHistory.push_back({x, now});
-            while (m_velocityHistory.size() > 1 &&
-                   now - m_velocityHistory.front().t > 100)
-                m_velocityHistory.erase(m_velocityHistory.begin());
-
-            event->accept();
-            return true;
-        }
-    }
-
-    // ── Crosshair tracking (passive mouse tracking without buttons) ──
-    if (m_crosshairEnabled) {
-        m_crosshairX = event->position().toPoint().x();
-        m_crosshairY = event->position().toPoint().y();
-        requestUpdate();
-
-        // Emit cursor data signal here (not from drawCrosshair) to keep
-        // signal emission out of the paint path and avoid repaint cascades.
-        emitCursorData();
-    }
-
-    // ── Annotation boundary hover cursor ─────────────────────────────
-    if (m_annotationSelectionEnabled && !m_annotations.empty()) {
-        bool isStart = false;
-        int hitIdx = hitTestAnnotationBoundary(event->position().toPoint().x(), isStart);
-        if (hitIdx >= 0) {
-            if (m_annHoverIndex != hitIdx || m_annHoverIsStart != isStart) {
-                m_annHoverIndex = hitIdx;
-                m_annHoverIsStart = isStart;
-                if (m_pHost)
-                    m_pHost->setCursorShape(Qt::SizeHorCursor);
-            }
-        } else if (m_annHoverIndex >= 0) {
-            m_annHoverIndex = -1;
-            if (m_pHost)
-                m_pHost->unsetCursorShape();
-        }
-    }
-
-    return false;
+    return forwardPointer(event, scene::PointerEvent::Type::Move);
 }
 
 //=============================================================================================================
 
 bool ChannelRhiRenderer::handleMouseRelease(QMouseEvent* event)
 {
-    // ── Annotation boundary drag-resize completion ───────────────────
-    if (m_annDragging && event->button() == Qt::LeftButton) {
-        int newSample = static_cast<int>(m_scrollSample + static_cast<float>(event->position().toPoint().x()) * m_samplesPerPixel);
-        newSample = qMax(newSample, m_firstFileSample);
-        if (m_lastFileSample >= 0)
-            newSample = qMin(newSample, m_lastFileSample);
-
-        emit annotationBoundaryMoved(m_annDragIndex, m_annDragIsStart, newSample);
-        m_annDragging = false;
-        m_annDragIndex = -1;
-        event->accept();
-        return true;
-    }
-
-    // ── Annotation range selection completion (right-button, annotation mode) ─
-    if (m_annSelecting && event->button() == Qt::RightButton) {
-        m_annSelX1 = event->position().toPoint().x();
-        m_annSelecting = false;
-        requestUpdate();
-
-        const int x0 = qMin(m_annSelX0, m_annSelX1);
-        const int x1 = qMax(m_annSelX0, m_annSelX1);
-        if (qAbs(x1 - x0) > 3) {
-            int startSample = static_cast<int>(m_scrollSample + static_cast<float>(x0) * m_samplesPerPixel);
-            int endSample = static_cast<int>(m_scrollSample + static_cast<float>(x1) * m_samplesPerPixel);
-
-            startSample = qMax(startSample, m_firstFileSample);
-            if (m_lastFileSample >= 0)
-                endSample = qMin(endSample, m_lastFileSample);
-
-            if (endSample >= startSample)
-                emit sampleRangeSelected(startSample, endSample);
-        }
-        event->accept();
-        return true;
-    }
-
-    if (m_rulerActive && event->button() == Qt::RightButton) {
-        m_rulerRawX1 = event->position().toPoint().x();
-        m_rulerRawY1 = event->position().toPoint().y();
-        // Apply final snap
-        switch (m_rulerSnap) {
-            case RulerSnap::Horizontal:
-                m_rulerX1 = m_rulerRawX1;
-                m_rulerY1 = m_rulerY0;
-                break;
-            case RulerSnap::Vertical:
-                m_rulerX1 = m_rulerX0;
-                m_rulerY1 = m_rulerRawY1;
-                break;
-            default:
-                m_rulerX1 = m_rulerRawX1;
-                m_rulerY1 = m_rulerRawY1;
-                break;
-        }
-        m_rulerActive = false;
-        requestUpdate();
-
-        event->accept();
-        return true;
-    }
-
-    if (m_dragging && (event->button() == Qt::MiddleButton || event->button() == Qt::LeftButton)) {
-        m_dragging = false;
-        event->accept();
-        return true;
-    }
-    if (event->button() == Qt::LeftButton && m_leftButtonDown) {
-        if (!m_leftDragActivated) {
-            // Short tap — emit click position, no inertia
-            float samplePos = m_leftDownScroll + static_cast<float>(event->position().x()) * m_samplesPerPixel;
-            emit sampleClicked(static_cast<int>(samplePos));
-        } else {
-            // Compute velocity from recent history and launch inertial animation
-            if (m_velocityHistory.size() >= 2) {
-                auto oldest = m_velocityHistory.front();
-                auto newest = m_velocityHistory.back();
-                float dt = static_cast<float>(newest.t - oldest.t);
-                if (dt > 5.f) {
-                    float dx = static_cast<float>(newest.x - oldest.x);
-                    // px/ms → samples/ms (positive dx = dragging right = going backward)
-                    float velSampPerMs = -(dx / dt) * m_samplesPerPixel;
-                    float speed = qAbs(velSampPerMs);
-                    if (speed > 0.3f) { // threshold: ~300 samples/s minimum
-                        // OutCubic: f'(0) = 3, so travel = v × duration / 3.
-                        // Longer duration and distance for a smooth, phone-like glide.
-                        float durationMs = qBound(500.f, speed * 1.0f, 5000.f);
-                        float targetScroll = m_scrollSample + velSampPerMs * durationMs / 3.f;
-                        targetScroll = qMax(targetScroll, static_cast<float>(m_firstFileSample));
-
-                        m_pInertialAnim = new QPropertyAnimation(this, "scrollSample", this);
-                        m_pInertialAnim->setDuration(static_cast<int>(durationMs));
-                        m_pInertialAnim->setEasingCurve(QEasingCurve::OutCubic);
-                        m_pInertialAnim->setStartValue(m_scrollSample);
-                        m_pInertialAnim->setEndValue(targetScroll);
-                        connect(m_pInertialAnim, &QPropertyAnimation::finished, this, [this]() {
-                            m_pInertialAnim = nullptr;
-                        });
-                        m_pInertialAnim->start(QAbstractAnimation::DeleteWhenStopped);
-                    }
-                }
-            }
-        }
-        m_leftButtonDown = false;
-        m_leftDragActivated = false;
-        event->accept();
-        return true;
-    }
-    return false;
+    return forwardPointer(event, scene::PointerEvent::Type::Release);
 }
 
 //=============================================================================================================
 
 bool ChannelRhiRenderer::handleMouseDoubleClick(QMouseEvent* event)
 {
-    if (!m_model || event->button() != Qt::LeftButton) {
+    // Double clicks toggle the bad state of a model channel
+    if (!m_model)
         return false;
-    }
+    return forwardPointer(event, scene::PointerEvent::Type::DoubleClick);
+}
 
-    int totalCh = totalLogicalChannels();
-    int visCnt = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
-    if (visCnt <= 0)
-        return true;
+//=============================================================================================================
 
-    float laneH = static_cast<float>(viewHeight()) / visCnt;
-    int row = static_cast<int>(event->position().y() / laneH);
-    if (row >= 0 && row < visCnt) {
-        int ch = actualChannelAt(m_firstVisibleChannel + row);
-        if (ch >= 0) {
-            auto info = m_model->channelInfo(ch);
-            m_model->setChannelBad(ch, !info.bad);
-        }
-    }
-    event->accept();
-    return true;
+bool ChannelRhiRenderer::forwardPointer(QMouseEvent* event, scene::PointerEvent::Type type)
+{
+    scene::PointerEvent pointer;
+    pointer.type = type;
+    pointer.x = event->position().x();
+    pointer.y = event->position().y();
+    pointer.button = toSceneButton(event->button());
+    pointer.modifiers = toSceneModifiers(event->modifiers());
+    pointer.timestamp_ms = monotonicMs();
+    const bool used = view().handle_pointer(pointer);
+    if (used)
+        event->accept();
+    return used;
 }
