@@ -93,13 +93,14 @@ Writes `image` as the next figure.
 
 Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
 
-````cpp title="src/examples/ex_disp_plots/main.cpp, line 227"
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 240"
 // Written only when MNE_CPP_FIGURE_DIR names a directory
 FigureExporter::save(line, "line_plot", "LinePlot: one period of a sine wave.");
 FigureExporter::save(bar, "bar", "Bar: counts of four amplitude classes.");
 FigureExporter::save(spline, "spline", "Spline: the same histogram as a smooth curve with three threshold markers.");
 FigureExporter::save(image, "image_sc", "ImageSc: a left-to-right ramp in the viridis colour map.");
 FigureExporter::save(tfPlot, "tf_plot", "TFplot: power confined to the 20-29 Hz bins.");
+FigureExporter::save(filterPlot, "filter_plot", "FilterPlot: magnitude response of a 1-40 Hz band pass.");
 ````
 
 ### [ex_disp](../../examples/disp/ex_disp.mdx)

@@ -25,17 +25,17 @@
     "lock_mismatch": []
   },
   "summary": {
-    "claims": 364,
+    "claims": 365,
     "by_evidence": {
       "cross-validated-static": 174,
       "cross-validated-live": 0,
-      "tested": 189,
+      "tested": 190,
       "unverified": 1
     },
     "by_claim": {
       "equivalent": 139,
       "exceeds": 0,
-      "implemented": 130,
+      "implemented": 131,
       "partial": 95
     },
     "equivalence_without_static_evidence": [],
@@ -43,7 +43,7 @@
       "classes": {
         "cross-validated-static": 32,
         "cross-validated-live": 0,
-        "tested": 68,
+        "tested": 69,
         "unverified": 1
       },
       "parity": {
@@ -1081,6 +1081,15 @@
       "claimed": "implemented",
       "equivalence": null,
       "test": "test_dsp_iirfilter",
+      "evidence": "tested"
+    },
+    {
+      "source": "classes",
+      "mne_cpp": "FilterResponsePlot",
+      "python": "mne.viz.plot_filter",
+      "claimed": "implemented",
+      "equivalence": null,
+      "test": "test_scene_render",
       "evidence": "tested"
     },
     {

@@ -641,7 +641,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/disp/evoked-set-model',
         'api/disp/fiff-raw-view-settings',
         'api/disp/filter-design-view',
-        'api/disp/filter-plot-scene',
+        'api/disp/filter-plot',
         'api/disp/filter-settings-view',
         'api/disp/frequency-spectrum-delegate',
         'api/disp/frequency-spectrum-model',
@@ -860,7 +860,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/scene/rect',
         'api/scene/rect-shape',
         'api/scene/text-shape',
-        'api/scene/transform'
+        'api/scene/transform',
+        'api/scene/filter-response-plot'
       ],
     }
 ];

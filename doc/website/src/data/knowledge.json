@@ -666,7 +666,8 @@
       "url": "/docs/examples/disp/ex_disp_plots/",
       "library": "disp",
       "libraries": [
-        "disp"
+        "disp",
+        "dsp"
       ],
       "tasks": [
         "visualization"

@@ -77,7 +77,7 @@
     },
     "disp": {
       "classes": 72,
-      "tested": 8,
+      "tested": 9,
       "untested": [
         "AbstractView",
         "ApplyToView",
@@ -107,7 +107,6 @@
         "EvokedSetModel",
         "FiffRawViewSettings",
         "FilterDesignView",
-        "FilterPlotScene",
         "FilterSettingsView",
         "FrequencySpectrumDelegate",
         "FrequencySpectrumModel",
@@ -472,8 +471,8 @@
       "missing_tests": []
     },
     "scene": {
-      "classes": 30,
-      "tested": 30,
+      "classes": 31,
+      "tested": 31,
       "untested": [],
       "missing_tests": []
     },

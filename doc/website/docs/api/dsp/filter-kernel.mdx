@@ -277,6 +277,20 @@ for (const FilterKernel* kernel : {&lowPass, &lowPassPm}) {
 }
 ````
 
+### [ex_disp_plots](../../examples/disp/ex_disp_plots.mdx)
+
+Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 230"
+// Band pass 1-40 Hz at 250 Hz, 256 taps; frequencies are normed to the Nyquist frequency of 125 Hz
+const FilterKernel bandPass("BPF_1_40", FilterKernel::filter_type_index("BPF"), 256, 20.5 / 125.0, 39.0 / 125.0,
+                            5.0 / 125.0, 250.0, FilterKernel::design_method_index("Cosine"));
+FilterPlot filterPlot;
+filterPlot.setFilter(bandPass);
+ok &= expect(filterPlot.plot().cutoffs().size() == 2 && filterPlot.plot().nyquist() == 125.0 && countColor(render(filterPlot), qRgb(220, 0, 0), 30) > 100,
+             "FilterPlot marks the two edges of the band pass in red");
+````
+
 ### [ex_filtering](../../examples/dsp/ex_filtering.mdx)
 
 Band-pass filter the MEG channels of a raw FIFF recording with a cosine FIR filter and write the result.
@@ -298,18 +312,7 @@ if (mne::filterFile(parser.value(outputOption).toStdU16String(),
     printf("[failed]\n");
 ````
 
-### [ex_dsp_analysis](../../examples/dsp/ex_dsp_analysis.mdx)
-
-DSP library: Welch PSD, FIR filtering, peak finding, envelope correlation, SPHARA and simulation.
-
-````cpp title="src/examples/ex_dsp_analysis/main.cpp, line 118"
-FilterKernel lowPass = FirFilter::design(256, FirFilter::LowPass, 20.0, 0.0, sFreq, 5.0); // order, type, cutoff(s), Hz, transition
-const RowVectorXd smooth = FirFilter::applyZeroPhase(tones, lowPass);
-const double kept = toneAmplitude(smooth.segment(250, 500), 10.0, sFreq);
-const double removed = toneAmplitude(smooth.segment(250, 500), 40.0, sFreq);
-ok &= expect(smooth.size() == tones.size() && std::fabs(kept - 1.0) < 0.02 && removed < 0.01,
-             std::format("FirFilter 20 Hz low-pass keeps 10 Hz ({:.4f}) and removes 40 Hz ({:.4f})", kept, removed));
-````
+Also used in [ex_dsp_analysis](../../examples/dsp/ex_dsp_analysis.mdx).
 
 ## Authors of this file
 

@@ -1,0 +1,110 @@
+---
+id: filter-plot
+title: "mne::disp::FilterPlot"
+sidebar_label: FilterPlot
+sidebar_position: 30
+---
+
+# FilterPlot
+
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/plots/filterplot.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/disp/plots/filterplot.h)
+
+`#include <mne/disp/filterplot.h>`
+
+```cpp
+class mne::disp::FilterPlot
+```
+
+Magnitude response of a FIR or IIR filter in dB, with its cut-off frequencies marked.
+
+```cpp title="src/examples/ex_disp_plots/main.cpp"
+// Band pass 1-40 Hz at 250 Hz, 256 taps; frequencies are normed to the Nyquist frequency of 125 Hz
+const FilterKernel bandPass("BPF_1_40", FilterKernel::filter_type_index("BPF"), 256, 20.5 / 125.0, 39.0 / 125.0,
+                            5.0 / 125.0, 250.0, FilterKernel::design_method_index("Cosine"));
+FilterPlot filterPlot;
+filterPlot.setFilter(bandPass);
+```
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QWidget <|-- FilterPlot
+```
+
+---
+
+## Public Methods
+
+### FilterPlot(parent)
+
+Constructs an empty plot.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  Parent widget.
+
+---
+
+### setFilter(filter)
+
+Shows the response of `filter:` its FFT magnitude from 0 Hz to half its sampling frequency, titled with its name, with its high-pass and low-pass frequencies marked where they lie inside that range.
+
+**Parameters:**
+
+- **filter** : *const [FilterKernel](/docs/api/dsp/filter-kernel) &*
+  The filter; one without coefficients leaves the plot unchanged.
+
+---
+
+### plot()
+
+**Returns:**
+
+- *const [FilterResponsePlot](/docs/api/scene/filter-response-plot) &* — The plot model.
+
+---
+
+### figure(size)
+
+The plot as a figure, e.g.
+
+to export it with `scene::write_svg()` or render it with `paintScene()`.
+
+**Parameters:**
+
+- **size** : *const QSize &*
+  Size of the figure in pixels.
+
+**Returns:**
+
+- *[DisplayList](/docs/api/scene/display-list)* — The figure on a white background, laid out with this widget's font.
+
+---
+
+## Example
+
+- Start here: [ex_disp_plots](../../examples/disp/ex_disp_plots.mdx) — Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+- Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
+- Build target: `ex_disp_plots` (runs under CTest)
+
+## Used in examples
+
+### [ex_disp_plots](../../examples/disp/ex_disp_plots.mdx)
+
+Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 230"
+// Band pass 1-40 Hz at 250 Hz, 256 taps; frequencies are normed to the Nyquist frequency of 125 Hz
+const FilterKernel bandPass("BPF_1_40", FilterKernel::filter_type_index("BPF"), 256, 20.5 / 125.0, 39.0 / 125.0,
+                            5.0 / 125.0, 250.0, FilterKernel::design_method_index("Cosine"));
+FilterPlot filterPlot;
+filterPlot.setFilter(bandPass);
+ok &= expect(filterPlot.plot().cutoffs().size() == 2 && filterPlot.plot().nyquist() == 125.0 && countColor(render(filterPlot), qRgb(220, 0, 0), 30) > 100,
+             "FilterPlot marks the two edges of the band pass in red");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

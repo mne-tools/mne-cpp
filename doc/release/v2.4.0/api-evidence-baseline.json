@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 496,
+    "exported_classes": 497,
     "exported_free_functions": 229,
-    "registered_classes": 619,
+    "registered_classes": 620,
     "exported_not_registered": 2,
     "registered_function_modules": 15,
     "registered_header_only": 110,
     "registered_stale": 0,
-    "registered_with_test": 299,
+    "registered_with_test": 301,
     "registered_test_unresolved": 0,
-    "registered_with_example": 452,
+    "registered_with_example": 454,
     "registered_example_not_built": 0,
-    "registered_with_python_equiv": 101,
+    "registered_with_python_equiv": 102,
     "registered_without_api_page": 0,
-    "with_snippet": 492,
-    "public_api_units": 621,
-    "example_eligible": 452,
-    "example_exempt": 169,
-    "eligible_backed_by_registry_example": 450,
-    "eligible_used_by_some_example": 385,
+    "with_snippet": 494,
+    "public_api_units": 622,
+    "example_eligible": 454,
+    "example_exempt": 168,
+    "eligible_backed_by_registry_example": 452,
+    "eligible_used_by_some_example": 387,
     "examples_on_disk": 81,
     "examples_built": 81
   },
@@ -92,11 +92,11 @@
     "disp": {
       "public": 72,
       "registered": 72,
-      "with_test": 8,
-      "eligible": 10,
-      "eligible_with_registry_example": 10,
-      "eligible_used_by_example": 10,
-      "with_snippet": 10
+      "with_test": 9,
+      "eligible": 11,
+      "eligible_with_registry_example": 11,
+      "eligible_used_by_example": 11,
+      "with_snippet": 11
     },
     "disp3D": {
       "public": 50,
@@ -234,13 +234,13 @@
       "with_snippet": 1
     },
     "scene": {
-      "public": 30,
-      "registered": 30,
-      "with_test": 30,
-      "eligible": 13,
-      "eligible_with_registry_example": 13,
-      "eligible_used_by_example": 6,
-      "with_snippet": 22
+      "public": 31,
+      "registered": 31,
+      "with_test": 31,
+      "eligible": 14,
+      "eligible_with_registry_example": 14,
+      "eligible_used_by_example": 7,
+      "with_snippet": 23
     },
     "sts": {
       "public": 12,
@@ -4798,6 +4798,29 @@
       "exempt_reason": null
     },
     {
+      "name": "FilterPlot",
+      "header": "disp/plots/filterplot.h",
+      "library": "disp",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_disp_viewers2",
+      "test_resolves": true,
+      "example": "ex_disp_plots",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp_plots"
+      ],
+      "snippets": [
+        "ex_disp_plots/main.cpp#filter_plot_usage"
+      ],
+      "api_page": "doc/website/docs/api/disp/filter-plot.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "Graph",
       "header": "disp/plots/graph.h",
       "library": "disp",
@@ -5632,25 +5655,6 @@
       "including_examples": [],
       "snippets": [],
       "api_page": "doc/website/docs/api/disp/evoked-set-model.mdx",
-      "python_equiv": null,
-      "example_eligible": false,
-      "exempt_reason": "header prefix 'disp/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
-    },
-    {
-      "name": "FilterPlotScene",
-      "header": "disp/viewers/helpers/filterplotscene.h",
-      "library": "disp",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
-      "api_page": "doc/website/docs/api/disp/filter-plot-scene.mdx",
       "python_equiv": null,
       "example_eligible": false,
       "exempt_reason": "header prefix 'disp/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
@@ -8129,6 +8133,7 @@
       "example": "ex_dsp_filter",
       "example_state": "built",
       "including_examples": [
+        "ex_disp_plots",
         "ex_dsp_analysis",
         "ex_dsp_filter",
         "ex_filtering"
@@ -8155,6 +8160,7 @@
       "example": "ex_dsp_filter",
       "example_state": "built",
       "including_examples": [
+        "ex_disp_plots",
         "ex_dsp_analysis",
         "ex_dsp_filter",
         "ex_filtering"
@@ -15239,6 +15245,29 @@
       "python_equiv": null,
       "example_eligible": false,
       "exempt_reason": "registry: Shape recorded by Canvas::draw_text(); read by the backends."
+    },
+    {
+      "name": "FilterResponsePlot",
+      "header": "scene/filter_response_plot.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene"
+      ],
+      "snippets": [
+        "ex_scene/main.cpp#filter_response_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/filter-response-plot.mdx",
+      "python_equiv": "mne.viz.plot_filter",
+      "example_eligible": true,
+      "exempt_reason": null
     },
     {
       "name": "Point",

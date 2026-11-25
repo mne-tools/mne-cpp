@@ -2938,6 +2938,7 @@
       "registry_classes": [
         "ChannelDataView",
         "ChannelRhiView",
+        "FilterPlot",
         "RtFiffRawView",
         "RtFiffRawViewDelegate",
         "RtFiffRawViewModel"
@@ -9433,6 +9434,7 @@
         "Command",
         "DisplayList",
         "EllipseShape",
+        "FilterResponsePlot",
         "Font",
         "GradientStop",
         "Image",
