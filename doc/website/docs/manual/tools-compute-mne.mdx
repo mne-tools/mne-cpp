@@ -22,21 +22,40 @@ mne_compute_mne [options]
 
 | Option | Description |
 |---|---|
-| `--in <file>` | Evoked data input file (required) |
+| `--inv <file>` | The inverse operator file. |
+| `--meas <file>` | The evoked data (measurement) file. |
 | `--fwd <file>` | Forward solution file (required) |
-| `--cov <file>` | Noise covariance matrix file (required) |
-| `--out <file>` | Base name of the output: `-lh.stc`/`-rh.stc` for surface, `-vl.stc` for volume source spaces |
+| `--fwdamp <nAm>` | Source amplitude in nAm for --fwd mode (default: 50). |
+| `--set <number>` | Data set number to use (1-based, default: 1). |
 | `--snr <value>` | SNR value for regularization |
-| `--method <type>` | Inverse method: mne, dSPM, sLORETA |
-| `--label <file>` | Restrict estimation to label (repeatable) |
-| `--labeldir <dir>` | Process all labels in directory |
-| `--baseline <tmin> <tmax>` | Baseline correction interval (ms) |
+| `--nave <number>` | Override number of averages (default: from data). |
+| `--method <method>` | Inverse method: mne, dSPM, sLORETA |
+| `--spm` | Compute dSPM (statistical parametric map). |
+| `--sLORETA` | Use sLORETA noise normalization. |
+| `--abs` | Output absolute value of current estimates. |
+| `--signed` | Preserve signed current direction (into/out of cortex). |
+| `--picknormalcomp` | Pick the source component normal to the cortex. |
+| `--tmin <time/ms>` | Start time for analysis in ms. |
+| `--tmax <time/ms>` | End time for analysis in ms. |
+| `--bmin <time/ms>` | Baseline start time in ms. |
+| `--bmax <time/ms>` | Baseline end time in ms. |
+| `--baselines <file>` | Per-channel baselines file (one line per channel: name value). |
+| `--out, --stcout <basename>` | Base name of the output: `-lh.stc`/`-rh.stc` for surface, `-vl.stc` for volume source spaces |
 | `--collapse` | Collapse source estimates across labels |
-| `--scaling <factor>` | Scale output data |
+| `--collapse1` | Collapse time axis with L1 norm (mean absolute value per source). |
+| `--collapse2` | Collapse time axis with L2 norm (RMS per source). |
+| `--scaleto <value>` | Scale output so global maximum = value (default: 50.0). |
+| `--scaleby <factor>` | Multiply all output values by this factor. |
+| `--SIcurrents` | Output raw SI-unit currents (no scaling applied). |
+| `--label <file>` | Restrict estimation to label (repeatable) |
+| `--labeltag <tag>` | FsLabel tag for ASCII output file. Written as `<out>`-`<tag>`-`<hemi>`.label. |
+| `--labelcoords` | Include source coordinates (x,y,z) in label ASCII output. |
+| `--labeltimebytime` | Use time-by-time layout for label ASCII output. |
 | `--dip <file>` | Output dipole snapshot file |
-| `--pick <time>` | Extract source estimate at specific time (ms) |
+| `--diptime <time/ms>` | Time in ms for the dipole snapshot (requires --dip). |
 | `--pred <file>` | Write the data predicted by the regularised minimum-norm model as text |
-| `--overwrite` | Overwrite output file if it exists |
+| `--pick <time/ms>` | Extract source estimate at specific time (ms) |
+| `--nomatch` | Do not check that inverse operator and data have matching measurement IDs. |
 
 ## Description
 

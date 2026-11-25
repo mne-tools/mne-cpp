@@ -1584,6 +1584,12 @@ aliases; replace the old spelling as below.
 - RAP-MUSIC takes the vertices of every source space of the forward solution;
   with a single (volume) space it read a second hemisphere that does not exist
   and returned estimates without vertices.
+- The Options tables of the command-line tool manual pages list the options
+  the tools have (`mne_compute_mne`, `mne_inverse_operator`,
+  `mne_make_source_space`, `mne_convert_surface` and others documented
+  options that do not exist or missed ones that do).
+  `scripts/doc/sync_tool_options.py` rewrites them from `--help`; `--check`
+  lists differences.
 
 ## [2.4.0] - 2026-10-27
 

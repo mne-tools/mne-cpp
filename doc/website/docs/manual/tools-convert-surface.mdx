@@ -22,12 +22,18 @@ mne_convert_surface [options]
 
 | Option | Description |
 |---|---|
+| `--surf <file>` | Input/output FreeSurfer surface file |
+| `--fif <file>` | Input/output FIFF BEM surface file |
 | `--tri <file>` | Input/output Triangle format surface (.tri) |
 | `--smf <file>` | Input/output Surface Mesh Format file (.smf) |
-| `--fif <file>` | Input/output FIFF BEM surface file |
-| `--surf <file>` | Input/output FreeSurfer surface file |
+| `--out <file>` | Output file (format detected from extension). |
+| `--outtri <file>` | Output as ASCII tri format. |
+| `--outfif <file>` | Output as FIF format. |
+| `--outsurf <file>` | Output as FreeSurfer surface format. |
+| `--outsmf <file>` | Output as SMF format. |
+| `--surfid <id>` | Surface ID for FIF output (4=head) (default: 4). |
 | `--meters` | Coordinates are in meters (default: millimeters) |
-| `--swap` | Swap triangle vertex ordering |
+| `--millimeters` | Input coordinates are in millimeters. |
 | `--help` | Print help |
 | `--version` | Print version |
 

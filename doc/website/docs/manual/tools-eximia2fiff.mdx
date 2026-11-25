@@ -25,8 +25,6 @@ mne_eximia2fiff [options]
 | `--nxe <file>` | eXimia .nxe data file **(required)** |
 | `--dig <file>` | Digitizer data file |
 | `--out <file>` | Output FIFF file **(required)** |
-| `--sfreq <Hz>` | Sampling frequency (default: 1450) |
-| `--nchan <count>` | Number of channels (default: 64) |
 | `--help` | Print help |
 | `--version` | Print version |
 
@@ -40,5 +38,5 @@ This utility converts Nexstim eXimia EEG data to FIFF format. It works by creati
 mne_eximia2fiff --nxe recording.nxe --out recording.fif
 
 # With digitizer data and custom sampling rate
-mne_eximia2fiff --nxe recording.nxe --dig digitizer.txt --out recording.fif --sfreq 1000
+mne_eximia2fiff --nxe recording.nxe --dig digitizer.txt --out recording.fif
 ```

@@ -23,18 +23,24 @@ mne_inverse_operator [options]
 | Option | Description |
 |---|---|
 | `--fwd <file>` | Input forward solution file (required) |
-| `--cov <file>` | Noise covariance matrix file (required) |
-| `--out <file>` | Output inverse operator file (required) |
-| `--loose <val>` | Loose orientation constraint (0=fixed, 1=free) |
-| `--depth <val>` | Depth weighting exponent |
-| `--fixed` | Fixed source orientations |
+| `--noisecov, --senscov <file>` | The noise (sensor) covariance matrix file. |
+| `--srccov <file>` | Source covariance matrix file (default: identity). |
 | `--meg` | Use MEG channels only |
 | `--eeg` | Use EEG channels only |
-| `--bad <ch>` | Mark channel as bad (repeatable) |
-| `--exclude <ch>` | Exclude channel from computation |
-| `--noiserank <val>` | Set noise covariance rank |
-| `--fmri <file>` | fMRI prior file |
-| `--overwrite` | Overwrite output file if it exists |
+| `--fixed` | Fixed source orientations |
+| `--loose <amount>` | Loose orientation constraint (0=fixed, 1=free) |
+| `--depth` | Depth weighting exponent |
+| `--weightexp <value>` | Depth weighting exponent (0.0-1.0, default: 0.8). |
+| `--weightlimit <value>` | Depth weighting upper limit (default: 10.0). |
+| `--nodepth` | Disable depth weighting. |
+| `--reg <amount>` | Regularization factor for all channel types. |
+| `--magreg <amount>` | Regularization factor for magnetometers (default: 0.1). |
+| `--gradreg <amount>` | Regularization factor for gradiometers (default: 0.1). |
+| `--eegreg <amount>` | Regularization factor for EEG channels (default: 0.1). |
+| `--diagnoise` | Omit off-diagonal terms from the noise covariance matrix. |
+| `--proj <file>` | Load SSP projectors from file (can be repeated). |
+| `--bad <file>` | Mark channel as bad (repeatable) |
+| `--inv <file>` | Output file for the inverse operator (default: `<fwd>`-inv.fif). |
 
 ## Description
 

@@ -25,16 +25,28 @@ The command-line options are defined by the `ComputeFwdSettings` class and follo
 | Option | Description |
 |---|---|
 | `--src <file>` | Source space file |
-| `--bem <file>` | BEM model file |
 | `--meas <file>` | Measurement data file (for sensor info) |
 | `--fwd <file>` | Output forward solution file |
+| `--mri <file>` | MRI description file for head/MRI transform. |
 | `--trans <file>` | Head-MRI coordinate transform file |
+| `--notrans` | Head and MRI coordinate systems are identical. |
+| `--bem <file>` | BEM model file |
+| `--origin <x:y:z>` | Sphere model origin in head coordinates (x:y:z in mm). |
+| `--eegscalp` | Scale electrode locations to the scalp surface (sphere model). |
+| `--eegmodels <file>` | File of EEG sphere model specifications. |
+| `--eegmodel <name>` | Name of the EEG sphere model to use (default: Default). |
+| `--eegrad <radius>` | Scalp radius for EEG sphere model in mm (default: 90.0). |
 | `--meg` | Compute MEG forward solution |
 | `--eeg` | Compute EEG forward solution |
-| `--mindist <dist>` | Minimum source-to-inner-skull distance (mm) |
-| `--accurate` | Use accurate coil geometry descriptions |
+| `--grad` | Compute the gradient of the field with respect to dipole coordinates. |
 | `--fixed` | Fixed source orientations (normal to cortex) |
+| `--accurate` | Use accurate coil geometry descriptions |
+| `--mricoord` | Do calculations in MRI coordinates instead of head coordinates. |
 | `--all` | Compute for all source space points |
+| `--label <file>` | FsLabel file to select sources (can be specified multiple times). |
+| `--mindist <dist>` | Minimum source-to-inner-skull distance (mm) |
+| `--mindistout <file>` | Output file for omitted source space points. |
+| `--includeall` | Omit all source space checks. |
 
 ## Description
 

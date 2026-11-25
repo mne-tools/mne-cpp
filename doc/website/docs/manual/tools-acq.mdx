@@ -42,10 +42,10 @@ mne_acq view <uri> [--window s] [--duration s] [--screenshot file.png]
 | `--duration <s>` | Seconds to run (`record`, `stream`); 0, the default, runs until the source ends or Ctrl+C |
 | `--lsl` | Publish as an LSL outlet (`stream`) |
 | `--name <n>` | Name of the published LSL stream (`stream`) |
-| `--window <s>` | Visible time window of `view` (default 10) |
-| `--screenshot <file.png>` | PNG of the `view` window when it closes |
 | `--brainflow-multicast <address:port>` | Publish in BrainFlow's multicast format to this group, e.g. `225.1.1.1:6677` (`stream`) |
 | `--master-board <id>` | BrainFlow board whose row layout is sent (`stream`; default -1, the synthetic board) |
+| `--window <s>` | Visible time window of `view` (default 10) |
+| `--screenshot <file>` | PNG of the `view` window when it closes |
 | `-h, --help` | Displays help |
 | `-v, --version` | Displays the version |
 

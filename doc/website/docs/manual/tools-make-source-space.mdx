@@ -24,13 +24,12 @@ mne_make_source_space [options]
 |---|---|
 | `--subject <name>` | Subject name (required) |
 | `--subjects_dir <dir>` | FreeSurfer SUBJECTS_DIR (required) |
-| `--surf <hemi>:<surf>` | Surface to use (default: white) |
-| `--spacing <val>` | Source spacing (e.g., ico-4, oct-6, all) |
-| `--morph` | Morph source space to another subject |
-| `--volume` | Create a volumetric source space |
-| `--exclude <label>` | Exclude label from source space |
-| `--out <file>` | Output source space file |
-| `--overwrite` | Overwrite output file if it exists |
+| `--surf <names>` | Surface to use (default: white) |
+| `--ico <grade>` | Icosahedron subdivision grade for downsampling (1-7). Grade 1 = 42 vertices, 2 = 162, 3 = 642, 4 = 2562, 5 = 10242, 6 = 40962, 7 = 163842. |
+| `--oct <grade>` | Octahedron subdivision grade (stored as negative ico grade internally). |
+| `--spacing <dist>` | Source spacing (e.g., ico-4, oct-6, all) |
+| `--all` | Use all surface vertices (no decimation). |
+| `--src <file>` | Output source space file (default: `<subject>`-`<ico/spacing>`-src.fif). |
 
 ## Description
 
