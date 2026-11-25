@@ -127,6 +127,46 @@ struct Rect
     {
         return {x + dx1, y + dy1, width - dx1 + dx2, height - dy1 + dy2};
     }
+
+    /**
+     * @param[in] p   Point.
+     *
+     * @return Whether @p p lies inside the rectangle or on its edges.
+     */
+    bool contains(Point p) const
+    {
+        return p.x >= x && p.x <= x + width && p.y >= y && p.y <= y + height;
+    }
+
+    /**
+     * @param[in] other   Rectangle.
+     *
+     * @return Whether the rectangles overlap, touching edges included; never with an empty rectangle.
+     */
+    bool intersects(const Rect& other) const
+    {
+        return !empty() && !other.empty() && other.x <= x + width && x <= other.x + other.width && other.y <= y + height && y <= other.y + other.height;
+    }
+
+    /**
+     * @param[in] other   Rectangle.
+     *
+     * @return The smallest rectangle holding both, like QRectF::united; an empty rectangle is ignored.
+     */
+    Rect united(const Rect& other) const
+    {
+        if (other.empty()) {
+            return *this;
+        }
+        if (empty()) {
+            return other;
+        }
+        const double left = x < other.x ? x : other.x;
+        const double top = y < other.y ? y : other.y;
+        const double r = right() > other.right() ? right() : other.right();
+        const double b = bottom() > other.bottom() ? bottom() : other.bottom();
+        return {left, top, r - left, b - top};
+    }
 };
 
 /**

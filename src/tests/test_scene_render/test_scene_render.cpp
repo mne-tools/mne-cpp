@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include "../common/golden.h"
+#include <mne/scene/average_layout.h>
 #include <mne/scene/average_tile.h>
 #include <mne/scene/bar_chart.h>
 #include <mne/scene/butterfly_plot.h>
@@ -24,6 +25,7 @@
 #include <mne/scene/image_plot.h>
 #include <mne/scene/line_chart.h>
 #include <mne/scene/raster_renderer.h>
+#include <mne/scene/sensor_layout.h>
 #include <mne/scene/svg_renderer.h>
 #include <mne/scene/text_metrics.h>
 #include <mne/scene/spline_plot.h>
@@ -41,10 +43,12 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <functional>
 #include <memory>
+#include <string>
 #include <vector>
 
 //=============================================================================================================
@@ -197,6 +201,56 @@ DisplayList plotFigure(const QString& name)
         plot.set_colors({30, 30, 30});
         return plot.render(480, 320, metrics, font);
     }
+    if (name == "sensor_layout") {
+        SensorLayout layout;
+        std::vector<SensorLayout::Sensor> sensors;
+        for (int i = 0; i < 9; ++i) {
+            SensorLayout::Sensor sensor;
+            sensor.name = "MEG " + std::to_string(111 + i);
+            const int row = i / 3; // rows of three
+            sensor.position = {(i % 3) * 6.0, -row * 6.0};
+            sensors.push_back(sensor);
+        }
+        sensors[1].bad = true;
+        sensors[2].selectable = false;
+        sensors[4].selected = true;
+        sensors[5].highlighted = true;
+        sensors[8].visible = false;
+        layout.set_sensors(sensors);
+        Canvas canvas(480, 320, Color::white());
+        canvas.translate(120, 60);
+        canvas.scale(1.5, 1.5);
+        layout.draw(canvas, metrics, font);
+        return canvas.take();
+    }
+    if (name == "average_layout") {
+        std::vector<AverageTile> tiles;
+        for (int t = 0; t < 4; ++t) {
+            AverageTile tile;
+            const int row = t / 2; // two rows
+            tile.box = AverageLayout::box_at({(t % 2) * 1.0, -row * 0.6});
+            tile.name = "EEG 00" + std::to_string(t + 1);
+            tile.bad = t == 3;
+            tile.stim_sample = -20;
+            tile.columns = 100;
+            AverageTile::Trace trace;
+            trace.color = {0, 80, 180};
+            for (int i = 0; i < 100; ++i) {
+                trace.samples.push_back((0.4 + 0.2 * t) * std::sin(i * 0.12));
+            }
+            tile.traces.push_back(trace);
+            tiles.push_back(tile);
+        }
+        AverageLayout layout;
+        layout.set_tiles(tiles);
+        const Rect bounds = layout.bounds();
+        Canvas canvas(480, 320, Color::white());
+        const double zoom = std::min(460 / bounds.width, 300 / bounds.height);
+        canvas.translate(240 - bounds.center().x * zoom, 160 - bounds.center().y * zoom);
+        canvas.scale(zoom, zoom);
+        layout.draw(canvas, font);
+        return canvas.take();
+    }
     if (name == "average_tile") {
         Canvas canvas(480, 320, Color::white());
         for (int t = 0; t < 2; ++t) {
@@ -265,6 +319,9 @@ private slots:
     void plotsMatchGoldenFiles();
     void linePlotPicksUnusedPaletteColors();
     void filterResponseIsRelativeToItsMaximum();
+    void rectsContainIntersectAndUnite();
+    void sensorLayoutSelectsLikeAGraphicsScene();
+    void averageLayoutPlacesTilesOnTheLayout();
     void splinePlotMapsPixelsAndData();
 };
 
@@ -522,7 +579,7 @@ void TestSceneRender::colormapsMatchTheirDefinition()
 void TestSceneRender::plotsMatchGoldenFiles_data()
 {
     QTest::addColumn<QString>("name");
-    for (const char* name : {"line_chart", "bar_chart", "spline_plot", "image_plot", "vector_plot", "butterfly_plot", "average_tile", "filter_response_plot"}) {
+    for (const char* name : {"line_chart", "bar_chart", "spline_plot", "image_plot", "vector_plot", "butterfly_plot", "average_tile", "filter_response_plot", "sensor_layout", "average_layout"}) {
         QTest::newRow(name) << QString(name);
     }
 }
@@ -570,6 +627,78 @@ void TestSceneRender::filterResponseIsRelativeToItsMaximum()
     plot.set_floor_db(-30.0);
     QCOMPARE(plot.magnitude_db()[2], -30.0);
     QVERIFY(FilterResponsePlot{}.magnitude_db().empty());
+}
+
+//=============================================================================================================
+
+void TestSceneRender::rectsContainIntersectAndUnite()
+{
+    const Rect a{0, 0, 10, 10};
+    QVERIFY(a.contains({10, 10}) && !a.contains({10.5, 5}));
+    QVERIFY(a.intersects({10, 10, 5, 5}) && !a.intersects({11, 0, 5, 5}) && !a.intersects(Rect{}));
+    QCOMPARE(a.united({20, -5, 5, 5}), (Rect{0, -5, 25, 15}));
+    QCOMPARE(Rect{}.united(a), a);
+    QCOMPARE(a.united(Rect{}), a);
+}
+
+//=============================================================================================================
+
+void TestSceneRender::sensorLayoutSelectsLikeAGraphicsScene()
+{
+    SensorLayout layout;
+    std::vector<SensorLayout::Sensor> sensors(4);
+    for (int i = 0; i < 4; ++i) {
+        sensors[i].name = "S" + std::to_string(i);
+        sensors[i].position = {i * 10.0, 0.0};
+    }
+    sensors[3].selectable = false;
+    layout.set_sensors(sensors);
+    QCOMPARE(layout.scene_position(2), (Point{200, 0}));
+    QCOMPARE(layout.sensor_rect(0), (Rect{-25, -30, 50, 50}));
+    QCOMPARE(layout.bounds(), (Rect{-25, -30, 350, 50}));
+
+    // A click selects one sensor, Ctrl+click toggles, a click beside the sensors clears
+    QVERIFY(layout.click({100, 0}, false));
+    QCOMPARE(layout.selected(), std::vector<std::size_t>({1}));
+    QVERIFY(layout.click({0, 0}, true));
+    QCOMPARE(layout.selected(), std::vector<std::size_t>({0, 1}));
+    QVERIFY(layout.click({0, 0}, true));
+    QCOMPARE(layout.selected(), std::vector<std::size_t>({1}));
+    QVERIFY(!layout.click({100, 0}, false));
+    QCOMPARE(layout.sensor_at({300, 0}), -1); // not selectable
+    QVERIFY(layout.click({300, 0}, false));
+    QVERIFY(layout.selected().empty());
+
+    // A band replaces the selection, with Ctrl it adds; hidden and unselectable sensors stay out
+    QVERIFY(layout.select_in({90, -5, 200, 10}, false));
+    QCOMPARE(layout.selected(), std::vector<std::size_t>({1, 2}));
+    layout.sensors()[1].visible = false;
+    QVERIFY(layout.select_in({-10, -5, 20, 10}, true));
+    QCOMPARE(layout.selected(), std::vector<std::size_t>({0, 1, 2}));
+    QVERIFY(layout.select_in({-10, -5, 400, 10}, false));
+    QCOMPARE(layout.selected(), std::vector<std::size_t>({0, 2}));
+    QCOMPARE(layout.bounds(), (Rect{-25, -30, 350, 50}));
+
+    QVERIFY(layout.select_names({"S3", "S1"}));
+    QCOMPARE(layout.selected(), std::vector<std::size_t>({1, 3}));
+    QVERIFY(!layout.select_names({"S3", "S1"}));
+}
+
+//=============================================================================================================
+
+void TestSceneRender::averageLayoutPlacesTilesOnTheLayout()
+{
+    QCOMPARE(AverageLayout::box_at({1.0, 0.5}), (Rect{100, -110, 120, 60}));
+    AverageLayout layout;
+    QVERIFY(layout.bounds().empty());
+    std::vector<AverageTile> tiles(2);
+    tiles[0].box = AverageLayout::box_at({0, 0});
+    tiles[1].box = AverageLayout::box_at({0.25, 0});
+    layout.set_tiles(tiles);
+    QCOMPARE(layout.tile_at({-40, 0}), 0);
+    QCOMPARE(layout.tile_at({0, 0}), 1); // the later tile lies on top
+    QCOMPARE(layout.tile_at({0, 40}), -1);
+    QCOMPARE(layout.bounds(), (Rect{-60, -33, 160, 63}));
 }
 
 //=============================================================================================================

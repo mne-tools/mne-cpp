@@ -8,6 +8,7 @@ project(mne_scene
 )
 
 set(SOURCES
+  average_layout.cpp
   average_tile.cpp
   bar_chart.cpp
   butterfly_plot.cpp
@@ -17,6 +18,7 @@ set(SOURCES
   image_plot.cpp
   line_chart.cpp
   raster_renderer.cpp
+  sensor_layout.cpp
   spline_plot.cpp
   svg_renderer.cpp
   text_metrics.cpp
@@ -27,6 +29,7 @@ set(SOURCES
 set(HEADERS
   scene_global.h
   scene.h
+  average_layout.h
   average_tile.h
   bar_chart.h
   butterfly_plot.h
@@ -38,6 +41,7 @@ set(HEADERS
   line_chart.h
   geometry.h
   raster_renderer.h
+  sensor_layout.h
   spline_plot.h
   style.h
   svg_renderer.h

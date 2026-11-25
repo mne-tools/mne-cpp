@@ -17,6 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "average_layout.h"
 #include "average_tile.h"
 #include "bar_chart.h"
 #include "butterfly_plot.h"
@@ -28,6 +29,7 @@
 #include "image_plot.h"
 #include "line_chart.h"
 #include "raster_renderer.h"
+#include "sensor_layout.h"
 #include "spline_plot.h"
 #include "style.h"
 #include "svg_renderer.h"

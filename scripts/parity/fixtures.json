@@ -141,6 +141,8 @@
         "src/tests/test_scene_render/data/bar_chart.svg": "863411ee0639bcde18a7375c69875b09ac5585b62e925530fb8203a0d5312b0e",
         "src/tests/test_scene_render/data/butterfly_plot.png": "dcba6c6c878f4560d5e853724a0df4b3160918bce183eb12210affd5a1f3474e",
         "src/tests/test_scene_render/data/butterfly_plot.svg": "fc42e41ebe9f6b5368fdf4fd0008de54783a886fbb5f84a4b2df6497408a1a0a",
+        "src/tests/test_scene_render/data/filter_response_plot.png": "821b0f20ab5463238b9830ab52af643466a2a5310e519e1e31b48233552bcbac",
+        "src/tests/test_scene_render/data/filter_response_plot.svg": "41cd1410ba9fb0d7aa2d88b189cf4d54024996c14e426036b27e7ee414ee1f7c",
         "src/tests/test_scene_render/data/image_plot.png": "e3d6c2fa92684e47d3e8d613c6280d8fbe5b0d02a1548d601606e6b120c5baf3",
         "src/tests/test_scene_render/data/image_plot.svg": "a3850c1399187015e71e5a61692fd1d3097eec3160a738a3334752624053413a",
         "src/tests/test_scene_render/data/line_chart.png": "d008d8a0026b5854c619dd46f3dc28c942153abdc70cff2e2aa9fd540c14fc0e",

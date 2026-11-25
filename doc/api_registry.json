@@ -13373,6 +13373,48 @@
       "python_url": null,
       "example_exempt": true,
       "example_exempt_reason": "Measures text for the plot widgets' QPainter backend inside their paintEvent(); not called by applications."
+    },
+    {
+      "name": "SensorLayout",
+      "module": "scene",
+      "header": "scene/sensor_layout.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_scene_render",
+      "example": "ex_scene",
+      "example_snippet": [
+        "ex_scene/main.cpp#sensor_layout_usage"
+      ],
+      "example_mode": "run",
+      "status": "documented",
+      "documented": true,
+      "sidebar_position": 61,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
+    },
+    {
+      "name": "AverageLayout",
+      "module": "scene",
+      "header": "scene/average_layout.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_scene_render",
+      "example": "ex_scene",
+      "example_snippet": [
+        "ex_scene/main.cpp#average_layout_usage"
+      ],
+      "example_mode": "run",
+      "status": "documented",
+      "documented": true,
+      "sidebar_position": 62,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
     }
   ],
   "parity": {
