@@ -390,7 +390,7 @@ double t_dConditionNumberClustered = Linalg::getConditionNumber(t_clusteredFwd.s
 
 Math library on inputs with known answers.
 
-````cpp title="src/examples/ex_math/main.cpp, line 96"
+````cpp title="src/examples/ex_math/main.cpp, line 97"
 MatrixXd tall(3, 2);
 tall << 1, 2, 3, 4, 5, 6;
 const MatrixXd tallPinv = Linalg::pinv(tall); // Moore-Penrose, 2 x 3

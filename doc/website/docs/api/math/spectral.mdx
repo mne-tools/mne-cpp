@@ -224,7 +224,7 @@ int iNfft = iNSamples;
 
 Math library on inputs with known answers.
 
-````cpp title="src/examples/ex_math/main.cpp, line 125"
+````cpp title="src/examples/ex_math/main.cpp, line 126"
 const auto [tapers, weights] = Spectral::generateTapers(nSamples, std::string("hanning"));
 const MatrixXcd spectra = Spectral::computeTaperedSpectraRow(signal, tapers, nSamples);
 const RowVectorXd psd = Spectral::psdFromTaperedSpectra(spectra, weights, nSamples, sFreq);

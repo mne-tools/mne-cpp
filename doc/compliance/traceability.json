@@ -335,8 +335,8 @@
       "missing_tests": []
     },
     "math": {
-      "classes": 10,
-      "tested": 8,
+      "classes": 12,
+      "tested": 10,
       "untested": [
         "FitUser",
         "TaperedSpectraInputData"

@@ -422,6 +422,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/math/sphere',
         'api/math/fit-user',
         'api/math/matrix-io',
+        'api/math/mat-file',
+        'api/math/mat-variable',
         'api/math/numerics',
         'api/math/spectral',
         'api/math/tapered-spectra-input-data'

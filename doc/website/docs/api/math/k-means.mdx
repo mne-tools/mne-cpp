@@ -170,7 +170,7 @@ Clusters input data X from given initial centroids (MATLAB's numeric `Start`), r
 
 Math library on inputs with known answers.
 
-````cpp title="src/examples/ex_math/main.cpp, line 167"
+````cpp title="src/examples/ex_math/main.cpp, line 168"
 MatrixXd X(6, 2); // two well separated groups of three points
 X << 0.0, 0.0, 0.1, 0.0, 0.0, 0.1, 5.0, 5.0, 5.1, 5.0, 5.0, 5.1;
 KMeans kmeans(KMeansDistance::SquaredEuclidean, KMeansStart::Sample, 5); // best of 5 replicates

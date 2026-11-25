@@ -4,24 +4,24 @@
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
     "exported_classes": 496,
-    "exported_free_functions": 228,
-    "registered_classes": 617,
+    "exported_free_functions": 229,
+    "registered_classes": 619,
     "exported_not_registered": 2,
-    "registered_function_modules": 14,
-    "registered_header_only": 109,
+    "registered_function_modules": 15,
+    "registered_header_only": 110,
     "registered_stale": 0,
-    "registered_with_test": 297,
+    "registered_with_test": 299,
     "registered_test_unresolved": 0,
-    "registered_with_example": 451,
+    "registered_with_example": 452,
     "registered_example_not_built": 0,
-    "registered_with_python_equiv": 100,
+    "registered_with_python_equiv": 101,
     "registered_without_api_page": 0,
-    "with_snippet": 490,
-    "public_api_units": 619,
-    "example_eligible": 451,
-    "example_exempt": 168,
-    "eligible_backed_by_registry_example": 449,
-    "eligible_used_by_some_example": 384,
+    "with_snippet": 492,
+    "public_api_units": 621,
+    "example_eligible": 452,
+    "example_exempt": 169,
+    "eligible_backed_by_registry_example": 450,
+    "eligible_used_by_some_example": 385,
     "examples_on_disk": 81,
     "examples_built": 81
   },
@@ -171,13 +171,13 @@
       "with_snippet": 4
     },
     "math": {
-      "public": 10,
-      "registered": 10,
-      "with_test": 8,
-      "eligible": 8,
-      "eligible_with_registry_example": 8,
-      "eligible_used_by_example": 8,
-      "with_snippet": 10
+      "public": 12,
+      "registered": 12,
+      "with_test": 10,
+      "eligible": 9,
+      "eligible_with_registry_example": 9,
+      "eligible_used_by_example": 9,
+      "with_snippet": 12
     },
     "ml": {
       "public": 4,
@@ -1366,6 +1366,11 @@
     {
       "name": "to_raster",
       "header": "scene/raster_renderer.h",
+      "library": "scene"
+    },
+    {
+      "name": "color_at",
+      "header": "scene/style.h",
       "library": "scene"
     },
     {
@@ -12308,6 +12313,52 @@
       "python_equiv": "numpy.linalg / scipy.linalg",
       "example_eligible": true,
       "exempt_reason": null
+    },
+    {
+      "name": "MatFile",
+      "header": "math/mat_file.h",
+      "library": "math",
+      "kind": "function-module",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_math_matrix_io",
+      "test_resolves": true,
+      "example": "ex_math",
+      "example_state": "built",
+      "including_examples": [
+        "ex_math"
+      ],
+      "snippets": [
+        "ex_math/main.cpp#mat_file_usage"
+      ],
+      "api_page": "doc/website/docs/api/math/mat-file.mdx",
+      "python_equiv": "scipy.io.savemat",
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "MatVariable",
+      "header": "math/mat_file.h",
+      "library": "math",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_math_matrix_io",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_math"
+      ],
+      "snippets": [
+        "ex_math/main.cpp#mat_file_usage"
+      ],
+      "api_page": "doc/website/docs/api/math/mat-variable.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Name and matrix pair passed to write_mat_file(); shown in the MatFile example and exercised by test_math_matrix_io."
     },
     {
       "name": "MatrixIo",

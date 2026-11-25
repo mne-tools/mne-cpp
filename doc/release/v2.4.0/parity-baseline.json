@@ -25,17 +25,17 @@
     "lock_mismatch": []
   },
   "summary": {
-    "claims": 363,
+    "claims": 364,
     "by_evidence": {
       "cross-validated-static": 174,
       "cross-validated-live": 0,
-      "tested": 188,
+      "tested": 189,
       "unverified": 1
     },
     "by_claim": {
       "equivalent": 139,
       "exceeds": 0,
-      "implemented": 129,
+      "implemented": 130,
       "partial": 95
     },
     "equivalence_without_static_evidence": [],
@@ -43,7 +43,7 @@
       "classes": {
         "cross-validated-static": 32,
         "cross-validated-live": 0,
-        "tested": 67,
+        "tested": 68,
         "unverified": 1
       },
       "parity": {
@@ -1013,6 +1013,15 @@
       "source": "classes",
       "mne_cpp": "MatrixIo",
       "python": "numpy.savetxt / numpy.loadtxt",
+      "claimed": "implemented",
+      "equivalence": null,
+      "test": "test_math_matrix_io",
+      "evidence": "tested"
+    },
+    {
+      "source": "classes",
+      "mne_cpp": "MatFile",
+      "python": "scipy.io.savemat",
       "claimed": "implemented",
       "equivalence": null,
       "test": "test_math_matrix_io",

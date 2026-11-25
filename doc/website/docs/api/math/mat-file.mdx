@@ -1,0 +1,74 @@
+---
+id: mat-file
+title: "MatFile"
+sidebar_label: MatFile
+sidebar_position: 24
+---
+
+# MatFile
+
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Math Library
+
+:::info[Module]
+This page documents a **header-level module** — a collection of free
+functions that share an algorithmic topic. There is no enclosing C++
+class; the functions live directly in the library namespace.
+:::
+
+:::info[Python equivalent]
+`scipy.io.savemat` in MNE-Python.
+:::
+
+`#include <mne/math/mat_file.h>`
+
+SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
+
+`mne::write_mat_file` stores named matrices uncompressed, in the layout MATLAB's `load` and SciPy's `scipy.io.loadmat` read. It is what mne_raw2mat and mne_epochs2mat write.
+
+```cpp title="src/examples/ex_math/main.cpp"
+// MATLAB Level 5 MAT-file: load('ex_math.mat') in MATLAB or scipy.io.loadmat in Python
+const std::filesystem::path matPath = std::filesystem::temp_directory_path() / "ex_math.mat";
+MatrixXd sfreq(1, 1);
+sfreq(0, 0) = 600.0;
+const auto written = mne::write_mat_file(matPath, "ex_math", {{"data", matrix}, {"sfreq", sfreq}});
+```
+
+---
+
+## Functions
+
+### write_mat_file(path, creator, variables)
+
+```cpp
+[Expected](/docs/api/base/expected)< void > write_mat_file(const std::filesystem::path & path, std::string_view creator, std::initializer_list< [MatVariable](/docs/api/math/mat-variable) > variables);
+```
+
+Writes matrices as double arrays to an uncompressed MATLAB Level 5 MAT-file.
+
+**Parameters:**
+
+- **path** : *const std::filesystem::path &*
+  Output file; an existing file is overwritten.
+
+- **creator** : *std::string_view*
+  Named in the file's text header ("MATLAB 5.0 MAT-file, created by &lt;creator&gt;").
+
+- **variables** : *std::initializer_list&lt; [MatVariable](/docs/api/math/mat-variable) &gt;*
+  Variables in the order they are written.
+
+**Returns:**
+
+- *[Expected](/docs/api/base/expected)&lt; void &gt;* — Nothing on success; an Io error if the file cannot be written, a Format error if a variable has no name or is too large for the format (4 GiB per variable).
+
+---
+
+## Example
+
+- Start here: [ex_math](../../examples/math/ex_math.mdx) — Math library on inputs with known answers.
+- Full source: [`src/examples/ex_math/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_math/main.cpp)
+- Build target: `ex_math` (runs under CTest)
+
+## Authors of this file
+
+- Matti Hamalainen &lt;msh@nmr.mgh.harvard.edu&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

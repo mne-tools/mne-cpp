@@ -1,0 +1,31 @@
+---
+id: mat-variable
+title: "mne::MatVariable"
+sidebar_label: MatVariable
+sidebar_position: 25
+---
+
+# MatVariable
+
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Math Library &nbsp;·&nbsp; **Source:** [`math/mat_file.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/math/mat_file.h)
+
+`#include <mne/math/mat_file.h>`
+
+```cpp
+struct mne::MatVariable
+```
+
+One variable of a MAT-file: its name and the matrix it holds.
+
+The matrix is referenced, not copied.
+
+---
+
+## Example
+
+No example of its own: Name and matrix pair passed to write_mat_file(); shown in the MatFile example and exercised by test_math_matrix_io.
+
+## Authors of this file
+
+- Matti Hamalainen &lt;msh@nmr.mgh.harvard.edu&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
