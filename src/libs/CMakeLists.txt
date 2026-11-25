@@ -100,6 +100,9 @@ if(MNE_BUILD_QT)
   list(APPEND CMAKE_INSTALL_RPATH ${MNE_QT_RPATH})
   add_subdirectory(mne/disp)
   add_subdirectory(mne/disp3D)
+  # Qt Widgets only here: plots, viewers and the QRhiWidget hosts on top of the two display cores
+  add_subdirectory(mne/disp_widgets)
+  add_subdirectory(mne/disp3D_widgets)
 endif()
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/MnePrecompiledHeaders.cmake)

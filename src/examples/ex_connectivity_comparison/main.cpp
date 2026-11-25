@@ -18,7 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp3D/view/brainview.h>
+#include <mne/disp3D_widgets/view/brainview.h>
 #include <mne/base/string_utils.h>
 #include <mne/disp3D/model/braintreemodel.h>
 #include <mne/disp3D/model/items/networktreeitem.h>
@@ -36,7 +36,7 @@
 #include <mne/inv/minimum_norm/inv_minimum_norm.h>
 #include <mne/base/log.h>
 #include <mne/fiff/fiff_events.h>
-#include <mne/disp/viewers/connectivitysettingsview.h>
+#include <mne/disp_widgets/viewers/connectivitysettingsview.h>
 
 //=============================================================================================================
 // QT INCLUDES

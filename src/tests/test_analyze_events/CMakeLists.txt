@@ -46,7 +46,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     analyze_events
     mne_events
     anShared
-    mne_disp
+    mne_disp_widgets
     mne_mne
     mne_fiff
     mne_base

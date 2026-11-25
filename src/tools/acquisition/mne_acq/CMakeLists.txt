@@ -18,11 +18,11 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 # view (live traces) needs the display library and Qt Widgets, confined to acq_view.cpp; the other commands stay
 # headless and Qt-free.
-if(TARGET mne_disp)
+if(TARGET mne_disp_widgets)
     find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
     find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
     target_sources(${PROJECT_NAME} PRIVATE acq_view.cpp acq_view.h)
-    target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets mne_disp mne_fiff Eigen3::Eigen)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets mne_disp_widgets mne_fiff Eigen3::Eigen)
     target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_ACQ_VIEW)
 endif()
 

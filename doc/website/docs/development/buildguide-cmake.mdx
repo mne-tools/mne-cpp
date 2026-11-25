@@ -187,7 +187,8 @@ cmake --build build --config Release --parallel %NUMBER_OF_PROCESSORS%
 
 ### Libraries without Qt
 
-Only the display libraries (`mne_disp`, `mne_disp3D`), the applications, the CLI tools and the plugins use Qt.
+Only the display libraries (`mne_disp`, `mne_disp3D`, `mne_disp_widgets`, `mne_disp3D_widgets`), the applications,
+the CLI tools and the plugins use Qt.
 To build the other libraries without it, configure with `-DMNE_BUILD_QT=OFF`, or leave Qt off
 `CMAKE_PREFIX_PATH`: CMake then reports that Qt was not found and switches `MNE_BUILD_QT` off for that
 configuration. Eigen is still required.
@@ -199,7 +200,7 @@ ctest --test-dir build-noqt
 cmake --install build-noqt --prefix "$HOME/mne-cpp-sdk"
 ```
 
-This builds all libraries except `mne_disp` and `mne_disp3D`, and the examples that use the libraries only
+This builds all libraries except the four display libraries, and the examples that use the libraries only
 (`ex_base`, `ex_channels`, `ex_com`, `ex_mna`, `ex_make_layout`, `ex_scene`, `ex_acq_performance`, `ex_acq_polhemus`);
 with `BUILD_TESTS=ON` those examples run as tests. The unit tests use QtTest and are built with Qt only.
 The installed `MNE-CPPConfig.cmake` neither looks for Qt nor passes it on to your targets.
@@ -214,12 +215,27 @@ figure as a display list of lines, paths, rectangles, text and images with their
 and clips, recorded through `mne::scene::Canvas`, whose calls follow `QPainter`. It renders display lists to
 SVG (`to_svg`, `write_svg`) and, through `mne::RasterImage`, to PNG (`to_raster`), and it holds the plot
 models: `LineChart`, `BarChart`, `SplinePlot`, `ImagePlot`, `VectorPlot`, `ButterflyPlot` and
-`AverageTile`. The widgets of `mne_disp` (`LinePlot`, `Bar`, `Spline`, `ImageSc`, `TFplot`, `Plot`,
+`AverageTile`. The widgets of `mne_disp_widgets` (`LinePlot`, `Bar`, `Spline`, `ImageSc`, `TFplot`, `Plot`,
 `ButterflyView` and the channel tiles of `AverageLayoutView`) keep such a model and paint it through the
 QPainter backend in `disp/plots/helpers/scenepainter.h`, so a figure looks the same on screen, in an SVG file
 and in a PNG written by a tool without Qt. `test_scene_render` compares each plot's SVG and PNG output with
 golden files in `src/tests/test_scene_render/data`; run it with `MNE_UPDATE_GOLDEN=1` to rewrite them after an
 intended change.
+
+### Display libraries and Qt Widgets
+
+The display code is split by the Qt modules it needs:
+
+| Library | Qt | Contents |
+|---|---|---|
+| `mne_disp` | Core, Gui | colour maps, QPainter scene backend, SVG writer, item models, `ChannelRhiRenderer`, `ChannelWindow` |
+| `mne_disp3D` | Core, Gui | QRhi brain renderer, `BrainViewCore`, `BrainWindow` |
+| `mne_disp_widgets` | + Widgets | plots, viewers, settings panels, `ChannelRhiView` and the other widget helpers |
+| `mne_disp3D_widgets` | + Widgets | `BrainView` (`QRhiWidget` host) |
+
+A program that shows its data in a `QWindow` (or renders off screen) links the two cores only; a Widgets
+application links `mne_disp_widgets` and, for the brain view, `mne_disp3D_widgets`, which pull in the cores.
+`scripts/quality/qt_usage_policy.json` keeps Qt Widgets out of the cores.
 
 ### Via Qt Creator
 

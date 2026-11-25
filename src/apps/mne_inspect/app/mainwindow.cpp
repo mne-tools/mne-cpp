@@ -17,7 +17,7 @@
 #include <mne/base/log.h>
 #include "mainwindow.h"
 
-#include <mne/disp3D/view/brainview.h>
+#include <mne/disp3D_widgets/view/brainview.h>
 #include <mne/disp3D/model/braintreemodel.h>
 #include <mne/disp3D/core/viewstate.h>
 #include <mne/disp3D/scene/multimodalscene.h>

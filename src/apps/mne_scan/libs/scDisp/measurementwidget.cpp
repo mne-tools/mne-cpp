@@ -18,7 +18,7 @@
 
 #include "measurementwidget.h"
 
-#include <mne/disp/viewers/quickcontrolview.h>
+#include <mne/disp_widgets/viewers/quickcontrolview.h>
 
 //=============================================================================================================
 // USED NAMESPACES

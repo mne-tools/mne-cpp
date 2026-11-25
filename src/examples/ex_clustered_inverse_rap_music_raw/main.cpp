@@ -27,7 +27,7 @@
 #include <mne/mne/mne_epoch_data_list.h>
 #include <mne/inv/inv_source_estimate.h>
 #include <mne/inv/rap_music/inv_rap_music.h>
-#include <mne/disp3D/view/brainview.h>
+#include <mne/disp3D_widgets/view/brainview.h>
 #include <mne/disp3D/model/braintreemodel.h>
 #include <mne/base/log.h>
 

@@ -24,14 +24,14 @@
 #include <scMeas/realtimehpiresult.h>
 #include <mne/connectivity/network/network.h>
 #include <mne/mne/mne_bem.h>
-#include <mne/disp3D/view/brainview.h>
+#include <mne/disp3D_widgets/view/brainview.h>
 #include <mne/disp3D/model/braintreemodel.h>
 #include <mne/disp3D/model/items/networktreeitem.h>
 #include <mne/disp3D/model/items/sensortreeitem.h>
 #include <mne/disp3D/model/items/surfacetreeitem.h>
 #include <mne/disp3D/model/items/bemtreeitem.h>
 #include <mne/disp3D/model/items/digitizersettreeitem.h>
-#include <mne/disp/viewers/control3dview.h>
+#include <mne/disp_widgets/viewers/control3dview.h>
 #include <mne/fiff/fiff_ch_info.h>
 #include <mne/fiff/fiff_digitizer_data.h>
 #include <mne/mne/mne_msh_display_surface_set.h>

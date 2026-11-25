@@ -39,8 +39,8 @@ set(MNE_LIBS_REQUIRED
   mne_fs
   mne_base
     mne_math
-  mne_disp
-  mne_disp3D
+  mne_disp_widgets
+  mne_disp3D_widgets
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

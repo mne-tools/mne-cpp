@@ -22,7 +22,7 @@
 
 #include "FormFiles/hpisetupwidget.h"
 #include <mne/base/string_utils.h>
-#include <mne/disp/viewers/hpisettingsview.h>
+#include <mne/disp_widgets/viewers/hpisettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimehpiresult.h>
 #include <mne/dsp/rt/rt_hpi.h>

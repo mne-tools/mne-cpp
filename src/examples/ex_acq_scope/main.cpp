@@ -32,7 +32,7 @@
 //=============================================================================================================
 
 #include <mne/acq/acq.h>
-#include <mne/disp/plots/helpers/figureexporter.h>
+#include <mne/disp_widgets/plots/helpers/figureexporter.h>
 
 //=============================================================================================================
 // QT INCLUDES

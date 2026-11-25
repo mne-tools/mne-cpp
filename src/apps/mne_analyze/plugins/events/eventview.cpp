@@ -25,7 +25,7 @@
 #include <mne/fiff/fiff.h>
 #include <mne/fiff/fiff_events.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <mne/disp/viewers/triggerdetectionview.h>
+#include <mne/disp_widgets/viewers/triggerdetectionview.h>
 #include <mne/base/thread_pool.h>
 
 //=============================================================================================================

@@ -763,143 +763,143 @@
     "src/libs/mne/bids/readers/bids_brain_vision_reader.cpp": {
       "performance-unnecessary-copy-initialization": 1
     },
-    "src/libs/mne/disp/plots/graph.cpp": {
+    "src/libs/mne/disp_widgets/plots/graph.cpp": {
       "bugprone-integer-division": 6
     },
-    "src/libs/mne/disp/plots/graph.h": {
+    "src/libs/mne/disp_widgets/plots/graph.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
     "src/libs/mne/disp/plots/helpers/colormap.h": {
       "bugprone-throwing-static-initialization": 1
     },
-    "src/libs/mne/disp/plots/imagesc.h": {
+    "src/libs/mne/disp_widgets/plots/imagesc.h": {
       "bugprone-derived-method-shadowing-base-method": 1,
       "modernize-use-nullptr": 4,
       "modernize-use-override": 2
     },
-    "src/libs/mne/disp/plots/lineplot.cpp": {
+    "src/libs/mne/disp_widgets/plots/lineplot.cpp": {
       "bugprone-integer-division": 1
     },
-    "src/libs/mne/disp/plots/lineplot.h": {
+    "src/libs/mne/disp_widgets/plots/lineplot.h": {
       "modernize-use-override": 1
     },
-    "src/libs/mne/disp/plots/plot.cpp": {
+    "src/libs/mne/disp_widgets/plots/plot.cpp": {
       "bugprone-integer-division": 1
     },
-    "src/libs/mne/disp/plots/plot.h": {
+    "src/libs/mne/disp_widgets/plots/plot.h": {
       "bugprone-derived-method-shadowing-base-method": 1,
       "modernize-use-nullptr": 1,
       "modernize-use-override": 2
     },
-    "src/libs/mne/disp/plots/spline.cpp": {
+    "src/libs/mne/disp_widgets/plots/spline.cpp": {
       "performance-unnecessary-value-param": 1
     },
-    "src/libs/mne/disp/plots/tfplot.cpp": {
+    "src/libs/mne/disp_widgets/plots/tfplot.cpp": {
       "performance-unnecessary-value-param": 1
     },
-    "src/libs/mne/disp/plots/tfplot.h": {
+    "src/libs/mne/disp_widgets/plots/tfplot.h": {
       "modernize-use-override": 1
     },
-    "src/libs/mne/disp/viewers/abstractview.h": {
+    "src/libs/mne/disp_widgets/viewers/abstractview.h": {
       "modernize-use-nullptr": 1
     },
-    "src/libs/mne/disp/viewers/applytoview.h": {
+    "src/libs/mne/disp_widgets/viewers/applytoview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/artifactsettingsview.h": {
+    "src/libs/mne/disp_widgets/viewers/artifactsettingsview.h": {
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/averagelayoutview.cpp": {
+    "src/libs/mne/disp_widgets/viewers/averagelayoutview.cpp": {
       "performance-for-range-copy": 1
     },
-    "src/libs/mne/disp/viewers/averagelayoutview.h": {
+    "src/libs/mne/disp_widgets/viewers/averagelayoutview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/averageselectionview.cpp": {
+    "src/libs/mne/disp_widgets/viewers/averageselectionview.cpp": {
       "modernize-use-nullptr": 1
     },
-    "src/libs/mne/disp/viewers/averageselectionview.h": {
+    "src/libs/mne/disp_widgets/viewers/averageselectionview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/averagingsettingsview.cpp": {
+    "src/libs/mne/disp_widgets/viewers/averagingsettingsview.cpp": {
       "modernize-use-nullptr": 1
     },
-    "src/libs/mne/disp/viewers/averagingsettingsview.h": {
+    "src/libs/mne/disp_widgets/viewers/averagingsettingsview.h": {
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/bidsview.h": {
+    "src/libs/mne/disp_widgets/viewers/bidsview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 7
     },
-    "src/libs/mne/disp/viewers/butterflyview.cpp": {
+    "src/libs/mne/disp_widgets/viewers/butterflyview.cpp": {
       "bugprone-integer-division": 1,
       "performance-for-range-copy": 1,
       "performance-unnecessary-value-param": 1
     },
-    "src/libs/mne/disp/viewers/butterflyview.h": {
+    "src/libs/mne/disp_widgets/viewers/butterflyview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 2
     },
-    "src/libs/mne/disp/viewers/channelselectionview.cpp": {
+    "src/libs/mne/disp_widgets/viewers/channelselectionview.cpp": {
       "clang-analyzer-cplusplus.NewDeleteLeaks": 2,
       "modernize-use-nullptr": 1,
       "performance-unnecessary-copy-initialization": 1,
       "performance-unnecessary-value-param": 5
     },
-    "src/libs/mne/disp/viewers/channelselectionview.h": {
+    "src/libs/mne/disp_widgets/viewers/channelselectionview.h": {
       "modernize-use-nullptr": 2,
       "modernize-use-override": 8
     },
-    "src/libs/mne/disp/viewers/compensatorview.h": {
+    "src/libs/mne/disp_widgets/viewers/compensatorview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/connectivitysettingsview.h": {
+    "src/libs/mne/disp_widgets/viewers/connectivitysettingsview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/control3dview.h": {
+    "src/libs/mne/disp_widgets/viewers/control3dview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/coregsettingsview.h": {
+    "src/libs/mne/disp_widgets/viewers/coregsettingsview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/covariancesettingsview.h": {
+    "src/libs/mne/disp_widgets/viewers/covariancesettingsview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/dipolefitview.h": {
+    "src/libs/mne/disp_widgets/viewers/dipolefitview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 5
     },
-    "src/libs/mne/disp/viewers/fiffrawviewsettings.cpp": {
+    "src/libs/mne/disp_widgets/viewers/fiffrawviewsettings.cpp": {
       "bugprone-switch-missing-default-case": 1,
       "clang-analyzer-cplusplus.NewDeleteLeaks": 1
     },
-    "src/libs/mne/disp/viewers/fiffrawviewsettings.h": {
+    "src/libs/mne/disp_widgets/viewers/fiffrawviewsettings.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/filterdesignview.cpp": {
+    "src/libs/mne/disp_widgets/viewers/filterdesignview.cpp": {
       "bugprone-switch-missing-default-case": 1,
       "performance-for-range-copy": 1
     },
-    "src/libs/mne/disp/viewers/filterdesignview.h": {
+    "src/libs/mne/disp_widgets/viewers/filterdesignview.h": {
       "bugprone-derived-method-shadowing-base-method": 1,
       "modernize-use-nullptr": 1,
       "modernize-use-override": 8
     },
-    "src/libs/mne/disp/viewers/filtersettingsview.h": {
+    "src/libs/mne/disp_widgets/viewers/filtersettingsview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/fwdsettingsview.h": {
+    "src/libs/mne/disp_widgets/viewers/fwdsettingsview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
@@ -928,11 +928,11 @@
       "modernize-use-nullptr": 2,
       "modernize-use-override": 8
     },
-    "src/libs/mne/disp/viewers/helpers/channelrhiview.cpp": {
+    "src/libs/mne/disp_widgets/viewers/helpers/channelrhiview.cpp": {
       "bugprone-float-loop-counter": 2,
       "bugprone-incorrect-roundings": 1
     },
-    "src/libs/mne/disp/viewers/helpers/draggableframelesswidget.h": {
+    "src/libs/mne/disp_widgets/viewers/helpers/draggableframelesswidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 5
     },
@@ -950,10 +950,10 @@
     "src/libs/mne/disp/viewers/helpers/filterplotscene.h": {
       "modernize-use-nullptr": 1
     },
-    "src/libs/mne/disp/viewers/helpers/frequencyspectrumdelegate.cpp": {
+    "src/libs/mne/disp_widgets/viewers/helpers/frequencyspectrumdelegate.cpp": {
       "bugprone-switch-missing-default-case": 2
     },
-    "src/libs/mne/disp/viewers/helpers/frequencyspectrumdelegate.h": {
+    "src/libs/mne/disp_widgets/viewers/helpers/frequencyspectrumdelegate.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 2
     },
@@ -968,11 +968,11 @@
       "modernize-use-nullptr": 1,
       "modernize-use-override": 9
     },
-    "src/libs/mne/disp/viewers/helpers/rtfiffrawviewdelegate.cpp": {
+    "src/libs/mne/disp_widgets/viewers/helpers/rtfiffrawviewdelegate.cpp": {
       "bugprone-integer-division": 5,
       "bugprone-switch-missing-default-case": 3
     },
-    "src/libs/mne/disp/viewers/helpers/rtfiffrawviewdelegate.h": {
+    "src/libs/mne/disp_widgets/viewers/helpers/rtfiffrawviewdelegate.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 2
     },
@@ -997,78 +997,78 @@
     "src/libs/mne/disp/viewers/helpers/selectionsceneitem.h": {
       "modernize-use-override": 2
     },
-    "src/libs/mne/disp/viewers/helpers/timerulerwidget.cpp": {
+    "src/libs/mne/disp_widgets/viewers/helpers/timerulerwidget.cpp": {
       "bugprone-incorrect-roundings": 1
     },
-    "src/libs/mne/disp/viewers/hpisettingsview.cpp": {
+    "src/libs/mne/disp_widgets/viewers/hpisettingsview.cpp": {
       "bugprone-switch-missing-default-case": 1,
       "performance-unnecessary-value-param": 1
     },
-    "src/libs/mne/disp/viewers/hpisettingsview.h": {
+    "src/libs/mne/disp_widgets/viewers/hpisettingsview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/minimumnormsettingsview.h": {
+    "src/libs/mne/disp_widgets/viewers/minimumnormsettingsview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/modalityselectionview.cpp": {
+    "src/libs/mne/disp_widgets/viewers/modalityselectionview.cpp": {
       "modernize-use-nullptr": 1
     },
-    "src/libs/mne/disp/viewers/modalityselectionview.h": {
+    "src/libs/mne/disp_widgets/viewers/modalityselectionview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/multiview.h": {
+    "src/libs/mne/disp_widgets/viewers/multiview.h": {
       "modernize-use-override": 1
     },
-    "src/libs/mne/disp/viewers/multiviewwindow.h": {
+    "src/libs/mne/disp_widgets/viewers/multiviewwindow.h": {
       "modernize-use-override": 1
     },
-    "src/libs/mne/disp/viewers/progressview.h": {
+    "src/libs/mne/disp_widgets/viewers/progressview.h": {
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/projectorsview.h": {
+    "src/libs/mne/disp_widgets/viewers/projectorsview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/projectsettingsview.h": {
+    "src/libs/mne/disp_widgets/viewers/projectsettingsview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/quickcontrolview.h": {
+    "src/libs/mne/disp_widgets/viewers/quickcontrolview.h": {
       "modernize-use-override": 1
     },
-    "src/libs/mne/disp/viewers/rtfiffrawview.cpp": {
+    "src/libs/mne/disp_widgets/viewers/rtfiffrawview.cpp": {
       "clang-analyzer-deadcode.DeadStores": 1
     },
-    "src/libs/mne/disp/viewers/rtfiffrawview.h": {
+    "src/libs/mne/disp_widgets/viewers/rtfiffrawview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 7
     },
-    "src/libs/mne/disp/viewers/scalingview.cpp": {
+    "src/libs/mne/disp_widgets/viewers/scalingview.cpp": {
       "bugprone-switch-missing-default-case": 1
     },
-    "src/libs/mne/disp/viewers/scalingview.h": {
+    "src/libs/mne/disp_widgets/viewers/scalingview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/libs/mne/disp/viewers/spectrumsettingsview.h": {
+    "src/libs/mne/disp_widgets/viewers/spectrumsettingsview.h": {
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/spectrumview.h": {
+    "src/libs/mne/disp_widgets/viewers/spectrumview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 7
     },
-    "src/libs/mne/disp/viewers/spharasettingsview.h": {
+    "src/libs/mne/disp_widgets/viewers/spharasettingsview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/tfsettingsview.h": {
+    "src/libs/mne/disp_widgets/viewers/tfsettingsview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/triggerdetectionview.h": {
+    "src/libs/mne/disp_widgets/viewers/triggerdetectionview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
@@ -1096,10 +1096,10 @@
     "src/libs/mne/disp3D/scene/sensorfieldmapper.cpp": {
       "bugprone-float-loop-counter": 2
     },
-    "src/libs/mne/disp3D/view/brainview.cpp": {
+    "src/libs/mne/disp3D_widgets/view/brainview.cpp": {
       "performance-unnecessary-copy-initialization": 1
     },
-    "src/libs/mne/disp3D/view/brainview.h": {
+    "src/libs/mne/disp3D_widgets/view/brainview.h": {
       "modernize-use-override": 1
     },
     "src/libs/mne/disp3D/workers/rtsensordatacontroller.cpp": {

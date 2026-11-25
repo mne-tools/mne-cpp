@@ -21,7 +21,7 @@
 #include <anShared/Model/averagingdatamodel.h>
 #include <anShared/Model/eventmodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <mne/disp/viewers/averagingsettingsview.h>
+#include <mne/disp_widgets/viewers/averagingsettingsview.h>
 #include <mne/fiff/fiff_evoked_set.h>
 
 //=============================================================================================================

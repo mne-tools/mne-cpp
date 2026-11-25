@@ -19,20 +19,20 @@
 #include <mne/base/log.h>
 #include "realtimeevokedsetwidget.h"
 
-#include <mne/disp/viewers/channelselectionview.h>
+#include <mne/disp_widgets/viewers/channelselectionview.h>
 #include <mne/disp/viewers/helpers/channelinfomodel.h>
-#include <mne/disp/viewers/filterdesignview.h>
-#include <mne/disp/viewers/filtersettingsview.h>
+#include <mne/disp_widgets/viewers/filterdesignview.h>
+#include <mne/disp_widgets/viewers/filtersettingsview.h>
 #include <mne/disp/viewers/helpers/evokedsetmodel.h>
-#include <mne/disp/viewers/butterflyview.h>
-#include <mne/disp/viewers/averagelayoutview.h>
-#include <mne/disp/viewers/scalingview.h>
-#include <mne/disp/viewers/projectorsview.h>
-#include <mne/disp/viewers/compensatorview.h>
-#include <mne/disp/viewers/modalityselectionview.h>
-#include <mne/disp/viewers/fiffrawviewsettings.h>
-#include <mne/disp/viewers/averageselectionview.h>
-#include <mne/disp/viewers/averagingsettingsview.h>
+#include <mne/disp_widgets/viewers/butterflyview.h>
+#include <mne/disp_widgets/viewers/averagelayoutview.h>
+#include <mne/disp_widgets/viewers/scalingview.h>
+#include <mne/disp_widgets/viewers/projectorsview.h>
+#include <mne/disp_widgets/viewers/compensatorview.h>
+#include <mne/disp_widgets/viewers/modalityselectionview.h>
+#include <mne/disp_widgets/viewers/fiffrawviewsettings.h>
+#include <mne/disp_widgets/viewers/averageselectionview.h>
+#include <mne/disp_widgets/viewers/averagingsettingsview.h>
 #include <scMeas/realtimeevokedset.h>
 #include <mne/dsp/filterkernel.h>
 

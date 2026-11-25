@@ -45,7 +45,8 @@ from audit_maintainability import strip_comments_and_strings  # noqa: E402
 REPO_ROOT = Path(__file__).resolve().parents[2]
 POLICY_FILE = Path(__file__).resolve().parent / "qt_usage_policy.json"
 QT_ROOT = REPO_ROOT / "src" / "3rdparty" / "qt" / "dynamic"
-SCOPES = {"disp": "src/libs/mne/disp", "disp3D": "src/libs/mne/disp3D", "applications": "src/apps"}
+SCOPES = {"disp": "src/libs/mne/disp", "disp3D": "src/libs/mne/disp3D", "disp_widgets": "src/libs/mne/disp_widgets",
+          "disp3D_widgets": "src/libs/mne/disp3D_widgets", "applications": "src/apps"}
 EXTENSIONS = {".h", ".hpp", ".cpp", ".cc", ".cxx", ".mm"}
 BASE_MODULES = {"Core", "Gui"}
 

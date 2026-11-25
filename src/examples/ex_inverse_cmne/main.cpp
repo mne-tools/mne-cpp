@@ -30,8 +30,8 @@
 #include <mne/fs/fs_label.h>
 #include <mne/fs/fs_surfaceset.h>
 
-#include <mne/disp/plots/helpers/figureexporter.h>
-#include <mne/disp/plots/lineplot.h>
+#include <mne/disp_widgets/plots/helpers/figureexporter.h>
+#include <mne/disp_widgets/plots/lineplot.h>
 
 //=============================================================================================================
 // QT INCLUDES

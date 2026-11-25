@@ -59,7 +59,7 @@ add_subdirectory(ex_report)
 add_subdirectory(ex_sts_statistics)
 add_subdirectory(ex_warp)
 
-## Examples that link mne_disp3D but don't use 3D visualization directly
+## Examples that link mne_disp3D_widgets but don't use 3D visualization directly
 if(NOT WASM)
   add_subdirectory(ex_acq_oddball)
   add_subdirectory(ex_acq_record)
@@ -95,7 +95,7 @@ if(NOT WASM)
 endif()
 
 ## Examples using disp3D
-if(TARGET mne_disp3D)
+if(TARGET mne_disp3D_widgets)
     add_subdirectory(ex_clustered_inverse_mne)
     add_subdirectory(ex_clustered_inverse_mne_raw)
     add_subdirectory(ex_clustered_inverse_pwl_rap_music_raw)

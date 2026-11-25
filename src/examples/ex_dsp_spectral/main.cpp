@@ -29,9 +29,9 @@
 #include <mne/dsp/resample.h>
 #include <mne/dsp/spectrogram.h>
 
-#include <mne/disp/plots/helpers/figureexporter.h>
-#include <mne/disp/plots/imagesc.h>
-#include <mne/disp/plots/lineplot.h>
+#include <mne/disp_widgets/plots/helpers/figureexporter.h>
+#include <mne/disp_widgets/plots/imagesc.h>
+#include <mne/disp_widgets/plots/lineplot.h>
 
 //=============================================================================================================
 // QT INCLUDES

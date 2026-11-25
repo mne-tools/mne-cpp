@@ -12,7 +12,8 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Gui Widgets ShaderTools)
+# Qt Gui only: the QRhiWidget host is in mne_disp3D_widgets
+set(QT_REQUIRED_COMPONENTS Core Gui ShaderTools)
 
 # GuiPrivate is needed for QRhi headers — check availability (may be absent in some WASM builds)
 find_package(Qt6 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
@@ -53,7 +54,6 @@ set(SOURCES
     scene/sensorfieldmapper.cpp
     scene/rtsensorstreammanager.cpp
     scene/sourceestimatemanager.cpp
-    view/brainview.cpp
     view/brainviewcore.cpp
     view/brainwindow.cpp
     view/brainrenderer.cpp
@@ -102,7 +102,6 @@ set(HEADERS
     scene/sensorfieldmapper.h
     scene/rtsensorstreammanager.h
     scene/sourceestimatemanager.h
-    view/brainview.h
     view/brainviewcore.h
     view/brainwindow.h
     view/brainrenderer.h
@@ -159,7 +158,9 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
 )
 
+# ShaderTools only runs qsb at build time; clients do not link it
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
+list(REMOVE_ITEM QT_REQUIRED_COMPONENT_LIBS ShaderTools)
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt6::")
 
 set(MNE_LIBS_REQUIRED

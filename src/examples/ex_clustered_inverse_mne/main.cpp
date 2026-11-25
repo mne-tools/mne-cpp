@@ -24,7 +24,7 @@
 #include <mne/fiff/fiff_evoked.h>
 #include <mne/inv/inv_source_estimate.h>
 #include <mne/inv/minimum_norm/inv_minimum_norm.h>
-#include <mne/disp3D/view/brainview.h>
+#include <mne/disp3D_widgets/view/brainview.h>
 #include <mne/disp3D/model/braintreemodel.h>
 #include <mne/math/linalg.h>
 #include <mne/base/log.h>

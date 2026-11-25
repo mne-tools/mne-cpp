@@ -27,8 +27,8 @@
 #include <mne/dsp/rt/rt_detect_trigger.h>
 #include <mne/dsp/rt/rt_filter.h>
 
-#include <mne/disp/plots/helpers/figureexporter.h>
-#include <mne/disp/plots/lineplot.h>
+#include <mne/disp_widgets/plots/helpers/figureexporter.h>
+#include <mne/disp_widgets/plots/lineplot.h>
 
 //=============================================================================================================
 // QT INCLUDES

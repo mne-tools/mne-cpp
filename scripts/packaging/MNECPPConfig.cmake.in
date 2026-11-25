@@ -12,8 +12,8 @@
 #    target_link_libraries(my_app PRIVATE MNE-CPP::mne_fiff MNE-CPP::mne_dsp MNE-CPP::mne_acq)
 #
 #  Components are library names with or without the mne_ prefix. Only the Qt modules the requested
-#  libraries and their MNE-CPP dependencies use are looked up; only the display libraries (disp, disp3D)
-#  use Qt, so every other component is found without Qt. An SDK built with MNE_BUILD_QT=OFF contains
+#  libraries and their MNE-CPP dependencies use are looked up; only the display libraries (disp, disp3D and their
+#  widgets libraries) use Qt, so every other component is found without Qt. An SDK built with MNE_BUILD_QT=OFF contains
 #  no Qt-based library at all. Without COMPONENTS every library is requested.
 #
 #  Legacy variables (for compatibility with non-target-based projects):

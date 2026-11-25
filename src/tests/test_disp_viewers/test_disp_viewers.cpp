@@ -20,24 +20,24 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp/viewers/abstractview.h>
-#include <mne/disp/viewers/scalingview.h>
-#include <mne/disp/viewers/compensatorview.h>
-#include <mne/disp/viewers/projectorsview.h>
-#include <mne/disp/viewers/modalityselectionview.h>
-#include <mne/disp/viewers/minimumnormsettingsview.h>
-#include <mne/disp/viewers/filtersettingsview.h>
-#include <mne/disp/viewers/filterdesignview.h>
-#include <mne/disp/viewers/spectrumsettingsview.h>
-#include <mne/disp/viewers/averagingsettingsview.h>
-#include <mne/disp/viewers/covariancesettingsview.h>
-#include <mne/disp/viewers/spharasettingsview.h>
-#include <mne/disp/viewers/tfsettingsview.h>
-#include <mne/disp/viewers/connectivitysettingsview.h>
-#include <mne/disp/viewers/triggerdetectionview.h>
-#include <mne/disp/viewers/progressview.h>
-#include <mne/disp/viewers/quickcontrolview.h>
-#include <mne/disp/viewers/multiview.h>
+#include <mne/disp_widgets/viewers/abstractview.h>
+#include <mne/disp_widgets/viewers/scalingview.h>
+#include <mne/disp_widgets/viewers/compensatorview.h>
+#include <mne/disp_widgets/viewers/projectorsview.h>
+#include <mne/disp_widgets/viewers/modalityselectionview.h>
+#include <mne/disp_widgets/viewers/minimumnormsettingsview.h>
+#include <mne/disp_widgets/viewers/filtersettingsview.h>
+#include <mne/disp_widgets/viewers/filterdesignview.h>
+#include <mne/disp_widgets/viewers/spectrumsettingsview.h>
+#include <mne/disp_widgets/viewers/averagingsettingsview.h>
+#include <mne/disp_widgets/viewers/covariancesettingsview.h>
+#include <mne/disp_widgets/viewers/spharasettingsview.h>
+#include <mne/disp_widgets/viewers/tfsettingsview.h>
+#include <mne/disp_widgets/viewers/connectivitysettingsview.h>
+#include <mne/disp_widgets/viewers/triggerdetectionview.h>
+#include <mne/disp_widgets/viewers/progressview.h>
+#include <mne/disp_widgets/viewers/quickcontrolview.h>
+#include <mne/disp_widgets/viewers/multiview.h>
 
 #include <mne/fiff/fiff_ch_info.h>
 #include <mne/fiff/fiff_proj.h>

@@ -36,7 +36,7 @@ endif()
 target_link_libraries(mne_analyze_studio_dummy_3d_extension_widgets PUBLIC
     ${QT_REQUIRED_COMPONENT_LIBS}
     mne_analyze_studio_sdk
-    mne_disp3D
+    mne_disp3D_widgets
     mne_fiff
     mne_fs
     mne_mne

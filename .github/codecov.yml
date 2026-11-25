@@ -89,6 +89,14 @@ component_management:
       name: libs/mne/disp3D
       paths:
         - src/libs/mne/disp3D/**
+    - component_id: libs_disp_widgets
+      name: libs/mne/disp_widgets
+      paths:
+        - src/libs/mne/disp_widgets/**
+    - component_id: libs_disp3D_widgets
+      name: libs/mne/disp3D_widgets
+      paths:
+        - src/libs/mne/disp3D_widgets/**
     - component_id: libs_dsp
       name: libs/mne/dsp
       paths:

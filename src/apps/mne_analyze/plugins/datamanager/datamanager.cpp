@@ -21,7 +21,7 @@
 #include "datamanager.h"
 
 #include <mne/base/log.h>
-#include <mne/disp/viewers/bidsview.h>
+#include <mne/disp_widgets/viewers/bidsview.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 

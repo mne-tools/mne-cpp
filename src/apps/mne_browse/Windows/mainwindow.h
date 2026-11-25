@@ -70,7 +70,7 @@
 #include "chinfowindow.h"
 #include "noisereductionwindow.h"
 
-#include <mne/disp/viewers/channelselectionview.h>
+#include <mne/disp_widgets/viewers/channelselectionview.h>
 
 
 //*************************************************************************************************************

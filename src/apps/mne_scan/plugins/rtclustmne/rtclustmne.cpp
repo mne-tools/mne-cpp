@@ -21,7 +21,7 @@
 
 #include "FormFiles/rtclustmnesetupwidget.h"
 #include <mne/base/string_utils.h>
-#include <mne/disp/viewers/minimumnormsettingsview.h>
+#include <mne/disp_widgets/viewers/minimumnormsettingsview.h>
 #include <mne/fs/fs_annotationset.h>
 #include <mne/fs/fs_surfaceset.h>
 #include <mne/fiff/fiff_ch_name.h>

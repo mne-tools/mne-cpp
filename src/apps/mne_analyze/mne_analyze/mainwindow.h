@@ -22,7 +22,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp/viewers/abstractview.h>
+#include <mne/disp_widgets/viewers/abstractview.h>
 #include "analyzecore.h"
 #include <mne/base/log.h>
 

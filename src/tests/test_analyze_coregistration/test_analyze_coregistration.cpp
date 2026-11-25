@@ -18,7 +18,7 @@
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/event.h>
 #include <anShared/Model/bemdatamodel.h>
-#include <mne/disp/viewers/coregsettingsview.h>
+#include <mne/disp_widgets/viewers/coregsettingsview.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_coord_trans.h>
 #include <mne/base/string_utils.h>

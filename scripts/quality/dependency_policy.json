@@ -84,16 +84,24 @@
     },
     {
       "name": "visualization",
-      "description": "Two-dimensional display widgets.",
+      "description": "Two-dimensional display core on Qt Gui: colour maps, the QPainter scene backend, item models and the QWindow channel view.",
       "libraries": [
         "mne_disp"
       ]
     },
     {
       "name": "visualization3d",
-      "description": "Three-dimensional display, the top of the stack.",
+      "description": "Three-dimensional display core on Qt Gui: the QRhi brain renderer and its QWindow host.",
       "libraries": [
         "mne_disp3D"
+      ]
+    },
+    {
+      "name": "widgets",
+      "description": "Qt Widgets on top of the display cores, the top of the stack: plots, viewers, settings panels and the QRhiWidget hosts.",
+      "libraries": [
+        "mne_disp_widgets",
+        "mne_disp3D_widgets"
       ]
     }
   ],
@@ -106,7 +114,8 @@
   "$qt_layers_comment": "The only layers whose libraries may link Qt (DEP022). Every other library builds and installs without Qt (MNE_BUILD_QT=OFF).",
   "qt_layers": [
     "visualization",
-    "visualization3d"
+    "visualization3d",
+    "widgets"
   ],
   "$allowed_external_comment": "Third-party targets the libraries are permitted to link. Qt targets are normalised to a version-independent Qt:: spelling. Adding an entry here is an architectural decision and should be reviewed as one.",
   "allowed_external": [

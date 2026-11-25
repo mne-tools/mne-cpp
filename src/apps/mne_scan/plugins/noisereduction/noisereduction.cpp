@@ -21,12 +21,12 @@
 
 #include "FormFiles/noisereductionsetupwidget.h"
 #include <mne/base/string_utils.h>
-#include <mne/disp/viewers/scalingview.h>
-#include <mne/disp/viewers/projectorsview.h>
-#include <mne/disp/viewers/filtersettingsview.h>
-#include <mne/disp/viewers/filterdesignview.h>
-#include <mne/disp/viewers/compensatorview.h>
-#include <mne/disp/viewers/spharasettingsview.h>
+#include <mne/disp_widgets/viewers/scalingview.h>
+#include <mne/disp_widgets/viewers/projectorsview.h>
+#include <mne/disp_widgets/viewers/filtersettingsview.h>
+#include <mne/disp_widgets/viewers/filterdesignview.h>
+#include <mne/disp_widgets/viewers/compensatorview.h>
+#include <mne/disp_widgets/viewers/spharasettingsview.h>
 #include <mne/dsp/rt/rt_filter.h>
 #include <mne/dsp/sphara.h>
 #include <mne/math/matrix_io.h>

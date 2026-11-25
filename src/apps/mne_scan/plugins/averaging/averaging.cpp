@@ -20,8 +20,8 @@
 #include "averaging.h"
 
 #include "FormFiles/averagingsetupwidget.h"
-#include <mne/disp/viewers/averagingsettingsview.h>
-#include <mne/disp/viewers/artifactsettingsview.h>
+#include <mne/disp_widgets/viewers/averagingsettingsview.h>
+#include <mne/disp_widgets/viewers/artifactsettingsview.h>
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimemultisamplearray.h>
 

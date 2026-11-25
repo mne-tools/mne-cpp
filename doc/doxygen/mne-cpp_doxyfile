@@ -2538,6 +2538,9 @@ PREDEFINED             = COMMUNICATIONSHARED_EXPORT= \
                          CONNECTIVITYSHARED_EXPORT= \
                          DISP3DRHISHARED_EXPORT= \
                          DISPSHARED_EXPORT= \
+                         DISPWIDGETSSHARED_EXPORT= \
+                         DISP3DSHARED_EXPORT= \
+                         DISP3DWIDGETSSHARED_EXPORT= \
                          EVENTS_EXPORT= \
                          FIFFSHARED_EXPORT= \
                          FSSHARED_EXPORT= \

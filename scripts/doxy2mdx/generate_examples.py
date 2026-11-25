@@ -86,7 +86,8 @@ DATASETS = {
     "mne-cpp-test-data": "the [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data) repository "
                          "cloned to `resources/data/mne-cpp-test-data`",
 }
-INCLUDE = re.compile(r"^#include\s*<mne/(\w+)/", re.M)
+# The widgets libraries are filed under the display library they build on.
+INCLUDE = re.compile(r"^#include\s*<mne/(\w+?)(?:_widgets)?/", re.M)
 BRIEF = re.compile(r"@brief\s+(.+?)\s*(?:\*/)?$", re.M)
 NOT_CODE = re.compile(r"^\s*(#|using\b|//|\*|/\*)")
 SNIPPET_MARKER = re.compile(r"^\s*//! \[\w+\]\s*$")

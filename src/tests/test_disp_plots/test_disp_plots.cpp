@@ -17,15 +17,15 @@
 //=============================================================================================================
 
 #include <mne/disp/plots/helpers/colormap.h>
-#include <mne/disp/plots/helpers/figureexporter.h>
-#include <mne/disp/plots/lineplot.h>
-#include <mne/disp/plots/imagesc.h>
-#include <mne/disp/plots/plot.h>
-#include <mne/disp/plots/spline.h>
-#include <mne/disp/plots/bar.h>
-#include <mne/disp/plots/tfplot.h>
-#include <mne/disp/plots/graph.h>
-#include <mne/disp/viewers/scalingview.h>
+#include <mne/disp_widgets/plots/helpers/figureexporter.h>
+#include <mne/disp_widgets/plots/lineplot.h>
+#include <mne/disp_widgets/plots/imagesc.h>
+#include <mne/disp_widgets/plots/plot.h>
+#include <mne/disp_widgets/plots/spline.h>
+#include <mne/disp_widgets/plots/bar.h>
+#include <mne/disp_widgets/plots/tfplot.h>
+#include <mne/disp_widgets/plots/graph.h>
+#include <mne/disp_widgets/viewers/scalingview.h>
 
 //=============================================================================================================
 // QT INCLUDES

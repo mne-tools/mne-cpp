@@ -424,7 +424,7 @@ if(NOT WASM)
   endif()
 
   # Visualization / testing
-  if(BUILD_MNE_SCREENSHOT_REGRESSION AND TARGET mne_disp3D)
+  if(BUILD_MNE_SCREENSHOT_REGRESSION AND TARGET mne_disp3D_widgets)
     add_subdirectory(visualization/mne_screenshot_regression)
   endif()
 

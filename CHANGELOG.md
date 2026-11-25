@@ -284,6 +284,20 @@ aliases; replace the old spelling as below.
   it, and `FilterDesignView` uses that widget instead of a `QGraphicsView`.
   Its plot export writes vector SVG. Removed: `FilterPlotScene` and
   `FilterDesignView::resizeEvent()`.
+- Breaking: the Qt Widgets code of the display libraries moved into two new
+  libraries, so `mne_disp` and `mne_disp3D` need Qt Gui only. `mne_disp_widgets`
+  holds the plots (`LinePlot`, `Bar`, `Spline`, `ImageSc`, `TFplot`, `Plot`,
+  `Graph`, `FilterPlot`, `FigureExporter`), all viewers and settings panels and
+  the widget helpers (`ChannelRhiView`, `SceneViewport`, `SensorLayoutWidget`,
+  `AverageLayoutWidget`, delegates, rulers); `mne_disp3D_widgets` holds
+  `BrainView`. `mne_disp` keeps the colour maps, the scene painter, the SVG
+  writer, the item models, `ChannelRhiRenderer` and `ChannelWindow`;
+  `mne_disp3D` keeps the renderer, `BrainViewCore` and `BrainWindow`. The
+  namespace stays `mne::disp`. Link `mne_disp_widgets` (or
+  `mne_disp3D_widgets`) instead of `mne_disp` (`mne_disp3D`) when you use a
+  widget, and include it from `<mne/disp_widgets/...>`
+  (`<mne/disp3D_widgets/view/brainview.h>`). The `QRhiWidget` hosts stay, in
+  the widgets libraries, for widget overlays and WebAssembly embedding.
 - `mne::write_mat_file()` (`math/mat_file.h`) writes matrices to a MATLAB
   Level 5 MAT-file; `mne_raw2mat` and `mne_epochs2mat` use it instead of two
   copies of the writer (their files are byte-identical).

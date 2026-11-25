@@ -28,7 +28,7 @@
 #include <anShared/Model/covariancemodel.h>
 #include <anShared/Model/averagingdatamodel.h>
 #include <anShared/Model/dipolefitmodel.h>
-#include <mne/disp/viewers/dipolefitview.h>
+#include <mne/disp_widgets/viewers/dipolefitview.h>
 #include <mne/inv/dipole_fit/inv_dipole_fit_data.h>
 #include <mne/inv/dipole_fit/inv_dipole_fit.h>
 #include <mne/inv/dipole_fit/inv_ecd_set.h>

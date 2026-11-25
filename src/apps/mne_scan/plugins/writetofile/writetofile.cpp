@@ -21,7 +21,7 @@
 
 #include "FormFiles/writetofilesetupwidget.h"
 #include "FormFiles/writetofilestatuswidget.h"
-#include <mne/disp/viewers/projectsettingsview.h>
+#include <mne/disp_widgets/viewers/projectsettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_stream.h>

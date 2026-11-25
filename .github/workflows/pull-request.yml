@@ -132,7 +132,7 @@ jobs:
     - name: Check Qt usage ceilings
       run: python3 scripts/quality/audit_qt_usage.py --ceilings
 
-    # Every target of disp, disp3D and the applications stays within its Qt module allowlist (qt_usage_policy.json).
+    # Every target of the display libraries and the applications stays within its Qt module allowlist (qt_usage_policy.json).
     - name: Check Qt module allowlists
       run: python3 scripts/quality/audit_qt_modules.py --check
 

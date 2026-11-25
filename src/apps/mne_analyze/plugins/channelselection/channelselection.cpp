@@ -20,8 +20,8 @@
 
 #include <mne/disp/viewers/helpers/selectionitem.h>
 #include <mne/disp/viewers/helpers/channelinfomodel.h>
-#include <mne/disp/viewers/channelselectionview.h>
-#include <mne/disp/viewers/applytoview.h>
+#include <mne/disp_widgets/viewers/channelselectionview.h>
+#include <mne/disp_widgets/viewers/applytoview.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Management/analyzedata.h>

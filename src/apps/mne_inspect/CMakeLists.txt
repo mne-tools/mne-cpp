@@ -19,14 +19,14 @@ set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 set(MNE_LIBS_REQUIRED
-    mne_disp3D
+    mne_disp3D_widgets
     mne_fs
     mne_fiff
     mne_fwd
     mne_mne
     mne_mna
     mne_mri
-    mne_disp
+    mne_disp_widgets
     mne_inv
     mne_base
     mne_math
@@ -102,7 +102,7 @@ target_include_directories(mne_inspect_demo_fixtures PUBLIC
 target_link_libraries(mne_inspect_demo_fixtures PUBLIC
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Gui
-    mne_disp3D
+    mne_disp3D_widgets
     mne_ieeg
     mne_mri
     mne_fiff

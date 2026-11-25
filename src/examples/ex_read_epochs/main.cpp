@@ -20,8 +20,8 @@
 #include <mne/fiff/fiff.h>
 #include <mne/mne/mne.h>
 #include <mne/mne/mne_epoch_data_list.h>
-#include <mne/disp/plots/helpers/figureexporter.h>
-#include <mne/disp/plots/imagesc.h>
+#include <mne/disp_widgets/plots/helpers/figureexporter.h>
+#include <mne/disp_widgets/plots/imagesc.h>
 #include <mne/base/log.h>
 
 //=============================================================================================================

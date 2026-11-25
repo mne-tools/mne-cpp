@@ -25,7 +25,7 @@
 #include "../anshared_global.h"
 #include "../Utils/types.h"
 
-#include <mne/disp/viewers/abstractview.h>
+#include <mne/disp_widgets/viewers/abstractview.h>
 
 //=============================================================================================================
 // QT INCLUDES

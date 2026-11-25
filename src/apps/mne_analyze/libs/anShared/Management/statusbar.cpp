@@ -24,7 +24,7 @@
 #include "communicator.h"
 #include "event.h"
 
-#include <mne/disp/viewers/progressview.h>
+#include <mne/disp_widgets/viewers/progressview.h>
 
 //=============================================================================================================
 // QT INCLUDES

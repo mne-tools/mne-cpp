@@ -23,8 +23,8 @@
 #include <mne/inv/inv_source_estimate.h>
 #include <mne/inv/minimum_norm/inv_minimum_norm.h>
 #include <mne/base/log.h>
-#include <mne/disp/plots/helpers/figureexporter.h>
-#include <mne/disp/plots/lineplot.h>
+#include <mne/disp_widgets/plots/helpers/figureexporter.h>
+#include <mne/disp_widgets/plots/lineplot.h>
 
 //=============================================================================================================
 // QT INCLUDES

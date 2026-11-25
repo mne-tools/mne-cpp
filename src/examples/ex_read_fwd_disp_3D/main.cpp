@@ -16,7 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp3D/view/brainview.h>
+#include <mne/disp3D_widgets/view/brainview.h>
 #include <mne/disp3D/model/braintreemodel.h>
 
 #include <mne/fs/fs_surfaceset.h>

@@ -3664,7 +3664,7 @@
     {
       "name": "AbstractView",
       "module": "disp",
-      "header": "disp/viewers/abstractview.h",
+      "header": "disp_widgets/viewers/abstractview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -3681,7 +3681,7 @@
     {
       "name": "ApplyToView",
       "module": "disp",
-      "header": "disp/viewers/applytoview.h",
+      "header": "disp_widgets/viewers/applytoview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -3698,7 +3698,7 @@
     {
       "name": "ArtifactSettingsView",
       "module": "disp",
-      "header": "disp/viewers/artifactsettingsview.h",
+      "header": "disp_widgets/viewers/artifactsettingsview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -3715,7 +3715,7 @@
     {
       "name": "AverageLayoutView",
       "module": "disp",
-      "header": "disp/viewers/averagelayoutview.h",
+      "header": "disp_widgets/viewers/averagelayoutview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -3732,7 +3732,7 @@
     {
       "name": "AverageSelectionView",
       "module": "disp",
-      "header": "disp/viewers/averageselectionview.h",
+      "header": "disp_widgets/viewers/averageselectionview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -3749,7 +3749,7 @@
     {
       "name": "AveragingSettingsView",
       "module": "disp",
-      "header": "disp/viewers/averagingsettingsview.h",
+      "header": "disp_widgets/viewers/averagingsettingsview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -3766,7 +3766,7 @@
     {
       "name": "Bar",
       "module": "disp",
-      "header": "disp/plots/bar.h",
+      "header": "disp_widgets/plots/bar.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -3787,7 +3787,7 @@
     {
       "name": "BidsView",
       "module": "disp",
-      "header": "disp/viewers/bidsview.h",
+      "header": "disp_widgets/viewers/bidsview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -3821,7 +3821,7 @@
     {
       "name": "ButterflyView",
       "module": "disp",
-      "header": "disp/viewers/butterflyview.h",
+      "header": "disp_widgets/viewers/butterflyview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -3855,7 +3855,7 @@
     {
       "name": "ChannelDataView",
       "module": "disp",
-      "header": "disp/viewers/channeldataview.h",
+      "header": "disp_widgets/viewers/channeldataview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -3889,7 +3889,7 @@
     {
       "name": "ChannelLabelPanel",
       "module": "disp",
-      "header": "disp/viewers/helpers/channellabelpanel.h",
+      "header": "disp_widgets/viewers/helpers/channellabelpanel.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -3906,7 +3906,7 @@
     {
       "name": "ChannelRhiView",
       "module": "disp",
-      "header": "disp/viewers/helpers/channelrhiview.h",
+      "header": "disp_widgets/viewers/helpers/channelrhiview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -3923,7 +3923,7 @@
     {
       "name": "ChannelSelectionView",
       "module": "disp",
-      "header": "disp/viewers/channelselectionview.h",
+      "header": "disp_widgets/viewers/channelselectionview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -3961,7 +3961,7 @@
     {
       "name": "CompensatorView",
       "module": "disp",
-      "header": "disp/viewers/compensatorview.h",
+      "header": "disp_widgets/viewers/compensatorview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -3978,7 +3978,7 @@
     {
       "name": "ConnectivitySettingsView",
       "module": "disp",
-      "header": "disp/viewers/connectivitysettingsview.h",
+      "header": "disp_widgets/viewers/connectivitysettingsview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -3995,7 +3995,7 @@
     {
       "name": "Control3DView",
       "module": "disp",
-      "header": "disp/viewers/control3dview.h",
+      "header": "disp_widgets/viewers/control3dview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4012,7 +4012,7 @@
     {
       "name": "CoregSettingsView",
       "module": "disp",
-      "header": "disp/viewers/coregsettingsview.h",
+      "header": "disp_widgets/viewers/coregsettingsview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4029,7 +4029,7 @@
     {
       "name": "CovarianceSettingsView",
       "module": "disp",
-      "header": "disp/viewers/covariancesettingsview.h",
+      "header": "disp_widgets/viewers/covariancesettingsview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4046,7 +4046,7 @@
     {
       "name": "DipoleFitView",
       "module": "disp",
-      "header": "disp/viewers/dipolefitview.h",
+      "header": "disp_widgets/viewers/dipolefitview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4063,7 +4063,7 @@
     {
       "name": "DraggableFramelessWidget",
       "module": "disp",
-      "header": "disp/viewers/helpers/draggableframelesswidget.h",
+      "header": "disp_widgets/viewers/helpers/draggableframelesswidget.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4097,7 +4097,7 @@
     {
       "name": "FiffRawViewSettings",
       "module": "disp",
-      "header": "disp/viewers/fiffrawviewsettings.h",
+      "header": "disp_widgets/viewers/fiffrawviewsettings.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4114,7 +4114,7 @@
     {
       "name": "FilterDesignView",
       "module": "disp",
-      "header": "disp/viewers/filterdesignview.h",
+      "header": "disp_widgets/viewers/filterdesignview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4131,7 +4131,7 @@
     {
       "name": "FilterPlot",
       "module": "disp",
-      "header": "disp/plots/filterplot.h",
+      "header": "disp_widgets/plots/filterplot.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4152,7 +4152,7 @@
     {
       "name": "FilterSettingsView",
       "module": "disp",
-      "header": "disp/viewers/filtersettingsview.h",
+      "header": "disp_widgets/viewers/filtersettingsview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4169,7 +4169,7 @@
     {
       "name": "FrequencySpectrumDelegate",
       "module": "disp",
-      "header": "disp/viewers/helpers/frequencyspectrumdelegate.h",
+      "header": "disp_widgets/viewers/helpers/frequencyspectrumdelegate.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4203,7 +4203,7 @@
     {
       "name": "FwdSettingsView",
       "module": "disp",
-      "header": "disp/viewers/fwdsettingsview.h",
+      "header": "disp_widgets/viewers/fwdsettingsview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4220,7 +4220,7 @@
     {
       "name": "Graph",
       "module": "disp",
-      "header": "disp/plots/graph.h",
+      "header": "disp_widgets/plots/graph.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4241,7 +4241,7 @@
     {
       "name": "HpiSettingsView",
       "module": "disp",
-      "header": "disp/viewers/hpisettingsview.h",
+      "header": "disp_widgets/viewers/hpisettingsview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4258,7 +4258,7 @@
     {
       "name": "ImageSc",
       "module": "disp",
-      "header": "disp/plots/imagesc.h",
+      "header": "disp_widgets/plots/imagesc.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4279,7 +4279,7 @@
     {
       "name": "LinePlot",
       "module": "disp",
-      "header": "disp/plots/lineplot.h",
+      "header": "disp_widgets/plots/lineplot.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4300,7 +4300,7 @@
     {
       "name": "FigureExporter",
       "module": "disp",
-      "header": "disp/plots/helpers/figureexporter.h",
+      "header": "disp_widgets/plots/helpers/figureexporter.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4359,7 +4359,7 @@
     {
       "name": "MinimumNormSettingsView",
       "module": "disp",
-      "header": "disp/viewers/minimumnormsettingsview.h",
+      "header": "disp_widgets/viewers/minimumnormsettingsview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4376,7 +4376,7 @@
     {
       "name": "ModalitySelectionView",
       "module": "disp",
-      "header": "disp/viewers/modalityselectionview.h",
+      "header": "disp_widgets/viewers/modalityselectionview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4393,7 +4393,7 @@
     {
       "name": "MultiView",
       "module": "disp",
-      "header": "disp/viewers/multiview.h",
+      "header": "disp_widgets/viewers/multiview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4410,7 +4410,7 @@
     {
       "name": "MultiViewWindow",
       "module": "disp",
-      "header": "disp/viewers/multiviewwindow.h",
+      "header": "disp_widgets/viewers/multiviewwindow.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4427,7 +4427,7 @@
     {
       "name": "OverviewBarWidget",
       "module": "disp",
-      "header": "disp/viewers/helpers/overviewbarwidget.h",
+      "header": "disp_widgets/viewers/helpers/overviewbarwidget.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4444,7 +4444,7 @@
     {
       "name": "Plot",
       "module": "disp",
-      "header": "disp/plots/plot.h",
+      "header": "disp_widgets/plots/plot.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4465,7 +4465,7 @@
     {
       "name": "ProgressView",
       "module": "disp",
-      "header": "disp/viewers/progressview.h",
+      "header": "disp_widgets/viewers/progressview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4482,7 +4482,7 @@
     {
       "name": "ProjectSettingsView",
       "module": "disp",
-      "header": "disp/viewers/projectsettingsview.h",
+      "header": "disp_widgets/viewers/projectsettingsview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4499,7 +4499,7 @@
     {
       "name": "ProjectorsView",
       "module": "disp",
-      "header": "disp/viewers/projectorsview.h",
+      "header": "disp_widgets/viewers/projectorsview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4516,7 +4516,7 @@
     {
       "name": "QuickControlView",
       "module": "disp",
-      "header": "disp/viewers/quickcontrolview.h",
+      "header": "disp_widgets/viewers/quickcontrolview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4533,7 +4533,7 @@
     {
       "name": "RtFiffRawView",
       "module": "disp",
-      "header": "disp/viewers/rtfiffrawview.h",
+      "header": "disp_widgets/viewers/rtfiffrawview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4550,7 +4550,7 @@
     {
       "name": "RtFiffRawViewDelegate",
       "module": "disp",
-      "header": "disp/viewers/helpers/rtfiffrawviewdelegate.h",
+      "header": "disp_widgets/viewers/helpers/rtfiffrawviewdelegate.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4584,7 +4584,7 @@
     {
       "name": "ScaleControl",
       "module": "disp",
-      "header": "disp/viewers/helpers/scalecontrol.h",
+      "header": "disp_widgets/viewers/helpers/scalecontrol.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4601,7 +4601,7 @@
     {
       "name": "ScalingView",
       "module": "disp",
-      "header": "disp/viewers/scalingview.h",
+      "header": "disp_widgets/viewers/scalingview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4635,7 +4635,7 @@
     {
       "name": "SpectrumSettingsView",
       "module": "disp",
-      "header": "disp/viewers/spectrumsettingsview.h",
+      "header": "disp_widgets/viewers/spectrumsettingsview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4652,7 +4652,7 @@
     {
       "name": "SpectrumView",
       "module": "disp",
-      "header": "disp/viewers/spectrumview.h",
+      "header": "disp_widgets/viewers/spectrumview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4669,7 +4669,7 @@
     {
       "name": "SpharaSettingsView",
       "module": "disp",
-      "header": "disp/viewers/spharasettingsview.h",
+      "header": "disp_widgets/viewers/spharasettingsview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4686,7 +4686,7 @@
     {
       "name": "Spline",
       "module": "disp",
-      "header": "disp/plots/spline.h",
+      "header": "disp_widgets/plots/spline.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4707,7 +4707,7 @@
     {
       "name": "TFplot",
       "module": "disp",
-      "header": "disp/plots/tfplot.h",
+      "header": "disp_widgets/plots/tfplot.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4728,7 +4728,7 @@
     {
       "name": "TfSettingsView",
       "module": "disp",
-      "header": "disp/viewers/tfsettingsview.h",
+      "header": "disp_widgets/viewers/tfsettingsview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4745,7 +4745,7 @@
     {
       "name": "TimeRulerWidget",
       "module": "disp",
-      "header": "disp/viewers/helpers/timerulerwidget.h",
+      "header": "disp_widgets/viewers/helpers/timerulerwidget.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4762,7 +4762,7 @@
     {
       "name": "TriggerDetectionView",
       "module": "disp",
-      "header": "disp/viewers/triggerdetectionview.h",
+      "header": "disp_widgets/viewers/triggerdetectionview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -9695,7 +9695,7 @@
     {
       "name": "TimeRulerEventMark",
       "module": "disp",
-      "header": "disp/viewers/helpers/timerulerwidget.h",
+      "header": "disp_widgets/viewers/helpers/timerulerwidget.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -9712,7 +9712,7 @@
     {
       "name": "TimeRulerReferenceMark",
       "module": "disp",
-      "header": "disp/viewers/helpers/timerulerwidget.h",
+      "header": "disp_widgets/viewers/helpers/timerulerwidget.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -11803,7 +11803,7 @@
     {
       "name": "BrainView",
       "module": "disp3D",
-      "header": "disp3D/view/brainview.h",
+      "header": "disp3D_widgets/view/brainview.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -13292,7 +13292,7 @@
     {
       "name": "SceneViewport",
       "module": "disp",
-      "header": "disp/viewers/helpers/sceneviewport.h",
+      "header": "disp_widgets/viewers/helpers/sceneviewport.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -13310,7 +13310,7 @@
     {
       "name": "SensorLayoutWidget",
       "module": "disp",
-      "header": "disp/viewers/helpers/sensorlayoutwidget.h",
+      "header": "disp_widgets/viewers/helpers/sensorlayoutwidget.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -13328,7 +13328,7 @@
     {
       "name": "AverageLayoutWidget",
       "module": "disp",
-      "header": "disp/viewers/helpers/averagelayoutwidget.h",
+      "header": "disp_widgets/viewers/helpers/averagelayoutwidget.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,

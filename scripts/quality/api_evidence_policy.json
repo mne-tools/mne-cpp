@@ -1,7 +1,8 @@
 {
   "$comment": "Policy for scripts/quality/audit_api_evidence.py. Proposed example-eligibility rules for gate G3. An exported class is example-eligible unless a rule below exempts it. Every rule states why; Per-record exemptions use example_exempt/example_exempt_reason in doc/api_registry.json. example_debt lists the eligible registry classes that still lack a built example with an example_snippet; scripts/validate_api_registry.py fails for any other eligible class, and the list and its ceiling may only shrink.",
   "exempt_header_prefixes": {
-    "disp/viewers/": "Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example.",
+    "disp/viewers/": "Model behind a Qt view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example.",
+    "disp_widgets/viewers/": "Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example.",
     "disp3D/model/": "Scene-graph item owned and driven by BrainView; not constructed directly by library users.",
     "disp3D/workers/": "Background worker owned by a real-time view; its behaviour is exercised through the owning view.",
     "disp3D/core/": "Renderer internals behind the BrainView/MultimodalScene facade.",

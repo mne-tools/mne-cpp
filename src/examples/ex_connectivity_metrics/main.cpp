@@ -38,9 +38,9 @@
 #include <mne/connectivity/metrics/weightedphaselagindex.h>
 #include <mne/connectivity/network/network.h>
 
-#include <mne/disp/plots/helpers/figureexporter.h>
-#include <mne/disp/plots/imagesc.h>
-#include <mne/disp/plots/lineplot.h>
+#include <mne/disp_widgets/plots/helpers/figureexporter.h>
+#include <mne/disp_widgets/plots/imagesc.h>
+#include <mne/disp_widgets/plots/lineplot.h>
 
 //=============================================================================================================
 // QT INCLUDES

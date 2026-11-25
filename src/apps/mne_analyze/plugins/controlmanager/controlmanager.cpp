@@ -20,10 +20,10 @@
 #include <mne/base/log.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
-#include <mne/disp/viewers/scalingview.h>
-#include <mne/disp/viewers/applytoview.h>
-#include <mne/disp/viewers/control3dview.h>
-#include <mne/disp/viewers/fiffrawviewsettings.h>
+#include <mne/disp_widgets/viewers/scalingview.h>
+#include <mne/disp_widgets/viewers/applytoview.h>
+#include <mne/disp_widgets/viewers/control3dview.h>
+#include <mne/disp_widgets/viewers/fiffrawviewsettings.h>
 #ifdef MNE_DISP3D
 #include <mne/disp3D/model/braintreemodel.h>
 #endif

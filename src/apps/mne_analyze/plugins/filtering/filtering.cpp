@@ -22,8 +22,8 @@
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <mne/disp/viewers/filtersettingsview.h>
-#include <mne/disp/viewers/filterdesignview.h>
+#include <mne/disp_widgets/viewers/filtersettingsview.h>
+#include <mne/disp_widgets/viewers/filterdesignview.h>
 #include <mne/dsp/filterkernel.h>
 
 //=============================================================================================================

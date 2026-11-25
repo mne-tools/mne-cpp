@@ -31,18 +31,18 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp/viewers/dipolefitview.h>
-#include <mne/disp/viewers/bidsview.h>
-#include <mne/disp/viewers/averagelayoutview.h>
-#include <mne/disp/viewers/butterflyview.h>
-#include <mne/disp/viewers/control3dview.h>
-#include <mne/disp/viewers/artifactsettingsview.h>
-#include <mne/disp/viewers/projectsettingsview.h>
-#include <mne/disp/viewers/helpers/timerulerwidget.h>
-#include <mne/disp/viewers/helpers/channellabelpanel.h>
-#include <mne/disp/viewers/helpers/overviewbarwidget.h>
+#include <mne/disp_widgets/viewers/dipolefitview.h>
+#include <mne/disp_widgets/viewers/bidsview.h>
+#include <mne/disp_widgets/viewers/averagelayoutview.h>
+#include <mne/disp_widgets/viewers/butterflyview.h>
+#include <mne/disp_widgets/viewers/control3dview.h>
+#include <mne/disp_widgets/viewers/artifactsettingsview.h>
+#include <mne/disp_widgets/viewers/projectsettingsview.h>
+#include <mne/disp_widgets/viewers/helpers/timerulerwidget.h>
+#include <mne/disp_widgets/viewers/helpers/channellabelpanel.h>
+#include <mne/disp_widgets/viewers/helpers/overviewbarwidget.h>
 #include <mne/disp/viewers/helpers/channeldatamodel.h>
-#include <mne/disp/viewers/helpers/channelrhiview.h>
+#include <mne/disp_widgets/viewers/helpers/channelrhiview.h>
 #include <mne/fiff/fiff_ch_info.h>
 #include <mne/fiff/fiff_info.h>
 
