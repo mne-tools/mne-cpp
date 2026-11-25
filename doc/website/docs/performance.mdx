@@ -43,11 +43,14 @@ To refresh this page, run `scripts/bench/refresh.sh`. It measures, writes
 | Machine | Apple M4, 10 cores, 16 GB |
 | Operating system | macOS 27.2.1 |
 | Compiler | AppleClang 21.0.0.21000334 Release |
-| MNE-CPP commit | `80f5f8730e` |
-| Measured | 2026-11-23 |
+| MNE-CPP commit | `fa7954d634` |
+| Measured | 2026-11-25 |
+| Earlier run | 2026-11-23, commit `80f5f8730e` (the charts that say so) |
 | Reference | MNE-Python 1.11.0, NumPy 2.4.0, SciPy 1.16.3, Python 3.14.2 |
 
 ## Acquisition ring throughput
+
+Measured 2026-11-23 at commit `80f5f8730e`.
 
 ![Acquisition ring throughput](/bench/acq_throughput.svg)
 
@@ -62,6 +65,8 @@ Reproduce: `mne_acq_bench --repeats 3 --json acq.json`
 
 ## Commit-to-wake latency
 
+Measured 2026-11-23 at commit `80f5f8730e`.
+
 ![Commit-to-wake latency](/bench/acq_latency.svg)
 
 | | p50 | p99 | p99.9 |
@@ -74,6 +79,8 @@ Reproduce: `mne_acq_bench --repeats 3 --json acq.json`
 
 ## Loss-free real-time acquisition
 
+Measured 2026-11-23 at commit `80f5f8730e`.
+
 ![Loss-free real-time acquisition](/bench/acq_paced.svg)
 
 | | MNE-CPP |
@@ -85,6 +92,8 @@ Reproduce: `mne_acq_bench --repeats 3 --json acq.json`
 Reproduce: `mne_acq_bench --repeats 3 --json acq.json`
 
 ## Forward solution
+
+Measured 2026-11-23 at commit `80f5f8730e`.
 
 ![Forward solution](/bench/forward.svg)
 
@@ -100,7 +109,7 @@ Reproduce: `python3 scripts/bench/run_benchmarks.py --suites forward`
 
 | | MNE-CPP | MNE-Python |
 |---|---:|---:|
-| MEG+EEG, loose 0.2, depth | 0.59 s | 0.70 s |
+| MEG+EEG, loose 0.2, depth | 0.51 s | 0.73 s |
 
 Reproduce: `python3 scripts/bench/run_benchmarks.py --suites inverse`
 
@@ -110,8 +119,8 @@ Reproduce: `python3 scripts/bench/run_benchmarks.py --suites inverse`
 
 | | MNE-CPP | MNE-Python |
 |---|---:|---:|
-| CLI tool (mne_show_fiff --version) | 20.4 ms | – |
-| import mne | – | 126 ms |
+| CLI tool (mne_show_fiff --version) | 11.9 ms | – |
+| import mne | – | 129 ms |
 
 Reproduce: `python3 scripts/bench/run_benchmarks.py --suites startup`
 
@@ -121,7 +130,7 @@ Reproduce: `python3 scripts/bench/run_benchmarks.py --suites startup`
 
 | | MNE-CPP | MNE-Python |
 |---|---:|---:|
-| CLI tool (mne_show_fiff --version) | 16.1 MB | – |
+| CLI tool (mne_show_fiff --version) | 2.91 MB | – |
 | import mne | – | 43.1 MB |
 
 Reproduce: `python3 scripts/bench/run_benchmarks.py --suites startup`

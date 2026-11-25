@@ -4,8 +4,8 @@
     "machine": "Apple M4, 10 cores, 16 GB",
     "os": "macOS 27.2.1",
     "compiler": "AppleClang 21.0.0.21000334 Release",
-    "commit": "80f5f8730e",
-    "date": "2026-11-23",
+    "commit": "fa7954d634",
+    "date": "2026-11-25",
     "reference": "MNE-Python 1.11.0, NumPy 2.4.0, SciPy 1.16.3, Python 3.14.2"
   },
   "charts": [
@@ -38,7 +38,11 @@
             }
           ]
         }
-      ]
+      ],
+      "environment": {
+        "commit": "80f5f8730e",
+        "date": "2026-11-23"
+      }
     },
     {
       "id": "acq_latency",
@@ -99,7 +103,11 @@
             }
           ]
         }
-      ]
+      ],
+      "environment": {
+        "commit": "80f5f8730e",
+        "date": "2026-11-23"
+      }
     },
     {
       "id": "acq_paced",
@@ -126,7 +134,11 @@
             }
           ]
         }
-      ]
+      ],
+      "environment": {
+        "commit": "80f5f8730e",
+        "date": "2026-11-23"
+      }
     },
     {
       "id": "forward",
@@ -163,7 +175,11 @@
             }
           ]
         }
-      ]
+      ],
+      "environment": {
+        "commit": "80f5f8730e",
+        "date": "2026-11-23"
+      }
     },
     {
       "id": "inverse",
@@ -178,7 +194,7 @@
           "points": [
             {
               "x": "MEG+EEG, loose 0.2, depth",
-              "y": 0.5925320839742199
+              "y": 0.5079174580750987
             }
           ]
         },
@@ -187,7 +203,7 @@
           "points": [
             {
               "x": "MEG+EEG, loose 0.2, depth",
-              "y": 0.7033901249524206
+              "y": 0.7334630000405014
             }
           ]
         }
@@ -206,7 +222,7 @@
           "points": [
             {
               "x": "CLI tool (mne_show_fiff --version)",
-              "y": 20.40541695896536
+              "y": 11.859500082209706
             }
           ]
         },
@@ -215,7 +231,7 @@
           "points": [
             {
               "x": "import mne",
-              "y": 126.10574997961521
+              "y": 128.8652919465676
             }
           ]
         }
@@ -234,7 +250,7 @@
           "points": [
             {
               "x": "CLI tool (mne_show_fiff --version)",
-              "y": 16.125
+              "y": 2.90625
             }
           ]
         },
@@ -243,7 +259,7 @@
           "points": [
             {
               "x": "import mne",
-              "y": 43.09375
+              "y": 43.078125
             }
           ]
         }
