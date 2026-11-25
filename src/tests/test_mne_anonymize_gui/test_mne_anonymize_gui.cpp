@@ -5,8 +5,8 @@
  *
  * @file     test_mne_anonymize_gui.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.4.0
- * @date     November, 2026
+ * @since    3.0.0
+ * @date     November 2026
  * @brief    Drives the main window of mne_anonymize_gui: read a file, set options, anonymize.
  */
 
