@@ -43,6 +43,38 @@
           "type": "website",
           "url": "https://www.qt.io"
         }
+      ],
+      "components": [
+        {
+          "type": "library",
+          "bom-ref": "qt-core",
+          "name": "Qt Core",
+          "version": "6.12.0"
+        },
+        {
+          "type": "library",
+          "bom-ref": "qt-gui",
+          "name": "Qt Gui",
+          "version": "6.12.0"
+        },
+        {
+          "type": "library",
+          "bom-ref": "qt-guiprivate",
+          "name": "Qt GuiPrivate",
+          "version": "6.12.0"
+        },
+        {
+          "type": "library",
+          "bom-ref": "qt-shadertools",
+          "name": "Qt ShaderTools",
+          "version": "6.12.0"
+        },
+        {
+          "type": "library",
+          "bom-ref": "qt-widgets",
+          "name": "Qt Widgets",
+          "version": "6.12.0"
+        }
       ]
     },
     {

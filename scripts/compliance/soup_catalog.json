@@ -24,6 +24,7 @@
         "Qt::Widgets",
         "Qt::ShaderTools"
       ],
+      "modules": "qt",
       "used_by": "disp, disp3D, applications, CLI tools; not the acquisition, processing or file I/O libraries",
       "purpose": "Windows, widgets, painting, GPU rendering through QRhi, the applications' event loop.",
       "risk": "Wrong, stale or frozen display; a crashed application. Acquired data, processing results and files do not pass through Qt.",
@@ -201,6 +202,25 @@
       "purpose": "User Python scripts; reference results for the parity tests.",
       "risk": "A failing or wrong result of an optional Python script.",
       "mitigation": "Process boundary with timeouts and exit-code checks; the acquisition and processing path does not depend on it.",
+      "safety_relevant": false
+    },
+    {
+      "id": "curl",
+      "name": "curl",
+      "supplier": "curl project (Daniel Stenberg)",
+      "license": "curl",
+      "url": "https://curl.se",
+      "purl": "",
+      "version": {
+        "literal": "the operating system's curl program"
+      },
+      "linkage": "separate process, not shipped",
+      "shipped": false,
+      "cmake_targets": [],
+      "used_by": "MNE Analyze Studio (the language-model assistant's HTTP requests)",
+      "purpose": "Sends the assistant's HTTPS requests to the configured language-model service.",
+      "risk": "A failed or garbled reply of the assistant; no data acquisition or processing depends on it.",
+      "mitigation": "Process boundary: HTTP and HTTPS only (--proto), ~/.curlrc ignored, request headers in private temporary files, the HTTP status and curl's exit code checked and reported.",
       "safety_relevant": false
     },
     {

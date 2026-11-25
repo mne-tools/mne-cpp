@@ -68,6 +68,18 @@ class TestGenerateSoup(unittest.TestCase):
         self.assertEqual(sbom["components"][0]["purl"], "pkg:generic/lib@1")
         self.assertEqual(sbom["dependencies"][0]["dependsOn"], ["lib"])
 
+    def test_qt_modules_come_from_the_shipped_cmake_files(self):
+        (self.root / "src" / "libs" / "a").mkdir(parents=True)
+        (self.root / "src" / "libs" / "a" / "CMakeLists.txt").write_text(
+            "set(QT_REQUIRED_COMPONENTS Core Gui)\nfind_package(Qt6 REQUIRED COMPONENTS ShaderTools)\n# Svg\n",
+            encoding="utf-8")
+        (self.root / "src" / "tests" / "t").mkdir(parents=True)
+        (self.root / "src" / "tests" / "t" / "CMakeLists.txt").write_text("set(QT_REQUIRED_COMPONENTS Core Test)\n",
+                                                                          encoding="utf-8")
+        self.assertEqual(soup.requested_qt_modules(self.root), ["Core", "Gui", "ShaderTools"])
+        cache = {"Qt6Core_DIR": "/qt", "Qt6CoreTools_DIR": "/qt", "Qt6Svg_DIR": "Qt6Svg_DIR-NOTFOUND", "Qt6_DIR": "/qt"}
+        self.assertEqual(soup.found_qt_modules(cache), ["Core"])
+
     def test_committed_files_are_current(self):
         self.assertEqual(soup.main(["--check"]), 0)
 

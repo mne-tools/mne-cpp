@@ -23,6 +23,7 @@ Every third-party component that MNE-CPP builds, ships, loads at run time or is 
 | liblsl | 1.13 or newer, test only | `MIT` | test only: the reference peer that produces LSL outlets in test_acq_lsl; product code uses MNE-CPP's own LSL implementation | no |
 | Amplifier vendor SDKs (eego SDK, TMSi SDK, g.USBamp API, BrainAmp driver) | installed with the amplifier's driver, loaded at run time | `LicenseRef-proprietary` | runtime-loaded, not shipped | yes |
 | Python and MNE-Python | user-installed, separate process | `PSF-2.0 AND BSD-3-Clause` | separate process (pybridge), optional, not shipped | no |
+| curl | the operating system's curl program | `curl` | separate process, not shipped | no |
 | Lato and Roboto fonts | Lato 1.104, Roboto 2.137 | `OFL-1.1 AND Apache-2.0` | resource compiled into the applications | no |
 | Operating system, C++ standard library and threads | macOS 26+, Windows 10+, Ubuntu 24.04+; libc++, libstdc++ or the MSVC STL | `LicenseRef-platform` | system | yes |
 | Build toolchain | pinned versions in the table below | `LicenseRef-build-tools` | build tool, not shipped | yes |
@@ -32,6 +33,7 @@ Every third-party component that MNE-CPP builds, ships, loads at run time or is 
 ### Qt
 
 - **Used by:** disp, disp3D, applications, CLI tools; not the acquisition, processing or file I/O libraries
+- **Modules:** Core, Gui, GuiPrivate, ShaderTools, Widgets (requested by the CMake files of the libraries, applications and tools)
 - **Purpose:** Windows, widgets, painting, GPU rendering through QRhi, the applications' event loop.
 - **If it fails:** Wrong, stale or frozen display; a crashed application. Acquired data, processing results and files do not pass through Qt.
 - **Mitigation:** The libraries that acquire, process and store data build and pass their tests without Qt (Qt-free SDK job on three platforms). Qt use is ratcheted per library (audit_qt_usage.py) and per module (audit_qt_modules.py). Display tests run offscreen in CI.
@@ -91,6 +93,13 @@ Every third-party component that MNE-CPP builds, ships, loads at run time or is 
 - **Purpose:** User Python scripts; reference results for the parity tests.
 - **If it fails:** A failing or wrong result of an optional Python script.
 - **Mitigation:** Process boundary with timeouts and exit-code checks; the acquisition and processing path does not depend on it.
+
+### curl
+
+- **Used by:** MNE Analyze Studio (the language-model assistant's HTTP requests)
+- **Purpose:** Sends the assistant's HTTPS requests to the configured language-model service.
+- **If it fails:** A failed or garbled reply of the assistant; no data acquisition or processing depends on it.
+- **Mitigation:** Process boundary: HTTP and HTTPS only (--proto), ~/.curlrc ignored, request headers in private temporary files, the HTTP status and curl's exit code checked and reported.
 
 ### Lato and Roboto fonts
 

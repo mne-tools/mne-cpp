@@ -119,6 +119,39 @@ def compiler(build_dir: Path, cache: dict[str, str]) -> dict[str, str] | None:
     return None
 
 
+SHIPPED_SOURCES = ("src/libs", "src/apps", "src/tools")
+_COMPONENT_LISTS = re.compile(
+    r"(?:set|list)\(\s*(?:APPEND\s+)?\w*QT\w*_COMPONENTS\s+([^)]*)\)"  # set(QT_REQUIRED_COMPONENTS Core Gui)
+    r"|find_package\(\s*(?:QT|Qt6|Qt\$\{QT_VERSION_MAJOR\})\b[^)]*?\bCOMPONENTS\s+([^)]*)\)")
+
+
+def requested_qt_modules(root: Path = REPO_ROOT) -> list[str]:
+    """Qt modules the CMakeLists of the shipped libraries, applications and tools request."""
+    modules: set[str] = set()
+    files: list[Path] = []
+    for directory in SHIPPED_SOURCES:
+        files += sorted((root / directory).rglob("CMakeLists.txt"))
+    for path in files:
+        if not path.exists() or "3rdparty" in path.parts:
+            continue
+        text = re.sub(r"#[^\n]*", "", path.read_text(encoding="utf-8", errors="replace"))
+        for match in _COMPONENT_LISTS.finditer(text):
+            for word in (match.group(1) or match.group(2)).split():
+                if re.fullmatch(r"[A-Z][A-Za-z0-9]*", word) and word not in {"REQUIRED", "OPTIONAL_COMPONENTS"}:
+                    modules.add(word)
+    return sorted(modules)
+
+
+def found_qt_modules(cache: dict[str, str]) -> list[str]:
+    """Qt modules a configured build found (Qt6<Module>_DIR), without the build-time tool packages."""
+    modules = set()
+    for key, value in cache.items():
+        match = re.fullmatch(r"Qt6([A-Z][A-Za-z0-9]*)_DIR", key)
+        if match and value and "NOTFOUND" not in value and not match.group(1).endswith("Tools"):
+            modules.add(match.group(1))
+    return sorted(modules)
+
+
 def unclaimed_targets(catalog: dict[str, Any], policy_file: Path = DEPENDENCY_POLICY) -> list[str]:
     """Third-party CMake targets the libraries may link that no catalog entry claims."""
     allowed = json.loads(policy_file.read_text(encoding="utf-8"))["allowed_external"]
@@ -134,10 +167,14 @@ def inventory(catalog: dict[str, Any], root: Path = REPO_ROOT, build_dir: Path |
         item = {key: entry[key] for key in ("id", "name", "supplier", "license", "url", "linkage", "shipped",
                                              "used_by", "purpose", "risk", "mitigation", "safety_relevant")}
         item["version"] = pinned_version(entry["version"], root, env)
+        if entry.get("modules") == "qt":
+            item["modules"] = requested_qt_modules(root)
         if build_dir:
             built = build_version(entry.get("build_version"), cache)
             if built:
                 item["build_version"] = built
+            if entry.get("modules") == "qt":
+                item["build_modules"] = found_qt_modules(cache)
         components.append(item)
     toolchain = [{"name": tool["name"], "version": pinned_version(tool["version"], root, env)}
                  for tool in catalog["toolchain"]]
@@ -165,6 +202,11 @@ def cyclonedx(report: dict[str, Any], catalog: dict[str, Any]) -> dict[str, Any]
             component["purl"] = purls[item["id"]].format(version=version)
         if item["url"]:
             component["externalReferences"] = [{"type": "website", "url": item["url"]}]
+        modules = item.get("modules")
+        if modules:
+            component["components"] = [{"type": "library", "bom-ref": f"{item['id']}-{module.lower()}",
+                                        "name": f"{item['name']} {module}", "version": version}
+                                       for module in modules]
         components.append(component)
     return {"bomFormat": "CycloneDX", "specVersion": "1.5", "version": 1,
             "metadata": {"component": {"type": "application", "bom-ref": "mne-cpp", "name": "MNE-CPP",
@@ -200,6 +242,8 @@ def render_mdx(report: dict[str, Any]) -> str:
     for item in report["components"]:
         lines += [f"### {item['name']}", "",
                   f"- **Used by:** {item['used_by']}",
+                  *([f"- **Modules:** {', '.join(item['modules'])} (requested by the CMake files of the libraries, "
+                     "applications and tools)"] if item.get("modules") else []),
                   f"- **Purpose:** {item['purpose']}",
                   f"- **If it fails:** {item['risk']}",
                   f"- **Mitigation:** {item['mitigation']}", ""]

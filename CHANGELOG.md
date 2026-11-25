@@ -245,6 +245,9 @@ aliases; replace the old spelling as below.
 - The coverage gate holds acq, dsp, fiff, fwd, inv and mne to their own line
   coverage floors (`library_floors` in `scripts/quality/coverage_policy.json`),
   so a weak library on the signal path cannot hide behind the total.
+- The SOUP inventory lists the Qt modules the libraries, applications and
+  tools request (also as sub-components in the CycloneDX SBOM) and the system
+  `curl` program that MNE Analyze Studio's assistant runs.
 - `mne::write_mat_file()` (`math/mat_file.h`) writes matrices to a MATLAB
   Level 5 MAT-file; `mne_raw2mat` and `mne_epochs2mat` use it instead of two
   copies of the writer (their files are byte-identical).
