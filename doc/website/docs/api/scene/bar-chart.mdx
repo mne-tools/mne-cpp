@@ -1,0 +1,167 @@
+---
+id: bar-chart
+title: "mne::scene::BarChart"
+sidebar_label: BarChart
+sidebar_position: 8
+---
+
+# BarChart
+
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/bar_chart.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/bar_chart.h)
+
+`#include <mne/scene/bar_chart.h>`
+
+```cpp
+class mne::scene::BarChart
+```
+
+Counts per category as bars, e.g.
+
+a histogram.
+
+Category labels sit under their bars, rotated by 45 degrees when they are wider than a bar.
+
+```cpp title="src/examples/ex_scene/main.cpp"
+// Qt:   QPainter p(&widget); p.setPen(...); p.drawRect(...); p.drawText(...);
+Canvas canvas(200, 120, Color::white());
+canvas.set_antialiasing(true);
+canvas.set_pen(Pen{{50, 100, 150}, 1.5});
+canvas.set_brush(Brush::solid({70, 130, 180}));
+canvas.draw_rounded_rect({20, 20, 80, 50}, 6, 6);
+canvas.set_pen(Color::black());
+canvas.draw_text(Rect{0, 80, 200, 30}, Align::Center, "Hello scene");
+const DisplayList figure = canvas.take();
+
+// A plot: the same model a disp widget shows on screen
+std::vector<double> x;
+std::vector<double> y;
+for (int i = 0; i < 100; ++i) {
+    x.push_back(i * 0.01);
+    y.push_back(std::sin(2 * 3.14159265358979 * 5 * x.back()));
+}
+LineChart plot;
+plot.set_title("5 Hz sine");
+plot.set_x_label("time (s)");
+plot.add_series(x, y, "signal");
+const ApproximateTextMetrics metrics;
+const DisplayList chart = plot.render(480, 320, metrics, Font{"", 0.0, 13.0});
+
+const Expected<void> svg = write_svg(chart, dir / "plot.svg");
+const Expected<void> png = to_raster(chart).save_png(dir / "plot.png");
+```
+
+---
+
+## Public Methods
+
+### set_title(title)
+
+Sets the title above the bars.
+
+**Parameters:**
+
+- **title** : *std::string*
+  Title text.
+
+---
+
+### set_x_label(label)
+
+Sets the label below the categories.
+
+**Parameters:**
+
+- **label** : *std::string*
+  Label text.
+
+---
+
+### set_y_label(label)
+
+Sets the label left of the y axis.
+
+**Parameters:**
+
+- **label** : *std::string*
+  Label text.
+
+---
+
+### set_bars(categories, counts)
+
+Sets the bars.
+
+**Parameters:**
+
+- **categories** : *std::vector&lt; std::string &gt;*
+  Label of each bar.
+
+- **counts** : *std::vector&lt; int &gt;*
+  Height of each bar; the bars are as many as counts.
+
+---
+
+### counts()
+
+**Returns:**
+
+- *const std::vector&lt; int &gt; &* — The bar heights.
+
+---
+
+### categories()
+
+**Returns:**
+
+- *const std::vector&lt; std::string &gt; &* — The category labels.
+
+---
+
+### draw(canvas, metrics, font)
+
+Draws the chart into the rectangle (0, 0, width, height) of `canvas`.
+
+**Parameters:**
+
+- **canvas** : *[Canvas](/docs/api/scene/canvas) &*
+  [`Canvas`](/docs/api/scene/canvas).
+
+- **metrics** : *const [TextMetrics](/docs/api/scene/text-metrics) &*
+  Measures the category labels.
+
+- **font** : *const [Font](/docs/api/scene/font) &*
+  [`Font`](/docs/api/scene/font) of the labels; the title is bold and 2 points larger, categories 1 point smaller.
+
+---
+
+### render(width, height, metrics, font)
+
+**Parameters:**
+
+- **width** : *double*
+  Width in pixels.
+
+- **height** : *double*
+  Height in pixels.
+
+- **metrics** : *const [TextMetrics](/docs/api/scene/text-metrics) &*
+  Measures the text.
+
+- **font** : *const [Font](/docs/api/scene/font) &*
+  [`Font`](/docs/api/scene/font) of the text.
+
+**Returns:**
+
+- *[DisplayList](/docs/api/scene/display-list)* — The chart as a figure of `width` x `height` on white.
+
+---
+
+## Example
+
+- Start here: [ex_scene](../../examples/scene/ex_scene.mdx) — Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+- Full source: [`src/examples/ex_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_scene/main.cpp)
+- Build target: `ex_scene` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

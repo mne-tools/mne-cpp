@@ -6,9 +6,9 @@
     "commit": "0800c9a1bf606c2df8c44e35fbb42ea13029b549"
   },
   "summary": {
-    "directories": 290,
+    "directories": 291,
     "registration": {
-      "unconditional": 277,
+      "unconditional": 278,
       "conditional": 10,
       "unregistered": 3
     },
@@ -71,7 +71,8 @@
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
-          "test_rtserver_observer_pattern"
+          "test_rtserver_observer_pattern",
+          "test_scene_render"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -168,7 +169,8 @@
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
-          "test_rtserver_observer_pattern"
+          "test_rtserver_observer_pattern",
+          "test_scene_render"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -265,7 +267,8 @@
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
-          "test_rtserver_observer_pattern"
+          "test_rtserver_observer_pattern",
+          "test_scene_render"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -362,7 +365,8 @@
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
-          "test_rtserver_observer_pattern"
+          "test_rtserver_observer_pattern",
+          "test_scene_render"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -459,7 +463,8 @@
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
-          "test_rtserver_observer_pattern"
+          "test_rtserver_observer_pattern",
+          "test_scene_render"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -556,7 +561,8 @@
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
-          "test_rtserver_observer_pattern"
+          "test_rtserver_observer_pattern",
+          "test_scene_render"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -2824,7 +2830,8 @@
         "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
-        "FigureExporter"
+        "FigureExporter",
+        "QtTextMetrics"
       ]
     },
     {
@@ -9381,6 +9388,69 @@
         "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
+    },
+    {
+      "name": "test_scene_render",
+      "cmake": "src/tests/test_scene_render/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_scene_render"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "ApproximateTextMetrics",
+        "AverageTile",
+        "BarChart",
+        "Brush",
+        "ButterflyPlot",
+        "Canvas",
+        "Clip",
+        "Color",
+        "Command",
+        "DisplayList",
+        "EllipseShape",
+        "Font",
+        "GradientStop",
+        "Image",
+        "ImagePlot",
+        "ImageShape",
+        "LineChart",
+        "LineShape",
+        "PathShape",
+        "Pen",
+        "Point",
+        "RasterOptions",
+        "Rect",
+        "RectShape",
+        "SplinePlot",
+        "SvgOptions",
+        "TextMetrics",
+        "TextShape",
+        "Transform",
+        "VectorPlot"
+      ]
     },
     {
       "name": "test_scmeas_measurements",

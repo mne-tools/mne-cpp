@@ -17,7 +17,7 @@ class mne::disp::ImageSc
 
 False-colour heat-map QWidget visualising an Eigen matrix with selectable colour map.
 
-Accepts `MatrixXd`, `MatrixXf` and `MatrixXi` inputs; ``init()`` rebuilds the cached `QImage` from the current matrix and the active colour map, and ``updateData()`` / ``paintEvent()`` keep the rendering in sync with the data.
+Accepts `MatrixXd`, `MatrixXf` and `MatrixXi` inputs and draws them as an [`ImagePlot`](/docs/api/scene/image-plot), which renders without Qt as well.
 
 ```cpp title="src/examples/ex_disp_plots/main.cpp"
 MatrixXd ramp(4, 8);

@@ -1,0 +1,71 @@
+---
+id: pen
+title: "mne::scene::Pen"
+sidebar_label: Pen
+sidebar_position: 25
+---
+
+# Pen
+
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/style.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/style.h)
+
+`#include <mne/scene/style.h>`
+
+```cpp
+struct mne::scene::Pen
+```
+
+The outline of shapes and the colour of text.
+
+---
+
+## Public Methods
+
+### visible()
+
+**Returns:**
+
+- *bool* — Whether the pen draws a line.
+
+---
+
+## Static Methods
+
+### none(textColor)
+
+**Parameters:**
+
+- **textColor** : *[Color](/docs/api/scene/color)*
+  Colour of text drawn with the pen.
+
+**Returns:**
+
+- *[Pen](/docs/api/scene/pen)* — A pen that draws no outline (text still takes its colour).
+
+---
+
+## Example
+
+No example of its own: Outline value type set on Canvas; shown in the ex_scene snippet.
+
+## Used in examples
+
+### [ex_scene](../../examples/scene/ex_scene.mdx)
+
+Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+
+````cpp title="src/examples/ex_scene/main.cpp, line 79"
+// Qt:   QPainter p(&widget); p.setPen(...); p.drawRect(...); p.drawText(...);
+Canvas canvas(200, 120, Color::white());
+canvas.set_antialiasing(true);
+canvas.set_pen(Pen{{50, 100, 150}, 1.5});
+canvas.set_brush(Brush::solid({70, 130, 180}));
+canvas.draw_rounded_rect({20, 20, 80, 50}, 6, 6);
+canvas.set_pen(Color::black());
+canvas.draw_text(Rect{0, 80, 200, 30}, Align::Center, "Hello scene");
+const DisplayList figure = canvas.take();
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

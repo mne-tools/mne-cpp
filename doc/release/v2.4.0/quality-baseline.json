@@ -11,7 +11,7 @@
   },
   "gates": {
     "G1_test_integrity": {
-      "registered": 287,
+      "registered": 288,
       "conditional": 10,
       "unregistered": 3,
       "without_labels": 0,
@@ -73,7 +73,8 @@
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
-          "test_rtserver_observer_pattern"
+          "test_rtserver_observer_pattern",
+          "test_scene_render"
         ],
         "macos-26-qt-min": [
           "test_acq_convert",
@@ -115,7 +116,8 @@
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
-          "test_rtserver_observer_pattern"
+          "test_rtserver_observer_pattern",
+          "test_scene_render"
         ],
         "ubuntu-24.04": [
           "test_acq_convert",
@@ -157,7 +159,8 @@
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
-          "test_rtserver_observer_pattern"
+          "test_rtserver_observer_pattern",
+          "test_scene_render"
         ],
         "ubuntu-24.04-qt-min": [
           "test_acq_convert",
@@ -199,7 +202,8 @@
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
-          "test_rtserver_observer_pattern"
+          "test_rtserver_observer_pattern",
+          "test_scene_render"
         ],
         "windows-2025-vs2026": [
           "test_acq_convert",
@@ -241,7 +245,8 @@
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
-          "test_rtserver_observer_pattern"
+          "test_rtserver_observer_pattern",
+          "test_scene_render"
         ],
         "windows-2025-vs2026-qt-min": [
           "test_acq_convert",
@@ -283,7 +288,8 @@
           "test_pybridge_python_runner",
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
-          "test_rtserver_observer_pattern"
+          "test_rtserver_observer_pattern",
+          "test_scene_render"
         ]
       },
       "ci_failures": 0,
@@ -307,12 +313,12 @@
       }
     },
     "G3_api_documentation": {
-      "public_api_units": 588,
+      "public_api_units": 619,
       "exported_not_registered": 2,
-      "example_eligible": 438,
-      "eligible_backed_percent": 99.54,
-      "snippets": 468,
-      "registered_test_percent": 45.39
+      "example_eligible": 451,
+      "eligible_backed_percent": 99.56,
+      "snippets": 490,
+      "registered_test_percent": 48.14
     },
     "G4_screenshots": {
       "referenced_images": 19,

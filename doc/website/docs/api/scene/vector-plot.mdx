@@ -1,0 +1,175 @@
+---
+id: vector-plot
+title: "mne::scene::VectorPlot"
+sidebar_label: VectorPlot
+sidebar_position: 11
+---
+
+# VectorPlot
+
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/vector_plot.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/vector_plot.h)
+
+`#include <mne/scene/vector_plot.h>`
+
+```cpp
+class mne::scene::VectorPlot
+```
+
+Vectors as blue lines over their sample index, in a frame 100 pixels from the sides and 50 from top and bottom, with ticks, a 20 pixel bold title and 12 pixel axis labels.
+
+```cpp title="src/examples/ex_scene/main.cpp"
+// Qt:   QPainter p(&widget); p.setPen(...); p.drawRect(...); p.drawText(...);
+Canvas canvas(200, 120, Color::white());
+canvas.set_antialiasing(true);
+canvas.set_pen(Pen{{50, 100, 150}, 1.5});
+canvas.set_brush(Brush::solid({70, 130, 180}));
+canvas.draw_rounded_rect({20, 20, 80, 50}, 6, 6);
+canvas.set_pen(Color::black());
+canvas.draw_text(Rect{0, 80, 200, 30}, Align::Center, "Hello scene");
+const DisplayList figure = canvas.take();
+
+// A plot: the same model a disp widget shows on screen
+std::vector<double> x;
+std::vector<double> y;
+for (int i = 0; i < 100; ++i) {
+    x.push_back(i * 0.01);
+    y.push_back(std::sin(2 * 3.14159265358979 * 5 * x.back()));
+}
+LineChart plot;
+plot.set_title("5 Hz sine");
+plot.set_x_label("time (s)");
+plot.add_series(x, y, "signal");
+const ApproximateTextMetrics metrics;
+const DisplayList chart = plot.render(480, 320, metrics, Font{"", 0.0, 13.0});
+
+const Expected<void> svg = write_svg(chart, dir / "plot.svg");
+const Expected<void> png = to_raster(chart).save_png(dir / "plot.png");
+```
+
+---
+
+## Public Methods
+
+### set_data(values)
+
+Replaces the plotted vectors by `values`; nothing changes if it is empty.
+
+**Parameters:**
+
+- **values** : *const std::vector&lt; double &gt; &*
+  Values over their index.
+
+---
+
+### add_data(values)
+
+Adds `values` to the plotted vectors; nothing changes if it is empty.
+
+**Parameters:**
+
+- **values** : *const std::vector&lt; double &gt; &*
+  Values over their index.
+
+---
+
+### data()
+
+**Returns:**
+
+- *const std::vector&lt; std::vector&lt; double &gt; &gt; &* — The plotted vectors.
+
+---
+
+### set_title(title)
+
+Sets the title above the frame.
+
+**Parameters:**
+
+- **title** : *std::string*
+  Title text.
+
+---
+
+### set_x_label(label)
+
+Sets the label below the frame.
+
+**Parameters:**
+
+- **label** : *std::string*
+  Label text.
+
+---
+
+### set_y_label(label)
+
+Sets the label left of the frame.
+
+**Parameters:**
+
+- **label** : *std::string*
+  Label text.
+
+---
+
+### draw(canvas, metrics)
+
+Draws the plot into the rectangle (0, 0, width, height) of `canvas`; nothing without data.
+
+**Parameters:**
+
+- **canvas** : *[Canvas](/docs/api/scene/canvas) &*
+  [`Canvas`](/docs/api/scene/canvas).
+
+- **metrics** : *const [TextMetrics](/docs/api/scene/text-metrics) &*
+  Measures the axis font.
+
+---
+
+### render(width, height, metrics)
+
+**Parameters:**
+
+- **width** : *double*
+  Width in pixels.
+
+- **height** : *double*
+  Height in pixels.
+
+- **metrics** : *const [TextMetrics](/docs/api/scene/text-metrics) &*
+  Measures the text.
+
+**Returns:**
+
+- *[DisplayList](/docs/api/scene/display-list)* — The plot as a figure of `width` x `height` on white.
+
+---
+
+## Static Methods
+
+### axes_font()
+
+**Returns:**
+
+- *[Font](/docs/api/scene/font)* — The font of ticks and axis labels, 12 pixels.
+
+---
+
+### title_font()
+
+**Returns:**
+
+- *[Font](/docs/api/scene/font)* — The font of the title, 20 pixels bold.
+
+---
+
+## Example
+
+- Start here: [ex_scene](../../examples/scene/ex_scene.mdx) — Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+- Full source: [`src/examples/ex_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_scene/main.cpp)
+- Build target: `ex_scene` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

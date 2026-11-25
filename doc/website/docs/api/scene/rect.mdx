@@ -1,0 +1,114 @@
+---
+id: rect
+title: "mne::scene::Rect"
+sidebar_label: Rect
+sidebar_position: 27
+---
+
+# Rect
+
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/geometry.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/geometry.h)
+
+`#include <mne/scene/geometry.h>`
+
+```cpp
+struct mne::scene::Rect
+```
+
+An axis-aligned rectangle given by its top-left corner and its size.
+
+---
+
+## Public Methods
+
+### left()
+
+**Returns:**
+
+- *double* — The left edge.
+
+---
+
+### top()
+
+**Returns:**
+
+- *double* — The top edge.
+
+---
+
+### right()
+
+**Returns:**
+
+- *double* — The right edge, x + width.
+
+---
+
+### bottom()
+
+**Returns:**
+
+- *double* — The bottom edge, y + height.
+
+---
+
+### center()
+
+**Returns:**
+
+- *[Point](/docs/api/scene/point)* — The centre.
+
+---
+
+### empty()
+
+**Returns:**
+
+- *bool* — Whether width or height is not positive.
+
+---
+
+### adjusted(dx1, dy1, dx2, dy2)
+
+**Parameters:**
+
+- **dx1** : *double*
+  Added to the left edge.
+
+- **dy1** : *double*
+  Added to the top edge.
+
+- **dx2** : *double*
+  Added to the right edge.
+
+- **dy2** : *double*
+  Added to the bottom edge.
+
+**Returns:**
+
+- *[Rect](/docs/api/scene/rect)* — The rectangle with moved edges, like QRectF::adjusted.
+
+---
+
+## Example
+
+No example of its own: Rectangle value type taken by Canvas; shown in the ex_scene snippet.
+
+## Used in examples
+
+### [ex_scene](../../examples/scene/ex_scene.mdx)
+
+Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+
+````cpp title="src/examples/ex_scene/main.cpp, line 83"
+canvas.set_brush(Brush::solid({70, 130, 180}));
+canvas.draw_rounded_rect({20, 20, 80, 50}, 6, 6);
+canvas.set_pen(Color::black());
+canvas.draw_text(Rect{0, 80, 200, 30}, Align::Center, "Hello scene");
+const DisplayList figure = canvas.take();
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

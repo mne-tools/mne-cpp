@@ -3,27 +3,27 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 485,
-    "exported_free_functions": 214,
-    "registered_classes": 586,
+    "exported_classes": 496,
+    "exported_free_functions": 228,
+    "registered_classes": 617,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
-    "registered_header_only": 89,
+    "registered_header_only": 109,
     "registered_stale": 0,
-    "registered_with_test": 266,
+    "registered_with_test": 297,
     "registered_test_unresolved": 0,
-    "registered_with_example": 438,
+    "registered_with_example": 451,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 100,
     "registered_without_api_page": 0,
-    "with_snippet": 468,
-    "public_api_units": 588,
-    "example_eligible": 438,
-    "example_exempt": 150,
-    "eligible_backed_by_registry_example": 436,
-    "eligible_used_by_some_example": 378,
-    "examples_on_disk": 80,
-    "examples_built": 80
+    "with_snippet": 490,
+    "public_api_units": 619,
+    "example_eligible": 451,
+    "example_exempt": 168,
+    "eligible_backed_by_registry_example": 449,
+    "eligible_used_by_some_example": 384,
+    "examples_on_disk": 81,
+    "examples_built": 81
   },
   "by_library": {
     "acq": {
@@ -90,9 +90,9 @@
       "with_snippet": 5
     },
     "disp": {
-      "public": 71,
-      "registered": 71,
-      "with_test": 7,
+      "public": 72,
+      "registered": 72,
+      "with_test": 8,
       "eligible": 10,
       "eligible_with_registry_example": 10,
       "eligible_used_by_example": 10,
@@ -232,6 +232,15 @@
       "eligible_with_registry_example": 1,
       "eligible_used_by_example": 1,
       "with_snippet": 1
+    },
+    "scene": {
+      "public": 30,
+      "registered": 30,
+      "with_test": 30,
+      "eligible": 13,
+      "eligible_with_registry_example": 13,
+      "eligible_used_by_example": 6,
+      "with_snippet": 22
     },
     "sts": {
       "public": 12,
@@ -945,6 +954,31 @@
       "library": "connectivity"
     },
     {
+      "name": "paintScene",
+      "header": "disp/plots/helpers/scenepainter.h",
+      "library": "disp"
+    },
+    {
+      "name": "toQFont",
+      "header": "disp/plots/helpers/scenepainter.h",
+      "library": "disp"
+    },
+    {
+      "name": "toSceneFont",
+      "header": "disp/plots/helpers/scenepainter.h",
+      "library": "disp"
+    },
+    {
+      "name": "toSceneColor",
+      "header": "disp/plots/helpers/scenepainter.h",
+      "library": "disp"
+    },
+    {
+      "name": "toSceneLineStyle",
+      "header": "disp/plots/helpers/scenepainter.h",
+      "library": "disp"
+    },
+    {
       "name": "getDefaultScalingValue",
       "header": "disp/viewers/scalingview.h",
       "library": "disp"
@@ -1313,6 +1347,51 @@
       "name": "base64_encode",
       "header": "report/report.h",
       "library": "report"
+    },
+    {
+      "name": "colormap_from_name",
+      "header": "scene/colormap.h",
+      "library": "scene"
+    },
+    {
+      "name": "map_color",
+      "header": "scene/colormap.h",
+      "library": "scene"
+    },
+    {
+      "name": "map_color",
+      "header": "scene/colormap.h",
+      "library": "scene"
+    },
+    {
+      "name": "to_raster",
+      "header": "scene/raster_renderer.h",
+      "library": "scene"
+    },
+    {
+      "name": "to_svg",
+      "header": "scene/svg_renderer.h",
+      "library": "scene"
+    },
+    {
+      "name": "scaled_font",
+      "header": "scene/text_metrics.h",
+      "library": "scene"
+    },
+    {
+      "name": "resized_font",
+      "header": "scene/text_metrics.h",
+      "library": "scene"
+    },
+    {
+      "name": "nice_ticks",
+      "header": "scene/ticks.h",
+      "library": "scene"
+    },
+    {
+      "name": "tick_label",
+      "header": "scene/ticks.h",
+      "library": "scene"
     }
   ],
   "classes": [
@@ -4797,6 +4876,25 @@
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
+    },
+    {
+      "name": "QtTextMetrics",
+      "header": "disp/plots/helpers/scenepainter.h",
+      "library": "disp",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_disp_plots",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/disp/qt-text-metrics.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Measures text for the plot widgets' QPainter backend inside their paintEvent(); not called by applications."
     },
     {
       "name": "SvgWriter",
@@ -14792,6 +14890,636 @@
       ],
       "api_page": "doc/website/docs/api/report/report-class.mdx",
       "python_equiv": "mne.Report",
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "AverageTile",
+      "header": "scene/average_tile.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/average-tile.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "BarChart",
+      "header": "scene/bar_chart.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/bar-chart.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "ButterflyPlot",
+      "header": "scene/butterfly_plot.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/butterfly-plot.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "Canvas",
+      "header": "scene/canvas.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene"
+      ],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/canvas.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "Clip",
+      "header": "scene/display_list.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/clip.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Clip rectangle recorded by Canvas::clip_rect() into each Command; backends read it, users do not build it."
+    },
+    {
+      "name": "Command",
+      "header": "scene/display_list.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/command.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: One recorded drawing call of a DisplayList, built by Canvas and read by the backends."
+    },
+    {
+      "name": "DisplayList",
+      "header": "scene/display_list.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/display-list.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "EllipseShape",
+      "header": "scene/display_list.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/ellipse-shape.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Shape recorded by Canvas::draw_ellipse(); read by the backends."
+    },
+    {
+      "name": "Image",
+      "header": "scene/display_list.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/image.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: RGBA pixels drawn by Canvas::draw_image(); a plain value type."
+    },
+    {
+      "name": "ImageShape",
+      "header": "scene/display_list.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/image-shape.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Shape recorded by Canvas::draw_image(); read by the backends."
+    },
+    {
+      "name": "LineShape",
+      "header": "scene/display_list.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/line-shape.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Shape recorded by Canvas::draw_line(); read by the backends."
+    },
+    {
+      "name": "PathShape",
+      "header": "scene/display_list.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/path-shape.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Shape recorded by Canvas::draw_polyline(), draw_polygon() and draw_bezier(); read by the backends."
+    },
+    {
+      "name": "RectShape",
+      "header": "scene/display_list.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/rect-shape.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Shape recorded by Canvas::draw_rect(), draw_rounded_rect() and fill_rect(); read by the backends."
+    },
+    {
+      "name": "TextShape",
+      "header": "scene/display_list.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/text-shape.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Shape recorded by Canvas::draw_text(); read by the backends."
+    },
+    {
+      "name": "Point",
+      "header": "scene/geometry.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/point.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Coordinate pair taken by Canvas and the plots."
+    },
+    {
+      "name": "Rect",
+      "header": "scene/geometry.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/rect.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Rectangle value type taken by Canvas; shown in the ex_scene snippet."
+    },
+    {
+      "name": "Transform",
+      "header": "scene/geometry.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/transform.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Affine transform recorded by Canvas::translate(), rotate() and scale(); tested against QTransform in test_scene_render."
+    },
+    {
+      "name": "ImagePlot",
+      "header": "scene/image_plot.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/image-plot.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "LineChart",
+      "header": "scene/line_chart.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene"
+      ],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/line-chart.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "RasterOptions",
+      "header": "scene/raster_renderer.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene"
+      ],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage",
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/raster-options.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "SplinePlot",
+      "header": "scene/spline_plot.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/spline-plot.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "Brush",
+      "header": "scene/style.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/brush.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Fill of shapes; a value type set on Canvas, used in the ex_scene snippet through Brush::solid()."
+    },
+    {
+      "name": "Color",
+      "header": "scene/style.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/color.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: RGBA value type taken by pens, brushes and plots; shown in the ex_scene snippet."
+    },
+    {
+      "name": "Font",
+      "header": "scene/style.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/font.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Font request value type set on Canvas and passed to the plots; shown in the ex_scene snippet."
+    },
+    {
+      "name": "GradientStop",
+      "header": "scene/style.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/gradient-stop.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Colour stop of Brush::linear_gradient(); a plain value pair."
+    },
+    {
+      "name": "Pen",
+      "header": "scene/style.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/pen.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Outline value type set on Canvas; shown in the ex_scene snippet."
+    },
+    {
+      "name": "SvgOptions",
+      "header": "scene/svg_renderer.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene"
+      ],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage",
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/svg-options.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "ApproximateTextMetrics",
+      "header": "scene/text_metrics.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene"
+      ],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage",
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/approximate-text-metrics.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "TextMetrics",
+      "header": "scene/text_metrics.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene"
+      ],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage",
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/text-metrics.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "VectorPlot",
+      "header": "scene/vector_plot.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_render",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#scene_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/vector-plot.mdx",
+      "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
     },

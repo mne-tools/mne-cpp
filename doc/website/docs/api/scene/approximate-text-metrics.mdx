@@ -1,0 +1,149 @@
+---
+id: approximate-text-metrics
+title: "mne::scene::ApproximateTextMetrics"
+sidebar_label: ApproximateTextMetrics
+sidebar_position: 6
+---
+
+# ApproximateTextMetrics
+
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/text_metrics.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/text_metrics.h)
+
+`#include <mne/scene/text_metrics.h>`
+
+```cpp
+class mne::scene::ApproximateTextMetrics
+```
+
+Text metrics from the font size alone, identical on every platform.
+
+A character advances 0.6 of the pixel size (wide enough for digits in common sans-serif fonts), the ascent is 0.8 and the descent 0.2 of it; results are rounded to whole pixels like QFontMetrics. A font without a size has the default pixel size, and points convert at 96 dots per inch.
+
+```cpp title="src/examples/ex_scene/main.cpp"
+// Qt:   QPainter p(&widget); p.setPen(...); p.drawRect(...); p.drawText(...);
+Canvas canvas(200, 120, Color::white());
+canvas.set_antialiasing(true);
+canvas.set_pen(Pen{{50, 100, 150}, 1.5});
+canvas.set_brush(Brush::solid({70, 130, 180}));
+canvas.draw_rounded_rect({20, 20, 80, 50}, 6, 6);
+canvas.set_pen(Color::black());
+canvas.draw_text(Rect{0, 80, 200, 30}, Align::Center, "Hello scene");
+const DisplayList figure = canvas.take();
+
+// A plot: the same model a disp widget shows on screen
+std::vector<double> x;
+std::vector<double> y;
+for (int i = 0; i < 100; ++i) {
+    x.push_back(i * 0.01);
+    y.push_back(std::sin(2 * 3.14159265358979 * 5 * x.back()));
+}
+LineChart plot;
+plot.set_title("5 Hz sine");
+plot.set_x_label("time (s)");
+plot.add_series(x, y, "signal");
+const ApproximateTextMetrics metrics;
+const DisplayList chart = plot.render(480, 320, metrics, Font{"", 0.0, 13.0});
+
+const Expected<void> svg = write_svg(chart, dir / "plot.svg");
+const Expected<void> png = to_raster(chart).save_png(dir / "plot.png");
+```
+
+### Inheritance
+
+```mermaid
+classDiagram
+    TextMetrics <|-- ApproximateTextMetrics
+    click TextMetrics href "../../scene/text-metrics/"
+```
+
+---
+
+## Public Methods
+
+### ApproximateTextMetrics(defaultPixelSize)
+
+**Parameters:**
+
+- **defaultPixelSize** : *double*
+  Pixel size of a font without size.
+
+---
+
+### pixel_size(font)
+
+**Parameters:**
+
+- **font** : *const [Font](/docs/api/scene/font) &*
+  [`Font`](/docs/api/scene/font) of the text.
+
+**Returns:**
+
+- *double* — The font size in pixels.
+
+---
+
+### advance(font, text)
+
+**Parameters:**
+
+- **font** : *const [Font](/docs/api/scene/font) &*
+  [`Font`](/docs/api/scene/font) of the text.
+
+- **text** : *std::string_view*
+  UTF-8 text.
+
+**Returns:**
+
+- *double* — The width of `text` in `font`, in pixels.
+
+---
+
+### ascent(font)
+
+**Parameters:**
+
+- **font** : *const [Font](/docs/api/scene/font) &*
+  [`Font`](/docs/api/scene/font) of the text.
+
+**Returns:**
+
+- *double* — The distance from the baseline to the top of the tallest glyphs.
+
+---
+
+### descent(font)
+
+**Parameters:**
+
+- **font** : *const [Font](/docs/api/scene/font) &*
+  [`Font`](/docs/api/scene/font) of the text.
+
+**Returns:**
+
+- *double* — The distance from the baseline to the bottom of the lowest glyphs.
+
+---
+
+## Example
+
+- Start here: [ex_scene](../../examples/scene/ex_scene.mdx) — Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+- Full source: [`src/examples/ex_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_scene/main.cpp)
+- Build target: `ex_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_scene](../../examples/scene/ex_scene.mdx)
+
+Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+
+````cpp title="src/examples/ex_scene/main.cpp, line 97"
+plot.set_title("5 Hz sine");
+plot.set_x_label("time (s)");
+plot.add_series(x, y, "signal");
+const ApproximateTextMetrics metrics;
+const DisplayList chart = plot.render(480, 320, metrics, Font{"", 0.0, 13.0});
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

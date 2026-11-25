@@ -1,0 +1,43 @@
+---
+id: font
+title: "mne::scene::Font"
+sidebar_label: Font
+sidebar_position: 19
+---
+
+# Font
+
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/style.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/style.h)
+
+`#include <mne/scene/style.h>`
+
+```cpp
+struct mne::scene::Font
+```
+
+A font request; a backend picks the closest font it has.
+
+[`Point`](/docs/api/scene/point) sizes are converted with the backend's resolution, pixel sizes are exact. With neither size set, the backend uses its default font size.
+
+---
+
+## Example
+
+No example of its own: Font request value type set on Canvas and passed to the plots; shown in the ex_scene snippet.
+
+## Used in examples
+
+### [ex_scene](../../examples/scene/ex_scene.mdx)
+
+Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+
+````cpp title="src/examples/ex_scene/main.cpp, line 98"
+plot.set_x_label("time (s)");
+plot.add_series(x, y, "signal");
+const ApproximateTextMetrics metrics;
+const DisplayList chart = plot.render(480, 320, metrics, Font{"", 0.0, 13.0});
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

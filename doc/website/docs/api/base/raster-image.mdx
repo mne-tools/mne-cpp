@@ -109,7 +109,7 @@ Sets every pixel to `color`.
 
 ---
 
-### fill_polygon(points, color)
+### fill_polygon(points, color, opacity)
 
 Fills a polygon, anti-aliased.
 
@@ -122,6 +122,46 @@ Parts outside the image are clipped.
 
 - **color** : *[Rgb](/docs/api/base/rgb)*
   Fill colour.
+
+- **opacity** : *int*
+  Opacity of the fill, 0 (transparent) to 255 (opaque).
+
+---
+
+### fill_polygons(polygons, color, opacity)
+
+Fills the area enclosed by several polygons at once, anti-aliased, with the non-zero winding rule over all of them: polygons of the same orientation fill their union, so overlapping pieces of a stroke blend once.
+
+**Parameters:**
+
+- **polygons** : *std::span&lt; const std::vector&lt; [PointF](/docs/api/base/point-f) &gt; &gt;*
+  Polygons, each with its corners in order; those with fewer than three are skipped.
+
+- **color** : *[Rgb](/docs/api/base/rgb)*
+  Fill colour.
+
+- **opacity** : *int*
+  Opacity of the fill, 0 (transparent) to 255 (opaque).
+
+---
+
+### blend_pixel(x, y, color, alpha)
+
+Mixes a colour into one pixel; pixels outside the image are ignored.
+
+**Parameters:**
+
+- **x** : *int*
+  Column.
+
+- **y** : *int*
+  Row.
+
+- **color** : *[Rgb](/docs/api/base/rgb)*
+  Colour to mix in.
+
+- **alpha** : *int*
+  Weight of `color`, 0 (none) to 255 (replaces the pixel).
 
 ---
 

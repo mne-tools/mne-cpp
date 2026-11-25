@@ -38,6 +38,7 @@
     "fwd": "Forward",
     "disp3D": "3D Visualization",
     "disp": "Visualization",
+    "scene": "Figures",
     "dsp": "Signal Processing",
     "ieeg": "iEEG",
     "bids": "BIDS",
@@ -1789,6 +1790,25 @@
         "mri"
       ],
       "level": "advanced",
+      "topics": []
+    },
+    {
+      "name": "ex_scene",
+      "title": "Draw figures and plots without Qt and write them as SVG and PNG",
+      "brief": "Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt",
+      "thumbnail": "",
+      "url": "/docs/examples/scene/ex_scene/",
+      "library": "scene",
+      "libraries": [
+        "scene"
+      ],
+      "tasks": [
+        "visualization"
+      ],
+      "modalities": [
+        "generic"
+      ],
+      "level": "start",
       "topics": []
     },
     {

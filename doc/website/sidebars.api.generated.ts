@@ -680,7 +680,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/disp/time-ruler-event-mark',
         'api/disp/time-ruler-reference-mark',
         'api/disp/figure-exporter',
-        'api/disp/svg-writer'
+        'api/disp/svg-writer',
+        'api/disp/qt-text-metrics'
       ],
     },
     {
@@ -819,6 +820,45 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/acq/digitized-point',
         'api/acq/acq-control-info',
         'api/acq/acq-control-event'
+      ],
+    },
+    {
+      type: 'category',
+      label: "Scene Library",
+      collapsible: true,
+      collapsed: true,
+      link: {type: 'doc', id: 'api/scene/index'},
+      items: [
+        'api/scene/canvas',
+        'api/scene/display-list',
+        'api/scene/svg-options',
+        'api/scene/raster-options',
+        'api/scene/text-metrics',
+        'api/scene/approximate-text-metrics',
+        'api/scene/line-chart',
+        'api/scene/bar-chart',
+        'api/scene/spline-plot',
+        'api/scene/image-plot',
+        'api/scene/vector-plot',
+        'api/scene/butterfly-plot',
+        'api/scene/average-tile',
+        'api/scene/brush',
+        'api/scene/clip',
+        'api/scene/color',
+        'api/scene/command',
+        'api/scene/ellipse-shape',
+        'api/scene/font',
+        'api/scene/gradient-stop',
+        'api/scene/image',
+        'api/scene/image-shape',
+        'api/scene/line-shape',
+        'api/scene/path-shape',
+        'api/scene/pen',
+        'api/scene/point',
+        'api/scene/rect',
+        'api/scene/rect-shape',
+        'api/scene/text-shape',
+        'api/scene/transform'
       ],
     }
 ];

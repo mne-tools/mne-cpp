@@ -1,0 +1,81 @@
+---
+id: image
+title: "mne::scene::Image"
+sidebar_label: Image
+sidebar_position: 21
+---
+
+# Image
+
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/display_list.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/display_list.h)
+
+`#include <mne/scene/display_list.h>`
+
+```cpp
+struct mne::scene::Image
+```
+
+An RGBA image, four bytes per pixel row by row from the top, not premultiplied.
+
+---
+
+## Public Methods
+
+### pixel(x, y)
+
+**Parameters:**
+
+- **x** : *int*
+  Column.
+
+- **y** : *int*
+  Row.
+
+**Returns:**
+
+- *[Color](/docs/api/scene/color)* — The colour of pixel (`x`, `y`), which must lie in the image.
+
+---
+
+### set_pixel(x, y, color)
+
+Sets pixel (`x`, `y`), which must lie in the image.
+
+**Parameters:**
+
+- **x** : *int*
+  Column.
+
+- **y** : *int*
+  Row.
+
+- **color** : *[Color](/docs/api/scene/color)*
+  Colour.
+
+---
+
+## Static Methods
+
+### transparent(w, h)
+
+**Parameters:**
+
+- **w** : *int*
+  Width in pixels.
+
+- **h** : *int*
+  Height in pixels.
+
+**Returns:**
+
+- *[Image](/docs/api/scene/image)* — A transparent image of the size.
+
+---
+
+## Example
+
+No example of its own: RGBA pixels drawn by Canvas::draw_image(); a plain value type.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

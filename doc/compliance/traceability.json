@@ -76,8 +76,8 @@
       "missing_tests": []
     },
     "disp": {
-      "classes": 71,
-      "tested": 7,
+      "classes": 72,
+      "tested": 8,
       "untested": [
         "AbstractView",
         "ApplyToView",
@@ -468,6 +468,12 @@
     "report": {
       "classes": 1,
       "tested": 1,
+      "untested": [],
+      "missing_tests": []
+    },
+    "scene": {
+      "classes": 30,
+      "tested": 30,
       "untested": [],
       "missing_tests": []
     },

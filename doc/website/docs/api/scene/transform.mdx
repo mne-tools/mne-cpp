@@ -1,0 +1,108 @@
+---
+id: transform
+title: "mne::scene::Transform"
+sidebar_label: Transform
+sidebar_position: 30
+---
+
+# Transform
+
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/geometry.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/geometry.h)
+
+`#include <mne/scene/geometry.h>`
+
+```cpp
+struct mne::scene::Transform
+```
+
+An affine transform of the plane with the layout and composition rules of QTransform.
+
+A point (x, y) maps to (m11 x + m21 y + dx, m12 x + m22 y + dy).
+
+---
+
+## Public Methods
+
+### identity()
+
+**Returns:**
+
+- *bool* — Whether this is the identity.
+
+---
+
+### map(p)
+
+**Parameters:**
+
+- **p** : *[Point](/docs/api/scene/point)*
+  [`Point`](/docs/api/scene/point).
+
+**Returns:**
+
+- *[Point](/docs/api/scene/point)* — The image of `p`.
+
+---
+
+### inverted()
+
+**Returns:**
+
+- *[Transform](/docs/api/scene/transform)* — The inverse transform, or the identity if this one is singular.
+
+---
+
+## Static Methods
+
+### translation(tx, ty)
+
+**Parameters:**
+
+- **tx** : *double*
+  Horizontal translation.
+
+- **ty** : *double*
+  Vertical translation.
+
+**Returns:**
+
+- *[Transform](/docs/api/scene/transform)* — A translation by (`tx`, `ty`).
+
+---
+
+### scaling(sx, sy)
+
+**Parameters:**
+
+- **sx** : *double*
+  Horizontal factor.
+
+- **sy** : *double*
+  Vertical factor.
+
+**Returns:**
+
+- *[Transform](/docs/api/scene/transform)* — A scaling by `sx` horizontally and `sy` vertically.
+
+---
+
+### rotation(degrees)
+
+**Parameters:**
+
+- **degrees** : *double*
+  Angle in degrees, clockwise on screen.
+
+**Returns:**
+
+- *[Transform](/docs/api/scene/transform)* — A rotation by `degrees`, clockwise on screen (y grows downwards), like QTransform::rotate.
+
+---
+
+## Example
+
+No example of its own: Affine transform recorded by Canvas::translate(), rotate() and scale(); tested against QTransform in test_scene_render.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

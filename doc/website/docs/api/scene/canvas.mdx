@@ -1,0 +1,444 @@
+---
+id: canvas
+title: "mne::scene::Canvas"
+sidebar_label: Canvas
+sidebar_position: 1
+---
+
+# Canvas
+
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/canvas.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/canvas.h)
+
+`#include <mne/scene/canvas.h>`
+
+```cpp
+class mne::scene::Canvas
+```
+
+Records drawing calls into a [`DisplayList`](/docs/api/scene/display-list).
+
+The calls and their state (pen, brush, font, transform, clip, save and restore) follow QPainter, so code that painted a widget becomes code that builds a figure any backend can draw. Text takes the pen's colour.
+
+```cpp title="src/examples/ex_scene/main.cpp"
+// Qt:   QPainter p(&widget); p.setPen(...); p.drawRect(...); p.drawText(...);
+Canvas canvas(200, 120, Color::white());
+canvas.set_antialiasing(true);
+canvas.set_pen(Pen{{50, 100, 150}, 1.5});
+canvas.set_brush(Brush::solid({70, 130, 180}));
+canvas.draw_rounded_rect({20, 20, 80, 50}, 6, 6);
+canvas.set_pen(Color::black());
+canvas.draw_text(Rect{0, 80, 200, 30}, Align::Center, "Hello scene");
+const DisplayList figure = canvas.take();
+
+// A plot: the same model a disp widget shows on screen
+std::vector<double> x;
+std::vector<double> y;
+for (int i = 0; i < 100; ++i) {
+    x.push_back(i * 0.01);
+    y.push_back(std::sin(2 * 3.14159265358979 * 5 * x.back()));
+}
+LineChart plot;
+plot.set_title("5 Hz sine");
+plot.set_x_label("time (s)");
+plot.add_series(x, y, "signal");
+const ApproximateTextMetrics metrics;
+const DisplayList chart = plot.render(480, 320, metrics, Font{"", 0.0, 13.0});
+
+const Expected<void> svg = write_svg(chart, dir / "plot.svg");
+const Expected<void> png = to_raster(chart).save_png(dir / "plot.png");
+```
+
+---
+
+## Public Methods
+
+### Canvas(width, height, background)
+
+Starts an empty figure.
+
+**Parameters:**
+
+- **width** : *double*
+  Width in pixels.
+
+- **height** : *double*
+  Height in pixels.
+
+- **background** : *std::optional&lt; [Color](/docs/api/scene/color) &gt;*
+  Fill of the whole figure, if any.
+
+---
+
+### width()
+
+**Returns:**
+
+- *double* — The width in pixels.
+
+---
+
+### height()
+
+**Returns:**
+
+- *double* — The height in pixels.
+
+---
+
+### save()
+
+Saves pen, brush, font, transform, clip, antialiasing and opacity; `restore()` brings them back.
+
+---
+
+### restore()
+
+Restores the state of the matching `save()`; without one it does nothing.
+
+---
+
+### translate(dx, dy)
+
+Moves the origin by (`dx`, `dy`) in the current coordinates.
+
+**Parameters:**
+
+- **dx** : *double*
+  Horizontal offset.
+
+- **dy** : *double*
+  Vertical offset.
+
+---
+
+### rotate(degrees)
+
+Rotates the coordinates by `degrees`, clockwise on screen.
+
+**Parameters:**
+
+- **degrees** : *double*
+  Angle in degrees, clockwise on screen.
+
+---
+
+### scale(sx, sy)
+
+Scales the coordinates by `sx` horizontally and `sy` vertically.
+
+**Parameters:**
+
+- **sx** : *double*
+  Horizontal factor.
+
+- **sy** : *double*
+  Vertical factor.
+
+---
+
+### transform()
+
+**Returns:**
+
+- *const [Transform](/docs/api/scene/transform) &* — The current transform from drawing coordinates to figure pixels.
+
+---
+
+### clip_rect(rect)
+
+Limits drawing to `rect` (in the current coordinates), within any earlier clip.
+
+**Parameters:**
+
+- **rect** : *const [Rect](/docs/api/scene/rect) &*
+  Rectangle in the current coordinates.
+
+---
+
+### set_antialiasing(on)
+
+Turns anti-aliased edges on or off (off by default, as in QPainter).
+
+**Parameters:**
+
+- **on** : *bool*
+  Whether edges are anti-aliased.
+
+---
+
+### set_opacity(opacity)
+
+Sets the opacity of what is drawn next, 0 (invisible) to 1 (default), like QPainter::setOpacity.
+
+**Parameters:**
+
+- **opacity** : *double*
+  Opacity, 0 to 1.
+
+---
+
+### set_pen(pen)
+
+Sets the outline and text colour.
+
+**Parameters:**
+
+- **pen** : *const [Pen](/docs/api/scene/pen) &*
+  [`Pen`](/docs/api/scene/pen).
+
+---
+
+### set_pen(color)
+
+Sets a solid one-pixel pen of `color`.
+
+**Parameters:**
+
+- **color** : *[Color](/docs/api/scene/color)*
+  Line and text colour.
+
+---
+
+### set_brush(brush)
+
+Sets the fill.
+
+**Parameters:**
+
+- **brush** : *const [Brush](/docs/api/scene/brush) &*
+  [`Brush`](/docs/api/scene/brush).
+
+---
+
+### set_font(font)
+
+Sets the font.
+
+**Parameters:**
+
+- **font** : *const [Font](/docs/api/scene/font) &*
+  [`Font`](/docs/api/scene/font) of the text drawn next.
+
+---
+
+### pen()
+
+**Returns:**
+
+- *const [Pen](/docs/api/scene/pen) &* — The current pen.
+
+---
+
+### brush()
+
+**Returns:**
+
+- *const [Brush](/docs/api/scene/brush) &* — The current brush.
+
+---
+
+### font()
+
+**Returns:**
+
+- *const [Font](/docs/api/scene/font) &* — The current font.
+
+---
+
+### draw_line(from, to)
+
+Draws a line from `from` to `to` with the pen.
+
+**Parameters:**
+
+- **from** : *[Point](/docs/api/scene/point)*
+  Start point.
+
+- **to** : *[Point](/docs/api/scene/point)*
+  End point.
+
+---
+
+### draw_polyline(points)
+
+Draws connected lines through `points` with the pen.
+
+**Parameters:**
+
+- **points** : *std::span&lt; const [Point](/docs/api/scene/point) &gt;*
+  Points in order.
+
+---
+
+### draw_bezier(points)
+
+Draws connected cubic Bézier segments with the pen.
+
+**Parameters:**
+
+- **points** : *std::span&lt; const [Point](/docs/api/scene/point) &gt;*
+  The start, then for each segment two control points and its end (3 n + 1 points).
+
+---
+
+### draw_polygon(points)
+
+Draws a closed polygon: filled with the brush, outlined with the pen.
+
+**Parameters:**
+
+- **points** : *std::span&lt; const [Point](/docs/api/scene/point) &gt;*
+  Points in order.
+
+---
+
+### draw_rect(rect)
+
+Draws a rectangle: filled with the brush, outlined with the pen.
+
+**Parameters:**
+
+- **rect** : *const [Rect](/docs/api/scene/rect) &*
+  Rectangle in the current coordinates.
+
+---
+
+### draw_rounded_rect(rect, rx, ry)
+
+Draws a rectangle with corners rounded by the radii `rx` and `ry`.
+
+**Parameters:**
+
+- **rect** : *const [Rect](/docs/api/scene/rect) &*
+  Rectangle in the current coordinates.
+
+- **rx** : *double*
+  Horizontal radius.
+
+- **ry** : *double*
+  Vertical radius.
+
+---
+
+### draw_ellipse(center, rx, ry)
+
+Draws an ellipse around `center` with the radii `rx` and `ry`.
+
+**Parameters:**
+
+- **center** : *[Point](/docs/api/scene/point)*
+  Centre.
+
+- **rx** : *double*
+  Horizontal radius.
+
+- **ry** : *double*
+  Vertical radius.
+
+---
+
+### fill_rect(rect, brush)
+
+Fills `rect` with `brush`, without outline and without changing the brush.
+
+**Parameters:**
+
+- **rect** : *const [Rect](/docs/api/scene/rect) &*
+  Rectangle in the current coordinates.
+
+- **brush** : *const [Brush](/docs/api/scene/brush) &*
+  [`Brush`](/docs/api/scene/brush).
+
+---
+
+### draw_text(box, align, text)
+
+Draws `text` placed in `box` by `align`, in the pen's colour.
+
+**Parameters:**
+
+- **box** : *const [Rect](/docs/api/scene/rect) &*
+  Rectangle the text is aligned in.
+
+- **align** : *Align*
+  Alignment in the rectangle.
+
+- **text** : *std::string_view*
+  UTF-8 text.
+
+---
+
+### draw_text(baseline, text)
+
+Draws `text` with its baseline starting at `baseline`.
+
+**Parameters:**
+
+- **baseline** : *[Point](/docs/api/scene/point)*
+  Start of the baseline.
+
+- **text** : *std::string_view*
+  UTF-8 text.
+
+---
+
+### draw_image(target, image, smooth)
+
+Draws `image` scaled into `target`.
+
+**Parameters:**
+
+- **target** : *const [Rect](/docs/api/scene/rect) &*
+  Rectangle the image fills.
+
+- **image** : *std::shared_ptr&lt; const [Image](/docs/api/scene/image) &gt;*
+  [`Image`](/docs/api/scene/image).
+
+- **smooth** : *bool*
+  Bilinear instead of nearest-pixel scaling.
+
+---
+
+### display_list()
+
+**Returns:**
+
+- *const [DisplayList](/docs/api/scene/display-list) &* — The figure recorded so far.
+
+---
+
+### take()
+
+**Returns:**
+
+- *[DisplayList](/docs/api/scene/display-list)* — The recorded figure, moved out; the canvas is empty afterwards.
+
+---
+
+## Example
+
+- Start here: [ex_scene](../../examples/scene/ex_scene.mdx) — Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+- Full source: [`src/examples/ex_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_scene/main.cpp)
+- Build target: `ex_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_scene](../../examples/scene/ex_scene.mdx)
+
+Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+
+````cpp title="src/examples/ex_scene/main.cpp, line 79"
+// Qt:   QPainter p(&widget); p.setPen(...); p.drawRect(...); p.drawText(...);
+Canvas canvas(200, 120, Color::white());
+canvas.set_antialiasing(true);
+canvas.set_pen(Pen{{50, 100, 150}, 1.5});
+canvas.set_brush(Brush::solid({70, 130, 180}));
+canvas.draw_rounded_rect({20, 20, 80, 50}, 6, 6);
+canvas.set_pen(Color::black());
+canvas.draw_text(Rect{0, 80, 200, 30}, Align::Center, "Hello scene");
+const DisplayList figure = canvas.take();
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
