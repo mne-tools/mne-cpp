@@ -391,6 +391,15 @@ aliases; replace the old spelling as below.
   detection for streamed blocks. `disp::RtFiffRawViewModel` and
   `disp::EvokedSetModel` are adapters that place the results into their
   buffers.
+- New library `mne_viewmodels` (model layer, depends on `mne_fiff`) holds
+  toolkit-independent view models: `ChannelTable` (channel information table
+  with layout name mapping), `SpectrumTable` (spectra, channel selection,
+  frozen copy, linear or log frequency axis and band) and `BidsTree`
+  (subjects, sessions, data-type folders and items with the BIDS naming
+  rules). `disp::ChannelInfoModel`, `disp::FrequencySpectrumModel` and
+  `disp::BidsViewModel` adapt them to Qt item models; items of the BIDS model
+  carry their tree node in `BIDS_ITEM_NODE`. The Qt usage ceiling of `disp`
+  drops to 4403 tokens.
 - The data behind the raw-data views moved to `mne_scene` as well.
   `TraceBuffer` (`scene/trace_buffer.h`) stores the samples of the trace view
   (replaced, or appended to with a capacity), resolves the channel

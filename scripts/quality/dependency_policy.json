@@ -41,12 +41,13 @@
     },
     {
       "name": "model",
-      "description": "Domain models and format bridges assembled from the I/O layer.",
+      "description": "Domain models and format bridges assembled from the I/O layer, and the toolkit-independent view models of the viewers (mne_viewmodels).",
       "libraries": [
         "mne_mne",
         "mne_mri",
         "mne_sts",
-        "mne_bids"
+        "mne_bids",
+        "mne_viewmodels"
       ]
     },
     {

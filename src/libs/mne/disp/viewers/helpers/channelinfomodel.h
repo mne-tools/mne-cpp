@@ -30,6 +30,7 @@
 //=============================================================================================================
 
 #include "../../disp_global.h"
+#include <mne/viewmodels/channel_table.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -190,19 +191,11 @@ public:
     void clearModel();
 
 protected:
-    //=========================================================================================================
-    /**
-     * Maps the currently loaded channels to the loaded layout file
-     */
-    void mapLayoutToChannels();
-
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< The fiff info of the currently loaded fiff file. */
 
     QMultiMap<int, std::shared_ptr<MNEOperator>> m_assignedOperators; /**< Map of MNEOperator types to channels.*/
-    std::map<std::string, QPointF> m_layoutMap;                       /**< The current layout map with a position for all MEG and EEG channels. */
 
-    std::vector<std::string> m_aliasNames;          /**< list of given channel aliases. */
-    std::vector<std::string> m_mappedLayoutChNames; /**< list of the mapped layout channel names. */
+    mne::viewmodels::ChannelTable m_table; /**< Channel rows, layout mapping and cell contents. */
 
 signals:
     //=========================================================================================================

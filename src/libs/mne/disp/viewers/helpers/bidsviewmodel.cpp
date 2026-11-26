@@ -30,14 +30,16 @@
 // STL INCLUDES
 //=============================================================================================================
 
-#include <iostream>
 #include <memory>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace mne::disp;
+using mne::viewmodels::BidsTree;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -46,6 +48,13 @@ using namespace mne::disp;
 BidsViewModel::BidsViewModel(QObject* pParent)
 : QStandardItemModel(pParent)
 {
+    // Names edited in a view go back into the tree, so subjects are found by their displayed name
+    connect(this, &QStandardItemModel::itemChanged, this, [this](QStandardItem* pItem) {
+        const int node = pItem->data(BIDS_ITEM_NODE).isValid() ? pItem->data(BIDS_ITEM_NODE).toInt() : -1;
+        if (m_tree.contains(node) && m_tree.node(node).name != pItem->text().toStdString()) {
+            m_tree.rename(node, pItem->text().toStdString());
+        }
+    });
 }
 
 //=============================================================================================================
@@ -66,14 +75,10 @@ void BidsViewModel::addData(QModelIndex selectedItem,
         case BIDS_BEHAVIORALDATA: {
             if (!selectedItem.isValid()) {
                 addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pNewItem, iDataType);
+            } else if (itemFromIndex(selectedItem)->data(BIDS_ITEM_TYPE).value<int>() != BIDS_SUBJECT) {
+                addDataToSession(itemFromIndex(selectedItem)->data(BIDS_ITEM_SESSION).value<QModelIndex>(), pNewItem, iDataType);
             } else {
-                if (itemFromIndex(selectedItem)->data(BIDS_ITEM_TYPE).value<int>() != BIDS_SUBJECT) {
-                    addDataToSession(itemFromIndex(selectedItem)->data(BIDS_ITEM_SESSION).value<QModelIndex>(),
-                                     pNewItem,
-                                     iDataType);
-                } else {
-                    mne::Log::debug("[BidsViewModel::addData] Prompt user to select a session");
-                }
+                mne::Log::debug("[BidsViewModel::addData] Prompt user to select a session");
             }
             break;
         }
@@ -84,16 +89,11 @@ void BidsViewModel::addData(QModelIndex selectedItem,
                 auto pOwnedItem = std::make_unique<QStandardItem>("Unknown");
                 pOwnedItem->setEditable(false);
                 pOwnedItem->setDragEnabled(true);
-
                 QStandardItem* pItem = pOwnedItem.get();
                 addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pOwnedItem.release(), BIDS_UNKNOWN);
-                addToData(pNewItem,
-                          indexFromItem(pItem),
-                          iDataType);
+                addToData(pNewItem, indexFromItem(pItem), iDataType);
             } else {
-                addToData(pNewItem,
-                          selectedItem,
-                          iDataType);
+                addToData(pNewItem, selectedItem, iDataType);
             }
             break;
         }
@@ -106,13 +106,16 @@ void BidsViewModel::addToData(QStandardItem* pNewAvgItem,
                               const QModelIndex& parentIndex,
                               int iDataType)
 {
-    QStandardItem* selectedData = itemFromIndex(parentIndex);
-    selectedData->setChild(selectedData->rowCount(),
-                           pNewAvgItem);
+    if (!m_tree.contains(nodeOf(parentIndex))) {
+        mne::Log::warning("[BidsViewModel::addToData] The parent is not an item of this model");
+        return;
+    }
 
-    pNewAvgItem->setData(itemFromIndex(parentIndex)->data(BIDS_ITEM_SUBJECT), BIDS_ITEM_SUBJECT);
-    pNewAvgItem->setData(itemFromIndex(parentIndex)->data(BIDS_ITEM_SESSION), BIDS_ITEM_SESSION);
-    pNewAvgItem->setData(QVariant::fromValue(iDataType), BIDS_ITEM_TYPE);
+    QStandardItem* selectedData = itemFromIndex(parentIndex);
+    const int node = m_tree.add_to_data(nodeOf(parentIndex), pNewAvgItem->text().toStdString(), iDataType);
+
+    selectedData->setChild(selectedData->rowCount(), pNewAvgItem);
+    tag(pNewAvgItem, node);
 
     emit newItemIndex(pNewAvgItem->index());
 }
@@ -121,23 +124,11 @@ void BidsViewModel::addToData(QStandardItem* pNewAvgItem,
 
 QModelIndex BidsViewModel::addSubject(const QString& sSubjectName)
 {
-    //Ensure subject name follow BIDS format
-    QString sNewSubjectName;
+    const int node = m_tree.add_subject(sSubjectName.toStdString());
 
-    if (!sSubjectName.startsWith("sub-")) {
-        sNewSubjectName = "sub-" + sSubjectName;
-    } else {
-        sNewSubjectName = sSubjectName;
-    }
-
-    sNewSubjectName.remove(" ");
-
-    //Add subject to model
-    appendRow(new QStandardItem(sNewSubjectName));
+    appendRow(new QStandardItem(QString::fromStdString(m_tree.node(node).name)));
     QStandardItem* pSubjectItem = item(rowCount() - 1);
-
-    pSubjectItem->setData(QVariant::fromValue(BIDS_SUBJECT), BIDS_ITEM_TYPE);
-    pSubjectItem->setData(QVariant::fromValue(pSubjectItem->index()), BIDS_ITEM_SUBJECT);
+    tag(pSubjectItem, node);
 
     emit newItemIndex(pSubjectItem->index());
 
@@ -149,57 +140,31 @@ QModelIndex BidsViewModel::addSubject(const QString& sSubjectName)
 QModelIndex BidsViewModel::addSessionToSubject(const QString& sSubjectName,
                                                const QString& sSessionName)
 {
-    //Ensure session name follow BIDS format
-    QString sNewSessionName;
+    const std::vector<int> sessions = m_tree.add_session(sSubjectName.toStdString(), sSessionName.toStdString());
 
-    if (!sSessionName.startsWith("ses-")) {
-        sNewSessionName = "ses-" + sSessionName;
-    } else {
-        sNewSessionName = sSessionName;
-    }
-
-    sNewSessionName.remove(" ");
-
-    QList<QStandardItem*> listItems = findItems(sSubjectName);
-    bool bRepeat = false;
-
-    //Check for repeated names, no names
-    if (listItems.size() > 1) {
-        mne::Log::warning("[BidsViewModel::addSessionToSubject] Multiple subjects with same name");
-        bRepeat = true;
-    } else if (listItems.size() == 0) {
+    if (sessions.empty()) {
         mne::Log::warning("[BidsViewModel::addSessionToSubject] No Subject found with name: {}", sSubjectName.toStdString());
         return QModelIndex();
     }
+    if (sessions.size() > 1) {
+        mne::Log::warning("[BidsViewModel::addSessionToSubject] Multiple subjects with same name");
+    }
 
-    // Stays null when the loop body never runs, which the return below guards
-    // against; dereferencing it unconditionally would be undefined.
     QStandardItem* pNewSessionItem = nullptr;
-
-    //Add session to subjects with mathcing names. Renames them if multiple.
-    for (int i = 0; i < listItems.size(); i++) {
-        QStandardItem* pSubjectItem = listItems.at(i);
-
-        if (bRepeat) {
-            pSubjectItem->setText(pSubjectItem->text() + QString::number(i + 1));
-        }
+    for (int session : sessions) {
+        // Subjects with the same name were renamed by the tree
+        QStandardItem* pSubjectItem = itemOf(m_tree.node(session).subject);
+        pSubjectItem->setText(QString::fromStdString(m_tree.node(m_tree.node(session).subject).name));
 
         const int iRow = pSubjectItem->rowCount();
-        pSubjectItem->setChild(iRow, new QStandardItem(sNewSessionName));
+        pSubjectItem->setChild(iRow, new QStandardItem(QString::fromStdString(m_tree.node(session).name)));
         pNewSessionItem = pSubjectItem->child(iRow);
-
-        pNewSessionItem->setData(QVariant::fromValue(BIDS_SESSION), BIDS_ITEM_TYPE);
-        pNewSessionItem->setData(QVariant::fromValue(pSubjectItem->index()), BIDS_ITEM_SUBJECT);
-        pNewSessionItem->setData(QVariant::fromValue(pNewSessionItem->index()), BIDS_ITEM_SESSION);
+        tag(pNewSessionItem, session);
 
         emit newItemIndex(pNewSessionItem->index());
     }
 
-    if (!pNewSessionItem) {
-        return QModelIndex();
-    }
-
-    return pNewSessionItem->index();
+    return pNewSessionItem ? pNewSessionItem->index() : QModelIndex();
 }
 
 //=============================================================================================================
@@ -207,25 +172,18 @@ QModelIndex BidsViewModel::addSessionToSubject(const QString& sSubjectName,
 QModelIndex BidsViewModel::addSessionToSubject(QModelIndex subjectIndex,
                                                const QString& sSessionName)
 {
-    //Ensure session name follow BIDS format
-    QString sNewSessionName;
-
-    if (!sSessionName.startsWith("ses-")) {
-        sNewSessionName = "ses-" + sSessionName;
-    } else {
-        sNewSessionName = sSessionName;
+    if (!m_tree.contains(nodeOf(subjectIndex))) {
+        mne::Log::warning("[BidsViewModel::addSessionToSubject] The subject is not an item of this model");
+        return QModelIndex();
     }
 
-    sNewSessionName.remove(" ");
+    const int session = m_tree.add_session(nodeOf(subjectIndex), sSessionName.toStdString());
 
     QStandardItem* pSubjectItem = itemFromIndex(subjectIndex);
     const int iRow = pSubjectItem->rowCount();
-    pSubjectItem->setChild(iRow, new QStandardItem(sNewSessionName));
+    pSubjectItem->setChild(iRow, new QStandardItem(QString::fromStdString(m_tree.node(session).name)));
     QStandardItem* pNewSessionItem = pSubjectItem->child(iRow);
-
-    pNewSessionItem->setData(QVariant::fromValue(BIDS_SESSION), BIDS_ITEM_TYPE);
-    pNewSessionItem->setData(QVariant::fromValue(subjectIndex), BIDS_ITEM_SUBJECT);
-    pNewSessionItem->setData(QVariant::fromValue(pNewSessionItem->index()), BIDS_ITEM_SESSION);
+    tag(pNewSessionItem, session);
 
     emit newItemIndex(pNewSessionItem->index());
 
@@ -238,52 +196,24 @@ QModelIndex BidsViewModel::addDataToSession(QModelIndex sessionIndex,
                                             QStandardItem* pNewItem,
                                             int iDataType)
 {
+    if (!m_tree.contains(nodeOf(sessionIndex))) {
+        mne::Log::warning("[BidsViewModel::addDataToSession] The session is not an item of this model");
+        return QModelIndex();
+    }
+
+    const BidsTree::Placement placement = m_tree.add_data_to_session(nodeOf(sessionIndex), pNewItem->text().toStdString(), iDataType);
+
     QStandardItem* pSessionItem = itemFromIndex(sessionIndex);
-    bool bFolder = false;
-    int iFolder;
-
-    QString sFolderName;
-
-    switch (iDataType) {
-        case BIDS_FUNCTIONALDATA:
-            sFolderName = "func";
-            break;
-        case BIDS_ANATOMICALDATA:
-            sFolderName = "anat";
-            break;
-        case BIDS_BEHAVIORALDATA:
-            sFolderName = "beh";
-            break;
-        default:
-            sFolderName = "unknown";
+    if (placement.folder_created) {
+        auto pOwnedFolder = std::make_unique<QStandardItem>(QString::fromStdString(m_tree.node(placement.folder).name));
+        QStandardItem* pFolder = pOwnedFolder.get();
+        pSessionItem->setChild(pSessionItem->rowCount(), pOwnedFolder.release());
+        tag(pFolder, placement.folder);
     }
 
-    for (iFolder = 0; iFolder < pSessionItem->rowCount(); iFolder++) {
-        if (pSessionItem->child(iFolder)->text() == sFolderName) {
-            bFolder = true;
-            break;
-        }
-    }
-
-    if (!bFolder) {
-        auto pOwnedFolder = std::make_unique<QStandardItem>(sFolderName);
-        pOwnedFolder->setData(QVariant::fromValue(BIDS_FOLDER), BIDS_ITEM_TYPE);
-        pOwnedFolder->setData(QVariant::fromValue(sessionIndex), BIDS_ITEM_SESSION);
-        pOwnedFolder->setData(itemFromIndex(sessionIndex)->data(BIDS_ITEM_SUBJECT), BIDS_ITEM_SUBJECT);
-
-        QStandardItem* pFunctionalItem = pOwnedFolder.get();
-        pSessionItem->setChild(pSessionItem->rowCount(),
-                               pOwnedFolder.release());
-        pFunctionalItem->setChild(pFunctionalItem->rowCount(),
-                                  pNewItem);
-    } else {
-        pSessionItem->child(iFolder)->setChild(pSessionItem->child(iFolder)->rowCount(),
-                                               pNewItem);
-    }
-
-    pNewItem->setData(QVariant::fromValue(iDataType), BIDS_ITEM_TYPE);
-    pNewItem->setData(QVariant::fromValue(sessionIndex), BIDS_ITEM_SESSION);
-    pNewItem->setData(itemFromIndex(sessionIndex)->data(BIDS_ITEM_SUBJECT), BIDS_ITEM_SUBJECT);
+    QStandardItem* pFolder = itemOf(placement.folder);
+    pFolder->setChild(pFolder->rowCount(), pNewItem);
+    tag(pNewItem, placement.item);
 
     emit newItemIndex(pNewItem->index());
 
@@ -295,22 +225,21 @@ QModelIndex BidsViewModel::addDataToSession(QModelIndex sessionIndex,
 QModelIndex BidsViewModel::moveSessionToSubject(QModelIndex subjectIndex,
                                                 QModelIndex sessionIndex)
 {
+    if (!m_tree.contains(nodeOf(subjectIndex)) || !m_tree.contains(nodeOf(sessionIndex))) {
+        return QModelIndex();
+    }
+
     beginResetModel();
 
     QStandardItem* subjectItem = itemFromIndex(subjectIndex);
     QStandardItem* sessionItem = itemFromIndex(sessionIndex);
+    const int session = nodeOf(sessionIndex);
+
+    m_tree.move_session(session, nodeOf(subjectIndex));
 
     sessionItem->parent()->takeRow(sessionItem->row());
-
     subjectItem->setChild(subjectItem->rowCount(), sessionItem);
-    subjectItem->setData(subjectIndex, BIDS_ITEM_SUBJECT);
-
-    for (int i = 0; i < sessionItem->rowCount(); i++) {
-        sessionItem->child(i)->setData(subjectIndex, BIDS_ITEM_SUBJECT);
-        for (int j = 0; j < sessionItem->child(i)->rowCount(); j++) {
-            sessionItem->child(i)->child(j)->setData(subjectIndex, BIDS_ITEM_SUBJECT);
-        }
-    }
+    tag(sessionItem, session);
 
     endResetModel();
 
@@ -324,39 +253,39 @@ QModelIndex BidsViewModel::moveSessionToSubject(QModelIndex subjectIndex,
 QModelIndex BidsViewModel::moveDataToSession(QModelIndex sessionIndex,
                                              QModelIndex dataIndex)
 {
+    if (!m_tree.contains(nodeOf(sessionIndex)) || !m_tree.contains(nodeOf(dataIndex))) {
+        return QModelIndex();
+    }
+
     beginResetModel();
 
     QStandardItem* dataItem = itemFromIndex(dataIndex);
+    const int data = nodeOf(dataIndex);
+    const BidsTree::Placement placement = m_tree.move_data(data, nodeOf(sessionIndex));
 
-    if (dataItem->parent()->rowCount() < 2) {
-        QStandardItem* parent = dataItem->parent();
-
-        dataItem->parent()->takeRow(dataItem->row()).first();
-        parent->parent()->takeRow(parent->row()).first();
-    } else {
-        dataItem->parent()->takeRow(dataItem->row()).first();
+    // Take the item out and drop its folder when it was the last item in it
+    QStandardItem* oldFolder = dataItem->parent();
+    oldFolder->takeRow(dataItem->row());
+    if (oldFolder->rowCount() == 0) {
+        oldFolder->parent()->removeRow(oldFolder->row());
     }
 
-    QModelIndex newIndex;
-    //    switch(dataItem->data(ITEM_TYPE).value<int>()){
-    //        case FUNCTIONALDATA:{
-    //            newIndex = addDataToSession(sessionIndex,
-    //                                        dataItem,
-    //                                        FUNCTIONALDATA);
-    //            break;
-    //        }
-    //        default:{
-    //            qWarning() << "[BidsViewModel::moveDataToSession] Move not supported for this type of data";
-    //        }
-    //    }
+    QStandardItem* pSessionItem = itemOf(m_tree.node(placement.folder).session);
+    if (placement.folder_created) {
+        auto pOwnedFolder = std::make_unique<QStandardItem>(QString::fromStdString(m_tree.node(placement.folder).name));
+        QStandardItem* pFolder = pOwnedFolder.get();
+        pSessionItem->setChild(pSessionItem->rowCount(), pOwnedFolder.release());
+        tag(pFolder, placement.folder);
+    }
 
-    newIndex = addDataToSession(sessionIndex,
-                                dataItem,
-                                dataItem->data(BIDS_ITEM_TYPE).value<int>());
+    QStandardItem* pFolder = itemOf(placement.folder);
+    pFolder->setChild(pFolder->rowCount(), dataItem);
+    tag(dataItem, data);
 
     endResetModel();
 
-    emit newItemIndex(sessionIndex);
+    const QModelIndex newIndex = dataItem->index();
+    emit newItemIndex(pSessionItem->index());
     emit newItemIndex(newIndex);
 
     return newIndex;
@@ -373,38 +302,50 @@ bool BidsViewModel::removeItem(QModelIndex itemIndex)
     beginResetModel();
 
     QStandardItem* pItem = itemFromIndex(itemIndex);
-
     mne::Log::info("Deleting {}", pItem->text().toStdString());
 
-    switch (pItem->data(BIDS_ITEM_TYPE).value<int>()) {
-        case BIDS_SUBJECT:
-            if (removeRows(itemIndex.row(), 1, itemIndex.parent())) {
-                endResetModel();
-            }
-            return true;
-        case BIDS_SESSION:
-            if (removeRows(itemIndex.row(), 1, itemIndex.parent())) {
-                endResetModel();
-            }
-            return true;
-        case BIDS_BEHAVIORALDATA:
-        case BIDS_ANATOMICALDATA:
-        case BIDS_FUNCTIONALDATA:
-            if (removeRows(itemIndex.row(), 1, itemIndex.parent())) {
-                endResetModel();
-            }
-            return true;
-        case BIDS_AVERAGE:
-        case BIDS_EVENT:
-        case BIDS_DIPOLE:
-            if (removeRows(itemIndex.row(), 1, itemIndex.parent())) {
-                endResetModel();
-            }
-            return true;
-        default:
-            if (removeRows(itemIndex.row(), 1, itemIndex.parent())) {
-                endResetModel();
-            }
-            return true;
+    m_tree.remove(nodeOf(itemIndex));
+    if (removeRows(itemIndex.row(), 1, itemIndex.parent())) {
+        endResetModel();
+    }
+
+    return true;
+}
+
+//=============================================================================================================
+
+int BidsViewModel::nodeOf(const QModelIndex& index) const
+{
+    const QStandardItem* pItem = itemFromIndex(index);
+    return pItem && pItem->data(BIDS_ITEM_NODE).isValid() ? pItem->data(BIDS_ITEM_NODE).toInt() : -1;
+}
+
+//=============================================================================================================
+
+QStandardItem* BidsViewModel::itemOf(int node) const
+{
+    QStandardItem* pItem = nullptr;
+    for (int row : m_tree.path(node)) {
+        pItem = pItem ? pItem->child(row) : item(row);
+    }
+    return pItem;
+}
+
+//=============================================================================================================
+
+void BidsViewModel::tag(QStandardItem* pItem, int node)
+{
+    const BidsTree::Node& treeNode = m_tree.node(node);
+    pItem->setData(QVariant::fromValue(node), BIDS_ITEM_NODE);
+    pItem->setData(QVariant::fromValue(treeNode.type), BIDS_ITEM_TYPE);
+    pItem->setData(QVariant::fromValue(indexFromItem(itemOf(treeNode.subject))), BIDS_ITEM_SUBJECT);
+    if (treeNode.session >= 0) {
+        pItem->setData(QVariant::fromValue(indexFromItem(itemOf(treeNode.session))), BIDS_ITEM_SESSION);
+    }
+
+    for (int row = 0; row < pItem->rowCount(); ++row) {
+        if (QStandardItem* pChild = pItem->child(row); pChild && pChild->data(BIDS_ITEM_NODE).isValid()) {
+            tag(pChild, pChild->data(BIDS_ITEM_NODE).toInt());
+        }
     }
 }

@@ -30,6 +30,7 @@
 
 #include "../../disp_global.h"
 #include <mne/fiff/fiff_types.h>
+#include <mne/viewmodels/spectrum_table.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -266,22 +267,7 @@ signals:
     void newSelection(const std::vector<int>& selection);
 
 private:
-    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Fiff Information.*/
-
-    std::map<int, int> m_qMapIdxRowSelection; /**< Selection mapping.*/
-
-    Eigen::RowVectorXd m_vecFreqScale;      /**< Frequency scale. */
-    Eigen::RowVectorXd m_vecFreqScaleBound; /**< Frequency scaled to boundaries. */
-    Eigen::MatrixXd m_dataCurrent;          /**< List that holds the current data*/
-    Eigen::MatrixXd m_dataCurrentFreeze;    /**< List that holds the current data when freezed*/
-
-    float m_fSps;          /**< Sampling rate. */
-    qint32 m_iT;           /**< Time window. */
-    qint32 m_iLowerFrqIdx; /**< Upper frequency plotting boundary. */
-    qint32 m_iUpperFrqIdx; /**< Lower frequency plotting boundary. */
-    qint8 m_iScaleType;    /**< The display scale type. */
-    bool m_bIsFreezed;     /**< Display is freezed. */
-    bool m_bInitialized;   /**< If it's initailized. */
+    mne::viewmodels::SpectrumTable m_table; /**< Spectra, selection and frequency axis. */
 };
 
 //=============================================================================================================
@@ -290,56 +276,56 @@ private:
 
 std::shared_ptr<mne::FiffInfo> FrequencySpectrumModel::getInfo() const
 {
-    return m_pFiffInfo;
+    return m_table.info();
 }
 
 //=============================================================================================================
 
 Eigen::RowVectorXd FrequencySpectrumModel::getFreqScale() const
 {
-    return m_vecFreqScale;
+    return m_table.freq_scale();
 }
 
 //=============================================================================================================
 
 Eigen::RowVectorXd FrequencySpectrumModel::getFreqScaleBound() const
 {
-    return m_vecFreqScaleBound;
+    return m_table.freq_scale_bound();
 }
 
 //=============================================================================================================
 
 inline qint32 FrequencySpectrumModel::getNumStems() const
 {
-    return m_dataCurrent.cols();
+    return m_table.bins();
 }
 
 //=============================================================================================================
 
 inline const std::map<int, int>& FrequencySpectrumModel::getIdxSelMap() const
 {
-    return m_qMapIdxRowSelection;
+    return m_table.selection();
 }
 
 //=============================================================================================================
 
 inline bool FrequencySpectrumModel::isFreezed() const
 {
-    return m_bIsFreezed;
+    return m_table.frozen();
 }
 
 //=============================================================================================================
 
 inline qint32 FrequencySpectrumModel::getLowerFrqBound() const
 {
-    return m_iLowerFrqIdx;
+    return m_table.lower_bin();
 }
 
 //=============================================================================================================
 
 inline qint32 FrequencySpectrumModel::getUpperFrqBound() const
 {
-    return m_iUpperFrqIdx;
+    return m_table.upper_bin();
 }
 } // NAMESPACE
 

@@ -69,6 +69,7 @@ add_subdirectory(mne/lsl)
 
 add_subdirectory(mne/fiff)
 add_subdirectory(mne/bids)
+add_subdirectory(mne/viewmodels)
 add_subdirectory(mne/ieeg)
 add_subdirectory(mne/fs)
 add_subdirectory(mne/mri)

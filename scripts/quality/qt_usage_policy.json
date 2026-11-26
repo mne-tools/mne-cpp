@@ -16,7 +16,8 @@
       "QWindow hosts and scene viewports (phase 3)": "ChannelWindow (QWindow + QRhi swap chain) next to the ChannelRhiView QRhiWidget host, and SceneViewport replacing the QGraphicsView scenes, raised the disp ceilings once (tokens 4846 -> 4885, public header includes 82 -> 89); the QRhiWidget hosts go with phase 4.",
       "Qt input translation shared with the brain view": "toScenePointerEvent() and toSceneWheelEvent() (plots/helpers/sceneinput.h), which ChannelRhiRenderer and disp3D's BrainViewCore share instead of each translating Qt events, raised the disp ceilings once (tokens 4543 -> 4549); the brain view's camera, input, layout and overlay moving to mne_scene lowered disp3D from 1961 to 1807 tokens.",
       "QRhi backend of the GPU frame description": "RhiFrameRenderer (plots/helpers/rhiframerenderer.h) executes the Qt-free scene::GpuFrame of any view with QRhi: pipelines, buffers, textures and shader reflection checks in one place instead of in each renderer. ChannelRhiRenderer lost its own QRhi code to it, net raising the disp ceilings once (tokens 4529 -> 4546); the brain view moving onto it lowers disp3D.",
-      "Generic settings panel builder": "SettingsPanel (viewers/settingspanel.h) builds the Qt Widgets of any Qt-free scene::SettingsForm, so a new toolkit needs one builder instead of a hand-written view per panel; the builder raised the disp ceilings once (tokens 4546 -> 4601); the covariance, spectrum, averaging, filter, artifact and time-frequency settings views ported onto it lowered them again (tokens 4601 -> 4519)."
+      "Generic settings panel builder": "SettingsPanel (viewers/settingspanel.h) builds the Qt Widgets of any Qt-free scene::SettingsForm, so a new toolkit needs one builder instead of a hand-written view per panel; the builder raised the disp ceilings once (tokens 4546 -> 4601); the covariance, spectrum, averaging, filter, artifact and time-frequency settings views ported onto it lowered them again (tokens 4601 -> 4519).",
+      "Qt adapters of the Qt-free view models": "ChannelInfoModel, FrequencySpectrumModel and BidsViewModel became adapters of mne_viewmodels (ChannelTable, SpectrumTable, BidsTree), and RtFiffRawViewModel and EvokedSetModel hand their SSP, compensator, SPHARA, filtering and trigger detection to mne_dsp (RtRawDisplay, DisplayCorrection). The adapters convert between the view models and QVariant, QStandardItem and QModelIndex, which raised the 'other' category once (1315 -> 1329) while the total fell (tokens 4519 -> 4403)."
     },
     "disp3D": {
       "BrainWindow host and GPU overlay (phase 3)": "BrainWindow (QWindow + QRhi swap chain), the forwarding BrainView host and the overlay painted into the GPU pass instead of child QLabels raised the disp3D ceilings once (tokens 1633 -> 1961); the QRhiWidget host goes with phase 4."
@@ -79,7 +80,7 @@
       "modules": []
     },
     "disp": {
-      "tokens": 4519,
+      "tokens": 4403,
       "public_header_includes": 87,
       "modules": [
         "Core",
@@ -87,13 +88,13 @@
         "Widgets"
       ],
       "by_category": {
-        "containers": 15,
+        "containers": 14,
         "files": 90,
-        "global": 923,
+        "global": 834,
         "gui": 904,
-        "objects_signals": 520,
-        "other": 1315,
-        "strings": 743,
+        "objects_signals": 508,
+        "other": 1329,
+        "strings": 715,
         "time": 9
       }
     },
@@ -194,6 +195,11 @@
       "modules": []
     },
     "sts": {
+      "tokens": 0,
+      "public_header_includes": 0,
+      "modules": []
+    },
+    "viewmodels": {
       "tokens": 0,
       "public_header_includes": 0,
       "modules": []

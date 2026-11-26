@@ -242,8 +242,8 @@ set(MNE_LIBS_REQUIRED
     mne_dsp
 )
 
-# The public headers include Qt and the scene models the plots draw
-target_link_libraries(${PROJECT_NAME} PUBLIC ${QT_REQUIRED_COMPONENT_LIBS} mne_scene)
+# The public headers include Qt, the scene models the plots draw and the view models the item models adapt
+target_link_libraries(${PROJECT_NAME} PUBLIC ${QT_REQUIRED_COMPONENT_LIBS} mne_scene mne_viewmodels)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${MNE_LIBS_REQUIRED}
     Eigen3::Eigen

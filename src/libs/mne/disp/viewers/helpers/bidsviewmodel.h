@@ -30,6 +30,7 @@
 #define BIDS_ITEM_TYPE Qt::UserRole + 2
 #define BIDS_ITEM_SUBJECT Qt::UserRole + 3
 #define BIDS_ITEM_SESSION Qt::UserRole + 4
+#define BIDS_ITEM_NODE Qt::UserRole + 5 /**< Id of the item in the mne::viewmodels::BidsTree of the model. */
 
 //ITEM TYPES
 
@@ -58,6 +59,7 @@ inline constexpr auto BIDS_UNKNOWN = 99;
 //=============================================================================================================
 
 #include "../../disp_global.h"
+#include <mne/viewmodels/bids_tree.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -226,6 +228,23 @@ signals:
      * @param[in] itemIndex    index of new item.
      */
     void newItemIndex(QModelIndex itemIndex);
+
+public:
+    //=========================================================================================================
+    /**
+     * @return The toolkit-independent tree this model mirrors.
+     */
+    const mne::viewmodels::BidsTree& tree() const
+    {
+        return m_tree;
+    }
+
+private:
+    int nodeOf(const QModelIndex& index) const;
+    QStandardItem* itemOf(int node) const;
+    void tag(QStandardItem* pItem, int node);
+
+    mne::viewmodels::BidsTree m_tree; /**< Subjects, sessions, folders and data items without Qt. */
 };
 
 } //Namespace

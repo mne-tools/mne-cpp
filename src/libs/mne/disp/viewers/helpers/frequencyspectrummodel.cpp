@@ -19,7 +19,6 @@
 //=============================================================================================================
 
 #include "frequencyspectrummodel.h"
-#include "../../detail/map_value.h"
 
 #include <mne/fiff/fiff_info.h>
 
@@ -28,6 +27,7 @@
 //=============================================================================================================
 
 #include <memory>
+#include <optional>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -43,13 +43,6 @@ using namespace Eigen;
 
 FrequencySpectrumModel::FrequencySpectrumModel(QObject* parent)
 : QAbstractTableModel(parent)
-, m_fSps(1024.0f)
-, m_iT(10)
-, m_iLowerFrqIdx(0)
-, m_iUpperFrqIdx(0)
-, m_iScaleType(0)
-, m_bIsFreezed(false)
-, m_bInitialized(false)
 {
 }
 
@@ -57,10 +50,7 @@ FrequencySpectrumModel::FrequencySpectrumModel(QObject* parent)
 
 int FrequencySpectrumModel::rowCount(const QModelIndex& /*parent*/) const
 {
-    if (!m_qMapIdxRowSelection.empty())
-        return static_cast<int>(m_qMapIdxRowSelection.size());
-    else
-        return 0;
+    return m_table.row_count();
 }
 
 //=============================================================================================================
@@ -74,47 +64,25 @@ int FrequencySpectrumModel::columnCount(const QModelIndex& /*parent*/) const
 
 QVariant FrequencySpectrumModel::data(const QModelIndex& index, int role) const
 {
-    if (role != Qt::DisplayRole && role != Qt::BackgroundRole)
+    if (role != Qt::DisplayRole || !index.isValid()) {
         return QVariant();
+    }
 
-    if (index.isValid()) {
-        qint32 r = detail::valueOr(m_qMapIdxRowSelection, index.row());
+    //******** first column (chname) ********
+    if (index.column() == 0) {
+        return m_table.info() ? QVariant(QString::fromStdString(m_table.channel_name(index.row()))) : QVariant();
+    }
 
-        //******** first column (chname) ********
-        if (index.column() == 0 && role == Qt::DisplayRole)
-            if (m_pFiffInfo)
-                return QString::fromStdString(m_pFiffInfo->chs[r].ch_name);
-
-        //******** second column (data plot) ********
-        if (index.column() == 1) {
-            QVariant v;
-
-            switch (role) {
-                case Qt::DisplayRole: {
-                    //pack the spectrum row
-                    const MatrixXd& data = m_bIsFreezed ? m_dataCurrentFreeze : m_dataCurrent;
-                    // Rows exist from setInfo() on; the spectrum only once data has arrived
-                    if (r < 0 || r >= data.rows()) {
-                        return QVariant();
-                    }
-                    v.setValue(RowVectorXd(data.row(r)));
-                    return v;
-                }
-                case Qt::BackgroundRole: {
-                    //                    if(m_fiffInfo.bads.contains(m_chInfolist[row].ch_name)) {
-                    //                        QBrush brush;
-                    //                        brush.setStyle(Qt::SolidPattern);
-                    //    //                    qDebug() << m_chInfolist[row].ch_name << "is marked as bad, index:" << row;
-                    //                        brush.setColor(Qt::red);
-                    //                        return QVariant(brush);
-                    //                    }
-                    //                    else
-                    return QVariant();
-                }
-            } // end role switch
-        } // end column check
-
-    } // end index.valid() check
+    //******** second column (data plot) ********
+    if (index.column() == 1) {
+        const std::optional<RowVectorXd> spectrum = m_table.spectrum(index.row());
+        if (!spectrum) {
+            return QVariant();
+        }
+        QVariant v;
+        v.setValue(*spectrum);
+        return v;
+    }
 
     return QVariant();
 }
@@ -155,54 +123,25 @@ QVariant FrequencySpectrumModel::headerData(int section, Qt::Orientation orienta
 void FrequencySpectrumModel::setInfo(std::shared_ptr<FiffInfo>& info)
 {
     beginResetModel();
-    m_pFiffInfo = info;
+    m_table.set_info(info);
     endResetModel();
-
-    resetSelection();
 }
 
 //=============================================================================================================
 
 void FrequencySpectrumModel::setScaleType(qint8 ScaleType)
 {
-    m_iScaleType = ScaleType;
+    m_table.set_scale(ScaleType ? viewmodels::SpectrumTable::Scale::Log : viewmodels::SpectrumTable::Scale::Linear);
 }
 
 //=============================================================================================================
 
 void FrequencySpectrumModel::addData(const MatrixXd& data)
 {
-    m_dataCurrent = data;
-
-    if (m_vecFreqScale.size() != m_dataCurrent.cols() && m_pFiffInfo) {
-        double freqRes = (m_pFiffInfo->sfreq / 2) / m_dataCurrent.cols();
-        double k = 1.0;
-        m_vecFreqScale.resize(1, m_dataCurrent.cols());
-
-        double currFreq = 0;
-        for (qint32 i = 0; i < m_dataCurrent.cols(); ++i) {
-            if (m_iScaleType) //log
-                m_vecFreqScale[i] = log10(currFreq + k);
-            else // normal
-                m_vecFreqScale[i] = currFreq;
-
-            currFreq += freqRes;
-        }
-
-        double max = m_vecFreqScale.maxCoeff();
-        m_vecFreqScale /= max;
-
-        m_vecFreqScaleBound = m_vecFreqScale;
-        m_iLowerFrqIdx = 0;
-        m_iUpperFrqIdx = m_vecFreqScale.size() - 1;
-
-        m_bInitialized = true;
-    }
+    m_table.set_data(data);
 
     //Update data content
-    QModelIndex topLeft = this->index(0, 1);
-    QModelIndex bottomRight = this->index(m_dataCurrent.rows() - 1, 1);
-    emit dataChanged(topLeft, bottomRight, {Qt::DisplayRole});
+    emit dataChanged(index(0, 1), index(m_table.data_rows() - 1, 1), {Qt::DisplayRole});
 }
 
 //=============================================================================================================
@@ -210,19 +149,8 @@ void FrequencySpectrumModel::addData(const MatrixXd& data)
 void FrequencySpectrumModel::selectRows(const std::vector<int>& selection)
 {
     beginResetModel();
-
-    m_qMapIdxRowSelection.clear();
-
-    qint32 count = 0;
-    for (qint32 i = 0; i < std::ssize(selection); ++i) {
-        if (selection[i] < std::ssize(m_pFiffInfo->chs)) {
-            m_qMapIdxRowSelection.insert_or_assign(count, selection[i]);
-            ++count;
-        }
-    }
-
+    m_table.select(selection);
     emit newSelection(selection);
-
     endResetModel();
 }
 
@@ -231,65 +159,29 @@ void FrequencySpectrumModel::selectRows(const std::vector<int>& selection)
 void FrequencySpectrumModel::resetSelection()
 {
     beginResetModel();
-
-    m_qMapIdxRowSelection.clear();
-
-    for (qint32 i = 0; i < std::ssize(m_pFiffInfo->chs); ++i)
-        m_qMapIdxRowSelection.insert_or_assign(i, i);
-
+    m_table.reset_selection();
     endResetModel();
 }
 
 //=============================================================================================================
 
-void FrequencySpectrumModel::toggleFreeze(const QModelIndex& index)
+void FrequencySpectrumModel::toggleFreeze(const QModelIndex& /*index*/)
 {
-    Q_UNUSED(index);
-
-    m_bIsFreezed = !m_bIsFreezed;
-
-    if (m_bIsFreezed)
-        m_dataCurrentFreeze = m_dataCurrent;
+    m_table.toggle_frozen();
 
     //Update data content
-    QModelIndex topLeft = this->index(0, 1);
-    QModelIndex bottomRight = this->index(m_dataCurrent.rows() - 1, 1);
-    emit dataChanged(topLeft, bottomRight, {Qt::DisplayRole});
+    emit dataChanged(index(0, 1), index(m_table.data_rows() - 1, 1), {Qt::DisplayRole});
 }
 
 //=============================================================================================================
 
 void FrequencySpectrumModel::setBoundaries(float fLowerFrqBound, float fUpperFrqBound)
 {
-    if (!m_bInitialized) {
+    if (m_table.freq_scale().size() == 0) {
         return;
     }
 
     beginResetModel();
-
-    double nf = m_pFiffInfo->sfreq / 2;
-
-    m_iLowerFrqIdx = 0;
-    m_iUpperFrqIdx = m_vecFreqScale.size() - 1;
-
-    //find boundaries
-    for (qint32 i = 0; i < m_vecFreqScale.size(); ++i) {
-        float val = m_vecFreqScale[i] * nf;
-        if (val < fLowerFrqBound) {
-            m_iLowerFrqIdx = i;
-        }
-
-        if (val > fUpperFrqBound) {
-            m_iUpperFrqIdx = i;
-            break;
-        }
-    }
-
-    // scale it new
-    m_vecFreqScaleBound = m_vecFreqScale;
-    for (qint32 i = 0; i < m_vecFreqScaleBound.size(); ++i) {
-        m_vecFreqScaleBound[i] = (m_vecFreqScaleBound[i] - m_vecFreqScale[m_iLowerFrqIdx]) / (m_vecFreqScale[m_iUpperFrqIdx] - m_vecFreqScale[m_iLowerFrqIdx]);
-    }
-
+    m_table.set_bounds(fLowerFrqBound, fUpperFrqBound);
     endResetModel();
 }

@@ -145,6 +145,10 @@ component_management:
       name: libs/mne/scene
       paths:
         - src/libs/mne/scene/**
+    - component_id: libs_viewmodels
+      name: libs/mne/viewmodels
+      paths:
+        - src/libs/mne/viewmodels/**
     - component_id: libs_base
       name: libs/mne/base
       paths:
