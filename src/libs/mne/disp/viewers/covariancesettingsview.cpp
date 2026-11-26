@@ -17,15 +17,13 @@
 //=============================================================================================================
 
 #include "covariancesettingsview.h"
+#include "settingspanel.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGridLayout>
-#include <QSpinBox>
-#include <QLabel>
-#include <QSettings>
+#include <QVBoxLayout>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -40,27 +38,24 @@ using namespace mne::disp;
 CovarianceSettingsView::CovarianceSettingsView(const QString& sSettingsPath,
                                                QWidget* parent)
 : AbstractView(parent)
+, m_pForm(std::make_shared<scene::SettingsForm>("Covariance Settings"))
 , m_sSettingsPath(sSettingsPath)
 {
     this->setWindowTitle("Covariance Settings");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
 
-    QGridLayout* t_pGridLayout = new QGridLayout(this);
+    constexpr int minSamples = 600;
+    m_pForm->add_int("samples", "Number of Samples", minSamples, minSamples, minSamples * 60, minSamples);
+    m_listener = m_pForm->add_listener([this](const std::string& key, const std::optional<scene::SettingValue>&) {
+        if (key == "samples") {
+            emit samplesChanged(m_pForm->get<int>("samples"));
+        }
+    });
 
-    QLabel* t_pLabelNumSamples = new QLabel(this);
-    t_pLabelNumSamples->setText("Number of Samples");
-    t_pGridLayout->addWidget(t_pLabelNumSamples, 0, 0, 1, 1);
-
-    qint32 minSamples = 600;
-
-    m_pSpinBoxNumSamples = new QSpinBox(this);
-    m_pSpinBoxNumSamples->setMinimum(minSamples);
-    m_pSpinBoxNumSamples->setMaximum(minSamples * 60);
-    m_pSpinBoxNumSamples->setSingleStep(minSamples);
-    connect(m_pSpinBoxNumSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &CovarianceSettingsView::samplesChanged);
-    t_pGridLayout->addWidget(m_pSpinBoxNumSamples, 0, 1, 1, 1);
+    auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(new SettingsPanel(m_pForm, this));
 
     loadSettings();
 }
@@ -69,6 +64,7 @@ CovarianceSettingsView::CovarianceSettingsView(const QString& sSettingsPath,
 
 CovarianceSettingsView::~CovarianceSettingsView()
 {
+    m_pForm->remove_listener(m_listener);
     saveSettings();
 }
 
@@ -76,39 +72,28 @@ CovarianceSettingsView::~CovarianceSettingsView()
 
 void CovarianceSettingsView::setCurrentSamples(int iSamples)
 {
-    m_pSpinBoxNumSamples->setValue(iSamples);
+    m_pForm->set_value("samples", iSamples);
 }
 
 //=============================================================================================================
 
 void CovarianceSettingsView::setMinSamples(int iSamples)
 {
-    m_pSpinBoxNumSamples->setMinimum(iSamples);
-    m_pSpinBoxNumSamples->setMaximum(iSamples * 60);
+    m_pForm->set_range("samples", iSamples, iSamples * 60);
 }
 
 //=============================================================================================================
 
 void CovarianceSettingsView::saveSettings()
 {
-    if (m_sSettingsPath.isEmpty()) {
-        return;
-    }
-
-    // Save Settings
-    QSettings settings("MNECPP");
+    // The number of samples comes from the plugin; nothing is persisted
 }
 
 //=============================================================================================================
 
 void CovarianceSettingsView::loadSettings()
 {
-    if (m_sSettingsPath.isEmpty()) {
-        return;
-    }
-
-    // Load Settings
-    QSettings settings("MNECPP");
+    // The number of samples comes from the plugin; nothing is persisted
 }
 
 //=============================================================================================================

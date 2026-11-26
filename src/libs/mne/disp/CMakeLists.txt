@@ -81,6 +81,7 @@ set(SOURCES
     viewers/multiview.cpp
     viewers/hpisettingsview.cpp
     viewers/covariancesettingsview.cpp
+    viewers/settingspanel.cpp
     viewers/bidsview.cpp
     viewers/helpers/channeldatamodel.cpp
     viewers/helpers/channelrhiview.cpp
@@ -155,6 +156,7 @@ set(HEADERS
     viewers/multiview.h
     viewers/hpisettingsview.h
     viewers/covariancesettingsview.h
+    viewers/settingspanel.h
     viewers/bidsview.h
     viewers/helpers/channeldatamodel.h
     viewers/helpers/channelrhiview.h

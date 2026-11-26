@@ -27,22 +27,19 @@
 
 #include "../disp_global.h"
 #include "abstractview.h"
+#include <mne/scene/settings_form.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QWidget>
-#include <QSpinBox>
-
-
-#include <QComboBox>
-#include <QCheckBox>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <memory>
 #include <utility>
 
 //=============================================================================================================
@@ -132,8 +129,9 @@ signals:
     void samplesChanged(int iSamples);
 
 private:
-    QSpinBox* m_pSpinBoxNumSamples;
-    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
+    std::shared_ptr<scene::SettingsForm> m_pForm; /**< The panel's fields, built into widgets by a SettingsPanel. */
+    int m_listener = 0;                           /**< Id of the view's listener on the form. */
+    QString m_sSettingsPath;                      /**< The settings path to store the GUI settings to. */
 };
 } // NAMESPACE mne_disp
 

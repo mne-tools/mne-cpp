@@ -27,6 +27,7 @@ set(SOURCES
   raster_renderer.cpp
   ray_picking.cpp
   sensor_layout.cpp
+  settings_form.cpp
   software_renderer.cpp
   spline_plot.cpp
   svg_renderer.cpp
@@ -68,6 +69,7 @@ set(HEADERS
   raster_renderer.h
   ray_picking.h
   sensor_layout.h
+  settings_form.h
   software_renderer.h
   spline_plot.h
   style.h

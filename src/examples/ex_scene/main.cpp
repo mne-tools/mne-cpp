@@ -23,6 +23,7 @@
 #include <mne/scene/line_chart.h>
 #include <mne/scene/raster_renderer.h>
 #include <mne/scene/sensor_layout.h>
+#include <mne/scene/settings_form.h>
 #include <mne/scene/svg_renderer.h>
 #include <mne/scene/text_metrics.h>
 
@@ -36,6 +37,7 @@
 #include <filesystem>
 #include <format>
 #include <print>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <system_error>
@@ -148,6 +150,30 @@ int main()
     topo.set_tiles({tile});
     //! [average_layout_usage]
     ok &= expect(topo.tile_at(topo.tiles()[0].box.center()) == 0, "the tile is found at its centre");
+
+    //! [settings_form_usage]
+    // A settings panel described once; any toolkit builds its widgets from it (disp::SettingsPanel for Qt)
+    SettingsForm form("Averaging");
+    form.add_int("trials", "Number of trials", 10, 1, 1000, 1, {}, "General");
+    form.add_bool("baseline", "Baseline correction", false, "Baseline");
+    SettingField from;
+    from.key = "baseline_from";
+    from.kind = SettingField::Kind::Int;
+    from.label = "From";
+    from.unit = " ms";
+    from.minimum = -1000;
+    from.maximum = 0;
+    from.group = "Baseline";
+    from.enabled_if = "baseline";
+    form.add(from);
+    int heard = 0;
+    form.add_listener([&heard](const std::string&, const std::optional<SettingValue>&) {
+        ++heard;
+    });
+    form.set_value("trials", 5000);
+    //! [settings_form_usage]
+    ok &= expect(form.get<int>("trials") == 1000 && heard == 1, "a value beyond the range is clamped and heard once");
+    ok &= expect(!form.is_enabled("baseline_from"), "the baseline range waits for the baseline switch");
 
     std::error_code removeError;
     std::filesystem::remove_all(dir, removeError);

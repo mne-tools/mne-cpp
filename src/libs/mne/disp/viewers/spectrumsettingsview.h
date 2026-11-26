@@ -27,18 +27,18 @@
 
 #include "../disp_global.h"
 #include "abstractview.h"
+#include <mne/scene/settings_form.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QPointer>
+#include <memory>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QSlider;
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne::disp
@@ -153,8 +153,8 @@ protected:
      */
     void updateProcessingMode(ProcessingMode mode);
 
-    QPointer<QSlider> m_pSliderLowerBound; /**< Lower bound frequency. */
-    QPointer<QSlider> m_pSliderUpperBound; /**< Upper bound frequency. */
+    std::shared_ptr<scene::SettingsForm> m_pForm; /**< Lower and upper bound in Hz, built into sliders by a SettingsPanel. */
+    int m_listener = 0;                           /**< Id of the view's listener on the form. */
 
 signals:
     //=========================================================================================================

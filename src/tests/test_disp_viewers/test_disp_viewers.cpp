@@ -38,6 +38,7 @@
 #include <mne/disp/viewers/progressview.h>
 #include <mne/disp/viewers/quickcontrolview.h>
 #include <mne/disp/viewers/multiview.h>
+#include <mne/disp/viewers/settingspanel.h>
 
 #include <mne/fiff/fiff_ch_info.h>
 #include <mne/fiff/fiff_proj.h>
@@ -53,6 +54,15 @@
 #include <QApplication>
 #include <QStringList>
 #include <QMap>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QDoubleSpinBox>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QSettings>
+#include <QSignalSpy>
+#include <QSlider>
+#include <QSpinBox>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -151,6 +161,7 @@ private slots:
      * Verifies that CovarianceSettingsView survives all lifecycle transitions.
      */
     void covarianceSettingsView_lifecycle();
+    void settingsPanel_buildsAndSyncsWidgets();
 
     //=========================================================================================================
     /**
@@ -419,6 +430,19 @@ void TestDispViewers::spectrumSettingsView_boundaries()
 
     // Typical MEG/EEG frequency range at 600 Hz sfreq
     view.setBoundaries(600.0f, 0.1f, 100.0f);
+    QCOMPARE(view.getLowerBound(), 0.1f);
+    QCOMPARE(view.getUpperBound(), 100.0f);
+    // The sliders run in steps of 1 mHz up to the Nyquist frequency; the lower bound stays below the upper one
+    auto* lower = view.findChild<QSlider*>(QStringLiteral("lower"));
+    auto* upper = view.findChild<QSlider*>(QStringLiteral("upper"));
+    QVERIFY(lower && upper);
+    QCOMPARE(upper->maximum(), 300000);
+    QSignalSpy changed(&view, &SpectrumSettingsView::settingsChanged);
+    upper->setValue(50000);
+    QCOMPARE(view.getUpperBound(), 50.0f);
+    QVERIFY(changed.count() >= 1);
+    lower->setValue(80000);
+    QCOMPARE(view.getLowerBound(), 50.0f);
 
     view.updateValue(50);
     view.updateValue(0);
@@ -476,6 +500,18 @@ void TestDispViewers::averagingSettingsView_setAndGet()
 void TestDispViewers::covarianceSettingsView_lifecycle()
 {
     CovarianceSettingsView view("test_disp_viewers");
+    auto* samples = view.findChild<QSpinBox*>(QStringLiteral("samples"));
+    QVERIFY(samples);
+    QCOMPARE(samples->minimum(), 600);
+    QCOMPARE(samples->maximum(), 36000);
+    QSignalSpy changed(&view, &CovarianceSettingsView::samplesChanged);
+    samples->setValue(1200);
+    QCOMPARE(changed.count(), 1);
+    QCOMPARE(changed.at(0).at(0).toInt(), 1200);
+    view.setMinSamples(100);
+    QCOMPARE(samples->maximum(), 6000);
+    view.setCurrentSamples(9000);
+    QCOMPARE(samples->value(), 6000);
 
     view.setGuiMode(AbstractView::GuiMode::Clinical);
     view.setGuiMode(AbstractView::GuiMode::Research);
@@ -486,6 +522,93 @@ void TestDispViewers::covarianceSettingsView_lifecycle()
     view.clearView();
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers::settingsPanel_buildsAndSyncsWidgets()
+{
+    auto form = std::make_shared<scene::SettingsForm>("Test panel");
+    form->add_int("trials", "Trials", 10, 1, 100, 1, " trials", "General");
+    form->add_double("prestim", "Pre-stimulus", 0.1, 0.0, 1.0, 0.05, 2, " s", "General");
+    form->add_bool("baseline", "Baseline", false, "Baseline");
+    scene::SettingField from;
+    from.key = "from";
+    from.kind = scene::SettingField::Kind::Int;
+    from.label = "From";
+    from.group = "Baseline";
+    from.enabled_if = "baseline";
+    form->add(from);
+    form->add_choice("mode", "Mode", {{"mean", "Mean"}, {"median", "Median"}}, "mean");
+    form->add_text("name", "Name", "avg");
+    scene::SettingField late;
+    late.key = "late";
+    late.kind = scene::SettingField::Kind::Int;
+    late.label = "Late";
+    late.maximum = 50;
+    late.commit = scene::SettingField::Commit::WhenFinished;
+    form->add(late);
+    form->add_action("reset", "Reset");
+    form->add_custom("extra", "Extra");
+
+    SettingsPanel panel(form);
+    QCOMPARE(panel.windowTitle(), QStringLiteral("Test panel"));
+    auto* trials = qobject_cast<QSpinBox*>(panel.editor("trials"));
+    auto* prestim = qobject_cast<QDoubleSpinBox*>(panel.editor("prestim"));
+    auto* baseline = qobject_cast<QCheckBox*>(panel.editor("baseline"));
+    auto* mode = qobject_cast<QComboBox*>(panel.editor("mode"));
+    auto* name = qobject_cast<QLineEdit*>(panel.editor("name"));
+    auto* reset = qobject_cast<QPushButton*>(panel.editor("reset"));
+    QVERIFY(trials && prestim && baseline && mode && name && reset);
+    QVERIFY(panel.customWidget("extra") && panel.customWidget("extra")->layout());
+    QVERIFY(!panel.customWidget("trials"));
+
+    // The widgets show the form's values and ranges
+    QCOMPARE(trials->value(), 10);
+    QCOMPARE(trials->suffix(), QStringLiteral(" trials"));
+    QCOMPARE(prestim->decimals(), 2);
+    QCOMPARE(mode->count(), 2);
+    QCOMPARE(name->text(), QStringLiteral("avg"));
+
+    // Widget edits reach the form, form changes reach the widgets
+    trials->setValue(42);
+    QCOMPARE(form->get<int>("trials"), 42);
+    mode->setCurrentIndex(1);
+    QCOMPARE(form->get<std::string>("mode"), std::string("median"));
+    // A field that commits when editing finishes waits for it
+    auto* lateSpin = qobject_cast<QSpinBox*>(panel.editor("late"));
+    lateSpin->setValue(7);
+    QCOMPARE(form->get<int>("late"), 0);
+    emit lateSpin->editingFinished();
+    QCOMPARE(form->get<int>("late"), 7);
+    form->set_value("prestim", 0.5);
+    QCOMPARE(prestim->value(), 0.5);
+    form->set_range("trials", 1, 20);
+    QCOMPARE(trials->maximum(), 20);
+    QCOMPARE(trials->value(), 20);
+    form->set_choices("mode", {{"max", "Maximum"}});
+    QCOMPARE(mode->itemText(0), QStringLiteral("Maximum"));
+
+    // Conditions enable fields; actions trigger listeners
+    QVERIFY(!panel.editor("from")->isEnabled());
+    baseline->setChecked(true);
+    QVERIFY(panel.editor("from")->isEnabled());
+    bool triggered = false;
+    form->add_listener([&triggered](const std::string& key, const std::optional<scene::SettingValue>& value) {
+        triggered = triggered || (key == "reset" && !value);
+    });
+    reset->click();
+    QVERIFY(triggered);
+
+    // Values round-trip through QSettings
+    const QString path = QStringLiteral("test_disp_viewers/settingsPanel");
+    panel.saveSettings(path);
+    form->set_value("trials", 3);
+    form->set_value("baseline", false);
+    panel.loadSettings(path);
+    QCOMPARE(form->get<int>("trials"), 20);
+    QVERIFY(form->get<bool>("baseline"));
+    QSettings(QStringLiteral("MNECPP")).remove(path);
 }
 
 //=============================================================================================================

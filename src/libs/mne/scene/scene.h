@@ -39,6 +39,7 @@
 #include "raster_renderer.h"
 #include "ray_picking.h"
 #include "sensor_layout.h"
+#include "settings_form.h"
 #include "software_renderer.h"
 #include "spline_plot.h"
 #include "style.h"

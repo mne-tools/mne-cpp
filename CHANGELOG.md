@@ -368,6 +368,15 @@ aliases; replace the old spelling as below.
   backend and shown as an SDL texture, SDL input translated to scene input
   events, a synthetic recording streaming in. The Qt-free CI job builds and
   runs it on macOS (SDL's dummy video driver).
+- Settings panels are described without a GUI toolkit: `scene::SettingsForm`
+  (`scene/settings_form.h`) lists the fields of a panel (bool, int and double
+  with range, step, unit and spin box or slider, choice, text, file path,
+  action button, or a host-provided custom widget), their groups, and
+  enabled/visible conditions, keeps the values valid and tells listeners
+  about changes. `disp::SettingsPanel` builds the Qt Widgets of any form and
+  persists its values in `QSettings`, so another toolkit needs one builder
+  instead of a hand-written view per panel. `CovarianceSettingsView` and
+  `SpectrumSettingsView` are built from forms; their APIs are unchanged.
   The Qt usage ceiling of `disp` drops to 4543 tokens.
 - The data behind the raw-data views moved to `mne_scene` as well.
   `TraceBuffer` (`scene/trace_buffer.h`) stores the samples of the trace view

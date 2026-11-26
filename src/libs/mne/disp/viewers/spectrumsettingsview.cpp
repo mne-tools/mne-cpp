@@ -18,15 +18,19 @@
 //=============================================================================================================
 
 #include "spectrumsettingsview.h"
+#include "settingspanel.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QLabel>
-#include <QGridLayout>
-#include <QSlider>
-#include <QSettings>
+#include <QVBoxLayout>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -42,31 +46,32 @@ SpectrumSettingsView::SpectrumSettingsView(const QString& sSettingsPath,
                                            QWidget* parent,
                                            Qt::WindowFlags f)
 : AbstractView(parent, f)
+, m_pForm(std::make_shared<scene::SettingsForm>("Spectrum Settings"))
 {
     m_sSettingsPath = sSettingsPath;
     this->setWindowTitle("Spectrum Settings");
 
-    QGridLayout* t_pGridLayout = new QGridLayout(this);
+    // Sliders in steps of 1 mHz; setBoundaries() sets the range to the Nyquist frequency
+    for (const auto& [key, label] : {std::pair{"lower", "Lower Frequency"}, std::pair{"upper", "Upper Frequency"}}) {
+        scene::SettingField bound;
+        bound.key = key;
+        bound.kind = scene::SettingField::Kind::Double;
+        bound.label = label;
+        bound.default_value = 0.0;
+        bound.maximum = 0.1;
+        bound.step = 0.001;
+        bound.decimals = 3;
+        bound.unit = " Hz";
+        bound.style = scene::SettingField::Style::Slider;
+        m_pForm->add(bound);
+    }
+    m_listener = m_pForm->add_listener([this](const std::string&, const std::optional<scene::SettingValue>&) {
+        updateValue(0);
+    });
 
-    QLabel* t_pLabelLower = new QLabel(this);
-    t_pLabelLower->setText("Lower Frequency");
-    m_pSliderLowerBound = new QSlider(Qt::Horizontal, this);
-    QLabel* t_pLabelUpper = new QLabel(this);
-    t_pLabelUpper->setText("Upper Frequency");
-    m_pSliderUpperBound = new QSlider(Qt::Horizontal, this);
-
-    m_pSliderUpperBound->setMinimum(0);
-    m_pSliderUpperBound->setMaximum(100);
-
-    connect(m_pSliderLowerBound.data(), &QSlider::valueChanged,
-            this, &SpectrumSettingsView::updateValue);
-    connect(m_pSliderUpperBound.data(), &QSlider::valueChanged,
-            this, &SpectrumSettingsView::updateValue);
-
-    t_pGridLayout->addWidget(t_pLabelLower, 0, 0);
-    t_pGridLayout->addWidget(m_pSliderLowerBound, 0, 1);
-    t_pGridLayout->addWidget(t_pLabelUpper, 1, 0);
-    t_pGridLayout->addWidget(m_pSliderUpperBound, 1, 1);
+    auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(new SettingsPanel(m_pForm, this));
 
     loadSettings();
 }
@@ -75,6 +80,7 @@ SpectrumSettingsView::SpectrumSettingsView(const QString& sSettingsPath,
 
 SpectrumSettingsView::~SpectrumSettingsView()
 {
+    m_pForm->remove_listener(m_listener);
     saveSettings();
 }
 
@@ -84,10 +90,13 @@ void SpectrumSettingsView::updateValue(qint32 value)
 {
     Q_UNUSED(value)
 
-    if (m_pSliderLowerBound->value() > m_pSliderUpperBound->value())
-        m_pSliderLowerBound->setValue(m_pSliderUpperBound->value());
-    else if (m_pSliderUpperBound->value() < m_pSliderLowerBound->value())
-        m_pSliderUpperBound->setValue(m_pSliderLowerBound->value());
+    // The lower bound never exceeds the upper one
+    const double lower = m_pForm->get<double>("lower");
+    const double upper = m_pForm->get<double>("upper");
+    if (lower > upper) {
+        m_pForm->set_value("lower", upper);
+        return;
+    }
 
     emit settingsChanged();
 }
@@ -96,24 +105,14 @@ void SpectrumSettingsView::updateValue(qint32 value)
 
 void SpectrumSettingsView::saveSettings()
 {
-    if (m_sSettingsPath.isEmpty()) {
-        return;
-    }
-
-    // Save Settings
-    QSettings settings("MNECPP");
+    // The bounds come from the plugin; nothing is persisted
 }
 
 //=============================================================================================================
 
 void SpectrumSettingsView::loadSettings()
 {
-    if (m_sSettingsPath.isEmpty()) {
-        return;
-    }
-
-    // Load Settings
-    QSettings settings("MNECPP");
+    // The bounds come from the plugin; nothing is persisted
 }
 
 //=============================================================================================================
@@ -122,27 +121,25 @@ void SpectrumSettingsView::setBoundaries(float fSFreq,
                                          float fLowerBound,
                                          float fUpperBound)
 {
-    m_pSliderLowerBound->setMinimum(0);
-    m_pSliderLowerBound->setMaximum(static_cast<qint32>(fSFreq / 2) * 1000);
-    m_pSliderLowerBound->setValue(static_cast<qint32>(fLowerBound * 1000));
-
-    m_pSliderUpperBound->setMinimum(0);
-    m_pSliderUpperBound->setMaximum(static_cast<qint32>(fSFreq / 2) * 1000);
-    m_pSliderUpperBound->setValue(static_cast<qint32>(fUpperBound * 1000));
+    const double nyquist = static_cast<int>(fSFreq / 2);
+    m_pForm->set_range("lower", 0.0, nyquist);
+    m_pForm->set_range("upper", 0.0, nyquist);
+    m_pForm->set_value("upper", static_cast<double>(fUpperBound));
+    m_pForm->set_value("lower", static_cast<double>(fLowerBound));
 }
 
 //=============================================================================================================
 
 float SpectrumSettingsView::getLowerBound()
 {
-    return m_pSliderLowerBound->value() / 1000.0f;
+    return static_cast<float>(m_pForm->get<double>("lower"));
 }
 
 //=============================================================================================================
 
 float SpectrumSettingsView::getUpperBound()
 {
-    return m_pSliderUpperBound->value() / 1000.0f;
+    return static_cast<float>(m_pForm->get<double>("upper"));
 }
 
 //=============================================================================================================
