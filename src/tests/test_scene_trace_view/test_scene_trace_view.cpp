@@ -14,9 +14,12 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <mne/base/raster_image.h>
 #include <mne/scene/canvas.h>
+#include <mne/scene/software_renderer.h>
 #include <mne/scene/svg_renderer.h>
 #include <mne/scene/text_metrics.h>
+#include <mne/scene/trace_frame.h>
 #include <mne/scene/trace_geometry.h>
 #include <mne/scene/trace_markers.h>
 #include <mne/scene/trace_view.h>
@@ -92,6 +95,45 @@ bool matches_golden(const std::string& svg, const std::string& path)
     std::fprintf(stderr, "%s differs at byte %zu\n expected: %s\n actual:   %s\n", path.c_str(), at,
                  expected.substr(from, 160).c_str(), svg.substr(from, 160).c_str());
     return false;
+}
+
+// Golden PNG comparison without Qt; small differences from floating-point contraction on other CPUs are tolerated
+bool matches_golden_png(const Image& image, const std::string& path)
+{
+    mne::RasterImage rgb(image.width, image.height);
+    for (int y = 0; y < image.height; ++y) {
+        for (int x = 0; x < image.width; ++x) {
+            const Color c = image.pixel(x, y);
+            rgb.set_pixel(x, y, {c.r, c.g, c.b});
+        }
+    }
+    const char* update = std::getenv("MNE_UPDATE_GOLDEN");
+    if (update && std::strcmp(update, "1") == 0) {
+        return rgb.save_png(path).has_value();
+    }
+    const mne::Expected<mne::RasterImage> expected = mne::RasterImage::load_png(path);
+    if (!expected) {
+        std::fprintf(stderr, "%s (run with MNE_UPDATE_GOLDEN=1)\n", expected.error().what());
+        return false;
+    }
+    if (expected->width() != rgb.width() || expected->height() != rgb.height()) {
+        std::fprintf(stderr, "%s: %d x %d instead of %d x %d\n", path.c_str(), rgb.width(), rgb.height(), expected->width(), expected->height());
+        return false;
+    }
+    int differing = 0;
+    for (int y = 0; y < rgb.height(); ++y) {
+        for (int x = 0; x < rgb.width(); ++x) {
+            const mne::Rgb a = rgb.pixel(x, y);
+            const mne::Rgb b = expected->pixel(x, y);
+            differing += std::max({std::abs(a.r - b.r), std::abs(a.g - b.g), std::abs(a.b - b.b)}) > 2 ? 1 : 0;
+        }
+    }
+    const int allowed = rgb.width() * rgb.height() / 500;
+    if (differing > allowed) {
+        std::fprintf(stderr, "%s: %d pixels differ (%d allowed)\n", path.c_str(), differing, allowed);
+        return false;
+    }
+    return true;
 }
 
 // 30 channels: three MEG magnetometers, then gradiometers and EEG; value = index + sample / 1000
@@ -1045,6 +1087,71 @@ void test_animator()
     CHECK(!animator.tick(now, view) && view.samples_per_pixel() == 1.0);
 }
 
+void test_trace_frame()
+{
+    const ApproximateTextMetrics metrics;
+    GeometrySource source;
+    TraceView view;
+    view.set_source(&source);
+    view.set_view_size(240, 120);
+    view.set_samples_per_pixel(1.0);
+    view.set_sfreq(100.0);
+    view.set_first_file_sample(100);
+    view.set_scroll_sample(960.0);
+    view.set_visible_channel_count(4);
+    view.set_annotations({{1010, 1029, {0, 90, 200}, " blink "}});
+    view.set_scalebars_visible(true);
+    TraceMarkers markers;
+    markers.set_events({{1050, 1, {220, 0, 0}, "1"}});
+    markers.set_epoch_markers({1100});
+    TraceStyle style;
+    style.background = Color::white();
+
+    // One pass cleared to the background: four traces, the marker overlay with the bands and the scalebars
+    TraceFrameBuilder builder;
+    GpuFrameTarget target;
+    target.pixel_width = 240;
+    target.pixel_height = 120;
+    GpuFrame frame = builder.build(view, source, style, markers, metrics, target);
+    CHECK(frame.pixel_width == 240 && frame.passes.size() == 1 && frame.passes[0].clear_color == style.background);
+    CHECK(frame.passes[0].draws.size() == 6 && builder.hud_texture() != 0);
+    const GpuResources& resources = builder.resources();
+    CHECK(resources.pipeline(frame.passes[0].draws[0].pipeline)->shader == "channeldata");
+    CHECK(resources.pipeline(frame.passes[0].draws[4].pipeline)->shader == "overlay");
+    CHECK(frame.passes[0].draws[5].textures[0].texture == builder.hud_texture());
+    SoftwareRenderer renderer;
+    CHECK(matches_golden_png(renderer.render(frame, resources), GOLDEN_DIR "/trace_frame.png"));
+
+    // A small scroll reuses the vertices and the marker texture; the scalebars are drawn again
+    const GpuHandle vertices = frame.passes[0].draws[0].vertex_buffers[0];
+    const GpuHandle overlay = frame.passes[0].draws[4].textures[0].texture;
+    const std::uint64_t vertexRevision = resources.buffer(vertices)->revision;
+    const std::uint64_t overlayRevision = resources.texture(overlay)->revision;
+    const std::uint64_t hudRevision = resources.texture(builder.hud_texture())->revision;
+    view.set_scroll_sample(990.0);
+    frame = builder.build(view, source, style, markers, metrics, target);
+    CHECK(resources.buffer(vertices)->revision == vertexRevision && resources.texture(overlay)->revision == overlayRevision);
+    CHECK(resources.texture(builder.hud_texture())->revision > hudRevision);
+
+    // A zoom or invalidate_overlay() draws the marker texture again; at twice the pixel ratio it has twice the pixels
+    view.set_samples_per_pixel(2.0);
+    builder.geometry().invalidate();
+    target.pixel_width = 480;
+    target.pixel_height = 240;
+    target.device_pixel_ratio = 2.0;
+    frame = builder.build(view, source, style, markers, metrics, target);
+    CHECK(resources.buffer(vertices)->revision > vertexRevision && resources.texture(overlay)->revision > overlayRevision);
+    CHECK(resources.texture(overlay)->pixel_width() == 3 * 240 * 2 && resources.texture(overlay)->pixel_height() == 240);
+    const std::uint64_t zoomedRevision = resources.texture(overlay)->revision;
+    builder.invalidate_overlay();
+    builder.build(view, source, style, markers, metrics, target);
+    CHECK(resources.texture(overlay)->revision > zoomedRevision);
+
+    // Without overlays there is no scalebar draw
+    view.set_scalebars_visible(false);
+    CHECK(builder.build(view, source, style, markers, metrics, target).passes[0].draws.size() == 5);
+}
+
 } // namespace
 
 //=============================================================================================================
@@ -1067,6 +1174,7 @@ int main()
         {"draws", test_draws},
         {"markers_and_figure_golden", test_markers_and_figure_golden},
         {"animator", test_animator},
+        {"trace_frame", test_trace_frame},
     };
     for (const auto& [name, test] : tests) {
         const int before = g_failures;

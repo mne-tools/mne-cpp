@@ -169,6 +169,7 @@
       "generators": [],
       "fixtures": {
         "src/tests/test_scene_trace_view/data/trace_figure.svg": "1f5ad574fa69d776cbe69cca4af154af3436170491192f8340b6459111b01ec3",
+        "src/tests/test_scene_trace_view/data/trace_frame.png": "ae4c3f255705a77444e9c432b2bff99120849ca01c0728532de36341863ee3b8",
         "src/tests/test_scene_trace_view/data/trace_markers.svg": "8be2f1768ce82b725726a2d2420d75d31ddbf7abd2e0ea7877ece696adcae723",
         "src/tests/test_scene_trace_view/data/trace_view_overlays.svg": "0d06988f7b3a675b0d2f4790943062f7219b1c1e62574ef7f6c6ef86f7f2afd5",
         "src/tests/test_scene_trace_view/data/trace_view_selection.svg": "83cbd091c34813ac658699769e265b33247f6782d9a1c3239bae28cea3a4ba92"

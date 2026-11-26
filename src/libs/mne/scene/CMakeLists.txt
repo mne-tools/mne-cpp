@@ -19,23 +19,27 @@ set(SOURCES
   colormap.cpp
   evoked_conditions.cpp
   filter_response_plot.cpp
+  gpu_frame.cpp
   image_plot.cpp
   line_chart.cpp
   pane_layout.cpp
   raster_renderer.cpp
   ray_picking.cpp
   sensor_layout.cpp
+  software_renderer.cpp
   spline_plot.cpp
   svg_renderer.cpp
   sweep_buffer.cpp
   text_metrics.cpp
   ticks.cpp
   trace_buffer.cpp
+  trace_frame.cpp
   trace_geometry.cpp
   trace_markers.cpp
   trace_view.cpp
   vector_plot.cpp
   view_animator.cpp
+  detail/software_shaders.cpp
 )
 
 set(HEADERS
@@ -53,6 +57,7 @@ set(HEADERS
   display_list.h
   evoked_conditions.h
   filter_response_plot.h
+  gpu_frame.h
   image_plot.h
   input_event.h
   line_chart.h
@@ -61,6 +66,7 @@ set(HEADERS
   raster_renderer.h
   ray_picking.h
   sensor_layout.h
+  software_renderer.h
   spline_plot.h
   style.h
   svg_renderer.h
@@ -68,6 +74,7 @@ set(HEADERS
   text_metrics.h
   ticks.h
   trace_buffer.h
+  trace_frame.h
   trace_geometry.h
   trace_markers.h
   trace_source.h
@@ -76,7 +83,7 @@ set(HEADERS
   view_animator.h
 )
 
-add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} detail/text_layout.h)
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} detail/software_shaders.h detail/text_layout.h)
 include(${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/MneWarnings.cmake)
 mne_warn_on_narrowing(${PROJECT_NAME})
 

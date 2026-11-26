@@ -324,6 +324,22 @@ aliases; replace the old spelling as below.
   the refetch margin equalled the prefetch, so any scroll left it. It now
   refetches once half of the prefetch on a side is used up, and never on a
   side where the fetched window already ends with the data.
+- `mne_scene` describes GPU frames without a graphics API (`scene/gpu_frame.h`):
+  a view keeps its vertex and index buffers, textures (RGBA pixels or a
+  `DisplayList` the backend rasterizes) and pipelines (shader id, vertex
+  layout, topology, blending, culling, depth state) in `GpuResources` with
+  per-resource revisions, and builds one `GpuFrame` per frame from passes and
+  draws (uniform blocks in std140 layout, textures, viewport, scissor,
+  instancing). `SoftwareRenderer` (`scene/software_renderer.h`) executes
+  frames on the CPU into an RGBA `Image`: clipped, perspective-correct
+  triangles with depth testing, culling and blending, one-pixel lines and
+  points, and C++ counterparts of the shaders (`channeldata` and `overlay` of
+  the trace view so far). `to_rgba_image()` rasterizes a figure with its
+  opacity. `TraceFrameBuilder` (`scene/trace_frame.h`) describes the frames
+  of the trace view: traces, the marker overlay with the per-second bands
+  and the crosshair, scalebar, ruler and selection overlay.
+  `test_scene_gpu_frame` tests the software backend; `test_scene_trace_view`
+  renders a trace view headless against a golden PNG.
   The Qt usage ceiling of `disp` drops to 4543 tokens.
 - The data behind the raw-data views moved to `mne_scene` as well.
   `TraceBuffer` (`scene/trace_buffer.h`) stores the samples of the trace view
