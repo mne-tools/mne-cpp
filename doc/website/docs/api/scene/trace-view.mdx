@@ -708,6 +708,29 @@ Handles a pointer event: ruler and annotation selection (right button), drag scr
 
 No example of its own: Interaction state of the raw-data trace view; driven by disp::ChannelRhiRenderer and exercised by test_scene_trace_view, it has no standalone use without a trace host.
 
+## Used in examples
+
+### [ex_scene_sdl](../../examples/scene/ex_scene_sdl.mdx)
+
+Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 181"
+TraceView view;
+ViewAnimator animator;
+TraceFrameBuilder builder;
+bool followEnd = true;
+bool following = false; // the scroll below is the example's, not the user's
+TraceView::Effects effects;
+effects.animate_scroll = [&](const TraceView::ScrollAnimation& animation) {
+    animator.start_scroll(animation, static_cast<std::int64_t>(SDL_GetTicks()));
+};
+effects.animate_zoom = [&](const TraceView::ZoomAnimation& animation) {
+    animator.start_zoom(animation, static_cast<std::int64_t>(SDL_GetTicks()));
+};
+effects.stop_animations = [&] {
+    animator.stop_scroll();
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

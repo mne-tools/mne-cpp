@@ -76,6 +76,19 @@ Sets pixel (`x`, `y`), which must lie in the image.
 
 No example of its own: RGBA pixels drawn by Canvas::draw_image(); a plain value type.
 
+## Used in examples
+
+### [ex_scene_sdl](../../examples/scene/ex_scene_sdl.mdx)
+
+Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 307"
+frameTarget.pixel_width = pixelWidth;
+frameTarget.pixel_height = pixelHeight;
+frameTarget.device_pixel_ratio = logicalWidth > 0 ? static_cast<double>(pixelWidth) / logicalWidth : 1.0;
+const Image image = renderer.render(builder.build(view, buffer, style, markers, metrics, frameTarget), builder.resources());
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

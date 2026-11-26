@@ -25,7 +25,7 @@ Public API units (exported classes, registered function namespaces and header-on
 
 - Eligible with a built registry example: 454 / 456 (99.6%)
 - Eligible whose header is included by any example: 388 / 456 (85.1%)
-- Examples on disk / built: 81 / 81
+- Examples on disk / built: 82 / 82
 
 ## By library
 

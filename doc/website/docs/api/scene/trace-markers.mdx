@@ -203,6 +203,23 @@ Draws annotations, then event lines and epoch markers.
 
 No example of its own: Event, epoch and annotation markers of the trace view; drawn by disp::ChannelRhiRenderer into its overlay texture and exercised by test_scene_trace_view.
 
+## Used in examples
+
+### [ex_scene_sdl](../../examples/scene/ex_scene_sdl.mdx)
+
+Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 213"
+TraceStyle style;
+style.background = Color{250, 250, 250};
+TraceMarkers markers;
+const ApproximateTextMetrics metrics;
+SoftwareRenderer renderer;
+SDL_Texture* texture = nullptr;
+int textureWidth = 0;
+int textureHeight = 0;
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

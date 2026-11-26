@@ -67,6 +67,26 @@ canvas.draw_text(Rect{0, 80, 200, 30}, Align::Center, "Hello scene");
 const DisplayList figure = canvas.take();
 ````
 
+### [ex_scene_sdl](../../examples/scene/ex_scene_sdl.mdx)
+
+Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 167"
+    TraceBuffer::ChannelSpec spec;
+    spec.name = "EEG " + std::to_string(ch + 1);
+    spec.type_label = "EEG";
+    spec.color = Color{170, 55, 10};
+    spec.default_scale = 40e-6f;
+    spec.bad = ch == 5;
+    specs.push_back(std::move(spec));
+}
+buffer.set_channels(std::move(specs));
+buffer.set_sample_rate(static_cast<float>(kSfreq));
+buffer.set_capacity(60 * static_cast<int>(kSfreq));
+int recorded = 4 * static_cast<int>(kSfreq);
+buffer.set_data(synthetic_block(0, recorded), 0);
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

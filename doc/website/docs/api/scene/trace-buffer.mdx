@@ -335,6 +335,29 @@ Returns the trace of a channel over a sample window, decimated to min/max pairs 
 
 No example of its own: Sample store and channel resolution of the raw-data trace view; wrapped by disp::ChannelDataModel and exercised by test_scene_trace_buffer, it has no standalone use without a trace host.
 
+## Used in examples
+
+### [ex_scene_sdl](../../examples/scene/ex_scene_sdl.mdx)
+
+Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 163"
+// The channels and the first seconds of the recording
+TraceBuffer buffer;
+std::vector<TraceBuffer::ChannelSpec> specs;
+for (int ch = 0; ch < kChannels; ++ch) {
+    TraceBuffer::ChannelSpec spec;
+    spec.name = "EEG " + std::to_string(ch + 1);
+    spec.type_label = "EEG";
+    spec.color = Color{170, 55, 10};
+    spec.default_scale = 40e-6f;
+    spec.bad = ch == 5;
+    specs.push_back(std::move(spec));
+}
+buffer.set_channels(std::move(specs));
+buffer.set_sample_rate(static_cast<float>(kSfreq));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

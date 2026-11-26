@@ -22,8 +22,8 @@
     "example_exempt": 222,
     "eligible_backed_by_registry_example": 454,
     "eligible_used_by_some_example": 388,
-    "examples_on_disk": 81,
-    "examples_built": 81
+    "examples_on_disk": 82,
+    "examples_built": 82
   },
   "by_library": {
     "acq": {
@@ -16250,7 +16250,9 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
       "snippets": [],
       "api_page": "doc/website/docs/api/scene/software-bindings.mdx",
       "python_equiv": null,
@@ -16269,7 +16271,9 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
       "snippets": [],
       "api_page": "doc/website/docs/api/scene/software-fragment.mdx",
       "python_equiv": null,
@@ -16288,7 +16292,9 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
       "snippets": [],
       "api_page": "doc/website/docs/api/scene/software-renderer.mdx",
       "python_equiv": null,
@@ -16307,7 +16313,9 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
       "snippets": [],
       "api_page": "doc/website/docs/api/scene/software-shader.mdx",
       "python_equiv": null,
@@ -16486,7 +16494,8 @@
       "example": "ex_scene",
       "example_state": "built",
       "including_examples": [
-        "ex_scene"
+        "ex_scene",
+        "ex_scene_sdl"
       ],
       "snippets": [
         "ex_scene/main.cpp#scene_usage",
@@ -16510,7 +16519,8 @@
       "example": "ex_scene",
       "example_state": "built",
       "including_examples": [
-        "ex_scene"
+        "ex_scene",
+        "ex_scene_sdl"
       ],
       "snippets": [
         "ex_scene/main.cpp#scene_usage",
@@ -16533,7 +16543,9 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
       "snippets": [],
       "api_page": "doc/website/docs/api/scene/trace-buffer.mdx",
       "python_equiv": null,
@@ -16552,7 +16564,9 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
       "snippets": [],
       "api_page": "doc/website/docs/api/scene/trace-frame-builder.mdx",
       "python_equiv": null,
@@ -16571,7 +16585,9 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
       "snippets": [],
       "api_page": "doc/website/docs/api/scene/trace-overlay-uniforms.mdx",
       "python_equiv": null,
@@ -16666,7 +16682,9 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
       "snippets": [],
       "api_page": "doc/website/docs/api/scene/trace-markers.mdx",
       "python_equiv": null,
@@ -16723,7 +16741,9 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
       "snippets": [],
       "api_page": "doc/website/docs/api/scene/trace-view.mdx",
       "python_equiv": null,
@@ -16763,7 +16783,9 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
       "snippets": [],
       "api_page": "doc/website/docs/api/scene/view-animator.mdx",
       "python_equiv": null,

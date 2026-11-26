@@ -1813,6 +1813,26 @@
       "topics": []
     },
     {
+      "name": "ex_scene_sdl",
+      "title": "Run the trace view in an SDL3 window instead of Qt",
+      "brief": "Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit",
+      "thumbnail": "",
+      "url": "/docs/examples/scene/ex_scene_sdl/",
+      "library": "scene",
+      "libraries": [
+        "scene"
+      ],
+      "tasks": [
+        "visualization",
+        "real-time"
+      ],
+      "modalities": [
+        "eeg"
+      ],
+      "level": "intermediate",
+      "topics": []
+    },
+    {
       "name": "ex_spectral",
       "title": "Multitaper spectra and cross-spectral density",
       "brief": "Multitaper spectra, power spectral density and cross-spectral density of random test signals",
