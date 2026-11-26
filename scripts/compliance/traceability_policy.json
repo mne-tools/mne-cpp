@@ -38,6 +38,7 @@
     "report": 1,
     "sts": 8,
     "viz": 33,
-    "viz_qt": 44
+    "viz_qt": 44,
+    "viz_sdl": 0
   }
 }

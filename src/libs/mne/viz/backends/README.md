@@ -7,11 +7,13 @@ toolkit or graphics API. It provides one or both of:
 
 - **a renderer** that executes `mne::viz::GpuFrame`s (and draws display lists) on a GPU API, and
 - **a host**: windows, input translated to `mne::viz` input events, timers, and widgets built from
-  `mne::viz::SettingsForm`s and the view models.
+  `mne::viz::SettingsForm`s and the view models. A host implements `mne::viz::Surface` (host/surface.h) and drives
+  any `mne::viz::SurfaceClient`, e.g. the trace view's `TraceViewClient` (host/trace_view_client.h).
 
 | Backend | Library | Namespace | Provides |
 |---|---|---|---|
 | `qt/` | `mne_viz_qt` | `mne::viz::qt` | host (Qt windows and widgets) and renderer (QRhi: Metal, Vulkan, Direct3D, OpenGL) |
+| `sdl/` | `mne_viz_sdl` | `mne::viz::sdl` | host (SDL3 window and input); frames drawn by the software renderer of mne_viz. Built with `-DBUILD_VIZ_SDL=ON` |
 
 Rules, enforced by `scripts/quality/audit_dependencies.py` through `scripts/quality/dependency_policy.json`:
 

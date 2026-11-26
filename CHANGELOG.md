@@ -389,12 +389,18 @@ aliases; replace the old spelling as below.
   GPU frames, or SVG) or a FreeSurfer surface with a source estimate (PNG)
   headless, without Qt, a window system or a GPU, on the software backend of
   `mne_viz`; `--autoscale` scales channel types to their signals.
-- New example `ex_scene_sdl` (`-DBUILD_EXAMPLES_SDL=ON`, needs SDL3) runs the
-  trace view in an SDL3 window instead of Qt: the same `TraceView`,
-  `TraceBuffer` and `TraceFrameBuilder`, frames executed by the software
-  backend and shown as an SDL texture, SDL input translated to scene input
-  events, a synthetic recording streaming in. The Qt-free CI job builds and
-  runs it on macOS (SDL's dummy video driver).
+- Views run in any backend through `viz/host/surface.h`: a backend implements
+  `viz::Surface` (redraw requests, clock, pointer shape) and drives a
+  `viz::SurfaceClient` (resize, pointer, wheel and key events, animation
+  ticks, GPU frames). `viz::TraceViewClient` (`viz/host/trace_view_client.h`)
+  is the trace view as such a client, with its animator, markers, style and
+  frame builder wired once.
+- New backend `mne_viz_sdl` (`viz/backends/sdl`, `-DBUILD_VIZ_SDL=ON`, needs
+  SDL3): `viz::sdl::SdlHost` shows any `SurfaceClient` in an SDL3 window,
+  translates SDL input to `mne_viz` input events and draws the frames with the
+  software renderer, without Qt or a GPU. Example `ex_scene_sdl` streams a
+  synthetic recording into a `TraceViewClient` hosted by it; the Qt-free CI
+  job builds and runs it on macOS (SDL's dummy video driver).
 - Settings panels are described without a GUI toolkit: `viz::SettingsForm`
   (`viz/forms/settings_form.h`) lists the fields of a panel (bool, int and double
   with range, step, unit and spin box or slider, choice, text, file path,

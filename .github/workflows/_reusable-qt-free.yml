@@ -68,7 +68,7 @@ jobs:
       if: runner.os == 'macOS'
       run: |
         brew install sdl3
-        echo "SDL_ARGS=-DBUILD_EXAMPLES_SDL=ON -DSDL3_DIR=$(brew --prefix sdl3)/lib/cmake/SDL3" >> "$GITHUB_ENV"
+        echo "SDL_ARGS=-DBUILD_VIZ_SDL=ON -DSDL3_DIR=$(brew --prefix sdl3)/lib/cmake/SDL3" >> "$GITHUB_ENV"
 
     - name: Build, test, install and consume the Qt-free SDK
       shell: bash

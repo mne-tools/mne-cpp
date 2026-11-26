@@ -84,9 +84,10 @@
     },
     {
       "name": "visualization backends",
-      "description": "Backends of mne_viz under src/libs/mne/viz/backends, the top of the stack: each renders mne_viz frames and/or hosts its views with one toolkit (mne_viz_qt: Qt). Backends never depend on each other, since edges within a layer are refused.",
+      "description": "Backends of mne_viz under src/libs/mne/viz/backends, the top of the stack: each renders mne_viz frames and/or hosts its views with one toolkit (mne_viz_qt: Qt; mne_viz_sdl: SDL3). Backends never depend on each other, since edges within a layer are refused.",
       "libraries": [
-        "mne_viz_qt"
+        "mne_viz_qt",
+        "mne_viz_sdl"
       ]
     }
   ],
@@ -108,6 +109,7 @@
     "Qt::Widgets",
     "Qt::ShaderTools",
     "Eigen3::Eigen",
+    "SDL3::SDL3",
     "onnxruntime::onnxruntime",
     "ZLIB::ZLIB",
     "zlibstatic",

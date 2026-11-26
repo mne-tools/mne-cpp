@@ -30,6 +30,8 @@ set(SOURCES
   gpu/gpu_frame.cpp
   gpu/software_renderer.cpp
   gpu/trace_frame.cpp
+  host/surface.cpp
+  host/trace_view_client.cpp
   models/bids_tree.cpp
   models/channel_table.cpp
   models/evoked_conditions.cpp
@@ -72,6 +74,8 @@ set(HEADERS
   gpu/gpu_frame.h
   gpu/software_renderer.h
   gpu/trace_frame.h
+  host/surface.h
+  host/trace_view_client.h
   models/bids_tree.h
   models/channel_table.h
   models/evoked_conditions.h

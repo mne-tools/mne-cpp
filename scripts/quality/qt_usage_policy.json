@@ -176,6 +176,11 @@
         "strings": 846,
         "time": 14
       }
+    },
+    "viz/backends/sdl": {
+      "tokens": 0,
+      "public_header_includes": 0,
+      "modules": []
     }
   },
   "qt_modules": {

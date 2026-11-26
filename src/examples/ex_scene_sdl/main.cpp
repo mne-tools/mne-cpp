@@ -23,15 +23,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/viz/gpu/software_renderer.h>
-#include <mne/viz/figures/text_metrics.h>
+#include <mne/viz/backends/sdl/sdl_host.h>
+#include <mne/viz/host/trace_view_client.h>
 #include <mne/viz/views/trace_buffer.h>
-#include <mne/viz/gpu/trace_frame.h>
-#include <mne/viz/views/trace_markers.h>
-#include <mne/viz/views/trace_view.h>
-#include <mne/viz/views/view_animator.h>
 
-#include <SDL3/SDL.h>
+#include <SDL3/SDL_version.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -43,15 +39,16 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <charconv>
-#include <string_view>
-#include <system_error>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <numbers>
 #include <string>
+#include <string_view>
+#include <system_error>
 #include <vector>
 
 //=============================================================================================================
@@ -84,53 +81,6 @@ Eigen::MatrixXd synthetic_block(int first, int samples)
     return block;
 }
 
-mne::viz::Modifier modifiers_of(SDL_Keymod mod)
-{
-    Modifier result = Modifier::None;
-    if ((mod & SDL_KMOD_SHIFT) != 0) {
-        result = result | Modifier::Shift;
-    }
-    if ((mod & SDL_KMOD_CTRL) != 0) {
-        result = result | Modifier::Ctrl;
-    }
-    if ((mod & SDL_KMOD_ALT) != 0) {
-        result = result | Modifier::Alt;
-    }
-    if ((mod & SDL_KMOD_GUI) != 0) {
-        result = result | Modifier::Meta;
-    }
-    return result;
-}
-
-MouseButton button_of(std::uint8_t button)
-{
-    switch (button) {
-        case SDL_BUTTON_LEFT:
-            return MouseButton::Left;
-        case SDL_BUTTON_RIGHT:
-            return MouseButton::Right;
-        case SDL_BUTTON_MIDDLE:
-            return MouseButton::Middle;
-        default:
-            return MouseButton::None;
-    }
-}
-
-MouseButtons buttons_of(SDL_MouseButtonFlags flags)
-{
-    MouseButtons result = MouseButtons::None;
-    if ((flags & SDL_BUTTON_LMASK) != 0) {
-        result = result | MouseButtons::Left;
-    }
-    if ((flags & SDL_BUTTON_RMASK) != 0) {
-        result = result | MouseButtons::Right;
-    }
-    if ((flags & SDL_BUTTON_MMASK) != 0) {
-        result = result | MouseButtons::Middle;
-    }
-    return result;
-}
-
 } // namespace
 
 //=============================================================================================================
@@ -139,33 +89,25 @@ MouseButtons buttons_of(SDL_MouseButtonFlags flags)
 
 int main(int argc, char* argv[])
 {
-    int frameLimit = -1;
+    sdl::SdlHost::Options options;
+    options.title = "MNE-CPP trace view (SDL3, no Qt)";
     for (int i = 1; i + 1 < argc; ++i) {
         if (std::strcmp(argv[i], "--frames") == 0) {
             const std::string_view value(argv[i + 1]);
-            if (std::from_chars(value.data(), value.data() + value.size(), frameLimit).ec != std::errc()) {
+            if (std::from_chars(value.data(), value.data() + value.size(), options.frame_limit).ec != std::errc()) {
                 std::fprintf(stderr, "--frames expects a number, got %s\n", argv[i + 1]);
                 return 1;
             }
         }
     }
 
-    if (!SDL_Init(SDL_INIT_VIDEO)) {
-        std::fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
+    //! [sdl_host_usage]
+    sdl::SdlHost host(options);
+    if (!host.is_open()) {
+        std::fprintf(stderr, "Cannot open the window: %s\n", host.error().c_str());
         return 1;
     }
-    SDL_Window* window = SDL_CreateWindow("MNE-CPP trace view (SDL3, no Qt)", 1000, 640, SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
-    // Any renderer only shows a texture; SDL's software renderer works without a GPU, e.g. on the dummy driver
-    SDL_Renderer* sdlRenderer = window ? SDL_CreateRenderer(window, nullptr) : nullptr;
-    if (window && !sdlRenderer) {
-        sdlRenderer = SDL_CreateRenderer(window, SDL_SOFTWARE_RENDERER);
-    }
-    if (!sdlRenderer) {
-        std::fprintf(stderr, "Cannot create the window: %s\n", SDL_GetError());
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-        return 1;
-    }
+    //! [sdl_host_usage]
 
     // The channels and the first seconds of the recording
     TraceBuffer buffer;
@@ -185,153 +127,56 @@ int main(int argc, char* argv[])
     int recorded = 4 * static_cast<int>(kSfreq);
     buffer.set_data(synthetic_block(0, recorded), 0);
 
-    TraceView view;
-    ViewAnimator animator;
-    TraceFrameBuilder builder;
-    bool followEnd = true;
-    bool following = false; // the scroll below is the example's, not the user's
-    TraceView::Effects effects;
-    effects.animate_scroll = [&](const TraceView::ScrollAnimation& animation) {
-        animator.start_scroll(animation, static_cast<std::int64_t>(SDL_GetTicks()));
-    };
-    effects.animate_zoom = [&](const TraceView::ZoomAnimation& animation) {
-        animator.start_zoom(animation, static_cast<std::int64_t>(SDL_GetTicks()));
-    };
-    effects.stop_animations = [&] {
-        animator.stop_scroll();
-    };
-    effects.scroll_changed = [&](double /*sample*/) {
-        followEnd = followEnd && following;
-    };
-    effects.zoom_changed = [&](double /*samples_per_pixel*/) {
-        builder.geometry().invalidate();
-    };
-    effects.channel_offset_changed = [&](int /*first_channel*/) {
-        builder.geometry().invalidate();
-    };
-    view.set_effects(std::move(effects));
-    view.set_source(&buffer);
+    //! [trace_view_client_usage]
+    TraceViewClient client;
+    client.style().background = Color{250, 250, 250};
+    TraceView& view = client.view();
     view.set_sfreq(kSfreq);
     view.set_first_file_sample(0);
     view.set_visible_channel_count(16);
     view.set_samples_per_pixel(5.0);
     view.set_scalebars_visible(true);
+    client.set_source(&buffer);
+    //! [trace_view_client_usage]
 
-    TraceStyle style;
-    style.background = Color{250, 250, 250};
-    TraceMarkers markers;
-    const ApproximateTextMetrics metrics;
-    SoftwareRenderer renderer;
-    SDL_Texture* texture = nullptr;
-    int textureWidth = 0;
-    int textureHeight = 0;
+    // The view follows the end of the recording until the user scrolls
+    bool followEnd = true;
+    bool following = false; // the scroll below is the example's, not the user's
+    TraceView::Effects effects;
+    effects.scroll_changed = [&](double /*sample*/) {
+        followEnd = followEnd && following;
+    };
+    client.set_effects(std::move(effects));
 
-    bool running = true;
-    for (int frame = 0; running && (frameLimit < 0 || frame < frameLimit); ++frame) {
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            const auto now = static_cast<std::int64_t>(SDL_GetTicks());
-            switch (event.type) {
-                case SDL_EVENT_QUIT:
-                    running = false;
-                    break;
-                case SDL_EVENT_MOUSE_BUTTON_DOWN:
-                case SDL_EVENT_MOUSE_BUTTON_UP: {
-                    PointerEvent pointer;
-                    pointer.type = event.type == SDL_EVENT_MOUSE_BUTTON_UP ? PointerEvent::Type::Release
-                        : event.button.clicks == 2                         ? PointerEvent::Type::DoubleClick
-                                                                           : PointerEvent::Type::Press;
-                    pointer.x = event.button.x;
-                    pointer.y = event.button.y;
-                    pointer.button = button_of(event.button.button);
-                    pointer.buttons = buttons_of(SDL_GetMouseState(nullptr, nullptr));
-                    pointer.modifiers = modifiers_of(SDL_GetModState());
-                    pointer.timestamp_ms = now;
-                    view.handle_pointer(pointer);
-                    break;
-                }
-                case SDL_EVENT_MOUSE_MOTION: {
-                    PointerEvent pointer;
-                    pointer.x = event.motion.x;
-                    pointer.y = event.motion.y;
-                    pointer.buttons = buttons_of(event.motion.state);
-                    pointer.modifiers = modifiers_of(SDL_GetModState());
-                    pointer.timestamp_ms = now;
-                    view.handle_pointer(pointer);
-                    break;
-                }
-                case SDL_EVENT_MOUSE_WHEEL: {
-                    WheelEvent wheel;
-                    wheel.x = event.wheel.mouse_x;
-                    wheel.y = event.wheel.mouse_y;
-                    // SDL counts notches, the scene eighths of a degree (120 per notch)
-                    wheel.angle_delta_x = -120.0 * event.wheel.x;
-                    wheel.angle_delta_y = 120.0 * event.wheel.y;
-                    wheel.modifiers = modifiers_of(SDL_GetModState());
-                    wheel.timestamp_ms = now;
-                    view.handle_wheel(wheel);
-                    break;
-                }
-                case SDL_EVENT_KEY_DOWN:
-                    if (event.key.key == SDLK_C) {
-                        view.set_crosshair_enabled(!view.crosshair_enabled());
-                    } else if (event.key.key == SDLK_END) {
-                        followEnd = true;
-                    } else if (event.key.key == SDLK_ESCAPE) {
-                        running = false;
-                    }
-                    break;
-                default:
-                    break;
-            }
+    host.set_key_handler([&](const KeyEvent& key) {
+        if (key.is_character(U'c')) {
+            view.set_crosshair_enabled(!view.crosshair_enabled());
+            return true;
         }
+        if (key.key == Key::End) {
+            followEnd = true;
+            return true;
+        }
+        return false;
+    });
 
+    const int frames = host.run(client, [&](std::int64_t now) {
         // 1 kHz streaming: append what arrived since the last frame
-        const int target = static_cast<int>(4 * kSfreq + static_cast<double>(SDL_GetTicks()));
+        const int target = static_cast<int>(4 * kSfreq + static_cast<double>(now));
         if (target > recorded) {
             const int samples = std::min(target - recorded, 200);
             buffer.append_data(synthetic_block(recorded, samples));
             recorded += samples;
-            builder.geometry().invalidate();
+            client.data_changed();
         }
-
-        int logicalWidth = 0;
-        int logicalHeight = 0;
-        int pixelWidth = 0;
-        int pixelHeight = 0;
-        SDL_GetWindowSize(window, &logicalWidth, &logicalHeight);
-        SDL_GetWindowSizeInPixels(window, &pixelWidth, &pixelHeight);
-        view.set_view_size(logicalWidth, logicalHeight);
-        animator.tick(static_cast<std::int64_t>(SDL_GetTicks()), view);
         if (followEnd) {
-            const double visible = logicalWidth * view.samples_per_pixel();
+            const double visible = view.view_width() * view.samples_per_pixel();
             following = true;
             view.set_scroll_sample(std::max(0.0, recorded - visible));
             following = false;
         }
+    });
 
-        GpuFrameTarget frameTarget;
-        frameTarget.pixel_width = pixelWidth;
-        frameTarget.pixel_height = pixelHeight;
-        frameTarget.device_pixel_ratio = logicalWidth > 0 ? static_cast<double>(pixelWidth) / logicalWidth : 1.0;
-        const Image image = renderer.render(builder.build(view, buffer, style, markers, metrics, frameTarget), builder.resources());
-
-        if (!texture || textureWidth != image.width || textureHeight != image.height) {
-            SDL_DestroyTexture(texture);
-            texture = SDL_CreateTexture(sdlRenderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, image.width, image.height);
-            textureWidth = image.width;
-            textureHeight = image.height;
-        }
-        SDL_UpdateTexture(texture, nullptr, image.rgba.data(), image.width * 4);
-        SDL_RenderClear(sdlRenderer);
-        SDL_RenderTexture(sdlRenderer, texture, nullptr, nullptr);
-        SDL_RenderPresent(sdlRenderer);
-    }
-
-    SDL_DestroyTexture(texture);
-    SDL_DestroyRenderer(sdlRenderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-    std::printf("Rendered with the software backend of mne_scene in SDL %d.%d.%d\n", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_MICRO_VERSION);
+    std::printf("Rendered %d frames with the SDL3 backend of mne_viz (SDL %d.%d.%d)\n", frames, SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_MICRO_VERSION);
     return 0;
 }

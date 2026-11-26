@@ -5,16 +5,13 @@
 cmake_minimum_required(VERSION 3.14)
 project(ex_scene_sdl LANGUAGES CXX)
 
-# A second host for the trace view: SDL3 instead of Qt
-find_package(SDL3 CONFIG QUIET)
-if(NOT SDL3_FOUND)
-  message(WARNING "ex_scene_sdl: SDL3 not found, the example is skipped (set SDL3_DIR or CMAKE_PREFIX_PATH)")
-  return()
-endif()
+# A second host for the trace view: the SDL3 backend mne_viz_sdl instead of Qt
+find_package(SDL3 CONFIG REQUIRED)
 
 add_executable(${PROJECT_NAME} main.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
+  mne_viz_sdl
   mne_viz
   mne_base
   SDL3::SDL3

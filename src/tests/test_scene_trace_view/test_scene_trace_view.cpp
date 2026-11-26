@@ -20,6 +20,7 @@
 #include <mne/viz/figures/svg_renderer.h>
 #include <mne/viz/figures/text_metrics.h>
 #include <mne/viz/gpu/trace_frame.h>
+#include <mne/viz/host/trace_view_client.h>
 #include <mne/viz/views/trace_geometry.h>
 #include <mne/viz/views/trace_markers.h>
 #include <mne/viz/views/trace_view.h>
@@ -1113,6 +1114,84 @@ void test_trace_frame()
     CHECK(builder.build(view, source, style, markers, metrics, target).passes[0].draws.size() == 5);
 }
 
+
+// A host that counts what the view asks of it
+class FakeSurface : public Surface
+{
+public:
+    void request_update() override
+    {
+        ++updates;
+    }
+
+    void set_cursor(CursorShape shape) override
+    {
+        cursor = shape;
+    }
+
+    std::int64_t now_ms() const override
+    {
+        return now;
+    }
+
+    int updates = 0;
+    CursorShape cursor = CursorShape::Default;
+    std::int64_t now = 1000;
+};
+
+void test_trace_view_client()
+{
+    TraceViewClient client;
+    GpuFrameTarget target;
+    target.pixel_width = 240;
+    target.pixel_height = 120;
+    CHECK(client.frame(target).passes.empty());
+
+    // Attached, the client asks for frames when its data or size changes
+    FakeSurface surface;
+    client.attach(&surface);
+    GeometrySource source;
+    client.set_source(&source);
+    CHECK(surface.updates == 1);
+    client.resize({240, 120, 240, 120, 1.0});
+    CHECK(client.view().view_width() == 240 && surface.updates == 2);
+    client.view().set_sfreq(100.0);
+    client.view().set_first_file_sample(100);
+    client.view().set_visible_channel_count(4);
+    client.view().set_scroll_sample(960.0);
+
+    // A zoom invalidates the vertex cache by itself and reaches the application's callback
+    double zoomed = 0.0;
+    TraceView::Effects effects;
+    effects.zoom_changed = [&](double spp) {
+        zoomed = spp;
+    };
+    client.set_effects(std::move(effects));
+    GpuFrame frame = client.frame(target);
+    CHECK(frame.passes.size() == 1 && !frame.passes[0].draws.empty());
+    const GpuHandle vertices = frame.passes[0].draws[0].vertex_buffers[0];
+    const std::uint64_t revision = client.resources().buffer(vertices)->revision;
+    client.view().set_samples_per_pixel(2.0);
+    CHECK(zoomed == 2.0);
+    client.frame(target);
+    CHECK(client.resources().buffer(vertices)->revision > revision);
+
+    // Animations run on the surface's clock: tick() reports them until they end
+    client.view().scroll_by(100.0, 200);
+    CHECK(client.animator().running());
+    surface.now = 1100;
+    CHECK(client.tick(surface.now));
+    surface.now = 1300;
+    client.tick(surface.now);
+    CHECK(!client.animator().running());
+    CHECK(std::abs(client.view().scroll_sample() - 1060.0) < 1e-6);
+
+    client.attach(nullptr);
+    const int updates = surface.updates;
+    client.data_changed();
+    CHECK(surface.updates == updates);
+}
+
 } // namespace
 
 //=============================================================================================================
@@ -1136,6 +1215,7 @@ int main()
         {"markers_and_figure_golden", test_markers_and_figure_golden},
         {"animator", test_animator},
         {"trace_frame", test_trace_frame},
+        {"trace_view_client", test_trace_view_client},
     };
     for (const auto& [name, test] : tests) {
         const int before = g_failures;

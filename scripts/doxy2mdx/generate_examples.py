@@ -75,7 +75,7 @@ GITHUB_BLOB = "https://github.com/mne-tools/mne-cpp/blob/staging"
 # Most specific first: an example is filed under the first library it includes.
 LIBRARIES = {
     "acq": "Acquisition", "connectivity": "Connectivity", "decoding": "Decoding", "ml": "Machine Learning",
-    "sts": "Statistics", "inv": "Inverse", "fwd": "Forward", "viz_qt": "Visualization (Qt)",
+    "sts": "Statistics", "inv": "Inverse", "fwd": "Forward", "viz_qt": "Visualization (Qt)", "viz_sdl": "Visualization (SDL)",
     "viz": "Visualization", "dsp": "Signal Processing", "ieeg": "iEEG", "bids": "BIDS",
     "lsl": "Lab Streaming Layer", "com": "Communication", "mna": "MNA Pipelines", "mri": "MRI", "fs": "FreeSurfer",
     "mne": "MNE Core", "fiff": "FIFF I/O", "math": "Math", "channels": "Channels", "pybridge": "Python Bridge", "report": "Report", "base": "Base",
