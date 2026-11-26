@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 520,
+    "exported_classes": 522,
     "exported_free_functions": 251,
-    "registered_classes": 676,
+    "registered_classes": 680,
     "exported_not_registered": 2,
     "registered_function_modules": 15,
-    "registered_header_only": 143,
+    "registered_header_only": 145,
     "registered_stale": 0,
-    "registered_with_test": 362,
+    "registered_with_test": 366,
     "registered_test_unresolved": 0,
-    "registered_with_example": 456,
+    "registered_with_example": 457,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 102,
     "registered_without_api_page": 0,
-    "with_snippet": 498,
-    "public_api_units": 678,
-    "example_eligible": 456,
-    "example_exempt": 222,
-    "eligible_backed_by_registry_example": 454,
-    "eligible_used_by_some_example": 388,
+    "with_snippet": 501,
+    "public_api_units": 682,
+    "example_eligible": 457,
+    "example_exempt": 225,
+    "eligible_backed_by_registry_example": 455,
+    "eligible_used_by_some_example": 389,
     "examples_on_disk": 82,
     "examples_built": 82
   },
@@ -90,9 +90,9 @@
       "with_snippet": 5
     },
     "disp": {
-      "public": 74,
-      "registered": 74,
-      "with_test": 16,
+      "public": 75,
+      "registered": 75,
+      "with_test": 17,
       "eligible": 11,
       "eligible_with_registry_example": 11,
       "eligible_used_by_example": 11,
@@ -234,13 +234,13 @@
       "with_snippet": 1
     },
     "scene": {
-      "public": 82,
-      "registered": 82,
-      "with_test": 82,
-      "eligible": 16,
-      "eligible_with_registry_example": 16,
-      "eligible_used_by_example": 9,
-      "with_snippet": 25
+      "public": 85,
+      "registered": 85,
+      "with_test": 85,
+      "eligible": 17,
+      "eligible_with_registry_example": 17,
+      "eligible_used_by_example": 10,
+      "with_snippet": 28
     },
     "sts": {
       "public": 12,
@@ -6280,6 +6280,25 @@
       "including_examples": [],
       "snippets": [],
       "api_page": "doc/website/docs/api/disp/scaling-view.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "header prefix 'disp/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
+    },
+    {
+      "name": "SettingsPanel",
+      "header": "disp/viewers/settingspanel.h",
+      "library": "disp",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_disp_viewers",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/disp/settings-panel.mdx",
       "python_equiv": null,
       "example_eligible": false,
       "exempt_reason": "header prefix 'disp/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
@@ -16234,6 +16253,75 @@
         "ex_scene/main.cpp#sensor_layout_usage"
       ],
       "api_page": "doc/website/docs/api/scene/sensor-layout.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "SettingChoice",
+      "header": "scene/settings_form.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_settings_form",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_scene"
+      ],
+      "snippets": [
+        "ex_scene/main.cpp#settings_form_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/setting-choice.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Value type of one option of a Choice field of a SettingsForm."
+    },
+    {
+      "name": "SettingField",
+      "header": "scene/settings_form.h",
+      "library": "scene",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_settings_form",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_scene"
+      ],
+      "snippets": [
+        "ex_scene/main.cpp#settings_form_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/setting-field.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Value type describing one field of a SettingsForm."
+    },
+    {
+      "name": "SettingsForm",
+      "header": "scene/settings_form.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_settings_form",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene"
+      ],
+      "snippets": [
+        "ex_scene/main.cpp#settings_form_usage"
+      ],
+      "api_page": "doc/website/docs/api/scene/settings-form.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null

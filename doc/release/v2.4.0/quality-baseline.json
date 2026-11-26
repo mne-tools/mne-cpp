@@ -11,7 +11,7 @@
   },
   "gates": {
     "G1_test_integrity": {
-      "registered": 294,
+      "registered": 295,
       "conditional": 10,
       "unregistered": 3,
       "without_labels": 0,
@@ -79,6 +79,7 @@
           "test_scene_brain_view",
           "test_scene_gpu_frame",
           "test_scene_render",
+          "test_scene_settings_form",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
@@ -128,6 +129,7 @@
           "test_scene_brain_view",
           "test_scene_gpu_frame",
           "test_scene_render",
+          "test_scene_settings_form",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
@@ -177,6 +179,7 @@
           "test_scene_brain_view",
           "test_scene_gpu_frame",
           "test_scene_render",
+          "test_scene_settings_form",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
@@ -226,6 +229,7 @@
           "test_scene_brain_view",
           "test_scene_gpu_frame",
           "test_scene_render",
+          "test_scene_settings_form",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
@@ -275,6 +279,7 @@
           "test_scene_brain_view",
           "test_scene_gpu_frame",
           "test_scene_render",
+          "test_scene_settings_form",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
@@ -324,6 +329,7 @@
           "test_scene_brain_view",
           "test_scene_gpu_frame",
           "test_scene_render",
+          "test_scene_settings_form",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
         ]
@@ -349,12 +355,12 @@
       }
     },
     "G3_api_documentation": {
-      "public_api_units": 678,
+      "public_api_units": 682,
       "exported_not_registered": 2,
-      "example_eligible": 456,
+      "example_eligible": 457,
       "eligible_backed_percent": 99.56,
-      "snippets": 498,
-      "registered_test_percent": 53.55
+      "snippets": 501,
+      "registered_test_percent": 53.82
     },
     "G4_screenshots": {
       "referenced_images": 19,

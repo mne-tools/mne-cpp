@@ -11,7 +11,8 @@
       "SvgWriter (QPaintEngine)": "Replaces QSvgGenerator so the vector export of widgets needs Qt Gui only; dropping the Qt Svg module raised the disp ceilings once (tokens 6025 -> 6159, public header includes 110 -> 112).",
       "QWindow hosts and scene viewports (phase 3)": "ChannelWindow (QWindow + QRhi swap chain) next to the ChannelRhiView QRhiWidget host, and SceneViewport replacing the QGraphicsView scenes, raised the disp ceilings once (tokens 4846 -> 4885, public header includes 82 -> 89); the QRhiWidget hosts go with phase 4.",
       "Qt input translation shared with the brain view": "toScenePointerEvent() and toSceneWheelEvent() (plots/helpers/sceneinput.h), which ChannelRhiRenderer and disp3D's BrainViewCore share instead of each translating Qt events, raised the disp ceilings once (tokens 4543 -> 4549); the brain view's camera, input, layout and overlay moving to mne_scene lowered disp3D from 1961 to 1807 tokens.",
-      "QRhi backend of the GPU frame description": "RhiFrameRenderer (plots/helpers/rhiframerenderer.h) executes the Qt-free scene::GpuFrame of any view with QRhi: pipelines, buffers, textures and shader reflection checks in one place instead of in each renderer. ChannelRhiRenderer lost its own QRhi code to it, net raising the disp ceilings once (tokens 4529 -> 4546); the brain view moving onto it lowers disp3D."
+      "QRhi backend of the GPU frame description": "RhiFrameRenderer (plots/helpers/rhiframerenderer.h) executes the Qt-free scene::GpuFrame of any view with QRhi: pipelines, buffers, textures and shader reflection checks in one place instead of in each renderer. ChannelRhiRenderer lost its own QRhi code to it, net raising the disp ceilings once (tokens 4529 -> 4546); the brain view moving onto it lowers disp3D.",
+      "Generic settings panel builder": "SettingsPanel (viewers/settingspanel.h) builds the Qt Widgets of any Qt-free scene::SettingsForm, so a new toolkit needs one builder instead of a hand-written view per panel; the builder raised the disp ceilings once (tokens 4546 -> 4601) and the settings views ported onto it lower them again."
     },
     "disp3D": {
       "BrainWindow host and GPU overlay (phase 3)": "BrainWindow (QWindow + QRhi swap chain), the forwarding BrainView host and the overlay painted into the GPU pass instead of child QLabels raised the disp3D ceilings once (tokens 1633 -> 1961); the QRhiWidget host goes with phase 4."
@@ -48,7 +49,7 @@
       "scene",
       "sts"
     ],
-    "tokens": 6353,
+    "tokens": 6408,
     "gui_outside_design": []
   },
   "libraries": {
@@ -141,20 +142,20 @@
       "modules": []
     },
     "disp": {
-      "tokens": 4546,
+      "tokens": 4601,
       "by_category": {
         "containers": 15,
-        "files": 97,
-        "global": 933,
-        "gui": 890,
-        "objects_signals": 521,
-        "other": 1328,
-        "strings": 753,
+        "files": 96,
+        "global": 927,
+        "gui": 904,
+        "objects_signals": 522,
+        "other": 1357,
+        "strings": 771,
         "time": 9
       },
-      "public_header_includes": 89,
-      "q_object": 61,
-      "files": 144,
+      "public_header_includes": 87,
+      "q_object": 62,
+      "files": 146,
       "modules": [
         "Core",
         "GuiPrivate",
@@ -301,7 +302,7 @@
       "by_category": {},
       "public_header_includes": 0,
       "q_object": 0,
-      "files": 74,
+      "files": 76,
       "modules": []
     },
     "sts": {

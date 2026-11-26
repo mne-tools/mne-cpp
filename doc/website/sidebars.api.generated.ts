@@ -685,7 +685,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/disp/channel-rhi-renderer',
         'api/disp/channel-rhi-host',
         'api/disp/channel-window',
-        'api/disp/rhi-frame-renderer'
+        'api/disp/rhi-frame-renderer',
+        'api/disp/settings-panel'
       ],
     },
     {
@@ -917,7 +918,10 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/scene/brain-instance-uniforms',
         'api/scene/gpu-stream-view',
         'api/scene/brain-surface-streams',
-        'api/scene/brain-instanced-streams'
+        'api/scene/brain-instanced-streams',
+        'api/scene/settings-form',
+        'api/scene/setting-field',
+        'api/scene/setting-choice'
       ],
     }
 ];

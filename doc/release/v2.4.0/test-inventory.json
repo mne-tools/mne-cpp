@@ -6,9 +6,9 @@
     "commit": "0800c9a1bf606c2df8c44e35fbb42ea13029b549"
   },
   "summary": {
-    "directories": 297,
+    "directories": 298,
     "registration": {
-      "unconditional": 284,
+      "unconditional": 285,
       "conditional": 10,
       "unregistered": 3
     },
@@ -77,6 +77,7 @@
           "test_scene_brain_view",
           "test_scene_gpu_frame",
           "test_scene_render",
+          "test_scene_settings_form",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
@@ -181,6 +182,7 @@
           "test_scene_brain_view",
           "test_scene_gpu_frame",
           "test_scene_render",
+          "test_scene_settings_form",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
@@ -285,6 +287,7 @@
           "test_scene_brain_view",
           "test_scene_gpu_frame",
           "test_scene_render",
+          "test_scene_settings_form",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
@@ -389,6 +392,7 @@
           "test_scene_brain_view",
           "test_scene_gpu_frame",
           "test_scene_render",
+          "test_scene_settings_form",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
@@ -493,6 +497,7 @@
           "test_scene_brain_view",
           "test_scene_gpu_frame",
           "test_scene_render",
+          "test_scene_settings_form",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
@@ -597,6 +602,7 @@
           "test_scene_brain_view",
           "test_scene_gpu_frame",
           "test_scene_render",
+          "test_scene_settings_form",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
@@ -3013,7 +3019,9 @@
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
       },
-      "registry_classes": []
+      "registry_classes": [
+        "SettingsPanel"
+      ]
     },
     {
       "name": "test_disp_viewers2",
@@ -9672,6 +9680,42 @@
         "TextShape",
         "Transform",
         "VectorPlot"
+      ]
+    },
+    {
+      "name": "test_scene_settings_form",
+      "cmake": "src/tests/test_scene_settings_form/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_scene_settings_form"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "SettingChoice",
+        "SettingField",
+        "SettingsForm"
       ]
     },
     {
