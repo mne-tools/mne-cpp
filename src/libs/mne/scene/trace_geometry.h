@@ -152,8 +152,8 @@ struct TraceStyle
  * @brief The vertices of all traces over a window around the view, and what to draw of them.
  *
  * stream() fetches the vertices of every logical channel for the visible samples plus a prefetch of
- * prefetch_factor() view widths on each side, decimated to the view's scale; while the view stays inside
- * the window, less than a prefetch margin from its edges, scrolling needs no new vertices. draws() lists the
+ * prefetch_factor() view widths on each side, decimated to the view's scale; scrolling needs no new vertices
+ * until the view uses up half of the prefetch on a side where the window does not end with the data. draws() lists the
  * traces of the current frame with their shader parameters.
  *
  * @since 3.0.0
@@ -255,6 +255,8 @@ private:
     double m_prefetchFactor = 1.0;
     int m_windowFirst = 0;
     int m_windowLast = 0;
+    bool m_windowAtDataFirst = false; /**< Whether the window starts at the first sample of the data. */
+    bool m_windowAtDataLast = false;  /**< Whether the window ends at the last sample of the data. */
     bool m_dirty = true;
 };
 

@@ -318,6 +318,10 @@ aliases; replace the old spelling as below.
   `renderToImage()` result, and ticks the animator per frame and on a timer
   instead of using `QPropertyAnimation`; its API and signals are unchanged.
   The dotted guide lines of `renderToImage()` use the scene's dot pattern.
+- The trace view no longer refetches all trace vertices on every scroll step:
+  the refetch margin equalled the prefetch, so any scroll left it. It now
+  refetches once half of the prefetch on a side is used up, and never on a
+  side where the fetched window already ends with the data.
   The Qt usage ceiling of `disp` drops to 4543 tokens.
 - The data behind the raw-data views moved to `mne_scene` as well.
   `TraceBuffer` (`scene/trace_buffer.h`) stores the samples of the trace view

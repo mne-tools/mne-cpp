@@ -773,22 +773,39 @@ void test_streaming_window()
     CHECK(geometry.channels().size() == 5 && geometry.channels()[4].first_sample == 800 && geometry.channels()[4].vertex_count() == 600);
     CHECK(!geometry.needs_stream(view));
 
-    // The margin is the prefetch: any scroll leaves it
+    // Scrolling refetches only once the view comes closer than half the prefetch to a window edge
     view.set_scroll_sample(1001.0);
+    CHECK(!geometry.needs_stream(view));
+    view.set_scroll_sample(1100.0);
+    CHECK(!geometry.needs_stream(view));
+    view.set_scroll_sample(1101.0);
+    CHECK(geometry.needs_stream(view));
+    view.set_scroll_sample(900.0);
+    CHECK(!geometry.needs_stream(view));
+    view.set_scroll_sample(899.0);
     CHECK(geometry.needs_stream(view));
     view.set_scroll_sample(1000.0);
     CHECK(!geometry.needs_stream(view));
     geometry.invalidate();
     CHECK(geometry.needs_stream(view));
 
-    // At the data start the window is clamped to the loaded samples
+    // At the data start the window is clamped to the loaded samples; there is nothing more to fetch on that side
     view.set_scroll_sample(100.0);
     geometry.stream(view, source, false);
     CHECK(geometry.window_first() == 100 && geometry.window_last() == 500);
+    CHECK(!geometry.needs_stream(view));
+    view.set_scroll_sample(200.0);
+    CHECK(!geometry.needs_stream(view));
+    view.set_scroll_sample(201.0);
+    CHECK(geometry.needs_stream(view));
     // Near the end, too
     view.set_scroll_sample(2000.0);
     geometry.stream(view, source, false);
     CHECK(geometry.window_first() == 1800 && geometry.window_last() == 2100);
+    CHECK(!geometry.needs_stream(view));
+    view.set_scroll_sample(1899.0);
+    CHECK(geometry.needs_stream(view));
+    view.set_scroll_sample(2000.0);
 
     // Without data in the window nothing is fetched and the old window stays
     view.set_scroll_sample(5000.0);

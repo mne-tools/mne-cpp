@@ -102,9 +102,12 @@ void TraceGeometry::set_prefetch_factor(double factor)
 bool TraceGeometry::needs_stream(const TraceView& view) const
 {
     const double visible = view.view_width() * view.samples_per_pixel();
-    const double margin = m_prefetchFactor * visible;
+    // Refetch once half of the prefetch on a side is used up, unless the window already ends with the data there
+    const double margin = 0.5 * m_prefetchFactor * visible;
     const double scroll = view.scroll_sample();
-    return m_dirty || scroll < m_windowFirst + margin || scroll + visible > m_windowLast - margin;
+    const bool nearFirst = !m_windowAtDataFirst && scroll < m_windowFirst + margin;
+    const bool nearLast = !m_windowAtDataLast && scroll + visible > m_windowLast - margin;
+    return m_dirty || nearFirst || nearLast;
 }
 
 //=============================================================================================================
@@ -123,6 +126,8 @@ bool TraceGeometry::stream(const TraceView& view, const TraceSource& source, boo
     }
     m_windowFirst = first;
     m_windowLast = last;
+    m_windowAtDataFirst = first == dataFirst;
+    m_windowAtDataLast = last == dataFirst + source.sample_count();
 
     // Decimated to the view's scale over the whole window
     const int pixelWidth = static_cast<int>((last - first) / spp);
