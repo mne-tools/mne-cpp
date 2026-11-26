@@ -889,7 +889,9 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/scene/pixel-rect',
         'api/scene/pixel-size',
         'api/scene/brain-view-interaction',
-        'api/scene/brain-view-overlay'
+        'api/scene/brain-view-overlay',
+        'api/scene/trace-buffer',
+        'api/scene/sweep-buffer'
       ],
     }
 ];

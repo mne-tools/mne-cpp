@@ -17,7 +17,7 @@ class mne::disp::ChannelDataModel
 
 Circular-buffer Qt model exposing a rolling window of the live FIFF stream as a table.
 
-Keeps a per-channel `Eigen::MatrixXd` ring buffer of the most recent N seconds, tracks bad-channel flags, trigger annotations and the active SSP / compensation / filter operators so the delegate can render the pre-processed signal without touching the raw buffer.
+Wraps a Qt-free [`TraceBuffer`](/docs/api/scene/trace-buffer) (see `buffer()`) that stores the samples and resolves the channel descriptions taken from the [`FiffInfo`](/docs/api/fiff/fiff-info); emits `dataChanged()` and `metaChanged()` when the buffer reports a change.
 
 ### Inheritance
 
@@ -288,6 +288,16 @@ Returns 0 if the sample is outside the buffer or channel index is out of range.
 **Returns:**
 
 - *float* — Sample value in physical units, or 0 if unavailable.
+
+---
+
+### buffer()
+
+The Qt-free store behind this model: samples, channel scales, colours and bad flags as a trace source indexed by channel.
+
+**Returns:**
+
+- *const [TraceBuffer](/docs/api/scene/trace-buffer) &* — The trace buffer.
 
 ---
 

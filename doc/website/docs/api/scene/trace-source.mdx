@@ -19,6 +19,14 @@ The channels a trace view shows: their description, values and trace vertices.
 
 Channels are addressed by their logical index: the position in the list of channels the view scrolls through, after any channel filter of the host.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    TraceSource <|-- TraceBuffer
+    click TraceBuffer href "../../scene/trace-buffer/"
+```
+
 ---
 
 ## Public Methods

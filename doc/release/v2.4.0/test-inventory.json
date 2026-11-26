@@ -6,9 +6,9 @@
     "commit": "0800c9a1bf606c2df8c44e35fbb42ea13029b549"
   },
   "summary": {
-    "directories": 295,
+    "directories": 296,
     "registration": {
-      "unconditional": 282,
+      "unconditional": 283,
       "conditional": 10,
       "unregistered": 3
     },
@@ -76,6 +76,7 @@
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
           "test_scene_render",
+          "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
         "executed_not_in_inventory": [
@@ -178,6 +179,7 @@
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
           "test_scene_render",
+          "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
         "executed_not_in_inventory": [
@@ -280,6 +282,7 @@
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
           "test_scene_render",
+          "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
         "executed_not_in_inventory": [
@@ -382,6 +385,7 @@
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
           "test_scene_render",
+          "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
         "executed_not_in_inventory": [
@@ -484,6 +488,7 @@
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
           "test_scene_render",
+          "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
         "executed_not_in_inventory": [
@@ -586,6 +591,7 @@
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
           "test_scene_render",
+          "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
         "executed_not_in_inventory": [
@@ -9603,6 +9609,41 @@
         "TextShape",
         "Transform",
         "VectorPlot"
+      ]
+    },
+    {
+      "name": "test_scene_trace_buffer",
+      "cmake": "src/tests/test_scene_trace_buffer/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_scene_trace_buffer"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "SweepBuffer",
+        "TraceBuffer"
       ]
     },
     {

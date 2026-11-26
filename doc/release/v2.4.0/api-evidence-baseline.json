@@ -3,23 +3,23 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 512,
-    "exported_free_functions": 249,
-    "registered_classes": 648,
+    "exported_classes": 514,
+    "exported_free_functions": 250,
+    "registered_classes": 650,
     "exported_not_registered": 2,
     "registered_function_modules": 15,
     "registered_header_only": 123,
     "registered_stale": 0,
-    "registered_with_test": 334,
+    "registered_with_test": 336,
     "registered_test_unresolved": 0,
     "registered_with_example": 456,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 102,
     "registered_without_api_page": 0,
     "with_snippet": 498,
-    "public_api_units": 650,
+    "public_api_units": 652,
     "example_eligible": 456,
-    "example_exempt": 194,
+    "example_exempt": 196,
     "eligible_backed_by_registry_example": 454,
     "eligible_used_by_some_example": 388,
     "examples_on_disk": 81,
@@ -234,9 +234,9 @@
       "with_snippet": 1
     },
     "scene": {
-      "public": 55,
-      "registered": 55,
-      "with_test": 55,
+      "public": 57,
+      "registered": 57,
+      "with_test": 57,
       "eligible": 16,
       "eligible_with_registry_example": 16,
       "eligible_used_by_example": 9,
@@ -1426,6 +1426,11 @@
     {
       "name": "map_color",
       "header": "scene/colormap.h",
+      "library": "scene"
+    },
+    {
+      "name": "pre_stimulus_samples",
+      "header": "scene/evoked_conditions.h",
       "library": "scene"
     },
     {
@@ -15989,6 +15994,25 @@
       "exempt_reason": null
     },
     {
+      "name": "SweepBuffer",
+      "header": "scene/sweep_buffer.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_trace_buffer",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/sweep-buffer.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Sweeping window of the real-time raw-data view; driven by disp::RtFiffRawViewModel and exercised by test_scene_trace_buffer, it has no standalone use without a real-time host."
+    },
+    {
       "name": "ApproximateTextMetrics",
       "header": "scene/text_metrics.h",
       "library": "scene",
@@ -16035,6 +16059,25 @@
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
+    },
+    {
+      "name": "TraceBuffer",
+      "header": "scene/trace_buffer.h",
+      "library": "scene",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_trace_buffer",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/scene/trace-buffer.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Sample store and channel resolution of the raw-data trace view; wrapped by disp::ChannelDataModel and exercised by test_scene_trace_buffer, it has no standalone use without a trace host."
     },
     {
       "name": "TraceDraw",

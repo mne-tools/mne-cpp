@@ -11,7 +11,7 @@
   },
   "gates": {
     "G1_test_integrity": {
-      "registered": 292,
+      "registered": 293,
       "conditional": 10,
       "unregistered": 3,
       "without_labels": 0,
@@ -78,6 +78,7 @@
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
           "test_scene_render",
+          "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
         "macos-26-qt-min": [
@@ -125,6 +126,7 @@
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
           "test_scene_render",
+          "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
         "ubuntu-24.04": [
@@ -172,6 +174,7 @@
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
           "test_scene_render",
+          "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
         "ubuntu-24.04-qt-min": [
@@ -219,6 +222,7 @@
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
           "test_scene_render",
+          "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
         "windows-2025-vs2026": [
@@ -266,6 +270,7 @@
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
           "test_scene_render",
+          "test_scene_trace_buffer",
           "test_scene_trace_view"
         ],
         "windows-2025-vs2026-qt-min": [
@@ -313,6 +318,7 @@
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
           "test_scene_render",
+          "test_scene_trace_buffer",
           "test_scene_trace_view"
         ]
       },
@@ -337,12 +343,12 @@
       }
     },
     "G3_api_documentation": {
-      "public_api_units": 650,
+      "public_api_units": 652,
       "exported_not_registered": 2,
       "example_eligible": 456,
       "eligible_backed_percent": 99.56,
       "snippets": 498,
-      "registered_test_percent": 51.54
+      "registered_test_percent": 51.69
     },
     "G4_screenshots": {
       "referenced_images": 19,
