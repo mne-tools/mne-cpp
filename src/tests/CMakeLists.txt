@@ -200,6 +200,7 @@ add_subdirectory(test_dsp_spectrogram)
 add_subdirectory(test_dsp_sphara)
 add_subdirectory(test_dsp_filterio)
 add_subdirectory(test_dsp_rt_cov)
+add_subdirectory(test_dsp_rt_raw_display)
 
 # Coverage boost tests
 add_subdirectory(test_inverse_rap_dipole)

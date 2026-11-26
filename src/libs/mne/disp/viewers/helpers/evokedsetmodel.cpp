@@ -64,8 +64,6 @@ EvokedSetModel::EvokedSetModel(QObject* parent)
 , m_qMapAverageActivationOld(std::make_shared<std::map<std::string, bool>>())
 , m_bIsInit(false)
 , m_bIsFreezed(false)
-, m_bProjActivated(false)
-, m_bCompActivated(false)
 , m_fSps(1024.0f)
 {
 }
@@ -253,25 +251,9 @@ void EvokedSetModel::init()
 
     beginResetModel();
 
-    //Generate bad channel index list
-    RowVectorXi sel; // = RowVectorXi(0,0);
-    StringList emptyExclude;
-
-    if (m_pEvokedSet->info.bads.size() > 0) {
-        sel = FiffInfoBase::pick_channels(m_pEvokedSet->info.ch_names, m_pEvokedSet->info.bads, emptyExclude);
-    }
-
-    m_vecBadIdcs = sel;
-
     m_fSps = m_pEvokedSet->info.sfreq;
 
-    m_matSparseProjMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(), m_pEvokedSet->info.chs.size());
-    m_matSparseCompMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(), m_pEvokedSet->info.chs.size());
-    m_matSparseProjCompMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(), m_pEvokedSet->info.chs.size());
-
-    m_matSparseProjMult.setIdentity();
-    m_matSparseCompMult.setIdentity();
-    m_matSparseProjCompMult.setIdentity();
+    m_correction.reset(static_cast<int>(m_pEvokedSet->info.chs.size()));
 
     m_qMapAverageActivation->clear();
     m_qMapAverageColor->clear();
@@ -302,32 +284,10 @@ void EvokedSetModel::updateData()
     m_matData.clear();
     m_lAvrTypes.clear();
 
-    for (int i = 0; i < std::ssize(m_pEvokedSet->evoked); ++i) {
-        bool doProj = m_bProjActivated && m_pEvokedSet->evoked.at(i).data.cols() > 0 && m_pEvokedSet->evoked.at(i).data.rows() == m_matProj.cols() ? true : false;
-
-        bool doComp = m_bCompActivated && m_pEvokedSet->evoked.at(i).data.cols() > 0 && m_pEvokedSet->evoked.at(i).data.rows() == m_matComp.cols() ? true : false;
-
-        if (doComp) {
-            if (doProj) {
-                //Comp + Proj
-                m_matData.push_back(m_matSparseProjCompMult * m_pEvokedSet->evoked.at(i).data);
-            } else {
-                //Comp
-                m_matData.push_back(m_matSparseCompMult * m_pEvokedSet->evoked.at(i).data);
-            }
-        } else {
-            if (doProj) {
-                //Proj
-                m_matData.push_back(m_matSparseProjMult * m_pEvokedSet->evoked.at(i).data);
-            } else {
-                //None - Raw
-                m_matData.push_back(m_pEvokedSet->evoked.at(i).data);
-            }
-        }
-
-        m_pairBaseline = m_pEvokedSet->evoked.at(i).baseline;
-
-        m_lAvrTypes.push_back(m_pEvokedSet->evoked.at(i).comment);
+    for (const FiffEvoked& evoked : m_pEvokedSet->evoked) {
+        m_matData.push_back(m_correction.apply(evoked.data));
+        m_pairBaseline = evoked.baseline;
+        m_lAvrTypes.push_back(evoked.comment);
     }
 
     // Update average selection information map. Use old colors if existing.
@@ -588,127 +548,23 @@ void EvokedSetModel::resetSelection()
 
 void EvokedSetModel::updateProjection(const std::vector<FiffProj>& projs)
 {
-    if (!m_pEvokedSet) {
+    if (!m_pEvokedSet || m_pEvokedSet->info.chs.empty()) {
         return;
     }
 
-    // Update the SSP projector
-    if (m_pEvokedSet->info.chs.size() > 0) {
-        m_pEvokedSet->info.projs = projs;
-        m_bProjActivated = false;
-        for (qint32 i = 0; i < std::ssize(projs); ++i) {
-            if (m_pEvokedSet->info.projs[i].active) {
-                m_bProjActivated = true;
-            }
-        }
-
-        m_pEvokedSet->info.make_projector(m_matProj);
-        //qDebug() << "EvokedSetModel::updateProjection - New projection calculated. m_bProjActivated is "<<m_bProjActivated;
-
-        //set columns of matrix to zero depending on bad channels indexes
-        RowVectorXi sel; // = RowVectorXi(0,0);
-        StringList emptyExclude;
-
-        if (m_pEvokedSet->info.bads.size() > 0) {
-            sel = FiffInfoBase::pick_channels(m_pEvokedSet->info.ch_names, m_pEvokedSet->info.bads, emptyExclude);
-        }
-
-        m_vecBadIdcs = sel;
-
-        for (qint32 j = 0; j < m_vecBadIdcs.cols(); ++j) {
-            m_matProj.col(m_vecBadIdcs[j]).setZero();
-        }
-
-        //        qDebug() << "Bads\n" << m_vecBadIdcs;
-        //        qDebug() << "Proj\n";
-        //        qDebug() << m_matProj.block(0,0,10,10);
-
-        qint32 nchan = m_pEvokedSet->info.nchan;
-        qint32 i, k;
-
-        typedef Eigen::Triplet<double> T;
-        std::vector<T> tripletList;
-        tripletList.reserve(nchan);
-
-        //
-        // Make proj sparse
-        //
-        tripletList.clear();
-        tripletList.reserve(m_matProj.rows() * m_matProj.cols());
-        for (i = 0; i < m_matProj.rows(); ++i) {
-            for (k = 0; k < m_matProj.cols(); ++k) {
-                if (m_matProj(i, k) != 0) {
-                    tripletList.push_back(T(i, k, m_matProj(i, k)));
-                }
-            }
-        }
-
-        m_matSparseProjMult = SparseMatrix<double>(m_matProj.rows(), m_matProj.cols());
-        if (tripletList.size() > 0) {
-            m_matSparseProjMult.setFromTriplets(tripletList.begin(), tripletList.end());
-        }
-
-        //Create full multiplication matrix
-        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
-    }
+    m_pEvokedSet->info.projs = projs;
+    m_correction.update_projection(m_pEvokedSet->info);
 }
 
 //=============================================================================================================
 
 void EvokedSetModel::updateCompensator(int to)
 {
-    if (!m_pEvokedSet) {
+    if (!m_pEvokedSet || m_pEvokedSet->info.chs.empty()) {
         return;
     }
 
-    // Update the compensator
-    if (m_pEvokedSet->info.chs.size() > 0) {
-        if (to == 0) {
-            m_bCompActivated = false;
-        } else {
-            m_bCompActivated = true;
-        }
-
-        //        qDebug()<<"to"<<to;
-        //        qDebug()<<"from"<<from;
-        //        qDebug()<<"m_bCompActivated"<<m_bCompActivated;
-
-        FiffCtfComp newComp;
-        m_pEvokedSet->info.make_compensator(0, to, newComp); //Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
-
-        //We do not need to call this->m_pFiffInfo->set_current_comp(to);
-        //Because we will set the compensators to the coil in the same FiffInfo which is already used to write to file.
-        //Note that the data is written in raw form not in compensated form.
-        m_matComp = newComp.data.data;
-
-        //
-        // Make proj sparse
-        //
-        qint32 nchan = m_pEvokedSet->info.nchan;
-        qint32 i, k;
-
-        typedef Eigen::Triplet<double> T;
-        std::vector<T> tripletList;
-        tripletList.reserve(nchan);
-
-        tripletList.clear();
-        tripletList.reserve(m_matComp.rows() * m_matComp.cols());
-        for (i = 0; i < m_matComp.rows(); ++i) {
-            for (k = 0; k < m_matComp.cols(); ++k) {
-                if (m_matComp(i, k) != 0) {
-                    tripletList.push_back(T(i, k, m_matComp(i, k)));
-                }
-            }
-        }
-
-        m_matSparseCompMult = SparseMatrix<double>(m_matComp.rows(), m_matComp.cols());
-        if (tripletList.size() > 0) {
-            m_matSparseCompMult.setFromTriplets(tripletList.begin(), tripletList.end());
-        }
-
-        //Create full multiplication matrix
-        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
-    }
+    m_correction.update_compensator(m_pEvokedSet->info, to);
 }
 
 //=============================================================================================================

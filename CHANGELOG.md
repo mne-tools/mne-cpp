@@ -383,6 +383,14 @@ aliases; replace the old spelling as below.
   `TfSettingsView` are built from forms; their APIs, signals and `QSettings`
   keys are unchanged and three `.ui` files are gone. The Qt usage ceiling of
   `disp` drops to 4519 tokens.
+- The display pre-processing of the raw and evoked viewers moved out of Qt
+  into `mne_dsp`: `DisplayCorrection` (`dsp/display_correction.h`) builds and
+  applies the SSP projector (bad channels zeroed) and the CTF compensator,
+  and `RtRawDisplay` (`dsp/rt/rt_raw_display.h`) adds SPHARA, FIR filtering
+  of a channel selection with overlap-add across blocks, and trigger
+  detection for streamed blocks. `disp::RtFiffRawViewModel` and
+  `disp::EvokedSetModel` are adapters that place the results into their
+  buffers.
 - The data behind the raw-data views moved to `mne_scene` as well.
   `TraceBuffer` (`scene/trace_buffer.h`) stores the samples of the trace view
   (replaced, or appended to with a capacity), resolves the channel

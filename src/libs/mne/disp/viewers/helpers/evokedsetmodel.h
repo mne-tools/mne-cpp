@@ -29,6 +29,7 @@
 //=============================================================================================================
 
 #include "../../disp_global.h"
+#include <mne/dsp/display_correction.h>
 #include <mne/dsp/filterkernel.h>
 #include <mne/fiff/fiff_types.h>
 
@@ -44,7 +45,6 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
-#include <Eigen/SparseCore>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -398,21 +398,13 @@ private:
     std::vector<std::string> m_lAvrTypes;         /**< The average types. */
     std::vector<std::string> m_lAvrTypesFreeze;   /**< The average types of m_matDataFreeze. */
 
-    Eigen::MatrixXd m_matProj;                           /**< SSP projector. */
-    Eigen::MatrixXd m_matComp;                           /**< Compensator. */
-    Eigen::SparseMatrix<double> m_matSparseProjCompMult; /**< The final sparse projection + compensator operator.*/
-    Eigen::SparseMatrix<double> m_matSparseProjMult;     /**< The final sparse SSP projector. */
-    Eigen::SparseMatrix<double> m_matSparseCompMult;     /**< The final sparse compensator matrix. */
-
-    Eigen::RowVectorXi m_vecBadIdcs; /**< Idcs of bad channels. */
+    mne::DisplayCorrection m_correction; /**< SSP projector and compensator. */
 
     std::pair<float, float> m_pairBaseline; /**< Baseline information. */
 
-    bool m_bIsInit;        /**< Init flag. */
-    bool m_bIsFreezed;     /**< Display is freezed. */
-    bool m_bProjActivated; /**< Doo projections flag. */
-    bool m_bCompActivated; /**< Compensator activated. */
-    float m_fSps;          /**< Sampling rate. */
+    bool m_bIsInit;    /**< Init flag. */
+    bool m_bIsFreezed; /**< Display is freezed. */
+    float m_fSps;      /**< Sampling rate. */
 
 signals:
     //=========================================================================================================

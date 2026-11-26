@@ -32,6 +32,7 @@
 #include <mne/fiff/fiff_types.h>
 #include <mne/fiff/fiff_proj.h>
 #include <mne/dsp/filterkernel.h>
+#include <mne/dsp/rt/rt_raw_display.h>
 #include <mne/scene/sweep_buffer.h>
 
 //=============================================================================================================
@@ -46,7 +47,6 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
-#include <Eigen/SparseCore>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -570,20 +570,18 @@ public:
 private:
     //=========================================================================================================
     /**
-     * Init the SPHARA method.
+     * Loads the SPHARA bases from the application resources and builds the default BabyMEG operator.
      */
     void initSphara();
 
-    static void doFilterPerChannelRTMSA(std::pair<std::vector<mne::FilterKernel>, std::pair<int, Eigen::RowVectorXd>>& channelDataTime);
-
     //=========================================================================================================
     /**
-     * Calculates the filtered version of the raw input data
+     * Filters a corrected block and writes the result into the filtered sweep.
      *
-     * @param[in] data          data which is to be filtered.
-     * @param[in] iDataIndex    buffer column of the first sample of data; the block may wrap around the buffer end.
+     * @param[in] data          Corrected data, channels by samples.
+     * @param[in] iDataIndex    Buffer column of the first sample of data; the block may wrap around the buffer end.
      */
-    void filterDataBlock(const Eigen::MatrixXd& data, int iDataIndex);
+    void writeFiltered(const Eigen::MatrixXd& data, int iDataIndex);
 
     //=========================================================================================================
     /**
@@ -597,50 +595,17 @@ private:
      */
     void clearModel();
 
-    bool m_bProjActivated;          /**< Projections activated. */
-    bool m_bCompActivated;          /**< Compensator activated. */
-    bool m_bSpharaActivated;        /**< Sphara activated. */
-    bool m_bDrawFilterFront;        /**< Flag whether to plot/write the delayed frontal part of the filtered signal. This flag is necessary to get rid of nasty signal jumps when changing the filter parameters. */
-    bool m_bPerformFiltering;       /**< Flag whether to activate/deactivate filtering. */
-    bool m_bTriggerDetectionActive; /**< Trigger detection activation state. */
-    float m_fSps;                   /**< Sampling rate. */
-    double m_dTriggerThreshold;     /**< Trigger detection threshold. */
-    qint32 m_iT;                    /**< Time window. */
-    qint32 m_iDownsampling;         /**< Down sampling factor. */
-    qint32 m_iMaxFilterLength;      /**< Max order of the current filters. */
-    int m_iCurrentTriggerChIndex;   /**< The index of the current trigger channel. */
-    int m_iDistanceTimerSpacer;     /**< The distance for the horizontal time spacers in the view in ms. */
-    int m_iDetectedTriggers;        /**< Detected triggers since the last reset. */
-
-    std::string m_sCurrentTriggerCh;  /**< Current trigger channel which is beeing scanned. */
-    std::string m_sFilterChannelType; /**< Kind of channel which is to be filtered. */
+    float m_fSps;                    /**< Sampling rate. */
+    qint32 m_iT;                     /**< Time window. */
+    qint32 m_iDownsampling;          /**< Down sampling factor. */
+    int m_iDistanceTimerSpacer;      /**< The distance for the horizontal time spacers in the view in ms. */
+    int m_iDetectedTriggers;         /**< Detected triggers since the last reset. */
+    std::string m_sCurrentTriggerCh; /**< Current trigger channel which is beeing scanned. */
 
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Fiff info. */
 
-    Eigen::RowVectorXi m_vecBadIdcs; /**< Idcs of bad channels. */
-
-    scene::SweepBuffer m_sweep;   /**< The raw and filtered sweep, its write position and frozen copy. */
-    Eigen::MatrixXd m_matOverlap; /**< Last overlap block for the back. */
-
-    Eigen::VectorXi m_vecIndicesFirstVV;       /**< The indices of the channels to pick for the first SPHARA operator in case of a VectorView system.*/
-    Eigen::VectorXi m_vecIndicesSecondVV;      /**< The indices of the channels to pick for the second SPHARA operator in case of a VectorView system.*/
-    Eigen::VectorXi m_vecIndicesFirstBabyMEG;  /**< The indices of the channels to pick for the first SPHARA operator in case of a BabyMEG system.*/
-    Eigen::VectorXi m_vecIndicesSecondBabyMEG; /**< The indices of the channels to pick for the second SPHARA operator in case of a BabyMEG system.*/
-    Eigen::VectorXi m_vecIndicesFirstEEG;      /**< The indices of the channels to pick for the second SPHARA operator in case of an EEG system.*/
-
-    Eigen::SparseMatrix<double> m_matSparseSpharaMult;   /**< The final sparse SPHARA operator .*/
-    Eigen::SparseMatrix<double> m_matSparseProjCompMult; /**< The final sparse projection + compensator operator.*/
-    Eigen::SparseMatrix<double> m_matSparseProjMult;     /**< The final sparse SSP projector. */
-    Eigen::SparseMatrix<double> m_matSparseCompMult;     /**< The final sparse compensator matrix. */
-
-    Eigen::MatrixXd m_matProj; /**< SSP projector. */
-    Eigen::MatrixXd m_matComp; /**< Compensator. */
-
-    Eigen::MatrixXd m_matSpharaVVGradLoaded;       /**< The loaded VectorView gradiometer basis functions.*/
-    Eigen::MatrixXd m_matSpharaVVMagLoaded;        /**< The loaded VectorView magnetometer basis functions.*/
-    Eigen::MatrixXd m_matSpharaBabyMEGInnerLoaded; /**< The loaded babyMEG inner layer basis functions.*/
-    Eigen::MatrixXd m_matSpharaBabyMEGOuterLoaded; /**< The loaded babyMEG outer layer basis functions.*/
-    Eigen::MatrixXd m_matSpharaEEGLoaded;          /**< The loaded EEG basis functions.*/
+    mne::RtRawDisplay m_display; /**< SSP, compensator, SPHARA, filter and trigger detection of the incoming blocks. */
+    scene::SweepBuffer m_sweep;  /**< The raw and filtered sweep, its write position and frozen copy. */
 
     std::map<double, QColor> m_qMapTriggerColor;                                       /**< Current colors for all trigger channels. */
     std::map<int, std::vector<std::pair<int, double>>> m_qMapDetectedTrigger;          /**< Detected trigger for each trigger channel. */
@@ -649,8 +614,6 @@ private:
     std::map<int, std::vector<std::pair<int, double>>> m_qMapDetectedTriggerOld;       /**< Old detected trigger for each trigger channel. */
     std::map<int, std::vector<std::pair<int, double>>> m_qMapDetectedTriggerOldFreeze; /**< Old detected trigger for each trigger channel while display is freezed. */
     std::map<int, float> m_qMapChScaling;                                              /**< Channel scaling map. */
-    std::vector<mne::FilterKernel> m_filterKernel;                                     /**< List of currently active filters. */
-    std::vector<std::string> m_filterChannelList;                                      /**< List of channels which are to be filtered.*/
     std::map<int, int> m_qMapIdxRowSelection;                                          /**< Selection mapping.*/
 
     QColor m_colBackground; /**< The background color.*/
@@ -699,8 +662,8 @@ inline qint32 RtFiffRawViewModel::getCurrentSampleIndex() const
         return m_sweep.frozen_write_position();
     }
 
-    if (!m_filterKernel.empty() && m_bPerformFiltering) {
-        return m_sweep.write_position() - m_iMaxFilterLength / 2;
+    if (m_display.filtering()) {
+        return m_sweep.write_position() - m_display.filter_delay();
     }
 
     return m_sweep.write_position();
@@ -710,7 +673,7 @@ inline qint32 RtFiffRawViewModel::getCurrentSampleIndex() const
 
 inline double RtFiffRawViewModel::getLastBlockFirstValue(int row) const
 {
-    return m_sweep.first_value(row, !m_filterKernel.empty());
+    return m_sweep.first_value(row, !m_display.filters().empty());
 }
 
 //=============================================================================================================
@@ -745,7 +708,7 @@ inline const std::map<int, float>& RtFiffRawViewModel::getScaling() const
 
 inline std::map<double, QColor> RtFiffRawViewModel::getTriggerColor() const
 {
-    if (m_bTriggerDetectionActive) {
+    if (m_display.trigger_detection_active()) {
         return m_qMapTriggerColor;
     }
 
@@ -760,10 +723,10 @@ inline std::vector<std::pair<int, double>> RtFiffRawViewModel::getDetectedTrigge
     std::vector<std::pair<int, double>> triggerIndices;
 
     if (m_sweep.frozen())
-        return m_qMapDetectedTriggerFreeze.contains(m_iCurrentTriggerChIndex) ? m_qMapDetectedTriggerFreeze.at(m_iCurrentTriggerChIndex) : triggerIndices;
+        return m_qMapDetectedTriggerFreeze.contains(m_display.trigger_channel()) ? m_qMapDetectedTriggerFreeze.at(m_display.trigger_channel()) : triggerIndices;
 
-    if (m_bTriggerDetectionActive) {
-        return m_qMapDetectedTrigger.contains(m_iCurrentTriggerChIndex) ? m_qMapDetectedTrigger.at(m_iCurrentTriggerChIndex) : triggerIndices;
+    if (m_display.trigger_detection_active()) {
+        return m_qMapDetectedTrigger.contains(m_display.trigger_channel()) ? m_qMapDetectedTrigger.at(m_display.trigger_channel()) : triggerIndices;
     } else
         return triggerIndices;
 }
@@ -775,10 +738,10 @@ inline std::vector<std::pair<int, double>> RtFiffRawViewModel::getDetectedTrigge
     std::vector<std::pair<int, double>> triggerIndices;
 
     if (m_sweep.frozen())
-        return m_qMapDetectedTriggerOldFreeze.contains(m_iCurrentTriggerChIndex) ? m_qMapDetectedTriggerOldFreeze.at(m_iCurrentTriggerChIndex) : triggerIndices;
+        return m_qMapDetectedTriggerOldFreeze.contains(m_display.trigger_channel()) ? m_qMapDetectedTriggerOldFreeze.at(m_display.trigger_channel()) : triggerIndices;
 
-    if (m_bTriggerDetectionActive) {
-        return m_qMapDetectedTriggerOld.contains(m_iCurrentTriggerChIndex) ? m_qMapDetectedTriggerOld.at(m_iCurrentTriggerChIndex) : triggerIndices;
+    if (m_display.trigger_detection_active()) {
+        return m_qMapDetectedTriggerOld.contains(m_display.trigger_channel()) ? m_qMapDetectedTriggerOld.at(m_display.trigger_channel()) : triggerIndices;
     } else
         return triggerIndices;
 }
@@ -795,7 +758,7 @@ inline int RtFiffRawViewModel::getNumberOfTimeSpacers() const
 
 inline double RtFiffRawViewModel::getTriggerThreshold() const
 {
-    return m_dTriggerThreshold;
+    return m_display.trigger_threshold();
 }
 
 //=============================================================================================================
@@ -809,24 +772,21 @@ inline std::string RtFiffRawViewModel::getTriggerName() const
 
 inline int RtFiffRawViewModel::getCurrentTriggerIndex() const
 {
-    return m_iCurrentTriggerChIndex;
+    return m_display.trigger_channel();
 }
 
 //=============================================================================================================
 
 inline bool RtFiffRawViewModel::triggerDetectionActive() const
 {
-    return m_bTriggerDetectionActive;
+    return m_display.trigger_detection_active();
 }
 
 //=============================================================================================================
 
 inline int RtFiffRawViewModel::getCurrentOverlapAddDelay() const
 {
-    if (!m_filterKernel.empty())
-        return m_iMaxFilterLength / 2;
-    else
-        return 0;
+    return m_display.filters().empty() ? 0 : m_display.filter_delay();
 }
 
 //=============================================================================================================

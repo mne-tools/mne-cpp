@@ -10,11 +10,13 @@ project(mne_dsp
 set(SOURCES
   filterkernel.cpp
   cosinefilter.cpp
+  display_correction.cpp
   parksmcclellan.cpp
   filterio.cpp
   spectrogram.cpp
   sphara.cpp
   rt/rt_cov.cpp
+  rt/rt_raw_display.cpp
   rt/rt_hpi.cpp
   rt/rt_inv_op.cpp
   rt/rt_averaging.cpp
@@ -60,11 +62,13 @@ set(HEADERS
   dsp_global.h
   filterkernel.h
   cosinefilter.h
+  display_correction.h
   parksmcclellan.h
   filterio.h
   spectrogram.h
   sphara.h
   rt/rt_cov.h
+  rt/rt_raw_display.h
   rt/rt_hpi.h
   rt/rt_inv_op.h
   rt/rt_averaging.h

@@ -23,12 +23,8 @@
 #include <mne/base/log.h>
 
 #include <mne/base/string_utils.h>
-#include <mne/base/thread_pool.h>
 #include <mne/fiff/fiff_types.h>
 #include <mne/fiff/fiff_info.h>
-#include <mne/math/matrix_io.h>
-#include <mne/dsp/sphara.h>
-#include <mne/dsp/rt/rt_detect_trigger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -44,6 +40,7 @@
 #include <algorithm>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <utility>
 #include <vector>
 
@@ -61,21 +58,11 @@ using namespace Eigen;
 
 RtFiffRawViewModel::RtFiffRawViewModel(QObject* parent)
 : QAbstractTableModel(parent)
-, m_bProjActivated(false)
-, m_bCompActivated(false)
-, m_bSpharaActivated(false)
-, m_bDrawFilterFront(true)
-, m_bPerformFiltering(false)
-, m_bTriggerDetectionActive(false)
 , m_fSps(1024.0f)
-, m_dTriggerThreshold(0.01)
 , m_iT(10)
 , m_iDownsampling(10)
-, m_iMaxFilterLength(128)
-, m_iCurrentTriggerChIndex(0)
 , m_iDistanceTimerSpacer(1000)
 , m_iDetectedTriggers(0)
-, m_sFilterChannelType("MEG")
 , m_pFiffInfo(std::make_shared<FiffInfo>())
 , m_colBackground(Qt::white)
 {
@@ -132,7 +119,7 @@ QVariant RtFiffRawViewModel::data(const QModelIndex& index, int role) const
             switch (role) {
                 case Qt::DisplayRole: {
                     // The frozen copy while frozen
-                    const scene::SweepBuffer::Matrix& matData = m_sweep.layer(!m_filterKernel.empty() && m_bPerformFiltering);
+                    const scene::SweepBuffer::Matrix& matData = m_sweep.layer(m_display.filtering());
                     rowVectorPair.first = matData.data() + row * matData.cols();
                     rowVectorPair.second = static_cast<int>(matData.cols());
                     v.setValue(rowVectorPair);
@@ -187,64 +174,10 @@ QVariant RtFiffRawViewModel::headerData(int section, Qt::Orientation orientation
 
 void RtFiffRawViewModel::initSphara()
 {
-    //Load SPHARA matrices for babymeg and vectorview
-    mne::read_matrix(m_matSpharaVVGradLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt")).toStdString());
-    mne::read_matrix(m_matSpharaVVMagLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt")).toStdString());
-
-    mne::read_matrix(m_matSpharaBabyMEGInnerLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt")).toStdString());
-    mne::read_matrix(m_matSpharaBabyMEGOuterLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt")).toStdString());
-
-    mne::read_matrix(m_matSpharaEEGLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt")).toStdString());
-
-    //Generate indices used to create the SPHARA operators for VectorView
-    m_vecIndicesFirstVV.resize(0);
-    m_vecIndicesSecondVV.resize(0);
-
-    for (int r = 0; r < std::ssize(m_pFiffInfo->chs); ++r) {
-        //Find GRADIOMETERS
-        if (m_pFiffInfo->chs.at(r).chpos.coil_type == 3012) {
-            m_vecIndicesFirstVV.conservativeResize(m_vecIndicesFirstVV.rows() + 1);
-            m_vecIndicesFirstVV(m_vecIndicesFirstVV.rows() - 1) = r;
-        }
-
-        //Find Magnetometers
-        if (m_pFiffInfo->chs.at(r).chpos.coil_type == 3024) {
-            m_vecIndicesSecondVV.conservativeResize(m_vecIndicesSecondVV.rows() + 1);
-            m_vecIndicesSecondVV(m_vecIndicesSecondVV.rows() - 1) = r;
-        }
-    }
-
-    //Generate indices used to create the SPHARA operators for babyMEG
-    m_vecIndicesFirstBabyMEG.resize(0);
-    for (int r = 0; r < std::ssize(m_pFiffInfo->chs); ++r) {
-        //Find INNER LAYER
-        if (m_pFiffInfo->chs.at(r).chpos.coil_type == 7002) {
-            m_vecIndicesFirstBabyMEG.conservativeResize(m_vecIndicesFirstBabyMEG.rows() + 1);
-            m_vecIndicesFirstBabyMEG(m_vecIndicesFirstBabyMEG.rows() - 1) = r;
-        }
-
-        //Find outer layer (FIFFV_COIL_BABY_REF_MAG)
-        if (m_pFiffInfo->chs.at(r).chpos.coil_type == 7003) {
-            m_vecIndicesSecondBabyMEG.conservativeResize(m_vecIndicesSecondBabyMEG.rows() + 1);
-            m_vecIndicesSecondBabyMEG(m_vecIndicesSecondBabyMEG.rows() - 1) = r;
-        }
-    }
-
-    //Generate indices used to create the SPHARA operators for EEG layouts
-    m_vecIndicesFirstEEG.resize(0);
-    for (int r = 0; r < std::ssize(m_pFiffInfo->chs); ++r) {
-        //Find EEG
-        if (m_pFiffInfo->chs.at(r).kind == FIFFV_EEG_CH) {
-            m_vecIndicesFirstEEG.conservativeResize(m_vecIndicesFirstEEG.rows() + 1);
-            m_vecIndicesFirstEEG(m_vecIndicesFirstEEG.rows() - 1) = r;
-        }
-    }
+    m_display.load_sphara_bases((QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA")).toStdString());
 
     //Create Sphara operator for the first time
     updateSpharaOptions("BabyMEG", 270, 105);
-
-    mne::Log::debug("RtFiffRawViewModel::initSphara - Read VectorView mag matrix {} {} and grad matrix {} {}", m_matSpharaVVMagLoaded.rows(), m_matSpharaVVMagLoaded.cols(), m_matSpharaVVGradLoaded.rows(), m_matSpharaVVGradLoaded.cols());
-    mne::Log::debug("RtFiffRawViewModel::initSphara - Read BabyMEG inner layer matrix {} {} and outer layer matrix {} {}", m_matSpharaBabyMEGInnerLoaded.rows(), m_matSpharaBabyMEGInnerLoaded.cols(), m_matSpharaBabyMEGOuterLoaded.rows(), m_matSpharaBabyMEGOuterLoaded.cols());
 }
 
 //=============================================================================================================
@@ -252,15 +185,6 @@ void RtFiffRawViewModel::initSphara()
 void RtFiffRawViewModel::setFiffInfo(std::shared_ptr<mne::FiffInfo>& p_pFiffInfo)
 {
     if (p_pFiffInfo) {
-        RowVectorXi sel; // = RowVectorXi(0,0);
-        StringList emptyExclude;
-
-        if (p_pFiffInfo->bads.size() > 0) {
-            sel = FiffInfoBase::pick_channels(p_pFiffInfo->ch_names, p_pFiffInfo->bads, emptyExclude);
-        }
-
-        m_vecBadIdcs = sel;
-
         m_pFiffInfo = p_pFiffInfo;
 
         resetSelection();
@@ -268,29 +192,12 @@ void RtFiffRawViewModel::setFiffInfo(std::shared_ptr<mne::FiffInfo>& p_pFiffInfo
         //Resize the sweep to the channels and clear it
         m_sweep.resize(static_cast<int>(m_pFiffInfo->chs.size()), m_sweep.window(), true);
 
-        m_matOverlap.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
+        //Reset SSP, compensator, filter state and SPHARA channels
+        m_display.set_info(m_pFiffInfo);
 
-        m_matSparseProjMult = SparseMatrix<double>(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
-        m_matSparseCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
-        m_matSparseSpharaMult = SparseMatrix<double>(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
-        m_matSparseProjCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
-
-        m_matSparseProjMult.setIdentity();
-        m_matSparseCompMult.setIdentity();
-        m_matSparseSpharaMult.setIdentity();
-        m_matSparseProjCompMult.setIdentity();
-
-        //Create the initial Compensator projector
-        updateCompensator(0);
-
-        setFilterChannelType(m_sFilterChannelType);
-
-        //Init the sphara operators
         initSphara();
     } else {
-        m_vecBadIdcs = RowVectorXi(0, 0);
-        m_matProj = MatrixXd(0, 0);
-        m_matComp = MatrixXd(0, 0);
+        m_display.set_info(nullptr);
     }
 }
 
@@ -312,22 +219,13 @@ void RtFiffRawViewModel::setSamplingInfo(float sps, int T, bool bSetZero)
 
 MatrixXd RtFiffRawViewModel::getLastBlock()
 {
-    return m_sweep.last_block(!m_filterKernel.empty() && m_bPerformFiltering);
+    return m_sweep.last_block(m_display.filtering());
 }
 
 //=============================================================================================================
 
 void RtFiffRawViewModel::addData(std::span<const MatrixXd> data)
 {
-    //SSP
-    bool doProj = m_bProjActivated && m_sweep.raw().cols() > 0 && m_sweep.raw().rows() == m_matProj.cols() ? true : false;
-
-    //Compensator
-    bool doComp = m_bCompActivated && m_sweep.raw().cols() > 0 && m_sweep.raw().rows() == m_matComp.cols() ? true : false;
-
-    //SPHARA
-    bool doSphara = m_bSpharaActivated && m_matSparseSpharaMult.cols() > 0 && m_sweep.raw().rows() == m_matSparseSpharaMult.cols() ? true : false;
-
     MatrixXdR& matDataRaw = m_sweep.raw();
     MatrixXdR& matDataFiltered = m_sweep.filtered();
     const int iMaxCols = static_cast<int>(matDataRaw.cols());
@@ -335,59 +233,49 @@ void RtFiffRawViewModel::addData(std::span<const MatrixXd> data)
         return;
     }
 
-    //Copy new data into the ring buffer: stream sample s goes to column s mod iMaxCols
-    for (qint32 b = 0; b < std::ssize(data); ++b) {
-        const int nRow = static_cast<int>(data[b].rows());
+    const bool doSphara = m_display.applies_sphara(matDataRaw.rows());
+    const bool doFilter = m_display.filtering();
+    const int iTriggerCh = m_display.trigger_channel();
 
-        if (nRow != matDataRaw.rows()) {
+    //Copy new data into the ring buffer: stream sample s goes to column s mod iMaxCols
+    for (const MatrixXd& matBlock : data) {
+        if (matBlock.rows() != matDataRaw.rows()) {
             mne::Log::debug("incoming data does not match internal data row size. Returning...");
             return;
         }
 
-        const MatrixXd& matBlock = data[b];
         const int nCol = static_cast<int>(matBlock.cols());
-
-        MatrixXd matCorrected;
-        if (doComp) {
-            matCorrected = doProj ? MatrixXd(m_matSparseProjCompMult * matBlock) : MatrixXd(m_matSparseCompMult * matBlock);
-        } else {
-            matCorrected = doProj ? MatrixXd(m_matSparseProjMult * matBlock) : matBlock;
-        }
-
-        std::vector<mne::TriggerFlank> lTriggers;
-        if (m_bTriggerDetectionActive) {
-            lTriggers = mne::detect_trigger_flanks_max(matBlock, m_iCurrentTriggerChIndex, 0, m_dTriggerThreshold, true, 500);
-        }
+        const mne::RtRawDisplay::Corrected corrected = m_display.correct(matBlock);
 
         m_sweep.write(nCol, [this] { startNewSweep(); }, [&](int iCol, int iOffset, int iLength) {
-            matDataRaw.middleCols(iCol, iLength) = matCorrected.middleCols(iOffset, iLength);
-            if (m_filterKernel.empty() || !m_bPerformFiltering) {
+            matDataRaw.middleCols(iCol, iLength) = corrected.data.middleCols(iOffset, iLength);
+            if (!doFilter) {
                 matDataFiltered.middleCols(iCol, iLength).setZero();
                 if (doSphara) {
-                    matDataRaw.middleCols(iCol, iLength) = m_matSparseSpharaMult * matDataRaw.middleCols(iCol, iLength);
+                    matDataRaw.middleCols(iCol, iLength) = m_display.sphara_operator() * matDataRaw.middleCols(iCol, iLength);
                 }
             }
 
-            for (const mne::TriggerFlank& trigger : lTriggers) {
+            for (const mne::TriggerFlank& trigger : corrected.triggers) {
                 if (trigger.sample >= iOffset && trigger.sample < iOffset + iLength) {
-                    m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].push_back({iCol + trigger.sample - iOffset, trigger.value});
+                    m_qMapDetectedTrigger[iTriggerCh].push_back({iCol + trigger.sample - iOffset, trigger.value});
                 }
             } });
 
-        if (!lTriggers.empty()) {
-            m_iDetectedTriggers += static_cast<int>(lTriggers.size());
+        if (!corrected.triggers.empty()) {
+            m_iDetectedTriggers += static_cast<int>(corrected.triggers.size());
             emit triggerDetected(m_iDetectedTriggers, m_qMapDetectedTrigger);
         }
 
         //Filter the whole block at once so the overlap-add stays continuous across the wrap
-        if (!m_filterKernel.empty() && m_bPerformFiltering) {
+        if (doFilter) {
             const int iBlockStart = m_sweep.write_position() - nCol;
-            filterDataBlock(matCorrected, iBlockStart);
+            writeFiltered(corrected.data, iBlockStart);
 
             //Perform SPHARA on filtered data after actual filtering - SPHARA should be applied on the best possible data
             if (doSphara) {
-                scene::for_wrapped_span(iBlockStart - m_iMaxFilterLength / 2, nCol, iMaxCols, [&](int iCol, int, int iLength) {
-                    matDataFiltered.middleCols(iCol, iLength) = m_matSparseSpharaMult * matDataFiltered.middleCols(iCol, iLength);
+                scene::for_wrapped_span(iBlockStart - m_display.filter_delay(), nCol, iMaxCols, [&](int iCol, int, int iLength) {
+                    matDataFiltered.middleCols(iCol, iLength) = m_display.sphara_operator() * matDataFiltered.middleCols(iCol, iLength);
                 });
             }
         }
@@ -407,7 +295,7 @@ void RtFiffRawViewModel::startNewSweep()
     m_qMapDetectedTriggerOld = m_qMapDetectedTrigger;
 
     //Clear detected triggers
-    if (m_bTriggerDetectionActive) {
+    if (m_display.trigger_detection_active()) {
         for (auto& [channel, triggers] : m_qMapDetectedTrigger) {
             triggers.clear();
         }
@@ -531,32 +419,10 @@ void RtFiffRawViewModel::setScaling(const std::map<int, float>& p_qMapChScaling)
 
 void RtFiffRawViewModel::updateProjection(const std::vector<mne::FiffProj>& projs)
 {
-    //  Update the SSP projector
     if (m_pFiffInfo) {
-        //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
-        m_bProjActivated = false;
         m_pFiffInfo->projs = projs;
-
-        for (qint32 i = 0; i < std::ssize(this->m_pFiffInfo->projs); ++i) {
-            if (this->m_pFiffInfo->projs[i].active) {
-                m_bProjActivated = true;
-                break;
-            }
-        }
-
-        this->m_pFiffInfo->make_projector(m_matProj);
-
+        m_display.update_projection();
         mne::Log::debug("RtFiffRawViewModel::updateProjection - New projection calculated.");
-
-        //set columns of matrix to zero depending on bad channels indexes
-        for (qint32 j = 0; j < m_vecBadIdcs.cols(); ++j) {
-            m_matProj.col(m_vecBadIdcs[j]).setZero();
-        }
-
-        m_matSparseProjMult = m_matProj.sparseView();
-
-        //Create full multiplication matrix
-        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
     }
 }
 
@@ -564,95 +430,36 @@ void RtFiffRawViewModel::updateProjection(const std::vector<mne::FiffProj>& proj
 
 void RtFiffRawViewModel::updateCompensator(int to)
 {
-    //  Update the compensator
-    if (m_pFiffInfo) {
-        if (to == 0) {
-            m_bCompActivated = false;
-        } else {
-            m_bCompActivated = true;
-        }
-
-        //        qDebug()<<"to"<<to;
-        //        qDebug()<<"from"<<from;
-        //        qDebug()<<"m_bCompActivated"<<m_bCompActivated;
-
-        FiffCtfComp newComp;
-        this->m_pFiffInfo->make_compensator(0, to, newComp); //Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
-
-        //We do not need to call this->m_pFiffInfo->set_current_comp(to);
-        //Because we will set the compensators to the coil in the same FiffInfo which is already used to write to file.
-        //Note that the data is written in raw form not in compensated form.
-        m_matComp = newComp.data.data;
-
-        m_matSparseCompMult = m_matComp.sparseView();
-
-        //Create full multiplication matrix
-        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
-    }
+    m_display.update_compensator(to);
 }
 
 //=============================================================================================================
 
 void RtFiffRawViewModel::updateSpharaActivation(bool state)
 {
-    m_bSpharaActivated = state;
+    m_display.set_sphara_active(state);
 }
 
 //=============================================================================================================
 
 void RtFiffRawViewModel::updateSpharaOptions(const std::string& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond)
 {
-    if (m_pFiffInfo) {
-        mne::Log::debug("RtFiffRawViewModel::updateSpharaOptions - Creating SPHARA operator for {}", sSytemType);
-
-        MatrixXd matSpharaMultFirst = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
-        MatrixXd matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
-
-        if (sSytemType == "VectorView" && m_matSpharaVVGradLoaded.size() != 0 && m_matSpharaVVMagLoaded.size() != 0) {
-            matSpharaMultFirst = mne::makeSpharaProjector(m_matSpharaVVGradLoaded, m_vecIndicesFirstVV, m_pFiffInfo->nchan, nBaseFctsFirst, 1);   //GRADIOMETERS
-            matSpharaMultSecond = mne::makeSpharaProjector(m_matSpharaVVMagLoaded, m_vecIndicesSecondVV, m_pFiffInfo->nchan, nBaseFctsSecond, 0); //Magnetometers
-        }
-
-        if (sSytemType == "BabyMEG" && m_matSpharaBabyMEGInnerLoaded.size() != 0) {
-            matSpharaMultFirst = mne::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, m_vecIndicesFirstBabyMEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
-        }
-
-        if (sSytemType == "EEG" && m_matSpharaEEGLoaded.size() != 0) {
-            matSpharaMultFirst = mne::makeSpharaProjector(m_matSpharaEEGLoaded, m_vecIndicesFirstEEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
-        }
-
-
-        //Create full multiplication matrix
-        const SparseMatrix<double> matSparseSpharaMultFirst = matSpharaMultFirst.sparseView();
-        const SparseMatrix<double> matSparseSpharaMultSecond = matSpharaMultSecond.sparseView();
-        m_matSparseSpharaMult = matSparseSpharaMultFirst * matSparseSpharaMultSecond;
-    }
+    mne::Log::debug("RtFiffRawViewModel::updateSpharaOptions - Creating SPHARA operator for {}", sSytemType);
+    m_display.update_sphara_options(sSytemType, nBaseFctsFirst, nBaseFctsSecond);
 }
 
 //=============================================================================================================
 
 void RtFiffRawViewModel::setFilter(const std::vector<FilterKernel>& filterData)
 {
-    m_filterKernel = filterData;
-
-    m_iMaxFilterLength = 1;
-    for (int i = 0; i < std::ssize(filterData); ++i) {
-        if (m_iMaxFilterLength < filterData.at(i).filter_order()) {
-            m_iMaxFilterLength = filterData.at(i).filter_order();
-        }
-    }
-
-    m_matOverlap.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
-    m_matOverlap.setZero();
-
-    m_bDrawFilterFront = false;
+    m_display.set_filters(filterData);
 }
 
 //=============================================================================================================
 
 void RtFiffRawViewModel::setFilterActive(bool state)
 {
-    m_bPerformFiltering = state;
+    m_display.set_filter_active(state);
 }
 
 //=============================================================================================================
@@ -666,17 +473,7 @@ void RtFiffRawViewModel::setBackgroundColor(const QColor& color)
 
 void RtFiffRawViewModel::setFilterChannelType(const std::string& channelType)
 {
-    m_sFilterChannelType = channelType;
-    m_filterChannelList.clear();
-
-    for (const FiffChInfo& ch : std::as_const(m_pFiffInfo->chs)) {
-        if (ch.kind == FIFFV_MEG_CH || ch.kind == FIFFV_EEG_CH || ch.kind == FIFFV_EOG_CH ||
-            ch.kind == FIFFV_ECG_CH || ch.kind == FIFFV_EMG_CH) {
-            if (m_sFilterChannelType == "All" || (ch.ch_name.find(m_sFilterChannelType) != std::string::npos)) {
-                m_filterChannelList.push_back(ch.ch_name);
-            }
-        }
-    }
+    m_display.set_filter_channel_type(channelType);
 }
 
 //=============================================================================================================
@@ -695,10 +492,6 @@ void RtFiffRawViewModel::markChBad(QModelIndex ch, bool status)
         mne::Log::debug("RawModel: {} marked as good.", chInfolist[ch.row()].ch_name);
     }
 
-    //Update indeices of bad channels (this vector is needed when creating new ssp operators)
-    StringList emptyExclude;
-    m_vecBadIdcs = FiffInfoBase::pick_channels(m_pFiffInfo->ch_names, m_pFiffInfo->bads, emptyExclude);
-
     emit dataChanged(ch, ch);
 }
 
@@ -707,26 +500,23 @@ void RtFiffRawViewModel::markChBad(QModelIndex ch, bool status)
 void RtFiffRawViewModel::triggerInfoChanged(const std::map<double, QColor>& colorMap, bool active, const std::string& triggerCh, double threshold)
 {
     m_qMapTriggerColor = colorMap;
-    m_bTriggerDetectionActive = active;
-    m_dTriggerThreshold = threshold;
+    int iTriggerCh = m_display.trigger_channel();
 
     //Find channel index and initialise detected trigger map if channel name changed
     if (m_sCurrentTriggerCh != triggerCh) {
         m_sCurrentTriggerCh = triggerCh;
-
-        std::vector<std::pair<int, double>> temp;
         m_qMapDetectedTrigger.clear();
 
         for (int i = 0; i < std::ssize(m_pFiffInfo->chs); ++i) {
             if (m_pFiffInfo->chs[i].ch_name == m_sCurrentTriggerCh) {
-                m_iCurrentTriggerChIndex = i;
-                m_qMapDetectedTrigger.insert_or_assign(i, temp);
+                iTriggerCh = i;
+                m_qMapDetectedTrigger.insert_or_assign(i, std::vector<std::pair<int, double>>());
                 break;
             }
         }
     }
 
-    m_sCurrentTriggerCh = triggerCh;
+    m_display.set_trigger_detection(active, iTriggerCh, threshold);
 }
 
 //=============================================================================================================
@@ -766,83 +556,32 @@ void RtFiffRawViewModel::markChBad(QModelIndexList chlist, bool status)
 
         emit dataChanged(chlist[i], chlist[i]);
     }
-
-    //Update indeices of bad channels (this vector is needed when creating new ssp operators)
-    StringList emptyExclude;
-    m_vecBadIdcs = FiffInfoBase::pick_channels(m_pFiffInfo->ch_names, m_pFiffInfo->bads, emptyExclude);
 }
 
 //=============================================================================================================
 
-void RtFiffRawViewModel::doFilterPerChannelRTMSA(std::pair<std::vector<FilterKernel>, std::pair<int, RowVectorXd>>& channelDataTime)
+void RtFiffRawViewModel::writeFiltered(const MatrixXd& data, int iDataIndex)
 {
-    for (int i = 0; i < std::ssize(channelDataTime.first); ++i) {
-        channelDataTime.first[i].apply_fft_filter(channelDataTime.second.second, true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
-    }
-}
-
-//=============================================================================================================
-
-void RtFiffRawViewModel::filterDataBlock(const MatrixXd& data, int iDataIndex)
-{
-    if (data.cols() < m_iMaxFilterLength) {
+    const std::optional<mne::RtRawDisplay::Filtered> filtered = m_display.filter(data);
+    if (!filtered) {
         return;
-    }
-
-    //Generate a list which can be filtered in parallel
-    std::vector<std::pair<std::vector<FilterKernel>, std::pair<int, RowVectorXd>>> timeData;
-    std::vector<int> notFilterChannelIndex;
-
-    for (qint32 i = 0; i < data.rows(); ++i) {
-        if (std::ranges::contains(m_filterChannelList, m_pFiffInfo->chs.at(i).ch_name)) {
-            timeData.emplace_back(m_filterKernel, std::pair<int, RowVectorXd>(i, data.row(i)));
-        } else {
-            notFilterChannelIndex.push_back(i);
-        }
     }
 
     MatrixXdR& matDataFiltered = m_sweep.filtered();
     const int iMaxCols = static_cast<int>(matDataFiltered.cols());
     const int nCol = static_cast<int>(data.cols());
-    const int iFilterDelay = m_iMaxFilterLength / 2;
 
-    //Do the concurrent filtering
-    if (!timeData.empty()) {
-        auto* pTimeData = timeData.data();
-        ThreadPool::global().parallel_for(0, static_cast<std::size_t>(timeData.size()), [pTimeData](std::size_t i) {
-            doFilterPerChannelRTMSA(pTimeData[i]);
-        });
-
-        //Overlap-add: output sample k of this block is convolution sample iDataIndex + k, drawn iFilterDelay earlier
-        for (int r = 0; r < std::ssize(timeData); ++r) {
-            const int iRow = timeData.at(r).second.first;
-            RowVectorXd tempData = timeData.at(r).second.second;
-
-            if (m_bDrawFilterFront) {
-                tempData.head(m_iMaxFilterLength) += m_matOverlap.row(iRow);
-                scene::for_wrapped_span(iDataIndex - iFilterDelay, nCol, iMaxCols, [&](int iCol, int iOffset, int iLength) {
-                    matDataFiltered.row(iRow).segment(iCol, iLength) = tempData.segment(iOffset, iLength);
-                });
-            } else {
-                //The overlap belongs to the previous filter, so skip the start-up transient of the new one
-                scene::for_wrapped_span(iDataIndex - iFilterDelay, m_iMaxFilterLength, iMaxCols, [&](int iCol, int, int iLength) {
-                    matDataFiltered.row(iRow).segment(iCol, iLength).setZero();
-                });
-                scene::for_wrapped_span(iDataIndex - iFilterDelay + m_iMaxFilterLength, nCol - m_iMaxFilterLength, iMaxCols, [&](int iCol, int iOffset, int iLength) {
-                    matDataFiltered.row(iRow).segment(iCol, iLength) = tempData.segment(m_iMaxFilterLength + iOffset, iLength);
-                });
-            }
-
-            m_matOverlap.row(iRow) = tempData.tail(m_iMaxFilterLength);
+    //Filter output sample k of this block belongs iFilterDelay samples before the block start
+    scene::for_wrapped_span(iDataIndex - m_display.filter_delay(), nCol, iMaxCols, [&](int iCol, int iOffset, int iLength) {
+        for (int iRow : filtered->filtered_rows) {
+            matDataFiltered.row(iRow).segment(iCol, iLength) = filtered->data.row(iRow).segment(iOffset, iLength);
         }
-    }
-
-    m_bDrawFilterFront = true;
+    });
 
     //Fill filtered data with raw data if the channel was not filtered
     scene::for_wrapped_span(iDataIndex, nCol, iMaxCols, [&](int iCol, int iOffset, int iLength) {
-        for (int i : std::as_const(notFilterChannelIndex)) {
-            matDataFiltered.row(i).segment(iCol, iLength) = data.row(i).segment(iOffset, iLength);
+        for (int iRow : filtered->passthrough_rows) {
+            matDataFiltered.row(iRow).segment(iCol, iLength) = data.row(iRow).segment(iOffset, iLength);
         }
     });
 }
@@ -854,7 +593,7 @@ void RtFiffRawViewModel::clearModel()
     beginResetModel();
 
     m_sweep.clear();
-    m_matOverlap.setZero();
+    m_display.clear_filter_state();
 
     endResetModel();
 }
