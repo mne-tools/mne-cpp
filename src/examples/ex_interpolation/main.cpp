@@ -22,8 +22,8 @@
 
 #include <mne/inv/inv_source_estimate.h>
 #include <mne/mne/mne_bem.h>
-#include <mne/viz/backends/qt/3d/helpers/geometryinfo.h>
-#include <mne/viz/backends/qt/3d/helpers/interpolation.h>
+#include <mne/viz/brain/geometryinfo.h>
+#include <mne/viz/brain/interpolation.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/base/log.h>
 
@@ -47,7 +47,7 @@
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::viz::qt;
+using namespace mne::viz;
 using namespace Eigen;
 
 //=============================================================================================================

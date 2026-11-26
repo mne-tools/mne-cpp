@@ -32,7 +32,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::viz::qt;
+using namespace mne::viz;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -53,8 +53,8 @@ std::shared_ptr<SparseMatrix<float>> Interpolation::createInterpolationMat(const
     std::shared_ptr<Eigen::SparseMatrix<float>> matInterpolationMatrix = std::make_shared<SparseMatrix<float>>(matDistanceTable->rows(), static_cast<int>(vecProjectedSensors.size()));
 
     std::vector<Triplet<float>> vecNonZeroEntries;
-    const std::int32_t iRows = matInterpolationMatrix->rows();
-    const std::int32_t iCols = matInterpolationMatrix->cols();
+    const auto iRows = static_cast<std::int32_t>(matInterpolationMatrix->rows());
+    const auto iCols = static_cast<std::int32_t>(matInterpolationMatrix->cols());
 
     // Build exclude set for O(1) lookup
     std::unordered_set<int> excludeSet;
@@ -76,10 +76,10 @@ std::shared_ptr<SparseMatrix<float>> Interpolation::createInterpolationMat(const
             const RowVectorXd& rowVec = matDistanceTable->row(r);
 
             for (std::int32_t c = 0; c < iCols; ++c) {
-                const float dDist = rowVec[c];
+                const auto dDist = static_cast<float>(rowVec[c]);
 
                 if (dDist < dCancelDist) {
-                    const float dValueWeight = std::fabs(1.0 / interpolationFunction(dDist));
+                    const auto dValueWeight = static_cast<float>(std::fabs(1.0 / interpolationFunction(dDist)));
                     dWeightsSum += dValueWeight;
                     vecBelowThresh.emplace_back(c, dValueWeight);
                 }

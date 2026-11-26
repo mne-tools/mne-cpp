@@ -19,8 +19,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/viz/backends/qt/3d/helpers/geometryinfo.h>
-#include <mne/viz/backends/qt/3d/helpers/interpolation.h>
+#include <mne/viz/brain/geometryinfo.h>
+#include <mne/viz/brain/interpolation.h>
 #include <mne/viz/backends/qt/3d/renderable/brainsurface.h>
 #include <mne/viz/backends/qt/3d/renderable/dipoleobject.h>
 #include <mne/viz/backends/qt/3d/renderable/electrodeobject.h>
@@ -64,6 +64,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace mne::viz;
 using namespace mne::viz::qt;
 using namespace mne;
 using namespace Eigen;

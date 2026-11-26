@@ -8,6 +8,8 @@ project(mne_viz
 )
 
 set(SOURCES
+  brain/geometryinfo.cpp
+  brain/interpolation.cpp
   figures/average_layout.cpp
   figures/average_tile.cpp
   figures/bar_chart.cpp
@@ -50,6 +52,8 @@ set(SOURCES
 )
 
 set(HEADERS
+  brain/geometryinfo.h
+  brain/interpolation.h
   figures/average_layout.h
   figures/average_tile.h
   figures/bar_chart.h

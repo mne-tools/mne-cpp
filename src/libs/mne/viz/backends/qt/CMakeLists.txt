@@ -107,8 +107,6 @@ set(SOURCES
     3d/core/dataloader.cpp
     3d/core/viewstate.cpp
     3d/geometry/meshfactory.cpp
-    3d/helpers/geometryinfo.cpp
-    3d/helpers/interpolation.cpp
     3d/input/cameracontroller.cpp
     3d/input/raypicker.cpp
     3d/model/braintreemodel.cpp
@@ -226,8 +224,6 @@ set(HEADERS
     3d/core/viewstate.h
     3d/core/rendertypes.h
     3d/geometry/meshfactory.h
-    3d/helpers/geometryinfo.h
-    3d/helpers/interpolation.h
     3d/input/cameracontroller.h
     3d/input/raypicker.h
     3d/model/braintreemodel.h

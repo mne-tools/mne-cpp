@@ -17,8 +17,8 @@
 #include "stcloadingworker.h"
 
 #include "../renderable/brainsurface.h"
-#include "../helpers/interpolation.h"
-#include "../helpers/geometryinfo.h"
+#include "../../../../brain/interpolation.h"
+#include "../../../../brain/geometryinfo.h"
 
 //=============================================================================================================
 // STL INCLUDES
@@ -87,11 +87,11 @@ std::shared_ptr<Eigen::SparseMatrix<float>> StcLoadingWorker::computeInterpolati
         emit progress(pct, std::format("{} geodesic interpolation {}/{}", hemiLabel, current, total));
     };
 
-    auto interpMat = mne::viz::qt::GeometryInfo::scdcInterpolationMat(
+    auto interpMat = mne::viz::GeometryInfo::scdcInterpolationMat(
         matVertices,
         vecNeighbors,
         vecSourceVertices,
-        mne::viz::qt::Interpolation::cubic,
+        mne::viz::Interpolation::cubic,
         cancelDist,
         progressCallback,
         &m_cancelled);

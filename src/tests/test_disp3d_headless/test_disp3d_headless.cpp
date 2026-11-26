@@ -16,8 +16,8 @@
 #include <QColor>
 #include <QFile>
 
-#include <mne/viz/backends/qt/3d/helpers/interpolation.h>
-#include <mne/viz/backends/qt/3d/helpers/geometryinfo.h>
+#include <mne/viz/brain/interpolation.h>
+#include <mne/viz/brain/geometryinfo.h>
 #include <mne/viz/backends/qt/3d/geometry/meshfactory.h>
 #include <mne/viz/backends/qt/3d/core/dataloader.h>
 #include <mne/viz/backends/qt/3d/workers/rtsourcedatacontroller.h>
@@ -25,6 +25,7 @@
 
 #include <mne/fiff/fiff.h>
 
+using namespace mne::viz;
 using namespace mne::viz::qt;
 using namespace Eigen;
 

@@ -42,7 +42,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::viz::qt;
+using namespace mne::viz;
 using namespace Eigen;
 using namespace mne;
 

@@ -11,8 +11,8 @@
  *
  * SourceEstimateOverlay loads a pair of @c .stc files (one per
  * hemisphere), holds the source-time-course matrix and the sparse
- * vertex interpolation matrix produced by @ref mne::viz::qt::GeometryInfo /
- * @ref mne::viz::qt::Interpolation, and for any given time index multiplies the
+ * vertex interpolation matrix produced by @ref mne::viz::GeometryInfo /
+ * @ref mne::viz::Interpolation, and for any given time index multiplies the
  * two to obtain a per-vertex activation vector.
  *
  * The vector is then mapped through a configurable colormap (Hot,

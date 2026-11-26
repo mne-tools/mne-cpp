@@ -10,29 +10,29 @@
  * @date     May 2017
  * @brief    Distance-based sparse interpolation weights and per-frame signal smoothing on triangulated meshes.
  *
- * Given the geodesic distance table produced by @ref mne::viz::qt::GeometryInfo,
+ * Given the geodesic distance table produced by @ref mne::viz::GeometryInfo,
  * Interpolation builds a sparse <em>n_vertices x n_sources</em>
  * weight matrix in which each vertex's row contains only those
  * sources within @c cancelDist metres. Weights fall off through one
  * of four radial basis functions selectable at runtime:
- * @ref mne::viz::qt::Interpolation::linear "linear", @ref mne::viz::qt::Interpolation::gaussian "gaussian", @ref mne::viz::qt::Interpolation::square "square" (negative parabola) and
- * @ref mne::viz::qt::Interpolation::cubic "cubic" (cubic hyperbola).
+ * @ref mne::viz::Interpolation::linear "linear", @ref mne::viz::Interpolation::gaussian "gaussian", @ref mne::viz::Interpolation::square "square" (negative parabola) and
+ * @ref mne::viz::Interpolation::cubic "cubic" (cubic hyperbola).
  *
- * @ref mne::viz::qt::Interpolation::interpolateSignal "interpolateSignal" multiplies the precomputed matrix by a
+ * @ref mne::viz::Interpolation::interpolateSignal "interpolateSignal" multiplies the precomputed matrix by a
  * per-frame source / sensor vector to produce smoothed per-vertex
  * values; the matrix is built once per scene and reused on every
  * real-time frame in @ref mne::viz::qt::RtSourceDataWorker and
  * @ref mne::viz::qt::RtSensorDataWorker, keeping per-frame cost at one sparse mat-vec.
  */
 
-#ifndef INTERPOLATION_H
-#define INTERPOLATION_H
+#ifndef VIZ_INTERPOLATION_H
+#define VIZ_INTERPOLATION_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
+#include "../viz_global.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -53,7 +53,7 @@
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 #ifndef FLOAT_INFINITY
@@ -69,7 +69,7 @@ namespace mne::viz::qt
  * @snippet ex_disp3d_scene/main.cpp interpolation_usage
  */
 
-class VIZQTSHARED_EXPORT Interpolation
+class VIZSHARED_EXPORT Interpolation
 {
 public:
     Interpolation() = delete;
@@ -150,6 +150,6 @@ public:
     static double cubic(const double dIn);
 };
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // INTERPOLATION_H
+#endif // VIZ_INTERPOLATION_H

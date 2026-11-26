@@ -40,13 +40,12 @@
     },
     {
       "name": "model",
-      "description": "Domain models and format bridges assembled from the I/O layer, and mne_viz: what the viewers show and how they behave (figures, views, GPU frames, forms, view models) without a GUI toolkit.",
+      "description": "Domain models and format bridges assembled from the I/O layer.",
       "libraries": [
         "mne_mne",
         "mne_mri",
         "mne_sts",
-        "mne_bids",
-        "mne_viz"
+        "mne_bids"
       ]
     },
     {
@@ -80,6 +79,13 @@
       "description": "Signal processing pipelines that orchestrate the analysis layer.",
       "libraries": [
         "mne_dsp"
+      ]
+    },
+    {
+      "name": "visualization",
+      "description": "mne_viz: what the viewers show and how they behave without a GUI toolkit (figures, views, GPU frames, forms, view models, the brain view's content), built on the data libraries below, like MNE-Python's mne.viz.",
+      "libraries": [
+        "mne_viz"
       ]
     },
     {

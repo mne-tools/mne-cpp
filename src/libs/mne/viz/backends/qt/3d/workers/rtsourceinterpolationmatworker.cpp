@@ -16,8 +16,8 @@
 
 #include "rtsourceinterpolationmatworker.h"
 
-#include "../helpers/interpolation.h"
-#include "../helpers/geometryinfo.h"
+#include "../../../../brain/interpolation.h"
+#include "../../../../brain/geometryinfo.h"
 #include <mne/base/log.h>
 #include <mne/fs/fs_label.h>
 

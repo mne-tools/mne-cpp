@@ -11,32 +11,32 @@
  * @brief    Surface-constrained geodesic distance and sensor-to-mesh projection helpers.
  *
  * GeometryInfo provides the geometric kernels that drive every
- * smooth source / sensor overlay in mne_viz_qt. @ref mne::viz::qt::GeometryInfo::scdc "scdc" runs a
+ * smooth source / sensor overlay in mne_viz_qt. @ref mne::viz::GeometryInfo::scdc "scdc" runs a
  * multi-source Dijkstra on the surface adjacency graph to compute
  * geodesic (surface-constrained) distances from a set of seed
  * vertices to all vertices on the mesh; the result is used by
- * @ref mne::viz::qt::Interpolation to build a sparse weight matrix that propagates
+ * @ref mne::viz::Interpolation to build a sparse weight matrix that propagates
  * source / sensor values across the cortex without crossing sulci.
  *
- * @ref mne::viz::qt::GeometryInfo::scdcInterpolationMat "scdcInterpolationMat" fuses the Dijkstra pass and the
+ * @ref mne::viz::GeometryInfo::scdcInterpolationMat "scdcInterpolationMat" fuses the Dijkstra pass and the
  * weight-matrix construction so the dense distance table is never
  * materialised &mdash; essential for high-resolution ico-5 source spaces
  * where the dense table would exceed several gigabytes.
  *
- * @ref mne::viz::qt::GeometryInfo::projectSensors "projectSensors" performs Euclidean nearest-vertex projection
+ * @ref mne::viz::GeometryInfo::projectSensors "projectSensors" performs Euclidean nearest-vertex projection
  * for MEG / EEG sensors onto the head or helmet mesh; @ref
- * mne::viz::qt::GeometryInfo::filterBadChannels "filterBadChannels" prunes columns of the distance table for
+ * mne::viz::GeometryInfo::filterBadChannels "filterBadChannels" prunes columns of the distance table for
  * channels marked bad in the @ref mne::FiffInfo.
  */
 
-#ifndef GEOMETRYINFO_H
-#define GEOMETRYINFO_H
+#ifndef VIZ_GEOMETRYINFO_H
+#define VIZ_GEOMETRYINFO_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
+#include "../viz_global.h"
 #include <mne/fiff/fiff_evoked.h>
 
 //=============================================================================================================
@@ -61,7 +61,7 @@
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 #define FLOAT_INFINITY std::numeric_limits<float>::infinity()
@@ -75,7 +75,7 @@ namespace mne::viz::qt
  * @snippet ex_disp3d_scene/main.cpp geometry_info_usage
  */
 
-class VIZQTSHARED_EXPORT GeometryInfo
+class VIZSHARED_EXPORT GeometryInfo
 {
 public:
     GeometryInfo() = delete;
@@ -170,6 +170,6 @@ double GeometryInfo::squared(double dBase)
     return dBase * dBase;
 }
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // GEOMETRYINFO_H
+#endif // VIZ_GEOMETRYINFO_H

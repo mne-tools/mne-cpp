@@ -25,7 +25,6 @@ endif()
 
 target_link_libraries(test_inv_rt_library PRIVATE
     mne_viz_qt
-    mne_viz_qt
     mne_dsp
     mne_connectivity
     mne_inv

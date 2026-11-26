@@ -389,6 +389,12 @@ aliases; replace the old spelling as below.
   GPU frames, or SVG) or a FreeSurfer surface with a source estimate (PNG)
   headless, without Qt, a window system or a GPU, on the software backend of
   `mne_viz`; `--autoscale` scales channel types to their signals.
+- `mne_viz` sits in its own "visualization" layer above the data and
+  processing libraries, like MNE-Python's `mne.viz`, so the content of the
+  brain view can move out of the Qt backend into `viz/brain/`. First moved:
+  `GeometryInfo` (surface-constrained distances) and `Interpolation`
+  (sensor-to-surface interpolation matrices), from
+  `viz/backends/qt/3d/helpers/` to `viz/brain/` (`mne::viz`).
 - Views run in any backend through `viz/host/surface.h`: a backend implements
   `viz::Surface` (redraw requests, clock, pointer shape) and drives a
   `viz::SurfaceClient` (resize, pointer, wheel and key events, animation

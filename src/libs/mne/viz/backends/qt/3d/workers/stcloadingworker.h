@@ -13,7 +13,7 @@
  * background thread, parses them into an @ref
  * mne::InvSourceEstimate per hemisphere and builds the sparse
  * vertex-to-source interpolation matrix using
- * @ref mne::viz::qt::GeometryInfo::scdc "GeometryInfo::scdc" / @ref mne::viz::qt::Interpolation::createInterpolationMat "Interpolation::createInterpolationMat"
+ * @ref mne::viz::GeometryInfo::scdc "GeometryInfo::scdc" / @ref mne::viz::Interpolation::createInterpolationMat "Interpolation::createInterpolationMat"
  * with a configurable geodesic cancel distance.
  *
  * On completion the controller signals the GUI to attach the data

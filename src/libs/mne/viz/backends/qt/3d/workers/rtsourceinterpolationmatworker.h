@@ -9,8 +9,8 @@
  * @date     March 2026
  * @brief    Background worker that builds the sparse source-to-vertex interpolation matrix for one hemisphere.
  *
- * Encapsulates the heavy-weight @ref mne::viz::qt::GeometryInfo::scdc "GeometryInfo::scdc" (geodesic
- * distance Dijkstra) and @ref mne::viz::qt::Interpolation::createInterpolationMat "Interpolation::createInterpolationMat"
+ * Encapsulates the heavy-weight @ref mne::viz::GeometryInfo::scdc "GeometryInfo::scdc" (geodesic
+ * distance Dijkstra) and @ref mne::viz::Interpolation::createInterpolationMat "Interpolation::createInterpolationMat"
  * (distance-based sparse weight build) calls. It supports two
  * @ref mne::viz::qt::RtSourceInterpolationMatWorker::VisualizationType "VisualizationType" modes: @c InterpolationBased uses the
  * smooth distance kernel, @c AnnotationBased uses a per-parcel

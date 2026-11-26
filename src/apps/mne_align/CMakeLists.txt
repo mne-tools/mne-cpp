@@ -28,7 +28,6 @@ set(MNE_LIBS_REQUIRED
     mne_fs
     mne_mne
     mne_viz_qt
-    mne_viz_qt
 )
 
 #---------------------------------------------------------------------------

@@ -41,7 +41,6 @@ set(MNE_LIBS_REQUIRED
     mne_math
   mne_events
   mne_viz_qt
-  mne_viz_qt
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

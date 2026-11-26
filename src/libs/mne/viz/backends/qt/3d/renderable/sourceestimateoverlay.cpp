@@ -20,8 +20,8 @@
 
 #include "brainsurface.h"
 #include "../core/rendertypes.h"
-#include "../helpers/interpolation.h"
-#include "../helpers/geometryinfo.h"
+#include "../../../../brain/interpolation.h"
+#include "../../../../brain/geometryinfo.h"
 #include <mne/viz/backends/qt/plots/helpers/colormap.h>
 
 //=============================================================================================================
@@ -149,7 +149,7 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface* surface, int timeIndex)
         interpMat->cols() == sourceData.size()) {
         // Use interpolation to spread values to all vertices
         // Note: interpolateSignal returns by value, not a shared pointer, so assignment matches
-        interpolatedData = mne::viz::qt::Interpolation::interpolateSignal(interpMat, std::make_shared<Eigen::VectorXf>(sourceData));
+        interpolatedData = mne::viz::Interpolation::interpolateSignal(interpMat, std::make_shared<Eigen::VectorXf>(sourceData));
     } else {
         // Fall back to sparse visualization (direct mapping)
         interpolatedData = Eigen::VectorXf::Zero(vertexCount);
@@ -343,7 +343,7 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface* surface, in
     // This uses Dijkstra's algorithm via GeometryInfo::scdc
     // Note: This can be slow for many sources!
     mne::Log::debug("SourceEstimateOverlay: Computing distance table (SCDC)...");
-    std::shared_ptr<Eigen::MatrixXd> distTable = mne::viz::qt::GeometryInfo::scdc(
+    std::shared_ptr<Eigen::MatrixXd> distTable = mne::viz::GeometryInfo::scdc(
         matVertices,
         vecNeighbors,
         vecSourceVertices,
@@ -356,10 +356,10 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface* surface, in
 
     // 2. Create Interpolation Matrix
     mne::Log::debug("SourceEstimateOverlay: Creating interpolation matrix...");
-    *pMatPtr = mne::viz::qt::Interpolation::createInterpolationMat(
+    *pMatPtr = mne::viz::Interpolation::createInterpolationMat(
         vecSourceVertices,
         distTable,
-        mne::viz::qt::Interpolation::cubic, // Use cubic interpolation function
+        mne::viz::Interpolation::cubic, // Use cubic interpolation function
         cancelDist);
 
     if (*pMatPtr && (*pMatPtr)->rows() > 0) {
