@@ -59,6 +59,8 @@ class DashboardTests(unittest.TestCase):
         dashboard = json.loads(self.files["quality-baseline.json"])
         g1 = dashboard["gates"]["G1_test_integrity"]
         g1["ci_not_executed"] = {}
+        # Independent of the pinned CI run, which lags behind tests added since
+        g1["ci_executed"] = {platform: g1["registered"] for platform in g1["ci_executed"]}
         row = next(line for line in report.render_dashboard(dashboard).splitlines() if "runs in CI" in line)
         self.assertTrue(row.endswith("| met |"), row)
         g1["ci_not_executed"] = {"ubuntu-24.04": ["test_new"]}
