@@ -76,8 +76,8 @@
       "missing_tests": []
     },
     "disp": {
-      "classes": 73,
-      "tested": 15,
+      "classes": 74,
+      "tested": 16,
       "untested": [
         "AbstractView",
         "ApplyToView",

@@ -2875,7 +2875,8 @@
       "registry_classes": [
         "ChannelRhiHost",
         "ChannelRhiRenderer",
-        "ChannelWindow"
+        "ChannelWindow",
+        "RhiFrameRenderer"
       ]
     },
     {

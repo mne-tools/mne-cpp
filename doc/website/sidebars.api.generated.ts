@@ -684,7 +684,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/disp/average-layout-widget',
         'api/disp/channel-rhi-renderer',
         'api/disp/channel-rhi-host',
-        'api/disp/channel-window'
+        'api/disp/channel-window',
+        'api/disp/rhi-frame-renderer'
       ],
     },
     {
