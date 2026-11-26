@@ -1,3 +1,3 @@
 scripts/build/build_and_test.sh text eol=lf
 # Golden files are compared byte for byte; no CRLF conversion on Windows checkouts
-src/tests/test_scene_render/data/*.svg -text
+src/tests/*/data/*.svg -text
