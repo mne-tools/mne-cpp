@@ -41,6 +41,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <cmath>
 #include <optional>
 #include <utility>
@@ -83,20 +84,27 @@ SettingsPanel::SettingsPanel(std::shared_ptr<SettingsForm> form, QWidget* parent
 {
     setWindowTitle(qt(m_form.title()));
     auto* layout = new QVBoxLayout(this);
-    for (const std::string& group : m_form.groups()) {
+    for (const std::string& group : m_form.groups()) { // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks): Qt parents own the layouts
+        const auto shown = [&group](const SettingField& field) {
+            return field.group == group && !field.hidden;
+        };
+        if (std::none_of(m_form.fields().begin(), m_form.fields().end(), shown)) {
+            continue;
+        }
         QFormLayout* formLayout = nullptr;
         if (group.empty()) {
             auto* holder = new QWidget(this);
+            layout->addWidget(holder);
             formLayout = new QFormLayout(holder);
             formLayout->setContentsMargins(0, 0, 0, 0);
-            layout->addWidget(holder);
         } else {
             auto* box = new QGroupBox(qt(group), this);
             formLayout = new QFormLayout(box);
             layout->addWidget(box);
+            m_groups[group] = box;
         }
         for (const SettingField& field : m_form.fields()) {
-            if (field.group == group) {
+            if (shown(field)) {
                 buildField(field, formLayout);
             }
         }
@@ -336,6 +344,13 @@ void SettingsPanel::updateConditions()
             row.label->setVisible(visible);
         }
     }
+    // A group box shows while one of its fields does
+    for (const auto& [group, box] : m_groups) {
+        const bool any = std::any_of(m_form.fields().begin(), m_form.fields().end(), [this, &group](const SettingField& field) {
+            return field.group == group && m_rows.contains(field.key) && m_form.is_visible(field.key);
+        });
+        box->setVisible(any);
+    }
 }
 
 //=============================================================================================================
@@ -364,7 +379,7 @@ void SettingsPanel::loadSettings(const QString& path)
     QSettings settings(QStringLiteral("MNECPP"));
     for (const SettingField& field : m_form.fields()) {
         const QString name = path + QLatin1Char('/') + qt(field.key);
-        if (!settings.contains(name)) {
+        if (!field.persistent || !settings.contains(name)) {
             continue;
         }
         const QVariant stored = settings.value(name);
@@ -399,6 +414,9 @@ void SettingsPanel::saveSettings(const QString& path) const
     }
     QSettings settings(QStringLiteral("MNECPP"));
     for (const auto& [key, value] : m_form.values()) {
+        if (const SettingField* field = m_form.field(key); !field || !field->persistent) {
+            continue;
+        }
         const QString name = path + QLatin1Char('/') + qt(key);
         std::visit(
             [&settings, &name](const auto& v) {

@@ -31,6 +31,7 @@
 #include "../disp_global.h"
 #include "abstractview.h"
 #include <mne/fiff/fiff_ch_info.h>
+#include <mne/scene/settings_form.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -43,22 +44,13 @@
 //=============================================================================================================
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-class QCheckBox;
-class QDoubleSpinBox;
-class QSpinBox;
-class QGridLayout;
-
-namespace Ui
-{
-class AverageSettingsViewWidget;
-}
 
 namespace mne
 {
@@ -76,6 +68,8 @@ namespace mne::disp
 //=============================================================================================================
 // mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
+
+class SettingsPanel;
 
 //=============================================================================================================
 /**
@@ -149,20 +143,26 @@ protected:
      */
     void redrawGUI();
 
+    //=========================================================================================================
+    /**
+     * Composes the thresholds of the present channel types, emits them and stores the settings.
+     */
     void onChangeArtifactThreshold();
 
-    std::map<std::string, QDoubleSpinBox*> m_mapChThresholdsDoubleSpinBoxes;
-    std::map<std::string, QSpinBox*> m_mapChThresholdsSpinBoxes;
+    //=========================================================================================================
+    /**
+     * Composes m_mapThresholds from the activation and the mantissa and exponent of each present channel type.
+     */
+    void updateThresholdMap();
 
-    std::map<std::string, double> m_mapThresholdsFirst;
-    std::map<std::string, int> m_mapThresholdsSecond;
-    std::map<std::string, double> m_mapThresholds;
+    std::shared_ptr<scene::SettingsForm> m_pForm; /**< Activation and per-type mantissa and exponent, built by m_pPanel. */
+    QPointer<SettingsPanel> m_pPanel;             /**< Qt Widgets of the form. */
+    int m_listener = 0;                           /**< Id of the view's listener on the form. */
+    bool m_bSilent = false;                       /**< Whether form changes are applied without signals. */
 
-    std::vector<mne::FiffChInfo> m_fiffChInfoList;
+    std::map<std::string, double> m_mapThresholds; /**< Activation ("Active") and threshold of each present channel type. */
 
-    bool m_bDoArtifactThresholdReduction = false;
-
-    QPointer<QCheckBox> m_pArtifactRejectionCheckBox;
+    std::vector<mne::FiffChInfo> m_fiffChInfoList; /**< Channels whose types get a threshold. */
 
 signals:
     void changeArtifactThreshold(const std::map<std::string, double>& mapThresholds);

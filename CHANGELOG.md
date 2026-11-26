@@ -375,9 +375,14 @@ aliases; replace the old spelling as below.
   enabled/visible conditions, keeps the values valid and tells listeners
   about changes. `disp::SettingsPanel` builds the Qt Widgets of any form and
   persists its values in `QSettings`, so another toolkit needs one builder
-  instead of a hand-written view per panel. `CovarianceSettingsView` and
-  `SpectrumSettingsView` are built from forms; their APIs are unchanged.
-  The Qt usage ceiling of `disp` drops to 4543 tokens.
+  instead of a hand-written view per panel. Flags (`add_flag()`) hold host
+  modes that conditions refer to without being shown or stored, fields can
+  opt out of persistence, and group boxes hide while none of their fields
+  shows. `CovarianceSettingsView`, `SpectrumSettingsView`,
+  `AveragingSettingsView`, `FilterSettingsView`, `ArtifactSettingsView` and
+  `TfSettingsView` are built from forms; their APIs, signals and `QSettings`
+  keys are unchanged and three `.ui` files are gone. The Qt usage ceiling of
+  `disp` drops to 4519 tokens.
 - The data behind the raw-data views moved to `mne_scene` as well.
   `TraceBuffer` (`scene/trace_buffer.h`) stores the samples of the trace view
   (replaced, or appended to with a capacity), resolves the channel

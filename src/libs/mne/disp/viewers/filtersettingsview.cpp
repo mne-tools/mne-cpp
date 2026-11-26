@@ -18,24 +18,22 @@
 //=============================================================================================================
 
 #include "filtersettingsview.h"
-
+#include "../detail/scoped_flag.h"
 #include "filterdesignview.h"
-#include "ui_filtersettingsview.h"
+#include "settingspanel.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QCheckBox>
-#include <QGridLayout>
-#include <QPushButton>
-#include <QSettings>
+#include <QVBoxLayout>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <memory>
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -51,12 +49,42 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
                                        QWidget* parent,
                                        Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pUi(std::make_unique<Ui::FilterSettingsViewWidget>())
+, m_pForm(std::make_shared<scene::SettingsForm>("Filter Settings"))
 {
     m_sSettingsPath = sSettingsPath;
     this->setWindowTitle("Filter Settings");
 
-    m_pUi->setupUi(this);
+    m_pForm->add_flag("clinical");
+    m_pForm->add_bool("filterActivated", "Activate filter", false);
+    m_pForm->add_choice("filterChannelType", "Channel type", {{"All", "All"}, {"MEG", "MEG"}, {"EEG", "EEG"}, {"ECG", "ECG"}, {"EOG", "EOG"}}, "All");
+    for (const auto& [key, label] : {std::pair{"filterFrom", "From"}, std::pair{"filterTo", "To"}}) {
+        scene::SettingField frequency;
+        frequency.key = key;
+        frequency.kind = scene::SettingField::Kind::Double;
+        frequency.label = label;
+        frequency.default_value = 0.0;
+        frequency.maximum = 10000000.0;
+        frequency.step = 0.1;
+        frequency.decimals = 1;
+        frequency.unit = "Hz";
+        frequency.commit = scene::SettingField::Commit::WhenFinished;
+        m_pForm->add(frequency);
+    }
+    scene::SettingField advanced;
+    advanced.key = "showFilterOptions";
+    advanced.kind = scene::SettingField::Kind::Action;
+    advanced.label = "Advanced filter design";
+    advanced.visible_if = "!clinical";
+    m_pForm->add(advanced);
+
+    m_listener = m_pForm->add_listener([this](const std::string& key, const std::optional<scene::SettingValue>&) {
+        onFormChanged(key);
+    });
+
+    auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    m_pPanel = new SettingsPanel(m_pForm, this);
+    layout->addWidget(m_pPanel);
 
     loadSettings();
 
@@ -65,36 +93,29 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
                                                        nullptr,
                                                        Qt::Dialog);
 
-    connect(m_pFilterView.get(), &FilterDesignView::updateFilterFrom, [=, this](double dFrom) {
-        m_pUi->m_pDoubleSpinBoxFrom->setValue(dFrom);
+    // The design view's pass band is shown, not handed back to it
+    connect(m_pFilterView.get(), &FilterDesignView::updateFilterFrom, this, [this](double dFrom) {
+        const detail::ScopedFlag silent(m_bSilent);
+        m_pForm->set_value("filterFrom", dFrom);
     });
-    connect(m_pFilterView.get(), &FilterDesignView::updateFilterTo, [=, this](double dTo) {
-        m_pUi->m_pDoubleSpinBoxTo->setValue(dTo);
+    connect(m_pFilterView.get(), &FilterDesignView::updateFilterTo, this, [this](double dTo) {
+        const detail::ScopedFlag silent(m_bSilent);
+        m_pForm->set_value("filterTo", dTo);
     });
 
     connect(this, &FilterSettingsView::guiStyleChanged,
             m_pFilterView.get(), &FilterDesignView::guiStyleChanged);
 
-    m_pUi->m_pDoubleSpinBoxFrom->setValue(m_pFilterView->getFrom());
-    m_pUi->m_pDoubleSpinBoxTo->setValue(m_pFilterView->getTo());
-
-    //Connect GUI elements
-    connect(m_pUi->m_pCheckBoxActivateFilter, &QCheckBox::toggled,
-            this, &FilterSettingsView::onFilterActivationChanged);
-    connect(m_pUi->m_pPushButtonShowFilterOptions, &QPushButton::clicked,
-            this, &FilterSettingsView::onShowFilterView);
-    connect(m_pUi->m_pDoubleSpinBoxFrom, &QDoubleSpinBox::editingFinished,
-            this, &FilterSettingsView::onFilterFromChanged);
-    connect(m_pUi->m_pDoubleSpinBoxTo, &QDoubleSpinBox::editingFinished,
-            this, &FilterSettingsView::onFilterToChanged);
-    connect(m_pUi->m_pcomboBoxChannelTypes, &QComboBox::currentTextChanged,
-            this, &FilterSettingsView::onFilterChannelTypeChanged);
+    const detail::ScopedFlag silent(m_bSilent);
+    m_pForm->set_value("filterFrom", m_pFilterView->getFrom());
+    m_pForm->set_value("filterTo", m_pFilterView->getTo());
 }
 
 //=============================================================================================================
 
 FilterSettingsView::~FilterSettingsView()
 {
+    m_pForm->remove_listener(m_listener);
     saveSettings();
 }
 
@@ -109,7 +130,7 @@ std::shared_ptr<FilterDesignView> FilterSettingsView::getFilterView()
 
 bool FilterSettingsView::getFilterActive()
 {
-    return m_pUi->m_pCheckBoxActivateFilter->isChecked();
+    return m_pForm->get<bool>("filterActivated");
 }
 
 //=============================================================================================================
@@ -117,17 +138,11 @@ bool FilterSettingsView::getFilterActive()
 void FilterSettingsView::setSamplingRate(double dSFreq)
 {
     //Update min max of spin boxes to nyquist
-    double nyquistFrequency = dSFreq / 2;
-
-    m_pUi->m_pDoubleSpinBoxFrom->setMaximum(nyquistFrequency);
-    m_pUi->m_pDoubleSpinBoxTo->setMaximum(nyquistFrequency);
-
-    if (m_pUi->m_pDoubleSpinBoxFrom->value() > dSFreq / 2) {
-        m_pUi->m_pDoubleSpinBoxFrom->setValue(dSFreq / 2);
-    }
-
-    if (m_pUi->m_pDoubleSpinBoxTo->value() > dSFreq / 2) {
-        m_pUi->m_pDoubleSpinBoxTo->setValue(dSFreq / 2);
+    const double nyquistFrequency = dSFreq / 2;
+    {
+        const detail::ScopedFlag silent(m_bSilent);
+        m_pForm->set_range("filterFrom", 0.0, nyquistFrequency);
+        m_pForm->set_range("filterTo", 0.0, nyquistFrequency);
     }
 
     m_pFilterView->setSamplingRate(dSFreq);
@@ -141,12 +156,7 @@ void FilterSettingsView::saveSettings()
         return;
     }
 
-    QSettings settings("MNECPP");
-
-    settings.setValue(m_sSettingsPath + QString("/FilterSettingsView/filterActivated"), m_pUi->m_pCheckBoxActivateFilter->isChecked());
-    settings.setValue(m_sSettingsPath + QString("/FilterSettingsView/filterFrom"), m_pUi->m_pDoubleSpinBoxFrom->value());
-    settings.setValue(m_sSettingsPath + QString("/FilterSettingsView/filterTo"), m_pUi->m_pDoubleSpinBoxTo->value());
-    settings.setValue(m_sSettingsPath + QString("/FilterSettingsView/filterChannelType"), m_pUi->m_pcomboBoxChannelTypes->currentText());
+    m_pPanel->saveSettings(m_sSettingsPath + QString("/FilterSettingsView"));
 }
 
 //=============================================================================================================
@@ -157,26 +167,15 @@ void FilterSettingsView::loadSettings()
         return;
     }
 
-    QSettings settings("MNECPP");
-
-    m_pUi->m_pCheckBoxActivateFilter->setChecked(settings.value(m_sSettingsPath + QString("/FilterSettingsView/filterActivated"), false).toBool());
-    m_pUi->m_pDoubleSpinBoxTo->setValue(settings.value(m_sSettingsPath + QString("/FilterSettingsView/filterTo"), 0).toDouble());
-    m_pUi->m_pDoubleSpinBoxFrom->setValue(settings.value(m_sSettingsPath + QString("/FilterSettingsView/filterFrom"), 0).toDouble());
-    m_pUi->m_pcomboBoxChannelTypes->setCurrentText(settings.value(m_sSettingsPath + QString("/FilterSettingsView/filterChannelType"), "All").toString());
+    const detail::ScopedFlag silent(m_bSilent);
+    m_pPanel->loadSettings(m_sSettingsPath + QString("/FilterSettingsView"));
 }
 
 //=============================================================================================================
 
 void FilterSettingsView::updateGuiMode(GuiMode mode)
 {
-    switch (mode) {
-        case GuiMode::Clinical:
-            m_pUi->m_pPushButtonShowFilterOptions->hide();
-            break;
-        default: // default is research mode
-            m_pUi->m_pPushButtonShowFilterOptions->show();
-            break;
-    }
+    m_pForm->set_value("clinical", mode == GuiMode::Clinical);
 }
 
 //=============================================================================================================
@@ -206,42 +205,33 @@ void FilterSettingsView::onShowFilterView()
 
 //=============================================================================================================
 
-void FilterSettingsView::onFilterActivationChanged()
+void FilterSettingsView::onFormChanged(const std::string& key)
 {
-    emit filterActivationChanged(m_pUi->m_pCheckBoxActivateFilter->isChecked());
-
-    saveSettings();
-}
-
-//=============================================================================================================
-
-void FilterSettingsView::onFilterFromChanged()
-{
-    m_pFilterView->setFrom(m_pUi->m_pDoubleSpinBoxFrom->value());
-
-    saveSettings();
-}
-
-//=============================================================================================================
-
-void FilterSettingsView::onFilterToChanged()
-{
-    if (m_pUi->m_pDoubleSpinBoxFrom->value() >= 2) {
-        m_pUi->m_pDoubleSpinBoxFrom->setMaximum(m_pUi->m_pDoubleSpinBoxTo->value() - 1);
-    } else {
-        m_pUi->m_pDoubleSpinBoxFrom->setMaximum(m_pUi->m_pDoubleSpinBoxTo->value());
+    if (m_bSilent || !m_pFilterView) {
+        return;
     }
 
-    m_pFilterView->setTo(m_pUi->m_pDoubleSpinBoxTo->value());
-
-    saveSettings();
-}
-
-//=============================================================================================================
-
-void FilterSettingsView::onFilterChannelTypeChanged(const QString& sType)
-{
-    m_pFilterView->setChannelType(sType);
+    if (key == "showFilterOptions") {
+        onShowFilterView();
+        return;
+    }
+    if (key == "filterActivated") {
+        emit filterActivationChanged(m_pForm->get<bool>(key));
+    } else if (key == "filterFrom") {
+        m_pFilterView->setFrom(m_pForm->get<double>(key));
+    } else if (key == "filterTo") {
+        const double to = m_pForm->get<double>(key);
+        {
+            // The lower edge stays below the upper one
+            const detail::ScopedFlag silent(m_bSilent);
+            m_pForm->set_range("filterFrom", 0.0, m_pForm->get<double>("filterFrom") >= 2 ? to - 1 : to);
+        }
+        m_pFilterView->setTo(to);
+    } else if (key == "filterChannelType") {
+        m_pFilterView->setChannelType(QString::fromStdString(m_pForm->get<std::string>(key)));
+    } else {
+        return;
+    }
 
     saveSettings();
 }

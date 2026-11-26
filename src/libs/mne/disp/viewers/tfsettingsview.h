@@ -26,6 +26,7 @@
 
 #include "../disp_global.h"
 #include "abstractview.h"
+#include <mne/scene/settings_form.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -36,11 +37,6 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-namespace Ui
-{
-class TfSettingsViewWidget;
-}
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne::disp
@@ -124,7 +120,8 @@ protected:
      */
     void onNumberTrialRowChanged();
 
-    std::unique_ptr<Ui::TfSettingsViewWidget> m_pUi;
+    std::shared_ptr<scene::SettingsForm> m_pForm; /**< Trial and row number, built into spin boxes by a SettingsPanel. */
+    int m_listener = 0;                           /**< Id of the view's listener on the form. */
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 

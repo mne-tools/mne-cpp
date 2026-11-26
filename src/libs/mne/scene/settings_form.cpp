@@ -172,6 +172,19 @@ const SettingField& SettingsForm::add_text(const std::string& key, const std::st
 
 //=============================================================================================================
 
+const SettingField& SettingsForm::add_flag(const std::string& key, bool value)
+{
+    SettingField f;
+    f.key = key;
+    f.kind = SettingField::Kind::Bool;
+    f.default_value = value;
+    f.hidden = true;
+    f.persistent = false;
+    return add(std::move(f));
+}
+
+//=============================================================================================================
+
 const SettingField& SettingsForm::add_action(const std::string& key, const std::string& label, const std::string& group)
 {
     SettingField f;
@@ -410,7 +423,7 @@ bool SettingsForm::is_enabled(const std::string& key) const
 bool SettingsForm::is_visible(const std::string& key) const
 {
     const SettingField* f = field(key);
-    return f && condition_holds(f->visible_if);
+    return f && !f->hidden && condition_holds(f->visible_if);
 }
 
 //=============================================================================================================

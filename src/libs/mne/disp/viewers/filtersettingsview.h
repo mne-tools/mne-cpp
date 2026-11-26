@@ -28,6 +28,7 @@
 
 #include "../disp_global.h"
 #include "abstractview.h"
+#include <mne/scene/settings_form.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -45,11 +46,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui
-{
-class FilterSettingsViewWidget;
-}
-
 //=============================================================================================================
 // DEFINE NAMESPACE mne::disp
 //=============================================================================================================
@@ -62,6 +58,7 @@ namespace mne::disp
 //=============================================================================================================
 
 class FilterDesignView;
+class SettingsPanel;
 
 //=============================================================================================================
 /**
@@ -168,35 +165,20 @@ protected:
 
     //=========================================================================================================
     /**
-     * This function is called whenever the filter activation changed
-     */
-    void onFilterActivationChanged();
-
-    //=========================================================================================================
-    /**
-     * This function is called whenever the filter parameters From changed
-     */
-    void onFilterFromChanged();
-
-    //=========================================================================================================
-    /**
-     * This function is called whenever the filter parameters To changed
-     */
-    void onFilterToChanged();
-
-    //=========================================================================================================
-    /**
-     * This function is called whenever the channel type changed
+     * Reacts to a changed field or a triggered action of the form.
      *
-     * @param[in] sType        the channel type.
+     * @param[in] key   Key of the field or action.
      */
-    void onFilterChannelTypeChanged(const QString& sType);
+    void onFormChanged(const std::string& key);
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
     std::shared_ptr<FilterDesignView> m_pFilterView; /**< The filter view. */
 
-    std::unique_ptr<Ui::FilterSettingsViewWidget> m_pUi; /**< The filter settings GUI view. */
+    std::shared_ptr<scene::SettingsForm> m_pForm; /**< Activation, channel type and pass band, built by m_pPanel. */
+    QPointer<SettingsPanel> m_pPanel;             /**< Qt Widgets of the form. */
+    int m_listener = 0;                           /**< Id of the view's listener on the form. */
+    bool m_bSilent = false;                       /**< Whether form changes are applied without reactions, e.g. while loading. */
 };
 } // NAMESPACE
 

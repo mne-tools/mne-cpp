@@ -18,27 +18,24 @@
 //=============================================================================================================
 
 #include "artifactsettingsview.h"
-#include "../detail/layout_reset.h"
+#include "../detail/scoped_flag.h"
+#include "settingspanel.h"
 
-#include <mne/base/string_utils.h>
 #include <mne/fiff/fiff_ch_info.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSettings>
-#include <QLabel>
-#include <QGridLayout>
-#include <QCheckBox>
-#include <QDoubleSpinBox>
-#include <QSpinBox>
+#include <QVBoxLayout>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <algorithm>
+#include <array>
+#include <cmath>
 #include <memory>
 #include <string>
 #include <vector>
@@ -51,6 +48,56 @@ using namespace mne::disp;
 using namespace mne;
 
 //=============================================================================================================
+// DEFINE STATIC HELPERS
+//=============================================================================================================
+
+namespace
+{
+
+/** Channel types with a threshold, in the order of the panel. */
+constexpr std::array<const char*, 6> kChannelTypes = {"grad", "mag", "eeg", "ecg", "emg", "eog"};
+
+/** Key of the flag that a channel type is present. */
+std::string presentKey(const std::string& type)
+{
+    return "present/" + type;
+}
+
+/** Key of the mantissa of a threshold; also its QSettings key. */
+std::string mantissaKey(const std::string& type)
+{
+    return "artifactThresholdsFirst/" + type;
+}
+
+/** Key of the decimal exponent of a threshold; also its QSettings key. */
+std::string exponentKey(const std::string& type)
+{
+    return "artifactThresholdsSecond/" + type;
+}
+
+/** The channel type of a channel that gets a threshold, or none. */
+const char* channelType(const FiffChInfo& channel)
+{
+    switch (channel.kind) {
+        case FIFFV_MEG_CH:
+            return channel.unit == FIFF_UNIT_T_M ? "grad" : channel.unit == FIFF_UNIT_T ? "mag"
+                                                                                        : nullptr;
+        case FIFFV_EEG_CH:
+            return "eeg";
+        case FIFFV_EOG_CH:
+            return "eog";
+        case FIFFV_EMG_CH:
+            return "emg";
+        case FIFFV_ECG_CH:
+            return "ecg";
+        default:
+            return nullptr;
+    }
+}
+
+} // namespace
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -58,6 +105,7 @@ ArtifactSettingsView::ArtifactSettingsView(const QString& sSettingsPath,
                                            const std::vector<FiffChInfo>& fiffChInfoList,
                                            QWidget* parent)
 : AbstractView(parent)
+, m_pForm(std::make_shared<scene::SettingsForm>("Artifact Rejection Settings"))
 , m_fiffChInfoList(fiffChInfoList)
 {
     m_sSettingsPath = sSettingsPath;
@@ -67,14 +115,61 @@ ArtifactSettingsView::ArtifactSettingsView(const QString& sSettingsPath,
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
 
+    // One row per channel type, shown while channels of the type are present
+    m_pForm->add_flag("hasChannelTypes");
+    scene::SettingField active;
+    active.key = "doArtifactThresholdReduction";
+    active.kind = scene::SettingField::Kind::Bool;
+    active.label = "Activate artifact rejection";
+    active.default_value = false;
+    active.visible_if = "hasChannelTypes";
+    m_pForm->add(active);
+    for (const std::string type : kChannelTypes) {
+        m_pForm->add_flag(presentKey(type));
+
+        scene::SettingField mantissa;
+        mantissa.key = mantissaKey(type);
+        mantissa.kind = scene::SettingField::Kind::Double;
+        mantissa.label = type;
+        mantissa.default_value = 1.0;
+        mantissa.maximum = 100000.0;
+        mantissa.prefix = "+/-";
+        mantissa.visible_if = presentKey(type);
+        m_pForm->add(mantissa);
+
+        scene::SettingField exponent;
+        exponent.key = exponentKey(type);
+        exponent.kind = scene::SettingField::Kind::Int;
+        exponent.default_value = -1;
+        exponent.minimum = -10000;
+        exponent.maximum = 0;
+        exponent.decimals = 0;
+        exponent.prefix = "e";
+        exponent.visible_if = presentKey(type);
+        m_pForm->add(exponent);
+    }
+
+    m_listener = m_pForm->add_listener([this](const std::string& key, const std::optional<scene::SettingValue>&) {
+        if (!m_bSilent && (key == "doArtifactThresholdReduction" || key.starts_with("artifactThresholds"))) {
+            onChangeArtifactThreshold();
+        }
+    });
+
+    auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    m_pPanel = new SettingsPanel(m_pForm, this);
+    layout->addWidget(m_pPanel);
+
     loadSettings();
     redrawGUI();
+    updateThresholdMap();
 }
 
 //=============================================================================================================
 
 ArtifactSettingsView::~ArtifactSettingsView()
 {
+    m_pForm->remove_listener(m_listener);
     saveSettings();
 }
 
@@ -109,11 +204,7 @@ void ArtifactSettingsView::setThresholdMap(const std::map<std::string, double>& 
 
 bool ArtifactSettingsView::getDoArtifactThresholdRejection()
 {
-    if (m_pArtifactRejectionCheckBox) {
-        return m_pArtifactRejectionCheckBox->isChecked();
-    }
-
-    return false;
+    return m_pForm->get<bool>("hasChannelTypes") && m_pForm->get<bool>("doArtifactThresholdReduction");
 }
 
 //=============================================================================================================
@@ -124,68 +215,19 @@ void ArtifactSettingsView::saveSettings()
         return;
     }
 
-    // Save Settings
-    QSettings settings("MNECPP");
-
-    settings.setValue(m_sSettingsPath + QString("/ArtifactSettingsView/doArtifactThresholdReduction"), m_bDoArtifactThresholdReduction);
-
-    settings.beginGroup(m_sSettingsPath + QString("/ArtifactSettingsView/artifactThresholdsFirst"));
-    std::map<std::string, double>::const_iterator itrFirst = m_mapThresholdsFirst.cbegin();
-    while (itrFirst != m_mapThresholdsFirst.cend()) {
-        settings.setValue(QString::fromStdString(itrFirst->first), itrFirst->second);
-        ++itrFirst;
-    }
-    settings.endGroup();
-
-    settings.beginGroup(m_sSettingsPath + QString("/ArtifactSettingsView/artifactThresholdsSecond"));
-    std::map<std::string, int>::const_iterator itrSecond = m_mapThresholdsSecond.cbegin();
-    while (itrSecond != m_mapThresholdsSecond.cend()) {
-        settings.setValue(QString::fromStdString(itrSecond->first), itrSecond->second);
-        ++itrSecond;
-    }
-    settings.endGroup();
+    m_pPanel->saveSettings(m_sSettingsPath + QString("/ArtifactSettingsView"));
 }
 
 //=============================================================================================================
 
 void ArtifactSettingsView::loadSettings()
 {
-    m_mapThresholdsFirst["grad"] = 1.0;
-    m_mapThresholdsFirst["mag"] = 1.0;
-    m_mapThresholdsFirst["eeg"] = 1.0;
-    m_mapThresholdsFirst["ecg"] = 1.0;
-    m_mapThresholdsFirst["emg"] = 1.0;
-    m_mapThresholdsFirst["eog"] = 1.0;
-
-    m_mapThresholdsSecond["grad"] = -1;
-    m_mapThresholdsSecond["mag"] = -1;
-    m_mapThresholdsSecond["eeg"] = -1;
-    m_mapThresholdsSecond["ecg"] = -1;
-    m_mapThresholdsSecond["emg"] = -1;
-    m_mapThresholdsSecond["eog"] = -1;
-
     if (m_sSettingsPath.isEmpty()) {
-        m_mapThresholds["Active"] = m_bDoArtifactThresholdReduction ? 1.0 : 0.0;
         return;
     }
 
-    // Load Settings
-    QSettings settings("MNECPP");
-
-    m_bDoArtifactThresholdReduction = settings.value(m_sSettingsPath + QString("/ArtifactSettingsView/doArtifactThresholdReduction"), false).toBool();
-    m_mapThresholds["Active"] = m_bDoArtifactThresholdReduction ? 1.0 : 0.0;
-
-    settings.beginGroup(m_sSettingsPath + QString("/ArtifactSettingsView/artifactThresholdsFirst"));
-    for (const QString& key : settings.childKeys()) {
-        m_mapThresholdsFirst.insert_or_assign(key.toStdString(), settings.value(key, 1.0).toDouble());
-    }
-    settings.endGroup();
-
-    settings.beginGroup(m_sSettingsPath + QString("/ArtifactSettingsView/artifactThresholdsSecond"));
-    for (const QString& key : settings.childKeys()) {
-        m_mapThresholdsSecond.insert_or_assign(key.toStdString(), settings.value(key, -1).toInt());
-    }
-    settings.endGroup();
+    const detail::ScopedFlag silent(m_bSilent);
+    m_pPanel->loadSettings(m_sSettingsPath + QString("/ArtifactSettingsView"));
 }
 
 //=============================================================================================================
@@ -216,126 +258,39 @@ void ArtifactSettingsView::updateProcessingMode(ProcessingMode mode)
 
 void ArtifactSettingsView::redrawGUI()
 {
-    detail::resetLayout(this);
-    m_mapChThresholdsDoubleSpinBoxes.clear();
-    m_mapChThresholdsSpinBoxes.clear();
-
-    auto pGroupBoxArtifactRejection = std::make_unique<QGridLayout>();
-
-    //Artifact rejection
-    if (!m_fiffChInfoList.empty()) {
-        std::vector<std::string> channelTypes;
-        const auto addType = [&channelTypes](const char* type) {
-            if (!std::ranges::contains(channelTypes, type)) {
-                channelTypes.push_back(type);
-            }
-        };
-        int kind, unit;
-
-        for (int i = 0; i < std::ssize(m_fiffChInfoList); ++i) {
-            kind = m_fiffChInfoList.at(i).kind;
-            unit = m_fiffChInfoList.at(i).unit;
-
-            if (kind == FIFFV_MEG_CH && unit == FIFF_UNIT_T_M) {
-                addType("grad");
-            }
-            if (kind == FIFFV_MEG_CH && unit == FIFF_UNIT_T) {
-                addType("mag");
-            }
-            if (kind == FIFFV_EEG_CH) {
-                addType("eeg");
-            }
-            if (kind == FIFFV_EOG_CH) {
-                addType("eog");
-            }
-            if (kind == FIFFV_EMG_CH) {
-                addType("emg");
-            }
-            if (kind == FIFFV_ECG_CH) {
-                addType("ecg");
-            }
-        }
-
-        if (!channelTypes.empty()) {
-            m_pArtifactRejectionCheckBox = new QCheckBox("Activate artifact rejection", this);
-            pGroupBoxArtifactRejection->addWidget(m_pArtifactRejectionCheckBox, 0, 0, 1, 2);
-            m_pArtifactRejectionCheckBox->setChecked(m_bDoArtifactThresholdReduction);
-            connect(m_pArtifactRejectionCheckBox.data(), &QCheckBox::clicked,
-                    this, &ArtifactSettingsView::onChangeArtifactThreshold);
-
-            for (int i = 0; i < std::ssize(channelTypes); ++i) {
-                QLabel* pLabel = new QLabel(QString::fromStdString(channelTypes.at(i)), this);
-                pGroupBoxArtifactRejection->addWidget(pLabel, i + 1, 0);
-
-                QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(this);
-                pDoubleSpinBox->setPrefix("+/-");
-                pDoubleSpinBox->setMinimum(0.0);
-                pDoubleSpinBox->setMaximum(100000.0);
-                pDoubleSpinBox->setValue(m_mapThresholdsFirst[channelTypes.at(i)]);
-                pGroupBoxArtifactRejection->addWidget(pDoubleSpinBox, i + 1, 1);
-                connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                        this, &ArtifactSettingsView::onChangeArtifactThreshold);
-                m_mapChThresholdsDoubleSpinBoxes[channelTypes.at(i)] = pDoubleSpinBox;
-
-                QSpinBox* pSpinBox = new QSpinBox(this);
-                pSpinBox->setPrefix("e");
-                pSpinBox->setMaximum(0);
-                pSpinBox->setMinimum(-10000);
-                pSpinBox->setValue(m_mapThresholdsSecond[channelTypes.at(i)]);
-                pGroupBoxArtifactRejection->addWidget(pSpinBox, i + 1, 2);
-                connect(pSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                        this, &ArtifactSettingsView::onChangeArtifactThreshold);
-                m_mapChThresholdsSpinBoxes[channelTypes.at(i)] = pSpinBox;
-            }
+    std::vector<std::string> present;
+    present.reserve(kChannelTypes.size());
+    for (const FiffChInfo& channel : m_fiffChInfoList) {
+        if (const char* type = channelType(channel)) {
+            present.emplace_back(type);
         }
     }
-    setLayout(pGroupBoxArtifactRejection.release());
+
+    const detail::ScopedFlag silent(m_bSilent);
+    for (const std::string type : kChannelTypes) {
+        m_pForm->set_value(presentKey(type), std::ranges::contains(present, type));
+    }
+    m_pForm->set_value("hasChannelTypes", !present.empty());
+}
+
+//=============================================================================================================
+
+void ArtifactSettingsView::updateThresholdMap()
+{
+    m_mapThresholds.clear();
+    m_mapThresholds["Active"] = getDoArtifactThresholdRejection() ? 1.0 : 0.0;
+    for (const std::string type : kChannelTypes) {
+        if (m_pForm->get<bool>(presentKey(type))) {
+            m_mapThresholds[type] = m_pForm->get<double>(mantissaKey(type)) * std::pow(10, m_pForm->get<int>(exponentKey(type)));
+        }
+    }
 }
 
 //=============================================================================================================
 
 void ArtifactSettingsView::onChangeArtifactThreshold()
 {
-    m_mapThresholds.clear();
-    m_mapThresholdsFirst.clear();
-    m_mapThresholdsSecond.clear();
-
-    if (m_pArtifactRejectionCheckBox) {
-        if (m_pArtifactRejectionCheckBox->isChecked()) {
-            m_mapThresholds["Active"] = 1.0;
-            m_bDoArtifactThresholdReduction = true;
-        } else {
-            m_mapThresholds["Active"] = 0.0;
-            m_bDoArtifactThresholdReduction = false;
-        }
-    }
-
-    for (const auto& [key, pDoubleSpinBox] : m_mapChThresholdsDoubleSpinBoxes) {
-        if (pDoubleSpinBox) {
-            const int exponent = m_mapChThresholdsSpinBoxes[key]->value();
-            m_mapThresholdsFirst[key] = pDoubleSpinBox->value();
-            m_mapThresholdsSecond[key] = exponent;
-
-            if (mne::to_lower(key).contains("grad")) {
-                m_mapThresholds["grad"] = pDoubleSpinBox->value() * pow(10, exponent);
-            }
-            if (mne::to_lower(key).contains("mag")) {
-                m_mapThresholds["mag"] = pDoubleSpinBox->value() * pow(10, exponent);
-            }
-            if (mne::to_lower(key).contains("eeg")) {
-                m_mapThresholds["eeg"] = pDoubleSpinBox->value() * pow(10, exponent);
-            }
-            if (mne::to_lower(key).contains("ecg")) {
-                m_mapThresholds["ecg"] = pDoubleSpinBox->value() * pow(10, exponent);
-            }
-            if (mne::to_lower(key).contains("eog")) {
-                m_mapThresholds["eog"] = pDoubleSpinBox->value() * pow(10, exponent);
-            }
-            if (mne::to_lower(key).contains("emg")) {
-                m_mapThresholds["emg"] = pDoubleSpinBox->value() * pow(10, exponent);
-            }
-        }
-    }
+    updateThresholdMap();
 
     emit changeArtifactThreshold(m_mapThresholds);
 

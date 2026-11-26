@@ -40,6 +40,7 @@
 #include <string>
 
 class QFormLayout;
+class QGroupBox;
 class QLabel;
 
 //=============================================================================================================
@@ -53,8 +54,8 @@ namespace mne::disp
  * @brief Qt Widgets for a scene::SettingsForm.
  *
  * The panel shares the form with its host, so it outlives the host's members when Qt deletes it as a child. Fields are laid out in the order of the form, one group box per group (fields
- * without a group come first, without a box). Custom fields get an empty container the host fills with its own
- * widget (customWidget()).
+ * without a group come first, without a box); a group box hides while none of its fields shows, and hidden fields
+ * get no widget. Custom fields get an empty container the host fills with its own widget (customWidget()).
  *
  * @since 3.0.0
  */
@@ -98,7 +99,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Reads the values stored under @p path; missing ones keep their current value.
+     * Reads the values stored under @p path; missing ones and fields that are not persistent keep their current value.
      *
      * @param[in] path   QSettings group of the panel, e.g. "MNESCAN/Averaging"; empty does nothing.
      */
@@ -106,7 +107,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Stores the values under @p path, one QSettings key per field.
+     * Stores the values under @p path, one QSettings key per persistent field.
      *
      * @param[in] path   QSettings group of the panel; empty does nothing.
      */
@@ -127,6 +128,7 @@ private:
     std::shared_ptr<scene::SettingsForm> m_pForm;
     scene::SettingsForm& m_form;
     std::map<std::string, Row> m_rows;
+    std::map<std::string, QGroupBox*> m_groups;
     int m_listener = 0;
     int m_structureListener = 0;
 };

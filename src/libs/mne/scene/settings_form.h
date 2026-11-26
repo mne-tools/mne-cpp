@@ -111,6 +111,8 @@ struct SettingField
     std::string group;                   /**< Title of the group the field is shown in; empty for none. */
     std::string enabled_if;              /**< Key of a Bool field the field needs on ("!key": off); empty for always. */
     std::string visible_if;              /**< Key of a Bool field the field is shown with ("!key": without). */
+    bool hidden = false;                 /**< Never shown, e.g. a mode flag of the host that conditions refer to. */
+    bool persistent = true;              /**< Whether hosts store the value with the other settings. */
 };
 
 /**
@@ -231,6 +233,17 @@ public:
      * @return The stored field.
      */
     const SettingField& add_text(const std::string& key, const std::string& label, const std::string& value, const std::string& group = {});
+
+    //=========================================================================================================
+    /**
+     * Adds a flag: a Bool field that is never shown or stored, e.g. a mode of the host that conditions refer to.
+     *
+     * @param[in] key     Field key.
+     * @param[in] value   Default value.
+     *
+     * @return The stored field.
+     */
+    const SettingField& add_flag(const std::string& key, bool value = false);
 
     //=========================================================================================================
     /**
@@ -376,7 +389,7 @@ public:
     /**
      * @param[in] key   Field key.
      *
-     * @return Whether the field is shown, from its visible_if condition.
+     * @return Whether the field is shown: not hidden and its visible_if condition holds.
      */
     bool is_visible(const std::string& key) const;
 

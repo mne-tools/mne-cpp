@@ -114,6 +114,28 @@ void test_conditions()
     CHECK(form.is_enabled("baseline") && !form.is_enabled("missing"));
 }
 
+void test_flags()
+{
+    SettingsForm form;
+    form.add_flag("offline");
+    SettingField compute;
+    compute.key = "compute";
+    compute.kind = SettingField::Kind::Action;
+    compute.visible_if = "offline";
+    form.add(compute);
+    form.add_bool("baseline", "Baseline correction", false);
+
+    // A flag holds a value conditions read, but is neither shown nor stored
+    const SettingField* flag = form.field("offline");
+    CHECK(flag && flag->kind == SettingField::Kind::Bool && flag->hidden && !flag->persistent);
+    CHECK(!form.is_visible("offline") && !form.is_visible("compute"));
+    CHECK(form.set_value("offline", true) && form.get<bool>("offline"));
+    CHECK(form.is_visible("compute") && !form.is_visible("offline"));
+    CHECK(form.add_flag("live", true).default_value == SettingValue(true) && form.get<bool>("live"));
+    // Ordinary fields are shown and stored
+    CHECK(!form.field("baseline")->hidden && form.field("baseline")->persistent && form.is_visible("baseline"));
+}
+
 void test_listeners()
 {
     SettingsForm form;
@@ -157,6 +179,7 @@ int main()
     const std::vector<std::pair<const char*, std::function<void()>>> tests = {
         {"fields_and_values", test_fields_and_values},
         {"conditions", test_conditions},
+        {"flags", test_flags},
         {"listeners", test_listeners},
     };
     for (const auto& [name, test] : tests) {

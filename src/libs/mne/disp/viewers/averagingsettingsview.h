@@ -31,6 +31,7 @@
 #include "../disp_global.h"
 #include "abstractview.h"
 #include <mne/fiff/fiff_ch_info.h>
+#include <mne/scene/settings_form.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -51,10 +52,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui
-{
-class AverageSettingsViewWidget;
-}
+class QGridLayout;
 
 namespace mne
 {
@@ -72,6 +70,8 @@ namespace mne::disp
 //=============================================================================================================
 // mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
+
+class SettingsPanel;
 
 //=============================================================================================================
 /**
@@ -170,27 +170,23 @@ protected:
      */
     void fillStimChannels();
 
-    void onChangePreStim();
-    void onChangePostStim();
-    void onChangeBaselineFrom();
-    void onChangeBaselineTo();
-    void onChangeNumAverages();
-    void onChangeBaselineActive(bool bActive);
-    void onChangeStimChannel();
-    void onChangeGroupSelect(int iIndex);
+    //=========================================================================================================
+    /**
+     * Reacts to a changed field or a triggered action of the form.
+     *
+     * @param[in] key   Key of the field or action.
+     */
+    void onFormChanged(const std::string& key);
 
-    std::unique_ptr<Ui::AverageSettingsViewWidget> m_pUi; /**< Holds the user interface for the AverageSettingsViewWidget.*/
+    std::shared_ptr<scene::SettingsForm> m_pForm; /**< Epoch window, baseline, stimulus channel and offline controls, built by m_pPanel. */
+    QPointer<SettingsPanel> m_pPanel;             /**< Qt Widgets of the form. */
+    QGridLayout* m_pDetectedTrials = nullptr;     /**< Table of the detected trials, the layout of the form's custom field. */
+    int m_listener = 0;                           /**< Id of the view's listener on the form. */
+    bool m_bSilent = false;                       /**< Whether form changes are applied without signals, e.g. while loading. */
 
-    std::string m_sCurrentStimChan = "STI 014";
+    std::string m_sCurrentStimChan = "STI 014"; /**< Selected stimulus channel, kept while it is not among the known ones. */
 
-    std::map<std::string, int> m_mapStimChsIndexNames;
-
-    int m_iNumAverages = 10;
-    int m_iPreStimSeconds = 100;
-    int m_iPostStimSeconds = 400;
-    int m_iBaselineFromSeconds = 0;
-    int m_iBaselineToSeconds = 0;
-    bool m_bDoBaselineCorrection = false;
+    std::map<std::string, int> m_mapStimChsIndexNames; /**< Known stimulus channels with their channel indices. */
 
 signals:
     void changePreStim(qint32 value);

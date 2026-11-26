@@ -18,14 +18,13 @@
 //=============================================================================================================
 
 #include "tfsettingsview.h"
-
-#include "ui_tfsettingsview.h"
+#include "settingspanel.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSettings>
+#include <QVBoxLayout>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -41,18 +40,21 @@ TfSettingsView::TfSettingsView(const QString& sSettingsPath,
                                QWidget* parent,
                                Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pUi(std::make_unique<Ui::TfSettingsViewWidget>())
+, m_pForm(std::make_shared<scene::SettingsForm>("Time frequency Settings"))
 {
     m_sSettingsPath = sSettingsPath;
-    m_pUi->setupUi(this);
+
+    m_pForm->add_int("trialNumber", "Trial number", 0, 0, 10000);
+    m_pForm->add_int("rowNumber", "Row number", 0, 0, 10000);
+    m_listener = m_pForm->add_listener([this](const std::string&, const std::optional<scene::SettingValue>&) {
+        onNumberTrialRowChanged();
+    });
+
+    auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(new SettingsPanel(m_pForm, this));
 
     loadSettings();
-
-    connect(m_pUi->m_spinBox_trialNumber, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, &TfSettingsView::onNumberTrialRowChanged);
-
-    connect(m_pUi->m_spinBox_rowNumber, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, &TfSettingsView::onNumberTrialRowChanged);
 
     this->setWindowTitle("Time frequency Settings");
     this->setMinimumWidth(330);
@@ -63,6 +65,7 @@ TfSettingsView::TfSettingsView(const QString& sSettingsPath,
 
 TfSettingsView::~TfSettingsView()
 {
+    m_pForm->remove_listener(m_listener);
     saveSettings();
 }
 
@@ -70,22 +73,14 @@ TfSettingsView::~TfSettingsView()
 
 void TfSettingsView::saveSettings()
 {
-    if (m_sSettingsPath.isEmpty()) {
-        return;
-    }
-
-    QSettings settings("MNECPP");
+    // The trial and row number come from the plugin; nothing is persisted
 }
 
 //=============================================================================================================
 
 void TfSettingsView::loadSettings()
 {
-    if (m_sSettingsPath.isEmpty()) {
-        return;
-    }
-
-    QSettings settings("MNECPP");
+    // The trial and row number come from the plugin; nothing is persisted
 }
 
 //=============================================================================================================
@@ -116,8 +111,7 @@ void TfSettingsView::updateProcessingMode(ProcessingMode mode)
 
 void TfSettingsView::onNumberTrialRowChanged()
 {
-    emit numberTrialRowChanged(m_pUi->m_spinBox_trialNumber->value(), m_pUi->m_spinBox_rowNumber->value());
-    saveSettings();
+    emit numberTrialRowChanged(m_pForm->get<int>("trialNumber"), m_pForm->get<int>("rowNumber"));
 }
 
 //=============================================================================================================

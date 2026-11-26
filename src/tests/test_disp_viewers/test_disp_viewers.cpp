@@ -12,7 +12,7 @@
  *           Covers: ScalingView, CompensatorView, ProjectorsView, ModalitySelectionView,
  *           MinimumNormSettingsView, FilterSettingsView, FilterDesignView,
  *           SpectrumSettingsView, AveragingSettingsView, CovarianceSettingsView,
- *           SpharaSettingsView, TfSettingsView, ConnectivitySettingsView,
+ *           ArtifactSettingsView, SettingsPanel, SpharaSettingsView, TfSettingsView, ConnectivitySettingsView,
  *           TriggerDetectionView, ProgressView, QuickControlView, and MultiView.
  */
 
@@ -30,6 +30,7 @@
 #include <mne/disp/viewers/filterdesignview.h>
 #include <mne/disp/viewers/spectrumsettingsview.h>
 #include <mne/disp/viewers/averagingsettingsview.h>
+#include <mne/disp/viewers/artifactsettingsview.h>
 #include <mne/disp/viewers/covariancesettingsview.h>
 #include <mne/disp/viewers/spharasettingsview.h>
 #include <mne/disp/viewers/tfsettingsview.h>
@@ -57,6 +58,8 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDoubleSpinBox>
+#include <QGroupBox>
+#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSettings>
@@ -162,6 +165,40 @@ private slots:
      */
     void covarianceSettingsView_lifecycle();
     void settingsPanel_buildsAndSyncsWidgets();
+
+    //=========================================================================================================
+    /**
+     * Verifies that SettingsPanel builds no widget for flags, hides group boxes without a shown field and stores
+     * only persistent fields.
+     */
+    void settingsPanel_flagsGroupsAndPersistence();
+
+    //=========================================================================================================
+    /**
+     * Verifies the form-built AveragingSettingsView: widgets per field, values both ways, signals, mode
+     * visibility and the QSettings keys.
+     */
+    void averagingSettingsView_formPanel();
+
+    //=========================================================================================================
+    /**
+     * Verifies the form-built FilterSettingsView: widgets per field, the design view in sync, the activation
+     * signal, the clinical mode and the QSettings keys.
+     */
+    void filterSettingsView_formPanel();
+
+    //=========================================================================================================
+    /**
+     * Verifies the form-built ArtifactSettingsView: rows per present channel type, composed thresholds, the
+     * threshold signal and the QSettings keys.
+     */
+    void artifactSettingsView_formPanel();
+
+    //=========================================================================================================
+    /**
+     * Verifies the form-built TfSettingsView: spin boxes for trial and row number and their signal.
+     */
+    void tfSettingsView_formPanel();
 
     //=========================================================================================================
     /**
@@ -609,6 +646,326 @@ void TestDispViewers::settingsPanel_buildsAndSyncsWidgets()
     QCOMPARE(form->get<int>("trials"), 20);
     QVERIFY(form->get<bool>("baseline"));
     QSettings(QStringLiteral("MNECPP")).remove(path);
+}
+
+//=============================================================================================================
+
+void TestDispViewers::settingsPanel_flagsGroupsAndPersistence()
+{
+    auto form = std::make_shared<scene::SettingsForm>();
+    form->add_flag("offline");
+    scene::SettingField compute;
+    compute.key = "compute";
+    compute.kind = scene::SettingField::Kind::Action;
+    compute.label = "Compute";
+    compute.group = "Offline";
+    compute.visible_if = "offline";
+    form->add(compute);
+    scene::SettingField temporary;
+    temporary.key = "temporary";
+    temporary.kind = scene::SettingField::Kind::Int;
+    temporary.label = "Temporary";
+    temporary.maximum = 10;
+    temporary.persistent = false;
+    form->add(temporary);
+    form->add_int("kept", "Kept", 1, 0, 10);
+
+    SettingsPanel panel(form);
+    panel.show();
+    // Flags get no widget; a group box shows while one of its fields does
+    QVERIFY(!panel.editor("offline"));
+    auto* box = panel.editor("compute")->parentWidget();
+    QVERIFY(qobject_cast<QGroupBox*>(box));
+    QVERIFY(box->isHidden());
+    form->set_value("offline", true);
+    QVERIFY(!box->isHidden() && !panel.editor("compute")->isHidden());
+    form->set_value("offline", false);
+    QVERIFY(box->isHidden());
+
+    // Only persistent fields are stored and read
+    const QString path = QStringLiteral("test_disp_viewers/settingsPanelPersistence");
+    QSettings(QStringLiteral("MNECPP")).remove(path);
+    form->set_value("temporary", 5);
+    form->set_value("kept", 7);
+    form->set_value("offline", true);
+    panel.saveSettings(path);
+    {
+        QSettings settings(QStringLiteral("MNECPP"));
+        QVERIFY(settings.contains(path + QStringLiteral("/kept")));
+        QVERIFY(!settings.contains(path + QStringLiteral("/temporary")));
+        QVERIFY(!settings.contains(path + QStringLiteral("/offline")));
+        settings.setValue(path + QStringLiteral("/temporary"), 9);
+    }
+    form->set_value("kept", 2);
+    panel.loadSettings(path);
+    QCOMPARE(form->get<int>("kept"), 7);
+    QCOMPARE(form->get<int>("temporary"), 5);
+    QSettings(QStringLiteral("MNECPP")).remove(path);
+}
+
+//=============================================================================================================
+
+void TestDispViewers::averagingSettingsView_formPanel()
+{
+    const QString path = QStringLiteral("test_disp_viewers_averaging_%1").arg(QCoreApplication::applicationPid());
+    QSettings(QStringLiteral("MNECPP")).remove(path);
+    const std::map<std::string, int> stimChannels = {{"STI 014", 306}, {"STI 101", 312}};
+    {
+        AveragingSettingsView view(path, stimChannels);
+        view.show();
+        auto* panel = view.findChild<SettingsPanel*>();
+        QVERIFY(panel);
+        auto* channels = qobject_cast<QComboBox*>(panel->editor("currentStimChannel"));
+        auto* pre = qobject_cast<QSpinBox*>(panel->editor("preStimSeconds"));
+        auto* post = qobject_cast<QSpinBox*>(panel->editor("postStimSeconds"));
+        auto* from = qobject_cast<QSpinBox*>(panel->editor("baselineFromSeconds"));
+        auto* num = qobject_cast<QSpinBox*>(panel->editor("numAverages"));
+        auto* baseline = qobject_cast<QCheckBox*>(panel->editor("doBaselineCorrection"));
+        QVERIFY(channels && pre && post && from && num && baseline);
+
+        // Defaults reach the widgets; the epoch window bounds the baseline
+        QCOMPARE(channels->count(), 2);
+        QCOMPARE(channels->currentText(), QStringLiteral("STI 014"));
+        QCOMPARE(view.getStimChannelIdx(), 306);
+        QCOMPARE(pre->value(), 100);
+        QCOMPARE(pre->prefix(), QStringLiteral("-"));
+        QCOMPARE(post->value(), 400);
+        QCOMPARE(num->value(), 10);
+        QCOMPARE(from->minimum(), -100);
+        QCOMPARE(from->maximum(), 400);
+
+        // Spin boxes report when editing finishes
+        QSignalSpy preSpy(&view, &AveragingSettingsView::changePreStim);
+        pre->setValue(200);
+        QCOMPARE(preSpy.count(), 0);
+        emit pre->editingFinished();
+        QCOMPARE(preSpy.count(), 1);
+        QCOMPARE(preSpy.last().at(0).toInt(), 200);
+        QCOMPARE(view.getPreStimMSeconds(), 200);
+        QCOMPARE(from->minimum(), -200);
+        from->setValue(-150);
+        emit from->editingFinished();
+        QCOMPARE(view.getBaselineFromSeconds(), -150);
+        QSignalSpy baselineSpy(&view, &AveragingSettingsView::changeBaselineActive);
+        baseline->click();
+        QCOMPARE(baselineSpy.count(), 1);
+        QVERIFY(view.getDoBaselineCorrection());
+        QSignalSpy stimSpy(&view, &AveragingSettingsView::changeStimChannel);
+        channels->setCurrentText(QStringLiteral("STI 101"));
+        QCOMPARE(stimSpy.count(), 1);
+        QCOMPARE(view.getCurrentStimCh(), std::string("STI 101"));
+        QCOMPARE(view.getStimChannelIdx(), 312);
+
+        // Realtime and offline controls follow the processing mode
+        auto* reset = panel->editor("reset");
+        auto* compute = panel->editor("compute");
+        auto* autoCompute = qobject_cast<QCheckBox*>(panel->editor("autoCompute"));
+        QVERIFY(reset && compute && autoCompute);
+        view.setProcessingMode(AbstractView::ProcessingMode::Offline);
+        QVERIFY(reset->isHidden() && channels->isHidden() && num->isHidden());
+        QVERIFY(!compute->isHidden() && !autoCompute->isHidden());
+        QSignalSpy autoSpy(&view, &AveragingSettingsView::setAutoCompute);
+        autoCompute->click();
+        QCOMPARE(autoSpy.count(), 1);
+        QVERIFY(autoSpy.last().at(0).toBool());
+        QVERIFY(view.getAutoComputeStatus());
+        view.setProcessingMode(AbstractView::ProcessingMode::RealTime);
+        QVERIFY(!reset->isHidden() && compute->isHidden());
+
+        // The detected trials show in their own group while there are some
+        auto* trials = panel->customWidget("detectedTrials");
+        QVERIFY(trials && trials->isHidden());
+        FiffEvokedSet evokedSet;
+        FiffEvoked evoked;
+        evoked.comment = "3";
+        evoked.nave = 12;
+        evokedSet.evoked.push_back(evoked);
+        view.setDetectedEpochs(evokedSet);
+        QVERIFY(!trials->isHidden());
+        QStringList texts;
+        for (QLabel* label : trials->findChildren<QLabel*>()) {
+            texts << label->text();
+        }
+        QVERIFY(texts.contains(QStringLiteral("12")));
+        view.setDetectedEpochs(FiffEvokedSet());
+        QVERIFY(trials->isHidden());
+    }
+
+    // The view stored its values under the original keys; a new view reads them
+    {
+        QSettings settings(QStringLiteral("MNECPP"));
+        const QString group = path + QStringLiteral("/AveragingSettingsView/");
+        QCOMPARE(settings.value(group + QStringLiteral("preStimSeconds")).toInt(), 200);
+        QCOMPARE(settings.value(group + QStringLiteral("baselineFromSeconds")).toInt(), -150);
+        QCOMPARE(settings.value(group + QStringLiteral("currentStimChannel")).toString(), QStringLiteral("STI 101"));
+        QVERIFY(settings.value(group + QStringLiteral("doBaselineCorrection")).toBool());
+        QVERIFY(!settings.contains(group + QStringLiteral("autoCompute")));
+        QVERIFY(!settings.contains(group + QStringLiteral("offline")));
+        settings.setValue(group + QStringLiteral("numAverages"), 33);
+    }
+    {
+        AveragingSettingsView view(path, stimChannels);
+        QCOMPARE(view.getPreStimMSeconds(), 200);
+        QCOMPARE(view.getBaselineFromSeconds(), -150);
+        QCOMPARE(view.getNumAverages(), 33);
+        QVERIFY(view.getDoBaselineCorrection());
+        QCOMPARE(view.getCurrentStimCh(), std::string("STI 101"));
+        QCOMPARE(qobject_cast<QSpinBox*>(view.findChild<SettingsPanel*>()->editor("numAverages"))->value(), 33);
+    }
+    QSettings(QStringLiteral("MNECPP")).remove(path);
+}
+
+//=============================================================================================================
+
+void TestDispViewers::filterSettingsView_formPanel()
+{
+    const QString path = QStringLiteral("test_disp_viewers_filter_%1").arg(QCoreApplication::applicationPid());
+    QSettings(QStringLiteral("MNECPP")).remove(path);
+    {
+        FilterSettingsView view(path);
+        view.show();
+        auto* panel = view.findChild<SettingsPanel*>();
+        QVERIFY(panel);
+        auto* active = qobject_cast<QCheckBox*>(panel->editor("filterActivated"));
+        auto* type = qobject_cast<QComboBox*>(panel->editor("filterChannelType"));
+        auto* from = qobject_cast<QDoubleSpinBox*>(panel->editor("filterFrom"));
+        auto* to = qobject_cast<QDoubleSpinBox*>(panel->editor("filterTo"));
+        auto* advanced = panel->editor("showFilterOptions");
+        QVERIFY(active && type && from && to && advanced);
+        QCOMPARE(type->count(), 5);
+        QCOMPARE(from->suffix(), QStringLiteral("Hz"));
+
+        // The pass band follows the design view and is handed to it when editing finishes
+        QCOMPARE(from->value(), view.getFilterView()->getFrom());
+        view.setSamplingRate(600.0);
+        QCOMPARE(to->maximum(), 300.0);
+        to->setValue(40.0);
+        emit to->editingFinished();
+        QCOMPARE(view.getFilterView()->getTo(), 40.0);
+        from->setValue(5.0);
+        emit from->editingFinished();
+        QCOMPARE(view.getFilterView()->getFrom(), 5.0);
+        type->setCurrentText(QStringLiteral("EEG"));
+        QCOMPARE(view.getFilterView()->getChannelType(), QStringLiteral("EEG"));
+
+        QSignalSpy activeSpy(&view, &FilterSettingsView::filterActivationChanged);
+        active->click();
+        QCOMPARE(activeSpy.count(), 1);
+        QVERIFY(activeSpy.last().at(0).toBool());
+        QVERIFY(view.getFilterActive());
+
+        // The clinical mode hides the advanced design
+        view.setGuiMode(AbstractView::GuiMode::Clinical);
+        QVERIFY(advanced->isHidden());
+        view.setGuiMode(AbstractView::GuiMode::Research);
+        QVERIFY(!advanced->isHidden());
+    }
+
+    {
+        QSettings settings(QStringLiteral("MNECPP"));
+        const QString group = path + QStringLiteral("/FilterSettingsView/");
+        QVERIFY(settings.value(group + QStringLiteral("filterActivated")).toBool());
+        QCOMPARE(settings.value(group + QStringLiteral("filterFrom")).toDouble(), 5.0);
+        QCOMPARE(settings.value(group + QStringLiteral("filterTo")).toDouble(), 40.0);
+        QCOMPARE(settings.value(group + QStringLiteral("filterChannelType")).toString(), QStringLiteral("EEG"));
+        QVERIFY(!settings.contains(group + QStringLiteral("clinical")));
+    }
+    {
+        FilterSettingsView view(path);
+        QVERIFY(view.getFilterActive());
+        auto* type = qobject_cast<QComboBox*>(view.findChild<SettingsPanel*>()->editor("filterChannelType"));
+        QCOMPARE(type->currentText(), QStringLiteral("EEG"));
+    }
+    QSettings(QStringLiteral("MNECPP")).remove(path);
+}
+
+//=============================================================================================================
+
+void TestDispViewers::artifactSettingsView_formPanel()
+{
+    auto channel = [](int kind, int unit) {
+        FiffChInfo ch;
+        ch.kind = kind;
+        ch.unit = unit;
+        return ch;
+    };
+    const QString path = QStringLiteral("test_disp_viewers_artifact_%1").arg(QCoreApplication::applicationPid());
+    QSettings(QStringLiteral("MNECPP")).remove(path);
+    {
+        ArtifactSettingsView view(path);
+        view.show();
+        auto* panel = view.findChild<SettingsPanel*>();
+        QVERIFY(panel);
+        auto* active = qobject_cast<QCheckBox*>(panel->editor("doArtifactThresholdReduction"));
+        auto* gradMantissa = qobject_cast<QDoubleSpinBox*>(panel->editor("artifactThresholdsFirst/grad"));
+        auto* gradExponent = qobject_cast<QSpinBox*>(panel->editor("artifactThresholdsSecond/grad"));
+        auto* eog = panel->editor("artifactThresholdsFirst/eog");
+        QVERIFY(active);
+        QVERIFY(gradMantissa);
+        QVERIFY(gradExponent);
+        QVERIFY(eog);
+        // Nothing shows before channels arrive
+        QVERIFY(active->isHidden() && gradMantissa->isHidden());
+        QVERIFY(!view.getDoArtifactThresholdRejection());
+
+        QSignalSpy thresholdSpy(&view, &ArtifactSettingsView::changeArtifactThreshold);
+        view.setChInfo({channel(FIFFV_MEG_CH, FIFF_UNIT_T_M), channel(FIFFV_EEG_CH, FIFF_UNIT_V)});
+        QCOMPARE(thresholdSpy.count(), 1);
+        QVERIFY(!active->isHidden() && !gradMantissa->isHidden() && !gradExponent->isHidden());
+        QVERIFY(eog->isHidden());
+        QCOMPARE(gradMantissa->prefix(), QStringLiteral("+/-"));
+        QCOMPARE(gradExponent->prefix(), QStringLiteral("e"));
+
+        // Mantissa and exponent compose the threshold
+        gradMantissa->setValue(4.0);
+        gradExponent->setValue(-11);
+        QCOMPARE(thresholdSpy.count(), 3);
+        const auto map = thresholdSpy.last().at(0).value<std::map<std::string, double>>();
+        QCOMPARE(map.size(), std::size_t(3));
+        QVERIFY(qAbs(map.at("grad") - 4e-11) < 1e-20);
+        QCOMPARE(map.at("eeg"), 0.1);
+        active->click();
+        QVERIFY(view.getDoArtifactThresholdRejection());
+        QCOMPARE(view.getThresholdMap().at("Active"), 1.0);
+    }
+
+    {
+        QSettings settings(QStringLiteral("MNECPP"));
+        const QString group = path + QStringLiteral("/ArtifactSettingsView/");
+        QVERIFY(settings.value(group + QStringLiteral("doArtifactThresholdReduction")).toBool());
+        QCOMPARE(settings.value(group + QStringLiteral("artifactThresholdsFirst/grad")).toDouble(), 4.0);
+        QCOMPARE(settings.value(group + QStringLiteral("artifactThresholdsSecond/grad")).toInt(), -11);
+        QVERIFY(!settings.contains(group + QStringLiteral("present/grad")));
+    }
+    {
+        ArtifactSettingsView view(path, {channel(FIFFV_MEG_CH, FIFF_UNIT_T_M)});
+        QVERIFY(view.getDoArtifactThresholdRejection());
+        QVERIFY(qAbs(view.getThresholdMap().at("grad") - 4e-11) < 1e-20);
+    }
+    QSettings(QStringLiteral("MNECPP")).remove(path);
+}
+
+//=============================================================================================================
+
+void TestDispViewers::tfSettingsView_formPanel()
+{
+    TfSettingsView view;
+    auto* panel = view.findChild<SettingsPanel*>();
+    QVERIFY(panel);
+    auto* trials = qobject_cast<QSpinBox*>(panel->editor("trialNumber"));
+    auto* rows = qobject_cast<QSpinBox*>(panel->editor("rowNumber"));
+    QVERIFY(trials && rows);
+    QCOMPARE(trials->maximum(), 10000);
+
+    QSignalSpy changed(&view, &TfSettingsView::numberTrialRowChanged);
+    trials->setValue(5);
+    rows->setValue(3);
+    QCOMPARE(changed.count(), 2);
+    QCOMPARE(changed.last().at(0).toInt(), 5);
+    QCOMPARE(changed.last().at(1).toInt(), 3);
+    panel->form().set_value("trialNumber", 8);
+    QCOMPARE(trials->value(), 8);
+    QCOMPARE(changed.last().at(0).toInt(), 8);
 }
 
 //=============================================================================================================

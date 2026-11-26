@@ -19,7 +19,8 @@
 
 #include "averagingsettingsview.h"
 #include "../detail/layout_reset.h"
-#include "ui_averagingsettingsview.h"
+#include "../detail/scoped_flag.h"
+#include "settingspanel.h"
 
 #include <mne/fiff/fiff_evoked_set.h>
 
@@ -27,13 +28,21 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QGridLayout>
+#include <QLabel>
 #include <QSettings>
+#include <QVBoxLayout>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
+#include <array>
 #include <memory>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -43,6 +52,52 @@ using namespace mne::disp;
 using namespace mne;
 
 //=============================================================================================================
+// DEFINE STATIC HELPERS
+//=============================================================================================================
+
+namespace
+{
+
+/** Adds a field edited in a spin box that hands its value over when editing finishes. */
+void addMilliseconds(scene::SettingsForm& form, const std::string& key, const std::string& label, int value, int minimum,
+                     const std::string& group, const std::string& prefix = {})
+{
+    scene::SettingField field;
+    field.key = key;
+    field.kind = scene::SettingField::Kind::Int;
+    field.label = label;
+    field.default_value = value;
+    field.minimum = minimum;
+    field.maximum = 10000;
+    field.step = 10;
+    field.decimals = 0;
+    field.prefix = prefix;
+    field.unit = " ms";
+    field.group = group;
+    field.commit = scene::SettingField::Commit::WhenFinished;
+    form.add(field);
+}
+
+using IntSignal = std::pair<std::string_view, void (AveragingSettingsView::*)(qint32)>;
+using BoolSignal = std::pair<std::string_view, void (AveragingSettingsView::*)(bool)>;
+
+/** Number fields and the signal that reports them. */
+constexpr std::array<IntSignal, 5> kIntSignals = {{{"preStimSeconds", &AveragingSettingsView::changePreStim},
+                                                   {"postStimSeconds", &AveragingSettingsView::changePostStim},
+                                                   {"baselineFromSeconds", &AveragingSettingsView::changeBaselineFrom},
+                                                   {"baselineToSeconds", &AveragingSettingsView::changeBaselineTo},
+                                                   {"numAverages", &AveragingSettingsView::changeNumAverages}}};
+
+/** Check boxes and buttons and the signal that reports them. */
+constexpr std::array<BoolSignal, 5> kBoolSignals = {{{"doBaselineCorrection", &AveragingSettingsView::changeBaselineActive},
+                                                     {"dropRejected", &AveragingSettingsView::changeDropActive},
+                                                     {"autoCompute", &AveragingSettingsView::setAutoCompute},
+                                                     {"reset", &AveragingSettingsView::resetAverage},
+                                                     {"compute", &AveragingSettingsView::calculateAverage}}};
+
+} // namespace
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -50,15 +105,101 @@ AveragingSettingsView::AveragingSettingsView(const QString& sSettingsPath,
                                              const std::map<std::string, int>& mapStimChsIndexNames,
                                              QWidget* parent)
 : AbstractView(parent)
-, m_pUi(std::make_unique<Ui::AverageSettingsViewWidget>())
+, m_pForm(std::make_shared<scene::SettingsForm>("Averaging Settings"))
 , m_mapStimChsIndexNames(mapStimChsIndexNames)
 {
     m_sSettingsPath = sSettingsPath;
-    m_pUi->setupUi(this);
 
     this->setWindowTitle("Averaging Settings");
     this->setMinimumWidth(330);
-    //this->setMaximumWidth(330);
+
+    // Mode flags the conditions of the fields refer to
+    m_pForm->add_flag("offline");
+    m_pForm->add_flag("hasDetectedTrials");
+
+    const std::string general = "General";
+    scene::SettingField stimChannel;
+    stimChannel.key = "currentStimChannel";
+    stimChannel.kind = scene::SettingField::Kind::Choice;
+    stimChannel.label = "Stimulus channel";
+    stimChannel.group = general;
+    stimChannel.visible_if = "!offline";
+    // The stored channel may be unknown until the stimulus channels arrive; loadSettings() keeps it aside
+    stimChannel.persistent = false;
+    m_pForm->add(stimChannel);
+
+    scene::SettingField numAverages;
+    numAverages.key = "numAverages";
+    numAverages.kind = scene::SettingField::Kind::Int;
+    numAverages.label = "Number of trials";
+    numAverages.default_value = 10;
+    numAverages.minimum = 1;
+    numAverages.maximum = 1000;
+    numAverages.decimals = 0;
+    numAverages.group = general;
+    numAverages.visible_if = "!offline";
+    numAverages.commit = scene::SettingField::Commit::WhenFinished;
+    m_pForm->add(numAverages);
+
+    addMilliseconds(*m_pForm, "preStimSeconds", "Pre-stimulus", 100, 0, general, "-");
+    addMilliseconds(*m_pForm, "postStimSeconds", "Post-stimulus", 400, 10, general);
+
+    // The baseline ranges follow the epoch window once the settings are loaded
+    const std::string baseline = "Baseline correction";
+    m_pForm->add_bool("doBaselineCorrection", "Activate", false, baseline);
+    addMilliseconds(*m_pForm, "baselineFromSeconds", "Baseline min", 0, -10000, baseline);
+    addMilliseconds(*m_pForm, "baselineToSeconds", "Baseline max", 0, -10000, baseline);
+
+    scene::SettingField detectedTrials;
+    detectedTrials.key = "detectedTrials";
+    detectedTrials.kind = scene::SettingField::Kind::Custom;
+    detectedTrials.group = "Detected Trials";
+    detectedTrials.visible_if = "hasDetectedTrials";
+    m_pForm->add(detectedTrials);
+
+    scene::SettingField reset;
+    reset.key = "reset";
+    reset.kind = scene::SettingField::Kind::Action;
+    reset.label = "Reset";
+    reset.visible_if = "!offline";
+    m_pForm->add(reset);
+
+    scene::SettingField dropRejected;
+    dropRejected.key = "dropRejected";
+    dropRejected.kind = scene::SettingField::Kind::Bool;
+    dropRejected.label = "Drop rejected";
+    dropRejected.default_value = false;
+    dropRejected.visible_if = "offline";
+    dropRejected.persistent = false;
+    m_pForm->add(dropRejected);
+
+    scene::SettingField autoCompute = dropRejected;
+    autoCompute.key = "autoCompute";
+    autoCompute.label = "Live average based on events";
+    m_pForm->add(autoCompute);
+
+    scene::SettingField compute;
+    compute.key = "compute";
+    compute.kind = scene::SettingField::Kind::Action;
+    compute.label = "Save";
+    compute.visible_if = "offline";
+    m_pForm->add(compute);
+
+    m_listener = m_pForm->add_listener([this](const std::string& key, const std::optional<scene::SettingValue>&) {
+        onFormChanged(key);
+    });
+
+    auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    m_pPanel = new SettingsPanel(m_pForm, this);
+    layout->addWidget(m_pPanel);
+
+    // The detected trials replace the layout of their custom field
+    if (auto* pTrials = m_pPanel->customWidget("detectedTrials")) {
+        detail::resetLayout(pTrials);
+        m_pDetectedTrials = new QGridLayout(pTrials);
+        m_pDetectedTrials->setContentsMargins(0, 0, 0, 0);
+    }
 
     loadSettings();
     redrawGUI();
@@ -68,6 +209,7 @@ AveragingSettingsView::AveragingSettingsView(const QString& sSettingsPath,
 
 AveragingSettingsView::~AveragingSettingsView()
 {
+    m_pForm->remove_listener(m_listener);
     saveSettings();
 }
 
@@ -85,19 +227,14 @@ void AveragingSettingsView::setStimChannels(const std::map<std::string, int>& ma
 
 void AveragingSettingsView::fillStimChannels()
 {
-    {
-        const QSignalBlocker blocker(m_pUi->m_pComboBoxChSelection);
-        m_pUi->m_pComboBoxChSelection->clear();
-
-        for (const auto& [name, index] : m_mapStimChsIndexNames) {
-            m_pUi->m_pComboBoxChSelection->addItem(QString::fromStdString(name), index);
-        }
-
-        m_pUi->m_pComboBoxChSelection->setCurrentText(QString::fromStdString(m_sCurrentStimChan));
+    const detail::ScopedFlag silent(m_bSilent);
+    std::vector<scene::SettingChoice> choices;
+    choices.reserve(m_mapStimChsIndexNames.size());
+    for (const auto& [name, index] : m_mapStimChsIndexNames) {
+        choices.push_back({name, name});
     }
-
-    connect(m_pUi->m_pComboBoxChSelection, &QComboBox::currentTextChanged,
-            this, &AveragingSettingsView::onChangeStimChannel, Qt::UniqueConnection);
+    m_pForm->set_choices("currentStimChannel", std::move(choices));
+    m_pForm->set_value("currentStimChannel", m_sCurrentStimChan);
 }
 
 //=============================================================================================================
@@ -111,49 +248,50 @@ std::string AveragingSettingsView::getCurrentStimCh()
 
 bool AveragingSettingsView::getDoBaselineCorrection()
 {
-    return m_bDoBaselineCorrection;
+    return m_pForm->get<bool>("doBaselineCorrection");
 }
 
 //=============================================================================================================
 
 int AveragingSettingsView::getNumAverages()
 {
-    return m_iNumAverages;
+    return m_pForm->get<int>("numAverages");
 }
 
 //=============================================================================================================
 
 int AveragingSettingsView::getBaselineFromSeconds()
 {
-    return m_iBaselineFromSeconds;
+    return m_pForm->get<int>("baselineFromSeconds");
 }
 
 //=============================================================================================================
 
 int AveragingSettingsView::getBaselineToSeconds()
 {
-    return m_iBaselineToSeconds;
+    return m_pForm->get<int>("baselineToSeconds");
 }
 
 //=============================================================================================================
 
 int AveragingSettingsView::getPreStimMSeconds()
 {
-    return m_iPreStimSeconds;
+    return m_pForm->get<int>("preStimSeconds");
 }
 
 //=============================================================================================================
 
 int AveragingSettingsView::getPostStimMSeconds()
 {
-    return m_iPostStimSeconds;
+    return m_pForm->get<int>("postStimSeconds");
 }
 
 //=============================================================================================================
 
 int AveragingSettingsView::getStimChannelIdx()
 {
-    return m_pUi->m_pComboBoxChSelection->currentData().toInt();
+    const auto it = m_mapStimChsIndexNames.find(m_pForm->get<std::string>("currentStimChannel"));
+    return it == m_mapStimChsIndexNames.end() ? 0 : it->second;
 }
 
 //=============================================================================================================
@@ -164,84 +302,37 @@ void AveragingSettingsView::redrawGUI()
         fillStimChannels();
     }
 
-    m_pUi->m_pSpinBoxNumAverages->setValue(m_iNumAverages);
-    connect(m_pUi->m_pSpinBoxNumAverages, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
-            this, &AveragingSettingsView::onChangeNumAverages);
-
-    //Pre Post stimulus
-    m_pUi->m_pSpinBoxPreStimMSeconds->setValue(m_iPreStimSeconds);
-    connect(m_pUi->m_pSpinBoxPreStimMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
-            this, &AveragingSettingsView::onChangePreStim);
-
-    m_pUi->m_pSpinBoxPostStimMSeconds->setValue(m_iPostStimSeconds);
-    connect(m_pUi->m_pSpinBoxPostStimMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
-            this, &AveragingSettingsView::onChangePostStim);
-
-    //Baseline Correction
-    m_pUi->m_pcheckBoxBaselineCorrection->setChecked(m_bDoBaselineCorrection);
-    connect(m_pUi->m_pcheckBoxBaselineCorrection, &QCheckBox::clicked,
-            this, &AveragingSettingsView::onChangeBaselineActive);
-
-    m_pUi->m_pSpinBoxBaselineFromMSeconds->setMinimum(m_pUi->m_pSpinBoxPreStimMSeconds->value() * -1);
-    m_pUi->m_pSpinBoxBaselineFromMSeconds->setMaximum(m_pUi->m_pSpinBoxPostStimMSeconds->value());
-    m_pUi->m_pSpinBoxBaselineFromMSeconds->setValue(m_iBaselineFromSeconds);
-    connect(m_pUi->m_pSpinBoxBaselineFromMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
-            this, &AveragingSettingsView::onChangeBaselineFrom);
-
-    m_pUi->m_pSpinBoxBaselineToMSeconds->setMinimum(m_pUi->m_pSpinBoxPreStimMSeconds->value() * -1);
-    m_pUi->m_pSpinBoxBaselineToMSeconds->setMaximum(m_pUi->m_pSpinBoxPostStimMSeconds->value());
-    m_pUi->m_pSpinBoxBaselineToMSeconds->setValue(m_iBaselineToSeconds);
-    connect(m_pUi->m_pSpinBoxBaselineToMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
-            this, &AveragingSettingsView::onChangeBaselineTo);
-
-    connect(m_pUi->m_pushButton_reset, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &AveragingSettingsView::resetAverage);
-
-    connect(m_pUi->m_pushButton_compute, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &AveragingSettingsView::calculateAverage);
-    connect(m_pUi->m_checkBox_reject, &QCheckBox::clicked,
-            this, &AveragingSettingsView::changeDropActive);
-
-    connect(m_pUi->checkBox_autoCompute, &QCheckBox::clicked,
-            this, &AveragingSettingsView::setAutoCompute);
-
-    m_pUi->m_pushButton_compute->hide();
-    m_pUi->m_checkBox_reject->hide();
-    m_pUi->m_pushButton_compute->hide();
+    // The baseline lies in the epoch window
+    const detail::ScopedFlag silent(m_bSilent);
+    const int preStim = getPreStimMSeconds();
+    const int postStim = getPostStimMSeconds();
+    m_pForm->set_range("baselineFromSeconds", -preStim, postStim);
+    m_pForm->set_range("baselineToSeconds", -preStim, postStim);
 
     setWindowFlags(Qt::WindowStaysOnTopHint);
-
-    m_pUi->m_groupBox_detectedTrials->hide();
 }
 
 //=============================================================================================================
 
 void AveragingSettingsView::setDetectedEpochs(const FiffEvokedSet& evokedSet)
 {
-    if (evokedSet.evoked.empty()) {
-        m_pUi->m_groupBox_detectedTrials->hide();
+    m_pForm->set_value("hasDetectedTrials", !evokedSet.evoked.empty());
+    if (evokedSet.evoked.empty() || !m_pDetectedTrials) {
         return;
-    } else {
-        m_pUi->m_groupBox_detectedTrials->show();
-    }
-
-    QGridLayout* topLayout = static_cast<QGridLayout*>(m_pUi->m_groupBox_detectedTrials->layout());
-    if (!topLayout) {
-        topLayout = new QGridLayout(m_pUi->m_groupBox_detectedTrials);
     }
 
     // The widgets go right away: the view is redrawn synchronously and looked up by name
-    detail::clearLayout(topLayout);
+    detail::clearLayout(m_pDetectedTrials);
 
-    topLayout->addWidget(new QLabel("Type"), 0, 0);
-    topLayout->addWidget(new QLabel("#"), 0, 1);
+    auto* table = m_pDetectedTrials->parentWidget();
+    m_pDetectedTrials->addWidget(new QLabel("Type", table), 0, 0);
+    m_pDetectedTrials->addWidget(new QLabel("#", table), 0, 1);
 
-    for (int i = 0; i < std::ssize(evokedSet.evoked); i++) {
-        if (i < 10) {
-            // Show only a maximum of 10 average types
-            topLayout->addWidget(new QLabel(QString::fromStdString(evokedSet.evoked.at(i).comment)), i + 1, 0);
-            topLayout->addWidget(new QLabel(QString::number(evokedSet.evoked.at(i).nave)), i + 1, 1);
-        }
+    // Show only a maximum of 10 average types
+    const int count = std::min(static_cast<int>(std::ssize(evokedSet.evoked)), 10);
+    for (int i = 0; i < count; i++) {
+        m_pDetectedTrials->addWidget(new QLabel(QString::fromStdString(evokedSet.evoked.at(i).comment), table), i + 1, 0);
+        m_pDetectedTrials->addWidget(new QLabel(QString::number(evokedSet.evoked.at(i).nave), table), i + 1, 1);
     }
 }
 
@@ -253,16 +344,9 @@ void AveragingSettingsView::saveSettings()
         return;
     }
 
-    // Save Settings
+    m_pPanel->saveSettings(m_sSettingsPath + QString("/AveragingSettingsView"));
     QSettings settings("MNECPP");
-
-    settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/preStimSeconds"), m_iPreStimSeconds);
-    settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/postStimSeconds"), m_iPostStimSeconds);
-    settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/numAverages"), m_iNumAverages);
     settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/currentStimChannel"), QString::fromStdString(m_sCurrentStimChan));
-    settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/baselineFromSeconds"), m_iBaselineFromSeconds);
-    settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/baselineToSeconds"), m_iBaselineToSeconds);
-    settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/doBaselineCorrection"), m_bDoBaselineCorrection);
 }
 
 //=============================================================================================================
@@ -273,25 +357,26 @@ void AveragingSettingsView::loadSettings()
         return;
     }
 
-    // Load Settings
+    const detail::ScopedFlag silent(m_bSilent);
+    // The stored baseline is checked against the stored epoch window, not against the current one
+    m_pForm->set_range("baselineFromSeconds", -10000, 10000);
+    m_pForm->set_range("baselineToSeconds", -10000, 10000);
+    m_pPanel->loadSettings(m_sSettingsPath + QString("/AveragingSettingsView"));
+
+    const int preStim = getPreStimMSeconds();
+    const int postStim = getPostStimMSeconds();
+    if (const int from = getBaselineFromSeconds(); from < -preStim || from > postStim) {
+        m_pForm->set_value("baselineFromSeconds", -preStim);
+    }
+    if (const int to = getBaselineToSeconds(); to > postStim || to < -preStim) {
+        m_pForm->set_value("baselineToSeconds", 0);
+    }
+
+    m_pForm->set_range("baselineFromSeconds", -preStim, postStim);
+    m_pForm->set_range("baselineToSeconds", -preStim, postStim);
+
     QSettings settings("MNECPP");
-
-    m_iPreStimSeconds = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/preStimSeconds"), 100).toInt();
-    m_iPostStimSeconds = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/postStimSeconds"), 400).toInt();
-    m_iBaselineFromSeconds = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/baselineFromSeconds"), 0).toInt();
-    m_iBaselineToSeconds = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/baselineToSeconds"), 0).toInt();
-
-    if (m_iBaselineFromSeconds < -1 * m_iPreStimSeconds || m_iBaselineFromSeconds > m_iPostStimSeconds) {
-        m_iBaselineFromSeconds = -1 * m_iPreStimSeconds;
-    }
-
-    if (m_iBaselineToSeconds > m_iPostStimSeconds || m_iBaselineToSeconds < -1 * m_iPreStimSeconds) {
-        m_iBaselineToSeconds = 0;
-    }
-
-    m_iNumAverages = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/numAverages"), 10).toInt();
     m_sCurrentStimChan = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/currentStimChannel"), "STI 014").toString().toStdString();
-    m_bDoBaselineCorrection = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/doBaselineCorrection"), false).toBool();
 }
 
 //=============================================================================================================
@@ -310,116 +395,54 @@ void AveragingSettingsView::updateGuiMode(GuiMode mode)
 
 void AveragingSettingsView::updateProcessingMode(ProcessingMode mode)
 {
-    switch (mode) {
-        case ProcessingMode::Offline:
-            m_pUi->m_pSpinBoxNumAverages->hide();
-            m_pUi->m_pComboBoxChSelection->hide();
-            m_pUi->m_pushButton_reset->hide();
-            m_pUi->label->hide();
-            m_pUi->m_label_numberAverages->hide();
-            m_pUi->m_pushButton_compute->show();
-            m_pUi->m_checkBox_reject->show();
-            m_pUi->checkBox_autoCompute->show();
-            break;
-        default: // default is realtime mode
-            m_pUi->m_pSpinBoxNumAverages->show();
-            m_pUi->m_pComboBoxChSelection->show();
-            m_pUi->m_pushButton_reset->show();
-            m_pUi->label->show();
-            m_pUi->m_label_numberAverages->show();
-            m_pUi->m_pushButton_compute->hide();
-            m_pUi->m_checkBox_reject->hide();
-            m_pUi->checkBox_autoCompute->hide();
-            break;
+    m_pForm->set_value("offline", mode == ProcessingMode::Offline);
+}
+
+//=============================================================================================================
+
+void AveragingSettingsView::onFormChanged(const std::string& key)
+{
+    if (m_bSilent) {
+        return;
     }
-}
-//=============================================================================================================
 
-void AveragingSettingsView::onChangePreStim()
-{
-    qint32 mSeconds = m_pUi->m_pSpinBoxPreStimMSeconds->value();
-    m_pUi->m_pSpinBoxBaselineToMSeconds->setMinimum(m_pUi->m_pSpinBoxPreStimMSeconds->value() * -1);
-    m_pUi->m_pSpinBoxBaselineFromMSeconds->setMinimum(m_pUi->m_pSpinBoxPreStimMSeconds->value() * -1);
+    // Fields that only report their value, and actions that report false like the clicked buttons did
+    for (const auto& [name, signal] : kBoolSignals) {
+        if (key == name) {
+            emit(this->*signal)(m_pForm->get<bool>(key));
+            if (m_pForm->value(key)) {
+                saveSettings();
+            }
+            return;
+        }
+    }
 
-    m_iPreStimSeconds = mSeconds;
+    // The epoch window bounds the baseline, the baseline bounds itself
+    const int mSeconds = m_pForm->get<int>(key);
+    const auto range = [this](const std::string& field) {
+        const scene::SettingField* f = m_pForm->field(field);
+        return std::pair{static_cast<int>(f->minimum), static_cast<int>(f->maximum)};
+    };
+    if (key == "preStimSeconds") {
+        m_pForm->set_range("baselineToSeconds", -mSeconds, range("baselineToSeconds").second);
+        m_pForm->set_range("baselineFromSeconds", -mSeconds, range("baselineFromSeconds").second);
+    } else if (key == "postStimSeconds") {
+        m_pForm->set_range("baselineToSeconds", range("baselineToSeconds").first, mSeconds);
+        m_pForm->set_range("baselineFromSeconds", range("baselineFromSeconds").first, mSeconds);
+    } else if (key == "baselineFromSeconds") {
+        m_pForm->set_range("baselineToSeconds", mSeconds, range("baselineToSeconds").second);
+    } else if (key == "baselineToSeconds") {
+        m_pForm->set_range("baselineFromSeconds", range("baselineFromSeconds").first, mSeconds);
+    }
 
-    emit changePreStim(mSeconds);
-
-    saveSettings();
-}
-
-//=============================================================================================================
-
-void AveragingSettingsView::onChangePostStim()
-{
-    qint32 mSeconds = m_pUi->m_pSpinBoxPostStimMSeconds->value();
-    m_pUi->m_pSpinBoxBaselineToMSeconds->setMaximum(m_pUi->m_pSpinBoxPostStimMSeconds->value());
-    m_pUi->m_pSpinBoxBaselineFromMSeconds->setMaximum(m_pUi->m_pSpinBoxPostStimMSeconds->value());
-
-    m_iPostStimSeconds = mSeconds;
-
-    emit changePostStim(mSeconds);
-
-    saveSettings();
-}
-
-//=============================================================================================================
-
-void AveragingSettingsView::onChangeBaselineFrom()
-{
-    qint32 mSeconds = m_pUi->m_pSpinBoxBaselineFromMSeconds->value();
-    m_pUi->m_pSpinBoxBaselineToMSeconds->setMinimum(mSeconds);
-
-    m_iBaselineFromSeconds = mSeconds;
-
-    emit changeBaselineFrom(mSeconds);
-
-    saveSettings();
-}
-
-//=============================================================================================================
-
-void AveragingSettingsView::onChangeBaselineTo()
-{
-    qint32 mSeconds = m_pUi->m_pSpinBoxBaselineToMSeconds->value();
-    m_pUi->m_pSpinBoxBaselineFromMSeconds->setMaximum(mSeconds);
-
-    m_iBaselineToSeconds = mSeconds;
-
-    emit changeBaselineTo(mSeconds);
-
-    saveSettings();
-}
-
-//=============================================================================================================
-
-void AveragingSettingsView::onChangeNumAverages()
-{
-    m_iNumAverages = m_pUi->m_pSpinBoxNumAverages->value();
-
-    emit changeNumAverages(m_pUi->m_pSpinBoxNumAverages->value());
-
-    saveSettings();
-}
-
-//=============================================================================================================
-
-void AveragingSettingsView::onChangeBaselineActive(bool bActive)
-{
-    m_bDoBaselineCorrection = bActive;
-
-    emit changeBaselineActive(bActive);
-
-    saveSettings();
-}
-
-//=============================================================================================================
-
-void AveragingSettingsView::onChangeStimChannel()
-{
-    m_sCurrentStimChan = m_pUi->m_pComboBoxChSelection->currentText().toStdString();
-
-    emit changeStimChannel(m_sCurrentStimChan);
+    if (key == "currentStimChannel") {
+        m_sCurrentStimChan = m_pForm->get<std::string>(key);
+        emit changeStimChannel(m_sCurrentStimChan);
+    } else if (const auto it = std::ranges::find(kIntSignals, key, &IntSignal::first); it != kIntSignals.end()) {
+        emit(this->*it->second)(mSeconds);
+    } else {
+        return;
+    }
 
     saveSettings();
 }
@@ -434,7 +457,7 @@ void AveragingSettingsView::clearView()
 
 bool AveragingSettingsView::getAutoComputeStatus()
 {
-    return m_pUi->checkBox_autoCompute->isChecked();
+    return m_pForm->get<bool>("autoCompute");
 }
 
 //=============================================================================================================

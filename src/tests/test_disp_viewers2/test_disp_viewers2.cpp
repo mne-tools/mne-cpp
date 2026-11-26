@@ -34,6 +34,7 @@
 #include <mne/disp/plots/helpers/scenepainter.h>
 #include <mne/disp/viewers/triggerdetectionview.h>
 #include <mne/disp/viewers/averagingsettingsview.h>
+#include <mne/disp/viewers/settingspanel.h>
 #include <mne/disp/viewers/bidsview.h>
 #include <mne/disp/viewers/channelselectionview.h>
 #include <mne/disp/viewers/channeldataview.h>
@@ -1224,12 +1225,12 @@ void TestDispViewers2::averagingSettingsView_controlsAndSettings()
     const std::map<std::string, int> stimChannels = {{"STI 014", 306}, {"STI 101", 312}};
     AveragingSettingsView view(sPath, stimChannels);
     view.show();
-    auto* pChannels = view.findChild<QComboBox*>(QStringLiteral("m_pComboBoxChSelection"));
-    auto* pPre = view.findChild<QSpinBox*>(QStringLiteral("m_pSpinBoxPreStimMSeconds"));
-    auto* pPost = view.findChild<QSpinBox*>(QStringLiteral("m_pSpinBoxPostStimMSeconds"));
-    auto* pFrom = view.findChild<QSpinBox*>(QStringLiteral("m_pSpinBoxBaselineFromMSeconds"));
-    auto* pTo = view.findChild<QSpinBox*>(QStringLiteral("m_pSpinBoxBaselineToMSeconds"));
-    auto* pNum = view.findChild<QSpinBox*>(QStringLiteral("m_pSpinBoxNumAverages"));
+    auto* pChannels = view.findChild<QComboBox*>(QStringLiteral("currentStimChannel"));
+    auto* pPre = view.findChild<QSpinBox*>(QStringLiteral("preStimSeconds"));
+    auto* pPost = view.findChild<QSpinBox*>(QStringLiteral("postStimSeconds"));
+    auto* pFrom = view.findChild<QSpinBox*>(QStringLiteral("baselineFromSeconds"));
+    auto* pTo = view.findChild<QSpinBox*>(QStringLiteral("baselineToSeconds"));
+    auto* pNum = view.findChild<QSpinBox*>(QStringLiteral("numAverages"));
     QVERIFY(pChannels);
     QVERIFY(pPre);
     QVERIFY(pPost);
@@ -1295,17 +1296,17 @@ void TestDispViewers2::averagingSettingsView_controlsAndSettings()
     QCOMPARE(view.getNumAverages(), 40);
 
     QSignalSpy baselineSpy(&view, &AveragingSettingsView::changeBaselineActive);
-    auto* pBaseline = view.findChild<QCheckBox*>(QStringLiteral("m_pcheckBoxBaselineCorrection"));
+    auto* pBaseline = view.findChild<QCheckBox*>(QStringLiteral("doBaselineCorrection"));
     pBaseline->click();
     QCOMPARE(baselineSpy.count(), 1);
     QCOMPARE(baselineSpy.last().at(0).toBool(), pBaseline->isChecked());
     QCOMPARE(view.getDoBaselineCorrection(), pBaseline->isChecked());
     QSignalSpy resetSpy(&view, &AveragingSettingsView::resetAverage);
-    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_reset")), Qt::LeftButton);
+    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("reset")), Qt::LeftButton);
     QCOMPARE(resetSpy.count(), 1);
 
     // Detected epochs: one row per type, at most ten
-    auto* pTrials = view.findChild<QGroupBox*>(QStringLiteral("m_groupBox_detectedTrials"));
+    auto* pTrials = view.findChild<SettingsPanel*>()->customWidget("detectedTrials");
     QVERIFY(pTrials);
     FiffEvokedSet evokedSet;
     for (int i = 0; i < 12; ++i) {
@@ -1316,7 +1317,7 @@ void TestDispViewers2::averagingSettingsView_controlsAndSettings()
     }
     view.setDetectedEpochs(evokedSet);
     QVERIFY(!pTrials->isHidden());
-    auto* pGrid = qobject_cast<QGridLayout*>(pTrials->layout());
+    auto* pGrid = pTrials->findChild<QGridLayout*>();
     QVERIFY(pGrid);
     QCOMPARE(pGrid->count(), 2 * 11);
     QCOMPARE(qobject_cast<QLabel*>(pGrid->itemAtPosition(3, 1)->widget())->text(), QStringLiteral("6"));
@@ -1328,12 +1329,12 @@ void TestDispViewers2::averagingSettingsView_controlsAndSettings()
     // Offline mode offers the compute controls
     QSignalSpy computeSpy(&view, &AveragingSettingsView::calculateAverage);
     view.setProcessingMode(AbstractView::ProcessingMode::Offline);
-    auto* pCompute = view.findChild<QPushButton*>(QStringLiteral("m_pushButton_compute"));
+    auto* pCompute = view.findChild<QPushButton*>(QStringLiteral("compute"));
     QVERIFY(!pCompute->isHidden());
     QVERIFY(pChannels->isHidden());
     QTest::mouseClick(pCompute, Qt::LeftButton);
     QCOMPARE(computeSpy.count(), 1);
-    auto* pAuto = view.findChild<QCheckBox*>(QStringLiteral("checkBox_autoCompute"));
+    auto* pAuto = view.findChild<QCheckBox*>(QStringLiteral("autoCompute"));
     QSignalSpy autoSpy(&view, &AveragingSettingsView::setAutoCompute);
     pAuto->click();
     QCOMPARE(autoSpy.count(), 1);
@@ -1455,7 +1456,16 @@ void TestDispViewers2::artifactSettingsView_thresholds()
 
     ArtifactSettingsView view(QString{});
     view.show();
-    QVERIFY(view.findChildren<QDoubleSpinBox*>().isEmpty());
+    auto shown = [&view]() {
+        QList<QDoubleSpinBox*> boxes;
+        for (QDoubleSpinBox* pBox : view.findChildren<QDoubleSpinBox*>()) {
+            if (!pBox->isHidden()) {
+                boxes << pBox;
+            }
+        }
+        return boxes;
+    };
+    QVERIFY(shown().isEmpty());
     QVERIFY(!view.getDoArtifactThresholdRejection());
 
     // One row per present type; mantissa and exponent compose the threshold
@@ -1465,7 +1475,7 @@ void TestDispViewers2::artifactSettingsView_thresholds()
         QApplication::processEvents();
         QStringList labels;
         for (QLabel* pLabel : view.findChildren<QLabel*>()) {
-            if (!pLabel->isHidden()) {
+            if (!pLabel->isHidden() && !pLabel->text().isEmpty()) {
                 labels << pLabel->text();
             }
         }
@@ -1473,32 +1483,22 @@ void TestDispViewers2::artifactSettingsView_thresholds()
         return labels;
     };
     QCOMPARE(visible(), QStringList({"eeg", "grad", "mag"}));
+    QCOMPARE(shown().size(), 3);
     QCOMPARE(thresholdSpy.count(), 1);
     std::map<std::string, double> map = view.getThresholdMap();
     QCOMPARE(mne::disp::detail::valueOr(map, "Active"), 0.0);
     QCOMPARE(std::vector<std::string>(std::views::keys(map).begin(), std::views::keys(map).end()), (std::vector<std::string>{"Active", "eeg", "grad", "mag"}));
     QCOMPARE(mne::disp::detail::valueOr(map, "grad"), 0.1);
 
-    auto spin = [&view](int iRow, int iColumn) {
-        auto* pLayout = qobject_cast<QGridLayout*>(view.layout());
-        return pLayout->itemAtPosition(iRow, iColumn)->widget();
-    };
-    auto* pLayout = qobject_cast<QGridLayout*>(view.layout());
-    QVERIFY(pLayout);
-    int iGradRow = -1;
-    for (int r = 1; r < pLayout->rowCount(); ++r) {
-        if (qobject_cast<QLabel*>(spin(r, 0))->text() == QStringLiteral("grad")) {
-            iGradRow = r;
-        }
-    }
-    QVERIFY(iGradRow > 0);
-    qobject_cast<QDoubleSpinBox*>(spin(iGradRow, 1))->setValue(4.0);
-    qobject_cast<QSpinBox*>(spin(iGradRow, 2))->setValue(-11);
+    auto* pPanel = view.findChild<SettingsPanel*>();
+    QVERIFY(pPanel);
+    qobject_cast<QDoubleSpinBox*>(pPanel->editor("artifactThresholdsFirst/grad"))->setValue(4.0);
+    qobject_cast<QSpinBox*>(pPanel->editor("artifactThresholdsSecond/grad"))->setValue(-11);
     QVERIFY(qAbs(mne::disp::detail::valueOr(view.getThresholdMap(), "grad") - 4e-11) < 1e-20);
     QVERIFY(qAbs(mne::disp::detail::valueOr(thresholdSpy.last().at(0).value<std::map<std::string, double>>(), "grad") - 4e-11) < 1e-20);
 
     // Activation is reported in the map
-    auto* pActive = qobject_cast<QCheckBox*>(spin(0, 0));
+    auto* pActive = qobject_cast<QCheckBox*>(pPanel->editor("doArtifactThresholdReduction"));
     QVERIFY(pActive);
     QTest::mouseClick(pActive, Qt::LeftButton);
     QVERIFY(view.getDoArtifactThresholdRejection());

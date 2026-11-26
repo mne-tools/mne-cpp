@@ -45,6 +45,7 @@ set(SOURCES
     plots/helpers/rhiframerenderer.cpp
     detail/map_value.h
     detail/layout_reset.h
+    detail/scoped_flag.h
     viewers/abstractview.cpp
     viewers/applytoview.cpp
     viewers/coregsettingsview.cpp
@@ -190,17 +191,14 @@ set(UI
     viewers/formfiles/progressview.ui
     viewers/formfiles/channelselectionview.ui
     viewers/formfiles/scalingview.ui
-    viewers/formfiles/filtersettingsview.ui
     viewers/formfiles/spharasettingsview.ui
     viewers/formfiles/fiffrawviewsettings.ui
     viewers/formfiles/triggerdetectionview.ui
     viewers/formfiles/quickcontrolview.ui
     viewers/formfiles/connectivitysettingsview.ui
     viewers/formfiles/minimumnormsettingsview.ui
-    viewers/formfiles/averagingsettingsview.ui
     viewers/formfiles/projectsettingsview.ui
     viewers/formfiles/control3dview.ui
-    viewers/formfiles/tfsettingsview.ui
     viewers/formfiles/hpisettingsview.ui
     viewers/formfiles/bidsview.ui
 )
