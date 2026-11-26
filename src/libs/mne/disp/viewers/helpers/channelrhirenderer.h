@@ -9,10 +9,10 @@
  * @date     November 2026
  * @brief    Widgets-free QRhi renderer and input handler of the raw-data channel trace view.
  *
- * ChannelRhiRenderer is the Qt side of the raw-trace view: it owns the QRhi pipelines, buffers and textures,
- * converts input events, paints display lists into textures and records a frame into any QRhi render target.
+ * ChannelRhiRenderer is the Qt side of the raw-trace view: it converts input events and records the frames of
+ * @ref mne::scene::TraceFrameBuilder into any QRhi render target with @ref mne::disp::RhiFrameRenderer.
  * The logic is Qt-free in mne_scene: @ref mne::scene::TraceView (viewport, interaction state, HUD overlays),
- * @ref mne::scene::TraceGeometry (trace vertices and per-trace shader parameters),
+ * @ref mne::scene::TraceFrameBuilder (trace vertices, textures and draws of a frame),
  * @ref mne::scene::TraceMarkers (annotation, event and epoch overlay) and @ref mne::scene::ViewAnimator
  * (scroll and zoom animations). It only depends on QtCore and QtGui: a host (the @c QRhiWidget
  * @ref mne::disp::ChannelRhiView or the @c QWindow @ref mne::disp::ChannelWindow) implements
@@ -28,6 +28,8 @@
 
 #include "../../disp_global.h"
 #include "channeldatamodel.h"
+#include "../../plots/helpers/rhiframerenderer.h"
+#include <mne/scene/trace_frame.h>
 #include <mne/scene/trace_geometry.h>
 #include <mne/scene/trace_markers.h>
 #include <mne/scene/trace_view.h>
@@ -61,14 +63,8 @@
 class QMouseEvent;
 class QPainter;
 class QRhi;
-class QRhiBuffer;
 class QRhiCommandBuffer;
-class QRhiGraphicsPipeline;
 class QRhiRenderTarget;
-class QRhiResourceUpdateBatch;
-class QRhiSampler;
-class QRhiShaderResourceBindings;
-class QRhiTexture;
 class QTimerEvent;
 class QWheelEvent;
 
@@ -266,10 +262,7 @@ public:
      *
      * @return The overlay image (premultiplied alpha is not used), or a null image.
      */
-    const QImage& hudImage() const
-    {
-        return m_hudImage;
-    }
+    QImage hudImage() const;
 
     // ── Input ─────────────────────────────────────────────────────────
 
@@ -954,64 +947,15 @@ private:
     void startAnimationTimer();
     scene::TraceStyle traceStyle() const;
 
-    // ── GPU resource management ────────────────────────────────────────
-    struct ChannelGpuData
-    {
-        std::unique_ptr<QRhiBuffer> vbo;
-        int vertexCount = 0;
-    };
-
-    void ensurePipeline(QRhi* rhi, QRhiRenderTarget* target);
-    void rebuildVBOs(QRhi* rhi, QRhiResourceUpdateBatch* batch);
-    void updateUBO(QRhiResourceUpdateBatch* batch);
-    bool isVboDirty() const;
-
-    // ── Overlay blit (annotations/events baked into texture, bands in shader) ──
-    void ensureOverlayPipeline(QRhi* rhi, QRhiRenderTarget* target);
-    bool ensureOverlayResources(QRhi* rhi, QRhiRenderTarget* target, QRhiResourceUpdateBatch* batch);
-    void rebuildOverlayImage(int logicalWidth, int logicalHeight, qreal devicePixelRatio);
-    bool prepareHud(QRhi* rhi, QRhiResourceUpdateBatch* batch, int logicalW, int logicalH, qreal dpr);
-
     ChannelRhiHost* m_pHost = nullptr;
 
-    std::unique_ptr<QRhiBuffer> m_overlayVbo; // Static quad
-    std::unique_ptr<QRhiTexture> m_overlayTex;
-    std::unique_ptr<QRhiSampler> m_overlaySampler;
-    std::unique_ptr<QRhiShaderResourceBindings> m_overlaySrb;
-    std::unique_ptr<QRhiGraphicsPipeline> m_overlayPipeline;
-    std::unique_ptr<QRhiBuffer> m_overlayUbo; // OverlayParams UBO
-    bool m_overlayVboNeedsUpload = false;
-    QImage m_overlayImage;
-    bool m_overlayDirty = true;
-    QSize m_overlayTexSize;
-
-    // Overlay prefetch: the texture covers a wider sample range than the viewport.
-    static constexpr float kOverlayPrefetchFactor = 1.0f; // extra viewport widths each side
-    float m_overlayFirstSample = 0.f;                     // first sample covered by overlay tex
-    float m_overlayTotalSamples = 0.f;                    // total sample span of overlay tex
-
-    // ── HUD overlay (crosshair, scalebars, ruler, annotation selection) ──
-    // Screen-space QImage drawn with the overlay pipeline as a second quad after the traces.
-    std::unique_ptr<QRhiTexture> m_hudTex;
-    std::unique_ptr<QRhiShaderResourceBindings> m_hudSrb;
-    std::unique_ptr<QRhiBuffer> m_hudUbo;
-    QImage m_hudImage;
-    QSize m_hudTexSize;
-    bool m_hudDirty = true;
-
-    std::unique_ptr<QRhiBuffer> m_ubo;
-    std::unique_ptr<QRhiShaderResourceBindings> m_srb;
-    std::unique_ptr<QRhiGraphicsPipeline> m_pipeline;
-    std::vector<ChannelGpuData> m_gpuChannels;  // VBO per logical channel, filled from m_geometry
-    std::vector<scene::TraceDraw> m_traceDraws; // traces of the frame; trace i uses UBO slot i
-    int m_uboStride = 256;
-    bool m_pipelineDirty = true;
+    scene::TraceFrameBuilder m_frameBuilder; // the frames as scene::GpuFrame: vertices, textures, pipelines
+    RhiFrameRenderer m_frameRenderer;        // executes the frames with QRhi
 
     // ── Shared browser state ───────────────────────────────────────────
     QPointer<ChannelDataModel> m_model;
     std::unique_ptr<TraceSourceAdapter> m_traceSource; // the model's channels for m_view
     mutable scene::TraceView m_view;                   // viewport, input and overlays; sized by view()
-    scene::TraceGeometry m_geometry;                   // streamed trace vertices and per-trace uniforms
     scene::TraceMarkers m_markers;                     // events and epoch markers
     scene::ViewAnimator m_animator;                    // scroll and zoom animations of m_view
     int m_animationTimerId = 0;                        // ticks m_animator while the host renders no frames

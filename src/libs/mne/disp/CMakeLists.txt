@@ -42,6 +42,7 @@ set(SOURCES
     plots/helpers/svgwriter.cpp
     plots/helpers/sceneinput.cpp
     plots/helpers/scenepainter.cpp
+    plots/helpers/rhiframerenderer.cpp
     detail/map_value.h
     detail/layout_reset.h
     viewers/abstractview.cpp
@@ -117,6 +118,7 @@ set(HEADERS
     plots/helpers/svgwriter.h
     plots/helpers/sceneinput.h
     plots/helpers/scenepainter.h
+    plots/helpers/rhiframerenderer.h
     viewers/abstractview.h
     viewers/applytoview.h
     viewers/coregsettingsview.h

@@ -18,16 +18,13 @@
 #include "../../plots/helpers/sceneinput.h"
 #include "../../plots/helpers/scenepainter.h"
 #include <mne/scene/trace_geometry.h>
-#include <mne/base/log.h>
 
 #include <rhi/qrhi.h>
-#include <rhi/qshader.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QFile>
 #include <QGuiApplication>
 #include <QMouseEvent>
 #include <QPainter>
@@ -40,8 +37,6 @@
 
 #include <chrono>
 #include <cmath>
-#include <cstring>
-#include <string>
 #include <utility>
 
 //=============================================================================================================
@@ -50,63 +45,6 @@
 
 using namespace mne::disp;
 namespace scene = mne::scene;
-
-//=============================================================================================================
-// Overlay quad and its shader parameters
-//=============================================================================================================
-
-namespace
-{
-// Full-screen quad: (pos.x, pos.y, uv.x, uv.y) per vertex, TriangleStrip. NDC Y+ = top, image UV Y=0 = top.
-constexpr float kQuadVerts[] = {
-    -1.f,
-    -1.f,
-    0.f,
-    1.f, // bottom-left
-    -1.f,
-    1.f,
-    0.f,
-    0.f, // top-left
-    1.f,
-    -1.f,
-    1.f,
-    1.f, // bottom-right
-    1.f,
-    1.f,
-    1.f,
-    0.f, // top-right
-};
-
-// Per-frame parameters of overlay.frag (binding 2)
-struct OverlayParams
-{
-    float scrollSample;
-    float samplesPerPixel;
-    float viewWidth;
-    float sfreq;
-    float firstFileSample;
-    float gridEnabled;
-    float overlayFirstSample;
-    float overlayTotalSamples;
-};
-
-constexpr int kOverlayUboSize = 256; // 8 floats, aligned to 256 for std140 on all backends
-
-} // namespace
-
-//=============================================================================================================
-// HELPERS
-//=============================================================================================================
-
-static QShader loadShader(const QString& filename)
-{
-    QFile f(filename);
-    if (!f.open(QIODevice::ReadOnly)) {
-        mne::Log::warning("ChannelRhiView: cannot open shader {}", filename.toStdString());
-        return {};
-    }
-    return QShader::fromSerialized(f.readAll());
-}
 
 //=============================================================================================================
 // TRACE SOURCE
@@ -186,6 +124,7 @@ ChannelRhiRenderer::ChannelRhiRenderer(ChannelRhiHost* host, QObject* parent)
 {
     m_view.set_source(m_traceSource.get());
     connectView();
+    m_frameRenderer.addShaderPrefix(":/disp/shaders/viewers/helpers/shaders/");
 
     // Repaint when the app regains focus
     if (qGuiApp) {
@@ -203,29 +142,17 @@ void ChannelRhiRenderer::connectView()
 {
     scene::TraceView::Effects effects;
     effects.scroll_changed = [this](double) {
-        const float sample = scrollSample();
-        const float visible = static_cast<float>(viewWidth()) * samplesPerPixel();
-
-        // Overlay prefetch: only rebuild when scroll exceeds the cached sample range.
-        // The shader handles bands via uniforms, so we only need to rebuild when
-        // annotations/events would be outside the cached texture.
-        if (m_overlayTotalSamples <= 0.f || sample < m_overlayFirstSample ||
-            sample + visible > m_overlayFirstSample + m_overlayTotalSamples) {
-            m_overlayDirty = true;
-        }
-
-        emit scrollSampleChanged(sample);
+        emit scrollSampleChanged(scrollSample());
         requestUpdate();
     };
     effects.zoom_changed = [this](double) {
-        m_geometry.invalidate(); // zoom change → decimation changes
-        m_overlayDirty = true;
+        m_frameBuilder.geometry().invalidate(); // zoom change → decimation changes
+        m_frameBuilder.invalidate_overlay();
         emit samplesPerPixelChanged(samplesPerPixel());
         requestUpdate();
     };
     effects.channel_offset_changed = [this](int firstChannel) {
-        m_geometry.invalidate();
-        m_pipelineDirty = true;
+        m_frameBuilder.geometry().invalidate();
         emit channelOffsetChanged(firstChannel);
         requestUpdate();
     };
@@ -250,7 +177,7 @@ void ChannelRhiRenderer::connectView()
         emit annotationBoundaryMoved(index, isStart, sample);
     };
     effects.annotations_changed = [this] {
-        m_overlayDirty = true;
+        m_frameBuilder.invalidate_overlay();
         requestUpdate();
     };
     effects.channel_double_clicked = [this](int logicalChannel) {
@@ -336,9 +263,8 @@ ChannelRhiRenderer::~ChannelRhiRenderer() = default;
 void ChannelRhiRenderer::setHost(ChannelRhiHost* host)
 {
     m_pHost = host;
-    m_geometry.invalidate();
-    m_overlayDirty = true;
-    m_hudDirty = true;
+    m_frameBuilder.geometry().invalidate();
+    m_frameBuilder.invalidate_overlay();
 }
 
 //=============================================================================================================
@@ -367,7 +293,6 @@ QFont ChannelRhiRenderer::hostFont() const
 void ChannelRhiRenderer::requestUpdate()
 {
     // Crosshair, scalebar and ruler values may depend on any state change
-    m_hudDirty = true;
     if (m_pHost)
         m_pHost->requestFrame();
 }
@@ -385,17 +310,15 @@ void ChannelRhiRenderer::setModel(ChannelDataModel* model)
     m_model = model;
     if (m_model) {
         connect(m_model, &ChannelDataModel::dataChanged, this, [this] {
-            m_geometry.invalidate();
+            m_frameBuilder.geometry().invalidate();
             requestUpdate();
         });
         connect(m_model, &ChannelDataModel::metaChanged, this, [this] {
-            m_geometry.invalidate();
-            m_pipelineDirty = true;
+            m_frameBuilder.geometry().invalidate();
             requestUpdate();
         });
     }
-    m_geometry.invalidate();
-    m_pipelineDirty = true;
+    m_frameBuilder.geometry().invalidate();
     requestUpdate();
 }
 
@@ -439,7 +362,7 @@ void ChannelRhiRenderer::zoomTo(float targetSpp, int durationMs)
 void ChannelRhiRenderer::setBackgroundColor(const QColor& color)
 {
     m_bgColor = color;
-    m_overlayDirty = true;
+    m_frameBuilder.invalidate_overlay();
     requestUpdate();
 }
 
@@ -447,7 +370,7 @@ void ChannelRhiRenderer::setBackgroundColor(const QColor& color)
 
 void ChannelRhiRenderer::setPrefetchFactor(float factor)
 {
-    m_geometry.set_prefetch_factor(factor);
+    m_frameBuilder.geometry().set_prefetch_factor(factor);
 }
 
 //=============================================================================================================
@@ -477,8 +400,7 @@ void ChannelRhiRenderer::setVisibleChannelCount(int count)
 {
     if (!m_view.set_visible_channel_count(count))
         return;
-    m_geometry.invalidate();
-    m_pipelineDirty = true;
+    m_frameBuilder.geometry().invalidate();
     requestUpdate();
 }
 
@@ -496,7 +418,7 @@ void ChannelRhiRenderer::setGridVisible(bool visible)
     if (visible == m_gridVisible)
         return;
     m_gridVisible = visible;
-    m_overlayDirty = true;
+    m_frameBuilder.invalidate_overlay();
     requestUpdate();
 }
 
@@ -505,7 +427,7 @@ void ChannelRhiRenderer::setGridVisible(bool visible)
 void ChannelRhiRenderer::setSfreq(float sfreq)
 {
     m_view.set_sfreq(sfreq);
-    m_overlayDirty = true;
+    m_frameBuilder.invalidate_overlay();
     requestUpdate();
 }
 
@@ -515,7 +437,7 @@ void ChannelRhiRenderer::setFirstFileSample(int first)
 {
     if (!m_view.set_first_file_sample(first))
         return;
-    m_overlayDirty = true;
+    m_frameBuilder.invalidate_overlay();
     requestUpdate();
 }
 
@@ -536,8 +458,7 @@ void ChannelRhiRenderer::setHideBadChannels(bool hide)
     m_hideBadChannels = hide;
     // Re-clamp the channel window to the new channel count
     m_view.set_first_visible_channel(m_view.first_visible_channel());
-    m_geometry.invalidate();
-    m_pipelineDirty = true;
+    m_frameBuilder.geometry().invalidate();
     requestUpdate();
 }
 
@@ -589,9 +510,8 @@ void ChannelRhiRenderer::setButterflyMode(bool enabled)
 {
     if (!m_view.set_butterfly_mode(enabled))
         return;
-    m_geometry.invalidate();
-    m_pipelineDirty = true;
-    m_overlayDirty = true;
+    m_frameBuilder.geometry().invalidate();
+    m_frameBuilder.invalidate_overlay();
     requestUpdate();
 }
 
@@ -602,8 +522,7 @@ void ChannelRhiRenderer::setChannelIndices(const std::vector<int>& indices)
     m_filteredChannels = indices;
     // Clamp the channel window to the new range
     m_view.set_first_visible_channel(m_view.first_visible_channel());
-    m_geometry.invalidate();
-    m_pipelineDirty = true;
+    m_frameBuilder.geometry().invalidate();
     requestUpdate();
 }
 
@@ -646,7 +565,7 @@ void ChannelRhiRenderer::setEvents(const std::vector<EventMarker>& events)
     for (const EventMarker& event : events)
         sceneEvents.push_back({event.sample, event.type, toSceneColor(event.color), event.label});
     m_markers.set_events(std::move(sceneEvents));
-    m_overlayDirty = true;
+    m_frameBuilder.invalidate_overlay();
     requestUpdate();
 }
 
@@ -655,7 +574,7 @@ void ChannelRhiRenderer::setEvents(const std::vector<EventMarker>& events)
 void ChannelRhiRenderer::setEpochMarkers(const std::vector<int>& triggerSamples)
 {
     m_markers.set_epoch_markers(triggerSamples);
-    m_overlayDirty = true;
+    m_frameBuilder.invalidate_overlay();
     requestUpdate();
 }
 
@@ -665,7 +584,7 @@ void ChannelRhiRenderer::setEpochMarkersVisible(bool visible)
 {
     if (!m_markers.set_epoch_markers_visible(visible))
         return;
-    m_overlayDirty = true;
+    m_frameBuilder.invalidate_overlay();
     requestUpdate();
 }
 
@@ -686,7 +605,7 @@ void ChannelRhiRenderer::setZScoreMode(bool enabled)
     if (m_bZScoreMode == enabled)
         return;
     m_bZScoreMode = enabled;
-    m_geometry.invalidate(); // VBO data changes (z-score normalization)
+    m_frameBuilder.geometry().invalidate(); // VBO data changes (z-score normalization)
     requestUpdate();
 }
 
@@ -700,7 +619,7 @@ void ChannelRhiRenderer::setAnnotations(const std::vector<AnnotationSpan>& annot
         spans.push_back({annotation.startSample, annotation.endSample, toSceneColor(annotation.color), annotation.label});
     }
     m_view.set_annotations(std::move(spans));
-    m_overlayDirty = true;
+    m_frameBuilder.invalidate_overlay();
     requestUpdate();
 }
 
@@ -717,7 +636,7 @@ void ChannelRhiRenderer::setEventsVisible(bool visible)
 {
     if (!m_markers.set_events_visible(visible))
         return;
-    m_overlayDirty = true;
+    m_frameBuilder.invalidate_overlay();
     requestUpdate();
 }
 
@@ -727,7 +646,7 @@ void ChannelRhiRenderer::setAnnotationsVisible(bool visible)
 {
     if (!m_markers.set_annotations_visible(visible))
         return;
-    m_overlayDirty = true;
+    m_frameBuilder.invalidate_overlay();
     requestUpdate();
 }
 
@@ -735,324 +654,18 @@ void ChannelRhiRenderer::setAnnotationsVisible(bool visible)
 
 void ChannelRhiRenderer::initializeResources()
 {
-    m_pipelineDirty = true;
-    m_geometry.invalidate();
+    m_frameBuilder.geometry().invalidate();
+    m_frameBuilder.invalidate_overlay();
 }
 
 //=============================================================================================================
 
 void ChannelRhiRenderer::releaseResources()
 {
-    m_pipeline.reset();
-    m_srb.reset();
-    m_ubo.reset();
-    m_gpuChannels.clear();
-    m_pipelineDirty = true;
-    m_geometry.invalidate();
-
-    m_overlayPipeline.reset();
-    m_overlaySrb.reset();
-    m_overlaySampler.reset();
-    m_overlayTex.reset();
-    m_overlayVbo.reset();
-    m_overlayUbo.reset();
-    m_overlayTexSize = QSize();
-    m_overlayDirty = true;
-
-    m_hudSrb.reset();
-    m_hudTex.reset();
-    m_hudUbo.reset();
-    m_hudTexSize = QSize();
-    m_hudDirty = true;
+    m_frameRenderer.releaseResources();
 }
 
 //=============================================================================================================
-
-void ChannelRhiRenderer::ensurePipeline(QRhi* rhi, QRhiRenderTarget* target)
-{
-    if (!m_pipelineDirty)
-        return;
-
-    m_uboStride = static_cast<int>(
-        (static_cast<int>(sizeof(scene::TraceUniforms)) + rhi->ubufAlignment() - 1) & ~(rhi->ubufAlignment() - 1));
-
-    // One UBO slot per drawn trace: the visible rows, or every channel in butterfly mode
-    const int nCh = scene::TraceGeometry::slot_count(view(), *m_traceSource);
-
-    // ── Uniform buffer ──────────────────────────────────────────────────
-    bool uboRecreated = false;
-    if (!m_ubo || m_ubo->size() < static_cast<quint32>(nCh * m_uboStride)) {
-        m_ubo.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
-                                   QRhiBuffer::UniformBuffer,
-                                   nCh * m_uboStride));
-        m_ubo->create();
-        uboRecreated = true;
-    }
-
-    // ── Shader resource bindings ────────────────────────────────────────
-    // Recreate if the UBO pointer changed — SRB holds a raw pointer to the UBO.
-    if (!m_srb || uboRecreated) {
-        m_srb.reset(rhi->newShaderResourceBindings());
-        m_srb->setBindings({QRhiShaderResourceBinding::uniformBufferWithDynamicOffset(
-            0,
-            QRhiShaderResourceBinding::VertexStage |
-                QRhiShaderResourceBinding::FragmentStage,
-            m_ubo.get(),
-            sizeof(scene::TraceUniforms) // visible block size for the shader
-            )});
-        m_srb->create();
-    }
-
-    // ── Shaders ─────────────────────────────────────────────────────────
-    // Resource path matches qt_add_shaders PREFIX + file path (including subdirectory).
-    QShader vs = loadShader(QStringLiteral(":/disp/shaders/viewers/helpers/shaders/channeldata.vert.qsb"));
-    QShader fs = loadShader(QStringLiteral(":/disp/shaders/viewers/helpers/shaders/channeldata.frag.qsb"));
-
-    if (!vs.isValid() || !fs.isValid()) {
-        mne::Log::warning("ChannelRhiView: shaders not found. Ensure qt_add_shaders is configured in CMakeLists.");
-        return;
-    }
-
-    // ── Graphics pipeline ───────────────────────────────────────────────
-    // Destroy any existing pipeline before creating a new one.
-    m_pipeline.reset();
-    m_pipeline.reset(rhi->newGraphicsPipeline());
-    m_pipeline->setShaderStages({{QRhiShaderStage::Vertex, vs},
-                                 {QRhiShaderStage::Fragment, fs}});
-
-    QRhiVertexInputLayout il;
-    il.setBindings({{2 * sizeof(float)}});                           // stride = vec2
-    il.setAttributes({{0, 0, QRhiVertexInputAttribute::Float2, 0}}); // location 0 = vec2
-
-    m_pipeline->setVertexInputLayout(il);
-    m_pipeline->setShaderResourceBindings(m_srb.get());
-    m_pipeline->setRenderPassDescriptor(target->renderPassDescriptor());
-    m_pipeline->setTopology(QRhiGraphicsPipeline::LineStrip);
-    m_pipeline->setDepthTest(false);
-    m_pipeline->setDepthWrite(false);
-
-    // Alpha blending for anti-aliased lines (if multisampling is disabled)
-    QRhiGraphicsPipeline::TargetBlend blend;
-    blend.enable = true;
-    blend.srcColor = QRhiGraphicsPipeline::SrcAlpha;
-    blend.dstColor = QRhiGraphicsPipeline::OneMinusSrcAlpha;
-    blend.srcAlpha = QRhiGraphicsPipeline::One;
-    blend.dstAlpha = QRhiGraphicsPipeline::OneMinusSrcAlpha;
-    m_pipeline->setTargetBlends({blend});
-
-    if (!m_pipeline->create()) {
-        mne::Log::warning("ChannelRhiView: failed to create graphics pipeline");
-        m_pipeline.reset();
-        return;
-    }
-
-    m_pipelineDirty = false;
-}
-
-//=============================================================================================================
-
-bool ChannelRhiRenderer::isVboDirty() const
-{
-    return m_model && m_geometry.needs_stream(view());
-}
-
-//=============================================================================================================
-
-void ChannelRhiRenderer::rebuildVBOs(QRhi* rhi, QRhiResourceUpdateBatch* batch)
-{
-    if (!m_model || !m_geometry.stream(view(), *m_traceSource, m_bZScoreMode))
-        return;
-
-    // VBOs are indexed by logical (filtered) channel index, not model channel index
-    const std::vector<scene::TraceVertices>& channels = m_geometry.channels();
-    m_gpuChannels.resize(channels.size());
-    for (std::size_t logCh = 0; logCh < channels.size(); ++logCh) {
-        const std::vector<float>& verts = channels[logCh].xy;
-        ChannelGpuData& gd = m_gpuChannels[logCh];
-        gd.vertexCount = 0;
-        if (verts.empty())
-            continue;
-
-        const quint32 byteSize = static_cast<quint32>(verts.size() * sizeof(float));
-        if (!gd.vbo || static_cast<quint32>(gd.vbo->size()) < byteSize) {
-            gd.vbo.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::VertexBuffer, byteSize));
-            if (!gd.vbo->create()) {
-                mne::Log::warning("ChannelRhiView: VBO create failed for channel {}", logCh);
-                continue;
-            }
-        }
-        batch->updateDynamicBuffer(gd.vbo.get(), 0, byteSize, verts.data());
-        gd.vertexCount = channels[logCh].vertex_count();
-    }
-}
-
-//=============================================================================================================
-
-void ChannelRhiRenderer::updateUBO(QRhiResourceUpdateBatch* batch)
-{
-    m_traceDraws.clear();
-    if (!m_model || !m_ubo)
-        return;
-
-    m_traceDraws = m_geometry.draws(view(), *m_traceSource, traceStyle());
-    // Never more slots than the UBO holds (it grows in ensurePipeline())
-    const int slotCount = static_cast<int>(m_ubo->size()) / m_uboStride;
-    if (std::ssize(m_traceDraws) > slotCount)
-        m_traceDraws.resize(static_cast<std::size_t>(slotCount));
-
-    QVarLengthArray<quint8> buf(m_uboStride, 0);
-    for (int slot = 0; slot < std::ssize(m_traceDraws); ++slot) {
-        memcpy(buf.data(), &m_traceDraws[static_cast<std::size_t>(slot)].uniforms, sizeof(scene::TraceUniforms));
-        batch->updateDynamicBuffer(m_ubo.get(), slot * m_uboStride, m_uboStride, buf.constData());
-    }
-}
-
-//=============================================================================================================
-// Overlay texture — annotations, events, and epoch markers baked into a QImage.
-// Alternating per-second bands are now computed in the fragment shader, so this
-// image only needs rebuilding when annotations/events change or when the scroll
-// exceeds the prefetch window.
-//
-// The overlay covers a wider sample range than the viewport (controlled by
-// kOverlayPrefetchFactor).  The fragment shader maps screen UVs into this
-// wider texture via the OverlayParams UBO.
-//=============================================================================================================
-
-void ChannelRhiRenderer::rebuildOverlayImage(int logicalWidth, int logicalHeight, qreal devicePixelRatio)
-{
-    const qreal dpr = qMax(devicePixelRatio, 1.0);
-    const int pixelWidth = qMax(1, qRound(logicalWidth * dpr));
-    const int pixelHeight = qMax(1, qRound(logicalHeight * dpr));
-
-    m_overlayImage = QImage(pixelWidth, pixelHeight, QImage::Format_RGBA8888);
-    m_overlayImage.setDevicePixelRatio(dpr);
-    m_overlayImage.fill(Qt::transparent);
-    m_overlayDirty = false;
-
-    if (logicalWidth <= 0 || logicalHeight <= 0 || m_view.sfreq() <= 0.0 || m_view.samples_per_pixel() <= 0.0 || m_overlayTotalSamples <= 0.f)
-        return;
-
-    // The overlay covers m_overlayFirstSample .. m_overlayFirstSample + m_overlayTotalSamples; per-second bands
-    // are computed in the fragment shader
-    const QFont font = QGuiApplication::font();
-    const QtTextMetrics metrics(font);
-    scene::Canvas canvas(logicalWidth, logicalHeight);
-    m_markers.draw(canvas, metrics, scene::Font{}, m_view.annotations(), m_overlayFirstSample,
-                   static_cast<double>(logicalWidth) / static_cast<double>(m_overlayTotalSamples));
-    QPainter p(&m_overlayImage);
-    paintScene(p, canvas.display_list(), font);
-}
-
-//=============================================================================================================
-
-void ChannelRhiRenderer::ensureOverlayPipeline(QRhi* rhi, QRhiRenderTarget* target)
-{
-    if (m_overlayPipeline)
-        return;
-
-    // Static full-screen quad (screen-space NDC coordinates); uploaded once in ensureOverlayResources()
-    static constexpr int kQuadBytes = sizeof(kQuadVerts);
-    m_overlayVbo.reset(rhi->newBuffer(QRhiBuffer::Immutable,
-                                      QRhiBuffer::VertexBuffer,
-                                      kQuadBytes));
-    if (!m_overlayVbo->create()) {
-        m_overlayVbo.reset();
-        return;
-    }
-
-    // Texture — placeholder 1×1; resized lazily in renderFrame() when pw/ph are known.
-    m_overlayTex.reset(rhi->newTexture(QRhiTexture::RGBA8, QSize(1, 1)));
-    m_overlayTex->create();
-    m_overlayTexSize = QSize();
-
-    m_overlaySampler.reset(rhi->newSampler(
-        QRhiSampler::Linear, QRhiSampler::Linear,
-        QRhiSampler::None,
-        QRhiSampler::ClampToEdge, QRhiSampler::ClampToEdge));
-    m_overlaySampler->create();
-
-    // UBO for per-frame overlay parameters (binding 2)
-    m_overlayUbo.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
-                                      QRhiBuffer::UniformBuffer,
-                                      kOverlayUboSize));
-    if (!m_overlayUbo->create()) {
-        m_overlayVbo.reset();
-        m_overlayUbo.reset();
-        return;
-    }
-
-    // SRB: binding 1 = combined image sampler, binding 2 = overlay UBO
-    m_overlaySrb.reset(rhi->newShaderResourceBindings());
-    m_overlaySrb->setBindings({QRhiShaderResourceBinding::sampledTexture(
-                                   1, QRhiShaderResourceBinding::FragmentStage,
-                                   m_overlayTex.get(), m_overlaySampler.get()),
-                               QRhiShaderResourceBinding::uniformBuffer(
-                                   2, QRhiShaderResourceBinding::FragmentStage,
-                                   m_overlayUbo.get())});
-    m_overlaySrb->create();
-
-    QShader vs = loadShader(QStringLiteral(":/disp/shaders/viewers/helpers/shaders/overlay.vert.qsb"));
-    QShader fs = loadShader(QStringLiteral(":/disp/shaders/viewers/helpers/shaders/overlay.frag.qsb"));
-    if (!vs.isValid() || !fs.isValid()) {
-        m_overlayVbo.reset();
-        m_overlayUbo.reset();
-        m_overlaySrb.reset();
-        m_overlaySampler.reset();
-        m_overlayTex.reset();
-        return;
-    }
-
-    m_overlayPipeline.reset(rhi->newGraphicsPipeline());
-    QRhiGraphicsPipeline::TargetBlend blend;
-    blend.enable = true;
-    blend.srcColor = QRhiGraphicsPipeline::SrcAlpha;
-    blend.dstColor = QRhiGraphicsPipeline::OneMinusSrcAlpha;
-    blend.srcAlpha = QRhiGraphicsPipeline::One;
-    blend.dstAlpha = QRhiGraphicsPipeline::OneMinusSrcAlpha;
-    m_overlayPipeline->setTargetBlends({blend});
-    m_overlayPipeline->setTopology(QRhiGraphicsPipeline::TriangleStrip);
-    m_overlayPipeline->setDepthTest(false);
-    m_overlayPipeline->setDepthWrite(false);
-    m_overlayPipeline->setShaderStages({
-        {QRhiShaderStage::Vertex, vs},
-        {QRhiShaderStage::Fragment, fs},
-    });
-
-    QRhiVertexInputLayout inputLayout;
-    inputLayout.setBindings({QRhiVertexInputBinding(4 * sizeof(float))});
-    inputLayout.setAttributes({QRhiVertexInputAttribute(0, 0, QRhiVertexInputAttribute::Float2, 0),
-                               QRhiVertexInputAttribute(0, 1, QRhiVertexInputAttribute::Float2, 2 * sizeof(float))});
-    m_overlayPipeline->setVertexInputLayout(inputLayout);
-    m_overlayPipeline->setShaderResourceBindings(m_overlaySrb.get());
-    m_overlayPipeline->setRenderPassDescriptor(target->renderPassDescriptor());
-
-    if (!m_overlayPipeline->create()) {
-        mne::Log::warning("ChannelRhiView: overlay pipeline create failed");
-        m_overlayPipeline.reset();
-        return;
-    }
-
-    // The static VBO needs an initial upload in the frame's resource batch.
-    m_overlayVboNeedsUpload = true;
-}
-
-//=============================================================================================================
-
-bool ChannelRhiRenderer::ensureOverlayResources(QRhi* rhi, QRhiRenderTarget* target, QRhiResourceUpdateBatch* batch)
-{
-    ensureOverlayPipeline(rhi, target);
-    if (!m_overlayPipeline || !m_overlayVbo || !m_overlayUbo)
-        return false;
-
-    // Upload the static quad VBO if it was just created
-    if (m_overlayVboNeedsUpload) {
-        batch->uploadStaticBuffer(m_overlayVbo.get(), 0,
-                                  static_cast<quint32>(sizeof(kQuadVerts)), kQuadVerts);
-        m_overlayVboNeedsUpload = false;
-    }
-    return true;
-}
-
 //=============================================================================================================
 
 bool ChannelRhiRenderer::hudVisible() const
@@ -1071,213 +684,27 @@ void ChannelRhiRenderer::paintHud(QPainter& painter) const
 }
 
 //=============================================================================================================
-// HUD quad — crosshair, scalebars, ruler and annotation selection painted into a screen-sized QImage and
-// drawn with the overlay pipeline after the traces. The shader parameters map the screen 1:1 to the texture
-// (no bands: gridEnabled = 0, sfreq = 0).
-//=============================================================================================================
-
-bool ChannelRhiRenderer::prepareHud(QRhi* rhi, QRhiResourceUpdateBatch* batch, int logicalW, int logicalH, qreal dpr)
-{
-    if (!hudVisible() || logicalW <= 0 || logicalH <= 0)
-        return false;
-
-    if (!m_hudUbo) {
-        m_hudUbo.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::UniformBuffer, kOverlayUboSize));
-        if (!m_hudUbo->create()) {
-            m_hudUbo.reset();
-            return false;
-        }
-    }
-
-    const qreal hudDpr = qMax(dpr, 1.0);
-    const QSize requiredTexSize(qMax(1, qRound(logicalW * hudDpr)), qMax(1, qRound(logicalH * hudDpr)));
-    if (!m_hudTex || !m_hudSrb || requiredTexSize != m_hudTexSize) {
-        m_hudTex.reset(rhi->newTexture(QRhiTexture::RGBA8, requiredTexSize));
-        if (!m_hudTex->create()) {
-            m_hudTex.reset();
-            return false;
-        }
-        // Same layout as m_overlaySrb, so the overlay pipeline can draw with it
-        m_hudSrb.reset(rhi->newShaderResourceBindings());
-        m_hudSrb->setBindings({QRhiShaderResourceBinding::sampledTexture(
-                                   1, QRhiShaderResourceBinding::FragmentStage,
-                                   m_hudTex.get(), m_overlaySampler.get()),
-                               QRhiShaderResourceBinding::uniformBuffer(
-                                   2, QRhiShaderResourceBinding::FragmentStage,
-                                   m_hudUbo.get())});
-        m_hudSrb->create();
-        m_hudTexSize = requiredTexSize;
-        m_hudDirty = true;
-    }
-
-    if (m_hudDirty) {
-        m_hudImage = QImage(requiredTexSize, QImage::Format_RGBA8888);
-        m_hudImage.setDevicePixelRatio(hudDpr);
-        m_hudImage.fill(Qt::transparent);
-        {
-            QPainter p(&m_hudImage);
-            paintHud(p);
-        }
-        QRhiTextureUploadEntry entry(0, 0, QRhiTextureSubresourceUploadDescription(m_hudImage));
-        batch->uploadTexture(m_hudTex.get(), entry);
-        m_hudDirty = false;
-    }
-
-    OverlayParams params;
-    params.scrollSample = 0.f;
-    params.samplesPerPixel = 1.f;
-    params.viewWidth = static_cast<float>(logicalW);
-    params.sfreq = 0.f;
-    params.firstFileSample = 0.f;
-    params.gridEnabled = 0.f;
-    params.overlayFirstSample = 0.f;
-    params.overlayTotalSamples = static_cast<float>(logicalW);
-    batch->updateDynamicBuffer(m_hudUbo.get(), 0, static_cast<quint32>(sizeof(params)), &params);
-    return true;
-}
-
 //=============================================================================================================
 
 void ChannelRhiRenderer::renderFrame(QRhi* rhi, QRhiRenderTarget* target, QRhiCommandBuffer* cb)
 {
     tickAnimations();
-    const bool hasTraces = m_model && totalLogicalChannels() > 0;
-
-    // ── Ensure GPU resources ─────────────────────────────────────────────
-    if (hasTraces) {
-        ensurePipeline(rhi, target);
-        if (!m_pipeline) {
-            // Pipeline not ready: show RED background so the failure is visible
-            QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
-            cb->beginPass(target, QColor(220, 0, 0), {1.f, 0}, u);
-            cb->endPass();
-            return;
-        }
-    }
-
-    QSize ps = target->pixelSize();
-    const int pw = ps.width();
-    const int ph = ps.height();
     const int logicalW = viewWidth();
-    const int logicalH = viewHeight();
-    const qreal overlayDpr = (logicalW > 0) ? (static_cast<qreal>(pw) / static_cast<qreal>(logicalW))
-                                            : (m_pHost ? m_pHost->surfaceDevicePixelRatio() : 1.0);
+    const qreal dpr = (logicalW > 0) ? (static_cast<qreal>(target->pixelSize().width()) / static_cast<qreal>(logicalW))
+                                     : (m_pHost ? m_pHost->surfaceDevicePixelRatio() : 1.0);
+    const QFont font = hostFont();
+    const QtTextMetrics metrics(font);
+    m_frameRenderer.setFont(font);
+    const scene::GpuFrame frame = m_frameBuilder.build(view(), *m_traceSource, traceStyle(), m_markers, metrics,
+                                                       RhiFrameRenderer::frameTarget(rhi, target, dpr));
+    m_frameRenderer.render(rhi, target, cb, frame, m_frameBuilder.resources());
+}
 
-    QRhiResourceUpdateBatch* batch = rhi->nextResourceUpdateBatch();
+//=============================================================================================================
 
-    bool overlayReady = false;
-    if (hasTraces) {
-        if (isVboDirty())
-            rebuildVBOs(rhi, batch);
-
-        updateUBO(batch);
-
-        // ── Overlay image (annotations + events; bands computed in shader) ──
-        if (ensureOverlayResources(rhi, target, batch) && pw > 0 && ph > 0 && logicalW > 0 && logicalH > 0) {
-            // Compute the overlay prefetch window (wider than the viewport)
-            const float visibleSamples = static_cast<float>(logicalW) * samplesPerPixel();
-            const float extraSamples = kOverlayPrefetchFactor * visibleSamples;
-            const float overlayFirstSample = scrollSample() - extraSamples;
-            const float overlayTotalSamples = visibleSamples + 2.0f * extraSamples;
-            // Width of overlay texture in logical pixels = 1 + 2*prefetch factor times viewport
-            const int overlayLogicalW = static_cast<int>(std::ceil(
-                (1.0f + 2.0f * kOverlayPrefetchFactor) * static_cast<float>(logicalW)));
-
-            // Rebuild the overlay QImage if dirty or resized
-            const QSize requiredTexSize(qRound(overlayLogicalW * overlayDpr),
-                                        qRound(logicalH * overlayDpr));
-            if (m_overlayDirty || requiredTexSize != m_overlayTexSize) {
-                // Store the sample range covered by this overlay build
-                m_overlayFirstSample = overlayFirstSample;
-                m_overlayTotalSamples = overlayTotalSamples;
-
-                rebuildOverlayImage(overlayLogicalW, logicalH, overlayDpr);
-
-                // (Re)create texture at the correct pixel size
-                if (requiredTexSize != m_overlayTexSize) {
-                    m_overlayTex.reset(rhi->newTexture(QRhiTexture::RGBA8, requiredTexSize));
-                    m_overlayTex->create();
-                    // Re-create SRB because it references the texture
-                    m_overlaySrb->setBindings({QRhiShaderResourceBinding::sampledTexture(
-                                                   1, QRhiShaderResourceBinding::FragmentStage,
-                                                   m_overlayTex.get(), m_overlaySampler.get()),
-                                               QRhiShaderResourceBinding::uniformBuffer(
-                                                   2, QRhiShaderResourceBinding::FragmentStage,
-                                                   m_overlayUbo.get())});
-                    m_overlaySrb->create();
-                    m_overlayTexSize = requiredTexSize;
-                }
-                QRhiTextureUploadEntry entry(0, 0, QRhiTextureSubresourceUploadDescription(m_overlayImage));
-                batch->uploadTexture(m_overlayTex.get(), entry);
-            }
-
-            // Upload per-frame overlay UBO (scroll params for shader-computed bands + UV mapping)
-            OverlayParams params;
-            params.scrollSample = scrollSample();
-            params.samplesPerPixel = samplesPerPixel();
-            params.viewWidth = static_cast<float>(logicalW);
-            params.sfreq = static_cast<float>(m_view.sfreq());
-            params.firstFileSample = static_cast<float>(m_view.first_file_sample());
-            params.gridEnabled = m_gridVisible ? 1.0f : 0.0f;
-            params.overlayFirstSample = m_overlayFirstSample;
-            params.overlayTotalSamples = m_overlayTotalSamples;
-            batch->updateDynamicBuffer(m_overlayUbo.get(), 0,
-                                       static_cast<quint32>(sizeof(params)), &params);
-
-            overlayReady = true;
-        }
-    }
-
-    // ── HUD image (crosshair, scalebars, ruler, annotation selection) ──
-    const bool hudReady = hudVisible() && pw > 0 && ph > 0 && ensureOverlayResources(rhi, target, batch) && prepareHud(rhi, batch, logicalW, logicalH, overlayDpr);
-
-    // ── Render pass ──────────────────────────────────────────────────────
-    QColor bg = m_bgColor;
-    cb->beginPass(target, bg, {1.f, 0}, batch);
-
-    cb->setViewport(QRhiViewport(0.f, 0.f, static_cast<float>(pw),
-                                 static_cast<float>(ph)));
-
-    if (hasTraces) {
-        // ── Waveform traces ──────────────────────────────────────────────────
-        cb->setGraphicsPipeline(m_pipeline.get());
-
-        // One draw per trace; its uniforms are in the UBO slot of the same index
-        for (int slot = 0; slot < std::ssize(m_traceDraws); ++slot) {
-            const int logCh = m_traceDraws[static_cast<std::size_t>(slot)].channel;
-            if (logCh >= std::ssize(m_gpuChannels))
-                continue;
-            const ChannelGpuData& gd = m_gpuChannels[static_cast<std::size_t>(logCh)];
-            if (!gd.vbo || gd.vertexCount < 2)
-                continue;
-
-            QRhiCommandBuffer::DynamicOffset dynOff{0, static_cast<quint32>(slot * m_uboStride)};
-            cb->setShaderResources(m_srb.get(), 1, &dynOff);
-            QRhiCommandBuffer::VertexInput vi(gd.vbo.get(), 0);
-            cb->setVertexInput(0, 1, &vi);
-            cb->draw(static_cast<quint32>(gd.vertexCount));
-        }
-    }
-
-    QRhiCommandBuffer::VertexInput overlayVi(m_overlayVbo.get(), 0);
-
-    // ── Overlay blit (bands + event lines) — drawn after waveforms ───────
-    if (overlayReady) {
-        cb->setGraphicsPipeline(m_overlayPipeline.get());
-        cb->setShaderResources(m_overlaySrb.get());
-        cb->setVertexInput(0, 1, &overlayVi);
-        cb->draw(4); // TriangleStrip: 4 vertices = 2 triangles = full-screen quad
-    }
-
-    // ── HUD blit (crosshair, scalebars, ruler, annotation selection) — on top of everything ──
-    if (hudReady) {
-        cb->setGraphicsPipeline(m_overlayPipeline.get());
-        cb->setShaderResources(m_hudSrb.get());
-        cb->setVertexInput(0, 1, &overlayVi);
-        cb->draw(4);
-    }
-
-    cb->endPass();
+QImage ChannelRhiRenderer::hudImage() const
+{
+    return m_frameRenderer.textureImage(m_frameBuilder.hud_texture());
 }
 
 //=============================================================================================================
@@ -1309,8 +736,8 @@ QImage ChannelRhiRenderer::renderToImage(const QSize& size) const
 
 void ChannelRhiRenderer::handleResize()
 {
-    m_geometry.invalidate();
-    m_overlayDirty = true;
+    m_frameBuilder.geometry().invalidate();
+    m_frameBuilder.invalidate_overlay();
     emit viewResized(viewWidth(), viewHeight());
     requestUpdate();
 }

@@ -14,12 +14,15 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <mne/disp/plots/helpers/rhiframerenderer.h>
 #include <mne/disp/viewers/helpers/channeldatamodel.h>
 #include <mne/disp/viewers/helpers/channelrhirenderer.h>
 #include <mne/disp/viewers/helpers/channelwindow.h>
 #include <mne/fiff/fiff_ch_info.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_info.h>
+#include <mne/scene/text_metrics.h>
+#include <mne/scene/trace_frame.h>
 
 #include <rhi/qrhi.h>
 #include <rhi/qrhi_platform.h>
@@ -186,6 +189,7 @@ private slots:
     void initTestCase();
     void renderer_rendersOffscreenFrame();
     void renderer_drawsHudOverlay();
+    void frames_matchTheirShaders();
     void window_rendersWithNullBackend();
     void window_forwardsInput();
     void cleanupTestCase();
@@ -307,6 +311,38 @@ void TestDispChannelWindow::renderer_drawsHudOverlay()
     QVERIFY(!renderer.hudVisible());
 
     renderer.releaseResources();
+}
+
+//=============================================================================================================
+
+void TestDispChannelWindow::frames_matchTheirShaders()
+{
+    // The trace view's frames feed every uniform block, sampler and vertex input of the .qsb shaders
+    scene::TraceView view;
+    view.set_source(&m_model.buffer());
+    view.set_view_size(320, 200);
+    view.set_sfreq(1000.0);
+    view.set_samples_per_pixel(0.5);
+    view.set_scalebars_visible(true);
+    scene::TraceFrameBuilder builder;
+    scene::GpuFrameTarget target;
+    target.pixel_width = 320;
+    target.pixel_height = 200;
+    const scene::ApproximateTextMetrics metrics;
+    scene::GpuFrame frame = builder.build(view, m_model.buffer(), scene::TraceStyle{}, scene::TraceMarkers{}, metrics, target);
+    QVERIFY(frame.passes.at(0).draws.size() >= 3);
+    RhiFrameRenderer renderer;
+    renderer.addShaderPrefix(":/disp/shaders/viewers/helpers/shaders/");
+    QVERIFY(renderer.checkShaders(frame, builder.resources()).empty());
+
+    // A uniform block of the wrong size, a missing sampler and a missing shader are reported
+    frame.passes[0].draws[0].uniforms[0].data.resize(48);
+    frame.passes[0].draws.back().textures.clear();
+    const std::vector<std::string> expected = {"channeldata: uniform block 0 has 48 bytes, the shader 52", "overlay: sampler 1 not set"};
+    QVERIFY(renderer.checkShaders(frame, builder.resources()) == expected);
+    RhiFrameRenderer unconfigured;
+    const std::vector<std::string> missing = unconfigured.checkShaders(frame, builder.resources());
+    QVERIFY(std::find(missing.begin(), missing.end(), "channeldata: no shaders") != missing.end());
 }
 
 //=============================================================================================================

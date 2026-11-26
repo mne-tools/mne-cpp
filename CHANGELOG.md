@@ -340,6 +340,15 @@ aliases; replace the old spelling as below.
   and the crosshair, scalebar, ruler and selection overlay.
   `test_scene_gpu_frame` tests the software backend; `test_scene_trace_view`
   renders a trace view headless against a golden PNG.
+- `disp::RhiFrameRenderer` (`disp/plots/helpers/rhiframerenderer.h`) is the
+  QRhi backend of the GPU frame description: one QRhi buffer, texture and
+  pipeline per resource handle, uploads of what changed, the uniform blocks
+  of all draws in one dynamic buffer, shaders as precompiled `.qsb` files
+  found by id, figure textures painted with `QPainter`. `checkShaders()`
+  compares a frame with the reflection of its shaders (uniform block sizes,
+  samplers, vertex inputs). `ChannelRhiRenderer` renders the frames of
+  `scene::TraceFrameBuilder` through it instead of its own QRhi code; its API
+  is unchanged except that `hudImage()` returns the image by value.
   The Qt usage ceiling of `disp` drops to 4543 tokens.
 - The data behind the raw-data views moved to `mne_scene` as well.
   `TraceBuffer` (`scene/trace_buffer.h`) stores the samples of the trace view
