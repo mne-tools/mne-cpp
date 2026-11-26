@@ -12,7 +12,7 @@ Map evoked MEG values onto a surface mesh with surface-constrained distances (Ge
 
 <ExampleFacts name="ex_interpolation" />
 
-**Libraries:** [Inverse](../../api/inv/index.mdx), [Visualization (Qt)](../../api/viz-qt/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Base](../../api/base/index.mdx)
+**Libraries:** [Inverse](../../api/inv/index.mdx), [Visualization](../../api/viz/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Base](../../api/base/index.mdx)
 
 ## Results
 
@@ -84,11 +84,16 @@ The documented classes this example uses most:
 
 | Class | Library |
 |---|---|
-| [`GeometryInfo`](../../api/viz-qt/geometry-info.mdx) | Visualization (Qt) |
-| [`Interpolation`](../../api/viz-qt/interpolation.mdx) | Visualization (Qt) |
+| [`GeometryInfo`](../../api/viz/geometry-info.mdx) | Visualization |
+| [`Interpolation`](../../api/viz/interpolation.mdx) | Visualization |
 | [`FiffChInfo`](../../api/fiff/fiff-ch-info.mdx) | FIFF I/O |
 | [`FiffEvoked`](../../api/fiff/fiff-evoked.mdx) | FIFF I/O |
 | [`MNEBem`](../../api/mne/mne-bem.mdx) | MNE Core |
+
+## Used in the API reference
+
+- [GeometryInfo](../../api/viz/geometry-info.mdx)
+- [Interpolation](../../api/viz/interpolation.mdx)
 
 ## Source
 
@@ -119,8 +124,8 @@ The documented classes this example uses most:
 
 #include <mne/inv/inv_source_estimate.h>
 #include <mne/mne/mne_bem.h>
-#include <mne/viz/backends/qt/3d/helpers/geometryinfo.h>
-#include <mne/viz/backends/qt/3d/helpers/interpolation.h>
+#include <mne/viz/brain/geometryinfo.h>
+#include <mne/viz/brain/interpolation.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/base/log.h>
 
@@ -144,7 +149,7 @@ The documented classes this example uses most:
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::viz::qt;
+using namespace mne::viz;
 using namespace Eigen;
 
 //=============================================================================================================

@@ -616,6 +616,7 @@
         "connectivity",
         "inv",
         "viz_qt",
+        "viz",
         "ieeg"
       ],
       "tasks": [
@@ -1140,7 +1141,7 @@
       "library": "viz_qt",
       "libraries": [
         "inv",
-        "viz_qt",
+        "viz",
         "mne",
         "fiff",
         "base"

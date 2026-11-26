@@ -614,6 +614,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       collapsed: true,
       link: {type: 'doc', id: 'api/viz/index'},
       items: [
+        'api/viz/geometry-info',
+        'api/viz/interpolation',
         'api/viz/channel-table',
         'api/viz/spectrum-table',
         'api/viz/bids-tree',
@@ -779,8 +781,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz-qt/time-ruler-widget',
         'api/viz-qt/trigger-detection-view',
         'api/viz-qt/electrode-object',
-        'api/viz-qt/geometry-info',
-        'api/viz-qt/interpolation',
         'api/viz-qt/multimodal-scene',
         'api/viz-qt/periodic-task',
         'api/viz-qt/rt-sensor-data-worker',

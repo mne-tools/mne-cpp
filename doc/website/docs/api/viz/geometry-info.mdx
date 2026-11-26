@@ -1,18 +1,18 @@
 ---
 id: geometry-info
-title: "mne::viz::qt::GeometryInfo"
+title: "mne::viz::GeometryInfo"
 sidebar_label: GeometryInfo
-sidebar_position: 65
+sidebar_position: 1
 ---
 
 # GeometryInfo
 
-**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/helpers/geometryinfo.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/helpers/geometryinfo.h)
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/geometryinfo.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/geometryinfo.h)
 
-`#include <mne/viz/backends/qt/geometryinfo.h>`
+`#include <mne/viz/geometryinfo.h>`
 
 ```cpp
-class mne::viz::qt::GeometryInfo
+class mne::viz::GeometryInfo
 ```
 
 This class allows sensor-to-mesh mapping and calculation of surface constrained distances.
@@ -140,6 +140,34 @@ filterBadChannels Filters bad channels from distance table.
 - Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 116"
+MatrixX3f sensors(2, 3);
+sensors << -0.2f, 0.1f, 0.5f,                                                             // above vertex 0
+    3.1f, 2.9f, 0.4f;                                                                     // above vertex 15
+VectorXi projected = GeometryInfo::projectSensors(vertices, sensors);                     // nearest vertex per sensor
+std::shared_ptr<MatrixXd> distances = GeometryInfo::scdc(vertices, neighbors, projected); // geodesic: n_vertices x n_sensors
+// scipy.sparse.csgraph.dijkstra on the same graph: Manhattan distances to vertices 0 and 15
+ok &= expect(projected == Vector2i(0, 15) && distances->rows() == 16 && (*distances)(5, 0) == 2.0 && (*distances)(5, 1) == 4.0 && (*distances)(3, 0) == 3.0 && (*distances)(3, 1) == 3.0,
+             "GeometryInfo projects the sensors onto vertices 0 and 15; geodesic distances match scipy");
+````
+
+### [ex_interpolation](../../examples/viz_qt/ex_interpolation.mdx)
+
+Map evoked MEG values onto a surface mesh with surface-constrained distances (GeometryInfo) and interpolation weights.
+
+````cpp title="src/examples/ex_interpolation/main.cpp, line 123"
+//projecting with MEG
+qint64 startTimeProjecting = QDateTime::currentMSecsSinceEpoch();
+VectorXi mappedSubSet = GeometryInfo::projectSensors(t_sensorSurfaceVV[0].rr, megSensors);
+std::cout << "Projecting duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeProjecting << " ms " << std::endl;
+````
 
 ## Authors of this file
 

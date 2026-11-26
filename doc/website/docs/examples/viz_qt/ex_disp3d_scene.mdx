@@ -12,7 +12,7 @@ Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, vide
 
 <ExampleFacts name="ex_disp3d_scene" />
 
-**Libraries:** [Connectivity](../../api/connectivity/index.mdx), [Inverse](../../api/inv/index.mdx), [Visualization (Qt)](../../api/viz-qt/index.mdx), [iEEG](../../api/ieeg/index.mdx)
+**Libraries:** [Connectivity](../../api/connectivity/index.mdx), [Inverse](../../api/inv/index.mdx), [Visualization (Qt)](../../api/viz-qt/index.mdx), [Visualization](../../api/viz/index.mdx), [iEEG](../../api/ieeg/index.mdx)
 
 ## What it demonstrates
 
@@ -63,8 +63,8 @@ The documented classes this example uses most:
 | [`BrainSurface`](../../api/viz-qt/brain-surface.mdx) | Visualization (Qt) |
 | [`BrainView`](../../api/viz-qt/brain-view.mdx) | Visualization (Qt) |
 | [`ElectrodeObject`](../../api/viz-qt/electrode-object.mdx) | Visualization (Qt) |
-| [`GeometryInfo`](../../api/viz-qt/geometry-info.mdx) | Visualization (Qt) |
-| [`Interpolation`](../../api/viz-qt/interpolation.mdx) | Visualization (Qt) |
+| [`GeometryInfo`](../../api/viz/geometry-info.mdx) | Visualization |
+| [`Interpolation`](../../api/viz/interpolation.mdx) | Visualization |
 | [`MultimodalScene`](../../api/viz-qt/multimodal-scene.mdx) | Visualization (Qt) |
 | [`SensorFieldMapper`](../../api/viz-qt/sensor-field-mapper.mdx) | Visualization (Qt) |
 | [`DipoleObject`](../../api/viz-qt/dipole-object.mdx) | Visualization (Qt) |
@@ -76,13 +76,13 @@ The documented classes this example uses most:
 - [IeegImplantation](../../api/ieeg/ieeg-implantation.mdx)
 - [InvEcdSet](../../api/inv/inv-ecd-set.mdx)
 - [InvEcd](../../api/inv/inv-ecd.mdx)
+- [GeometryInfo](../../api/viz/geometry-info.mdx)
+- [Interpolation](../../api/viz/interpolation.mdx)
 - [BrainRenderer](../../api/viz-qt/brain-renderer.mdx)
 - [BrainSurface](../../api/viz-qt/brain-surface.mdx)
 - [BrainView](../../api/viz-qt/brain-view.mdx)
 - [DipoleObject](../../api/viz-qt/dipole-object.mdx)
 - [ElectrodeObject](../../api/viz-qt/electrode-object.mdx)
-- [GeometryInfo](../../api/viz-qt/geometry-info.mdx)
-- [Interpolation](../../api/viz-qt/interpolation.mdx)
 - [LiveMarker](../../api/viz-qt/live-marker.mdx)
 - [MultiViewLayout](../../api/viz-qt/multi-view-layout.mdx)
 - [MultimodalScene](../../api/viz-qt/multimodal-scene.mdx)
@@ -124,8 +124,8 @@ The documented classes this example uses most:
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/viz/backends/qt/3d/helpers/geometryinfo.h>
-#include <mne/viz/backends/qt/3d/helpers/interpolation.h>
+#include <mne/viz/brain/geometryinfo.h>
+#include <mne/viz/brain/interpolation.h>
 #include <mne/viz/backends/qt/3d/renderable/brainsurface.h>
 #include <mne/viz/backends/qt/3d/renderable/dipoleobject.h>
 #include <mne/viz/backends/qt/3d/renderable/electrodeobject.h>
@@ -169,6 +169,7 @@ The documented classes this example uses most:
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace mne::viz;
 using namespace mne::viz::qt;
 using namespace mne;
 using namespace Eigen;

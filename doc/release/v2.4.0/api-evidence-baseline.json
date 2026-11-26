@@ -12959,54 +12959,6 @@
       "exempt_reason": "header prefix 'viz/backends/qt/3d/geometry/': Renderer internals behind the BrainView/MultimodalScene facade."
     },
     {
-      "name": "GeometryInfo",
-      "header": "viz/backends/qt/3d/helpers/geometryinfo.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": "ex_disp3d_scene",
-      "example_state": "built",
-      "including_examples": [
-        "ex_disp3d_scene",
-        "ex_interpolation"
-      ],
-      "snippets": [
-        "ex_disp3d_scene/main.cpp#geometry_info_usage"
-      ],
-      "api_page": "doc/website/docs/api/viz-qt/geometry-info.mdx",
-      "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
-    },
-    {
-      "name": "Interpolation",
-      "header": "viz/backends/qt/3d/helpers/interpolation.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": "ex_disp3d_scene",
-      "example_state": "built",
-      "including_examples": [
-        "ex_disp3d_scene",
-        "ex_interpolation"
-      ],
-      "snippets": [
-        "ex_disp3d_scene/main.cpp#interpolation_usage"
-      ],
-      "api_page": "doc/website/docs/api/viz-qt/interpolation.mdx",
-      "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
-    },
-    {
       "name": "CameraController",
       "header": "viz/backends/qt/3d/input/cameracontroller.h",
       "library": "viz",
@@ -15486,6 +15438,54 @@
         "ex_scene_sdl/main.cpp#sdl_host_usage"
       ],
       "api_page": "doc/website/docs/api/viz-sdl/sdl-host.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "GeometryInfo",
+      "header": "viz/brain/geometryinfo.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene",
+        "ex_interpolation"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#geometry_info_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/geometry-info.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "Interpolation",
+      "header": "viz/brain/interpolation.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene",
+        "ex_interpolation"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#interpolation_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/interpolation.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null

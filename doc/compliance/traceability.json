@@ -392,13 +392,16 @@
       "missing_tests": []
     },
     "viz": {
-      "classes": 92,
+      "classes": 94,
       "tested": 92,
-      "untested": [],
+      "untested": [
+        "GeometryInfo",
+        "Interpolation"
+      ],
       "missing_tests": []
     },
     "viz_qt": {
-      "classes": 128,
+      "classes": 126,
       "tested": 57,
       "untested": [
         "AbstractTreeItem",
@@ -433,11 +436,9 @@
         "FrequencySpectrumDelegate",
         "FrequencySpectrumModel",
         "FwdSettingsView",
-        "GeometryInfo",
         "Graph",
         "HpiSettingsView",
         "ImageSc",
-        "Interpolation",
         "LinePlot",
         "LiveMarker",
         "MNEOperator",

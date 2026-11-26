@@ -266,7 +266,7 @@
       "by_category": {},
       "public_header_includes": 0,
       "q_object": 0,
-      "files": 86,
+      "files": 90,
       "modules": []
     },
     "viz/backends/qt": {
@@ -283,7 +283,7 @@
       },
       "public_header_includes": 159,
       "q_object": 76,
-      "files": 234,
+      "files": 230,
       "modules": [
         "Core",
         "Gui",
