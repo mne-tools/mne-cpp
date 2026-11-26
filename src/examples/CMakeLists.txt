@@ -24,6 +24,10 @@ if(NOT WASM)
   add_subdirectory(ex_make_layout)
   add_subdirectory(ex_mna)
   add_subdirectory(ex_scene)
+  # A trace view in an SDL3 window instead of Qt; needs SDL3 (find_package)
+  if(BUILD_EXAMPLES_SDL)
+    add_subdirectory(ex_scene_sdl)
+  endif()
 endif()
 
 # The other examples are Qt programs.

@@ -63,6 +63,15 @@ jobs:
       run: |
         call scripts\ci\download_toolchain.bat --kind eigen --version "%EIGEN_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\3rdparty\eigen"
 
+    # ex_scene_sdl runs the trace view in an SDL3 window instead of Qt (a second host of mne_scene)
+    - name: Install SDL3 (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install sdl3
+        echo "SDL_ARGS=-DBUILD_EXAMPLES_SDL=ON -DSDL3_DIR=$(brew --prefix sdl3)/lib/cmake/SDL3" >> "$GITHUB_ENV"
+
     - name: Build, test, install and consume the Qt-free SDK
       shell: bash
-      run: ./scripts/ci/qt_free_sdk.sh "$RUNNER_TEMP/qt-free" -DMNE_WARNINGS_AS_ERRORS=ON -DUSE_ONNXRUNTIME=OFF
+      run: |
+        read -ra sdl <<< "${SDL_ARGS:-}"
+        ./scripts/ci/qt_free_sdk.sh "$RUNNER_TEMP/qt-free" -DMNE_WARNINGS_AS_ERRORS=ON -DUSE_ONNXRUNTIME=OFF "${sdl[@]}"

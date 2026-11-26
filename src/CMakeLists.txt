@@ -31,6 +31,7 @@ else()
 endif()
 
 option(BUILD_EXAMPLES "Build examples" ON)
+option(BUILD_EXAMPLES_SDL "Build the examples that need SDL3 (ex_scene_sdl)" OFF)
 option(BUILD_APPLICATIONS "Build applications" ON)
 option(BUILD_TOOLS "Build CLI tools (when BUILD_APPLICATIONS is ON)" ON)
 option(BUILD_TESTS "Build tests" OFF)

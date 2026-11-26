@@ -18671,6 +18671,18 @@
         ],
         "level": "start",
         "library": "scene"
+      },
+      "ex_scene_sdl": {
+        "title": "Run the trace view in an SDL3 window instead of Qt",
+        "tasks": [
+          "visualization",
+          "real-time"
+        ],
+        "modalities": [
+          "eeg"
+        ],
+        "level": "intermediate",
+        "library": "scene"
       }
     }
   }

@@ -177,6 +177,7 @@ cmake --build build --config Release --parallel %NUMBER_OF_PROCESSORS%
 | `BUILD_SHARED_LIBS` | `ON` | Build shared (dynamic) libraries |
 | `BUILD_APPLICATIONS` | `ON` | Build GUI applications |
 | `BUILD_EXAMPLES` | `ON` | Build example programs |
+| `BUILD_EXAMPLES_SDL` | `OFF` | Build `ex_scene_sdl`, the trace view in an SDL3 window instead of Qt; needs SDL3 (`find_package(SDL3)`, e.g. `-DSDL3_DIR=$(brew --prefix sdl3)/lib/cmake/SDL3`) |
 | `BUILD_TESTS` | `OFF` | Build unit tests |
 | `BUILD_ALL` | `OFF` | Enable apps, examples, and tests |
 | `MNE_BUILD_QT` | `ON` | Build the Qt-based parts: the display libraries, applications, CLI tools, plugins and the QtTest tests. Switches itself off when Qt is not found (see [Libraries without Qt](#libraries-without-qt)) |

@@ -362,6 +362,12 @@ aliases; replace the old spelling as below.
   GPU frames, or SVG) or a FreeSurfer surface with a source estimate (PNG)
   headless, without Qt, a window system or a GPU, on the software backend of
   `mne_scene`; `--autoscale` scales channel types to their signals.
+- New example `ex_scene_sdl` (`-DBUILD_EXAMPLES_SDL=ON`, needs SDL3) runs the
+  trace view in an SDL3 window instead of Qt: the same `TraceView`,
+  `TraceBuffer` and `TraceFrameBuilder`, frames executed by the software
+  backend and shown as an SDL texture, SDL input translated to scene input
+  events, a synthetic recording streaming in. The Qt-free CI job builds and
+  runs it on macOS (SDL's dummy video driver).
   The Qt usage ceiling of `disp` drops to 4543 tokens.
 - The data behind the raw-data views moved to `mne_scene` as well.
   `TraceBuffer` (`scene/trace_buffer.h`) stores the samples of the trace view
