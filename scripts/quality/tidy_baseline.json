@@ -656,15 +656,6 @@
     "src/apps/mne_scan/plugins/ftbuffer/ftbuffer.h": {
       "modernize-use-override": 11
     },
-    "src/apps/mne_scan/plugins/ftbuffer/ftbuffproducer.cpp": {
-      "performance-unnecessary-value-param": 1
-    },
-    "src/apps/mne_scan/plugins/ftbuffer/ftbuffproducer.h": {
-      "modernize-use-override": 1
-    },
-    "src/apps/mne_scan/plugins/ftbuffer/ftconnector.h": {
-      "modernize-use-override": 1
-    },
     "src/apps/mne_scan/plugins/hpi/FormFiles/hpisetupwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
@@ -903,15 +894,6 @@
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/disp/viewers/helpers/averagescene.h": {
-      "modernize-use-nullptr": 1
-    },
-    "src/libs/mne/disp/viewers/helpers/averagesceneitem.cpp": {
-      "bugprone-integer-division": 2
-    },
-    "src/libs/mne/disp/viewers/helpers/averagesceneitem.h": {
-      "modernize-use-override": 4
-    },
     "src/libs/mne/disp/viewers/helpers/bidsviewmodel.cpp": {
       "bugprone-switch-missing-default-case": 1
     },
@@ -943,13 +925,6 @@
       "modernize-use-nullptr": 1,
       "modernize-use-override": 5
     },
-    "src/libs/mne/disp/viewers/helpers/filterplotscene.cpp": {
-      "bugprone-integer-division": 13,
-      "bugprone-switch-missing-default-case": 1
-    },
-    "src/libs/mne/disp/viewers/helpers/filterplotscene.h": {
-      "modernize-use-nullptr": 1
-    },
     "src/libs/mne/disp/viewers/helpers/frequencyspectrumdelegate.cpp": {
       "bugprone-switch-missing-default-case": 2
     },
@@ -963,10 +938,6 @@
     "src/libs/mne/disp/viewers/helpers/frequencyspectrummodel.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 4
-    },
-    "src/libs/mne/disp/viewers/helpers/layoutscene.h": {
-      "modernize-use-nullptr": 1,
-      "modernize-use-override": 9
     },
     "src/libs/mne/disp/viewers/helpers/rtfiffrawviewdelegate.cpp": {
       "bugprone-integer-division": 5,
@@ -984,18 +955,6 @@
     "src/libs/mne/disp/viewers/helpers/rtfiffrawviewmodel.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 5
-    },
-    "src/libs/mne/disp/viewers/helpers/selectionscene.cpp": {
-      "performance-unnecessary-value-param": 2
-    },
-    "src/libs/mne/disp/viewers/helpers/selectionscene.h": {
-      "modernize-use-nullptr": 1
-    },
-    "src/libs/mne/disp/viewers/helpers/selectionsceneitem.cpp": {
-      "performance-unnecessary-value-param": 1
-    },
-    "src/libs/mne/disp/viewers/helpers/selectionsceneitem.h": {
-      "modernize-use-override": 2
     },
     "src/libs/mne/disp/viewers/helpers/timerulerwidget.cpp": {
       "bugprone-incorrect-roundings": 1
@@ -1633,18 +1592,8 @@
     "src/tests/test_math_sphere/test_math_sphere.cpp": {
       "bugprone-random-generator-seed": 1
     },
-    "src/tools/conversion/mne_edf2fiff/edf_ch_info.cpp": {
-      "performance-unnecessary-value-param": 4
-    },
-    "src/tools/conversion/mne_edf2fiff/edf_raw_data.cpp": {
-      "performance-unnecessary-copy-initialization": 1
-    },
     "src/tools/conversion/mne_eximia2fiff/main.cpp": {
       "performance-unnecessary-copy-initialization": 1
-    },
-    "src/tools/info/mne_show_fiff/mne_fiff_exp_set.cpp": {
-      "bugprone-switch-missing-default-case": 1,
-      "clang-analyzer-deadcode.DeadStores": 1
     },
     "src/tools/info/mne_show_mna/main.cpp": {
       "performance-unnecessary-copy-initialization": 1
@@ -1661,10 +1610,6 @@
     },
     "src/tools/preprocessing/mne_anonymize/settingscontrollercl.cpp": {
       "bugprone-assignment-in-if-condition": 2
-    },
-    "src/tools/server/mne_rt_server/mne_rt_server/IConnector.h": {
-      "bugprone-reserved-identifier": 1,
-      "modernize-use-override": 2
     },
     "src/tools/server/mne_rt_server/mne_rt_server/commandserver.cpp": {
       "performance-unnecessary-value-param": 3

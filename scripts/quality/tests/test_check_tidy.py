@@ -125,6 +125,11 @@ class ConfigTests(unittest.TestCase):
             self.assertTrue(tidy.in_scope(file), file)
             self.assertTrue(all(isinstance(n, int) and n > 0 for n in checks.values()), file)
 
+    def test_baseline_lists_existing_files(self) -> None:
+        baseline = json.loads(tidy.BASELINE.read_text(encoding="utf-8"))
+        missing = [file for file in baseline["findings"] if not (_REPO_ROOT / file).is_file()]
+        self.assertEqual(missing, [])
+
     def test_ci_pins_version(self) -> None:
         text = (_REPO_ROOT / ".github" / "workflows" / "_reusable-tests.yml").read_text(encoding="utf-8")
         self.assertIn(f"clang-tidy=={tidy.CLANG_TIDY_VERSION}", text)
