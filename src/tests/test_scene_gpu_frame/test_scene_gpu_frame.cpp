@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/scene/canvas.h>
-#include <mne/scene/gpu_frame.h>
-#include <mne/scene/software_renderer.h>
+#include <mne/viz/figures/canvas.h>
+#include <mne/viz/gpu/gpu_frame.h>
+#include <mne/viz/gpu/software_renderer.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -34,7 +34,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::scene;
+using namespace mne::viz;
 
 namespace
 {

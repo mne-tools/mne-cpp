@@ -20,17 +20,17 @@
 #include <mne/base/log.h>
 #include "realtimemultisamplearraywidget.h"
 
-#include <mne/disp/viewers/filterdesignview.h>
-#include <mne/disp/viewers/channelselectionview.h>
-#include <mne/disp/viewers/helpers/channelinfomodel.h>
-#include <mne/disp/viewers/rtfiffrawview.h>
-#include <mne/disp/viewers/scalingview.h>
-#include <mne/disp/viewers/projectorsview.h>
-#include <mne/disp/viewers/filtersettingsview.h>
-#include <mne/disp/viewers/compensatorview.h>
-#include <mne/disp/viewers/spharasettingsview.h>
-#include <mne/disp/viewers/fiffrawviewsettings.h>
-#include <mne/disp/viewers/triggerdetectionview.h>
+#include <mne/viz/backends/qt/viewers/filterdesignview.h>
+#include <mne/viz/backends/qt/viewers/channelselectionview.h>
+#include <mne/viz/backends/qt/viewers/helpers/channelinfomodel.h>
+#include <mne/viz/backends/qt/viewers/rtfiffrawview.h>
+#include <mne/viz/backends/qt/viewers/scalingview.h>
+#include <mne/viz/backends/qt/viewers/projectorsview.h>
+#include <mne/viz/backends/qt/viewers/filtersettingsview.h>
+#include <mne/viz/backends/qt/viewers/compensatorview.h>
+#include <mne/viz/backends/qt/viewers/spharasettingsview.h>
+#include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
+#include <mne/viz/backends/qt/viewers/triggerdetectionview.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <mne/dsp/filterkernel.h>
 #include <mne/fiff/fiff_info.h>
@@ -58,7 +58,7 @@
 //=============================================================================================================
 
 using namespace mne::scan;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

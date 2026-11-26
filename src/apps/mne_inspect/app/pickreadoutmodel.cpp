@@ -20,7 +20,7 @@
 
 #include "plugins/electrodes/electrodes.h"
 #include "plugins/mri_slices/mri_slices.h"
-#include <mne/disp3D/scene/multimodalscene.h>
+#include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 using namespace MNEINSPECT;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 

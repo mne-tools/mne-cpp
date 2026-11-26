@@ -17,15 +17,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/scene/average_layout.h>
-#include <mne/scene/canvas.h>
-#include <mne/scene/filter_response_plot.h>
-#include <mne/scene/line_chart.h>
-#include <mne/scene/raster_renderer.h>
-#include <mne/scene/sensor_layout.h>
-#include <mne/scene/settings_form.h>
-#include <mne/scene/svg_renderer.h>
-#include <mne/scene/text_metrics.h>
+#include <mne/viz/figures/average_layout.h>
+#include <mne/viz/figures/canvas.h>
+#include <mne/viz/figures/filter_response_plot.h>
+#include <mne/viz/figures/line_chart.h>
+#include <mne/viz/figures/raster_renderer.h>
+#include <mne/viz/figures/sensor_layout.h>
+#include <mne/viz/forms/settings_form.h>
+#include <mne/viz/figures/svg_renderer.h>
+#include <mne/viz/figures/text_metrics.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -48,7 +48,7 @@
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::scene;
+using namespace mne::viz;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
@@ -152,7 +152,7 @@ int main()
     ok &= expect(topo.tile_at(topo.tiles()[0].box.center()) == 0, "the tile is found at its centre");
 
     //! [settings_form_usage]
-    // A settings panel described once; any toolkit builds its widgets from it (disp::SettingsPanel for Qt)
+    // A settings panel described once; any toolkit builds its widgets from it (viz::qt::SettingsPanel for Qt)
     SettingsForm form("Averaging");
     form.add_int("trials", "Number of trials", 10, 1, 1000, 1, {}, "General");
     form.add_bool("baseline", "Baseline correction", false, "Baseline");

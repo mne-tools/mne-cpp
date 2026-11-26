@@ -23,7 +23,7 @@
 //=============================================================================================================
 
 #include "rawdataviewer_global.h"
-#include <mne/disp/viewers/abstractview.h>
+#include <mne/viz/backends/qt/viewers/abstractview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -80,7 +80,7 @@ class FiffRawViewDelegate;
 /**
  * TableView for Fiff data.
  */
-class RAWDATAVIEWERSHARED_EXPORT FiffRawView : public mne::disp::AbstractView
+class RAWDATAVIEWERSHARED_EXPORT FiffRawView : public mne::viz::qt::AbstractView
 {
     Q_OBJECT
 
@@ -381,7 +381,7 @@ private:
     std::map<int, float> m_qMapChScaling; /**< Channel scaling values. */
 
     float m_fDefaultSectionSize;  /**< Default row height */
-    float m_fZoomFactor = 16.0f;  /**< Number of channels shown at once (mne::disp::FiffRawViewSettings default) */
+    float m_fZoomFactor = 16.0f;  /**< Number of channels shown at once (mne::viz::qt::FiffRawViewSettings default) */
     int m_iLastClickedSample = 0; /**< Stores last clicked sample on screen */
 
     qint32 m_iT = 10; /**< Display window size in seconds. */

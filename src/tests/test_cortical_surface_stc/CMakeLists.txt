@@ -13,7 +13,7 @@ set(QT_REQUIRED_COMPONENTS Core Widgets Test)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-# The cortical_surface plugin is only built when mne_disp3D is available;
+# The cortical_surface plugin is only built when mne_viz_qt is available;
 # silently skip this test otherwise (e.g. WASM).
 enable_testing()
 mne_add_test(${PROJECT_NAME}
@@ -45,7 +45,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     analyze_cortical_surface
     anShared
-    mne_disp3D
+    mne_viz_qt
     mne_inv
     mne_fs
     mne_mne

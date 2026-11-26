@@ -75,8 +75,8 @@ GITHUB_BLOB = "https://github.com/mne-tools/mne-cpp/blob/staging"
 # Most specific first: an example is filed under the first library it includes.
 LIBRARIES = {
     "acq": "Acquisition", "connectivity": "Connectivity", "decoding": "Decoding", "ml": "Machine Learning",
-    "sts": "Statistics", "inv": "Inverse", "fwd": "Forward", "disp3D": "3D Visualization",
-    "disp": "Visualization", "scene": "Figures", "dsp": "Signal Processing", "ieeg": "iEEG", "bids": "BIDS",
+    "sts": "Statistics", "inv": "Inverse", "fwd": "Forward", "viz_qt": "Visualization (Qt)",
+    "viz": "Visualization", "dsp": "Signal Processing", "ieeg": "iEEG", "bids": "BIDS",
     "lsl": "Lab Streaming Layer", "com": "Communication", "mna": "MNA Pipelines", "mri": "MRI", "fs": "FreeSurfer",
     "mne": "MNE Core", "fiff": "FIFF I/O", "math": "Math", "channels": "Channels", "pybridge": "Python Bridge", "report": "Report", "base": "Base",
 }
@@ -86,7 +86,7 @@ DATASETS = {
     "mne-cpp-test-data": "the [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data) repository "
                          "cloned to `resources/data/mne-cpp-test-data`",
 }
-INCLUDE = re.compile(r"^#include\s*<mne/(\w+)/", re.M)
+INCLUDE = re.compile(r"^#include\s*<mne/((?:viz/backends/)?\w+)/", re.M)
 BRIEF = re.compile(r"@brief\s+(.+?)\s*(?:\*/)?$", re.M)
 NOT_CODE = re.compile(r"^\s*(#|using\b|//|\*|/\*)")
 SNIPPET_MARKER = re.compile(r"^\s*//! \[\w+\]\s*$")
@@ -100,7 +100,7 @@ OPTION = re.compile(r'QCommandLineOption\s+\w+\(\s*(\{[^}]*\}|"[^"]*")\s*,\s*"((
 
 
 def api_slug(lib: str) -> str:
-    return re.sub(r"(?<=[0-9a-z])([A-Z])", r"-\1", lib).lower()
+    return re.sub(r"(?<=[0-9a-z])([A-Z])", r"-\1", lib).replace("_", "-").lower()
 
 
 def mdx_text(text: str) -> str:
@@ -152,7 +152,8 @@ def example_info(src: Path) -> tuple[list[str], str, dict[str, list[str]]]:
     """(libraries most specific first, brief, {file name: lines}) of one example directory."""
     texts = {p.name: p.read_text(encoding="utf-8") for p in sorted(src.iterdir()) if p.suffix in {".cpp", ".h"}}
     brief = _header_text(texts["main.cpp"])[0].rstrip(".") or src.name
-    used = {m for text in texts.values() for m in INCLUDE.findall(text)}
+    # A backend under viz/backends/<name> is filed as viz_<name>
+    used = {m.replace("viz/backends/", "viz_") for text in texts.values() for m in INCLUDE.findall(text)}
     return [lib for lib in LIBRARIES if lib in used], brief, {n: t.splitlines() for n, t in texts.items()}
 
 

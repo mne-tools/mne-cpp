@@ -9,7 +9,7 @@
  * @date     May, 2026
  * @brief    Lightweight 3-D viewer for MNE Align.
  *
- *           Hosts a @ref mne::disp::MultimodalScene and registers two
+ *           Hosts a @ref mne::viz::qt::MultimodalScene and registers two
  *           layers: the loaded head BEM mesh (`SceneLayerKind::BrainSurface`)
  *           and the live set of acquired digitisation points
  *           (`SceneLayerKind::Custom`, id="acquired_points"). The actual
@@ -54,13 +54,13 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class BrainTreeModel;
 class BrainView;
 }
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class MultimodalScene;
 }
@@ -90,7 +90,7 @@ enum class CameraFocus
 /**
  * @brief 3-D viewer widget for the MNE Align digitisation workflow.
  *
- * Hosts a @ref mne::disp::MultimodalScene, renders the head BEM mesh,
+ * Hosts a @ref mne::viz::qt::MultimodalScene, renders the head BEM mesh,
  * digitised points, and live Polhemus tracker markers. Manages the
  * device→head and head→MRI transform chain.
  */
@@ -170,7 +170,7 @@ public:
     }
 
     /** @return The underlying multimodal scene. */
-    mne::disp::MultimodalScene* scene() const;
+    mne::viz::qt::MultimodalScene* scene() const;
 
     /** @return The loaded BEM data (may be null). */
     std::shared_ptr<mne::MNEBem> bem() const
@@ -256,7 +256,7 @@ private:
     void applyViewConfiguration();
 
     AlignPoints* m_pPoints = nullptr;
-    std::unique_ptr<mne::disp::MultimodalScene> m_pScene;
+    std::unique_ptr<mne::viz::qt::MultimodalScene> m_pScene;
     std::shared_ptr<mne::MNEBem> m_pBem;
     int m_cameraPreset = 1;
     CameraFocus m_cameraFocus = CameraFocus::Brain;
@@ -277,8 +277,8 @@ private:
     bool m_haveHeadToMriOverride = false;
     QMatrix4x4 m_headToMriOverride;
 
-    QPointer<mne::disp::BrainView> m_pBrainView;
-    QPointer<mne::disp::BrainTreeModel> m_pBrainModel;
+    QPointer<mne::viz::qt::BrainView> m_pBrainView;
+    QPointer<mne::viz::qt::BrainTreeModel> m_pBrainModel;
 };
 
 } // namespace MNEALIGN

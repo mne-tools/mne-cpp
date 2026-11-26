@@ -188,7 +188,7 @@ cmake --build build --config Release --parallel %NUMBER_OF_PROCESSORS%
 
 ### Libraries without Qt
 
-Only the display libraries (`mne_disp`, `mne_disp3D`), the applications, the CLI tools and the plugins use Qt.
+Only `mne_viz_qt` (the Qt backend of `mne_viz`), the applications, the CLI tools and the plugins use Qt.
 To build the other libraries without it, configure with `-DMNE_BUILD_QT=OFF`, or leave Qt off
 `CMAKE_PREFIX_PATH`: CMake then reports that Qt was not found and switches `MNE_BUILD_QT` off for that
 configuration. Eigen is still required.
@@ -200,7 +200,7 @@ ctest --test-dir build-noqt
 cmake --install build-noqt --prefix "$HOME/mne-cpp-sdk"
 ```
 
-This builds all libraries except `mne_disp` and `mne_disp3D`, and the examples that use the libraries only
+This builds all libraries except `mne_viz_qt`, and the examples that use the libraries only
 (`ex_base`, `ex_channels`, `ex_com`, `ex_mna`, `ex_make_layout`, `ex_scene`, `ex_acq_performance`, `ex_acq_polhemus`);
 with `BUILD_TESTS=ON` those examples run as tests. The unit tests use QtTest and are built with Qt only.
 The installed `MNE-CPPConfig.cmake` neither looks for Qt nor passes it on to your targets.
@@ -208,26 +208,38 @@ The installed `MNE-CPPConfig.cmake` neither looks for Qt nor passes it on to you
 refers to Qt and builds `scripts/ci/sdk_consumer` against the install tree; CI runs it on Linux, macOS and
 Windows.
 
-### Figures without Qt
+### Visualization without Qt
 
-The plots are drawn in two layers. `mne_scene` (Qt-free, beside `mne_math` in the layering) describes a
-figure as a display list of lines, paths, rectangles, text and images with their pens, fonts, transforms
-and clips, recorded through `mne::scene::Canvas`, whose calls follow `QPainter`. It renders display lists to
-SVG (`to_svg`, `write_svg`) and, through `mne::RasterImage`, to PNG (`to_raster`), and it holds the plot
-models: `LineChart`, `BarChart`, `SplinePlot`, `ImagePlot`, `VectorPlot`, `ButterflyPlot` and
-`AverageTile`. The widgets of `mne_disp` (`LinePlot`, `Bar`, `Spline`, `ImageSc`, `TFplot`, `Plot`,
-`ButterflyView` and the channel tiles of `AverageLayoutView`) keep such a model and paint it through the
-QPainter backend in `disp/plots/helpers/scenepainter.h`, so a figure looks the same on screen, in an SVG file
-and in a PNG written by a tool without Qt. `test_scene_render` compares each plot's SVG and PNG output with
-golden files in `src/tests/test_scene_render/data`; run it with `MNE_UPDATE_GOLDEN=1` to rewrite them after an
-intended change.
+Visualization is split into a toolkit-free core and backends:
 
-The interactive views keep their state in `mne_scene` as well, driven by toolkit-neutral input events
-(`scene/input_event.h`): `TraceView` for the raw-data traces, and for the 3-D brain view `OrbitCamera` (camera
-matrices and view presets), `BrainViewInteraction` (orbit, pan, zoom and pane splitters), `MultiViewLayout`,
-the pick rays of `scene/ray_picking.h` and the head-up display `BrainViewOverlay`. The 3-D maths use Eigen,
-which `mne_scene` links like `mne_math`. `test_scene_trace_view` and `test_scene_brain_view` test them
-without Qt.
+```text
+src/libs/mne/viz/                 mne_viz       what the viewers show and how they behave, no GUI toolkit
+  figures/  views/  gpu/  forms/  models/
+  backends/
+    qt/                           mne_viz_qt    Qt backend: QRhi rendering, windows, widgets, item models, 3d/
+```
+
+`mne_viz` describes a figure as a display list of lines, paths, rectangles, text and images with their pens,
+fonts, transforms and clips, recorded through `mne::viz::Canvas`, whose calls follow `QPainter`. It renders
+display lists to SVG (`to_svg`, `write_svg`) and, through `mne::RasterImage`, to PNG (`to_raster`), and it holds
+the plot models: `LineChart`, `BarChart`, `SplinePlot`, `ImagePlot`, `VectorPlot`, `ButterflyPlot` and
+`AverageTile` (`figures/`). The widgets of `mne_viz_qt` (`LinePlot`, `Bar`, `Spline`, `ImageSc`, `TFplot`,
+`Plot`, `ButterflyView` and the channel tiles of `AverageLayoutView`) keep such a model and paint it through the
+QPainter backend in `viz/backends/qt/plots/helpers/scenepainter.h`, so a figure looks the same on screen, in an
+SVG file and in a PNG written by a tool without Qt. `test_scene_render` compares each plot's SVG and PNG output
+with golden files in `src/tests/test_scene_render/data`; run it with `MNE_UPDATE_GOLDEN=1` to rewrite them after
+an intended change.
+
+The interactive views keep their state in `mne_viz` as well (`views/`), driven by toolkit-neutral input events
+(`views/input_event.h`): `TraceView` for the raw-data traces, and for the 3-D brain view `OrbitCamera` (camera
+matrices and view presets), `BrainViewInteraction` (orbit, pan, zoom and pane splitters), the pick rays of
+`views/ray_picking.h` and the head-up display `BrainViewOverlay`. Their frames are described as `GpuFrame`s
+(`gpu/`), which the built-in `SoftwareRenderer` draws headless and `mne_viz_qt` draws with QRhi. Settings panels
+are described as `SettingsForm`s (`forms/`) and the table, spectrum and BIDS browser data as view models
+(`models/`). `test_scene_trace_view` and `test_scene_brain_view` test them without Qt.
+
+A backend depends on `mne_viz` only, never on another backend, and `mne_viz` never includes from `backends/`;
+`scripts/quality/audit_dependencies.py` enforces both through the layering in `dependency_policy.json`.
 
 ### Via Qt Creator
 

@@ -20,8 +20,8 @@
 #include <mne/fiff/fiff.h>
 #include <mne/mne/mne.h>
 #include <mne/mne/mne_epoch_data_list.h>
-#include <mne/disp/plots/helpers/figureexporter.h>
-#include <mne/disp/plots/imagesc.h>
+#include <mne/viz/backends/qt/plots/helpers/figureexporter.h>
+#include <mne/viz/backends/qt/plots/imagesc.h>
 #include <mne/base/log.h>
 
 //=============================================================================================================
@@ -44,7 +44,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 using namespace Eigen;
 

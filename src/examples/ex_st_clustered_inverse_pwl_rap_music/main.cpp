@@ -27,8 +27,8 @@
 #include <mne/mne/mne_epoch_data_list.h>
 #include <mne/inv/inv_source_estimate.h>
 #include <mne/inv/rap_music/inv_pwl_rap_music.h>
-#include <mne/disp3D/view/brainview.h>
-#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
 #include <mne/base/log.h>
 
 //=============================================================================================================
@@ -51,7 +51,7 @@
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // MAIN

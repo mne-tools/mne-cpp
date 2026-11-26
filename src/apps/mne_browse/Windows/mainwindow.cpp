@@ -1339,14 +1339,14 @@ void MainWindow::setupWindowWidgets()
             this, &MainWindow::recomputeEvoked);
 
     auto refreshAnnotationOverlay = [this]() {
-        std::vector<mne::disp::ChannelRhiView::AnnotationSpan> spans;
+        std::vector<mne::viz::qt::ChannelRhiView::AnnotationSpan> spans;
         const QVector<AnnotationSpanData> modelSpans =
             m_pAnnotationWindow->getAnnotationModel()->getAnnotationSpans();
         spans.reserve(modelSpans.size());
         for (const AnnotationSpanData& modelSpan : modelSpans) {
             if (!m_pAnnotationWindow->isDescriptionVisible(modelSpan.label))
                 continue;
-            mne::disp::ChannelRhiView::AnnotationSpan span;
+            mne::viz::qt::ChannelRhiView::AnnotationSpan span;
             span.startSample = modelSpan.startSample;
             span.endSample = modelSpan.endSample;
             span.color = modelSpan.color;
@@ -1416,7 +1416,7 @@ void MainWindow::setupWindowWidgets()
     // Connect crosshair cursor data to status bar
     // The signal is forwarded: ChannelRhiView → ChannelDataView → here
     if (m_pDataWindow->getChannelDataView()) {
-        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::cursorDataChanged,
+        connect(m_pDataWindow->getChannelDataView(), &mne::viz::qt::ChannelDataView::cursorDataChanged,
                 this, [this](float timeSec, float amplitude, const QString& channelName, const QString& unitLabel) {
                     auto fmtAmp = [](float amp, const QString& unit) -> QString {
                         float absAmp = qAbs(amp);
@@ -1452,25 +1452,25 @@ void MainWindow::setupWindowWidgets()
                 });
 
         // Sync toolbar action checked states when toggled via keyboard shortcuts
-        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::crosshairToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::viz::qt::ChannelDataView::crosshairToggled,
                 m_pCrosshairAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::butterflyToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::viz::qt::ChannelDataView::butterflyToggled,
                 m_pButterflyAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::scalebarsToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::viz::qt::ChannelDataView::scalebarsToggled,
                 m_pScalebarsAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::eventsVisibleToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::viz::qt::ChannelDataView::eventsVisibleToggled,
                 m_pEventsVisibleAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::annotationsVisibleToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::viz::qt::ChannelDataView::annotationsVisibleToggled,
                 m_pAnnotationsVisibleAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::overviewBarToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::viz::qt::ChannelDataView::overviewBarToggled,
                 m_pOverviewBarAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::epochMarkersToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::viz::qt::ChannelDataView::epochMarkersToggled,
                 m_pEpochMarkersAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::clippingToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::viz::qt::ChannelDataView::clippingToggled,
                 m_pClippingAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::zScoreModeToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::viz::qt::ChannelDataView::zScoreModeToggled,
                 m_pZScoreAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::scrollSpeedChanged,
+        connect(m_pDataWindow->getChannelDataView(), &mne::viz::qt::ChannelDataView::scrollSpeedChanged,
                 this, [this](float factor) {
                     statusBar()->showMessage(QString("Scroll speed: %1x").arg(factor, 0, 'f', 2), 2000);
                 });

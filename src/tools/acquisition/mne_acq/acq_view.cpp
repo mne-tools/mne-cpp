@@ -18,7 +18,7 @@
 
 #include <mne/acq/acq_eigen.h>
 #include <mne/acq/fiff/acq_fiff.h>
-#include <mne/disp/viewers/channeldataview.h>
+#include <mne/viz/backends/qt/viewers/channeldataview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -46,7 +46,7 @@
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace std::chrono_literals;
 
 //=============================================================================================================

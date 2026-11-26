@@ -17,9 +17,9 @@
 #include <mne/fiff/fiff_ch_info.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_info.h>
-#include <mne/viewmodels/bids_tree.h>
-#include <mne/viewmodels/channel_table.h>
-#include <mne/viewmodels/spectrum_table.h>
+#include <mne/viz/models/bids_tree.h>
+#include <mne/viz/models/channel_table.h>
+#include <mne/viz/models/spectrum_table.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -38,7 +38,7 @@
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::viewmodels;
+using namespace mne::viz;
 
 namespace
 {

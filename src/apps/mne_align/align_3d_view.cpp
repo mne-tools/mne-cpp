@@ -14,9 +14,9 @@
 
 #include "qt_conversions.h"
 
-#include <mne/disp3D/model/braintreemodel.h>
-#include <mne/disp3D/scene/multimodalscene.h>
-#include <mne/disp3D/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
 
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_coord_trans.h>
@@ -29,10 +29,10 @@
 
 using namespace mne;
 using namespace MNEALIGN;
-using namespace mne::disp;
-using mne::disp::MultimodalScene;
-using mne::disp::SceneLayer;
-using mne::disp::SceneLayerKind;
+using namespace mne::viz::qt;
+using mne::viz::qt::MultimodalScene;
+using mne::viz::qt::SceneLayer;
+using mne::viz::qt::SceneLayerKind;
 
 namespace
 {

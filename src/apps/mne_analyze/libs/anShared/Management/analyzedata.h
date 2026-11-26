@@ -25,7 +25,7 @@
 #include "../Model/abstractmodel.h"
 #include "../Utils/types.h"
 #include <mne/base/log.h>
-#include <mne/disp/viewers/helpers/bidsviewmodel.h>
+#include <mne/viz/backends/qt/viewers/helpers/bidsviewmodel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -308,7 +308,7 @@ private:
      */
     QList<QStandardItem*> getAllItems(QModelIndex parent = QModelIndex()) const;
 
-    QPointer<mne::disp::BidsViewModel> m_pData; /**< The BidsViewModel that holds all the subject, session, and data items. */
+    QPointer<mne::viz::qt::BidsViewModel> m_pData; /**< The BidsViewModel that holds all the subject, session, and data items. */
 
     std::unique_ptr<mne::analyze::Communicator> m_pCommu; /**< Used to send events. */
 

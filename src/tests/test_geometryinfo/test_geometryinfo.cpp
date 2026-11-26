@@ -27,7 +27,7 @@
 
 #include <mne/base/log.h>
 
-#include <mne/disp3D/helpers/geometryinfo.h>
+#include <mne/viz/backends/qt/3d/helpers/geometryinfo.h>
 #include <mne/mne/mne_bem.h>
 #include <mne/mne/mne_bem_surface.h>
 
@@ -41,7 +41,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 using namespace Eigen;
 

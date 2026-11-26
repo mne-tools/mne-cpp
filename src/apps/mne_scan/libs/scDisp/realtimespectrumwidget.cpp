@@ -18,8 +18,8 @@
 
 #include "realtimespectrumwidget.h"
 
-#include <mne/disp/viewers/spectrumsettingsview.h>
-#include <mne/disp/viewers/spectrumview.h>
+#include <mne/viz/backends/qt/viewers/spectrumsettingsview.h>
+#include <mne/viz/backends/qt/viewers/spectrumview.h>
 #include <scMeas/realtimespectrum.h>
 #include <math.h>
 
@@ -49,7 +49,7 @@
 //=============================================================================================================
 
 using namespace mne::scan;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

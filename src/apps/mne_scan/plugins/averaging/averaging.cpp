@@ -20,8 +20,8 @@
 #include "averaging.h"
 
 #include "FormFiles/averagingsetupwidget.h"
-#include <mne/disp/viewers/averagingsettingsview.h>
-#include <mne/disp/viewers/artifactsettingsview.h>
+#include <mne/viz/backends/qt/viewers/averagingsettingsview.h>
+#include <mne/viz/backends/qt/viewers/artifactsettingsview.h>
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimemultisamplearray.h>
 
@@ -46,7 +46,7 @@
 using namespace AVERAGINGPLUGIN;
 using namespace mne::scan;
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace Eigen;
 
 //=============================================================================================================

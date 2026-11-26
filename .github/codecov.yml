@@ -81,14 +81,10 @@ component_management:
       name: libs/mne/decoding
       paths:
         - src/libs/mne/decoding/**
-    - component_id: libs_disp
-      name: libs/mne/disp
+    - component_id: libs_viz
+      name: libs/mne/viz
       paths:
-        - src/libs/mne/disp/**
-    - component_id: libs_disp3D
-      name: libs/mne/disp3D
-      paths:
-        - src/libs/mne/disp3D/**
+        - src/libs/mne/viz/**
     - component_id: libs_dsp
       name: libs/mne/dsp
       paths:
@@ -141,14 +137,6 @@ component_management:
       name: libs/mne/sts
       paths:
         - src/libs/mne/sts/**
-    - component_id: libs_scene
-      name: libs/mne/scene
-      paths:
-        - src/libs/mne/scene/**
-    - component_id: libs_viewmodels
-      name: libs/mne/viewmodels
-      paths:
-        - src/libs/mne/viewmodels/**
     - component_id: libs_base
       name: libs/mne/base
       paths:

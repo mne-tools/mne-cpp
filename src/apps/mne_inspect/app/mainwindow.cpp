@@ -17,11 +17,11 @@
 #include <mne/base/log.h>
 #include "mainwindow.h"
 
-#include <mne/disp3D/view/brainview.h>
-#include <mne/disp3D/model/braintreemodel.h>
-#include <mne/disp3D/core/viewstate.h>
-#include <mne/disp3D/scene/multimodalscene.h>
-#include <mne/disp3D/scene/pickresult.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/core/viewstate.h>
+#include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
+#include <mne/viz/backends/qt/3d/scene/pickresult.h>
 #include <mne/fs/fs_surface.h>
 #include <mne/fs/fs_surfaceset.h>
 #include <mne/fs/fs_annotation.h>
@@ -106,7 +106,7 @@
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // OVERLAY COLOR BAR
@@ -970,8 +970,8 @@ void MainWindow::setupConnections()
                 m_brainView->setElectrodeValues(values);
             });
     connect(m_brainView, &BrainView::electrodeContactClicked, this, [this](const QString& name, const QVector3D& position) {
-        mne::disp::PickResult pick;
-        pick.kind = mne::disp::PickKind::ElectrodeContact;
+        mne::viz::qt::PickResult pick;
+        pick.kind = mne::viz::qt::PickKind::ElectrodeContact;
         pick.world = position;
         pick.label = name;
         pick.sourceId = m_electrodesPlugin.sceneLayerId();
@@ -3217,7 +3217,7 @@ void MainWindow::createLayersDock()
     lay->addStretch(1);
 
     // Toggling a kind-checkbox flips visibility on every layer of that kind.
-    auto toggleKind = [this](mne::disp::SceneLayerKind kind, bool visible) {
+    auto toggleKind = [this](mne::viz::qt::SceneLayerKind kind, bool visible) {
         const auto layers = m_scene.layers();
         for (const auto& layer : layers) {
             if (layer.kind == kind) {
@@ -3226,21 +3226,21 @@ void MainWindow::createLayersDock()
         }
     };
     connect(m_layerBrainCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
-        toggleKind(mne::disp::SceneLayerKind::BrainSurface, v);
+        toggleKind(mne::viz::qt::SceneLayerKind::BrainSurface, v);
     });
     connect(m_layerElectrodesCheck, &QCheckBox::toggled, this, [this, toggleKind](bool v) {
-        toggleKind(mne::disp::SceneLayerKind::Electrode, v);
+        toggleKind(mne::viz::qt::SceneLayerKind::Electrode, v);
         m_electrodesPlugin.electrodeObject()->setVisible(v);
         m_brainView->update();
     });
     connect(m_layerMriCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
-        toggleKind(mne::disp::SceneLayerKind::MriSlice, v);
+        toggleKind(mne::viz::qt::SceneLayerKind::MriSlice, v);
     });
     connect(m_layerSensorsCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
-        toggleKind(mne::disp::SceneLayerKind::Sensor, v);
+        toggleKind(mne::viz::qt::SceneLayerKind::Sensor, v);
     });
     connect(m_layerSourceOverlayCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
-        toggleKind(mne::disp::SceneLayerKind::SourceOverlay, v);
+        toggleKind(mne::viz::qt::SceneLayerKind::SourceOverlay, v);
     });
 
     m_layersDock->setWidget(body);
@@ -3338,7 +3338,7 @@ void MainWindow::createOverlayDock()
 
     // Bidirectional sync: external setTimeCursor / setOverlayThresholds
     // updates should reflect in the dock without firing a feedback loop.
-    connect(&m_scene, &mne::disp::MultimodalScene::overlayThresholdsChanged,
+    connect(&m_scene, &mne::viz::qt::MultimodalScene::overlayThresholdsChanged,
             this, [this](float fmin, float fmid, float fmax) {
                 QSignalBlocker b1(m_overlayFminSpin);
                 QSignalBlocker b2(m_overlayFmidSpin);
@@ -3350,7 +3350,7 @@ void MainWindow::createOverlayDock()
                     m_overlayColorBar->setRange(fmin, fmid, fmax);
                 }
             });
-    connect(&m_scene, &mne::disp::MultimodalScene::timeCursorChanged,
+    connect(&m_scene, &mne::viz::qt::MultimodalScene::timeCursorChanged,
             this, [this](double seconds) {
                 QSignalBlocker b(m_overlayTimeSlider);
                 const int v = qBound(0, static_cast<int>(std::lround(seconds * 1000.0)), 1000);
@@ -3593,9 +3593,9 @@ void MainWindow::applyMriDisplayPreferences()
     m_mriOpacityLabel->setText(QString("%1%").arg(qRound(opacity * 100)));
 
     for (int i = 0; i < 3; ++i) {
-        mne::disp::SliceObject* slice = (i == 0) ? m_mriSlicesPlugin.axialSlice()
-            : (i == 1)                           ? m_mriSlicesPlugin.coronalSlice()
-                                                 : m_mriSlicesPlugin.sagittalSlice();
+        mne::viz::qt::SliceObject* slice = (i == 0) ? m_mriSlicesPlugin.axialSlice()
+            : (i == 1)                              ? m_mriSlicesPlugin.coronalSlice()
+                                                    : m_mriSlicesPlugin.sagittalSlice();
         if (slice) {
             slice->setWindowLevel(center, width);
             slice->setOpacity(opacity);

@@ -30,7 +30,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp/viewers/helpers/mneoperator.h>
+#include <mne/viz/backends/qt/viewers/helpers/mneoperator.h>
 //*************************************************************************************************************
 #include <mne/fiff/fiff.h>
 #include <mne/mne/mne.h>
@@ -55,7 +55,7 @@
 using namespace mne;
 using namespace Eigen;
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 
 //*************************************************************************************************************

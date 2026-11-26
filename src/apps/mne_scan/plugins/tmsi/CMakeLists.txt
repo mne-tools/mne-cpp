@@ -67,7 +67,7 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 set(MNE_LIBS_REQUIRED 
     mne_acq_devices
     mne_acq_fiff
-    mne_disp
+    mne_viz_qt
     mne_channels
     mne_base
     mne_math

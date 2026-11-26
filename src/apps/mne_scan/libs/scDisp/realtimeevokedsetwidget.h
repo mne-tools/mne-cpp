@@ -21,7 +21,7 @@
 
 #include "scdisp_global.h"
 #include "measurementwidget.h"
-#include <mne/disp/viewers/butterflyview.h>
+#include <mne/viz/backends/qt/viewers/butterflyview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -50,7 +50,7 @@ namespace mne
 class FiffInfo;
 }
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class EvokedSetModel;
 class ButterflyView;
@@ -155,13 +155,13 @@ private:
      */
     bool virtual eventFilter(QObject* object, QEvent* event);
 
-    std::shared_ptr<mne::disp::EvokedSetModel> m_pEvokedSetModel;             /**< RTE data model. */
-    QSharedPointer<mne::scan::RealTimeEvokedSet> m_pRTESet;                   /**< The real-time evoked measurement. */
-    std::shared_ptr<mne::disp::ChannelSelectionView> m_pChannelSelectionView; /**< ChannelSelectionView. */
-    std::shared_ptr<mne::disp::ChannelInfoModel> m_pChannelInfoModel;         /**< Channel info model. */
-    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                               /**< FiffInfo, which is used instead of ListChInfo*/
-    QPointer<mne::disp::AverageLayoutView> m_pAverageLayoutView;              /**< 2D layout view for plotting averages*/
-    QPointer<mne::disp::ButterflyView> m_pButterflyView;                      /**< Butterfly plot. */
+    std::shared_ptr<mne::viz::qt::EvokedSetModel> m_pEvokedSetModel;             /**< RTE data model. */
+    QSharedPointer<mne::scan::RealTimeEvokedSet> m_pRTESet;                      /**< The real-time evoked measurement. */
+    std::shared_ptr<mne::viz::qt::ChannelSelectionView> m_pChannelSelectionView; /**< ChannelSelectionView. */
+    std::shared_ptr<mne::viz::qt::ChannelInfoModel> m_pChannelInfoModel;         /**< Channel info model. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                                  /**< FiffInfo, which is used instead of ListChInfo*/
+    QPointer<mne::viz::qt::AverageLayoutView> m_pAverageLayoutView;              /**< 2D layout view for plotting averages*/
+    QPointer<mne::viz::qt::ButterflyView> m_pButterflyView;                      /**< Butterfly plot. */
 
     QList<qint32> m_qListCurrentSelection; /**< Current selection list -> hack around C++11 lambda . */
 

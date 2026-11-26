@@ -48,7 +48,7 @@ class AveragingDataModel;
 class Communicator;
 }
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class AveragingSettingsView;
 class AverageSelectionView;
@@ -300,20 +300,20 @@ private:
 
     void updateEvokedSetModel();
 
-    QSharedPointer<mne::analyze::FiffRawViewModel> m_pFiffRawModel;   /**< Pointer to currently loaded FiffRawView Model. */
-    QSharedPointer<QList<QPair<int, double>>> m_pTriggerList;         /**< Pointer to list of stim triggers. */
-    std::shared_ptr<mne::disp::EvokedSetModel> m_pEvokedModel;        /**< Pointer to model used to display averaging data from m_pFiffEvokedSet and m_pFiffEvoked. */
-    std::shared_ptr<mne::disp::ChannelInfoModel> m_pChannelInfoModel; /**< Pointer to model that holds channel info data. */
-    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                       /**< Pointer to info about loaded fiff data. */
+    QSharedPointer<mne::analyze::FiffRawViewModel> m_pFiffRawModel;      /**< Pointer to currently loaded FiffRawView Model. */
+    QSharedPointer<QList<QPair<int, double>>> m_pTriggerList;            /**< Pointer to list of stim triggers. */
+    std::shared_ptr<mne::viz::qt::EvokedSetModel> m_pEvokedModel;        /**< Pointer to model used to display averaging data from m_pFiffEvokedSet and m_pFiffEvoked. */
+    std::shared_ptr<mne::viz::qt::ChannelInfoModel> m_pChannelInfoModel; /**< Pointer to model that holds channel info data. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                          /**< Pointer to info about loaded fiff data. */
 
-    QPointer<mne::analyze::Communicator> m_pCommu;               /**< To broadcst signals. */
-    QPointer<mne::disp::ButterflyView> m_pButterflyView;         /**< The butterfly plot view. */
-    QPointer<mne::disp::AverageLayoutView> m_pAverageLayoutView; /**< The average layout plot view. */
+    QPointer<mne::analyze::Communicator> m_pCommu;                  /**< To broadcst signals. */
+    QPointer<mne::viz::qt::ButterflyView> m_pButterflyView;         /**< The butterfly plot view. */
+    QPointer<mne::viz::qt::AverageLayoutView> m_pAverageLayoutView; /**< The average layout plot view. */
 
-    mne::disp::AveragingSettingsView* m_pAveragingSettingsView; /**< Pointer to averaging settings GUI. */
+    mne::viz::qt::AveragingSettingsView* m_pAveragingSettingsView; /**< Pointer to averaging settings GUI. */
 
-    std::unique_ptr<mne::disp::AverageSelectionView> m_pAverageSelectionView;   /**< Holds the average selection; not shown. */
-    std::unique_ptr<mne::disp::FiffRawViewSettings> m_pChannelDataSettingsView; /**< Holds the view settings; not shown. */
+    std::unique_ptr<mne::viz::qt::AverageSelectionView> m_pAverageSelectionView;   /**< Holds the average selection; not shown. */
+    std::unique_ptr<mne::viz::qt::FiffRawViewSettings> m_pChannelDataSettingsView; /**< Holds the view settings; not shown. */
 
     float m_fBaselineFromS;    /**< Baseline start - in seconds relative to stim(0) - can be negative*/
     float m_fBaselineToS;      /**< Baseline end - in seconds relative to stim(0) - can be negative*/

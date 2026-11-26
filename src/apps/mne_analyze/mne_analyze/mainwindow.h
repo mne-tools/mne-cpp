@@ -22,7 +22,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp/viewers/abstractview.h>
+#include <mne/viz/backends/qt/viewers/abstractview.h>
 #include "analyzecore.h"
 #include <mne/base/log.h>
 
@@ -49,7 +49,7 @@ class QDockWidget;
 class QGridLayout;
 QT_END_NAMESPACE
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class MultiView;
 }
@@ -147,7 +147,7 @@ signals:
      *
      * @param[in] mode       the new gui mode.
      */
-    void guiModeChanged(mne::disp::AbstractView::GuiMode mode);
+    void guiModeChanged(mne::viz::qt::AbstractView::GuiMode mode);
 
     //=========================================================================================================
     /**
@@ -155,7 +155,7 @@ signals:
      *
      * @param[in] style       the new gui style.
      */
-    void guiStyleChanged(mne::disp::AbstractView::StyleMode style);
+    void guiStyleChanged(mne::viz::qt::AbstractView::StyleMode style);
 
     //=========================================================================================================
     /**
@@ -269,7 +269,7 @@ private:
      */
     void removeMenus();
 
-    QPointer<mne::disp::MultiView> m_pMultiView;    /**< The central View.*/
+    QPointer<mne::viz::qt::MultiView> m_pMultiView; /**< The central View.*/
     QPointer<AnalyzeCore> m_pAnalyzeCoreController; /**< Pointer to the application controller Obj.*/
     QPointer<QGridLayout> m_pGridLayout;            /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow */
 

@@ -53,7 +53,7 @@ namespace mne
 class FiffInfo;
 }
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class ConnectivitySettingsView;
 }

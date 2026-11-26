@@ -19,7 +19,7 @@
  * loaded from a vendor @c .elc file) it produces the 2-D
  * channel layout used by every topographic widget in
  * mne-cpp — butterfly plots, sensor maps, time-frequency
- * heatmaps in mne_disp and mne_disp3D.
+ * heatmaps in mne_viz_qt and mne_viz_qt.
  *
  * As in MNE-C @c mne_make_eeg_layout, a sphere is fitted to the
  * points (@ref mne::Sphere::fit_sphere_simplex) and every

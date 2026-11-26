@@ -14,10 +14,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/scene/evoked_conditions.h>
-#include <mne/scene/sweep_buffer.h>
-#include <mne/scene/trace_buffer.h>
-#include <mne/scene/trace_geometry.h>
+#include <mne/viz/models/evoked_conditions.h>
+#include <mne/viz/views/sweep_buffer.h>
+#include <mne/viz/views/trace_buffer.h>
+#include <mne/viz/views/trace_geometry.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -44,7 +44,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::scene;
+using namespace mne::viz;
 
 namespace
 {

@@ -75,7 +75,7 @@ class Communicator;
 class Event;
 }
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class MultimodalScene;
 }
@@ -162,7 +162,7 @@ struct CORTICAL_SURFACE_SHARED_EXPORT CorticalPickedVertex
  *   3. The user picks subject + hemisphere set + surface type.
  *   4. The plugin loads the requested @ref mne::FsSurface objects and
  *      registers them as @c BrainSurface layers on the shared
- *      @ref mne::disp::MultimodalScene.
+ *      @ref mne::viz::qt::MultimodalScene.
  *   5. The hemisphere toggle and surface-type combo box let the user
  *      switch what is shown without re-opening the dialog.
  *
@@ -198,7 +198,7 @@ public:
      * @return Pointer to the shared MultimodalScene used by this plugin.
      *         Owned by the plugin; consumers must not delete it.
      */
-    mne::disp::MultimodalScene* scene() const;
+    mne::viz::qt::MultimodalScene* scene() const;
 
     //=========================================================================================================
     /**
@@ -241,7 +241,7 @@ public:
     /**
      * Install an already-constructed source estimate as the active overlay.
      * Resets the time slider to sample 0 and re-publishes the overlay layer
-     * on the shared @ref mne::disp::MultimodalScene.
+     * on the shared @ref mne::viz::qt::MultimodalScene.
      */
     void setSourceEstimate(const mne::InvSourceEstimate& stc);
 
@@ -539,7 +539,7 @@ private:
 
     /** Per-plugin scene; a future slice will share this with the
      *  MNE Inspect application via the AnalyzeData store. */
-    std::unique_ptr<mne::disp::MultimodalScene> m_pScene;
+    std::unique_ptr<mne::viz::qt::MultimodalScene> m_pScene;
 
     QString m_lastSubjectsDir;
     QString m_lastSubjectId;

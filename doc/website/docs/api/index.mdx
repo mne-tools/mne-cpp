@@ -87,8 +87,8 @@ middle, and visualization at the top.
 
 | Library | Namespace | Purpose |
 |---------|-----------|---------|
-| [**Disp**](/docs/api/disp/) | `mne::disp` | 2D display widgets and visualization helpers: charts, topography, colour maps, `QWidget`-based viewers |
-| [**Disp3D**](/docs/api/disp3-d/) | `mne::disp` | 3D brain visualization using the Qt RHI rendering backend: cortical surfaces, connectivity networks, BEM models, source estimates, digitizers — supports Metal, Vulkan, D3D, and OpenGL backends |
+| [**Viz**](/docs/api/viz/) | `mne::viz` | What the viewers show and how they behave, without a GUI toolkit: figures as display lists (SVG, PNG), trace and brain view logic, GPU frame descriptions with a software renderer, settings forms, view models |
+| [**Viz: Qt Backend**](/docs/api/viz-qt/) | `mne::viz::qt` | The Qt backend of `mne_viz` (`viz/backends/qt`): QRhi rendering (Metal, Vulkan, D3D, OpenGL), windows, 2D plots and viewers, the 3D brain view, Qt item models |
 
 Each library link above leads to its dedicated overview page with the
 architecture diagram, class inventory, MNE-Python and MNE-C

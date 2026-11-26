@@ -10,8 +10,8 @@
 # @brief    Attribute Qt use of the display stack and applications to Qt modules, per file and class.
 """Qt modules used by the display stack and the applications.
 
-Plans shrinking the Qt dependency to Qt Core + Gui. For each scope (``src/libs/mne/disp``,
-``src/libs/mne/disp3D``, ``src/apps``) and each CMake target inside it, it reports:
+Plans shrinking the Qt dependency to Qt Core + Gui. For each scope (``src/libs/mne/viz/backends/qt``, ``src/apps``)
+and each CMake target inside it, it reports:
 
 * which Qt module every ``#include`` and every Q-identifier in code belongs to (comments and string literals are
   removed); the class -> module map is built from the Qt headers in ``src/3rdparty/qt/dynamic`` (forwarding headers
@@ -46,7 +46,7 @@ from audit_maintainability import strip_comments_and_strings  # noqa: E402
 REPO_ROOT = Path(__file__).resolve().parents[2]
 POLICY_FILE = Path(__file__).resolve().parent / "qt_usage_policy.json"
 QT_ROOT = REPO_ROOT / "src" / "3rdparty" / "qt" / "dynamic"
-SCOPES = {"disp": "src/libs/mne/disp", "disp3D": "src/libs/mne/disp3D", "applications": "src/apps"}
+SCOPES = {"viz_qt": "src/libs/mne/viz/backends/qt", "applications": "src/apps"}
 EXTENSIONS = {".h", ".hpp", ".cpp", ".cc", ".cxx", ".mm"}
 BASE_MODULES = {"Core", "Gui"}
 

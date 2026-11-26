@@ -44,7 +44,7 @@
 
 class RawDataViewerControl;
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class ScalingView;
 class FiffRawViewSettings;

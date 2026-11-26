@@ -22,10 +22,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp3D/view/brainview.h>
-#include <mne/disp3D/model/braintreemodel.h>
-#include <mne/disp3D/model/items/digitizersettreeitem.h>
-#include <mne/disp3D/model/items/bemtreeitem.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/model/items/digitizersettreeitem.h>
+#include <mne/viz/backends/qt/3d/model/items/bemtreeitem.h>
 
 #include <mne/fs/fs_surfaceset.h>
 #include <mne/fs/fs_annotationset.h>
@@ -61,7 +61,7 @@
 
 using namespace mne;
 using namespace Eigen;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // MAIN

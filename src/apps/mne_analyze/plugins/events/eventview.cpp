@@ -25,7 +25,7 @@
 #include <mne/fiff/fiff.h>
 #include <mne/fiff/fiff_events.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <mne/disp/viewers/triggerdetectionview.h>
+#include <mne/viz/backends/qt/viewers/triggerdetectionview.h>
 #include <mne/base/thread_pool.h>
 
 //=============================================================================================================
@@ -84,10 +84,10 @@ EventView::EventView(QWidget* parent)
     onDataChanged();
     createContextMenu();
 
-    m_pTriggerDetectView = std::make_shared<mne::disp::TriggerDetectionView>("MNEANALYZE/EVENTS",
-                                                                             nullptr,
-                                                                             Qt::Window);
-    m_pTriggerDetectView->setProcessingMode(mne::disp::AbstractView::ProcessingMode::Offline);
+    m_pTriggerDetectView = std::make_shared<mne::viz::qt::TriggerDetectionView>("MNEANALYZE/EVENTS",
+                                                                                nullptr,
+                                                                                Qt::Window);
+    m_pTriggerDetectView->setProcessingMode(mne::viz::qt::AbstractView::ProcessingMode::Offline);
     m_pTriggerDetectView->setWindowFlag(Qt::WindowStaysOnTopHint);
 }
 
@@ -169,7 +169,7 @@ void EventView::initGUIFunctionality()
     connect(m_pUi->m_pushButtonStim, &QPushButton::clicked,
             this, &EventView::onStimButtonClicked, Qt::UniqueConnection);
 
-    connect(m_pTriggerDetectView.get(), &mne::disp::TriggerDetectionView::detectTriggers,
+    connect(m_pTriggerDetectView.get(), &mne::viz::qt::TriggerDetectionView::detectTriggers,
             this, &EventView::onDetectTriggers, Qt::UniqueConnection);
 
     m_pEventModel->setShowSelected(m_pUi->m_checkBox_showSelectedEventsOnly->isChecked());
@@ -302,7 +302,7 @@ void EventView::disconnectFromModel()
                this, &EventView::customGroupContextMenuRequested);
     disconnect(m_pUi->m_pushButtonStim, &QPushButton::clicked,
                this, &EventView::onStimButtonClicked);
-    disconnect(m_pTriggerDetectView.get(), &mne::disp::TriggerDetectionView::detectTriggers,
+    disconnect(m_pTriggerDetectView.get(), &mne::viz::qt::TriggerDetectionView::detectTriggers,
                this, &EventView::onDetectTriggers);
 }
 

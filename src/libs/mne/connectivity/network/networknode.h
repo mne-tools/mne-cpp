@@ -16,7 +16,7 @@
  * One @ref mne::NetworkNode exists per sensor (in sensor-space connectivity)
  * or per source vertex / ROI centroid (in source-space connectivity). The
  * position comes from @c mne::ConnectivitySettings::setNodePositions "ConnectivitySettings::setNodePositions"
- * and is used by disp3D to draw the node at its anatomical location.
+ * and is used by mne_viz_qt to draw the node at its anatomical location.
  */
 
 #ifndef NETWORKNODE_H

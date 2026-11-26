@@ -101,7 +101,7 @@ enum class Direction
  * Holds the nodes (channel / source positions) and the edges (per-frequency
  * weight matrices + scalar band-averaged weights), the metric name ("COH",
  * "PLI", "GC", ...), the threshold that marks edges active, and the
- * @ref VisualizationInfo read by the disp3D rendering layer. Edges are
+ * @ref VisualizationInfo read by the mne_viz_qt rendering layer. Edges are
  * read-only once added so that the cached weight ranges stay consistent.
  *
  * @brief Graph container for one connectivity metric; nodes + weighted edges + threshold/visualisation state.

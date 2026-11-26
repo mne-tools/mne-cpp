@@ -19,46 +19,46 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp/viewers/abstractview.h>
-#include <mne/disp/detail/map_value.h>
+#include <mne/viz/backends/qt/viewers/abstractview.h>
+#include <mne/viz/backends/qt/detail/map_value.h>
 #include <mne/base/string_utils.h>
 #include <mne/base/log.h>
-#include <mne/disp/viewers/hpisettingsview.h>
-#include <mne/disp/viewers/coregsettingsview.h>
-#include <mne/disp/viewers/artifactsettingsview.h>
-#include <mne/disp/viewers/fwdsettingsview.h>
-#include <mne/disp/viewers/fiffrawviewsettings.h>
-#include <mne/disp/viewers/projectsettingsview.h>
-#include <mne/disp/viewers/filterdesignview.h>
-#include <mne/disp/plots/filterplot.h>
-#include <mne/disp/plots/helpers/scenepainter.h>
-#include <mne/disp/viewers/triggerdetectionview.h>
-#include <mne/disp/viewers/averagingsettingsview.h>
-#include <mne/disp/viewers/settingspanel.h>
-#include <mne/disp/viewers/bidsview.h>
-#include <mne/disp/viewers/channelselectionview.h>
-#include <mne/disp/viewers/channeldataview.h>
-#include <mne/disp/viewers/averagelayoutview.h>
-#include <mne/disp/viewers/averageselectionview.h>
-#include <mne/disp/viewers/butterflyview.h>
-#include <mne/disp/viewers/spectrumview.h>
-#include <mne/disp/viewers/rtfiffrawview.h>
-#include <mne/disp/viewers/helpers/rtfiffrawviewmodel.h>
-#include <mne/disp/viewers/helpers/evokedsetmodel.h>
-#include <mne/disp/viewers/helpers/channelinfomodel.h>
-#include <mne/disp/viewers/dipolefitview.h>
-#include <mne/disp/viewers/control3dview.h>
-#include <mne/disp/viewers/applytoview.h>
-#include <mne/disp/viewers/helpers/rtfiffrawviewdelegate.h>
-#include <mne/disp/viewers/helpers/frequencyspectrummodel.h>
-#include <mne/disp/viewers/helpers/frequencyspectrumdelegate.h>
-#include <mne/disp/viewers/helpers/bidsviewmodel.h>
-#include <mne/disp/viewers/helpers/mneoperator.h>
-#include <mne/disp/viewers/helpers/channelrhiview.h>
-#include <mne/disp/viewers/helpers/averagelayoutwidget.h>
-#include <mne/disp/viewers/helpers/selectionitem.h>
-#include <mne/disp/viewers/helpers/sensorlayoutwidget.h>
-#include <mne/disp/viewers/helpers/channeldatamodel.h>
+#include <mne/viz/backends/qt/viewers/hpisettingsview.h>
+#include <mne/viz/backends/qt/viewers/coregsettingsview.h>
+#include <mne/viz/backends/qt/viewers/artifactsettingsview.h>
+#include <mne/viz/backends/qt/viewers/fwdsettingsview.h>
+#include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
+#include <mne/viz/backends/qt/viewers/projectsettingsview.h>
+#include <mne/viz/backends/qt/viewers/filterdesignview.h>
+#include <mne/viz/backends/qt/plots/filterplot.h>
+#include <mne/viz/backends/qt/plots/helpers/scenepainter.h>
+#include <mne/viz/backends/qt/viewers/triggerdetectionview.h>
+#include <mne/viz/backends/qt/viewers/averagingsettingsview.h>
+#include <mne/viz/backends/qt/viewers/settingspanel.h>
+#include <mne/viz/backends/qt/viewers/bidsview.h>
+#include <mne/viz/backends/qt/viewers/channelselectionview.h>
+#include <mne/viz/backends/qt/viewers/channeldataview.h>
+#include <mne/viz/backends/qt/viewers/averagelayoutview.h>
+#include <mne/viz/backends/qt/viewers/averageselectionview.h>
+#include <mne/viz/backends/qt/viewers/butterflyview.h>
+#include <mne/viz/backends/qt/viewers/spectrumview.h>
+#include <mne/viz/backends/qt/viewers/rtfiffrawview.h>
+#include <mne/viz/backends/qt/viewers/helpers/rtfiffrawviewmodel.h>
+#include <mne/viz/backends/qt/viewers/helpers/evokedsetmodel.h>
+#include <mne/viz/backends/qt/viewers/helpers/channelinfomodel.h>
+#include <mne/viz/backends/qt/viewers/dipolefitview.h>
+#include <mne/viz/backends/qt/viewers/control3dview.h>
+#include <mne/viz/backends/qt/viewers/applytoview.h>
+#include <mne/viz/backends/qt/viewers/helpers/rtfiffrawviewdelegate.h>
+#include <mne/viz/backends/qt/viewers/helpers/frequencyspectrummodel.h>
+#include <mne/viz/backends/qt/viewers/helpers/frequencyspectrumdelegate.h>
+#include <mne/viz/backends/qt/viewers/helpers/bidsviewmodel.h>
+#include <mne/viz/backends/qt/viewers/helpers/mneoperator.h>
+#include <mne/viz/backends/qt/viewers/helpers/channelrhiview.h>
+#include <mne/viz/backends/qt/viewers/helpers/averagelayoutwidget.h>
+#include <mne/viz/backends/qt/viewers/helpers/selectionitem.h>
+#include <mne/viz/backends/qt/viewers/helpers/sensorlayoutwidget.h>
+#include <mne/viz/backends/qt/viewers/helpers/channeldatamodel.h>
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_ch_info.h>
 #include <mne/fiff/fiff_coord_trans.h>
@@ -134,7 +134,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 using mne::FilterKernel;
 using mne::FilterIO;
@@ -1405,7 +1405,7 @@ void TestDispViewers2::triggerDetectionView_settingsAndSignals()
     QTest::mouseClick(pColor, Qt::LeftButton);
     QCOMPARE(pColor->palette().color(QPalette::Button), QColor(10, 200, 30));
     using ColorMap = std::map<double, QColor>;
-    QCOMPARE(mne::disp::detail::valueOr(infoSpy.last().at(0).value<ColorMap>(), 4.0), QColor(10, 200, 30));
+    QCOMPARE(mne::viz::qt::detail::valueOr(infoSpy.last().at(0).value<ColorMap>(), 4.0), QColor(10, 200, 30));
     pTypes->setCurrentIndex(0);
     QVERIFY(pColor->palette().color(QPalette::Button) != QColor(10, 200, 30));
     pTypes->setCurrentIndex(1);
@@ -1486,23 +1486,23 @@ void TestDispViewers2::artifactSettingsView_thresholds()
     QCOMPARE(shown().size(), 3);
     QCOMPARE(thresholdSpy.count(), 1);
     std::map<std::string, double> map = view.getThresholdMap();
-    QCOMPARE(mne::disp::detail::valueOr(map, "Active"), 0.0);
+    QCOMPARE(mne::viz::qt::detail::valueOr(map, "Active"), 0.0);
     QCOMPARE(std::vector<std::string>(std::views::keys(map).begin(), std::views::keys(map).end()), (std::vector<std::string>{"Active", "eeg", "grad", "mag"}));
-    QCOMPARE(mne::disp::detail::valueOr(map, "grad"), 0.1);
+    QCOMPARE(mne::viz::qt::detail::valueOr(map, "grad"), 0.1);
 
     auto* pPanel = view.findChild<SettingsPanel*>();
     QVERIFY(pPanel);
     qobject_cast<QDoubleSpinBox*>(pPanel->editor("artifactThresholdsFirst/grad"))->setValue(4.0);
     qobject_cast<QSpinBox*>(pPanel->editor("artifactThresholdsSecond/grad"))->setValue(-11);
-    QVERIFY(qAbs(mne::disp::detail::valueOr(view.getThresholdMap(), "grad") - 4e-11) < 1e-20);
-    QVERIFY(qAbs(mne::disp::detail::valueOr(thresholdSpy.last().at(0).value<std::map<std::string, double>>(), "grad") - 4e-11) < 1e-20);
+    QVERIFY(qAbs(mne::viz::qt::detail::valueOr(view.getThresholdMap(), "grad") - 4e-11) < 1e-20);
+    QVERIFY(qAbs(mne::viz::qt::detail::valueOr(thresholdSpy.last().at(0).value<std::map<std::string, double>>(), "grad") - 4e-11) < 1e-20);
 
     // Activation is reported in the map
     auto* pActive = qobject_cast<QCheckBox*>(pPanel->editor("doArtifactThresholdReduction"));
     QVERIFY(pActive);
     QTest::mouseClick(pActive, Qt::LeftButton);
     QVERIFY(view.getDoArtifactThresholdRejection());
-    QCOMPARE(mne::disp::detail::valueOr(view.getThresholdMap(), "Active"), 1.0);
+    QCOMPARE(mne::viz::qt::detail::valueOr(view.getThresholdMap(), "Active"), 1.0);
 
     // A new channel set replaces the rows and keeps the active state and the edited threshold
     view.setChInfo({channel(FIFFV_MEG_CH, FIFF_UNIT_T_M), channel(FIFFV_EOG_CH, FIFF_UNIT_V)});
@@ -1511,7 +1511,7 @@ void TestDispViewers2::artifactSettingsView_thresholds()
     QVERIFY(view.getDoArtifactThresholdRejection());
     map = view.getThresholdMap();
     QCOMPARE(std::vector<std::string>(std::views::keys(map).begin(), std::views::keys(map).end()), (std::vector<std::string>{"Active", "eog", "grad"}));
-    QVERIFY(qAbs(mne::disp::detail::valueOr(map, "grad") - 4e-11) < 1e-20);
+    QVERIFY(qAbs(mne::viz::qt::detail::valueOr(map, "grad") - 4e-11) < 1e-20);
 
     view.saveSettings();
     view.loadSettings();
@@ -1794,7 +1794,7 @@ void TestDispViewers2::averageSelectionView_lifecycle()
     QSignalSpy activationSpy(view.get(), &AverageSelectionView::newAverageActivationMap);
     visBox->click();
     QCOMPARE(activationSpy.size(), 1);
-    QVERIFY(mne::disp::detail::valueOr(*activation, "vis"));
+    QVERIFY(mne::viz::qt::detail::valueOr(*activation, "vis"));
 
     // Picking a colour stores it; cancelling the dialog keeps the old one
     QSignalSpy colorSpy(view.get(), &AverageSelectionView::newAverageColorMap);
@@ -1806,7 +1806,7 @@ void TestDispViewers2::averageSelectionView_lifecycle()
         static_cast<QDialog*>(pDialog)->accept();
     });
     visButton->click();
-    QCOMPARE(mne::disp::detail::valueOr(*colors, "vis"), QColor(10, 200, 30));
+    QCOMPARE(mne::viz::qt::detail::valueOr(*colors, "vis"), QColor(10, 200, 30));
     QCOMPARE(colorSpy.size(), 1);
     answerNextModal([](QWidget* pModal) {
         auto* pDialog = qobject_cast<QColorDialog*>(pModal);
@@ -1814,14 +1814,14 @@ void TestDispViewers2::averageSelectionView_lifecycle()
         static_cast<QDialog*>(pDialog)->reject();
     });
     visButton->click();
-    QCOMPARE(mne::disp::detail::valueOr(*colors, "vis"), QColor(10, 200, 30));
+    QCOMPARE(mne::viz::qt::detail::valueOr(*colors, "vis"), QColor(10, 200, 30));
     QCOMPARE(colorSpy.size(), 1);
 
     // Colours and activation are restored by a new view with the same settings path
     view.reset();
     view = std::make_unique<AverageSelectionView>(settingsPath);
-    QCOMPARE(mne::disp::detail::valueOr(*view->getAverageColor(), "vis"), QColor(10, 200, 30));
-    QVERIFY(mne::disp::detail::valueOr(*view->getAverageActivation(), "vis"));
+    QCOMPARE(mne::viz::qt::detail::valueOr(*view->getAverageColor(), "vis"), QColor(10, 200, 30));
+    QVERIFY(mne::viz::qt::detail::valueOr(*view->getAverageActivation(), "vis"));
     QCOMPARE(view->findChildren<QCheckBox*>().size(), 2);
 
     // At most 10 averages are listed; maps of different size are not drawn
@@ -2021,8 +2021,8 @@ void TestDispViewers2::rtFiffRawViewModel_dataFlow()
     QSignalSpy selectionSpy(&model, &RtFiffRawViewModel::newSelection);
     model.selectRows({0, 2, 99});
     QCOMPARE(model.getIdxSelMap().size(), 2);
-    QCOMPARE(mne::disp::detail::valueOr(model.getIdxSelMap(), 0), 0);
-    QCOMPARE(mne::disp::detail::valueOr(model.getIdxSelMap(), 1), 2);
+    QCOMPARE(mne::viz::qt::detail::valueOr(model.getIdxSelMap(), 0), 0);
+    QCOMPARE(mne::viz::qt::detail::valueOr(model.getIdxSelMap(), 1), 2);
     QCOMPARE(selectionSpy.size(), 1);
     model.hideRows({0});
     QCOMPARE(model.getIdxSelMap().size(), 1);
@@ -2319,8 +2319,8 @@ void TestDispViewers2::averageLayoutView_drawsEachChannelsAverage()
     view.setAverageColor(std::make_shared<std::map<std::string, QColor>>(std::map<std::string, QColor>{{"aud", Qt::red}}));
     view.setAverageActivation(std::make_shared<std::map<std::string, bool>>(std::map<std::string, bool>{{"aud", true}}));
     view.setSingleAverageColor(Qt::black);
-    QCOMPARE(mne::disp::detail::valueOr(*view.getAverageColor(), "aud"), QColor(Qt::black));
-    QVERIFY(mne::disp::detail::valueOr(*view.getAverageActivation(), "aud"));
+    QCOMPARE(mne::viz::qt::detail::valueOr(*view.getAverageColor(), "aud"), QColor(Qt::black));
+    QVERIFY(mne::viz::qt::detail::valueOr(*view.getAverageActivation(), "aud"));
 
     auto* layout = view.findChild<AverageLayoutWidget*>();
     QVERIFY(layout != nullptr);
@@ -2339,7 +2339,7 @@ void TestDispViewers2::averageLayoutView_drawsEachChannelsAverage()
     QImage image(480, 120, QImage::Format_RGB32);
     image.fill(Qt::white);
     {
-        mne::scene::Canvas canvas(480, 120);
+        mne::viz::Canvas canvas(480, 120);
         canvas.translate(240, 60);
         layout->averageLayout().draw(canvas, toSceneFont(layout->font()));
         QPainter painter(&image);
@@ -2424,8 +2424,8 @@ void TestDispViewers2::evokedSetModel_projectionRolesAndAverageMaps()
     QCOMPARE(model.getBaselineInfo().first, -0.1f);
     QCOMPARE(colorSpy.size(), 1);
     QCOMPARE(activationSpy.size(), 1);
-    QCOMPARE(mne::disp::detail::valueOr(*model.getAverageColor(), "vis"), QColor(Qt::yellow));
-    QVERIFY(mne::disp::detail::valueOr(*model.getAverageActivation(), "aud"));
+    QCOMPARE(mne::viz::qt::detail::valueOr(*model.getAverageColor(), "vis"), QColor(Qt::yellow));
+    QVERIFY(mne::viz::qt::detail::valueOr(*model.getAverageActivation(), "aud"));
 
     // Column 1: one row per average type for the butterfly; column 2: whole matrices for the 2D layout
     auto rows = model.data(2, 1).value<std::vector<AvrTypeRowVector>>();
@@ -2493,7 +2493,7 @@ void TestDispViewers2::evokedSetModel_projectionRolesAndAverageMaps()
     QCOMPARE(model.data(0, 1).value<std::vector<AvrTypeRowVector>>().size(), 1);
     set->evoked.push_back(vis);
     model.setEvokedSet(set);
-    QCOMPARE(mne::disp::detail::valueOr(*model.getAverageColor(), "vis"), QColor(Qt::cyan));
+    QCOMPARE(mne::viz::qt::detail::valueOr(*model.getAverageColor(), "vis"), QColor(Qt::cyan));
     QCOMPARE(model.getEvokedSet(), set);
 
     model.setAverageColor(std::make_shared<std::map<std::string, QColor>>());
@@ -3063,7 +3063,7 @@ void TestDispViewers2::sensorLayoutWidget_zoomPanAndSelect()
         QWheelEvent event(at, widget.mapToGlobal(at), QPoint(), QPoint(0, delta), Qt::NoButton, Qt::NoModifier, Qt::NoScrollPhase, false);
         QApplication::sendEvent(&widget, &event);
     };
-    const mne::scene::Point anchor = widget.mapToScene(QPointF(50, 50));
+    const mne::viz::Point anchor = widget.mapToScene(QPointF(50, 50));
     wheel(120, QPointF(50, 50));
     QVERIFY(std::fabs(widget.zoom() - fitted * 1.15) < 1e-9);
     QVERIFY(!widget.isFitted());
@@ -4003,11 +4003,11 @@ void TestDispViewers2::averageLayoutWidget_paintsScaledClampedCurves()
     widget.setScaleMap({{FIFF_UNIT_T, 1e-12f}});
     widget.setAverageColors({{"aud", Qt::blue}});
     widget.setAverageActivation({{"aud", true}, {"vis", false}});
-    QCOMPARE(widget.averageLayout().tiles().front().box, (mne::scene::Rect{-60, -30, 120, 60}));
+    QCOMPARE(widget.averageLayout().tiles().front().box, (mne::viz::Rect{-60, -30, 120, 60}));
 
     // Render the 120 x 60 tile 1:1 into an image whose origin is the tile's top-left corner
     auto render = [&widget]() {
-        mne::scene::Canvas canvas(120, 60);
+        mne::viz::Canvas canvas(120, 60);
         canvas.translate(60, 30);
         widget.averageLayout().draw(canvas, toSceneFont(widget.font()));
         QImage image(120, 60, QImage::Format_RGB32);

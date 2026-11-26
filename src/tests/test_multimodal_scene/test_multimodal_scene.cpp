@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp3D/scene/multimodalscene.h>
-#include <mne/disp3D/scene/pickresult.h>
-#include <mne/disp3D/renderable/electrodeobject.h>
+#include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
+#include <mne/viz/backends/qt/3d/scene/pickresult.h>
+#include <mne/viz/backends/qt/3d/renderable/electrodeobject.h>
 #include <mne/ieeg/ieeg_implantation.h>
 
 //=============================================================================================================
@@ -27,7 +27,7 @@
 #include <QSignalSpy>
 #include <QtTest>
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 class TestMultimodalScene : public QObject

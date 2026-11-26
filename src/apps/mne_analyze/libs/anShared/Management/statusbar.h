@@ -46,7 +46,7 @@
 class QLabel;
 class QProgressBar;
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class ProgressView;
 }
@@ -134,8 +134,8 @@ private:
 
     QStack<QString> m_LoadingStack; /** Keeps the currently loading messages */
 
-    QPointer<QWidget> m_pHoverWidget;                  /** Widget for showing all current loading messageswhen hovering over the loading bar */
-    QPointer<mne::disp::ProgressView> m_pProgressView; /** Widget for showiung loading bar and loadoing message */
+    QPointer<QWidget> m_pHoverWidget;                     /** Widget for showing all current loading messageswhen hovering over the loading bar */
+    QPointer<mne::viz::qt::ProgressView> m_pProgressView; /** Widget for showiung loading bar and loadoing message */
 };
 
 //=============================================================================================================

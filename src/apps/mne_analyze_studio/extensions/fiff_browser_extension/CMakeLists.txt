@@ -51,7 +51,7 @@ endif()
 target_link_libraries(mne_analyze_studio_fiff_browser_extension_widgets PUBLIC
     ${QT_REQUIRED_COMPONENT_LIBS}
     mne_analyze_studio_sdk
-    mne_disp
+    mne_viz_qt
     mne_dsp
     mne_fiff
     mne_fs

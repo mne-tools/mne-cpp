@@ -4,9 +4,9 @@
 
 #include <QtTest/QtTest>
 #include <QColor>
-#include <mne/disp/plots/helpers/colormap.h>
+#include <mne/viz/backends/qt/plots/helpers/colormap.h>
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 class TestDispColormap : public QObject
 {

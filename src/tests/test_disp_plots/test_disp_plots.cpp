@@ -16,16 +16,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp/plots/helpers/colormap.h>
-#include <mne/disp/plots/helpers/figureexporter.h>
-#include <mne/disp/plots/lineplot.h>
-#include <mne/disp/plots/imagesc.h>
-#include <mne/disp/plots/plot.h>
-#include <mne/disp/plots/spline.h>
-#include <mne/disp/plots/bar.h>
-#include <mne/disp/plots/tfplot.h>
-#include <mne/disp/plots/graph.h>
-#include <mne/disp/viewers/scalingview.h>
+#include <mne/viz/backends/qt/plots/helpers/colormap.h>
+#include <mne/viz/backends/qt/plots/helpers/figureexporter.h>
+#include <mne/viz/backends/qt/plots/lineplot.h>
+#include <mne/viz/backends/qt/plots/imagesc.h>
+#include <mne/viz/backends/qt/plots/plot.h>
+#include <mne/viz/backends/qt/plots/spline.h>
+#include <mne/viz/backends/qt/plots/bar.h>
+#include <mne/viz/backends/qt/plots/tfplot.h>
+#include <mne/viz/backends/qt/plots/graph.h>
+#include <mne/viz/backends/qt/viewers/scalingview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -59,7 +59,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace Eigen;
 
 //=============================================================================================================

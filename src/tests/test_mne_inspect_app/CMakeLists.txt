@@ -18,7 +18,7 @@ mne_add_test(${PROJECT_NAME}
     REQUIRES_DATA
         mne-cpp-test-data/MEG/sample
         mne-cpp-test-data/subjects/sample
-    REQUIRES_TARGETS mne_disp3D mne_inspect_app_core
+    REQUIRES_TARGETS mne_viz_qt mne_inspect_app_core
     ENVIRONMENT QT_QPA_PLATFORM=offscreen)
 if(MNE_TEST_SKIPPED)
     return()
@@ -42,7 +42,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_inspect_app_core
     inspect_electrodes
     inspect_mri_slices
-    mne_disp3D
+    mne_viz_qt
     mne_mna
 )
 

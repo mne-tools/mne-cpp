@@ -18,7 +18,7 @@ plugin-loader pattern in the repository (`anShared::AbstractPlugin`) lives in
 
 Rather than inventing a parallel mechanism, both plugins are scaffolded as
 **self-contained QObject-based static libraries** that compile against
-`mne_disp3D`, `mne_fiff` and `mne_mri`. The library entry point is the plugin
+`mne_viz_qt`, `mne_fiff` and `mne_mri`. The library entry point is the plugin
 class itself (`ElectrodesPlugin`, `MriSlicesPlugin`); the host instantiates
 it, attaches it to a `MultimodalScene`, and drives it via direct method
 calls.

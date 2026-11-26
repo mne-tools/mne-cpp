@@ -24,7 +24,7 @@
 #include "communicator.h"
 #include "event.h"
 
-#include <mne/disp/viewers/progressview.h>
+#include <mne/viz/backends/qt/viewers/progressview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -62,7 +62,7 @@ StatusBar::StatusBar(QWidget* pParent)
     connect(m_pCommunicator.get(), &Communicator::receivedEvent,
             this, &StatusBar::onNewMessageReceived);
 
-    auto pProgressView = std::make_unique<mne::disp::ProgressView>(true, "QLabel { color : red; }");
+    auto pProgressView = std::make_unique<mne::viz::qt::ProgressView>(true, "QLabel { color : red; }");
     m_pProgressView = pProgressView.get();
     this->addPermanentWidget(pProgressView.release());
     m_pProgressView->hide();

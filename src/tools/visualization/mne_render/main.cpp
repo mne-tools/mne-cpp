@@ -26,18 +26,18 @@
 #include <mne/fiff/fiff_raw_data.h>
 #include <mne/fs/fs_surface.h>
 #include <mne/inv/inv_source_estimate.h>
-#include <mne/scene/brain_frame.h>
-#include <mne/scene/camera.h>
-#include <mne/scene/canvas.h>
-#include <mne/scene/colormap.h>
-#include <mne/scene/software_renderer.h>
-#include <mne/scene/svg_renderer.h>
-#include <mne/scene/text_metrics.h>
-#include <mne/scene/trace_buffer.h>
-#include <mne/scene/trace_frame.h>
-#include <mne/scene/trace_geometry.h>
-#include <mne/scene/trace_markers.h>
-#include <mne/scene/trace_view.h>
+#include <mne/viz/gpu/brain_frame.h>
+#include <mne/viz/views/camera.h>
+#include <mne/viz/figures/canvas.h>
+#include <mne/viz/figures/colormap.h>
+#include <mne/viz/gpu/software_renderer.h>
+#include <mne/viz/figures/svg_renderer.h>
+#include <mne/viz/figures/text_metrics.h>
+#include <mne/viz/views/trace_buffer.h>
+#include <mne/viz/gpu/trace_frame.h>
+#include <mne/viz/views/trace_geometry.h>
+#include <mne/viz/views/trace_markers.h>
+#include <mne/viz/views/trace_view.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -66,7 +66,7 @@
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::scene;
+using namespace mne::viz;
 
 //=============================================================================================================
 // STATIC DEFINITIONS

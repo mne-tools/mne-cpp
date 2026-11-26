@@ -1,0 +1,140 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2019-2026 MNE-CPP Authors
+ *
+ * @file     tfsettingsview.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     July 2019
+ * @brief    Time-frequency analysis window-length and overlap configuration panel.
+ *
+ * TfSettingsView holds the spinboxes that drive the on-line
+ * time-frequency estimator: number of trials, window length and
+ * overlap (in samples) for the underlying STFT / Wavelet routine.
+ */
+
+#ifndef TFSETTINGSVIEW_H
+#define TFSETTINGSVIEW_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../viz_qt_global.h"
+#include "abstractview.h"
+#include <mne/viz/forms/settings_form.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+//=============================================================================================================
+// DEFINE NAMESPACE mne::viz::qt
+//=============================================================================================================
+
+namespace mne::viz::qt
+{
+
+//=============================================================================================================
+// mne::viz::qt FORWARD DECLARATIONS
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * @brief Time-frequency analysis configuration panel (trials, window length, overlap).
+ *
+ * Spinboxes drive the on-line STFT / Wavelet estimator; values are
+ * emitted as Qt signals on every edit.
+ */
+class VIZQTSHARED_EXPORT TfSettingsView : public AbstractView
+{
+    Q_OBJECT
+
+public:
+    //=========================================================================================================
+    /**
+     * Constructs a TfSettingsView which is a child of parent.
+     *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
+     * @param[in] parent        parent of widget.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
+     */
+    TfSettingsView(const QString& sSettingsPath = "",
+                   QWidget* parent = 0,
+                   Qt::WindowFlags f = Qt::Widget);
+
+    //=========================================================================================================
+    /**
+     * Destroys the TfSettingsView.
+     */
+    ~TfSettingsView();
+
+    //=========================================================================================================
+    /**
+     * Saves all important settings of this view via QSettings.
+     */
+    void saveSettings();
+
+    //=========================================================================================================
+    /**
+     * Loads and inits all important settings of this view via QSettings.
+     */
+    void loadSettings();
+
+    //=========================================================================================================
+    /**
+     * Clears the view
+     */
+    void clearView();
+
+protected:
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
+     *
+     * @param[in] mode     The new mode (Clinical=0, Research=1).
+     */
+    void updateGuiMode(GuiMode mode);
+
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
+     *
+     * @param[in] mode     The new mode (RealTime=0, Offline=1).
+     */
+    void updateProcessingMode(ProcessingMode mode);
+
+    //=========================================================================================================
+    /**
+     * Slot called when the trial or row number changed.
+     */
+    void onNumberTrialRowChanged();
+
+    std::shared_ptr<viz::SettingsForm> m_pForm; /**< Trial and row number, built into spin boxes by a SettingsPanel. */
+    int m_listener = 0;                         /**< Id of the view's listener on the form. */
+
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
+
+signals:
+    //=========================================================================================================
+    /**
+     * Emit signal whenever trial number changed.
+     *
+     * @param[in] iNumberTrial        The new trial number.
+     * @param[in] iNumberRow        The new row number.
+     */
+    void numberTrialRowChanged(int iNumberTrial, int iNumberRow);
+};
+} // NAMESPACE
+
+#endif // CONNECTIVITYSETTINGSVIEW_H

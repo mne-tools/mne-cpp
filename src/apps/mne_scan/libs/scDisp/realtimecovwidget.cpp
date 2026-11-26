@@ -20,8 +20,8 @@
 
 #include <mne/base/string_utils.h>
 #include <scMeas/realtimecov.h>
-#include <mne/disp/viewers/modalityselectionview.h>
-#include <mne/disp/plots/imagesc.h>
+#include <mne/viz/backends/qt/viewers/modalityselectionview.h>
+#include <mne/viz/backends/qt/plots/imagesc.h>
 #include <mne/fiff/fiff_info.h>
 
 //=============================================================================================================
@@ -45,7 +45,7 @@
 //=============================================================================================================
 
 using namespace mne::scan;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 using namespace Eigen;
 
@@ -129,7 +129,7 @@ void RealTimeCovWidget::initDisplayControllWidgets()
         //Init control widgets
         QList<QWidget*> lControlWidgets;
 
-        mne::disp::ModalitySelectionView* pModalitySelectionWidget = new ModalitySelectionView(m_pRTC->getFiffInfo()->chs, QString("MNESCAN/RTCW"), this);
+        mne::viz::qt::ModalitySelectionView* pModalitySelectionWidget = new ModalitySelectionView(m_pRTC->getFiffInfo()->chs, QString("MNESCAN/RTCW"), this);
         pModalitySelectionWidget->setObjectName("group_tab_View_Modalities");
         lControlWidgets.append(pModalitySelectionWidget);
 

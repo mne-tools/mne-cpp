@@ -20,7 +20,7 @@
 //=============================================================================================================
 
 #include <mne/base/raster_image.h>
-#include <mne/scene/display_list.h>
+#include <mne/viz/figures/display_list.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -45,12 +45,12 @@ namespace scene_golden
  *
  * @return Whether the image matches; the difference is printed otherwise.
  */
-inline bool matches_png(const mne::scene::Image& image, const std::string& path)
+inline bool matches_png(const mne::viz::Image& image, const std::string& path)
 {
     mne::RasterImage rgb(image.width, image.height);
     for (int y = 0; y < image.height; ++y) {
         for (int x = 0; x < image.width; ++x) {
-            const mne::scene::Color c = image.pixel(x, y);
+            const mne::viz::Color c = image.pixel(x, y);
             rgb.set_pixel(x, y, {c.r, c.g, c.b});
         }
     }

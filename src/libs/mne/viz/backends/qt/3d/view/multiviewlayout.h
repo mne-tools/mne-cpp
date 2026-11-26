@@ -1,0 +1,219 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @file     multiviewlayout.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Viewport geometry, splitter logic and per-pane preset assignment for the mne_viz_qt multi-view grid.
+ *
+ * MultiViewLayout computes the four sub-viewports (Top-left
+ * perspective, Top-right orthographic top, Bottom-left
+ * orthographic left, Bottom-right orthographic front) inside the
+ * owning QRhiWidget, honours user-dragged splitter ratios, and
+ * publishes the per-pane @ref mne::viz::qt::SubView so the camera and renderer
+ * can set viewport / scissor and pick the right matrix preset. It is the
+ * Qt-typed adapter of the toolkit-neutral @ref mne::viz::PaneLayout.
+ */
+
+#ifndef MULTIVIEWLAYOUT_H
+#define MULTIVIEWLAYOUT_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../../viz_qt_global.h"
+
+#include <mne/viz/views/pane_layout.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QRect>
+#include <QSize>
+#include <QPoint>
+#include <Qt>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
+
+namespace mne::viz::qt
+{
+
+/** Identifies which splitter(s) are hit by a cursor position. */
+using SplitterHit = viz::SplitterHit;
+
+//=============================================================================================================
+/**
+ * Pure-geometry class for multi-view viewport layout.
+ *
+ * This class has no widget dependencies — it works with sizes, rectangles,
+ * and fractional split positions. The hosting widget queries this class
+ * for rectangles and hit-test results, and updates separator widgets
+ * accordingly.
+ *
+ * Layout rules:
+ *   - 1 pane  → full area
+ *   - 2 panes → side-by-side, split at m_splitX
+ *   - 3 panes → full-width top row + 2 bottom panes split at m_splitX
+ *   - 4 panes → 2×2 grid split at (m_splitX, m_splitY)
+ *
+ * @brief    Multi-view geometry computations.
+ *
+ * @snippet ex_disp3d_scene/main.cpp multi_view_layout_usage
+ */
+class VIZQTSHARED_EXPORT MultiViewLayout
+{
+public:
+    //=========================================================================================================
+    /**
+     * Constructor.
+     */
+    MultiViewLayout() = default;
+
+    // ── Split fractions ────────────────────────────────────────────────
+
+    float splitX() const
+    {
+        return m_layout.split_x();
+    }
+    float splitY() const
+    {
+        return m_layout.split_y();
+    }
+    void setSplitX(float x)
+    {
+        m_layout.set_split_x(x);
+    }
+    void setSplitY(float y)
+    {
+        m_layout.set_split_y(y);
+    }
+    void resetSplits()
+    {
+        m_layout.reset_splits();
+    }
+
+    // ── Tolerance / sizing constants ───────────────────────────────────
+
+    int hitTolerancePx() const
+    {
+        return m_layout.hit_tolerance_px();
+    }
+    int minPanePx() const
+    {
+        return m_layout.min_pane_px();
+    }
+    int separatorLinePx() const
+    {
+        return m_layout.separator_line_px();
+    }
+
+    //=========================================================================================================
+    /**
+     * Compute the pixel rectangle for a layout slot.
+     *
+     * @param[in] slot          Slot index (0-based among enabled viewports).
+     * @param[in] numEnabled    Total number of enabled panes (1–4).
+     * @param[in] outputSize    Total output pixel size.
+     * @return                  Pixel rectangle for the slot.
+     */
+    QRect slotRect(int slot, int numEnabled, const QSize& outputSize) const;
+
+    //=========================================================================================================
+    /**
+     * Hit-test the splitter bars.
+     *
+     * @param[in] pos           Cursor position (widget coords).
+     * @param[in] numEnabled    Total number of enabled panes.
+     * @param[in] outputSize    Total output pixel size.
+     * @return                  Which splitter(s) are under the cursor.
+     */
+    SplitterHit hitTestSplitter(const QPoint& pos,
+                                int numEnabled,
+                                const QSize& outputSize) const;
+
+    //=========================================================================================================
+    /**
+     * Return the Qt::CursorShape appropriate for a splitter hit.
+     *
+     * @param[in] hit           Hit-test result.
+     * @return                  Cursor shape (ArrowCursor if None).
+     */
+    static Qt::CursorShape cursorForHit(SplitterHit hit);
+
+    //=========================================================================================================
+    /**
+     * Given a cursor position and output size, determine which viewport
+     * index the cursor is in.
+     *
+     * @param[in] pos               Cursor position (widget coords).
+     * @param[in] enabledViewports  Ordered list of enabled viewport indices.
+     * @param[in] outputSize        Total output pixel size.
+     * @return                      Viewport index, or -1 if outside.
+     */
+    int viewportIndexAt(const QPoint& pos,
+                        const std::vector<int>& enabledViewports,
+                        const QSize& outputSize) const;
+
+    //=========================================================================================================
+    /**
+     * Apply a separator-pixel inset to a pane rect so adjacent panes
+     * don't overlap the separator bar.  This is used in the render loop
+     * to trim viewports.
+     *
+     * @param[in] paneRect      Original pane rectangle.
+     * @param[in] slot          Slot index (0-based).
+     * @param[in] numEnabled    Total enabled count.
+     * @return                  Inset rectangle.
+     */
+    QRect insetForSeparator(const QRect& paneRect,
+                            int slot,
+                            int numEnabled) const;
+
+    //=========================================================================================================
+    /**
+     * Compute the separator widget geometries.
+     *
+     * @param[in]  numEnabled      Number of enabled panes.
+     * @param[in]  widgetSize      Widget size in pixels.
+     * @param[out] verticalRect    Geometry for the vertical separator (empty if hidden).
+     * @param[out] horizontalRect  Geometry for the horizontal separator (empty if hidden).
+     */
+    void separatorGeometries(int numEnabled,
+                             const QSize& widgetSize,
+                             QRect& verticalRect,
+                             QRect& horizontalRect) const;
+
+    //=========================================================================================================
+    /**
+     * Update split fractions from a mouse drag position.
+     *
+     * @param[in] pos            Current cursor position.
+     * @param[in] activeSplitter Which splitter is being dragged.
+     * @param[in] widgetSize     Widget size in pixels.
+     */
+    void dragSplitter(const QPoint& pos,
+                      SplitterHit activeSplitter,
+                      const QSize& widgetSize);
+
+    /** @return The toolkit-neutral layout this adapter converts. */
+    const viz::PaneLayout& layout() const
+    {
+        return m_layout;
+    }
+
+private:
+    viz::PaneLayout m_layout;
+};
+
+} // namespace mne::viz::qt
+
+#endif // MULTIVIEWLAYOUT_H

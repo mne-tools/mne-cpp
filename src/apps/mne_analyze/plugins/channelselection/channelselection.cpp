@@ -18,10 +18,10 @@
 #include <mne/base/log.h>
 #include "channelselection.h"
 
-#include <mne/disp/viewers/helpers/selectionitem.h>
-#include <mne/disp/viewers/helpers/channelinfomodel.h>
-#include <mne/disp/viewers/channelselectionview.h>
-#include <mne/disp/viewers/applytoview.h>
+#include <mne/viz/backends/qt/viewers/helpers/selectionitem.h>
+#include <mne/viz/backends/qt/viewers/helpers/channelinfomodel.h>
+#include <mne/viz/backends/qt/viewers/channelselectionview.h>
+#include <mne/viz/backends/qt/viewers/applytoview.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Management/analyzedata.h>
@@ -51,7 +51,7 @@ using namespace mne::analyze;
 //=============================================================================================================
 
 ChannelSelection::ChannelSelection()
-: m_pSelectionItem(std::make_unique<mne::disp::SelectionItem>())
+: m_pSelectionItem(std::make_unique<mne::viz::qt::SelectionItem>())
 , m_pChannelInfoModel(nullptr)
 , m_pFiffInfo(nullptr)
 , m_pViewLayout(nullptr)
@@ -185,29 +185,29 @@ void ChannelSelection::setFiffSettings(std::shared_ptr<mne::FiffInfo> pFiffInfo)
     //First time set up only
     std::unique_ptr<QLayoutItem>(m_pControlLayout->takeAt(0))->widget()->hide();
 
-    m_pChannelInfoModel = std::make_shared<mne::disp::ChannelInfoModel>(m_pFiffInfo);
+    m_pChannelInfoModel = std::make_shared<mne::viz::qt::ChannelInfoModel>(m_pFiffInfo);
 
-    m_pChannelSelectionView = std::make_unique<mne::disp::ChannelSelectionView>(QString("MNEANALYZE/CHANSELECT"),
-                                                                                nullptr,
-                                                                                m_pChannelInfoModel,
-                                                                                Qt::Window);
+    m_pChannelSelectionView = std::make_unique<mne::viz::qt::ChannelSelectionView>(QString("MNEANALYZE/CHANSELECT"),
+                                                                                   nullptr,
+                                                                                   m_pChannelInfoModel,
+                                                                                   Qt::Window);
 
     m_pViewLayout->addWidget(m_pChannelSelectionView->getViewWidget());
     m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
 
-    m_pApplyToView = new mne::disp::ApplyToView("", m_pControlLayout->parentWidget());
+    m_pApplyToView = new mne::viz::qt::ApplyToView("", m_pControlLayout->parentWidget());
 
     m_pControlLayout->addWidget(m_pApplyToView);
 
-    connect(m_pChannelSelectionView.get(), &mne::disp::ChannelSelectionView::loadedLayoutMap,
-            m_pChannelInfoModel.get(), &mne::disp::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
+    connect(m_pChannelSelectionView.get(), &mne::viz::qt::ChannelSelectionView::loadedLayoutMap,
+            m_pChannelInfoModel.get(), &mne::viz::qt::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
 
-    connect(m_pChannelInfoModel.get(), &mne::disp::ChannelInfoModel::channelsMappedToLayout,
-            m_pChannelSelectionView.get(), &mne::disp::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
+    connect(m_pChannelInfoModel.get(), &mne::viz::qt::ChannelInfoModel::channelsMappedToLayout,
+            m_pChannelSelectionView.get(), &mne::viz::qt::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
 
     //Slots for event loop
 
-    connect(m_pChannelSelectionView.get(), &mne::disp::ChannelSelectionView::selectionChanged,
+    connect(m_pChannelSelectionView.get(), &mne::viz::qt::ChannelSelectionView::selectionChanged,
             this, &ChannelSelection::onSelectionChanged, Qt::UniqueConnection);
 
     m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
@@ -219,7 +219,7 @@ void ChannelSelection::setFiffSettings(std::shared_ptr<mne::FiffInfo> pFiffInfo)
 
 //=============================================================================================================
 
-void ChannelSelection::onSelectionChanged(const mne::disp::SelectionItem& selection)
+void ChannelSelection::onSelectionChanged(const mne::viz::qt::SelectionItem& selection)
 {
     *m_pSelectionItem = selection;
     m_pSelectionItem->m_sViewsToApply.clear();

@@ -48,11 +48,11 @@ set(MNE_LIBS_REQUIRED
     mne_base
     mne_math
     mne_events
-    mne_disp
+    mne_viz_qt
 )
 
-if(TARGET mne_disp3D)
-  list(APPEND MNE_LIBS_REQUIRED mne_disp3D)
+if(TARGET mne_viz_qt)
+  list(APPEND MNE_LIBS_REQUIRED mne_viz_qt)
 endif()
 
 # Everything but main(), so tests can drive the application
@@ -88,7 +88,7 @@ if(NOT BUILD_SHARED_LIBS)
       analyze_sourcelocalization
   )
   
-  if(TARGET mne_disp3D)
+  if(TARGET mne_viz_qt)
     list(APPEND MNE_ANALYZE_PLUGINS analyze_view3d)
   endif()
 

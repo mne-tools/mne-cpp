@@ -13,7 +13,7 @@
  * detects trigger flanks on one stimulus channel, optionally reduces noise with SPHARA and filters a selection
  * of channels with FIR kernels. RtRawDisplay does all of that block by block and keeps the filter overlap
  * between blocks; the caller places the results into its display buffer. It has no GUI dependency; the Qt model
- * of the raw viewer (disp::RtFiffRawViewModel) is an adapter around it.
+ * of the raw viewer (viz::qt::RtFiffRawViewModel) is an adapter around it.
  */
 
 #ifndef DSP_RT_RAW_DISPLAY_H

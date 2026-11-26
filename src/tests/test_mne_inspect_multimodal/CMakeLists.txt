@@ -17,8 +17,8 @@ enable_testing()
 mne_add_test(${PROJECT_NAME}
     LABELS unit
     TIMEOUT 60
-    ENVIRONMENT "DYLD_LIBRARY_PATH=$<TARGET_FILE_DIR:mne_disp3D>:$<TARGET_FILE_DIR:mne_inspect>"
-    REQUIRES_TARGETS inspect_electrodes inspect_mri_slices mne_disp3D mne_inspect_app_core)
+    ENVIRONMENT "DYLD_LIBRARY_PATH=$<TARGET_FILE_DIR:mne_viz_qt>:$<TARGET_FILE_DIR:mne_inspect>"
+    REQUIRES_TARGETS inspect_electrodes inspect_mri_slices mne_viz_qt mne_inspect_app_core)
 if(MNE_TEST_SKIPPED)
     return()
 endif()
@@ -53,7 +53,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_inspect_demo_fixtures
     inspect_electrodes
     inspect_mri_slices
-    mne_disp3D
+    mne_viz_qt
     mne_ieeg
     mne_fiff
     mne_mri

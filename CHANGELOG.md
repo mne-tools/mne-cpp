@@ -28,8 +28,8 @@ table.
 | Before | Now |
 |---|---|
 | `BASELIB`, `FIFFLIB`, `MNELIB`, `FWDLIB`, `INVLIB`, `DSPLIB`, `ACQLIB`, `BIDSLIB`, `IEEGLIB`, `MNALIB`, `FSLIB`, `MRILIB`, `MATHLIB`, `STSLIB`, `CONNECTIVITYLIB`, `DECODINGLIB`, `MLLIB`, `LSLLIB`, `COMLIB`, `CHANNELSLIB`, `PYBRIDGELIB`, `REPORTLIB` | `mne` |
-| `DISPLIB`, `DISP3DLIB` | `mne::disp` |
-| `SURFACEKEYS` | `mne::disp::surface_keys` |
+| `DISPLIB`, `DISP3DLIB` | `mne::viz::qt` (library `mne_viz_qt`, see below) |
+| `SURFACEKEYS` | `mne::viz::qt::surface_keys` |
 | `ANSHAREDLIB` (MNE Analyze) | `mne::analyze` |
 | `EVENTSLIB` (MNE Analyze events) | `mne::analyze::events` |
 | `EVENTSINTERNAL` | `mne::analyze::events::detail` |
@@ -37,6 +37,33 @@ table.
 | `using namespace FIFFLIB; using namespace MNELIB; ...` | `using namespace mne;` |
 | `FIFFLIB::buildDateTime()`, `buildHash()`, `buildHashLong()` and the same three in every other library | `mne::buildDateTime()`, `buildHash()`, `buildHashLong()` from `base/base_global.h` only; all libraries are built from one commit |
 | `ACQLIB::buildDateTime()`, `buildHash()`, `buildHashLong()` | `mne::acq_build_date_time()`, `acq_build_hash()`, `acq_build_hash_long()`; `mne_acq` builds without `mne_base` |
+
+Visualization is one toolkit-free library with backends, the way MNE-Python
+has `mne.viz` and its backends:
+
+```text
+src/libs/mne/viz/            mne_viz      mne::viz      figures/, views/, gpu/, forms/, models/
+  backends/qt/               mne_viz_qt   mne::viz::qt  plots/, viewers/, 3d/
+```
+
+`mne_viz` describes what the viewers show and how they behave without a GUI
+toolkit (figures as display lists, the trace and brain view logic, GPU frame
+descriptions with a software renderer, settings forms and view models).
+`mne_viz_qt` is its Qt backend and the only library that uses Qt. A backend
+depends on `mne_viz` only, never on another backend; `dependency_policy.json`
+enforces this. The former `mne_scene` and `mne_viewmodels` are `mne_viz`, and
+`mne_disp` and `mne_disp3D` are `mne_viz_qt`; the 3-D view lives in its `3d/`.
+
+| Before | Now |
+|---|---|
+| `mne_scene`, `mne_viewmodels` (`mne::scene`, `mne::viewmodels`) | `mne_viz` (`mne::viz`) |
+| `mne_disp`, `mne_disp3D` (`mne::disp`) | `mne_viz_qt` (`mne::viz::qt`) |
+| `<mne/scene/canvas.h>`, `<mne/scene/trace_view.h>`, `<mne/scene/gpu_frame.h>`, ... | `<mne/viz/figures/canvas.h>`, `<mne/viz/views/trace_view.h>`, `<mne/viz/gpu/gpu_frame.h>`, ... |
+| `<mne/viewmodels/channel_table.h>` | `<mne/viz/models/channel_table.h>` |
+| `<mne/disp/...>` | `<mne/viz/backends/qt/...>` |
+| `<mne/disp3D/...>` | `<mne/viz/backends/qt/3d/...>` |
+| `DISPSHARED_EXPORT`, `DISP3DSHARED_EXPORT`, `SCENESHARED_EXPORT` | `VIZQTSHARED_EXPORT`, `VIZSHARED_EXPORT` |
+| `MNE_DISP3D` (defined when the 3-D view is available) | `MNE_VIZ_QT_3D` |
 
 The base library's functions are snake_case like the standard library's:
 
@@ -222,7 +249,7 @@ aliases; replace the old spelling as below.
   polygons as one area and `blend_pixel()` mixes a colour into a pixel;
   `decode_png()` and `load_png()` read 8-bit RGB and RGBA PNG files, e.g.
   golden images of the Qt-free tests.
-- New library `mne_scene` (`mne/scene/`), Qt-free: `mne::scene::Canvas`
+- New library `mne_viz` (`mne/viz/`), Qt-free: `mne::viz::Canvas`
   records drawing calls that follow `QPainter` (pens, brushes with linear
   gradients, fonts, transforms, clips, opacity, cubic curves, text and images)
   into a `DisplayList`, which `to_svg()` writes as a deterministic SVG document
@@ -230,19 +257,19 @@ aliases; replace the old spelling as below.
   `LineChart`, `BarChart`, `SplinePlot`, `ImagePlot`, `VectorPlot`,
   `ButterflyPlot` and `AverageTile`, axis ticks (`nice_ticks()`,
   `tick_label()`) and the colour maps (`map_color()`, moved from
-  `disp::ColorMap`, which now calls them). `ex_scene` writes a plot as SVG and
+  `viz::qt::ColorMap`, which now calls them). `ex_scene` writes a plot as SVG and
   PNG without Qt.
-- The plot widgets of `mne_disp` (`LinePlot`, `Bar`, `Spline`, `ImageSc`,
+- The plot widgets of `mne_viz_qt` (`LinePlot`, `Bar`, `Spline`, `ImageSc`,
   `TFplot`, `Plot`, `ButterflyView` and the channel tiles of
-  `AverageLayoutView`) draw their `mne_scene` model through a QPainter backend
-  (`disp/plots/helpers/scenepainter.h`: `paintScene()`, `QtTextMetrics`). On
+  `AverageLayoutView`) draw their `mne_viz` model through a QPainter backend
+  (`viz/backends/qt/plots/helpers/scenepainter.h`: `paintScene()`, `QtTextMetrics`). On
   screen they draw the same pixels as before; `test_scene_render` compares
   every model's SVG and PNG output with golden files. `ButterflyView` saves
   SVG screenshots as vector graphics instead of an embedded bitmap. Removed
   with the move: `Graph::drawLabels()`, the protected data members of `Plot`
   and `ImageSc` (`ImageSc::normalize()`, `updateMaps()`), the public members
   `Spline::m_dMinAxisX` and `m_dMaxAxisX`, the protected helpers of
-  `ColorMap` and `disp/plots/detail/niceticks.h` (use `scene::nice_ticks()`).
+  `ColorMap` and `plots/detail/niceticks.h` (use `viz::nice_ticks()`).
   The Qt usage ceilings of `disp` drop accordingly (tokens 5149 to 4883).
 - The coverage gate holds acq, dsp, fiff, fwd, inv and mne to their own line
   coverage floors (`library_floors` in `scripts/quality/coverage_policy.json`),
@@ -254,7 +281,7 @@ aliases; replace the old spelling as below.
 - The SOUP inventory lists the Qt modules the libraries, applications and
   tools request (also as sub-components in the CycloneDX SBOM) and the system
   `curl` program that MNE Analyze Studio's assistant runs.
-- The GPU views run without Qt Widgets in their core: `disp::ChannelRhiRenderer`
+- The GPU views run without Qt Widgets in their core: `viz::qt::ChannelRhiRenderer`
   holds the state, input handling and QRhi rendering of the raw-data trace
   view, and `disp3D::BrainViewCore` those of the 3-D brain view. Each has two
   hosts: the existing `ChannelRhiView` and `BrainView` (still `QRhiWidget`s,
@@ -263,16 +290,16 @@ aliases; replace the old spelling as below.
   `QWidget::createWindowContainer()`). The crosshair, scalebars and ruler of
   the trace view and the FPS, info and viewport labels and separators of the
   brain view are drawn in the GPU pass instead of by child widgets.
-  `LiveMarker` moved to `disp3D/view/brainviewcore.h`.
-- `audit_qt_modules.py --check` keeps the rendering code of `mne_disp` and
-  `mne_disp3D` free of Qt Widgets: the colour maps, scene painter, SVG writer,
+  `LiveMarker` moved to `viz/backends/qt/3d/view/brainviewcore.h`.
+- `audit_qt_modules.py --check` keeps the rendering code of `mne_viz_qt` and
+  `mne_viz_qt` free of Qt Widgets: the colour maps, scene painter, SVG writer,
   item models, `ChannelRhiRenderer`, `BrainViewCore` and the `QWindow` hosts
   (`widgets_free` in `scripts/quality/qt_usage_policy.json`).
-- The sensor-layout views of `mne_disp` no longer use `QGraphicsView`:
-  `mne::scene::SensorLayout` (sensors as labelled dots, with click and
+- The sensor-layout views of `mne_viz_qt` no longer use `QGraphicsView`:
+  `mne::viz::SensorLayout` (sensors as labelled dots, with click and
   rubber-band selection as in a `QGraphicsScene`) and
-  `mne::scene::AverageLayout` (an `AverageTile` per channel at its layout
-  position) are the Qt-free models; `disp::SceneViewport` shows such a model
+  `mne::viz::AverageLayout` (an `AverageTile` per channel at its layout
+  position) are the Qt-free models; `viz::qt::SceneViewport` shows such a model
   with wheel and pinch zoom, right-button panning, a rubber band and
   double-click fitting, and keeps it fitted until the user zooms or pans.
   `ChannelSelectionView` picks sensors in a `SensorLayoutWidget`,
@@ -281,41 +308,41 @@ aliases; replace the old spelling as below.
   Breaking: `ChannelSelectionView::selectionChanged()` and
   `AverageLayoutView::channelSelectionManagerChanged()` take a
   `SelectionItem` instead of a list of `QGraphicsItem`; `SelectionItem` moved
-  to `disp/viewers/helpers/selectionitem.h` and copies all its fields;
+  to `viz/backends/qt/viewers/helpers/selectionitem.h` and copies all its fields;
   `LayoutScene`, `SelectionScene`, `SelectionSceneItem`, `AverageScene` and
   `AverageSceneItem` are removed (mne_browse keeps a private `LayoutScene`
   for its butterfly plot). Highlighted sensors now show an orange ring.
-- `mne::scene::FilterResponsePlot` draws the magnitude response of a filter
-  in dB with its cut-off frequencies; the new `disp::FilterPlot` widget shows
+- `mne::viz::FilterResponsePlot` draws the magnitude response of a filter
+  in dB with its cut-off frequencies; the new `viz::qt::FilterPlot` widget shows
   it, and `FilterDesignView` uses that widget instead of a `QGraphicsView`.
   Its plot export writes vector SVG. Removed: `FilterPlotScene` and
   `FilterDesignView::resizeEvent()`.
-- `mne::scene::TraceView` (`scene/trace_view.h`) holds the viewport and
+- `mne::viz::TraceView` (`viz/views/trace_view.h`) holds the viewport and
   interaction state of the raw-data trace view without a GUI toolkit: scroll
   position, zoom, file bounds and clamping, the channel window, wheel zoom and
   scrolling, drag scrolling with inertia, the ruler with its axis snapping,
   annotation range selection and boundary resizing, and the crosshair. Input
   arrives as toolkit-neutral `PointerEvent` and `WheelEvent`
-  (`scene/input_event.h`) with timestamps; what the host has to do (animate a
+  (`viz/views/input_event.h`) with timestamps; what the host has to do (animate a
   scroll or zoom, change the cursor, redraw, report clicks and edits) comes
   back through callbacks. `draw_overlays()` draws the crosshair, scalebars,
-  ruler and annotation selection into a `Canvas`. `disp::ChannelRhiRenderer`
+  ruler and annotation selection into a `Canvas`. `viz::qt::ChannelRhiRenderer`
   delegates to it and paints the overlays with `paintScene()`; its API and
   signals are unchanged. `test_scene_trace_view` tests it without Qt, with
   golden SVG files of the overlays. The Qt usage ceiling of `disp` drops
   accordingly (tokens 4885 to 4680).
-- The rest of the trace view's logic moved to `mne_scene` as well:
+- The rest of the trace view's logic moved to `mne_viz` as well:
   `decimate_trace()` (the min/max decimation and detrending that
   `ChannelDataModel::decimatedVertices()` now calls), `visible_channels()`,
-  and `TraceGeometry` (`scene/trace_geometry.h`), which streams the trace
+  and `TraceGeometry` (`viz/views/trace_geometry.h`), which streams the trace
   vertices over the prefetch window and lists the traces of a frame with
   their shader parameters (`TraceUniforms`, the 52-byte uniform block of the
-  trace shader). `TraceSource` (now `scene/trace_source.h`) supplies colours,
+  trace shader). `TraceSource` (now `viz/views/trace_source.h`) supplies colours,
   bad flags and vertices, and computes the butterfly lanes by default.
   `TraceMarkers` draws the annotation, event and epoch overlay into a
   `Canvas`; `draw_trace_figure()` draws the whole view as a display list.
   `ViewAnimator` runs the scroll, inertial and zoom animations (cubic
-  ease-out) over explicit timestamps. `disp::ChannelRhiRenderer` only uploads
+  ease-out) over explicit timestamps. `viz::qt::ChannelRhiRenderer` only uploads
   vertices and uniforms, paints the display lists into its textures and
   `renderToImage()` result, and ticks the animator per frame and on a timer
   instead of using `QPropertyAnimation`; its API and signals are unchanged.
@@ -324,32 +351,32 @@ aliases; replace the old spelling as below.
   the refetch margin equalled the prefetch, so any scroll left it. It now
   refetches once half of the prefetch on a side is used up, and never on a
   side where the fetched window already ends with the data.
-- `mne_scene` describes GPU frames without a graphics API (`scene/gpu_frame.h`):
+- `mne_viz` describes GPU frames without a graphics API (`viz/gpu/gpu_frame.h`):
   a view keeps its vertex and index buffers, textures (RGBA pixels or a
   `DisplayList` the backend rasterizes) and pipelines (shader id, vertex
   layout, topology, blending, culling, depth state) in `GpuResources` with
   per-resource revisions, and builds one `GpuFrame` per frame from passes and
   draws (uniform blocks in std140 layout, textures, viewport, scissor,
-  instancing). `SoftwareRenderer` (`scene/software_renderer.h`) executes
+  instancing). `SoftwareRenderer` (`viz/gpu/software_renderer.h`) executes
   frames on the CPU into an RGBA `Image`: clipped, perspective-correct
   triangles with depth testing, culling and blending, one-pixel lines and
   points, and C++ counterparts of the shaders (`channeldata` and `overlay` of
   the trace view so far). `to_rgba_image()` rasterizes a figure with its
-  opacity. `TraceFrameBuilder` (`scene/trace_frame.h`) describes the frames
+  opacity. `TraceFrameBuilder` (`viz/gpu/trace_frame.h`) describes the frames
   of the trace view: traces, the marker overlay with the per-second bands
   and the crosshair, scalebar, ruler and selection overlay.
   `test_scene_gpu_frame` tests the software backend; `test_scene_trace_view`
   renders a trace view headless against a golden PNG.
-- `disp::RhiFrameRenderer` (`disp/plots/helpers/rhiframerenderer.h`) is the
+- `viz::qt::RhiFrameRenderer` (`viz/backends/qt/plots/helpers/rhiframerenderer.h`) is the
   QRhi backend of the GPU frame description: one QRhi buffer, texture and
   pipeline per resource handle, uploads of what changed, the uniform blocks
   of all draws in one dynamic buffer, shaders as precompiled `.qsb` files
   found by id, figure textures painted with `QPainter`. `checkShaders()`
   compares a frame with the reflection of its shaders (uniform block sizes,
   samplers, vertex inputs). `ChannelRhiRenderer` renders the frames of
-  `scene::TraceFrameBuilder` through it instead of its own QRhi code; its API
+  `viz::TraceFrameBuilder` through it instead of its own QRhi code; its API
   is unchanged except that `hudImage()` returns the image by value.
-- `scene::BrainFrameBuilder` (`scene/brain_frame.h`) describes frames of the
+- `viz::BrainFrameBuilder` (`viz/gpu/brain_frame.h`) describes frames of the
   3-D brain view as `GpuFrame`: surfaces with the standard, holographic
   (back faces, then front faces), anatomical, x-ray and normals shaders,
   instanced dipole and electrode glyphs, and a screen overlay, pane by pane;
@@ -361,19 +388,19 @@ aliases; replace the old spelling as below.
 - New tool `mne_render` renders raw data traces (PNG through the trace view's
   GPU frames, or SVG) or a FreeSurfer surface with a source estimate (PNG)
   headless, without Qt, a window system or a GPU, on the software backend of
-  `mne_scene`; `--autoscale` scales channel types to their signals.
+  `mne_viz`; `--autoscale` scales channel types to their signals.
 - New example `ex_scene_sdl` (`-DBUILD_EXAMPLES_SDL=ON`, needs SDL3) runs the
   trace view in an SDL3 window instead of Qt: the same `TraceView`,
   `TraceBuffer` and `TraceFrameBuilder`, frames executed by the software
   backend and shown as an SDL texture, SDL input translated to scene input
   events, a synthetic recording streaming in. The Qt-free CI job builds and
   runs it on macOS (SDL's dummy video driver).
-- Settings panels are described without a GUI toolkit: `scene::SettingsForm`
-  (`scene/settings_form.h`) lists the fields of a panel (bool, int and double
+- Settings panels are described without a GUI toolkit: `viz::SettingsForm`
+  (`viz/forms/settings_form.h`) lists the fields of a panel (bool, int and double
   with range, step, unit and spin box or slider, choice, text, file path,
   action button, or a host-provided custom widget), their groups, and
   enabled/visible conditions, keeps the values valid and tells listeners
-  about changes. `disp::SettingsPanel` builds the Qt Widgets of any form and
+  about changes. `viz::qt::SettingsPanel` builds the Qt Widgets of any form and
   persists its values in `QSettings`, so another toolkit needs one builder
   instead of a hand-written view per panel. Flags (`add_flag()`) hold host
   modes that conditions refer to without being shown or stored, fields can
@@ -388,61 +415,60 @@ aliases; replace the old spelling as below.
   applies the SSP projector (bad channels zeroed) and the CTF compensator,
   and `RtRawDisplay` (`dsp/rt/rt_raw_display.h`) adds SPHARA, FIR filtering
   of a channel selection with overlap-add across blocks, and trigger
-  detection for streamed blocks. `disp::RtFiffRawViewModel` and
-  `disp::EvokedSetModel` are adapters that place the results into their
+  detection for streamed blocks. `viz::qt::RtFiffRawViewModel` and
+  `viz::qt::EvokedSetModel` are adapters that place the results into their
   buffers.
-- New library `mne_viewmodels` (model layer, depends on `mne_fiff`) holds
-  toolkit-independent view models: `ChannelTable` (channel information table
+- `mne_viz` holds toolkit-independent view models (`models/`): `ChannelTable` (channel information table
   with layout name mapping), `SpectrumTable` (spectra, channel selection,
   frozen copy, linear or log frequency axis and band) and `BidsTree`
   (subjects, sessions, data-type folders and items with the BIDS naming
-  rules). `disp::ChannelInfoModel`, `disp::FrequencySpectrumModel` and
-  `disp::BidsViewModel` adapt them to Qt item models; items of the BIDS model
+  rules). `viz::qt::ChannelInfoModel`, `viz::qt::FrequencySpectrumModel` and
+  `viz::qt::BidsViewModel` adapt them to Qt item models; items of the BIDS model
   carry their tree node in `BIDS_ITEM_NODE`. The Qt usage ceiling of `disp`
   drops to 4403 tokens.
-- The data behind the raw-data views moved to `mne_scene` as well.
-  `TraceBuffer` (`scene/trace_buffer.h`) stores the samples of the trace view
+- The data behind the raw-data views moved to `mne_viz` as well.
+  `TraceBuffer` (`viz/views/trace_buffer.h`) stores the samples of the trace view
   (replaced, or appended to with a capacity), resolves the channel
   descriptions a host gives (`ChannelSpec`: name, type, colour, scale keys,
   bad flag, virtual) against a scale map and a signal colour, computes the
   RMS, and is a `TraceSource` that decimates and detrends its traces; changes
-  reach listeners as callbacks. `disp::ChannelDataModel` wraps it, describes
+  reach listeners as callbacks. `viz::qt::ChannelDataModel` wraps it, describes
   the channels of its `FiffInfo` (per-kind scales, colours and type labels)
   and turns the callbacks into its unchanged signals; its API is unchanged
   apart from the new `buffer()`, which `ChannelRhiRenderer` now reads as its
-  trace source. `SweepBuffer` (`scene/sweep_buffer.h`) is the sweeping window
+  trace source. `SweepBuffer` (`viz/views/sweep_buffer.h`) is the sweeping window
   of the real-time view: raw and filtered layers written at a wrapping write
   position, new sweeps, the last block, the frozen copy and the sample under
-  a column; `disp::RtFiffRawViewModel` keeps its SSP, compensator, SPHARA,
+  a column; `viz::qt::RtFiffRawViewModel` keeps its SSP, compensator, SPHARA,
   filter and trigger processing (they need `mne_fiff` and `mne_dsp`) and
   writes into it. `reconcile_conditions()` and `pre_stimulus_samples()`
-  (`scene/evoked_conditions.h`) do the per-condition colour and visibility
-  bookkeeping and the onset search of `disp::EvokedSetModel`.
+  (`viz/models/evoked_conditions.h`) do the per-condition colour and visibility
+  bookkeeping and the onset search of `viz::qt::EvokedSetModel`.
   `test_scene_trace_buffer` tests them without Qt. The Qt usage ceiling of
   `disp` drops to 4529 tokens.
 - The camera, input handling, pane layout and head-up display of the 3-D brain
-  view moved to `mne_scene` (which now links Eigen): `OrbitCamera`
-  (`scene/camera.h`) computes the projection, view and model matrices, the
+  view moved to `mne_viz` (which now links Eigen): `OrbitCamera`
+  (`viz/views/camera.h`) computes the projection, view and model matrices, the
   seven view presets and the orbit and pan of a drag; `PaneCamera` holds the
-  preset, zoom, pan and rotation of a pane (`disp::SubView` derives from it,
+  preset, zoom, pan and rotation of a pane (`viz::qt::SubView` derives from it,
   so its `perspectiveRotation` and `QVector2D pan` are now the Eigen
   `rotation` and `pan`, and `SubView::load()` takes an `Eigen::Quaternionf`
   fallback). `ray_from_pixel()`, `intersect_ray_triangle()` and
-  `intersect_ray_sphere()` (`scene/ray_picking.h`) do the picking maths of
+  `intersect_ray_sphere()` (`viz/views/ray_picking.h`) do the picking maths of
   `BrainSurface`, `DipoleObject`, `ElectrodeObject` and `RayPicker`.
-  `PaneLayout` (`scene/pane_layout.h`) lays out 1 to 4 panes with
+  `PaneLayout` (`viz/views/pane_layout.h`) lays out 1 to 4 panes with
   their separators and splitters. `BrainViewInteraction` is the input state
   machine (orbit, pan, wheel zoom per pane, pane selection, preset-menu
   clicks, splitter drags, R and S keys) with effects through callbacks, and
   `BrainViewOverlay` draws the FPS, info, region and pane-name labels and the
-  separators as a display list. `scene/input_event.h` gains `KeyEvent` and the
+  separators as a display list. `viz/views/input_event.h` gains `KeyEvent` and the
   buttons held during a pointer event; `toScenePointerEvent()` and
-  `toSceneWheelEvent()` (`disp/plots/helpers/sceneinput.h`) translate Qt
-  events for the trace and brain views. `disp::BrainViewCore` translates
+  `toSceneWheelEvent()` (`viz/backends/qt/plots/helpers/sceneinput.h`) translate Qt
+  events for the trace and brain views. `viz::qt::BrainViewCore` translates
   events, converts the matrices for its QRhi uniforms and paints the overlay
   with `paintScene()`; the APIs and signals of `BrainViewCore`, `BrainView`
   and `BrainWindow` are unchanged, and `CameraController`, `RayPicker` and
-  `disp::MultiViewLayout` remain as Qt-typed adapters. `test_scene_brain_view`
+  `viz::qt::MultiViewLayout` remain as Qt-typed adapters. `test_scene_brain_view`
   tests it without Qt, with a golden SVG of the overlay. The Qt usage ceiling
   of `disp3D` drops to 1807 tokens.
 - `mne::write_mat_file()` (`math/mat_file.h`) writes matrices to a MATLAB
@@ -565,7 +591,7 @@ aliases; replace the old spelling as below.
   use the same types. Signals consumed by widgets (`stcLoadingProgress`,
   `hoveredRegionChanged`, `electrodeContactClicked`, `shaderModeChanged`),
   the tree model and `PickResult` keep `QString`. The real-time controllers
-  stream on a `mne::disp::PeriodicTask` (`std::jthread`) and recompute
+  stream on a `mne::viz::qt::PeriodicTask` (`std::jthread`) and recompute
   interpolation matrices in order on a one-thread `mne::ThreadPool` instead of
   `QThread`s; locks are `std::mutex`, timing `std::chrono`, logging
   `mne::Log`.
@@ -596,7 +622,7 @@ aliases; replace the old spelling as below.
   SVG are no longer needed; MNE-CPP builds against Qt Core, Gui, Widgets and
   Shader Tools (plus Qt Test for the tests). The SVG export of the viewers,
   MNE Browse, MNE Analyze and the impedance widgets of MNE Scan goes through
-  the new `mne::disp::SvgWriter`, a paint device that writes SVG 1.1 with Qt
+  the new `mne::viz::qt::SvgWriter`, a paint device that writes SVG 1.1 with Qt
   Gui only, in place of `QSvgGenerator`. Background work runs on
   `mne::ThreadPool` (new: `active_count()`), sockets are `mne_com`'s:
   `mne_rt_server` serves its command and data ports through them, and MNE
@@ -615,7 +641,7 @@ aliases; replace the old spelling as below.
   provides from macOS 26 on. `scripts/quality/tests/test_macos_availability.py`
   compiles every unit that uses it for the minimum macOS.
 - The libraries build, install and link without Qt. `MNE_BUILD_QT` (default
-  `ON`) builds the Qt-based parts: `mne_disp`, `mne_disp3D`, the applications
+  `ON`) builds the Qt-based parts: `mne_viz_qt`, `mne_viz_qt`, the applications
   with their plugins, the CLI tools and the QtTest tests and examples. With
   `-DMNE_BUILD_QT=OFF`, or when CMake does not find Qt (it says so and
   switches the option off), every other library is built and installed with

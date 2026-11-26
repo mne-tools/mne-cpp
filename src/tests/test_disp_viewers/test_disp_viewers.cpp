@@ -20,26 +20,26 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp/viewers/abstractview.h>
-#include <mne/disp/viewers/scalingview.h>
-#include <mne/disp/viewers/compensatorview.h>
-#include <mne/disp/viewers/projectorsview.h>
-#include <mne/disp/viewers/modalityselectionview.h>
-#include <mne/disp/viewers/minimumnormsettingsview.h>
-#include <mne/disp/viewers/filtersettingsview.h>
-#include <mne/disp/viewers/filterdesignview.h>
-#include <mne/disp/viewers/spectrumsettingsview.h>
-#include <mne/disp/viewers/averagingsettingsview.h>
-#include <mne/disp/viewers/artifactsettingsview.h>
-#include <mne/disp/viewers/covariancesettingsview.h>
-#include <mne/disp/viewers/spharasettingsview.h>
-#include <mne/disp/viewers/tfsettingsview.h>
-#include <mne/disp/viewers/connectivitysettingsview.h>
-#include <mne/disp/viewers/triggerdetectionview.h>
-#include <mne/disp/viewers/progressview.h>
-#include <mne/disp/viewers/quickcontrolview.h>
-#include <mne/disp/viewers/multiview.h>
-#include <mne/disp/viewers/settingspanel.h>
+#include <mne/viz/backends/qt/viewers/abstractview.h>
+#include <mne/viz/backends/qt/viewers/scalingview.h>
+#include <mne/viz/backends/qt/viewers/compensatorview.h>
+#include <mne/viz/backends/qt/viewers/projectorsview.h>
+#include <mne/viz/backends/qt/viewers/modalityselectionview.h>
+#include <mne/viz/backends/qt/viewers/minimumnormsettingsview.h>
+#include <mne/viz/backends/qt/viewers/filtersettingsview.h>
+#include <mne/viz/backends/qt/viewers/filterdesignview.h>
+#include <mne/viz/backends/qt/viewers/spectrumsettingsview.h>
+#include <mne/viz/backends/qt/viewers/averagingsettingsview.h>
+#include <mne/viz/backends/qt/viewers/artifactsettingsview.h>
+#include <mne/viz/backends/qt/viewers/covariancesettingsview.h>
+#include <mne/viz/backends/qt/viewers/spharasettingsview.h>
+#include <mne/viz/backends/qt/viewers/tfsettingsview.h>
+#include <mne/viz/backends/qt/viewers/connectivitysettingsview.h>
+#include <mne/viz/backends/qt/viewers/triggerdetectionview.h>
+#include <mne/viz/backends/qt/viewers/progressview.h>
+#include <mne/viz/backends/qt/viewers/quickcontrolview.h>
+#include <mne/viz/backends/qt/viewers/multiview.h>
+#include <mne/viz/backends/qt/viewers/settingspanel.h>
 
 #include <mne/fiff/fiff_ch_info.h>
 #include <mne/fiff/fiff_proj.h>
@@ -71,7 +71,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 
 //=============================================================================================================
@@ -265,9 +265,9 @@ void TestDispViewers::cleanupTestCase()
 void TestDispViewers::scalingView_constructAndGetSet()
 {
     // Free function: getDefaultScalingValue(kind, unit)
-    float megMagDefault = mne::disp::getDefaultScalingValue(FIFFV_MEG_CH, FIFF_UNIT_T);
-    float megGradDefault = mne::disp::getDefaultScalingValue(FIFFV_MEG_CH, FIFF_UNIT_T_M);
-    float eegDefault = mne::disp::getDefaultScalingValue(FIFFV_EEG_CH, FIFF_UNIT_V);
+    float megMagDefault = mne::viz::qt::getDefaultScalingValue(FIFFV_MEG_CH, FIFF_UNIT_T);
+    float megGradDefault = mne::viz::qt::getDefaultScalingValue(FIFFV_MEG_CH, FIFF_UNIT_T_M);
+    float eegDefault = mne::viz::qt::getDefaultScalingValue(FIFFV_EEG_CH, FIFF_UNIT_V);
     QVERIFY(megMagDefault > 0.0f);
     QVERIFY(megGradDefault > 0.0f);
     QVERIFY(eegDefault > 0.0f);
@@ -565,25 +565,25 @@ void TestDispViewers::covarianceSettingsView_lifecycle()
 
 void TestDispViewers::settingsPanel_buildsAndSyncsWidgets()
 {
-    auto form = std::make_shared<scene::SettingsForm>("Test panel");
+    auto form = std::make_shared<viz::SettingsForm>("Test panel");
     form->add_int("trials", "Trials", 10, 1, 100, 1, " trials", "General");
     form->add_double("prestim", "Pre-stimulus", 0.1, 0.0, 1.0, 0.05, 2, " s", "General");
     form->add_bool("baseline", "Baseline", false, "Baseline");
-    scene::SettingField from;
+    viz::SettingField from;
     from.key = "from";
-    from.kind = scene::SettingField::Kind::Int;
+    from.kind = viz::SettingField::Kind::Int;
     from.label = "From";
     from.group = "Baseline";
     from.enabled_if = "baseline";
     form->add(from);
     form->add_choice("mode", "Mode", {{"mean", "Mean"}, {"median", "Median"}}, "mean");
     form->add_text("name", "Name", "avg");
-    scene::SettingField late;
+    viz::SettingField late;
     late.key = "late";
-    late.kind = scene::SettingField::Kind::Int;
+    late.kind = viz::SettingField::Kind::Int;
     late.label = "Late";
     late.maximum = 50;
-    late.commit = scene::SettingField::Commit::WhenFinished;
+    late.commit = viz::SettingField::Commit::WhenFinished;
     form->add(late);
     form->add_action("reset", "Reset");
     form->add_custom("extra", "Extra");
@@ -631,7 +631,7 @@ void TestDispViewers::settingsPanel_buildsAndSyncsWidgets()
     baseline->setChecked(true);
     QVERIFY(panel.editor("from")->isEnabled());
     bool triggered = false;
-    form->add_listener([&triggered](const std::string& key, const std::optional<scene::SettingValue>& value) {
+    form->add_listener([&triggered](const std::string& key, const std::optional<viz::SettingValue>& value) {
         triggered = triggered || (key == "reset" && !value);
     });
     reset->click();
@@ -652,18 +652,18 @@ void TestDispViewers::settingsPanel_buildsAndSyncsWidgets()
 
 void TestDispViewers::settingsPanel_flagsGroupsAndPersistence()
 {
-    auto form = std::make_shared<scene::SettingsForm>();
+    auto form = std::make_shared<viz::SettingsForm>();
     form->add_flag("offline");
-    scene::SettingField compute;
+    viz::SettingField compute;
     compute.key = "compute";
-    compute.kind = scene::SettingField::Kind::Action;
+    compute.kind = viz::SettingField::Kind::Action;
     compute.label = "Compute";
     compute.group = "Offline";
     compute.visible_if = "offline";
     form->add(compute);
-    scene::SettingField temporary;
+    viz::SettingField temporary;
     temporary.key = "temporary";
-    temporary.kind = scene::SettingField::Kind::Int;
+    temporary.kind = viz::SettingField::Kind::Int;
     temporary.label = "Temporary";
     temporary.maximum = 10;
     temporary.persistent = false;

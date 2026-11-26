@@ -44,7 +44,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class BrainView;
 class BrainTreeModel;
@@ -58,7 +58,7 @@ namespace mne::scan
 class RealTimeConnectivityEstimate;
 }
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class QuickControlView;
 class Control3DView;
@@ -193,14 +193,14 @@ protected:
     QMatrix4x4 m_tAlignment;            /**< Transformation matrix alignment fiducials/tracked in head space. */
     mne::FiffCoordTrans m_mriHeadTrans; /**< The mri to head transformation. */
 
-    QSharedPointer<mne::disp::BrainTreeModel> m_pData3DModel; /**< The Disp3D model. */
+    QSharedPointer<mne::viz::qt::BrainTreeModel> m_pData3DModel; /**< The Disp3D model. */
 
-    mne::disp::DigitizerSetTreeItem* m_pTrackedDigitizer; /**< The 3D item pointing to the tracked digitizers. */
-    QPointer<mne::disp::BrainView> m_p3DView;             /**< The Disp3D view. */
-    mne::disp::NetworkTreeItem* m_pRtConnectivityItem;    /**< The Disp3D real time item. */
-    bool m_bRtSourceActive;                               /**< Whether realtime source is active. */
-    mne::disp::BemTreeItem* m_pBemHeadAvr;                /**< The fsaverage BEM head model. */
-    QPointer<QAction> m_pActionQuickControl;              /**< Show quick control widget. */
+    mne::viz::qt::DigitizerSetTreeItem* m_pTrackedDigitizer; /**< The 3D item pointing to the tracked digitizers. */
+    QPointer<mne::viz::qt::BrainView> m_p3DView;             /**< The Disp3D view. */
+    mne::viz::qt::NetworkTreeItem* m_pRtConnectivityItem;    /**< The Disp3D real time item. */
+    bool m_bRtSourceActive;                                  /**< Whether realtime source is active. */
+    mne::viz::qt::BemTreeItem* m_pBemHeadAvr;                /**< The fsaverage BEM head model. */
+    QPointer<QAction> m_pActionQuickControl;                 /**< Show quick control widget. */
 };
 } // NAMESPACE
 

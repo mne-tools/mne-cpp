@@ -428,7 +428,7 @@ if(NOT WASM)
   if(BUILD_MNE_RENDER)
     add_subdirectory(visualization/mne_render)
   endif()
-  if(BUILD_MNE_SCREENSHOT_REGRESSION AND TARGET mne_disp3D)
+  if(BUILD_MNE_SCREENSHOT_REGRESSION AND TARGET mne_viz_qt)
     add_subdirectory(visualization/mne_screenshot_regression)
   endif()
 

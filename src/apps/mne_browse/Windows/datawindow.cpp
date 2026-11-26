@@ -21,7 +21,7 @@
 
 #include "../Models/virtualchannelmodel.h"
 #include <mne/base/string_utils.h>
-#include <mne/disp/viewers/helpers/channeldatamodel.h>
+#include <mne/viz/backends/qt/viewers/helpers/channeldatamodel.h>
 #include <mne/fiff/fiff_ch_name.h>
 #include <mne/fiff/fiff_constants.h>
 
@@ -290,7 +290,7 @@ void DataWindow::updateDataTableViews()
 
     // Event type colours may have been changed in the event window
     bool colorsChanged = false;
-    for (mne::disp::ChannelRhiView::EventMarker& ev : m_stimEvents) {
+    for (mne::viz::qt::ChannelRhiView::EventMarker& ev : m_stimEvents) {
         const QColor color = eventTypeColor(ev.type);
         colorsChanged = colorsChanged || ev.color != color;
         ev.color = color;
@@ -302,7 +302,7 @@ void DataWindow::updateDataTableViews()
 
 //=============================================================================================================
 
-const std::vector<mne::disp::ChannelRhiView::EventMarker>& DataWindow::stimEvents() const
+const std::vector<mne::viz::qt::ChannelRhiView::EventMarker>& DataWindow::stimEvents() const
 {
     return m_stimEvents;
 }
@@ -403,7 +403,7 @@ void DataWindow::hideBadChannels(bool hideChannels)
 
 //*************************************************************************************************************
 
-void DataWindow::setAnnotations(const std::vector<mne::disp::ChannelRhiView::AnnotationSpan>& annotations)
+void DataWindow::setAnnotations(const std::vector<mne::viz::qt::ChannelRhiView::AnnotationSpan>& annotations)
 {
     if (m_pChannelDataView) {
         m_pChannelDataView->setAnnotations(annotations);
@@ -623,7 +623,7 @@ void DataWindow::updateTimeRulerMarkers()
         return;
     }
 
-    std::vector<mne::disp::TimeRulerReferenceMark> marks;
+    std::vector<mne::viz::qt::TimeRulerReferenceMark> marks;
     marks.reserve(m_dataMarkers.size());
     for (const PersistentMarker& marker : std::as_const(m_dataMarkers)) {
         QString label = QStringLiteral("M%1").arg(marker.id);
@@ -856,17 +856,17 @@ void DataWindow::initMVCSettings()
 
     m_pChannelDataView = new RawView("DataWindow", this);
     m_pChannelDataView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    connect(m_pChannelDataView, &mne::disp::ChannelDataView::scrollPositionChanged,
+    connect(m_pChannelDataView, &mne::viz::qt::ChannelDataView::scrollPositionChanged,
             this, &DataWindow::onChannelViewScrollChanged);
-    connect(m_pChannelDataView, &mne::disp::ChannelDataView::sampleRangeSelected,
+    connect(m_pChannelDataView, &mne::viz::qt::ChannelDataView::sampleRangeSelected,
             this, &DataWindow::annotationRangeSelected);
-    connect(m_pChannelDataView, &mne::disp::ChannelDataView::annotationBoundaryMoved,
+    connect(m_pChannelDataView, &mne::viz::qt::ChannelDataView::annotationBoundaryMoved,
             this, &DataWindow::annotationBoundaryMoved);
-    connect(m_pChannelDataView, &mne::disp::ChannelDataView::referenceMarkerAddRequested,
+    connect(m_pChannelDataView, &mne::viz::qt::ChannelDataView::referenceMarkerAddRequested,
             this, &DataWindow::addMarkerAtSample);
-    connect(m_pChannelDataView, &mne::disp::ChannelDataView::referenceMarkerRemoveRequested,
+    connect(m_pChannelDataView, &mne::viz::qt::ChannelDataView::referenceMarkerRemoveRequested,
             this, &DataWindow::removeMarkerNearSample);
-    connect(m_pChannelDataView, &mne::disp::ChannelDataView::referenceMarkersClearRequested,
+    connect(m_pChannelDataView, &mne::viz::qt::ChannelDataView::referenceMarkersClearRequested,
             this, &DataWindow::clearMarkers);
 
     // Insert ChannelDataView into the grid at the same slot as the legacy QTableView
@@ -1050,7 +1050,7 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd& matData, int firstSample)
                     const quint64 key = makeStimEventKey(absSample, type);
 
                     if (!m_seenStimEventKeys.contains(key)) {
-                        mne::disp::ChannelRhiView::EventMarker ev;
+                        mne::viz::qt::ChannelRhiView::EventMarker ev;
                         ev.sample = absSample;
                         ev.type = type;
                         ev.color = eventTypeColor(type);
@@ -1070,8 +1070,8 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd& matData, int firstSample)
 
             if (eventsChanged && m_pChannelDataView) {
                 std::sort(m_stimEvents.begin(), m_stimEvents.end(),
-                          [](const mne::disp::ChannelRhiView::EventMarker& a,
-                             const mne::disp::ChannelRhiView::EventMarker& b) {
+                          [](const mne::viz::qt::ChannelRhiView::EventMarker& a,
+                             const mne::viz::qt::ChannelRhiView::EventMarker& b) {
                               return a.sample < b.sample;
                           });
                 m_pChannelDataView->setEvents(m_stimEvents);
@@ -1109,7 +1109,7 @@ void DataWindow::rebuildVirtualChannels()
         channelIndexByName.insert(QString::fromStdString(fiffInfo->ch_names.at(channelIndex)).trimmed(), channelIndex);
     }
 
-    std::vector<mne::disp::ChannelDisplayInfo> virtualDisplayInfo;
+    std::vector<mne::viz::qt::ChannelDisplayInfo> virtualDisplayInfo;
     virtualDisplayInfo.reserve(m_virtualChannelDefinitions.size());
 
     for (const VirtualChannelDefinition& definition : std::as_const(m_virtualChannelDefinitions)) {
@@ -1415,9 +1415,9 @@ void DataWindow::initLabels()
 {
     //Setup range samples
     if (m_pChannelDataView) {
-        connect(m_pChannelDataView, &mne::disp::ChannelDataView::scrollPositionChanged,
+        connect(m_pChannelDataView, &mne::viz::qt::ChannelDataView::scrollPositionChanged,
                 this, &DataWindow::setRangeSampleLabels);
-        connect(m_pChannelDataView, &mne::disp::ChannelDataView::scrollPositionChanged,
+        connect(m_pChannelDataView, &mne::viz::qt::ChannelDataView::scrollPositionChanged,
                 this, &DataWindow::setMarkerSampleLabel);
     }
 }
@@ -1487,14 +1487,14 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
                     // Cycle detrending: None → Mean → Linear → None
                     auto mode = m_pChannelDataView->detrendMode();
                     switch (mode) {
-                        case mne::disp::DetrendMode::None:
-                            m_pChannelDataView->setDetrendMode(mne::disp::DetrendMode::Mean);
+                        case mne::viz::qt::DetrendMode::None:
+                            m_pChannelDataView->setDetrendMode(mne::viz::qt::DetrendMode::Mean);
                             break;
-                        case mne::disp::DetrendMode::Mean:
-                            m_pChannelDataView->setDetrendMode(mne::disp::DetrendMode::Linear);
+                        case mne::viz::qt::DetrendMode::Mean:
+                            m_pChannelDataView->setDetrendMode(mne::viz::qt::DetrendMode::Linear);
                             break;
-                        case mne::disp::DetrendMode::Linear:
-                            m_pChannelDataView->setDetrendMode(mne::disp::DetrendMode::None);
+                        case mne::viz::qt::DetrendMode::Linear:
+                            m_pChannelDataView->setDetrendMode(mne::viz::qt::DetrendMode::None);
                             break;
                     }
                 }

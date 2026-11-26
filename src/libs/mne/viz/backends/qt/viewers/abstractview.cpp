@@ -1,0 +1,49 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2020-2026 MNE-CPP Authors
+ *
+ * @file     abstractview.cpp
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.3
+ * @date     June 2020
+ * @brief    Implementation of the AbstractView base widget (mode dispatching, default style/processing handling).
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "abstractview.h"
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace mne::viz::qt;
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+AbstractView::AbstractView(QWidget* parent,
+                           Qt::WindowFlags f)
+: QWidget(parent, f)
+{
+}
+
+//=============================================================================================================
+
+void AbstractView::setGuiMode(GuiMode mode)
+{
+    updateGuiMode(mode);
+};
+
+//=============================================================================================================
+
+void AbstractView::setProcessingMode(ProcessingMode mode)
+{
+    updateProcessingMode(mode);
+}

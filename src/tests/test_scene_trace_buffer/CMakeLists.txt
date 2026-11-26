@@ -5,11 +5,11 @@
 cmake_minimum_required(VERSION 3.14)
 project(test_scene_trace_buffer LANGUAGES CXX)
 
-# Qt-free: the data models of the trace views in mne_scene are tested without Qt, as they are built
+# Qt-free: the data models of the trace views in mne_viz are tested without Qt, as they are built
 add_executable(${PROJECT_NAME} test_scene_trace_buffer.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  mne_scene
+  mne_viz
   mne_base
 )
 

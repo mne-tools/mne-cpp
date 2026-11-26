@@ -25,7 +25,7 @@
 #include "../anshared_global.h"
 #include "../Utils/types.h"
 
-#include <mne/disp/viewers/abstractview.h>
+#include <mne/viz/backends/qt/viewers/abstractview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -246,7 +246,7 @@ signals:
      *
      * @param[in] mode       the new gui mode.
      */
-    void guiModeChanged(mne::disp::AbstractView::GuiMode mode);
+    void guiModeChanged(mne::viz::qt::AbstractView::GuiMode mode);
 
     //=========================================================================================================
     /**
@@ -254,7 +254,7 @@ signals:
      *
      * @param[in] style       the new gui style.
      */
-    void guiStyleChanged(mne::disp::AbstractView::StyleMode style);
+    void guiStyleChanged(mne::viz::qt::AbstractView::StyleMode style);
 
 protected:
     QSharedPointer<AnalyzeData> m_pAnalyzeData; /**< Pointer to the global data base */

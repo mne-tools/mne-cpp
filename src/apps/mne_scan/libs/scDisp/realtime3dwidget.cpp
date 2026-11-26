@@ -24,14 +24,14 @@
 #include <scMeas/realtimehpiresult.h>
 #include <mne/connectivity/network/network.h>
 #include <mne/mne/mne_bem.h>
-#include <mne/disp3D/view/brainview.h>
-#include <mne/disp3D/model/braintreemodel.h>
-#include <mne/disp3D/model/items/networktreeitem.h>
-#include <mne/disp3D/model/items/sensortreeitem.h>
-#include <mne/disp3D/model/items/surfacetreeitem.h>
-#include <mne/disp3D/model/items/bemtreeitem.h>
-#include <mne/disp3D/model/items/digitizersettreeitem.h>
-#include <mne/disp/viewers/control3dview.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/model/items/networktreeitem.h>
+#include <mne/viz/backends/qt/3d/model/items/sensortreeitem.h>
+#include <mne/viz/backends/qt/3d/model/items/surfacetreeitem.h>
+#include <mne/viz/backends/qt/3d/model/items/bemtreeitem.h>
+#include <mne/viz/backends/qt/3d/model/items/digitizersettreeitem.h>
+#include <mne/viz/backends/qt/viewers/control3dview.h>
 #include <mne/fiff/fiff_ch_info.h>
 #include <mne/fiff/fiff_digitizer_data.h>
 #include <mne/mne/mne_msh_display_surface_set.h>
@@ -64,7 +64,7 @@
 //=============================================================================================================
 
 using namespace mne::scan;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 
 //=============================================================================================================
@@ -132,7 +132,7 @@ void RealTime3DWidget::update(mne::scan::Measurement::SPtr pMeasurement)
             }
 
             // Note: Sensor surface visualization from FiffChInfo/MNEBem is not
-            // directly supported in disp3D's addSensors API. Use loadSensors()
+            // directly supported in mne_viz_qt's addSensors API. Use loadSensors()
             // with a .fif file path if sensor visualization is needed.
             m_iNumberBadChannels = pRTCE->getFiffInfo() ? static_cast<int>(pRTCE->getFiffInfo()->bads.size()) : 0;
         } else {
@@ -144,7 +144,7 @@ void RealTime3DWidget::update(mne::scan::Measurement::SPtr pMeasurement)
             if (pRTCE->getSensorSurface() && pRTCE->getFiffInfo()) {
                 if (m_iNumberBadChannels != static_cast<int>(pRTCE->getFiffInfo()->bads.size())) {
                     // Note: Sensor update from in-memory FiffChInfo/MNEBem not
-                    // directly supported in disp3D.
+                    // directly supported in mne_viz_qt.
                     m_iNumberBadChannels = static_cast<int>(pRTCE->getFiffInfo()->bads.size());
                 }
             }
@@ -181,7 +181,7 @@ void RealTime3DWidget::update(mne::scan::Measurement::SPtr pMeasurement)
     } else if (RealTimeHpiResult::SPtr pRTHR = qSharedPointerDynamicCast<RealTimeHpiResult>(pMeasurement)) {
         if (!m_pBemHeadAvr) {
             // Note: Loading sensor surfaces from in-memory MNEBem is not directly
-            // supported by disp3D's addSensors API. Sensor surfaces skipped.
+            // supported by mne_viz_qt's addSensors API. Sensor surfaces skipped.
 
             // Add average head surface
             MNEBem t_BemHeadAvr((QCoreApplication::applicationDirPath() + "/../resources/general/hpiAlignment/fsaverage-head.fif").toStdU16String());
@@ -215,7 +215,7 @@ void RealTime3DWidget::update(mne::scan::Measurement::SPtr pMeasurement)
             const QVector<Eigen::Vector3f> history = pRTHR->headPositionHistory();
             m_p3DView->setHeadMovementPath(std::vector<Eigen::Vector3f>(history.cbegin(), history.cend()));
 
-            // Note: Per-item transforms for HPI tracking are not yet supported in disp3D.
+            // Note: Per-item transforms for HPI tracking are not yet supported in mne_viz_qt.
             // The BrainSurface renderable supports applyTransform() but tree items do not
             // expose this directly yet.
         }

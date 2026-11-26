@@ -59,7 +59,6 @@ endif()
 
 add_subdirectory(mne/base)
 add_subdirectory(mne/math)
-add_subdirectory(mne/scene)
 add_subdirectory(mne/channels)
 if(NOT WASM) # WebAssembly cannot start processes
   add_subdirectory(mne/pybridge)
@@ -69,7 +68,7 @@ add_subdirectory(mne/lsl)
 
 add_subdirectory(mne/fiff)
 add_subdirectory(mne/bids)
-add_subdirectory(mne/viewmodels)
+add_subdirectory(mne/viz)
 add_subdirectory(mne/ieeg)
 add_subdirectory(mne/fs)
 add_subdirectory(mne/mri)
@@ -96,11 +95,10 @@ add_subdirectory(mne/sts)
 include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/MneQtFree.cmake)
 mne_require_qt_free(${CMAKE_CURRENT_SOURCE_DIR})
 
-# The display libraries are Qt by design and the only libraries that may use it.
+# mne_viz_qt is the Qt backend of mne_viz and the only library that may use Qt.
 if(MNE_BUILD_QT)
   list(APPEND CMAKE_INSTALL_RPATH ${MNE_QT_RPATH})
-  add_subdirectory(mne/disp)
-  add_subdirectory(mne/disp3D)
+  add_subdirectory(mne/viz/backends/qt)
 endif()
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/MnePrecompiledHeaders.cmake)

@@ -21,7 +21,7 @@
 #include "rtfwd.h"
 
 #include "FormFiles/rtfwdsetupwidget.h"
-#include <mne/disp/viewers/fwdsettingsview.h>
+#include <mne/viz/backends/qt/viewers/fwdsettingsview.h>
 #include <mne/fwd/compute_fwd/compute_fwd_settings.h>
 #include <mne/fwd/compute_fwd/compute_fwd.h>
 #include <mne/inv/hpi/inv_hpi_fit.h>
@@ -58,7 +58,7 @@
 using namespace RTFWDPLUGIN;
 using namespace mne::scan;
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace Eigen;
 
 //=============================================================================================================

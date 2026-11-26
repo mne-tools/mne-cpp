@@ -21,7 +21,7 @@
 #include <anShared/Model/averagingdatamodel.h>
 #include <anShared/Model/eventmodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <mne/disp/viewers/averagingsettingsview.h>
+#include <mne/viz/backends/qt/viewers/averagingsettingsview.h>
 #include <mne/fiff/fiff_evoked_set.h>
 
 //=============================================================================================================
@@ -87,7 +87,7 @@ void TestAnalyzeAveraging::averagesEveryEventCodeLikePython()
     plugin->handleEvent(QSharedPointer<Event>::create(SELECTED_MODEL_CHANGED, nullptr, QVariant::fromValue(raw.staticCast<AbstractModel>())));
 
     // -100..300 ms with a -100..0 ms baseline, set in the control panel
-    auto* settings = control->findChild<mne::disp::AveragingSettingsView*>();
+    auto* settings = control->findChild<mne::viz::qt::AveragingSettingsView*>();
     QVERIFY(settings);
     emit settings->changePreStim(100);
     emit settings->changePostStim(300);

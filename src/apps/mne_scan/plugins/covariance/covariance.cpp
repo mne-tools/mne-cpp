@@ -19,7 +19,7 @@
 #include "covariance.h"
 
 #include "FormFiles/covariancesetupwidget.h"
-#include <mne/disp/viewers/covariancesettingsview.h>
+#include <mne/viz/backends/qt/viewers/covariancesettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimecov.h>
 #include <mne/dsp/rt/rt_cov.h>
@@ -47,7 +47,7 @@
 //=============================================================================================================
 
 using namespace COVARIANCEPLUGIN;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne::scan;
 using namespace mne;
 using namespace Eigen;

@@ -21,7 +21,7 @@
 #include "datamanager.h"
 
 #include <mne/base/log.h>
-#include <mne/disp/viewers/bidsview.h>
+#include <mne/viz/backends/qt/viewers/bidsview.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 
@@ -99,17 +99,17 @@ QMenu* DataManager::getMenu()
 QDockWidget* DataManager::getControl()
 {
     auto pControlDock = std::make_unique<QDockWidget>(getName());
-    mne::disp::BidsView* pDataManagerBidsView = new mne::disp::BidsView(pControlDock.get());
+    mne::viz::qt::BidsView* pDataManagerBidsView = new mne::viz::qt::BidsView(pControlDock.get());
 
     pDataManagerBidsView->setModel(m_pAnalyzeData->getDataModel());
 
-    connect(pDataManagerBidsView, &mne::disp::BidsView::selectedModelChanged,
+    connect(pDataManagerBidsView, &mne::viz::qt::BidsView::selectedModelChanged,
             this, &DataManager::onCurrentlySelectedModelChanged, Qt::UniqueConnection);
 
-    connect(pDataManagerBidsView, &mne::disp::BidsView::selectedItemChanged,
+    connect(pDataManagerBidsView, &mne::viz::qt::BidsView::selectedItemChanged,
             this, &DataManager::onCurrentItemChanged, Qt::UniqueConnection);
 
-    connect(pDataManagerBidsView, &mne::disp::BidsView::removeItem,
+    connect(pDataManagerBidsView, &mne::viz::qt::BidsView::removeItem,
             this, &DataManager::onRemoveItem, Qt::UniqueConnection);
 
     pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);

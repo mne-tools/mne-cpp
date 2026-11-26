@@ -32,7 +32,7 @@
  * @brief    "scene_only" shot kind: renders a labelled placeholder PNG.
  *
  *           A real Metal/QRhi readback of a MultimodalScene requires a
- *           dedicated mne::disp renderer which does not yet exist (the
+ *           dedicated mne::viz::qt renderer which does not yet exist (the
  *           current MultimodalScene class is a pure controller).  Until
  *           that renderer lands, this implementation produces a clearly
  *           labelled gradient placeholder so the documentation pipeline

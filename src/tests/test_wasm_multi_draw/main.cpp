@@ -11,9 +11,9 @@
  * Purpose
  * -------
  * Probe which multi-draw patterns render on the QRhi GLES2/WebGL backend. A
- * second draw call per pass used to blank the whole frame in disp3D on WebGL,
+ * second draw call per pass used to blank the whole frame in mne_viz_qt on WebGL,
  * which led to merging every surface into one VBO/IBO with a single draw. The
- * cause was disp3D's uniform slot stride, reproduced by the shared-ubuf modes.
+ * cause was mne_viz_qt's uniform slot stride, reproduced by the shared-ubuf modes.
  *
  * What this renders
  * -----------------
@@ -34,9 +34,9 @@
  * window title.
  *
  * Four cases run in sequence: first with all resource updates committed via
- * beginPass(), then the disp3D pattern of a cb->resourceUpdate() per draw
+ * beginPass(), then the mne_viz_qt pattern of a cb->resourceUpdate() per draw
  * INSIDE the pass, which QRhi documents as "Cannot be called inside a pass".
- * The last two share one dynamic-offset uniform buffer like disp3D: slots spaced
+ * The last two share one dynamic-offset uniform buffer like mne_viz_qt: slots spaced
  * by rhi->ubufAlignment() overlap on GL, where that alignment is 1 byte, and
  * slots spaced by rhi->ubufAligned(block size) do not.
  */

@@ -24,7 +24,7 @@ using namespace MNEBROWSE;
 RawView::RawView(const QString& sSettingsPath,
                  QWidget* parent,
                  Qt::WindowFlags f)
-: mne::disp::ChannelDataView(sSettingsPath, parent, f)
+: mne::viz::qt::ChannelDataView(sSettingsPath, parent, f)
 {
 }
 

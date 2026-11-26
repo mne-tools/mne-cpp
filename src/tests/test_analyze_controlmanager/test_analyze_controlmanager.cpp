@@ -21,9 +21,9 @@
 #include <anShared/Management/eventmanager.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Utils/types.h>
-#include <mne/disp/viewers/control3dview.h>
-#include <mne/disp/viewers/fiffrawviewsettings.h>
-#include <mne/disp/viewers/scalingview.h>
+#include <mne/viz/backends/qt/viewers/control3dview.h>
+#include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
+#include <mne/viz/backends/qt/viewers/scalingview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -129,7 +129,7 @@ void TestAnalyzeControlManager::publishesViewSettings()
     layout->setChecked(false);
     const std::vector<std::string> views{"null", "signalview"};
 
-    auto* settings = dock->findChild<mne::disp::FiffRawViewSettings*>();
+    auto* settings = dock->findChild<mne::viz::qt::FiffRawViewSettings*>();
     QVERIFY(settings);
     auto* zoom = settings->findChild<QDoubleSpinBox*>("m_doubleSpinBox_numberVisibleChannels");
     zoom->setValue(zoom->value() == 20.0 ? 21.0 : 20.0);
@@ -153,7 +153,7 @@ void TestAnalyzeControlManager::publishesViewSettings()
     QCOMPARE(view.last().m_sImageType, settings->findChild<QComboBox*>("m_comboBox_imageType")->currentText());
 
     // Scaling
-    auto* scalingView = dock->findChild<mne::disp::ScalingView*>();
+    auto* scalingView = dock->findChild<mne::viz::qt::ScalingView*>();
     QVERIFY(scalingView);
     auto* scale = scalingView->findChild<QDoubleSpinBox*>();
     QVERIFY(scale);
@@ -173,7 +173,7 @@ void TestAnalyzeControlManager::publishesViewSettings()
     QCOMPARE(view.last().m_iTimeSpacers, spacer->currentIndex() == 2 ? 500 : 1000);
 
     // 3D controls
-    auto* control3d = dock->findChild<mne::disp::Control3DView*>();
+    auto* control3d = dock->findChild<mne::viz::qt::Control3DView*>();
     QVERIFY(control3d);
     auto* rotate = control3d->findChild<QCheckBox*>("m_checkBox_rotate");
     QVERIFY(rotate);

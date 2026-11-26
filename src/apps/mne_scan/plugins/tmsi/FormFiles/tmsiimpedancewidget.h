@@ -22,7 +22,7 @@
 #include "../tmsi_global.h"
 #include "../tmsielectrodeitem.h"
 #include "../tmsiimpedancescene.h"
-#include "mne/disp/plots/helpers/colormap.h"
+#include "../../../../../libs/mne/viz/backends/qt/plots/helpers/colormap.h"
 #include <mne/channels/layoutloader.h>
 #include <scMeas/realtimemultisamplearray.h>
 
@@ -98,7 +98,7 @@ private:
 
     std::unique_ptr<Ui::TMSIImpedanceWidget> ui; /**< The user interface for the TMSIImpedanceWidget.*/
 
-    std::shared_ptr<mne::disp::ColorMap> m_cbColorMap; /**< The pointer the colormap object.*/
+    std::shared_ptr<mne::viz::qt::ColorMap> m_cbColorMap; /**< The pointer the colormap object.*/
 
     double m_dMaxImpedance; /**< Maximum impedance value. This is a fixed value to scale the color map.*/
 

@@ -29,8 +29,8 @@
 #include <mne/inv/inv_source_estimate.h>
 #include <time.h>
 #include <mne/inv/minimum_norm/inv_minimum_norm.h>
-#include <mne/disp3D/view/brainview.h>
-#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
 #include <mne/math/linalg.h>
 #include <mne/base/log.h>
 
@@ -58,7 +58,7 @@
 
 using namespace mne;
 using namespace Eigen;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // MAIN

@@ -21,7 +21,7 @@
 
 #include "FormFiles/writetofilesetupwidget.h"
 #include "FormFiles/writetofilestatuswidget.h"
-#include <mne/disp/viewers/projectsettingsview.h>
+#include <mne/viz/backends/qt/viewers/projectsettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_stream.h>
@@ -45,7 +45,7 @@
 
 using namespace WRITETOFILEPLUGIN;
 using namespace mne::scan;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 using namespace Eigen;
 

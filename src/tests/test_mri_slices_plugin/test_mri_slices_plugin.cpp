@@ -18,8 +18,8 @@
 
 #include <mri_slices.h>
 
-#include <mne/disp3D/scene/multimodalscene.h>
-#include <mne/disp3D/scene/pickresult.h>
+#include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
+#include <mne/viz/backends/qt/3d/scene/pickresult.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -31,7 +31,7 @@
 #include <QVector3D>
 
 using namespace MRISLICESPLUGIN;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 

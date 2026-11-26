@@ -23,10 +23,10 @@
 #include "mne/mne/mne_bem_surface.h"
 #include "mne/mne/mne_project_to_surface.h"
 #include "mne/mne/mne_icp.h"
-#include <mne/disp3D/view/brainview.h>
-#include <mne/disp3D/model/braintreemodel.h>
-#include <mne/disp3D/model/items/digitizersettreeitem.h>
-#include <mne/disp3D/model/items/bemtreeitem.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/model/items/digitizersettreeitem.h>
+#include <mne/viz/backends/qt/3d/model/items/bemtreeitem.h>
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
 
@@ -58,7 +58,7 @@
 
 using namespace Eigen;
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // MAIN

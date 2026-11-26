@@ -25,9 +25,9 @@
 #include <anShared/Plugins/abstractplugin.h>
 #include <anShared/Management/statusbar.h>
 
-#include <mne/disp/viewers/multiview.h>
-#include <mne/disp/viewers/multiviewwindow.h>
-#include <mne/disp/viewers/abstractview.h>
+#include <mne/viz/backends/qt/viewers/multiview.h>
+#include <mne/viz/backends/qt/viewers/multiviewwindow.h>
+#include <mne/viz/backends/qt/viewers/abstractview.h>
 
 #include <mne/base/base_global.h>
 
@@ -59,7 +59,7 @@
 
 using namespace MNEANALYZE;
 using namespace mne::analyze;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -373,7 +373,7 @@ void MainWindow::changeStyle()
     if (QApplication* pApp = qobject_cast<QApplication*>(QApplication::instance())) {
         if (m_sCurrentStyle == "default") {
             pApp->setStyleSheet("");
-            emit guiStyleChanged(mne::disp::AbstractView::StyleMode::Default);
+            emit guiStyleChanged(mne::viz::qt::AbstractView::StyleMode::Default);
         } else if (m_sCurrentStyle == "dark") {
             QFile file(":/dark.qss");
             if (file.open(QFile::ReadOnly)) {
@@ -383,7 +383,7 @@ void MainWindow::changeStyle()
                 mne::Log::warning("Could not open dark theme stylesheet.");
                 pApp->setStyleSheet("");
             }
-            emit guiStyleChanged(mne::disp::AbstractView::StyleMode::Dark);
+            emit guiStyleChanged(mne::viz::qt::AbstractView::StyleMode::Dark);
         }
 
         // Set default font
@@ -400,9 +400,9 @@ void MainWindow::changeStyle()
 void MainWindow::manageGuiModeChanged()
 {
     if (m_pActionResearchMode->isChecked()) {
-        emit guiModeChanged(mne::disp::AbstractView::GuiMode::Research);
+        emit guiModeChanged(mne::viz::qt::AbstractView::GuiMode::Research);
     } else if (m_pActionClinicalMode->isChecked()) {
-        emit guiModeChanged(mne::disp::AbstractView::GuiMode::Clinical);
+        emit guiModeChanged(mne::viz::qt::AbstractView::GuiMode::Clinical);
     }
 }
 

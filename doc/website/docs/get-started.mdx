@@ -56,7 +56,7 @@ The prefix now contains `include/<library>/…`, the shared libraries, and
 `lib/cmake/MNE-CPP/MNE-CPPConfig.cmake`, which defines one imported target per library —
 `MNE-CPP::mne_fiff`, `MNE-CPP::mne_dsp`, `MNE-CPP::mne_inv` and so on. Every library is also a component:
 `find_package(MNE-CPP REQUIRED COMPONENTS fiff dsp acq)` makes those libraries and the ones they use
-available. Only the display libraries `disp` and `disp3D` use Qt; every other component is found and linked
+available. Only `mne_viz_qt`, the Qt backend of `mne_viz`, uses Qt; every other component is found and linked
 without Qt, so your program does not need Qt unless it shows MNE-CPP's widgets. Without `COMPONENTS`,
 every library is available.
 

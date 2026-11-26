@@ -18,7 +18,7 @@
 
 #include "filterwindow.h"
 
-#include <mne/disp/plots/helpers/svgwriter.h>
+#include <mne/viz/backends/qt/plots/helpers/svgwriter.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -39,7 +39,7 @@
 
 using namespace MNEBROWSE;
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 
 //*************************************************************************************************************

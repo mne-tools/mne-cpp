@@ -28,7 +28,7 @@
 #include <anShared/Model/covariancemodel.h>
 #include <anShared/Model/averagingdatamodel.h>
 #include <anShared/Model/dipolefitmodel.h>
-#include <mne/disp/viewers/dipolefitview.h>
+#include <mne/viz/backends/qt/viewers/dipolefitview.h>
 #include <mne/inv/dipole_fit/inv_dipole_fit_data.h>
 #include <mne/inv/dipole_fit/inv_dipole_fit.h>
 #include <mne/inv/dipole_fit/inv_ecd_set.h>
@@ -110,51 +110,51 @@ QMenu* InvDipoleFit::getMenu()
 QDockWidget* InvDipoleFit::getControl()
 {
     auto pDockWidgt = std::make_unique<QDockWidget>(getName());
-    mne::disp::DipoleFitView* pDipoleView = new mne::disp::DipoleFitView(pDockWidgt.get());
+    mne::viz::qt::DipoleFitView* pDipoleView = new mne::viz::qt::DipoleFitView(pDockWidgt.get());
 
     //Send Gui updates
     connect(this, &InvDipoleFit::newBemModel,
-            pDipoleView, &mne::disp::DipoleFitView::addBem, Qt::UniqueConnection);
+            pDipoleView, &mne::viz::qt::DipoleFitView::addBem, Qt::UniqueConnection);
     connect(this, &InvDipoleFit::newCovarianceModel,
-            pDipoleView, &mne::disp::DipoleFitView::addNoise, Qt::UniqueConnection);
+            pDipoleView, &mne::viz::qt::DipoleFitView::addNoise, Qt::UniqueConnection);
     connect(this, &InvDipoleFit::newMriModel,
-            pDipoleView, &mne::disp::DipoleFitView::addMri, Qt::UniqueConnection);
+            pDipoleView, &mne::viz::qt::DipoleFitView::addMri, Qt::UniqueConnection);
     connect(this, &InvDipoleFit::newMeasurment,
-            pDipoleView, &mne::disp::DipoleFitView::addMeas, Qt::UniqueConnection);
+            pDipoleView, &mne::viz::qt::DipoleFitView::addMeas, Qt::UniqueConnection);
     connect(this, &InvDipoleFit::getUpdate,
-            pDipoleView, &mne::disp::DipoleFitView::requestParams, Qt::UniqueConnection);
+            pDipoleView, &mne::viz::qt::DipoleFitView::requestParams, Qt::UniqueConnection);
     connect(this, &InvDipoleFit::removeModel,
-            pDipoleView, &mne::disp::DipoleFitView::removeModel, Qt::UniqueConnection);
+            pDipoleView, &mne::viz::qt::DipoleFitView::removeModel, Qt::UniqueConnection);
 
     //Receive Gui updates
-    connect(pDipoleView, &mne::disp::DipoleFitView::modalityChanged,
+    connect(pDipoleView, &mne::viz::qt::DipoleFitView::modalityChanged,
             this, &InvDipoleFit::onModalityChanged, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::disp::DipoleFitView::timeChanged,
+    connect(pDipoleView, &mne::viz::qt::DipoleFitView::timeChanged,
             this, &InvDipoleFit::onTimeChanged, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::disp::DipoleFitView::fittingChanged,
+    connect(pDipoleView, &mne::viz::qt::DipoleFitView::fittingChanged,
             this, &InvDipoleFit::onFittingChanged, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::disp::DipoleFitView::baselineChanged,
+    connect(pDipoleView, &mne::viz::qt::DipoleFitView::baselineChanged,
             this, &InvDipoleFit::onBaselineChanged, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::disp::DipoleFitView::noiseChanged,
+    connect(pDipoleView, &mne::viz::qt::DipoleFitView::noiseChanged,
             this, &InvDipoleFit::onNoiseChanged, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::disp::DipoleFitView::regChanged,
+    connect(pDipoleView, &mne::viz::qt::DipoleFitView::regChanged,
             this, &InvDipoleFit::onRegChanged, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::disp::DipoleFitView::setChanged,
+    connect(pDipoleView, &mne::viz::qt::DipoleFitView::setChanged,
             this, &InvDipoleFit::onSetChanged, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::disp::DipoleFitView::sphereChanged,
+    connect(pDipoleView, &mne::viz::qt::DipoleFitView::sphereChanged,
             this, &InvDipoleFit::onSphereChanged, Qt::UniqueConnection);
 
-    connect(pDipoleView, &mne::disp::DipoleFitView::selectedBem,
+    connect(pDipoleView, &mne::viz::qt::DipoleFitView::selectedBem,
             this, &InvDipoleFit::onNewBemSelected, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::disp::DipoleFitView::selectedMri,
+    connect(pDipoleView, &mne::viz::qt::DipoleFitView::selectedMri,
             this, &InvDipoleFit::onNewMriSelected, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::disp::DipoleFitView::selectedNoise,
+    connect(pDipoleView, &mne::viz::qt::DipoleFitView::selectedNoise,
             this, &InvDipoleFit::onNewNoiseSelected, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::disp::DipoleFitView::selectedMeas,
+    connect(pDipoleView, &mne::viz::qt::DipoleFitView::selectedMeas,
             this, &InvDipoleFit::onNewMeasSelected, Qt::UniqueConnection);
 
     //Fit
-    connect(pDipoleView, &mne::disp::DipoleFitView::performDipoleFit,
+    connect(pDipoleView, &mne::viz::qt::DipoleFitView::performDipoleFit,
             this, &InvDipoleFit::onPerformDipoleFit, Qt::UniqueConnection);
 
     pDockWidgt->setWidget(pDipoleView);

@@ -47,7 +47,7 @@ class Communicator;
 class AbstractModel;
 }
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class ChannelSelectionView;
 class ChannelInfoModel;
@@ -112,7 +112,7 @@ private slots:
      *
      * @param[in] selection     The channels picked in the channel selection view.
      */
-    void onSelectionChanged(const mne::disp::SelectionItem& selection);
+    void onSelectionChanged(const mne::viz::qt::SelectionItem& selection);
 
 private:
     //=========================================================================================================
@@ -141,13 +141,13 @@ private:
 
     QPointer<mne::analyze::Communicator> m_pCommu; /**< To broadcast signals. */
 
-    std::unique_ptr<mne::disp::SelectionItem> m_pSelectionItem; /**< The selection received from the channel selection view, published to the other plugins. */
+    std::unique_ptr<mne::viz::qt::SelectionItem> m_pSelectionItem; /**< The selection received from the channel selection view, published to the other plugins. */
 
-    std::unique_ptr<mne::disp::ChannelSelectionView> m_pChannelSelectionView; /**< View for selecting channels to be displayed. */
-    std::shared_ptr<mne::disp::ChannelInfoModel> m_pChannelInfoModel;         /**< Hold channel info - needed to initialize channelselectionview. */
-    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                               /**< Hold Information baout currently loaded file. */
+    std::unique_ptr<mne::viz::qt::ChannelSelectionView> m_pChannelSelectionView; /**< View for selecting channels to be displayed. */
+    std::shared_ptr<mne::viz::qt::ChannelInfoModel> m_pChannelInfoModel;         /**< Hold channel info - needed to initialize channelselectionview. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                                  /**< Hold Information baout currently loaded file. */
 
-    mne::disp::ApplyToView* m_pApplyToView;
+    mne::viz::qt::ApplyToView* m_pApplyToView;
 
     QHBoxLayout* m_pViewLayout;    /**< Holds the view portion of the channel selection to be displayed. */
     QVBoxLayout* m_pControlLayout; /**< Holds the control portion of the channel selection to be displayed. */

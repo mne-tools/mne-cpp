@@ -23,8 +23,8 @@
 #include <mne/inv/inv_source_estimate.h>
 #include <mne/inv/minimum_norm/inv_minimum_norm.h>
 #include <mne/base/log.h>
-#include <mne/disp/plots/helpers/figureexporter.h>
-#include <mne/disp/plots/lineplot.h>
+#include <mne/viz/backends/qt/plots/helpers/figureexporter.h>
+#include <mne/viz/backends/qt/plots/lineplot.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -45,7 +45,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace Eigen;
 using namespace mne;
 

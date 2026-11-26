@@ -35,7 +35,7 @@ target_link_libraries(test_fwd_bem_data PRIVATE
     mne_fs
     mne_base
     mne_math
-    mne_disp
-    mne_disp3D
+    mne_viz_qt
+    mne_viz_qt
     Eigen3::Eigen
 )

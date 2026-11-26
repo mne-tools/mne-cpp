@@ -10,12 +10,11 @@
     },
     {
       "name": "core",
-      "description": "Numerics, transport primitives (TCP, UDP and serial transports among them) and figures as display lists (mne_scene), built only on the base library or on the standard library alone.",
+      "description": "Numerics and transport primitives (TCP, UDP and serial transports among them), built only on the base library or on the standard library alone.",
       "libraries": [
         "mne_math",
         "mne_acq",
-        "mne_com",
-        "mne_scene"
+        "mne_com"
       ]
     },
     {
@@ -41,13 +40,13 @@
     },
     {
       "name": "model",
-      "description": "Domain models and format bridges assembled from the I/O layer, and the toolkit-independent view models of the viewers (mne_viewmodels).",
+      "description": "Domain models and format bridges assembled from the I/O layer, and mne_viz: what the viewers show and how they behave (figures, views, GPU frames, forms, view models) without a GUI toolkit.",
       "libraries": [
         "mne_mne",
         "mne_mri",
         "mne_sts",
         "mne_bids",
-        "mne_viewmodels"
+        "mne_viz"
       ]
     },
     {
@@ -84,17 +83,10 @@
       ]
     },
     {
-      "name": "visualization",
-      "description": "Two-dimensional display widgets.",
+      "name": "visualization backends",
+      "description": "Backends of mne_viz under src/libs/mne/viz/backends, the top of the stack: each renders mne_viz frames and/or hosts its views with one toolkit (mne_viz_qt: Qt). Backends never depend on each other, since edges within a layer are refused.",
       "libraries": [
-        "mne_disp"
-      ]
-    },
-    {
-      "name": "visualization3d",
-      "description": "Three-dimensional display, the top of the stack.",
-      "libraries": [
-        "mne_disp3D"
+        "mne_viz_qt"
       ]
     }
   ],
@@ -106,8 +98,7 @@
   },
   "$qt_layers_comment": "The only layers whose libraries may link Qt (DEP022). Every other library builds and installs without Qt (MNE_BUILD_QT=OFF).",
   "qt_layers": [
-    "visualization",
-    "visualization3d"
+    "visualization backends"
   ],
   "$allowed_external_comment": "Third-party targets the libraries are permitted to link. Qt targets are normalised to a version-independent Qt:: spelling. Adding an entry here is an architectural decision and should be reviewed as one.",
   "allowed_external": [

@@ -18,9 +18,9 @@
 
 #include <electrodes.h>
 
-#include <mne/disp3D/renderable/electrodeobject.h>
-#include <mne/disp3D/scene/multimodalscene.h>
-#include <mne/disp3D/scene/pickresult.h>
+#include <mne/viz/backends/qt/3d/renderable/electrodeobject.h>
+#include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
+#include <mne/viz/backends/qt/3d/scene/pickresult.h>
 #include <mne/ieeg/ieeg_implantation.h>
 #include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
@@ -39,7 +39,7 @@
 #include <QTextStream>
 
 using namespace ELECTRODESPLUGIN;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 
 namespace

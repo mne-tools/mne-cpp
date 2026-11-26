@@ -9,7 +9,7 @@ project(test_viewmodels LANGUAGES CXX)
 add_executable(${PROJECT_NAME} test_viewmodels.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  mne_viewmodels
+  mne_viz
   mne_fiff
   mne_base
   Eigen3::Eigen

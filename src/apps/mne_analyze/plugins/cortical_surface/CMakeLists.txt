@@ -14,9 +14,9 @@ set(QT_REQUIRED_COMPONENTS Core Widgets)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-# This plugin pulls in DISP3D's MultimodalScene; skip on builds without disp3D.
-if(NOT TARGET mne_disp3D)
-    message(STATUS "analyze_cortical_surface: mne_disp3D not built — skipping")
+# This plugin pulls in mne_viz_qt's MultimodalScene; skip on builds without mne_viz_qt.
+if(NOT TARGET mne_viz_qt)
+    message(STATUS "analyze_cortical_surface: mne_viz_qt not built — skipping")
     return()
 endif()
 
@@ -49,7 +49,7 @@ set(MNE_LIBS_REQUIRED
     mne_fs
     mne_mne
     mne_inv
-    mne_disp3D
+    mne_viz_qt
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

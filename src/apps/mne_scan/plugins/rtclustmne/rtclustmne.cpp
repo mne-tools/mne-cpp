@@ -21,7 +21,7 @@
 
 #include "FormFiles/rtclustmnesetupwidget.h"
 #include <mne/base/string_utils.h>
-#include <mne/disp/viewers/minimumnormsettingsview.h>
+#include <mne/viz/backends/qt/viewers/minimumnormsettingsview.h>
 #include <mne/fs/fs_annotationset.h>
 #include <mne/fs/fs_surfaceset.h>
 #include <mne/fiff/fiff_ch_name.h>
@@ -60,7 +60,7 @@
 using namespace RTCLUSTMNEPLUGIN;
 using namespace mne;
 using namespace mne::scan;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace Eigen;
 
 //=============================================================================================================

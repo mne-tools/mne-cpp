@@ -13,12 +13,12 @@ set(QT_REQUIRED_COMPONENTS Core Gui Test)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-# disp3D requires Qt6::GuiPrivate and is only built when QRhi is available (not e.g. WASM).
+# mne_viz_qt requires Qt6::GuiPrivate and is only built when QRhi is available (not e.g. WASM).
 enable_testing()
 mne_add_test(${PROJECT_NAME}
     LABELS unit
     TIMEOUT 60
-    REQUIRES_TARGETS mne_disp3D)
+    REQUIRES_TARGETS mne_viz_qt)
 if(MNE_TEST_SKIPPED)
     return()
 endif()
@@ -37,7 +37,7 @@ set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 set(MNE_LIBS_REQUIRED
-    mne_disp3D
+    mne_viz_qt
     mne_ieeg
     mne_base
     mne_math

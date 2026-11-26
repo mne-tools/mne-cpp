@@ -105,7 +105,7 @@ enum EVENT_TYPE
     FILTER_ACTIVE_CHANGED,       ///< [bool] send when the filter active state was toggled
     FILTER_DESIGN_CHANGED,       ///< [FilterKernel] send when the designed filter changed
     CHANNEL_SELECTION_ITEMS,     ///< [send when channel selection changes with channel info about graphic items to draw
-    SCALING_MAP_CHANGED,         ///< [mne::disp::SelectionItem*] send when view scaling controls are updated
+    SCALING_MAP_CHANGED,         ///< [mne::viz::qt::SelectionItem*] send when view scaling controls are updated
     VIEW_SETTINGS_CHANGED,       ///< [mne::analyze::ViewParameters] send to trigger view settings update
     LOADING_START,               ///< [QString] send to start status bar loaidng bar and message
     LOADING_END,                 ///< [QString] send to end status bar loading bar and message
@@ -148,7 +148,7 @@ struct ViewParameters
         all
     };
 
-    // Defaults are those of mne::disp::FiffRawViewSettings
+    // Defaults are those of mne::viz::qt::FiffRawViewSettings
     std::vector<std::string> m_sViewsToApply;
     ViewSetting m_sSettingsToApply = all;
     QColor m_colorSignal = Qt::blue;

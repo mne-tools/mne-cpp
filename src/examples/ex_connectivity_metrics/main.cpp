@@ -38,9 +38,9 @@
 #include <mne/connectivity/metrics/weightedphaselagindex.h>
 #include <mne/connectivity/network/network.h>
 
-#include <mne/disp/plots/helpers/figureexporter.h>
-#include <mne/disp/plots/imagesc.h>
-#include <mne/disp/plots/lineplot.h>
+#include <mne/viz/backends/qt/plots/helpers/figureexporter.h>
+#include <mne/viz/backends/qt/plots/imagesc.h>
+#include <mne/viz/backends/qt/plots/lineplot.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -65,7 +65,7 @@
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -295,7 +295,7 @@ int main(int argc, char* argv[])
     const int hubDegree = network.degree(1);
     const int hubStrongDegree = network.degree(1, EdgeSet::thresholded);
     const double hubStrength = network.strength(1);
-    network.set_visualization_info({.coloring = VisualizationInfo::Coloring::fixed, // how disp3D colours the network
+    network.set_visualization_info({.coloring = VisualizationInfo::Coloring::fixed, // how mne_viz_qt colours the network
                                     .edge_color = Eigen::Vector4i(0, 0, 255, 255)});
     //! [network_threshold]
     ok &= expect(adjacency(1, 0) == 0.9 && adjacency(2, 1) == 0.2 && strongEdges == 1 && network.visualization_info().edge_color(2) == 255,

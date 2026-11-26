@@ -31,18 +31,18 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp/viewers/dipolefitview.h>
-#include <mne/disp/viewers/bidsview.h>
-#include <mne/disp/viewers/averagelayoutview.h>
-#include <mne/disp/viewers/butterflyview.h>
-#include <mne/disp/viewers/control3dview.h>
-#include <mne/disp/viewers/artifactsettingsview.h>
-#include <mne/disp/viewers/projectsettingsview.h>
-#include <mne/disp/viewers/helpers/timerulerwidget.h>
-#include <mne/disp/viewers/helpers/channellabelpanel.h>
-#include <mne/disp/viewers/helpers/overviewbarwidget.h>
-#include <mne/disp/viewers/helpers/channeldatamodel.h>
-#include <mne/disp/viewers/helpers/channelrhiview.h>
+#include <mne/viz/backends/qt/viewers/dipolefitview.h>
+#include <mne/viz/backends/qt/viewers/bidsview.h>
+#include <mne/viz/backends/qt/viewers/averagelayoutview.h>
+#include <mne/viz/backends/qt/viewers/butterflyview.h>
+#include <mne/viz/backends/qt/viewers/control3dview.h>
+#include <mne/viz/backends/qt/viewers/artifactsettingsview.h>
+#include <mne/viz/backends/qt/viewers/projectsettingsview.h>
+#include <mne/viz/backends/qt/viewers/helpers/timerulerwidget.h>
+#include <mne/viz/backends/qt/viewers/helpers/channellabelpanel.h>
+#include <mne/viz/backends/qt/viewers/helpers/overviewbarwidget.h>
+#include <mne/viz/backends/qt/viewers/helpers/channeldatamodel.h>
+#include <mne/viz/backends/qt/viewers/helpers/channelrhiview.h>
 #include <mne/fiff/fiff_ch_info.h>
 #include <mne/fiff/fiff_info.h>
 
@@ -69,7 +69,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 /**

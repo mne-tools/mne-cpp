@@ -45,7 +45,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     analyze_averaging
     anShared
-    mne_disp
+    mne_viz_qt
     mne_mne
     mne_fiff
     mne_base

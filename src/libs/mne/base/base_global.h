@@ -48,7 +48,7 @@
  * @brief     MNE-CPP: reading, processing, source estimation and acquisition of MEG/EEG data in standard C++.
  *
  * Every library shares this namespace; the class names carry their library prefix (FiffInfo, BidsChannel,
- * MnaProject, ...). The Qt-based display libraries live in @ref mne::disp.
+ * MnaProject, ...). The Qt-based display libraries live in @ref mne::viz::qt.
  */
 namespace mne
 {

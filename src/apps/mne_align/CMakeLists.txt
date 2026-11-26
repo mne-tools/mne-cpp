@@ -27,8 +27,8 @@ set(MNE_LIBS_REQUIRED
     mne_fiff
     mne_fs
     mne_mne
-    mne_disp
-    mne_disp3D
+    mne_viz_qt
+    mne_viz_qt
 )
 
 #---------------------------------------------------------------------------

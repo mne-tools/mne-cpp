@@ -12,7 +12,7 @@ set(CMAKE_AUTORCC ON)
 set(QT_REQUIRED_COMPONENTS Core Gui Test)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-# QRhi (BrainViewCore and BrainWindow on the Null backend) lives in GuiPrivate, like in disp3D itself
+# QRhi (BrainViewCore and BrainWindow on the Null backend) lives in GuiPrivate, like in mne_viz_qt itself
 set(QT_NO_PRIVATE_MODULE_WARNING ON)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS GuiPrivate)
 
@@ -28,7 +28,7 @@ set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 set(MNE_LIBS_REQUIRED
-    mne_fs mne_base mne_scene mne_disp mne_disp3D
+    mne_fs mne_base mne_viz mne_viz_qt mne_viz_qt
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

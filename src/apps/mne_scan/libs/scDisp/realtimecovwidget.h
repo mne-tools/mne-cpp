@@ -61,7 +61,7 @@ namespace mne::scan
 class RealTimeCov;
 }
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class ModalitySelectionView;
 class ImageSc;
@@ -143,7 +143,7 @@ protected:
 
     std::map<std::string, bool> m_modalityMap; /**< Map of different modalities. */
 
-    QPointer<mne::disp::ImageSc> m_pImageSc; /**< The covariance colormap. */
+    QPointer<mne::viz::qt::ImageSc> m_pImageSc; /**< The covariance colormap. */
 
     QList<qint32> m_qListSelChannel; /**< The channel list generated from the selected modalities. */
 };

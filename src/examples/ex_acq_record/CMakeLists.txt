@@ -18,7 +18,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   mne_acq
   mne_acq_fiff
   mne_fiff
-  mne_disp
+  mne_viz_qt
   Qt${QT_VERSION_MAJOR}::Core
   Qt${QT_VERSION_MAJOR}::Widgets
   Eigen3::Eigen

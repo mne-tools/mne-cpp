@@ -21,12 +21,12 @@
 
 #include "FormFiles/noisereductionsetupwidget.h"
 #include <mne/base/string_utils.h>
-#include <mne/disp/viewers/scalingview.h>
-#include <mne/disp/viewers/projectorsview.h>
-#include <mne/disp/viewers/filtersettingsview.h>
-#include <mne/disp/viewers/filterdesignview.h>
-#include <mne/disp/viewers/compensatorview.h>
-#include <mne/disp/viewers/spharasettingsview.h>
+#include <mne/viz/backends/qt/viewers/scalingview.h>
+#include <mne/viz/backends/qt/viewers/projectorsview.h>
+#include <mne/viz/backends/qt/viewers/filtersettingsview.h>
+#include <mne/viz/backends/qt/viewers/filterdesignview.h>
+#include <mne/viz/backends/qt/viewers/compensatorview.h>
+#include <mne/viz/backends/qt/viewers/spharasettingsview.h>
 #include <mne/dsp/rt/rt_filter.h>
 #include <mne/dsp/sphara.h>
 #include <mne/math/matrix_io.h>
@@ -52,7 +52,7 @@
 using namespace NOISEREDUCTIONPLUGIN;
 using namespace mne::scan;
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace Eigen;
 
 //=============================================================================================================

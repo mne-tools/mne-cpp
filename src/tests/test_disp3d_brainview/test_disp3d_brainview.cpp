@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March, 2026
- * @brief    Tests for the disp3D BrainView, BrainTreeModel, workers and scene managers.
+ * @brief    Tests for the mne_viz_qt BrainView, BrainTreeModel, workers and scene managers.
  *           Covers: BrainView construction and public API (without GPU rendering),
  *           BrainTreeModel item model, RtSourceInterpolationMatWorker,
  *           RtSensorInterpolationMatWorker, SourceEstimateManager,
@@ -18,48 +18,48 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp3D/view/brainview.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
 #include <mne/base/string_utils.h>
 #include <mne/base/log.h>
-#include <mne/disp3D/view/brainrenderer.h>
+#include <mne/viz/backends/qt/3d/view/brainrenderer.h>
 #include <rhi/qrhi.h>
-#include <mne/disp3D/renderable/polylineobject.h>
-#include <mne/disp3D/view/multiviewlayout.h>
-#include <mne/disp3D/model/braintreemodel.h>
-#include <mne/disp3D/model/items/abstracttreeitem.h>
-#include <mne/disp3D/model/items/digitizersettreeitem.h>
-#include <mne/disp3D/model/items/digitizertreeitem.h>
-#include <mne/disp3D/model/items/surfacetreeitem.h>
-#include <mne/disp3D/model/items/bemtreeitem.h>
-#include <mne/disp3D/model/items/networktreeitem.h>
-#include <mne/disp3D/model/items/dipoletreeitem.h>
-#include <mne/disp3D/model/items/sourcespacetreeitem.h>
-#include <mne/disp3D/workers/rtsourceinterpolationmatworker.h>
-#include <mne/disp3D/workers/rtsourcedatacontroller.h>
-#include <mne/disp3D/workers/rtsensorinterpolationmatworker.h>
-#include <mne/disp3D/workers/rtsourcedataworker.h>
-#include <mne/disp3D/workers/rtsensordataworker.h>
-#include <mne/disp3D/workers/rtsensordatacontroller.h>
-#include <mne/disp3D/scene/sourceestimatemanager.h>
-#include <mne/disp3D/scene/rtsensorstreammanager.h>
-#include <mne/disp3D/workers/stcloadingworker.h>
-#include <mne/disp3D/renderable/brainsurface.h>
-#include <mne/disp3D/input/cameracontroller.h>
-#include <mne/disp3D/input/raypicker.h>
-#include <mne/disp3D/renderable/dipoleobject.h>
-#include <mne/disp3D/renderable/electrodeobject.h>
+#include <mne/viz/backends/qt/3d/renderable/polylineobject.h>
+#include <mne/viz/backends/qt/3d/view/multiviewlayout.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/model/items/abstracttreeitem.h>
+#include <mne/viz/backends/qt/3d/model/items/digitizersettreeitem.h>
+#include <mne/viz/backends/qt/3d/model/items/digitizertreeitem.h>
+#include <mne/viz/backends/qt/3d/model/items/surfacetreeitem.h>
+#include <mne/viz/backends/qt/3d/model/items/bemtreeitem.h>
+#include <mne/viz/backends/qt/3d/model/items/networktreeitem.h>
+#include <mne/viz/backends/qt/3d/model/items/dipoletreeitem.h>
+#include <mne/viz/backends/qt/3d/model/items/sourcespacetreeitem.h>
+#include <mne/viz/backends/qt/3d/workers/rtsourceinterpolationmatworker.h>
+#include <mne/viz/backends/qt/3d/workers/rtsourcedatacontroller.h>
+#include <mne/viz/backends/qt/3d/workers/rtsensorinterpolationmatworker.h>
+#include <mne/viz/backends/qt/3d/workers/rtsourcedataworker.h>
+#include <mne/viz/backends/qt/3d/workers/rtsensordataworker.h>
+#include <mne/viz/backends/qt/3d/workers/rtsensordatacontroller.h>
+#include <mne/viz/backends/qt/3d/scene/sourceestimatemanager.h>
+#include <mne/viz/backends/qt/3d/scene/rtsensorstreammanager.h>
+#include <mne/viz/backends/qt/3d/workers/stcloadingworker.h>
+#include <mne/viz/backends/qt/3d/renderable/brainsurface.h>
+#include <mne/viz/backends/qt/3d/input/cameracontroller.h>
+#include <mne/viz/backends/qt/3d/input/raypicker.h>
+#include <mne/viz/backends/qt/3d/renderable/dipoleobject.h>
+#include <mne/viz/backends/qt/3d/renderable/electrodeobject.h>
 #include <mne/ieeg/ieeg_implantation.h>
-#include <mne/disp3D/renderable/networkobject.h>
-#include <mne/disp3D/renderable/sourceestimateoverlay.h>
-#include <mne/disp3D/renderable/sliceobject.h>
-#include <mne/disp3D/renderable/videooverlay.h>
-#include <mne/disp3D/scene/sensorfieldmapper.h>
+#include <mne/viz/backends/qt/3d/renderable/networkobject.h>
+#include <mne/viz/backends/qt/3d/renderable/sourceestimateoverlay.h>
+#include <mne/viz/backends/qt/3d/renderable/sliceobject.h>
+#include <mne/viz/backends/qt/3d/renderable/videooverlay.h>
+#include <mne/viz/backends/qt/3d/scene/sensorfieldmapper.h>
 #include <mne/fiff/fiff_evoked.h>
 #include <mne/fwd/fwd_coil_set.h>
 #include <mne/fwd/fwd_field_map.h>
-#include <mne/disp/plots/helpers/colormap.h>
+#include <mne/viz/backends/qt/plots/helpers/colormap.h>
 #include <mne/inv/inv_source_estimate.h>
-#include <mne/disp3D/core/viewstate.h>
+#include <mne/viz/backends/qt/3d/core/viewstate.h>
 #include <mne/fiff/fiff_dig_point.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_coord_trans_set.h>
@@ -101,14 +101,14 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 
 //=============================================================================================================
 /**
  * DECLARE CLASS TestDisp3dBrainView
  *
- * @brief The TestDisp3dBrainView class tests the disp3D BrainView and related classes headlessly
+ * @brief The TestDisp3dBrainView class tests the mne_viz_qt BrainView and related classes headlessly
  *        (construction and public-API calls that do not require an active GPU/render context).
  *
  */
@@ -1532,7 +1532,7 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
 
     // The uniform buffer grows to one slot per draw (at most 16384); a whole frame must stay usable when it overflows
     QTest::failOnWarning(QRegularExpression(QStringLiteral("exhausted|uniform buffer|inside a render pass")));
-    const auto modes = {mne::disp::Standard, mne::disp::Holographic, mne::disp::Anatomical, mne::disp::XRay, mne::disp::ShowNormals};
+    const auto modes = {mne::viz::qt::Standard, mne::viz::qt::Holographic, mne::viz::qt::Anatomical, mne::viz::qt::XRay, mne::viz::qt::ShowNormals};
     for (int frameIndex = 0; frameIndex < 2; ++frameIndex) {
         QRhiCommandBuffer* cb = nullptr;
         QCOMPARE(rhi->beginOffscreenFrame(&cb), QRhi::FrameOpSuccess);
@@ -1588,8 +1588,8 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
         renderer.issueElectrodeDraw(cb, &electrodes, electrodeOffset);
         renderer.issueVideoOverlayDraw(cb, &video, nullptr, quadOffset);
         renderer.issueVideoOverlayDraw(cb, &video, &surface, decalOffset);
-        renderer.issueSurfaceDraw(cb, &surface, mne::disp::Standard, last);
-        renderer.issueSurfaceDraw(cb, &surface, mne::disp::Standard, -1);
+        renderer.issueSurfaceDraw(cb, &surface, mne::viz::qt::Standard, last);
+        renderer.issueSurfaceDraw(cb, &surface, mne::viz::qt::Standard, -1);
 
         // QRhi forbids resource updates inside a pass, so preparing one there is refused
         QRhiResourceUpdateBatch* late = rhi->nextResourceUpdateBatch();
@@ -1607,7 +1607,7 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
         renderer.endPass(cb);
 
         renderer.beginPreservingPass(cb);
-        renderer.issueSurfaceDraw(cb, &surface, mne::disp::Standard, surfaceOffset);
+        renderer.issueSurfaceDraw(cb, &surface, mne::viz::qt::Standard, surfaceOffset);
         renderer.endPass(cb);
         QCOMPARE(rhi->endOffscreenFrame(), QRhi::FrameOpSuccess);
     }
@@ -1650,7 +1650,7 @@ void TestDisp3dBrainView::brainRenderer_uniformSlotsDoNotOverlap()
     BrainRenderer::SceneData scene;
     scene.cameraPos = QVector3D(0.0f, 0.0f, 1.0f);
     scene.lightDir = QVector3D(0.0f, 0.0f, 1.0f);
-    scene.overlayMode = static_cast<float>(mne::disp::ModeScientific);
+    scene.overlayMode = static_cast<float>(mne::viz::qt::ModeScientific);
 
     const bool hasOpenGl = QGuiApplicationPrivate::platformIntegration()->hasCapability(QPlatformIntegration::OpenGL);
     std::unique_ptr<QOffscreenSurface> glSurface(hasOpenGl ? QRhiGles2InitParams::newFallbackSurface() : nullptr);
@@ -1690,8 +1690,8 @@ void TestDisp3dBrainView::brainRenderer_uniformSlotsDoNotOverlap()
         QVERIFY2(second >= 256, qPrintable(QStringLiteral("%1: second slot at byte %2").arg(rhi->backendName()).arg(second)));
         QCOMPARE(second % rhi->ubufAlignment(), 0);
         renderer.beginFrame(cb, updates);
-        renderer.issueSurfaceDraw(cb, &left, mne::disp::Standard, first);
-        renderer.issueSurfaceDraw(cb, &right, mne::disp::Standard, second);
+        renderer.issueSurfaceDraw(cb, &left, mne::viz::qt::Standard, first);
+        renderer.issueSurfaceDraw(cb, &right, mne::viz::qt::Standard, second);
         renderer.endPass(cb);
         QRhiReadbackResult readback;
         QRhiResourceUpdateBatch* read = rhi->nextResourceUpdateBatch();
@@ -2017,10 +2017,10 @@ void TestDisp3dBrainView::brainSurface_advanced()
     surf.applyTransform(QMatrix4x4());
     QCOMPARE(surf.vertexDataRef()[1].pos, QVector3D(0.01f, 0.0f, 0.0f));
     QCOMPARE(surf.colorsRef()[1], packABGR(10, 20, 30, 128));
-    surf.setVisualizationMode(mne::disp::ModeSurface);
-    surf.setVisualizationMode(mne::disp::ModeScientific);
-    surf.setVisualizationMode(mne::disp::ModeSourceEstimate);
-    surf.setVisualizationMode(mne::disp::ModeAnnotation);
+    surf.setVisualizationMode(mne::viz::qt::ModeSurface);
+    surf.setVisualizationMode(mne::viz::qt::ModeScientific);
+    surf.setVisualizationMode(mne::viz::qt::ModeSourceEstimate);
+    surf.setVisualizationMode(mne::viz::qt::ModeAnnotation);
 
     // applySourceEstimateColors
     std::vector<uint32_t> colors(3, 0xFF808080u);
@@ -2492,7 +2492,7 @@ void TestDisp3dBrainView::sourceEstimateOverlay_colorsSurface()
     overlay.setColormap("Hot");
     overlay.applyToSurface(&surface, 0);
     const auto& colors = surface.colorsRef();
-    const QRgb top = mne::disp::ColorMap::valueToColor(1.0, QStringLiteral("Hot"));
+    const QRgb top = mne::viz::qt::ColorMap::valueToColor(1.0, QStringLiteral("Hot"));
     const uint32_t vertex2 = colors[2];
     QCOMPARE(static_cast<int>(vertex2 & 0xFFu), qRed(top));
     QCOMPARE(static_cast<int>((vertex2 >> 8) & 0xFFu), qGreen(top));

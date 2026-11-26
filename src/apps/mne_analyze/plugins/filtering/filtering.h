@@ -46,7 +46,7 @@ namespace mne
 class FilterKernel;
 }
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class FilterSettingsView;
 }
@@ -122,7 +122,7 @@ private:
     void setFilterActive(bool state);
 
     QPointer<mne::analyze::Communicator> m_pCommu; /**< To broadcst signals. */
-    QPointer<mne::disp::FilterSettingsView> m_pFilterSettingsView;
+    QPointer<mne::viz::qt::FilterSettingsView> m_pFilterSettingsView;
 };
 
 //=============================================================================================================

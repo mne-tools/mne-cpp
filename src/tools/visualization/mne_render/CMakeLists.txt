@@ -5,11 +5,11 @@
 cmake_minimum_required(VERSION 3.14)
 project(mne_render LANGUAGES CXX)
 
-# Standard C++ only: the views of mne_scene run on its software renderer
+# Standard C++ only: the views of mne_viz run on its software renderer
 add_executable(${PROJECT_NAME} main.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    mne_scene
+    mne_viz
     mne_fiff
     mne_fs
     mne_inv

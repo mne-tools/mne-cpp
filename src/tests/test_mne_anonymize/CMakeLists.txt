@@ -47,8 +47,8 @@ set(MNE_LIBS_REQUIRED
   mne_fs
   mne_base
     mne_math
-  mne_disp
-  mne_disp3D
+  mne_viz_qt
+  mne_viz_qt
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

@@ -49,7 +49,7 @@ class Communicator;
 class AbstractModel;
 }
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class ProgressView;
 }
@@ -201,9 +201,9 @@ private:
      */
     void onModelChanged(QSharedPointer<mne::analyze::AbstractModel> pNewModel);
 
-    QPointer<mne::analyze::Communicator> m_pCommu;     /**< Used for sending events. */
-    QPointer<mne::disp::ProgressView> m_pProgressView; /**< Holds loading bar and loading message. */
-    std::unique_ptr<QWidget> m_pProgressViewWidget;    /**< Window for ProgressView. */
+    QPointer<mne::analyze::Communicator> m_pCommu;        /**< Used for sending events. */
+    QPointer<mne::viz::qt::ProgressView> m_pProgressView; /**< Holds loading bar and loading message. */
+    std::unique_ptr<QWidget> m_pProgressViewWidget;       /**< Window for ProgressView. */
 
     QSharedPointer<mne::analyze::FiffRawViewModel> m_pSelectedModel; /**< Pointer to currently selected Fiff model. */
     QSharedPointer<mne::analyze::AbstractModel> m_pSelectedAverage;  /**< Pointer to the currently selected average. */

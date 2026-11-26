@@ -54,7 +54,7 @@ target_link_libraries(mne_analyze_studio_app_core PUBLIC
     mne_analyze_studio_dummy_3d_extension_widgets
     mne_analyze_studio_fiff_browser_extension_widgets
     mne_analyze_studio_psd_analysis_extension_widgets
-    mne_disp
+    mne_viz_qt
     mne_dsp
     mne_fiff
     mne_fs

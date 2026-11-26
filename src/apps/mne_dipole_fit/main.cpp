@@ -20,9 +20,9 @@
 #include <mne/inv/dipole_fit/inv_dipole_fit.h>
 #include <mne/base/log.h>
 #include <mne/mne/mne_bem.h>
-#include <mne/disp3D/view/brainview.h>
-#include <mne/disp3D/model/braintreemodel.h>
-#include <mne/disp3D/model/items/dipoletreeitem.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/model/items/dipoletreeitem.h>
 #include <mne/fs/fs_label.h>
 #include <mne/fs/fs_surfaceset.h>
 #include <mne/fs/fs_annotationset.h>
@@ -47,7 +47,7 @@
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // STATIC DEFINITIONS

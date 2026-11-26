@@ -1,0 +1,161 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @file     raypicker.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Mouse-ray vs scene-object intersection for picking dipoles, electrodes and surfaces.
+ *
+ * RayPicker unprojects the current mouse position through the
+ * active camera into a world-space ray and tests it against every
+ * selectable scene primitive: per-triangle Moller-Trumbore against
+ * @ref mne::viz::qt::BrainSurface meshes, per-arrow segment / cylinder for
+ * @ref mne::viz::qt::DipoleObject and ECoG electrodes, and per-sphere for
+ * source-space points and digitizer fiducials.
+ *
+ * The closest hit is returned as a @ref mne::viz::qt::RayHit that names the
+ * object, the triangle / instance index and the world-space
+ * intersection point &mdash; enough for the surrounding GUI to
+ * highlight a region, show a tooltip, or seed an interactive label.
+ */
+
+#ifndef RAYPICKER_H
+#define RAYPICKER_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../../viz_qt_global.h"
+#include "../core/viewstate.h"
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QPoint>
+#include <QRect>
+#include <QMatrix4x4>
+#include <QVector3D>
+#include <QStandardItem>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <map>
+#include <memory>
+#include <string>
+
+namespace mne::viz::qt
+{
+
+class BrainSurface;
+class DipoleObject;
+
+//=============================================================================================================
+/**
+ * @brief Result of a ray–mesh intersection test containing the hit point, triangle index, and distance.
+ *
+ * Describes the result of a ray-pick operation.
+ */
+struct VIZQTSHARED_EXPORT RayHit
+{
+    bool hit = false;      ///< True if something was hit
+    float distance = 0.0f; ///< Distance along ray to hit point
+    QVector3D hitPoint;    ///< World-space intersection point
+
+    QStandardItem* item = nullptr; ///< Tree item that was hit (nullable)
+    std::string surfaceKey;        ///< FsSurface map key of the hit surface
+    int vertexIndex = -1;          ///< Vertex or element index at hit
+
+    bool isDipole = false; ///< True if a dipole was hit
+    int dipoleIndex = -1;  ///< Index within the dipole set
+
+    // FsAnnotation info (brain surfaces only)
+    std::string regionName; ///< FsAnnotation region label (if available)
+    int regionId = -1;      ///< FsAnnotation label ID
+
+    //=========================================================================================================
+    /**
+     * Build a human-readable display label for the hit object.
+     * Includes annotation region, sensor name, BEM compartment, etc.
+     *
+     * @return Display label string, empty if no hit.
+     */
+    std::string displayLabel() const;
+};
+
+//=============================================================================================================
+/**
+ * Stateless ray-picking utility.
+ *
+ * Given camera matrices, a screen position, and the scene contents, this
+ * class casts a ray and returns a RayHit describing the closest
+ * intersection.  It has no state of its own — hover tracking is handled
+ * by the caller.
+ *
+ * @brief    Ray casting and intersection testing.
+ */
+class VIZQTSHARED_EXPORT RayPicker
+{
+public:
+    //=========================================================================================================
+    /**
+     * Unproject a screen position to a world-space ray.
+     *
+     * @param[in]  screenPos    2D cursor position (widget coords).
+     * @param[in]  paneRect     Rectangle of the active viewport pane.
+     * @param[in]  pvm          Combined projection × view × model matrix.
+     * @param[out] rayOrigin    Ray origin (world space).
+     * @param[out] rayDir       Ray direction (normalised, world space).
+     * @return                  True if the unproject succeeded.
+     */
+    static bool unproject(const QPoint& screenPos,
+                          const QRect& paneRect,
+                          const QMatrix4x4& pvm,
+                          QVector3D& rayOrigin,
+                          QVector3D& rayDir);
+
+    //=========================================================================================================
+    /**
+     * Cast a ray against all surfaces in the scene.
+     *
+     * @param[in] rayOrigin       World-space ray origin.
+     * @param[in] rayDir          World-space ray direction (normalised).
+     * @param[in] subView         Active SubView (for visibility / surface type filtering).
+     * @param[in] surfaces        Map of surface key → BrainSurface.
+     * @param[in] itemSurfaceMap  Map of tree item → BrainSurface (for reverse lookup).
+     * @param[in] itemDipoleMap   Map of tree item → DipoleObject.
+     * @return                    RayHit for the closest hit.
+     */
+    static RayHit pick(const QVector3D& rayOrigin,
+                       const QVector3D& rayDir,
+                       const SubView& subView,
+                       const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces,
+                       const std::map<const QStandardItem*, std::shared_ptr<BrainSurface>>& itemSurfaceMap,
+                       const std::map<const QStandardItem*, std::shared_ptr<DipoleObject>>& itemDipoleMap);
+
+    //=========================================================================================================
+    /**
+     * Build a display label from a RayHit.
+     *
+     * This examines the surface key, annotation data, and item type
+     * to produce a human-readable hover label.
+     *
+     * @param[in] result          RayHit from pick().
+     * @param[in] itemSurfaceMap  Map for reverse item → surface lookup.
+     * @param[in] surfaces        FsSurface map for key-based lookup.
+     * @return                    Display label string.
+     */
+    static std::string buildLabel(const RayHit& result,
+                                  const std::map<const QStandardItem*, std::shared_ptr<BrainSurface>>& itemSurfaceMap,
+                                  const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces);
+};
+
+} // namespace mne::viz::qt
+
+#endif // RAYPICKER_H

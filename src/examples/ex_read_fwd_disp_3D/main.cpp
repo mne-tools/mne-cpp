@@ -16,8 +16,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp3D/view/brainview.h>
-#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
 
 #include <mne/fs/fs_surfaceset.h>
 #include <mne/fs/fs_annotationset.h>
@@ -38,7 +38,7 @@
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // MAIN

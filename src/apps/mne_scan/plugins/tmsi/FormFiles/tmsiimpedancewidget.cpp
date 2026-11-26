@@ -22,7 +22,7 @@
 #include "ui_tmsiimpedancewidget.h"
 #include "../tmsi.h"
 #include <mne/base/string_utils.h>
-#include <mne/disp/plots/helpers/svgwriter.h>
+#include <mne/viz/backends/qt/plots/helpers/svgwriter.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -61,7 +61,7 @@ QString layoutDirectory()
 
 using namespace TMSIPLUGIN;
 using namespace Eigen;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace std;
 
 //=============================================================================================================
@@ -210,7 +210,7 @@ void TMSIImpedanceWidget::takeScreenshot()
     if (!fileName.isEmpty()) {
         // Generate screenshot
         if (fileName.contains(".svg")) {
-            mne::disp::SvgWriter svgGen;
+            mne::viz::qt::SvgWriter svgGen;
 
             svgGen.setFileName(fileName.toStdString());
             QRectF rect = m_qGScene->itemsBoundingRect();

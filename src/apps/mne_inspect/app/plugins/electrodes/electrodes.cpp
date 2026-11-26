@@ -21,7 +21,7 @@
 
 #include <mne/ieeg/ieeg_implantation.h>
 #include <mne/mri/mri_vol_data.h>
-#include <mne/disp3D/scene/multimodalscene.h>
+#include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_dig_point.h>
 #include <mne/fiff/fiff_dig_point_set.h>
@@ -57,7 +57,7 @@
 //=============================================================================================================
 
 using namespace ELECTRODESPLUGIN;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 
 namespace

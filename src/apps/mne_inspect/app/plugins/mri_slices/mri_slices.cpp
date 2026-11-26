@@ -19,7 +19,7 @@
 #include <mne/base/log.h>
 #include "mri_slices.h"
 
-#include <mne/disp3D/scene/multimodalscene.h>
+#include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
 #include <mne/mri/mri_slicer.h>
 
 //=============================================================================================================
@@ -41,7 +41,7 @@
 //=============================================================================================================
 
 using namespace MRISLICESPLUGIN;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 
 namespace

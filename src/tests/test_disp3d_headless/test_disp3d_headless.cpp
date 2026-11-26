@@ -5,7 +5,7 @@
  *
  * @file     test_disp3d_headless.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @brief    Headless tests for disp3D library: Interpolation functions,
+ * @brief    Headless tests for mne_viz_qt library: Interpolation functions,
  *        GeometryInfo (surface distances & projection), MeshFactory geometry,
  *        DataLoader I/O paths, and RtSourceDataController / RtSensorDataController setters.
  */
@@ -16,16 +16,16 @@
 #include <QColor>
 #include <QFile>
 
-#include <mne/disp3D/helpers/interpolation.h>
-#include <mne/disp3D/helpers/geometryinfo.h>
-#include <mne/disp3D/geometry/meshfactory.h>
-#include <mne/disp3D/core/dataloader.h>
-#include <mne/disp3D/workers/rtsourcedatacontroller.h>
-#include <mne/disp3D/workers/rtsensordatacontroller.h>
+#include <mne/viz/backends/qt/3d/helpers/interpolation.h>
+#include <mne/viz/backends/qt/3d/helpers/geometryinfo.h>
+#include <mne/viz/backends/qt/3d/geometry/meshfactory.h>
+#include <mne/viz/backends/qt/3d/core/dataloader.h>
+#include <mne/viz/backends/qt/3d/workers/rtsourcedatacontroller.h>
+#include <mne/viz/backends/qt/3d/workers/rtsensordatacontroller.h>
 
 #include <mne/fiff/fiff.h>
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace Eigen;
 
 class TestDisp3dHeadless : public QObject

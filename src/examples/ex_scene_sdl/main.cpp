@@ -23,13 +23,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/scene/software_renderer.h>
-#include <mne/scene/text_metrics.h>
-#include <mne/scene/trace_buffer.h>
-#include <mne/scene/trace_frame.h>
-#include <mne/scene/trace_markers.h>
-#include <mne/scene/trace_view.h>
-#include <mne/scene/view_animator.h>
+#include <mne/viz/gpu/software_renderer.h>
+#include <mne/viz/figures/text_metrics.h>
+#include <mne/viz/views/trace_buffer.h>
+#include <mne/viz/gpu/trace_frame.h>
+#include <mne/viz/views/trace_markers.h>
+#include <mne/viz/views/trace_view.h>
+#include <mne/viz/views/view_animator.h>
 
 #include <SDL3/SDL.h>
 
@@ -43,6 +43,9 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <charconv>
+#include <string_view>
+#include <system_error>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
@@ -55,7 +58,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::scene;
+using namespace mne::viz;
 
 namespace
 {
@@ -81,7 +84,7 @@ Eigen::MatrixXd synthetic_block(int first, int samples)
     return block;
 }
 
-mne::scene::Modifier modifiers_of(SDL_Keymod mod)
+mne::viz::Modifier modifiers_of(SDL_Keymod mod)
 {
     Modifier result = Modifier::None;
     if ((mod & SDL_KMOD_SHIFT) != 0) {
@@ -139,7 +142,11 @@ int main(int argc, char* argv[])
     int frameLimit = -1;
     for (int i = 1; i + 1 < argc; ++i) {
         if (std::strcmp(argv[i], "--frames") == 0) {
-            frameLimit = std::atoi(argv[i + 1]);
+            const std::string_view value(argv[i + 1]);
+            if (std::from_chars(value.data(), value.data() + value.size(), frameLimit).ec != std::errc()) {
+                std::fprintf(stderr, "--frames expects a number, got %s\n", argv[i + 1]);
+                return 1;
+            }
         }
     }
 

@@ -24,13 +24,13 @@
 #include <anShared/Model/bemdatamodel.h>
 #include <anShared/Model/dipolefitmodel.h>
 #include <anShared/Model/abstractmodel.h>
-#include <mne/disp3D/view/brainview.h>
-#include <mne/disp3D/model/braintreemodel.h>
-#include <mne/disp3D/model/items/digitizersettreeitem.h>
-#include <mne/disp3D/model/items/digitizertreeitem.h>
-#include <mne/disp3D/model/items/bemtreeitem.h>
-#include <mne/disp3D/model/items/dipoletreeitem.h>
-#include <mne/disp/viewers/control3dview.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/model/items/digitizersettreeitem.h>
+#include <mne/viz/backends/qt/3d/model/items/digitizertreeitem.h>
+#include <mne/viz/backends/qt/3d/model/items/bemtreeitem.h>
+#include <mne/viz/backends/qt/3d/model/items/dipoletreeitem.h>
+#include <mne/viz/backends/qt/viewers/control3dview.h>
 #include <mne/fiff/fiff_dig_point_set.h>
 
 //=============================================================================================================
@@ -39,7 +39,7 @@
 
 using namespace VIEW3DPLUGIN;
 using namespace mne::analyze;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -222,7 +222,7 @@ void View3D::updateCoregMriFid(const FiffDigPointSet& digSetFid)
 
 void View3D::updateCoregTrans(const FiffCoordTrans& headMriTrans)
 {
-    // Note: Per-item transforms for digitizers are not yet supported in disp3D.
+    // Note: Per-item transforms for digitizers are not yet supported in mne_viz_qt.
     // The coregistration transform will need to be applied via BrainView's scene transform
     // or by rebuilding the digitizer data in the transformed space.
     Q_UNUSED(headMriTrans)
@@ -253,7 +253,7 @@ void View3D::newPickingEvent(const QVector3D& worldIntersection)
 void View3D::onFiducialChanged(const int iFiducial)
 {
     // Note: BrainView does not have setCameraRotation(int degrees).
-    // Camera rotation for fiducial picking is not yet supported in disp3D.
+    // Camera rotation for fiducial picking is not yet supported in mne_viz_qt.
     Q_UNUSED(iFiducial)
     m_iFiducial = iFiducial;
 }

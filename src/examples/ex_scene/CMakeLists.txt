@@ -8,7 +8,7 @@ project(ex_scene LANGUAGES CXX)
 add_executable(${PROJECT_NAME} main.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  mne_scene
+  mne_viz
   mne_base
 )
 

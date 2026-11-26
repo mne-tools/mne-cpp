@@ -20,7 +20,7 @@
 #include "cortical_surface.h"
 
 #include <anShared/Management/communicator.h>
-#include <mne/disp3D/scene/multimodalscene.h>
+#include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
 #include <mne/fs/fs_annotation.h>
 #include <mne/fs/fs_label.h>
 #include <mne/fs/fs_label_utils.h>
@@ -94,7 +94,7 @@
 
 using namespace CORTICALSURFACEPLUGIN;
 using namespace mne::analyze;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 
 //=============================================================================================================

@@ -24,7 +24,7 @@
 #include "ui_eegosportsimpedancewidget.h"
 #include "../eegosports.h"
 #include <mne/base/string_utils.h>
-#include <mne/disp/plots/helpers/svgwriter.h>
+#include <mne/viz/backends/qt/plots/helpers/svgwriter.h>
 #include <mne/channels/layoutloader.h>
 #include <mne/channels/layoutmaker.h>
 
@@ -236,7 +236,7 @@ void EEGoSportsImpedanceWidget::takeScreenshot()
     if (!fileName.isEmpty()) {
         // Generate screenshot
         if (fileName.contains(".svg")) {
-            mne::disp::SvgWriter svgGen;
+            mne::viz::qt::SvgWriter svgGen;
 
             svgGen.setFileName(fileName.toStdString());
             QRectF rect = m_qGScene->itemsBoundingRect();

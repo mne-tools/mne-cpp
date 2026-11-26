@@ -45,14 +45,14 @@ namespace mne::analyze
 class Communicator;
 }
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class ApplyToView;
 class Control3DView;
 }
 
-#ifdef MNE_DISP3D
-namespace mne::disp
+#ifdef MNE_VIZ_QT_3D
+namespace mne::viz::qt
 {
 class BrainTreeModel;
 }
@@ -166,8 +166,8 @@ private:
      *
      * @param[in] pModel   new 3D Model.
      */
-#ifdef MNE_DISP3D
-    void init3DGui(QSharedPointer<mne::disp::BrainTreeModel> pModel);
+#ifdef MNE_VIZ_QT_3D
+    void init3DGui(QSharedPointer<mne::viz::qt::BrainTreeModel> pModel);
 #endif
 
     //=========================================================================================================
@@ -226,9 +226,9 @@ private:
 
     QPointer<mne::analyze::Communicator> m_pCommu; /**< Communicator to send events trhoug hevent manager. */
 
-    QPointer<mne::disp::Control3DView> m_pControl3DView; /**< Controls for 3d View. */
+    QPointer<mne::viz::qt::Control3DView> m_pControl3DView; /**< Controls for 3d View. */
 
-    QPointer<mne::disp::ApplyToView> m_pApplyToView;     /**< Controls for selecting views to apply settings; null until getControl() and after the dock is closed. */
+    QPointer<mne::viz::qt::ApplyToView> m_pApplyToView;  /**< Controls for selecting views to apply settings; null until getControl() and after the dock is closed. */
     mne::analyze::ScalingParameters m_ScalingParameters; /**< Controls for scaling. */
     mne::analyze::ViewParameters m_ViewParameters;       /**< Struct for 2D view settings. */
     mne::analyze::View3DParameters m_View3DParameters;   /**< Struct for 3D view settings. */

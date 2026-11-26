@@ -39,7 +39,7 @@ endif()
 
 set(MNE_LIBS_REQUIRED
     anShared
-    mne_disp
+    mne_viz_qt
     mne_dsp
     mne_fiff
     mne_base

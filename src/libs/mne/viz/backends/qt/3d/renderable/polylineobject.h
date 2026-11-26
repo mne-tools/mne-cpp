@@ -1,0 +1,242 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @file     polylineobject.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.4.0
+ * @date     July, 2026
+ * @brief    PolylineObject class declaration.
+ *
+ * A polyline is an ordered chain of points drawn as connected segments, for
+ * things like a head movement path, a dipole trajectory or a fibre tract.
+ *
+ * This exists as its own renderable rather than reusing NetworkObject, which
+ * can also express a chain but is built for connectivity graphs: it draws a
+ * sphere at every point, it prunes segments by weight in @ref
+ * mne::viz::qt::NetworkObject::setThreshold, and its node ids are qint16, which silently
+ * wraps past 32767 points. None of that suits an ordered path, so a polyline
+ * of N points here costs N-1 segment instances and nothing else.
+ */
+
+#ifndef DISP3DLIB_POLYLINEOBJECT_H
+#define DISP3DLIB_POLYLINEOBJECT_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../../viz_qt_global.h"
+#include "../core/rendertypes.h"
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QColor>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <vector>
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//=============================================================================================================
+// DEFINE CLASS
+//=============================================================================================================
+
+// Deliberately at global scope, matching DipoleObject and NetworkObject. The
+// other renderables in this directory are not namespaced either.
+
+namespace mne::viz::qt
+{
+
+//=============================================================================================================
+/**
+ * Renders an ordered sequence of points as connected line segments.
+ *
+ * Each segment is one instance of a unit cylinder, using the same instance
+ * layout as DipoleObject and NetworkObject so the existing Dipole pipeline can
+ * draw it without a dedicated shader.
+ *
+ * @brief Connected line segments through an ordered list of points.
+ *
+ * @snippet ex_disp3d_scene/main.cpp polyline_object_usage
+ */
+class VIZQTSHARED_EXPORT PolylineObject
+{
+public:
+    //=========================================================================================================
+    /**
+     * Constructs a PolylineObject without any points.
+     */
+    PolylineObject();
+
+    //=========================================================================================================
+    /**
+     * Destroys the PolylineObject.
+     */
+    ~PolylineObject();
+
+    //=========================================================================================================
+    /**
+     * Sets the points of the polyline.
+     *
+     * Fewer than two points clears the object, since a single point has no
+     * segment to draw.
+     *
+     * @param[in] vecPoints     Points in scene coordinates, in order.
+     */
+    void setPoints(const std::vector<Eigen::Vector3f>& vecPoints);
+
+    //=========================================================================================================
+    /**
+     * Clears all points.
+     */
+    void clear();
+
+    //=========================================================================================================
+    /**
+     * Sets the radius of the drawn segments.
+     *
+     * @param[in] fRadius   Segment radius in scene units.
+     */
+    void setRadius(float fRadius);
+
+    //=========================================================================================================
+    /**
+     * Sets the colours the segments are graded between from start to end.
+     *
+     * Grading the line makes the direction of travel readable without any
+     * extra decoration.
+     *
+     * @param[in] startColor    Colour of the first segment.
+     * @param[in] endColor      Colour of the last segment.
+     */
+    void setGradient(const QColor& startColor, const QColor& endColor);
+
+    //=========================================================================================================
+    /**
+     * @return CPU streams of the unit segment mesh and of one instance per segment.
+     */
+    InstancedStreams streams() const;
+
+    /**
+     * @return Identity of this object in the renderer's GPU cache.
+     */
+    const RenderKey& renderKey() const
+    {
+        return m_renderKey;
+    }
+
+    //=========================================================================================================
+    /**
+     * @return Number of indices in the unit segment mesh.
+     */
+    int indexCount() const
+    {
+        return m_iIndexCount;
+    }
+
+    //=========================================================================================================
+    /**
+     * @return Number of segment instances, one less than the number of points.
+     */
+    int instanceCount() const
+    {
+        return m_iInstanceCount;
+    }
+
+    //=========================================================================================================
+    /**
+     * @return Whether the polyline is drawn.
+     */
+    bool isVisible() const
+    {
+        return m_bVisible;
+    }
+
+    //=========================================================================================================
+    /**
+     * Sets whether the polyline is drawn.
+     *
+     * @param[in] bVisible  True to draw the polyline.
+     */
+    void setVisible(bool bVisible)
+    {
+        m_bVisible = bVisible;
+    }
+
+    //=========================================================================================================
+    /**
+     * @return Whether there is at least one segment to draw.
+     */
+    bool hasData() const
+    {
+        return m_iInstanceCount > 0;
+    }
+
+private:
+    //=========================================================================================================
+    /**
+     * Builds the unit cylinder used for every segment.
+     */
+    void createSegmentGeometry();
+
+    //=========================================================================================================
+    /**
+     * Builds the per-segment instance transforms and colours.
+     */
+    void buildInstances();
+
+    // Instance layout shared with DipoleObject and NetworkObject so that the
+    // Dipole pipeline can render this object unchanged.
+    struct InstanceData
+    {
+        float model[16];
+        float color[4];
+        float isSelected; /**< Always 0, polylines are not pickable. */
+    };
+
+    struct VertexData
+    {
+        float x, y, z;
+        float nx, ny, nz;
+    };
+
+    std::vector<Eigen::Vector3f> m_vecPoints; /**< Points of the polyline, in order. */
+
+    std::vector<std::byte> m_vertexData;   /**< Unit segment vertices. */
+    std::vector<std::byte> m_indexData;    /**< Unit segment indices. */
+    std::vector<std::byte> m_instanceData; /**< Per-segment instance data. */
+
+    int m_iIndexCount;    /**< Index count of the unit segment. */
+    int m_iInstanceCount; /**< Number of segments. */
+
+    float m_fRadius;     /**< Segment radius in scene units. */
+    QColor m_startColor; /**< Colour of the first segment. */
+    QColor m_endColor;   /**< Colour of the last segment. */
+
+    bool m_bVisible;                  /**< Whether the polyline is drawn. */
+    quint64 m_geometryGeneration = 0; /**< Bumped when the unit segment changes. */
+    quint64 m_instanceGeneration = 0; /**< Bumped when the segments change. */
+
+    RenderKey m_renderKey;
+};
+
+} // namespace mne::viz::qt
+
+#endif // DISP3DLIB_POLYLINEOBJECT_H

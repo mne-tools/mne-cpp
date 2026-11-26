@@ -23,7 +23,7 @@
 #include "../Management/pluginoutputdata.h"
 #include "../Management/plugininputdata.h"
 
-#include <mne/disp/viewers/abstractview.h>
+#include <mne/viz/backends/qt/viewers/abstractview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -245,7 +245,7 @@ signals:
      *
      * @param[in] mode       the new gui mode.
      */
-    void guiModeChanged(mne::disp::AbstractView::GuiMode mode);
+    void guiModeChanged(mne::viz::qt::AbstractView::GuiMode mode);
 
 protected:
     //=========================================================================================================

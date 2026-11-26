@@ -39,7 +39,7 @@ set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 set(MNE_LIBS_REQUIRED 
-    mne_disp
+    mne_viz_qt
     mne_base
     mne_math
     mne_fiff
@@ -51,8 +51,8 @@ set(MNE_LIBS_REQUIRED
     mne_events
 )
 
-if(TARGET mne_disp3D)
-  list(APPEND MNE_LIBS_REQUIRED mne_disp3D)
+if(TARGET mne_viz_qt)
+  list(APPEND MNE_LIBS_REQUIRED mne_viz_qt)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

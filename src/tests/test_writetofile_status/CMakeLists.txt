@@ -49,7 +49,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_fiff
     mne_base
     mne_math
-    mne_disp
+    mne_viz_qt
     Eigen3::Eigen
 )
 

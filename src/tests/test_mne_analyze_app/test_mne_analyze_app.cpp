@@ -21,7 +21,7 @@
 #include <anShared/Management/event.h>
 #include <anShared/Model/dipolefitmodel.h>
 #include <anShared/Plugins/abstractplugin.h>
-#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
 #include <mne/inv/dipole_fit/inv_ecd_set.h>
 
 //=============================================================================================================
@@ -217,9 +217,9 @@ void TestMneAnalyzeApp::showsEachDipoleFitOnceAndRemovesIt()
 
     // The plugin publishes its scene model when asked for its view
     mne::analyze::Communicator listener(QVector<mne::analyze::EVENT_TYPE>{mne::analyze::SET_DATA3D_TREE_MODEL});
-    QSharedPointer<mne::disp::BrainTreeModel> tree;
+    QSharedPointer<mne::viz::qt::BrainTreeModel> tree;
     connect(&listener, &mne::analyze::Communicator::receivedEvent, this, [&tree](const QSharedPointer<mne::analyze::Event> e) {
-        tree = e->getData().value<QSharedPointer<mne::disp::BrainTreeModel>>();
+        tree = e->getData().value<QSharedPointer<mne::viz::qt::BrainTreeModel>>();
     });
     view3d->getView();
     QTRY_VERIFY(tree);

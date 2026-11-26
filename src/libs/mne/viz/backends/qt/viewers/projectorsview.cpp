@@ -1,0 +1,261 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2018-2026 MNE-CPP Authors
+ *
+ * @file     projectorsview.cpp
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Andreas Griesshammer <ag@fieldlineinc.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     July 2018
+ * @brief    Implementation of the ProjectorsView SSP projector toggle panel.
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "projectorsview.h"
+#include "../detail/layout_reset.h"
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QCheckBox>
+#include <QGridLayout>
+#include <QFrame>
+#include <QSettings>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <vector>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace mne::viz::qt;
+using namespace mne;
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+ProjectorsView::ProjectorsView(const QString& sSettingsPath,
+                               QWidget* parent,
+                               Qt::WindowFlags f)
+: AbstractView(parent, f)
+, m_pEnableDisableProjectors(nullptr)
+{
+    m_sSettingsPath = sSettingsPath;
+    this->setWindowTitle("Projectors");
+    this->setMinimumWidth(330);
+    this->setMaximumWidth(330);
+
+    loadSettings();
+    redrawGUI();
+}
+
+//=============================================================================================================
+
+ProjectorsView::~ProjectorsView()
+{
+    saveSettings();
+}
+
+//=============================================================================================================
+
+std::vector<mne::FiffProj> ProjectorsView::getProjectors() const
+{
+    return m_pProjs;
+}
+
+//=============================================================================================================
+
+void ProjectorsView::setProjectors(const std::vector<mne::FiffProj>& projs)
+{
+    m_pProjs = projs;
+
+    for (int i = 0; i < std::ssize(m_pProjs); ++i) {
+        if (!m_mapProjActive.contains(m_pProjs.at(i).desc)) {
+            m_mapProjActive.insert_or_assign(m_pProjs.at(i).desc, m_pProjs.at(i).active);
+        } else {
+            m_pProjs[i].active = m_mapProjActive[m_pProjs.at(i).desc];
+        }
+    }
+
+    redrawGUI();
+}
+
+//=============================================================================================================
+
+void ProjectorsView::redrawGUI()
+{
+    if (m_pProjs.empty()) {
+        return;
+    }
+
+    m_qListProjCheckBox.clear();
+    detail::resetLayout(this);
+
+    // Projection Selection
+    QGridLayout* topLayout = new QGridLayout(this);
+
+    bool bAllActivated = true;
+
+    qint32 i = 0;
+
+    for (; i < std::ssize(m_pProjs); ++i) {
+        QCheckBox* checkBox = new QCheckBox(QString::fromStdString(m_pProjs.at(i).desc), this);
+
+        if (m_pProjs.at(i).active == false) {
+            bAllActivated = false;
+        }
+
+        m_qListProjCheckBox.append(checkBox);
+
+        connect(checkBox, &QCheckBox::toggled,
+                this, &ProjectorsView::onCheckProjStatusChanged);
+
+        checkBox->setChecked(m_pProjs.at(i).active);
+
+        topLayout->addWidget(checkBox, i, 0);
+    }
+
+    QFrame* line = new QFrame(this);
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+
+    topLayout->addWidget(line, i + 1, 0);
+
+    m_pEnableDisableProjectors = new QCheckBox("Enable all", this);
+    m_pEnableDisableProjectors->setChecked(bAllActivated);
+    topLayout->addWidget(m_pEnableDisableProjectors, i + 2, 0);
+    connect(m_pEnableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &ProjectorsView::onEnableDisableAllProj);
+
+    onCheckProjStatusChanged();
+}
+
+//=============================================================================================================
+
+void ProjectorsView::saveSettings()
+{
+    if (m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings("MNECPP");
+
+    settings.beginGroup(m_sSettingsPath + QString("/ProjectorsView/projectorsActive"));
+
+    std::map<std::string, bool>::const_iterator iProj = m_mapProjActive.cbegin();
+    while (iProj != m_mapProjActive.cend()) {
+        settings.setValue(QString::fromStdString(iProj->first), iProj->second);
+        ++iProj;
+    }
+
+    settings.endGroup();
+}
+
+//=============================================================================================================
+
+void ProjectorsView::loadSettings()
+{
+    if (m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings("MNECPP");
+
+    settings.beginGroup(m_sSettingsPath + QString("/ProjectorsView/projectorsActive"));
+
+    for (const QString& key : settings.childKeys()) {
+        m_mapProjActive[key.toStdString()] = settings.value(key).toBool();
+    }
+    settings.endGroup();
+}
+
+//=============================================================================================================
+
+void ProjectorsView::updateGuiMode(GuiMode mode)
+{
+    switch (mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is research mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
+void ProjectorsView::updateProcessingMode(ProcessingMode mode)
+{
+    switch (mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is realtime mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
+void ProjectorsView::onEnableDisableAllProj(bool status)
+{
+    //Set all checkboxes to status
+    for (int i = 0; i < m_qListProjCheckBox.size(); i++) {
+        m_qListProjCheckBox.at(i)->setChecked(status);
+    }
+
+    //Set all projection activation states to status
+    for (int i = 0; i < std::ssize(m_pProjs); ++i) {
+        m_pProjs[i].active = status;
+        m_mapProjActive[m_pProjs.at(i).desc] = status;
+    }
+
+    if (m_pEnableDisableProjectors) {
+        m_pEnableDisableProjectors->setChecked(status);
+    }
+
+    emit projSelectionChanged(m_pProjs);
+
+    saveSettings();
+}
+
+//=============================================================================================================
+
+void ProjectorsView::onCheckProjStatusChanged()
+{
+    bool bAllActivated = true;
+
+    for (qint32 i = 0; i < m_qListProjCheckBox.size(); ++i) {
+        if (m_qListProjCheckBox.at(i)->isChecked() == false) {
+            bAllActivated = false;
+        }
+
+        m_pProjs[i].active = m_qListProjCheckBox.at(i)->isChecked();
+        m_mapProjActive[m_pProjs.at(i).desc] = m_qListProjCheckBox.at(i)->isChecked();
+    }
+
+    if (m_pEnableDisableProjectors) {
+        m_pEnableDisableProjectors->setChecked(bAllActivated);
+    }
+
+    emit projSelectionChanged(m_pProjs);
+
+    saveSettings();
+}
+
+//=============================================================================================================
+
+void ProjectorsView::clearView()
+{
+}

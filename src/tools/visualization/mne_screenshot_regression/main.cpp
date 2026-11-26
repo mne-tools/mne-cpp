@@ -2,7 +2,7 @@
 // Copyright (c) 2026 MNE-CPP Authors
 //   Christoph Dinh <christoph.dinh@mne-cpp.org>
 //
-// Headless screenshot regression tool for disp3D BrainView.
+// Headless screenshot regression tool for mne_viz_qt BrainView.
 //
 // Loads FreeSurfer surfaces from a subjects directory, renders them
 // offscreen via BrainView::savePng() and optionally compares the
@@ -20,14 +20,14 @@
 
 #include <mne/fs/fs_surface.h>
 #include <mne/fs/fs_annotation.h>
-#include <mne/disp3D/view/brainview.h>
-#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
 #include <mne/base/log.h>
 
 #include <cmath>
 
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
     app.setApplicationName("mne_screenshot_regression");
 
     QCommandLineParser parser;
-    parser.setApplicationDescription("Headless screenshot regression for disp3D");
+    parser.setApplicationDescription("Headless screenshot regression for mne_viz_qt");
     parser.addHelpOption();
 
     parser.addOption({{"s", "subjects-dir"}, "FreeSurfer subjects directory.", "path"});

@@ -29,9 +29,9 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/eventmodel.h>
 
-#include <mne/disp/viewers/fiffrawviewsettings.h>
-#include <mne/disp/viewers/scalingview.h>
-#include <mne/disp/viewers/helpers/selectionitem.h>
+#include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
+#include <mne/viz/backends/qt/viewers/scalingview.h>
+#include <mne/viz/backends/qt/viewers/helpers/selectionitem.h>
 
 #include <mne/dsp/filterkernel.h>
 
@@ -47,7 +47,7 @@
 
 using namespace RAWDATAVIEWERPLUGIN;
 using namespace mne::analyze;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 
 //=============================================================================================================
@@ -162,14 +162,14 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
             m_pFiffRawView->setFilter(e->getData().value<FilterKernel>());
             break;
         case EVENT_TYPE::CHANNEL_SELECTION_ITEMS:
-            if (std::ranges::contains(e->getData().value<mne::disp::SelectionItem*>()->m_sViewsToApply, "signalview")) {
+            if (std::ranges::contains(e->getData().value<mne::viz::qt::SelectionItem*>()->m_sViewsToApply, "signalview")) {
                 if (m_pFiffRawView->getModel().isNull()) {
                     return;
                 }
-                if (e->getData().value<mne::disp::SelectionItem*>()->m_bShowAll) {
+                if (e->getData().value<mne::viz::qt::SelectionItem*>()->m_bShowAll) {
                     m_pFiffRawView->showAllChannels();
                 } else {
-                    m_pFiffRawView->showSelectedChannelsOnly(e->getData().value<mne::disp::SelectionItem*>()->m_iChannelNumber);
+                    m_pFiffRawView->showSelectedChannelsOnly(e->getData().value<mne::viz::qt::SelectionItem*>()->m_iChannelNumber);
                 }
             }
             break;

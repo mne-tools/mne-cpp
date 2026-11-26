@@ -3,7 +3,7 @@
   "namespaces": {
     "std": "Standard library.",
     "Ui": "Qt Designer generated form classes.",
-    "mne::disp::surface_keys": "String-key constants for disp3D surface lookups, not types."
+    "mne::viz::qt::surface_keys": "String-key constants for the 3-D surface lookups of mne_viz_qt, not types."
   },
   "classes": {
     "mne::AcqExtension": "Declared ahead of its implementation; registered with the FIFF bridge that implements and exercises it.",

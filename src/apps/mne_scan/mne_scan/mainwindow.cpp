@@ -29,10 +29,10 @@
 #include <scDisp/realtimemultisamplearraywidget.h>
 #include <scDisp/realtimeevokedsetwidget.h>
 
-#include <mne/disp/viewers/multiview.h>
-#include <mne/disp/viewers/multiviewwindow.h>
+#include <mne/viz/backends/qt/viewers/multiview.h>
+#include <mne/viz/backends/qt/viewers/multiviewwindow.h>
 
-#include <mne/disp/viewers/quickcontrolview.h>
+#include <mne/viz/backends/qt/viewers/quickcontrolview.h>
 
 #include <mne/base/base_global.h>
 
@@ -66,7 +66,7 @@
 
 using namespace MNESCAN;
 using namespace mne::scan;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // CONST
@@ -240,9 +240,9 @@ void MainWindow::onStyleChanged(const QString& sStyle)
 void MainWindow::onGuiModeChanged()
 {
     if (m_pActionResearchMode->isChecked()) {
-        emit guiModeChanged(mne::disp::AbstractView::GuiMode::Research);
+        emit guiModeChanged(mne::viz::qt::AbstractView::GuiMode::Research);
     } else if (m_pActionClinicalMode->isChecked()) {
-        emit guiModeChanged(mne::disp::AbstractView::GuiMode::Clinical);
+        emit guiModeChanged(mne::viz::qt::AbstractView::GuiMode::Clinical);
     }
 }
 

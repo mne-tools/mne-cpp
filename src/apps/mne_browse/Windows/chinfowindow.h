@@ -21,7 +21,7 @@
 
 #include "ui_chinfowindow.h"
 #include <mne/fiff/fiff.h>
-#include <mne/disp/viewers/helpers/channelinfomodel.h>
+#include <mne/viz/backends/qt/viewers/helpers/channelinfomodel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 
 //*************************************************************************************************************

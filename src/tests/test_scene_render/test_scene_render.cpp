@@ -15,22 +15,22 @@
 //=============================================================================================================
 
 #include "../common/golden.h"
-#include <mne/scene/average_layout.h>
-#include <mne/scene/average_tile.h>
-#include <mne/scene/bar_chart.h>
-#include <mne/scene/butterfly_plot.h>
-#include <mne/scene/canvas.h>
-#include <mne/scene/colormap.h>
-#include <mne/scene/filter_response_plot.h>
-#include <mne/scene/image_plot.h>
-#include <mne/scene/line_chart.h>
-#include <mne/scene/raster_renderer.h>
-#include <mne/scene/sensor_layout.h>
-#include <mne/scene/svg_renderer.h>
-#include <mne/scene/text_metrics.h>
-#include <mne/scene/spline_plot.h>
-#include <mne/scene/ticks.h>
-#include <mne/scene/vector_plot.h>
+#include <mne/viz/figures/average_layout.h>
+#include <mne/viz/figures/average_tile.h>
+#include <mne/viz/figures/bar_chart.h>
+#include <mne/viz/figures/butterfly_plot.h>
+#include <mne/viz/figures/canvas.h>
+#include <mne/viz/figures/colormap.h>
+#include <mne/viz/figures/filter_response_plot.h>
+#include <mne/viz/figures/image_plot.h>
+#include <mne/viz/figures/line_chart.h>
+#include <mne/viz/figures/raster_renderer.h>
+#include <mne/viz/figures/sensor_layout.h>
+#include <mne/viz/figures/svg_renderer.h>
+#include <mne/viz/figures/text_metrics.h>
+#include <mne/viz/figures/spline_plot.h>
+#include <mne/viz/figures/ticks.h>
+#include <mne/viz/figures/vector_plot.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -56,7 +56,7 @@
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::scene;
+using namespace mne::viz;
 
 namespace
 {

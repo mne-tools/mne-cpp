@@ -14,7 +14,7 @@
  * MNE_UPDATE_GOLDEN=1 the comparisons write the current output as the new golden files instead:
  *
  * @code
- * QVERIFY2(golden::matches_svg(mne::scene::to_svg(list), GOLDEN_DIR "/plot.svg"), golden::last_message());
+ * QVERIFY2(golden::matches_svg(mne::viz::to_svg(list), GOLDEN_DIR "/plot.svg"), golden::last_message());
  * @endcode
  */
 

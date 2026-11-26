@@ -1382,7 +1382,8 @@ _LIBRARY_OVERVIEW_DEV_FILES: Dict[str, str] = {
     "ml": "ml.mdx",
     "sts": "sts.mdx",
     "mna": "mna.mdx",
-    "disp3D": "disp3d.mdx",
+    "viz": "viz.mdx",
+    "viz_qt": "viz_qt.mdx",
 }
 
 

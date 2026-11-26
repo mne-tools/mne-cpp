@@ -17,7 +17,7 @@ else()
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  mne_disp
+  mne_viz_qt
   Qt${QT_VERSION_MAJOR}::Core
   Qt${QT_VERSION_MAJOR}::Widgets
   mne_connectivity

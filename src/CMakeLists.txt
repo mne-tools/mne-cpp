@@ -289,7 +289,7 @@ endif()
 
 if(NOT MNE_BUILD_QT)
   message(STATUS "[MNE-CPP] MNE_BUILD_QT is OFF: building the Qt-free libraries, examples and tests only "
-                 "(no disp, disp3D, applications, CLI tools, plugins or QtTest tests)")
+                 "(no mne_viz_qt, applications, CLI tools, plugins or QtTest tests)")
 endif()
 
 # CMAKE_INSTALL_RPATH_USE_LINK_PATH skips directories inside the project, such as the Qt init.sh downloads into src/3rdparty

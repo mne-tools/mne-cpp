@@ -38,7 +38,7 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     inspect_electrodes
-    mne_disp3D
+    mne_viz_qt
     mne_ieeg
     mne_mri
     mne_fiff

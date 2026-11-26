@@ -23,7 +23,7 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/eventmodel.h>
 
-#include <mne/disp/viewers/scalingview.h>
+#include <mne/viz/backends/qt/viewers/scalingview.h>
 
 #include <mne/dsp/filterkernel.h>
 
@@ -213,7 +213,7 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem& option,
 {
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
 
-    double dMaxValue = mne::disp::getScalingValue(t_pModel->getScaling(), t_pModel->getKind(index.row()), t_pModel->getUnit(index.row()));
+    double dMaxValue = mne::viz::qt::getScalingValue(t_pModel->getScaling(), t_pModel->getKind(index.row()), t_pModel->getUnit(index.row()));
     double dScaleY = option.rect.height() / (2 * dMaxValue);
     double y_base = path.currentPosition().y();
     double dValue, newY;

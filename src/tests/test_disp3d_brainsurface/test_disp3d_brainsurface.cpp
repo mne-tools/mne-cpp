@@ -16,9 +16,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp3D/renderable/brainsurface.h>
-#include <mne/disp3D/geometry/meshfactory.h>
-#include <mne/disp3D/core/rendertypes.h>
+#include <mne/viz/backends/qt/3d/renderable/brainsurface.h>
+#include <mne/viz/backends/qt/3d/geometry/meshfactory.h>
+#include <mne/viz/backends/qt/3d/core/rendertypes.h>
 #include <mne/fs/fs_annotation.h>
 
 //=============================================================================================================
@@ -44,7 +44,7 @@
 
 #include <cmath>
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 /**

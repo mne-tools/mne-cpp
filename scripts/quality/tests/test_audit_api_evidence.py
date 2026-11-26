@@ -42,7 +42,7 @@ class FixtureTree:
                "class FIFFSHARED_EXPORT FiffReader : public QObject\n{\n};\n"
                "struct FIFFSHARED_EXPORT FiffRecord\n{\n};\n"               "class FIFFSHARED_EXPORT FiffWorker\n{\n};\n"               "FIFFSHARED_EXPORT int countTags(const QString& path);\n")
         _write(root, "src/libs/mne/fiff/fiff_utils.h", "namespace mne { int helper(); }\n")
-        _write(root, "src/libs/mne/disp/viewers/rawview.h", "class DISPSHARED_EXPORT RawView\n{\n};\n")
+        _write(root, "src/libs/mne/viz/backends/qt/viewers/rawview.h", "class VIZQTSHARED_EXPORT RawView\n{\n};\n")
         _write(root, "src/examples/CMakeLists.txt", "add_subdirectory(ex_read)\n")
         _write(root, "src/examples/ex_read/main.cpp", "#include <mne/fiff/fiff_reader.h>\n")
         _write(root, "src/examples/ex_orphan/main.cpp", "int main() {}\n")
@@ -99,7 +99,7 @@ class AuditTests(unittest.TestCase):
         report = self.build()
         records = {r["name"]: r for r in report["classes"]}
         self.assertFalse(records["RawView"]["example_eligible"])
-        self.assertIn("disp/viewers/", records["RawView"]["exempt_reason"])
+        self.assertIn("viz/backends/qt/viewers/", records["RawView"]["exempt_reason"])
         self.assertFalse(records["FiffWorker"]["example_eligible"])
         self.assertEqual(records["FiffWorker"]["exempt_reason"], "registry: Internal work item.")
         summary = report["summary"]

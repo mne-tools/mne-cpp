@@ -26,7 +26,7 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/eventmodel.h>
 
-#include <mne/disp/plots/helpers/svgwriter.h>
+#include <mne/viz/backends/qt/plots/helpers/svgwriter.h>
 #include <mne/dsp/filterkernel.h>
 
 //=============================================================================================================
@@ -60,7 +60,7 @@ using namespace mne;
 //=============================================================================================================
 
 FiffRawView::FiffRawView(QWidget* parent)
-: mne::disp::AbstractView(parent)
+: mne::viz::qt::AbstractView(parent)
 , m_pTableView(new QTableView(this))
 , m_fDefaultSectionSize(80.0f)
 {
@@ -334,7 +334,7 @@ void FiffRawView::onMakeScreenshot(const QString& imageType)
     if (imageType.contains("SVG")) {
         fileName = QString("./Screenshots/%1-%2-AnalyzeDataView.svg").arg(sDate).arg(sTime);
 
-        mne::disp::SvgWriter svgGen;
+        mne::viz::qt::SvgWriter svgGen;
         svgGen.setFileName(fileName.toStdString());
         svgGen.setSize(m_pTableView->size());
         svgGen.setViewBox(m_pTableView->rect());

@@ -44,7 +44,7 @@ class AbstractModel;
 class DipoleFitModel;
 }
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class BrainView;
 class BrainTreeModel;
@@ -53,7 +53,7 @@ class DigitizerSetTreeItem;
 class DipoleTreeItem;
 }
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class Control3DView;
 }
@@ -168,7 +168,7 @@ private:
      *
      * @param[in] pModel   new 3D model to be emitted.
      */
-    void new3DModel(QSharedPointer<mne::disp::BrainTreeModel> pModel);
+    void new3DModel(QSharedPointer<mne::viz::qt::BrainTreeModel> pModel);
 
     //=========================================================================================================
     /**
@@ -205,12 +205,12 @@ private:
 
     int m_iFiducial; /**< Currently selected fiducial. */
 
-    QSharedPointer<mne::disp::BrainTreeModel> m_p3DModel;                           /**< The 3D model data. */
+    QSharedPointer<mne::viz::qt::BrainTreeModel> m_p3DModel;                        /**< The 3D model data. */
     QHash<const mne::analyze::AbstractModel*, QPersistentModelIndex> m_dipoleItems; /**< Scene item of each dipole fit model. */
-    mne::disp::BemTreeItem* m_pBemTreeCoreg;                                        /**< TThe BEM head model of the coregistration plugin. */
+    mne::viz::qt::BemTreeItem* m_pBemTreeCoreg;                                     /**< TThe BEM head model of the coregistration plugin. */
 
-    QPointer<mne::disp::BrainView> m_pView3D;   /**< The Disp3D view; the main window owns it once getView() handed it over. */
-    mne::disp::Control3DView* m_pControl3DView; /**< The 3D Control view. */
+    QPointer<mne::viz::qt::BrainView> m_pView3D;   /**< The Disp3D view; the main window owns it once getView() handed it over. */
+    mne::viz::qt::Control3DView* m_pControl3DView; /**< The 3D Control view. */
 
     bool m_bPickingActivated; /**< If Picking is activated*/
 

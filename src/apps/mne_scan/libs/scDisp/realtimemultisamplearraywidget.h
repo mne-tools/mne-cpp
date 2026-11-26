@@ -45,7 +45,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class ChannelSelectionView;
 class ChannelInfoModel;
@@ -154,10 +154,10 @@ private:
 private:
     QSharedPointer<mne::scan::RealTimeMultiSampleArray> m_pRTMSA; /**< The real-time sample array measurement. */
 
-    std::shared_ptr<mne::disp::QuickControlView> m_pQuickControlView;         /**< quick control widget. */
-    std::shared_ptr<mne::disp::ChannelInfoModel> m_pChannelInfoModel;         /**< channel info model. */
-    std::shared_ptr<mne::disp::ChannelSelectionView> m_pChannelSelectionView; /**< ChannelSelectionView. */
-    QPointer<mne::disp::RtFiffRawView> m_pChannelDataView;                    /**< the QTableView being part of the model/view framework of Qt. */
+    std::shared_ptr<mne::viz::qt::QuickControlView> m_pQuickControlView;         /**< quick control widget. */
+    std::shared_ptr<mne::viz::qt::ChannelInfoModel> m_pChannelInfoModel;         /**< channel info model. */
+    std::shared_ptr<mne::viz::qt::ChannelSelectionView> m_pChannelSelectionView; /**< ChannelSelectionView. */
+    QPointer<mne::viz::qt::RtFiffRawView> m_pChannelDataView;                    /**< the QTableView being part of the model/view framework of Qt. */
 
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< FiffInfo, which is used insteadd of ListChInfo*/
 

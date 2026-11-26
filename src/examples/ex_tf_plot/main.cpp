@@ -21,8 +21,8 @@
 #include <mne/dsp/spectrogram.h>
 #include <mne/base/log.h>
 
-#include <mne/disp/plots/tfplot.h>
-#include <mne/disp/plots/helpers/figureexporter.h>
+#include <mne/viz/backends/qt/plots/tfplot.h>
+#include <mne/viz/backends/qt/plots/helpers/figureexporter.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -37,7 +37,7 @@
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace Eigen;
 
 //=============================================================================================================

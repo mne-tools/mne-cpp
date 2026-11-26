@@ -26,8 +26,8 @@
 #include <mne/acq/acq.h>
 #include <mne/acq/fiff/acq_fiff_replay.h>
 #include <mne/acq/fiff/acq_recorder.h>
-#include <mne/disp/plots/helpers/figureexporter.h>
-#include <mne/disp/plots/lineplot.h>
+#include <mne/viz/backends/qt/plots/helpers/figureexporter.h>
+#include <mne/viz/backends/qt/plots/lineplot.h>
 #include <mne/fiff/fiff_raw_data.h>
 
 //=============================================================================================================
@@ -59,7 +59,7 @@
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // MAIN

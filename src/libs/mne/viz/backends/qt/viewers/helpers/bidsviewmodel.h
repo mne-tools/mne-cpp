@@ -1,0 +1,252 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2019-2026 MNE-CPP Authors
+ *
+ * @file     bidsviewmodel.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.4
+ * @date     May 2019
+ * @brief    QStandardItemModel mirroring the BIDS dataset hierarchy (subjects / sessions / runs / derivatives).
+ *
+ * BidsViewModel rebuilds itself from a top-level dataset path and
+ * exposes the BIDS tree to @ref mne::viz::qt::BidsView. Item roles carry the
+ * absolute path, the BIDS entity type and the loadable-by-this-app
+ * flag so the surrounding plugin can react to double-clicks (load
+ * raw, attach derivative, …) without re-walking the file system.
+ */
+
+#ifndef BIDSVIEWMODEL_H
+#define BIDSVIEWMODEL_H
+
+//=============================================================================================================
+// DEFINE MACROS
+//=============================================================================================================
+
+//USER ROLES
+#define BIDS_ITEM_TYPE Qt::UserRole + 2
+#define BIDS_ITEM_SUBJECT Qt::UserRole + 3
+#define BIDS_ITEM_SESSION Qt::UserRole + 4
+#define BIDS_ITEM_NODE Qt::UserRole + 5 /**< Id of the item in the mne::viz::BidsTree of the model. */
+
+//ITEM TYPES
+
+//CONTAINERS
+inline constexpr auto BIDS_SUBJECT = 01;
+inline constexpr auto BIDS_SESSION = 02;
+inline constexpr auto BIDS_FOLDER = 03;
+
+//DATA TYPES
+inline constexpr auto BIDS_FUNCTIONALDATA = 10;
+inline constexpr auto BIDS_ANATOMICALDATA = 11;
+inline constexpr auto BIDS_BEHAVIORALDATA = 12;
+inline constexpr auto BIDS_IEEGDATA = 13;
+
+//SUB-ITEMS
+inline constexpr auto BIDS_AVERAGE = 20;
+inline constexpr auto BIDS_EVENT = 21;
+inline constexpr auto BIDS_DIPOLE = 22;
+inline constexpr auto BIDS_ELECTRODES = 23;
+inline constexpr auto BIDS_COORDSYSTEM = 24;
+
+inline constexpr auto BIDS_UNKNOWN = 99;
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../../viz_qt_global.h"
+#include <mne/viz/models/bids_tree.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QStandardItemModel>
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+//=============================================================================================================
+// DEFINE NAMESPACE mne::analyze
+//=============================================================================================================
+
+namespace mne::viz::qt
+{
+
+//=============================================================================================================
+// mne::analyze FORWARD DECLARATIONS
+//=============================================================================================================
+
+//=============================================================================================================
+// ENUMERATIONS
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * @brief QStandardItemModel mirroring the BIDS dataset hierarchy (subjects / sessions / runs / derivatives).
+ *
+ * Rebuilds itself from a top-level dataset path; item roles carry
+ * the absolute path, BIDS entity type and loadable-by-this-app flag
+ * so the host @ref BidsView can dispatch double-clicks without
+ * re-walking the file system.
+ */
+class VIZQTSHARED_EXPORT BidsViewModel : public QStandardItemModel
+{
+    Q_OBJECT
+
+public:
+    //=========================================================================================================
+    /**
+     * Constructs the Analyze Data Model.
+     *
+     * @param[in] pParent  Parent QObject (default nullptr).
+     */
+    BidsViewModel(QObject* pParent = nullptr);
+
+    //=========================================================================================================
+    /**
+     * Destroys the Analyze Data Model.
+     */
+    ~BidsViewModel();
+
+public slots:
+    //=========================================================================================================
+    /**
+     * Adds data to the item model.
+     *
+     * @param[in] selectedItem Model index of the item the data is added under.
+     * @param[in, out] pNewItem The item to be added.
+     * @param[in] iDataType BIDS data type of the new item.
+     *
+     */
+    void addData(QModelIndex selectedItem,
+                 QStandardItem* pNewItem,
+                 int iDataType);
+
+    //=========================================================================================================
+    /**
+     * Adds a sub-item to a data item (ex. an average)
+     *
+     * @param[in] pNewItem     item to be added.
+     * @param[in] parentIndex  index of where the nitem should be added.
+     */
+    void addToData(QStandardItem* pNewItem,
+                   const QModelIndex& parentIndex,
+                   int iDataType);
+
+    //=========================================================================================================
+    /**
+     * Adds subject with given input name
+     *
+     * @param[in] sSubjectName     name of subject name.
+     *
+     * @return  index of newly added item.
+     */
+    QModelIndex addSubject(const QString& sSubjectName);
+
+    //=========================================================================================================
+    /**
+     * Adds session named after sSessionName to subjects names sSubjectName
+     *
+     * @param[in] sSubjectName     Name of subject to which session will be added.
+     * @param[in] sSessionName     Name of session to add.
+     *
+     * @return  index of newly added item.
+     */
+    QModelIndex addSessionToSubject(const QString& sSubjectName,
+                                    const QString& sSessionName);
+
+    //=========================================================================================================
+    /**
+     * Adds session named after sSessionName to subject at subjectIndex
+     *
+     * @param[in] subjectIndex     Index of subject to which session will be added.
+     * @param[in] sSessionName     Name of session to add.
+     *
+     * @return  index of newly added item.
+     */
+    QModelIndex addSessionToSubject(QModelIndex subjectIndex,
+                                    const QString& sSessionName);
+
+    //=========================================================================================================
+    /**
+     * Adds data item pNewItem to session at sessionIndex
+     *
+     * @param[in] sessionIndex     Index of session to which data will be added.
+     * @param[in] pNewItem         New item to be added.
+     *
+     * @return index of newly added item.
+     */
+    QModelIndex addDataToSession(QModelIndex sessionIndex,
+                                 QStandardItem* pNewItem,
+                                 int iDataType);
+
+    //=========================================================================================================
+    /**
+     * Moves a session to a new subject
+     * @param[in] subjectIndex     Target subject.
+     * @param[in] sessionIndex     Session to be moved.
+     *
+     * @return
+     */
+    QModelIndex moveSessionToSubject(QModelIndex subjectIndex,
+                                     QModelIndex sessionIndex);
+
+    //=========================================================================================================
+    /**
+     * Moves data at dataIndex to session at sessionIndex
+     *
+     * @param[in] sessionIndex     Target session.
+     * @param[in] dataIndex        Data to be moved.
+     *
+     * @return
+     */
+    QModelIndex moveDataToSession(QModelIndex sessionIndex,
+                                  QModelIndex dataIndex);
+
+    //=========================================================================================================
+    /**
+     * Removes item at index itemIndex
+     *
+     * @param[in] itemIndex    index of item to be removed.
+     *
+     * @return true if succefully removed, false if not.
+     */
+    bool removeItem(QModelIndex itemIndex);
+
+signals:
+
+    //=========================================================================================================
+    /**
+     * Emit index of newly added items to be selected
+     *
+     * @param[in] itemIndex    index of new item.
+     */
+    void newItemIndex(QModelIndex itemIndex);
+
+public:
+    //=========================================================================================================
+    /**
+     * @return The toolkit-independent tree this model mirrors.
+     */
+    const mne::viz::BidsTree& tree() const
+    {
+        return m_tree;
+    }
+
+private:
+    int nodeOf(const QModelIndex& index) const;
+    QStandardItem* itemOf(int node) const;
+    void tag(QStandardItem* pItem, int node);
+
+    mne::viz::BidsTree m_tree; /**< Subjects, sessions, folders and data items without Qt. */
+};
+
+} //Namespace
+
+#endif //BIDSVIEWMODEL_H

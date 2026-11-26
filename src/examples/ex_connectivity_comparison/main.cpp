@@ -18,10 +18,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp3D/view/brainview.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
 #include <mne/base/string_utils.h>
-#include <mne/disp3D/model/braintreemodel.h>
-#include <mne/disp3D/model/items/networktreeitem.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/model/items/networktreeitem.h>
 #include <mne/connectivity/compute_connectivity.h>
 #include <mne/connectivity/connectivitysettings.h>
 #include <mne/connectivity/network/network.h>
@@ -36,7 +36,7 @@
 #include <mne/inv/minimum_norm/inv_minimum_norm.h>
 #include <mne/base/log.h>
 #include <mne/fiff/fiff_events.h>
-#include <mne/disp/viewers/connectivitysettingsview.h>
+#include <mne/viz/backends/qt/viewers/connectivitysettingsview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -62,7 +62,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 using namespace Eigen;
 

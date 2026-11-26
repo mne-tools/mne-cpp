@@ -19,21 +19,21 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp3D/helpers/geometryinfo.h>
-#include <mne/disp3D/helpers/interpolation.h>
-#include <mne/disp3D/renderable/brainsurface.h>
-#include <mne/disp3D/renderable/dipoleobject.h>
-#include <mne/disp3D/renderable/electrodeobject.h>
+#include <mne/viz/backends/qt/3d/helpers/geometryinfo.h>
+#include <mne/viz/backends/qt/3d/helpers/interpolation.h>
+#include <mne/viz/backends/qt/3d/renderable/brainsurface.h>
+#include <mne/viz/backends/qt/3d/renderable/dipoleobject.h>
+#include <mne/viz/backends/qt/3d/renderable/electrodeobject.h>
 #include <mne/ieeg/ieeg_implantation.h>
-#include <mne/disp3D/renderable/networkobject.h>
-#include <mne/disp3D/renderable/polylineobject.h>
-#include <mne/disp3D/renderable/sliceobject.h>
-#include <mne/disp3D/renderable/sourceestimateoverlay.h>
-#include <mne/disp3D/renderable/videooverlay.h>
-#include <mne/disp3D/scene/multimodalscene.h>
-#include <mne/disp3D/scene/sensorfieldmapper.h>
-#include <mne/disp3D/view/brainview.h>
-#include <mne/disp3D/view/multiviewlayout.h>
+#include <mne/viz/backends/qt/3d/renderable/networkobject.h>
+#include <mne/viz/backends/qt/3d/renderable/polylineobject.h>
+#include <mne/viz/backends/qt/3d/renderable/sliceobject.h>
+#include <mne/viz/backends/qt/3d/renderable/sourceestimateoverlay.h>
+#include <mne/viz/backends/qt/3d/renderable/videooverlay.h>
+#include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
+#include <mne/viz/backends/qt/3d/scene/sensorfieldmapper.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
+#include <mne/viz/backends/qt/3d/view/multiviewlayout.h>
 
 #include <mne/connectivity/network/network.h>
 #include <mne/inv/dipole_fit/inv_ecd_set.h>
@@ -64,7 +64,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 using namespace Eigen;
 

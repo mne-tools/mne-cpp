@@ -45,7 +45,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     analyze_cortical_surface
     anShared
-    mne_disp3D
+    mne_viz_qt
     mne_inv
     mne_fs
     mne_mne

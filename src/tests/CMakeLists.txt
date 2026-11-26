@@ -226,7 +226,7 @@ add_subdirectory(test_inv_rt_library)
 # Communication library tests
 add_subdirectory(test_com)
 
-# Utils, disp, and disp3D coverage tests
+# Utils, disp, and mne_viz_qt coverage tests
 add_subdirectory(test_channels_layout_selection)
 add_subdirectory(test_disp_plots)
 add_subdirectory(test_disp_svg_writer)

@@ -15,15 +15,15 @@
 //=============================================================================================================
 
 #include "../common/scene_golden.h"
-#include <mne/scene/canvas.h>
-#include <mne/scene/software_renderer.h>
-#include <mne/scene/svg_renderer.h>
-#include <mne/scene/text_metrics.h>
-#include <mne/scene/trace_frame.h>
-#include <mne/scene/trace_geometry.h>
-#include <mne/scene/trace_markers.h>
-#include <mne/scene/trace_view.h>
-#include <mne/scene/view_animator.h>
+#include <mne/viz/figures/canvas.h>
+#include <mne/viz/gpu/software_renderer.h>
+#include <mne/viz/figures/svg_renderer.h>
+#include <mne/viz/figures/text_metrics.h>
+#include <mne/viz/gpu/trace_frame.h>
+#include <mne/viz/views/trace_geometry.h>
+#include <mne/viz/views/trace_markers.h>
+#include <mne/viz/views/trace_view.h>
+#include <mne/viz/views/view_animator.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -49,7 +49,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::scene;
+using namespace mne::viz;
 
 namespace
 {

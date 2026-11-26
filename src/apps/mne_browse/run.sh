@@ -24,13 +24,13 @@ select_build_root() {
     local app_path="$candidate_bin/mne_browse.app/Contents/MacOS/mne_browse"
     local bin_path="$candidate_bin/mne_browse"
 
-    if [ -f "$app_path" ] && [ -f "$candidate_lib/libmne_disp.dylib" ]; then
+    if [ -f "$app_path" ] && [ -f "$candidate_lib/libmne_viz_qt.dylib" ]; then
         BuildRoot="$candidate_root"
         BuildPath="$app_path"
         return 0
     fi
 
-    if [ -f "$bin_path" ] && [ -f "$candidate_lib/libmne_disp.dylib" ]; then
+    if [ -f "$bin_path" ] && [ -f "$candidate_lib/libmne_viz_qt.dylib" ]; then
         BuildRoot="$candidate_root"
         BuildPath="$bin_path"
         return 0
@@ -47,7 +47,7 @@ done
 
 if [ -z "$BuildPath" ]; then
     echo "Error: Could not locate a runnable mne_browse build."
-    echo "Checked for executable + libmne_disp.dylib in:"
+    echo "Checked for executable + libmne_viz_qt.dylib in:"
     echo "  $OUT_DIR/Release"
     echo "  $OUT_DIR/Coverage"
     echo "  $OUT_DIR/Debug"

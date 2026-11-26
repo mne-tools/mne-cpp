@@ -17,8 +17,8 @@
 #include <extensionviewfactoryregistry.h>
 #include <iextensionviewfactory.h>
 
-#include <mne/disp3D/model/braintreemodel.h>
-#include <mne/disp3D/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
 #include <mne/fiff/fiff_stream.h>
 #include <mne/fs/fs_surface.h>
 #include <mne/mne/mne_bem.h>
@@ -38,7 +38,7 @@
 #include <memory>
 
 using namespace MNEANALYZESTUDIO;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 namespace
 {

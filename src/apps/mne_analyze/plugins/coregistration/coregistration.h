@@ -52,7 +52,7 @@ class Communicator;
 class AbstractModel;
 }
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class CoregSettingsView;
 }
@@ -330,7 +330,7 @@ private:
 
     QPointer<mne::analyze::Communicator> m_pCommu;
 
-    mne::disp::CoregSettingsView* m_pCoregSettingsView; /**< Pointer to coreg GUI. */
+    mne::viz::qt::CoregSettingsView* m_pCoregSettingsView; /**< Pointer to coreg GUI. */
 
     std::future<mne::FiffCoordTrans> m_Future; /**< Pending ICP fit; valid until its result is consumed. */
     QMutex m_ParameterMutex;

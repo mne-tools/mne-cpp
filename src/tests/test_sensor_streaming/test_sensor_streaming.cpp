@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp3D/workers/rtsensordataworker.h>
-#include <mne/disp3D/workers/rtsensordatacontroller.h>
-#include <mne/disp3D/workers/periodictask.h>
+#include <mne/viz/backends/qt/3d/workers/rtsensordataworker.h>
+#include <mne/viz/backends/qt/3d/workers/rtsensordatacontroller.h>
+#include <mne/viz/backends/qt/3d/workers/periodictask.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -40,7 +40,7 @@
 #include <cmath>
 #include <thread>
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 /**

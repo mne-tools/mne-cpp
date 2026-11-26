@@ -11,7 +11,7 @@
  *
  * @brief    Headless integration tests for MNE Inspect's multimodal scene wiring
  *           wiring: ElectrodesPlugin + MriSlicesPlugin + PickReadoutModel
- *           composed on top of a single mne::disp::MultimodalScene.
+ *           composed on top of a single mne::viz::qt::MultimodalScene.
  *
  *           These tests exercise model state, not widget pixels — the
  *           MainWindow itself is intentionally not constructed so the
@@ -28,9 +28,9 @@
 #include <electrodes.h>
 #include <mri_slices.h>
 
-#include <mne/disp3D/renderable/electrodeobject.h>
-#include <mne/disp3D/scene/multimodalscene.h>
-#include <mne/disp3D/scene/pickresult.h>
+#include <mne/viz/backends/qt/3d/renderable/electrodeobject.h>
+#include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
+#include <mne/viz/backends/qt/3d/scene/pickresult.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -41,7 +41,7 @@
 #include <QTest>
 #include <QVector3D>
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace ELECTRODESPLUGIN;
 using namespace MRISLICESPLUGIN;
 using namespace MNEINSPECT;

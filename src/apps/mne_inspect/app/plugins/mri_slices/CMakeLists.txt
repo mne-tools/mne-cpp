@@ -15,9 +15,9 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 # Pulls in DISP3D's SliceObject and MultimodalScene; skip on builds without
-# disp3D (e.g. WASM without QRhi).
-if(NOT TARGET mne_disp3D)
-    message(STATUS "inspect_mri_slices: mne_disp3D not built — skipping")
+# mne_viz_qt (e.g. WASM without QRhi).
+if(NOT TARGET mne_viz_qt)
+    message(STATUS "inspect_mri_slices: mne_viz_qt not built — skipping")
     return()
 endif()
 
@@ -39,7 +39,7 @@ set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 set(MNE_LIBS_REQUIRED
-    mne_disp3D
+    mne_viz_qt
     mne_mri
     mne_base
     mne_math

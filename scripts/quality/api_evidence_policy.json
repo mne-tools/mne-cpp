@@ -1,12 +1,12 @@
 {
   "$comment": "Policy for scripts/quality/audit_api_evidence.py. Proposed example-eligibility rules for gate G3. An exported class is example-eligible unless a rule below exempts it. Every rule states why; Per-record exemptions use example_exempt/example_exempt_reason in doc/api_registry.json. example_debt lists the eligible registry classes that still lack a built example with an example_snippet; scripts/validate_api_registry.py fails for any other eligible class, and the list and its ceiling may only shrink.",
   "exempt_header_prefixes": {
-    "disp/viewers/": "Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example.",
-    "disp3D/model/": "Scene-graph item owned and driven by BrainView; not constructed directly by library users.",
-    "disp3D/workers/": "Background worker owned by a real-time view; its behaviour is exercised through the owning view.",
-    "disp3D/core/": "Renderer internals behind the BrainView/MultimodalScene facade.",
-    "disp3D/geometry/": "Renderer internals behind the BrainView/MultimodalScene facade.",
-    "disp3D/input/": "Interaction handler of an interactive view; evidenced by GUI tests."
+    "viz/backends/qt/viewers/": "Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example.",
+    "viz/backends/qt/3d/model/": "Scene-graph item owned and driven by BrainView; not constructed directly by library users.",
+    "viz/backends/qt/3d/workers/": "Background worker owned by a real-time view; its behaviour is exercised through the owning view.",
+    "viz/backends/qt/3d/core/": "Renderer internals behind the BrainView/MultimodalScene facade.",
+    "viz/backends/qt/3d/geometry/": "Renderer internals behind the BrainView/MultimodalScene facade.",
+    "viz/backends/qt/3d/input/": "Interaction handler of an interactive view; evidenced by GUI tests."
   },
   "exempt_name_suffixes": {
     "Private": "Implementation detail behind a public facade.",

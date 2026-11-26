@@ -18,14 +18,14 @@
 
 #include "measurementwidget.h"
 
-#include <mne/disp/viewers/quickcontrolview.h>
+#include <mne/viz/backends/qt/viewers/quickcontrolview.h>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace mne::scan;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

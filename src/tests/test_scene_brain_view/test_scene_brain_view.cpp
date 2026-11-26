@@ -16,16 +16,16 @@
 //=============================================================================================================
 
 #include "../common/scene_golden.h"
-#include <mne/scene/brain_frame.h>
-#include <mne/scene/brain_view_interaction.h>
-#include <mne/scene/brain_view_overlay.h>
-#include <mne/scene/camera.h>
-#include <mne/scene/canvas.h>
-#include <mne/scene/pane_layout.h>
-#include <mne/scene/ray_picking.h>
-#include <mne/scene/software_renderer.h>
-#include <mne/scene/svg_renderer.h>
-#include <mne/scene/text_metrics.h>
+#include <mne/viz/gpu/brain_frame.h>
+#include <mne/viz/views/brain_view_interaction.h>
+#include <mne/viz/views/brain_view_overlay.h>
+#include <mne/viz/views/camera.h>
+#include <mne/viz/figures/canvas.h>
+#include <mne/viz/views/pane_layout.h>
+#include <mne/viz/views/ray_picking.h>
+#include <mne/viz/gpu/software_renderer.h>
+#include <mne/viz/figures/svg_renderer.h>
+#include <mne/viz/figures/text_metrics.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -56,7 +56,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::scene;
+using namespace mne::viz;
 
 namespace
 {

@@ -9,7 +9,7 @@
  * @date     May, 2026
  * @brief    ElectrodesPlugin — mne_inspect plugin that loads an sEEG / ECoG
  *           implantation from BIDS, FIFF or CSV into an mne::IeegImplantation,
- *           draws it through mne::disp::ElectrodeObject, and publishes the
+ *           draws it through mne::viz::qt::ElectrodeObject, and publishes the
  *           selection through MultimodalScene.
  *
  *           NOTE: mne_inspect does not yet ship a plugin loader. The plugin
@@ -25,8 +25,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp3D/renderable/electrodeobject.h>
-#include <mne/disp3D/scene/pickresult.h>
+#include <mne/viz/backends/qt/3d/renderable/electrodeobject.h>
+#include <mne/viz/backends/qt/3d/scene/pickresult.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -47,7 +47,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class MultimodalScene;
 }
@@ -76,10 +76,10 @@ enum class ElectrodeSource
  *     FIFF (`FiffDigPointSet`) or CSV (`label,x,y,z[,lead,type]`).
  *   - Group contacts into the depth leads, strips and grids of an
  *     `mne::IeegImplantation`.
- *   - Hand the resulting `mne::disp::ElectrodeObject` to the host through
+ *   - Hand the resulting `mne::viz::qt::ElectrodeObject` to the host through
  *     @ref electrodeObject() and register it as a `SceneLayerKind::Electrode`
  *     layer when @ref attachScene() has been called.
- *   - Translate scene picks (`mne::disp::PickResult` with
+ *   - Translate scene picks (`mne::viz::qt::PickResult` with
  *     `kind == ElectrodeContact`) into a contact-name selection and emit
  *     @ref contactPicked.
  *
@@ -213,7 +213,7 @@ public:
     /**
      * @return Underlying renderable. Owned by the plugin; never null.
      */
-    mne::disp::ElectrodeObject* electrodeObject() const
+    mne::viz::qt::ElectrodeObject* electrodeObject() const
     {
         return m_object.get();
     }
@@ -236,7 +236,7 @@ public:
      *
      * Passing a null pointer detaches.
      */
-    void attachScene(mne::disp::MultimodalScene* scene);
+    void attachScene(mne::viz::qt::MultimodalScene* scene);
 
     //=========================================================================================================
     /**
@@ -275,7 +275,7 @@ public slots:
      * pick originated from this plugin's layer, update the contact
      * selection and emit @ref contactPicked.
      */
-    void handlePick(const mne::disp::PickResult& pick);
+    void handlePick(const mne::viz::qt::PickResult& pick);
 
 signals:
     /** Emitted when the underlying ElectrodeObject is replaced. */
@@ -292,8 +292,8 @@ private:
     void publishToScene();
     void rebuild(const mne::IeegImplantation& implantation);
 
-    std::unique_ptr<mne::disp::ElectrodeObject> m_object;
-    mne::disp::MultimodalScene* m_scene = nullptr;
+    std::unique_ptr<mne::viz::qt::ElectrodeObject> m_object;
+    mne::viz::qt::MultimodalScene* m_scene = nullptr;
     ElectrodeSource m_source = ElectrodeSource::None;
     QString m_sourcePath;
     QString m_lastError;

@@ -19,20 +19,20 @@
 #include <mne/base/log.h>
 #include "realtimeevokedsetwidget.h"
 
-#include <mne/disp/viewers/channelselectionview.h>
-#include <mne/disp/viewers/helpers/channelinfomodel.h>
-#include <mne/disp/viewers/filterdesignview.h>
-#include <mne/disp/viewers/filtersettingsview.h>
-#include <mne/disp/viewers/helpers/evokedsetmodel.h>
-#include <mne/disp/viewers/butterflyview.h>
-#include <mne/disp/viewers/averagelayoutview.h>
-#include <mne/disp/viewers/scalingview.h>
-#include <mne/disp/viewers/projectorsview.h>
-#include <mne/disp/viewers/compensatorview.h>
-#include <mne/disp/viewers/modalityselectionview.h>
-#include <mne/disp/viewers/fiffrawviewsettings.h>
-#include <mne/disp/viewers/averageselectionview.h>
-#include <mne/disp/viewers/averagingsettingsview.h>
+#include <mne/viz/backends/qt/viewers/channelselectionview.h>
+#include <mne/viz/backends/qt/viewers/helpers/channelinfomodel.h>
+#include <mne/viz/backends/qt/viewers/filterdesignview.h>
+#include <mne/viz/backends/qt/viewers/filtersettingsview.h>
+#include <mne/viz/backends/qt/viewers/helpers/evokedsetmodel.h>
+#include <mne/viz/backends/qt/viewers/butterflyview.h>
+#include <mne/viz/backends/qt/viewers/averagelayoutview.h>
+#include <mne/viz/backends/qt/viewers/scalingview.h>
+#include <mne/viz/backends/qt/viewers/projectorsview.h>
+#include <mne/viz/backends/qt/viewers/compensatorview.h>
+#include <mne/viz/backends/qt/viewers/modalityselectionview.h>
+#include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
+#include <mne/viz/backends/qt/viewers/averageselectionview.h>
+#include <mne/viz/backends/qt/viewers/averagingsettingsview.h>
 #include <scMeas/realtimeevokedset.h>
 #include <mne/dsp/filterkernel.h>
 
@@ -68,7 +68,7 @@
 //=============================================================================================================
 
 using namespace mne::scan;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 
 //=============================================================================================================

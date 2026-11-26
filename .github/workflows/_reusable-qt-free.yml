@@ -63,7 +63,7 @@ jobs:
       run: |
         call scripts\ci\download_toolchain.bat --kind eigen --version "%EIGEN_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\3rdparty\eigen"
 
-    # ex_scene_sdl runs the trace view in an SDL3 window instead of Qt (a second host of mne_scene)
+    # ex_scene_sdl runs the trace view in an SDL3 window instead of Qt (a second host of mne_viz)
     - name: Install SDL3 (macOS)
       if: runner.os == 'macOS'
       run: |

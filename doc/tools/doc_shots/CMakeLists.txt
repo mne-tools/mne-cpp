@@ -14,7 +14,7 @@ cmake_minimum_required(VERSION 3.15)
 project(mne_doc_shots LANGUAGES CXX)
 
 # On Windows, emit the executable next to the MNE runtime DLLs it links against
-# (mne_disp3D, mne_fiff, mne_inspect_app_core, …) so the loader can resolve
+# (mne_viz_qt, mne_fiff, mne_inspect_app_core, …) so the loader can resolve
 # them. Without this the tool lands in its own build subtree with no DLLs
 # beside it and not on PATH; the missing-DLL loader dialog then blocks the
 # process forever on headless CI, and test_doc_shots — which spawns the tool —
@@ -79,7 +79,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_align_demo_fixtures
     inspect_electrodes
     inspect_mri_slices
-    mne_disp3D
+    mne_viz_qt
     mne_mri
     mne_fiff
     mne_base

@@ -15,7 +15,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp3D/renderable/electrodeobject.h>
+#include <mne/viz/backends/qt/3d/renderable/electrodeobject.h>
 #include <mne/ieeg/ieeg_implantation.h>
 
 //=============================================================================================================
@@ -30,7 +30,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 
 namespace

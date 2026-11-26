@@ -22,7 +22,7 @@
 #include "pickreadoutmodel.h"
 #include <mne/mna/mna_types.h>
 #include <mne/mna/mna_project.h>
-#include <mne/disp3D/scene/multimodalscene.h>
+#include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -53,7 +53,7 @@ class QProgressBar;
 class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
-namespace mne::disp
+namespace mne::viz::qt
 {
 class BrainView;
 class BrainTreeModel;
@@ -119,7 +119,7 @@ public:
      * not go through these — they exist solely so we can drive the real
      * widget tree from a documentation / test harness.
      */
-    mne::disp::MultimodalScene& scene()
+    mne::viz::qt::MultimodalScene& scene()
     {
         return m_scene;
     }
@@ -273,8 +273,8 @@ private:
 
 private:
     // Core components
-    mne::disp::BrainView* m_brainView = nullptr;
-    mne::disp::BrainTreeModel* m_model = nullptr;
+    mne::viz::qt::BrainView* m_brainView = nullptr;
+    mne::viz::qt::BrainTreeModel* m_model = nullptr;
 
     // Group boxes (disabled until data is loaded)
     QGroupBox* m_surfGroup = nullptr;
@@ -459,7 +459,7 @@ private:
     //=========================================================================================================
     // Multimodal scene + co-located inspection plugins (electrodes, MRI slices)
     //=========================================================================================================
-    mne::disp::MultimodalScene m_scene;
+    mne::viz::qt::MultimodalScene m_scene;
     ELECTRODESPLUGIN::ElectrodesPlugin m_electrodesPlugin;
     QString m_subjectDir; /**< FreeSurfer subject directory of the loaded surfaces, for its T1. */
     MRISLICESPLUGIN::MriSlicesPlugin m_mriSlicesPlugin;

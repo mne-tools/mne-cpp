@@ -24,17 +24,17 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/eventmodel.h>
 #include <anShared/Model/averagingdatamodel.h>
-#include <mne/disp/viewers/helpers/channelinfomodel.h>
-#include <mne/disp/viewers/helpers/evokedsetmodel.h>
-#include <mne/disp/viewers/averagingsettingsview.h>
-#include <mne/disp/viewers/modalityselectionview.h>
-#include <mne/disp/viewers/channelselectionview.h>
-#include <mne/disp/viewers/averageselectionview.h>
-#include <mne/disp/viewers/fiffrawviewsettings.h>
-#include <mne/disp/viewers/averagelayoutview.h>
-#include <mne/disp/viewers/butterflyview.h>
-#include <mne/disp/viewers/scalingview.h>
-#include <mne/disp/viewers/helpers/selectionitem.h>
+#include <mne/viz/backends/qt/viewers/helpers/channelinfomodel.h>
+#include <mne/viz/backends/qt/viewers/helpers/evokedsetmodel.h>
+#include <mne/viz/backends/qt/viewers/averagingsettingsview.h>
+#include <mne/viz/backends/qt/viewers/modalityselectionview.h>
+#include <mne/viz/backends/qt/viewers/channelselectionview.h>
+#include <mne/viz/backends/qt/viewers/averageselectionview.h>
+#include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
+#include <mne/viz/backends/qt/viewers/averagelayoutview.h>
+#include <mne/viz/backends/qt/viewers/butterflyview.h>
+#include <mne/viz/backends/qt/viewers/scalingview.h>
+#include <mne/viz/backends/qt/viewers/helpers/selectionitem.h>
 #include <mne/dsp/filterkernel.h>
 #include <mne/dsp/rt/rt_filter.h>
 #include <mne/mne/mne_epoch_data_list.h>
@@ -88,7 +88,7 @@ Averaging::Averaging()
 , m_bAutoRecompute(false)
 , m_bSavingAverage(false)
 {
-    m_pEvokedModel = std::make_shared<mne::disp::EvokedSetModel>();
+    m_pEvokedModel = std::make_shared<mne::viz::qt::EvokedSetModel>();
 }
 
 //=============================================================================================================
@@ -142,17 +142,17 @@ QWidget* Averaging::getView()
     QTabWidget* pTabView = new QTabWidget(pAveragingViewWidget.get());
     QVBoxLayout* pAveragingViewLayout = new QVBoxLayout(pAveragingViewWidget.get());
 
-    m_pButterflyView = new mne::disp::ButterflyView("", pTabView);
-    m_pAverageLayoutView = new mne::disp::AverageLayoutView("", pTabView);
+    m_pButterflyView = new mne::viz::qt::ButterflyView("", pTabView);
+    m_pAverageLayoutView = new mne::viz::qt::AverageLayoutView("", pTabView);
 
     connect(this, &Averaging::showSelectedChannels,
-            m_pButterflyView.data(), &mne::disp::ButterflyView::showSelectedChannels, Qt::UniqueConnection);
+            m_pButterflyView.data(), &mne::viz::qt::ButterflyView::showSelectedChannels, Qt::UniqueConnection);
 
     connect(this, &Averaging::showAllChannels,
-            m_pButterflyView.data(), &mne::disp::ButterflyView::showAllChannels, Qt::UniqueConnection);
+            m_pButterflyView.data(), &mne::viz::qt::ButterflyView::showAllChannels, Qt::UniqueConnection);
 
     connect(this, &Averaging::channelSelectionManagerChanged,
-            m_pAverageLayoutView.data(), &mne::disp::AverageLayoutView::channelSelectionChanged, Qt::UniqueConnection);
+            m_pAverageLayoutView.data(), &mne::viz::qt::AverageLayoutView::channelSelectionChanged, Qt::UniqueConnection);
 
     m_pButterflyView->setObjectName("butterflyview");
     m_pAverageLayoutView->setObjectName("layoutview");
@@ -181,32 +181,32 @@ QDockWidget* Averaging::getControl()
     m_pTabView = new QTabWidget(pWidget);
 
     //Average Settings View
-    m_pAveragingSettingsView = new mne::disp::AveragingSettingsView(QString("MNEANALYZE/%1").arg(this->getName()), {}, m_pTabView);
+    m_pAveragingSettingsView = new mne::viz::qt::AveragingSettingsView(QString("MNEANALYZE/%1").arg(this->getName()), {}, m_pTabView);
 
-    connect(m_pAveragingSettingsView, &mne::disp::AveragingSettingsView::changeNumAverages,
+    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::changeNumAverages,
             this, &Averaging::onChangeNumAverages, Qt::UniqueConnection);
-    connect(m_pAveragingSettingsView, &mne::disp::AveragingSettingsView::changeBaselineFrom,
+    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::changeBaselineFrom,
             this, &Averaging::onChangeBaselineFrom, Qt::UniqueConnection);
-    connect(m_pAveragingSettingsView, &mne::disp::AveragingSettingsView::changeBaselineTo,
+    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::changeBaselineTo,
             this, &Averaging::onChangeBaselineTo, Qt::UniqueConnection);
-    connect(m_pAveragingSettingsView, &mne::disp::AveragingSettingsView::changePostStim,
+    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::changePostStim,
             this, &Averaging::onChangePostStim, Qt::UniqueConnection);
-    connect(m_pAveragingSettingsView, &mne::disp::AveragingSettingsView::changePreStim,
+    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::changePreStim,
             this, &Averaging::onChangePreStim, Qt::UniqueConnection);
-    connect(m_pAveragingSettingsView, &mne::disp::AveragingSettingsView::changeBaselineActive,
+    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::changeBaselineActive,
             this, &Averaging::onChangeBaselineActive, Qt::UniqueConnection);
-    connect(m_pAveragingSettingsView, &mne::disp::AveragingSettingsView::resetAverage,
+    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::resetAverage,
             this, &Averaging::onResetAverage, Qt::UniqueConnection);
-    //    connect(m_pAveragingSettingsView, &mne::disp::AveragingSettingsView::changeStimChannel,
+    //    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::changeStimChannel,
     //            this, &Averaging::onChangeStimChannel);
-    connect(m_pAveragingSettingsView, &mne::disp::AveragingSettingsView::calculateAverage,
+    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::calculateAverage,
             this, &Averaging::onComputeButtonClicked, Qt::UniqueConnection);
-    connect(m_pAveragingSettingsView, &mne::disp::AveragingSettingsView::changeDropActive,
+    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::changeDropActive,
             this, &Averaging::onRejectionChecked, Qt::UniqueConnection);
-    connect(m_pAveragingSettingsView, &mne::disp::AveragingSettingsView::setAutoCompute,
+    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::setAutoCompute,
             this, &Averaging::setAutoCompute, Qt::UniqueConnection);
 
-    m_pAveragingSettingsView->setProcessingMode(mne::disp::AbstractView::ProcessingMode::Offline);
+    m_pAveragingSettingsView->setProcessingMode(mne::viz::qt::AbstractView::ProcessingMode::Offline);
     m_pAveragingSettingsView->setSizePolicy(QSizePolicy::Expanding,
                                             QSizePolicy::Fixed);
 
@@ -482,42 +482,42 @@ void Averaging::loadFullGui(std::shared_ptr<mne::FiffInfo> pInfo)
     m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
 
     //Modality selection
-    mne::disp::ModalitySelectionView* pModalitySelectionView = new mne::disp::ModalitySelectionView(m_pFiffInfo->chs, QString("MNEANALYZE/AVERAGING"), m_pTabView);
+    mne::viz::qt::ModalitySelectionView* pModalitySelectionView = new mne::viz::qt::ModalitySelectionView(m_pFiffInfo->chs, QString("MNEANALYZE/AVERAGING"), m_pTabView);
     pModalitySelectionView->setObjectName("group_tab_View_Modalities");
 
-    connect(pModalitySelectionView, &mne::disp::ModalitySelectionView::modalitiesChanged,
-            m_pButterflyView.data(), &mne::disp::ButterflyView::setModalityMap, Qt::UniqueConnection);
+    connect(pModalitySelectionView, &mne::viz::qt::ModalitySelectionView::modalitiesChanged,
+            m_pButterflyView.data(), &mne::viz::qt::ButterflyView::setModalityMap, Qt::UniqueConnection);
 
     m_pButterflyView->setModalityMap(pModalitySelectionView->getModalityMap());
 
     // Quick control average selection
     // Never shown: it only holds the average selection, so the plugin keeps it
-    m_pAverageSelectionView = std::make_unique<mne::disp::AverageSelectionView>(QString("MNEANALYZE/AVERAGING"));
-    mne::disp::AverageSelectionView* pAverageSelectionView = m_pAverageSelectionView.get();
+    m_pAverageSelectionView = std::make_unique<mne::viz::qt::AverageSelectionView>(QString("MNEANALYZE/AVERAGING"));
+    mne::viz::qt::AverageSelectionView* pAverageSelectionView = m_pAverageSelectionView.get();
     pAverageSelectionView->setObjectName("group_tab_View_Selection");
 
-    connect(m_pEvokedModel.get(), &mne::disp::EvokedSetModel::newAverageActivationMap,
-            pAverageSelectionView, &mne::disp::AverageSelectionView::setAverageActivation, Qt::UniqueConnection);
-    connect(m_pEvokedModel.get(), &mne::disp::EvokedSetModel::newAverageColorMap,
-            pAverageSelectionView, &mne::disp::AverageSelectionView::setAverageColor, Qt::UniqueConnection);
+    connect(m_pEvokedModel.get(), &mne::viz::qt::EvokedSetModel::newAverageActivationMap,
+            pAverageSelectionView, &mne::viz::qt::AverageSelectionView::setAverageActivation, Qt::UniqueConnection);
+    connect(m_pEvokedModel.get(), &mne::viz::qt::EvokedSetModel::newAverageColorMap,
+            pAverageSelectionView, &mne::viz::qt::AverageSelectionView::setAverageColor, Qt::UniqueConnection);
 
-    connect(m_pEvokedModel.get(), &mne::disp::EvokedSetModel::newAverageColorMap,
-            m_pButterflyView.data(), &mne::disp::ButterflyView::setAverageColor, Qt::UniqueConnection);
-    connect(m_pEvokedModel.get(), &mne::disp::EvokedSetModel::newAverageActivationMap,
-            m_pButterflyView.data(), &mne::disp::ButterflyView::setAverageActivation, Qt::UniqueConnection);
-    connect(pAverageSelectionView, &mne::disp::AverageSelectionView::newAverageActivationMap,
-            m_pButterflyView.data(), &mne::disp::ButterflyView::setAverageActivation, Qt::UniqueConnection);
-    connect(pAverageSelectionView, &mne::disp::AverageSelectionView::newAverageColorMap,
-            m_pButterflyView.data(), &mne::disp::ButterflyView::setAverageColor, Qt::UniqueConnection);
+    connect(m_pEvokedModel.get(), &mne::viz::qt::EvokedSetModel::newAverageColorMap,
+            m_pButterflyView.data(), &mne::viz::qt::ButterflyView::setAverageColor, Qt::UniqueConnection);
+    connect(m_pEvokedModel.get(), &mne::viz::qt::EvokedSetModel::newAverageActivationMap,
+            m_pButterflyView.data(), &mne::viz::qt::ButterflyView::setAverageActivation, Qt::UniqueConnection);
+    connect(pAverageSelectionView, &mne::viz::qt::AverageSelectionView::newAverageActivationMap,
+            m_pButterflyView.data(), &mne::viz::qt::ButterflyView::setAverageActivation, Qt::UniqueConnection);
+    connect(pAverageSelectionView, &mne::viz::qt::AverageSelectionView::newAverageColorMap,
+            m_pButterflyView.data(), &mne::viz::qt::ButterflyView::setAverageColor, Qt::UniqueConnection);
 
-    connect(m_pEvokedModel.get(), &mne::disp::EvokedSetModel::newAverageColorMap,
-            m_pAverageLayoutView.data(), &mne::disp::AverageLayoutView::setAverageColor, Qt::UniqueConnection);
-    connect(m_pEvokedModel.get(), &mne::disp::EvokedSetModel::newAverageActivationMap,
-            m_pAverageLayoutView.data(), &mne::disp::AverageLayoutView::setAverageActivation, Qt::UniqueConnection);
-    connect(pAverageSelectionView, &mne::disp::AverageSelectionView::newAverageActivationMap,
-            m_pAverageLayoutView.data(), &mne::disp::AverageLayoutView::setAverageActivation, Qt::UniqueConnection);
-    connect(pAverageSelectionView, &mne::disp::AverageSelectionView::newAverageColorMap,
-            m_pAverageLayoutView.data(), &mne::disp::AverageLayoutView::setAverageColor, Qt::UniqueConnection);
+    connect(m_pEvokedModel.get(), &mne::viz::qt::EvokedSetModel::newAverageColorMap,
+            m_pAverageLayoutView.data(), &mne::viz::qt::AverageLayoutView::setAverageColor, Qt::UniqueConnection);
+    connect(m_pEvokedModel.get(), &mne::viz::qt::EvokedSetModel::newAverageActivationMap,
+            m_pAverageLayoutView.data(), &mne::viz::qt::AverageLayoutView::setAverageActivation, Qt::UniqueConnection);
+    connect(pAverageSelectionView, &mne::viz::qt::AverageSelectionView::newAverageActivationMap,
+            m_pAverageLayoutView.data(), &mne::viz::qt::AverageLayoutView::setAverageActivation, Qt::UniqueConnection);
+    connect(pAverageSelectionView, &mne::viz::qt::AverageSelectionView::newAverageColorMap,
+            m_pAverageLayoutView.data(), &mne::viz::qt::AverageLayoutView::setAverageColor, Qt::UniqueConnection);
 
     m_pEvokedModel->setAverageActivation(pAverageSelectionView->getAverageActivation());
     m_pEvokedModel->setAverageColor(pAverageSelectionView->getAverageColor());
@@ -530,18 +530,18 @@ void Averaging::loadFullGui(std::shared_ptr<mne::FiffInfo> pInfo)
 
     //Data customization:
     // Never shown: it only provides the view settings, so the plugin keeps it
-    m_pChannelDataSettingsView = std::make_unique<mne::disp::FiffRawViewSettings>(QString("MNESCAN/RTESW"));
-    mne::disp::FiffRawViewSettings* pChannelDataSettingsView = m_pChannelDataSettingsView.get();
+    m_pChannelDataSettingsView = std::make_unique<mne::viz::qt::FiffRawViewSettings>(QString("MNESCAN/RTESW"));
+    mne::viz::qt::FiffRawViewSettings* pChannelDataSettingsView = m_pChannelDataSettingsView.get();
     pChannelDataSettingsView->setWidgetList({"screenshot", "backgroundColor"});
     pChannelDataSettingsView->setObjectName("group_tab_View_General");
 
-    connect(pChannelDataSettingsView, &mne::disp::FiffRawViewSettings::backgroundColorChanged,
-            m_pAverageLayoutView.data(), &mne::disp::AverageLayoutView::setBackgroundColor, Qt::UniqueConnection);
+    connect(pChannelDataSettingsView, &mne::viz::qt::FiffRawViewSettings::backgroundColorChanged,
+            m_pAverageLayoutView.data(), &mne::viz::qt::AverageLayoutView::setBackgroundColor, Qt::UniqueConnection);
 
-    connect(pChannelDataSettingsView, &mne::disp::FiffRawViewSettings::backgroundColorChanged,
-            m_pButterflyView.data(), &mne::disp::ButterflyView::setBackgroundColor, Qt::UniqueConnection);
+    connect(pChannelDataSettingsView, &mne::viz::qt::FiffRawViewSettings::backgroundColorChanged,
+            m_pButterflyView.data(), &mne::viz::qt::ButterflyView::setBackgroundColor, Qt::UniqueConnection);
 
-    connect(pChannelDataSettingsView, &mne::disp::FiffRawViewSettings::makeScreenshot,
+    connect(pChannelDataSettingsView, &mne::viz::qt::FiffRawViewSettings::makeScreenshot,
             this, &Averaging::onMakeScreenshot, Qt::UniqueConnection);
 
     m_pAverageLayoutView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
@@ -595,14 +595,14 @@ void Averaging::onMakeScreenshot(const QString& imageType)
 
 void Averaging::setChannelSelection(const QVariant& data)
 {
-    if (std::ranges::contains(data.value<mne::disp::SelectionItem*>()->m_sViewsToApply, "layoutview")) {
+    if (std::ranges::contains(data.value<mne::viz::qt::SelectionItem*>()->m_sViewsToApply, "layoutview")) {
         emit channelSelectionManagerChanged(data);
     }
-    if (std::ranges::contains(data.value<mne::disp::SelectionItem*>()->m_sViewsToApply, "butterflyview")) {
-        if (data.value<mne::disp::SelectionItem*>()->m_bShowAll) {
+    if (std::ranges::contains(data.value<mne::viz::qt::SelectionItem*>()->m_sViewsToApply, "butterflyview")) {
+        if (data.value<mne::viz::qt::SelectionItem*>()->m_bShowAll) {
             emit showAllChannels();
         } else {
-            emit showSelectedChannels(data.value<mne::disp::SelectionItem*>()->m_iChannelNumber);
+            emit showSelectedChannels(data.value<mne::viz::qt::SelectionItem*>()->m_iChannelNumber);
         }
     }
 }

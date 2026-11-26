@@ -15,8 +15,8 @@
 //=============================================================================================================
 
 #include <mne/base/log.h>
-#include <mne/disp3D/workers/rtsourcedataworker.h>
-#include <mne/disp3D/workers/rtsourcedatacontroller.h>
+#include <mne/viz/backends/qt/3d/workers/rtsourcedataworker.h>
+#include <mne/viz/backends/qt/3d/workers/rtsourcedatacontroller.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -43,7 +43,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace Eigen;
 
 //=============================================================================================================

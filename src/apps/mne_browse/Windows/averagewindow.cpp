@@ -20,10 +20,10 @@
 
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
-#include <mne/disp/plots/helpers/svgwriter.h>
-#include <mne/disp/plots/helpers/scenepainter.h>
-#include <mne/disp/viewers/helpers/averagelayoutwidget.h>
-#include <mne/scene/svg_renderer.h>
+#include <mne/viz/backends/qt/plots/helpers/svgwriter.h>
+#include <mne/viz/backends/qt/plots/helpers/scenepainter.h>
+#include <mne/viz/backends/qt/viewers/helpers/averagelayoutwidget.h>
+#include <mne/viz/figures/svg_renderer.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -246,7 +246,7 @@ AverageModel* AverageWindow::getAverageModel()
 
 //*************************************************************************************************************
 
-void AverageWindow::channelSelectionManagerChanged(const mne::disp::SelectionItem& selection)
+void AverageWindow::channelSelectionManagerChanged(const mne::viz::qt::SelectionItem& selection)
 {
     // One tile per selected channel
     ui->m_averageLayout->setChannels(AverageLayoutWidget::channelsFrom(selection));
@@ -1057,9 +1057,9 @@ void AverageWindow::exportAverageLayoutPlot()
 
     if (!fileName.isEmpty()) {
         // The tiles at their size on screen, as vector graphics or an image
-        const mne::scene::DisplayList figure = ui->m_averageLayout->figure(ui->m_averageLayout->size());
+        const mne::viz::DisplayList figure = ui->m_averageLayout->figure(ui->m_averageLayout->size());
         if (fileName.contains(".svg")) {
-            if (const auto written = mne::scene::write_svg(figure, fileName.toStdU16String()); !written) {
+            if (const auto written = mne::viz::write_svg(figure, fileName.toStdU16String()); !written) {
                 mne::Log::warning("{}", written.error().what());
             }
         }
@@ -1090,7 +1090,7 @@ void AverageWindow::exportAverageButterflyPlot()
     if (!fileName.isEmpty()) {
         // Generate screenshot
         if (fileName.contains(".svg")) {
-            mne::disp::SvgWriter svgGen;
+            mne::viz::qt::SvgWriter svgGen;
 
             svgGen.setFileName(fileName.toStdString());
             QRectF rect = m_pButterflyScene->itemsBoundingRect();

@@ -23,7 +23,7 @@
 #include <mne/base/string_utils.h>
 #include <mne/connectivity/connectivity.h>
 #include <mne/dsp/rt/rt_connectivity.h>
-#include <mne/disp/viewers/connectivitysettingsview.h>
+#include <mne/viz/backends/qt/viewers/connectivitysettingsview.h>
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimeconnectivityestimate.h>
 #include <scMeas/realtimemultisamplearray.h>
@@ -53,7 +53,7 @@
 using namespace NEURONALCONNECTIVITYPLUGIN;
 using namespace mne::scan;
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace Eigen;
 
 //=============================================================================================================

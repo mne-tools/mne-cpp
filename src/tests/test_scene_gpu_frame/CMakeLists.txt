@@ -9,7 +9,7 @@ project(test_scene_gpu_frame LANGUAGES CXX)
 add_executable(${PROJECT_NAME} test_scene_gpu_frame.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  mne_scene
+  mne_viz
   mne_base
 )
 

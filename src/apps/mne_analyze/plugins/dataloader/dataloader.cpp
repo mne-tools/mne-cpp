@@ -31,7 +31,7 @@
 #include <mne/fiff/fiff_stream.h>
 #include <mne/fiff/fiff_dir_node.h>
 #include <mne/fiff/fiff_constants.h>
-#include <mne/disp/viewers/progressview.h>
+#include <mne/viz/backends/qt/viewers/progressview.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -93,7 +93,7 @@ DataLoader::DataLoader()
     m_pProgressViewWidget->setWindowFlags(Qt::Window);
 
     QVBoxLayout* layout = new QVBoxLayout(m_pProgressViewWidget.get());
-    auto pProgressView = std::make_unique<mne::disp::ProgressView>(false);
+    auto pProgressView = std::make_unique<mne::viz::qt::ProgressView>(false);
     m_pProgressView = pProgressView.get();
     layout->addWidget(pProgressView.release());
     loadSettings();

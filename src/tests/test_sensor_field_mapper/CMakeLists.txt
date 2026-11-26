@@ -20,7 +20,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Test
-    mne_disp3D
+    mne_viz_qt
     mne_fiff
     Eigen3::Eigen
 )

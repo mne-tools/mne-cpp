@@ -145,7 +145,7 @@ set(MNE_LIBS_REQUIRED
     mne_mna
     mne_fwd
     mne_inv
-    mne_disp
+    mne_viz_qt
     mne_dsp
 )
 

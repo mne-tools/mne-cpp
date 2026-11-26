@@ -43,7 +43,7 @@ using namespace mne::analyze;
 
 AnalyzeData::AnalyzeData(QObject* pParent)
 : QObject(pParent)
-, m_pData(new mne::disp::BidsViewModel(this))
+, m_pData(new mne::viz::qt::BidsViewModel(this))
 , m_pCommu(std::make_unique<Communicator>())
 {
 }

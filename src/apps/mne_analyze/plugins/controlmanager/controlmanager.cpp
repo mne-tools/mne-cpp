@@ -20,12 +20,12 @@
 #include <mne/base/log.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
-#include <mne/disp/viewers/scalingview.h>
-#include <mne/disp/viewers/applytoview.h>
-#include <mne/disp/viewers/control3dview.h>
-#include <mne/disp/viewers/fiffrawviewsettings.h>
-#ifdef MNE_DISP3D
-#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/viz/backends/qt/viewers/scalingview.h>
+#include <mne/viz/backends/qt/viewers/applytoview.h>
+#include <mne/viz/backends/qt/viewers/control3dview.h>
+#include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
+#ifdef MNE_VIZ_QT_3D
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
 #endif
 
 //=============================================================================================================
@@ -46,7 +46,7 @@
 
 using namespace CONTROLMANAGERPLUGIN;
 using namespace mne::analyze;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -112,30 +112,30 @@ QDockWidget* ControlManager::getControl()
     const std::vector<std::string> slControlFlags{"Data", "View", "Light"};
 
     //Scaling
-    mne::disp::ScalingView* pScalingWidget = new mne::disp::ScalingView("MNEANALYZE", wrappedScrollArea);
+    mne::viz::qt::ScalingView* pScalingWidget = new mne::viz::qt::ScalingView("MNEANALYZE", wrappedScrollArea);
     pTabWidget->addTab(pScalingWidget, "Scaling");
 
-    connect(pScalingWidget, &mne::disp::ScalingView::scalingChanged,
+    connect(pScalingWidget, &mne::viz::qt::ScalingView::scalingChanged,
             this, &ControlManager::onScalingChanged, Qt::UniqueConnection);
 
     m_ScalingParameters.m_mScalingMap = pScalingWidget->getScaleMap();
 
     //View Settings
-    mne::disp::FiffRawViewSettings* pFiffViewSettings = new mne::disp::FiffRawViewSettings("MNEANALYZE", wrappedScrollArea);
+    mne::viz::qt::FiffRawViewSettings* pFiffViewSettings = new mne::viz::qt::FiffRawViewSettings("MNEANALYZE", wrappedScrollArea);
 
     pTabWidget->addTab(pFiffViewSettings, "Controls");
 
-    connect(pFiffViewSettings, &mne::disp::FiffRawViewSettings::signalColorChanged,
+    connect(pFiffViewSettings, &mne::viz::qt::FiffRawViewSettings::signalColorChanged,
             this, &ControlManager::onSignalColorChanged, Qt::UniqueConnection);
-    connect(pFiffViewSettings, &mne::disp::FiffRawViewSettings::backgroundColorChanged,
+    connect(pFiffViewSettings, &mne::viz::qt::FiffRawViewSettings::backgroundColorChanged,
             this, &ControlManager::onBackgroundColorChanged, Qt::UniqueConnection);
-    connect(pFiffViewSettings, &mne::disp::FiffRawViewSettings::zoomChanged,
+    connect(pFiffViewSettings, &mne::viz::qt::FiffRawViewSettings::zoomChanged,
             this, &ControlManager::onZoomChanged, Qt::UniqueConnection);
-    connect(pFiffViewSettings, &mne::disp::FiffRawViewSettings::timeWindowChanged,
+    connect(pFiffViewSettings, &mne::viz::qt::FiffRawViewSettings::timeWindowChanged,
             this, &ControlManager::onTimeWindowChanged, Qt::UniqueConnection);
-    connect(pFiffViewSettings, &mne::disp::FiffRawViewSettings::distanceTimeSpacerChanged,
+    connect(pFiffViewSettings, &mne::viz::qt::FiffRawViewSettings::distanceTimeSpacerChanged,
             this, &ControlManager::onDistanceTimeSpacerChanged, Qt::UniqueConnection);
-    connect(pFiffViewSettings, &mne::disp::FiffRawViewSettings::makeScreenshot,
+    connect(pFiffViewSettings, &mne::viz::qt::FiffRawViewSettings::makeScreenshot,
             this, &ControlManager::onMakeScreenshot, Qt::UniqueConnection);
 
     m_ViewParameters.m_colorSignal = pFiffViewSettings->getSignalColor();
@@ -146,26 +146,26 @@ QDockWidget* ControlManager::getControl()
     m_ViewParameters.m_sImageType = "";
 
     //View3D Settings
-    m_pControl3DView = new mne::disp::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), pTabWidget, slControlFlags);
+    m_pControl3DView = new mne::viz::qt::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), pTabWidget, slControlFlags);
 
     pTabWidget->addTab(m_pControl3DView, "3D");
 
-    connect(m_pControl3DView, &mne::disp::Control3DView::sceneColorChanged,
+    connect(m_pControl3DView, &mne::viz::qt::Control3DView::sceneColorChanged,
             this, &ControlManager::onSceneColorChange);
-    connect(m_pControl3DView, &mne::disp::Control3DView::rotationChanged,
+    connect(m_pControl3DView, &mne::viz::qt::Control3DView::rotationChanged,
             this, &ControlManager::onRotationChanged);
-    connect(m_pControl3DView, &mne::disp::Control3DView::showCoordAxis,
+    connect(m_pControl3DView, &mne::viz::qt::Control3DView::showCoordAxis,
             this, &ControlManager::onShowCoordAxis);
-    connect(m_pControl3DView, &mne::disp::Control3DView::showFullScreen,
+    connect(m_pControl3DView, &mne::viz::qt::Control3DView::showFullScreen,
             this, &ControlManager::onShowFullScreen);
-    connect(m_pControl3DView, &mne::disp::Control3DView::lightColorChanged,
+    connect(m_pControl3DView, &mne::viz::qt::Control3DView::lightColorChanged,
             this, &ControlManager::onLightColorChanged);
-    connect(m_pControl3DView, &mne::disp::Control3DView::lightIntensityChanged,
+    connect(m_pControl3DView, &mne::viz::qt::Control3DView::lightIntensityChanged,
             this, &ControlManager::onLightIntensityChanged);
-    connect(m_pControl3DView, &mne::disp::Control3DView::takeScreenshotChanged,
+    connect(m_pControl3DView, &mne::viz::qt::Control3DView::takeScreenshotChanged,
             this, &ControlManager::onTakeScreenshotChanged);
 
-    m_pApplyToView = new mne::disp::ApplyToView("", wrappedScrollArea);
+    m_pApplyToView = new mne::viz::qt::ApplyToView("", wrappedScrollArea);
     pLayout->addWidget(pTabWidget);
     pLayout->addWidget(m_pApplyToView);
     pLayout->addStretch();
@@ -195,7 +195,7 @@ void ControlManager::handleEvent(QSharedPointer<Event> e)
             }
             break;
 
-#ifdef MNE_DISP3D
+#ifdef MNE_VIZ_QT_3D
         case EVENT_TYPE::SET_DATA3D_TREE_MODEL:
             init3DGui(e->getData().value<QSharedPointer<BrainTreeModel>>());
             break;
@@ -212,7 +212,7 @@ QVector<EVENT_TYPE> ControlManager::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
     temp.push_back(SELECTED_MODEL_CHANGED);
-#ifdef MNE_DISP3D
+#ifdef MNE_VIZ_QT_3D
     temp.push_back(SET_DATA3D_TREE_MODEL);
 #endif
 
@@ -298,7 +298,7 @@ void ControlManager::onMakeScreenshot(const QString& imageType)
 
 //=============================================================================================================
 
-#ifdef MNE_DISP3D
+#ifdef MNE_VIZ_QT_3D
 void ControlManager::init3DGui(QSharedPointer<BrainTreeModel> pModel)
 {
     if (m_pControl3DView)

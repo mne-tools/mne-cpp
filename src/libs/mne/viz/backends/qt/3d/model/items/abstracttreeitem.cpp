@@ -1,0 +1,78 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @file     abstracttreeitem.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Type-safe accessors backing the shared visibility / transform / colour / alpha roles on every mne_viz_qt tree item.
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "abstracttreeitem.h"
+
+namespace mne::viz::qt
+{
+
+AbstractTreeItem::AbstractTreeItem(const QString& text, int type)
+: QStandardItem(text)
+, m_type(type)
+{
+    // Set default values
+    setData(true, VisibleRole);           // Visible by default
+    setData(QMatrix4x4(), TransformRole); // Identity
+    setData(QColor(Qt::white), ColorRole);
+    setData(1.0f, AlphaRole);
+}
+
+int AbstractTreeItem::type() const
+{
+    return itemTypeId(static_cast<ItemType>(m_type));
+}
+
+void AbstractTreeItem::setVisible(bool visible)
+{
+    setData(visible, VisibleRole);
+}
+
+bool AbstractTreeItem::isVisible() const
+{
+    return data(VisibleRole).toBool();
+}
+
+void AbstractTreeItem::setTransform(const QMatrix4x4& transform)
+{
+    setData(transform, TransformRole);
+}
+
+QMatrix4x4 AbstractTreeItem::transform() const
+{
+    return data(TransformRole).value<QMatrix4x4>();
+}
+
+void AbstractTreeItem::setColor(const QColor& color)
+{
+    setData(color, ColorRole);
+}
+
+QColor AbstractTreeItem::color() const
+{
+    return data(ColorRole).value<QColor>();
+}
+
+void AbstractTreeItem::setAlpha(float alpha)
+{
+    setData(alpha, AlphaRole);
+}
+
+float AbstractTreeItem::alpha() const
+{
+    return data(AlphaRole).toFloat();
+}
+
+} // namespace mne::viz::qt

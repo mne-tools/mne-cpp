@@ -14,15 +14,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp/plots/helpers/rhiframerenderer.h>
-#include <mne/disp/viewers/helpers/channeldatamodel.h>
-#include <mne/disp/viewers/helpers/channelrhirenderer.h>
-#include <mne/disp/viewers/helpers/channelwindow.h>
+#include <mne/viz/backends/qt/plots/helpers/rhiframerenderer.h>
+#include <mne/viz/backends/qt/viewers/helpers/channeldatamodel.h>
+#include <mne/viz/backends/qt/viewers/helpers/channelrhirenderer.h>
+#include <mne/viz/backends/qt/viewers/helpers/channelwindow.h>
 #include <mne/fiff/fiff_ch_info.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_info.h>
-#include <mne/scene/text_metrics.h>
-#include <mne/scene/trace_frame.h>
+#include <mne/viz/figures/text_metrics.h>
+#include <mne/viz/gpu/trace_frame.h>
 
 #include <rhi/qrhi.h>
 #include <rhi/qrhi_platform.h>
@@ -56,7 +56,7 @@
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 namespace
 {
@@ -318,18 +318,18 @@ void TestDispChannelWindow::renderer_drawsHudOverlay()
 void TestDispChannelWindow::frames_matchTheirShaders()
 {
     // The trace view's frames feed every uniform block, sampler and vertex input of the .qsb shaders
-    scene::TraceView view;
+    viz::TraceView view;
     view.set_source(&m_model.buffer());
     view.set_view_size(320, 200);
     view.set_sfreq(1000.0);
     view.set_samples_per_pixel(0.5);
     view.set_scalebars_visible(true);
-    scene::TraceFrameBuilder builder;
-    scene::GpuFrameTarget target;
+    viz::TraceFrameBuilder builder;
+    viz::GpuFrameTarget target;
     target.pixel_width = 320;
     target.pixel_height = 200;
-    const scene::ApproximateTextMetrics metrics;
-    scene::GpuFrame frame = builder.build(view, m_model.buffer(), scene::TraceStyle{}, scene::TraceMarkers{}, metrics, target);
+    const viz::ApproximateTextMetrics metrics;
+    viz::GpuFrame frame = builder.build(view, m_model.buffer(), viz::TraceStyle{}, viz::TraceMarkers{}, metrics, target);
     QVERIFY(frame.passes.at(0).draws.size() >= 3);
     RhiFrameRenderer renderer;
     renderer.addShaderPrefix(":/disp/shaders/viewers/helpers/shaders/");

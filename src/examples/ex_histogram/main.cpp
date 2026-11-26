@@ -21,9 +21,9 @@
 #include <mne/mne/mne.h>
 #include <mne/math/numerics.h>
 #include <mne/base/log.h>
-#include <mne/disp/plots/bar.h>
-#include <mne/disp/plots/helpers/figureexporter.h>
-#include <mne/disp/plots/spline.h>
+#include <mne/viz/backends/qt/plots/bar.h>
+#include <mne/viz/backends/qt/plots/helpers/figureexporter.h>
+#include <mne/viz/backends/qt/plots/spline.h>
 //includes for source localization data
 #include <mne/fs/fs_label.h>
 #include <mne/fs/fs_surface.h>
@@ -71,7 +71,7 @@
 
 using namespace mne;
 using namespace std;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace Eigen;
 
 //=============================================================================================================

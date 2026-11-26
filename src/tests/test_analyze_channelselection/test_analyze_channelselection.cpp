@@ -22,8 +22,8 @@
 #include <anShared/Management/eventmanager.h>
 #include <anShared/Model/bemdatamodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <mne/disp/viewers/channelselectionview.h>
-#include <mne/disp/viewers/helpers/selectionitem.h>
+#include <mne/viz/backends/qt/viewers/channelselectionview.h>
+#include <mne/viz/backends/qt/viewers/helpers/selectionitem.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -89,15 +89,15 @@ void TestAnalyzeChannelSelection::publishesTheSelectedChannels()
     std::vector<std::vector<std::string>> names;
     std::vector<std::vector<int>> indices;
     connect(&listener, &Communicator::receivedEvent, this, [&](const QSharedPointer<Event> e) {
-        const auto* item = e->getData().value<mne::disp::SelectionItem*>();
+        const auto* item = e->getData().value<mne::viz::qt::SelectionItem*>();
         names.push_back(item->m_sChannelName);
         indices.push_back(item->m_iChannelNumber);
     });
 
-    auto* selection = view->findChild<mne::disp::ChannelSelectionView*>();
+    auto* selection = view->findChild<mne::viz::qt::ChannelSelectionView*>();
     if (!selection) {
         for (QWidget* w : QApplication::topLevelWidgets()) {
-            if (auto* v = qobject_cast<mne::disp::ChannelSelectionView*>(w))
+            if (auto* v = qobject_cast<mne::viz::qt::ChannelSelectionView*>(w))
                 selection = v;
         }
     }

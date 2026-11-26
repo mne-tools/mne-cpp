@@ -24,7 +24,7 @@
 #include "../eegosports_global.h"
 #include "../eegosportselectrodeitem.h"
 #include "../eegosportsimpedancescene.h"
-#include "mne/disp/plots/helpers/colormap.h"
+#include "../../../../../libs/mne/viz/backends/qt/plots/helpers/colormap.h"
 #include <mne/channels/layoutloader.h>
 #include <scMeas/realtimemultisamplearray.h>
 
@@ -64,7 +64,7 @@ namespace EEGOSPORTSPLUGIN
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // EEGOSPORTSPLUGIN FORWARD DECLARATIONS

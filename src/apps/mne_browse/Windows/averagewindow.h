@@ -25,7 +25,7 @@
 #include "../Models/averagemodel.h"
 #include "../Delegates/averagedelegate.h"
 #include <mne/channels/layoutloader.h>
-#include <mne/disp/viewers/helpers/selectionitem.h>
+#include <mne/viz/backends/qt/viewers/helpers/selectionitem.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -52,7 +52,7 @@ class QDoubleSpinBox;
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 
 //*************************************************************************************************************
@@ -122,7 +122,7 @@ public:
      *
      * @param [in] selection   The picked channels with their layout positions.
      */
-    void channelSelectionManagerChanged(const mne::disp::SelectionItem& selection);
+    void channelSelectionManagerChanged(const mne::viz::qt::SelectionItem& selection);
 
     //=========================================================================================================
     /**

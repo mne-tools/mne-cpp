@@ -5,7 +5,7 @@
 include_guard(GLOBAL)
 
 # Fails the configuration when a target defined in one of the given directories (or below) links Qt or runs one
-# of Qt's code generators. Only the display libraries may use Qt; every other library must build without it, also
+# of Qt's code generators. Only mne_viz_qt, the Qt backend of mne_viz, may use Qt; every other library must build without it, also
 # when Qt is found for the rest of the tree.
 function(mne_require_qt_free)
   set(_directories ${ARGN})
@@ -42,6 +42,6 @@ function(mne_require_qt_free)
   endwhile()
   if(_offenders)
     list(JOIN _offenders "\n  " _text)
-    message(FATAL_ERROR "Only the display libraries may use Qt:\n  ${_text}")
+    message(FATAL_ERROR "Only mne_viz_qt may use Qt:\n  ${_text}")
   endif()
 endfunction()

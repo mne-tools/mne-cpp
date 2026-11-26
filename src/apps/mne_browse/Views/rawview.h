@@ -18,7 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp/viewers/channeldataview.h>
+#include <mne/viz/backends/qt/viewers/channeldataview.h>
 
 
 //*************************************************************************************************************
@@ -31,13 +31,13 @@ namespace MNEBROWSE
 
 //=============================================================================================================
 /**
- * @brief Thin application-level wrapper around mne::disp::ChannelDataView.
+ * @brief Thin application-level wrapper around mne::viz::qt::ChannelDataView.
  *
  * RawView intentionally adds no browser-specific behavior yet. It exists as the stable seam where
- * mne_browse-specific adaptations can live later without pushing those changes into the generic mne_disp
+ * mne_browse-specific adaptations can live later without pushing those changes into the generic mne_viz_qt
  * viewer stack too early.
  */
-class RawView : public mne::disp::ChannelDataView
+class RawView : public mne::viz::qt::ChannelDataView
 {
     Q_OBJECT
 

@@ -27,8 +27,8 @@
 #include "../Models/fiffblockreader.h"
 #include "../Utils/sessionfilter.h"
 #include "../Views/rawview.h"
-#include <mne/disp/viewers/channeldataview.h>
-#include <mne/disp/viewers/helpers/channelrhiview.h>
+#include <mne/viz/backends/qt/viewers/channeldataview.h>
+#include <mne/viz/backends/qt/viewers/helpers/channelrhiview.h>
 #include <mne/fiff/fiff_cov.h>
 
 //=============================================================================================================
@@ -222,7 +222,7 @@ public:
      *
      * @return The event markers, sorted by sample.
      */
-    const std::vector<mne::disp::ChannelRhiView::EventMarker>& stimEvents() const;
+    const std::vector<mne::viz::qt::ChannelRhiView::EventMarker>& stimEvents() const;
 
     //=========================================================================================================
     /**
@@ -248,7 +248,7 @@ public:
     /**
      * Returns the GPU-accelerated ChannelDataView (may be nullptr before loadFiffFile).
      */
-    mne::disp::ChannelDataView* getChannelDataView()
+    mne::viz::qt::ChannelDataView* getChannelDataView()
     {
         return m_pChannelDataView;
     }
@@ -266,7 +266,7 @@ public:
     /**
      * Set the browser annotation spans shown in the GPU raw view.
      */
-    void setAnnotations(const std::vector<mne::disp::ChannelRhiView::AnnotationSpan>& annotations);
+    void setAnnotations(const std::vector<mne::viz::qt::ChannelRhiView::AnnotationSpan>& annotations);
 
     //=========================================================================================================
     /**
@@ -531,12 +531,12 @@ private:
     QString m_sFiffFilePath;                  /**< Path of the currently open FIFF file. */
 
     // ── STIM event cache ───────────────────────────────────────────────
-    std::vector<mne::disp::ChannelRhiView::EventMarker> m_stimEvents; /**< Accumulated STIM-channel events across loaded blocks. */
-    QMap<int, QColor> m_eventTypeColors;                              /**< Palette colours of codes the event model has no colour for. */
-    QSet<quint64> m_seenStimEventKeys;                                /**< De-duplicates events when blocks are revisited. */
-    int m_iStimChannel = -1;                                          /**< Selected trigger channel index (prefer STI 014). */
-    int m_iStimLastSample = std::numeric_limits<int>::min();          /**< Last scanned sample on the trigger channel. */
-    int m_iStimLastValue = 0;                                         /**< Trigger value at m_iStimLastSample. */
+    std::vector<mne::viz::qt::ChannelRhiView::EventMarker> m_stimEvents; /**< Accumulated STIM-channel events across loaded blocks. */
+    QMap<int, QColor> m_eventTypeColors;                                 /**< Palette colours of codes the event model has no colour for. */
+    QSet<quint64> m_seenStimEventKeys;                                   /**< De-duplicates events when blocks are revisited. */
+    int m_iStimChannel = -1;                                             /**< Selected trigger channel index (prefer STI 014). */
+    int m_iStimLastSample = std::numeric_limits<int>::min();             /**< Last scanned sample on the trigger channel. */
+    int m_iStimLastValue = 0;                                            /**< Trigger value at m_iStimLastSample. */
 
     struct ResolvedVirtualChannel
     {
@@ -545,7 +545,7 @@ private:
         int primaryChannel = -1;
         QVector<int> referenceChannels;
         QVector<double> referenceWeights;
-        mne::disp::ChannelDisplayInfo displayInfo;
+        mne::viz::qt::ChannelDisplayInfo displayInfo;
     };
 
     QVector<VirtualChannelDefinition> m_virtualChannelDefinitions; /**< Requested virtual-channel definitions. */

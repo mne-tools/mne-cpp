@@ -16,7 +16,7 @@
  * LayoutScene installs gesture recognisers on the active view and
  * translates pan / pinch / swipe events into the same view-zoom /
  * view-pan operations regardless of input device. ButterflyScene derives from it to
- * inherit the gesture-driven navigation behaviour. Moved here from mne_disp, whose views no longer use
+ * inherit the gesture-driven navigation behaviour. Moved here from mne_disp (now mne_viz_qt), whose views no longer use
  * QGraphicsScene.
  */
 
@@ -181,6 +181,6 @@ protected:
     //bool                            m_bExtendedSelectionMode;       /**< Flag whether the extended selection mode.*/
     QPointF m_mousePressPosition; /**< The current mouse press location.*/
 };
-} // NAMESPACE mne_disp
+} // NAMESPACE
 
 #endif // LAYOUTSCENE_H

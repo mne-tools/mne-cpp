@@ -46,8 +46,8 @@
 #include "plugins/electrodes/electrodes.h"
 #include "plugins/mri_slices/mri_slices.h"
 
-#include <mne/disp3D/scene/multimodalscene.h>
-#include <mne/disp3D/scene/pickresult.h>
+#include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
+#include <mne/viz/backends/qt/3d/scene/pickresult.h>
 
 #include <QApplication>
 #include <QDockWidget>
@@ -58,8 +58,8 @@
 #include <QString>
 #include <QVector3D>
 
-using mne::disp::PickKind;
-using mne::disp::PickResult;
+using mne::viz::qt::PickKind;
+using mne::viz::qt::PickResult;
 
 namespace DOCSHOTS
 {

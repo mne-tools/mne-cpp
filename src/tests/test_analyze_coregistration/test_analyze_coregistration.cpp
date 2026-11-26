@@ -18,7 +18,7 @@
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/event.h>
 #include <anShared/Model/bemdatamodel.h>
-#include <mne/disp/viewers/coregsettingsview.h>
+#include <mne/viz/backends/qt/viewers/coregsettingsview.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_coord_trans.h>
 #include <mne/base/string_utils.h>
@@ -45,7 +45,7 @@
 
 using namespace COREGISTRATIONPLUGIN;
 using namespace mne::analyze;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 
 //=============================================================================================================

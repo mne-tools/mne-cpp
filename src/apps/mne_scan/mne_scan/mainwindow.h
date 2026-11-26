@@ -23,7 +23,7 @@
 #include "mainsplashscreen.h"
 #include "mainsplashscreencloser.h"
 
-#include <mne/disp/viewers/abstractview.h>
+#include <mne/viz/backends/qt/viewers/abstractview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -70,7 +70,7 @@ class PluginConnectorConnection;
 class DisplayManager;
 }
 
-namespace mne::disp
+namespace mne::viz::qt
 {
 class MultiView;
 class QuickControlView;
@@ -426,13 +426,13 @@ private:
 
     QPointer<StartUpWidget> m_pStartUpWidget; /**< holds the StartUpWidget.*/
 
-    QPointer<mne::disp::MultiView> m_pMultiView; /**< The multi view widget, which is set as central widget as soon as the measurement starts. */
+    QPointer<mne::viz::qt::MultiView> m_pMultiView; /**< The multi view widget, which is set as central widget as soon as the measurement starts. */
 
     LogLevel m_eLogLevelCurrent; /**< Holds the current log level.*/
 
     QPointer<PluginGui> m_pPluginGui; /**< Holds the plugin GUI.*/
 
-    QPointer<mne::disp::QuickControlView> m_pQuickControlView; /**< quick control widget. */
+    QPointer<mne::viz::qt::QuickControlView> m_pQuickControlView; /**< quick control widget. */
 
     MainSplashScreenCloser::SPtr m_pSplashScreenHider; /**< Holds the object responsible of hiding the splashscreen. */
     MainSplashScreen::SPtr m_pSplashScreen;            /**< Holds the splash screen. */
@@ -454,7 +454,7 @@ signals:
      *
      * @param[in] mode       the new gui mode.
      */
-    void guiModeChanged(mne::disp::AbstractView::GuiMode mode);
+    void guiModeChanged(mne::viz::qt::AbstractView::GuiMode mode);
 };
 } // NAMESPACE
 

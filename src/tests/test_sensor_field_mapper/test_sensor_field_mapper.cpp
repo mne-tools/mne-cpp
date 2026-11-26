@@ -10,14 +10,14 @@
  * @brief    Data-free tests for SensorFieldMapper utilities and state.
  */
 
-#include <mne/disp3D/scene/sensorfieldmapper.h>
+#include <mne/viz/backends/qt/3d/scene/sensorfieldmapper.h>
 
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_dig_point.h>
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_raw_data.h>
 #include <mne/fiff/fiff_evoked.h>
-#include <mne/disp3D/renderable/brainsurface.h>
+#include <mne/viz/backends/qt/3d/renderable/brainsurface.h>
 
 #include <Eigen/Core>
 
@@ -27,7 +27,7 @@
 
 using namespace Eigen;
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 namespace
 {

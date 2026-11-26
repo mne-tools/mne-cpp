@@ -22,8 +22,8 @@
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <mne/disp/viewers/filtersettingsview.h>
-#include <mne/disp/viewers/filterdesignview.h>
+#include <mne/viz/backends/qt/viewers/filtersettingsview.h>
+#include <mne/viz/backends/qt/viewers/filterdesignview.h>
 #include <mne/dsp/filterkernel.h>
 
 //=============================================================================================================
@@ -38,7 +38,7 @@
 
 using namespace FILTERINGPLUGIN;
 using namespace mne::analyze;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 
 //=============================================================================================================
