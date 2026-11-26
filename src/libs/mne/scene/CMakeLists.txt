@@ -17,6 +17,7 @@ set(SOURCES
   camera.cpp
   canvas.cpp
   colormap.cpp
+  evoked_conditions.cpp
   filter_response_plot.cpp
   image_plot.cpp
   line_chart.cpp
@@ -26,8 +27,10 @@ set(SOURCES
   sensor_layout.cpp
   spline_plot.cpp
   svg_renderer.cpp
+  sweep_buffer.cpp
   text_metrics.cpp
   ticks.cpp
+  trace_buffer.cpp
   trace_geometry.cpp
   trace_markers.cpp
   trace_view.cpp
@@ -48,6 +51,7 @@ set(HEADERS
   canvas.h
   colormap.h
   display_list.h
+  evoked_conditions.h
   filter_response_plot.h
   image_plot.h
   input_event.h
@@ -60,8 +64,10 @@ set(HEADERS
   spline_plot.h
   style.h
   svg_renderer.h
+  sweep_buffer.h
   text_metrics.h
   ticks.h
+  trace_buffer.h
   trace_geometry.h
   trace_markers.h
   trace_source.h

@@ -10,14 +10,11 @@
  * @date     July 2018
  * @brief    Circular-buffer Qt model exposing a rolling window of the live FIFF stream as a table.
  *
- * ChannelDataModel keeps a per-channel @c Eigen::MatrixXd ring buffer
- * of the most recent N seconds of data and translates Qt's
- * @c QAbstractTableModel API into the view-friendly per-row /
- * per-time slice access that @ref mne::disp::ChannelDataView and
- * @ref mne::disp::RtFiffRawViewDelegate need. It also tracks bad-channel flags,
- * trigger annotations and the currently-active SSP / compensation /
- * filter operators so the delegate can render the pre-processed
- * signal without touching the raw buffer.
+ * ChannelDataModel is the Qt face of @ref mne::scene::TraceBuffer, which stores the
+ * samples of the most recent N seconds per channel and resolves the channels' scales,
+ * colours and bad flags. The model describes the channels of a FiffInfo to it (names,
+ * types, per-kind scales and colours), keeps the FiffInfo's bad list in step and
+ * turns the buffer's change notifications into Qt signals.
  */
 
 #ifndef CHANNELDATAMODEL_H
@@ -28,6 +25,7 @@
 //=============================================================================================================
 
 #include "../../disp_global.h"
+#include <mne/scene/trace_buffer.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -48,7 +46,7 @@
 
 #include <map>
 #include <memory>
-#include <shared_mutex>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -97,11 +95,9 @@ struct ChannelDisplayInfo
 /**
  * @brief Circular-buffer Qt model exposing a rolling window of the live FIFF stream as a table.
  *
- * Keeps a per-channel @c Eigen::MatrixXd ring buffer of the most
- * recent N seconds, tracks bad-channel flags, trigger annotations
- * and the active SSP / compensation / filter operators so the
- * delegate can render the pre-processed signal without touching the
- * raw buffer.
+ * Wraps a Qt-free @ref mne::scene::TraceBuffer (see buffer()) that stores the
+ * samples and resolves the channel descriptions taken from the FiffInfo; emits
+ * dataChanged() and metaChanged() when the buffer reports a change.
  */
 class DISPSHARED_EXPORT ChannelDataModel : public QObject
 {
@@ -208,14 +204,11 @@ public:
     void setRemoveDC(bool remove);
     bool removeDC() const
     {
-        return m_detrendMode != DetrendMode::None;
+        return detrendMode() != DetrendMode::None;
     }
 
     void setDetrendMode(DetrendMode mode);
-    DetrendMode detrendMode() const
-    {
-        return m_detrendMode;
-    }
+    DetrendMode detrendMode() const;
 
     // ── Accessors (all thread-safe read) ──────────────────────────────
 
@@ -283,6 +276,20 @@ public:
      */
     float sampleValueAt(int channelIdx, int sample) const;
 
+    //=========================================================================================================
+    /**
+     * The Qt-free store behind this model: samples, channel scales, colours and bad flags as a trace source
+     * indexed by channel.
+     *
+     * @return The trace buffer.
+     *
+     * @since 3.0.0
+     */
+    const scene::TraceBuffer& buffer() const
+    {
+        return m_buffer;
+    }
+
 signals:
     //=========================================================================================================
     /**
@@ -297,24 +304,13 @@ signals:
     void metaChanged();
 
 private:
-    void rebuildDisplayInfo();
-    float amplitudeMaxForChannel(int ch) const;
-    QColor colorForChannel(int ch) const;
-    std::string typeLabelForChannel(int ch) const;
+    std::vector<scene::TraceBuffer::ChannelSpec> channelSpecs() const;
 
-    mutable std::shared_mutex m_lock;
+    scene::TraceBuffer m_buffer; // samples, channel scales, colours and bad flags
 
+    mutable std::mutex m_infoLock; // guards m_pFiffInfo and m_virtualDisplayInfo
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo;
-    std::vector<std::vector<float>> m_channelData; // [ch][sample]
-    int m_firstSample = 0;
-    int m_maxStoredSamples = 0; // 0 = unlimited
-
-    std::map<int, float> m_scaleMap;
-    QColor m_signalColor{Qt::darkGreen};
-
     std::vector<ChannelDisplayInfo> m_virtualDisplayInfo;
-    std::vector<ChannelDisplayInfo> m_displayInfo; // pre-computed, rebuild on meta change
-    DetrendMode m_detrendMode = DetrendMode::None;
 };
 
 } // namespace mne::disp

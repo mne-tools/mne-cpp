@@ -23,6 +23,7 @@
 #include <mne/base/string_utils.h>
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_evoked_set.h>
+#include <mne/scene/evoked_conditions.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -36,7 +37,9 @@
 //=============================================================================================================
 
 #include <algorithm>
+#include <cstddef>
 #include <memory>
+#include <span>
 #include <utility>
 #include <vector>
 #include <iostream>
@@ -329,53 +332,19 @@ void EvokedSetModel::updateData()
 
     // Update average selection information map. Use old colors if existing.
     std::vector<std::string> slCurrentAvrComments;
-    const std::size_t iSizeAvrActivation = m_qMapAverageActivation->size();
-    const std::size_t iSizeAvrColor = m_qMapAverageColor->size();
-
-    for (int i = 0; i < std::ssize(m_pEvokedSet->evoked); ++i) {
-        const std::string& comment = m_pEvokedSet->evoked.at(i).comment;
-        slCurrentAvrComments.push_back(comment);
-
-        if (!m_qMapAverageActivation->contains(comment)) {
-            if (m_qMapAverageActivationOld->contains(comment)) {
-                m_qMapAverageActivation->insert_or_assign(comment, m_qMapAverageActivationOld->at(comment));
-            } else {
-                m_qMapAverageActivation->insert_or_assign(comment, true);
-            }
-        }
-
-        if (!m_qMapAverageColor->contains(comment)) {
-            if (m_qMapAverageColorOld->contains(comment)) {
-                m_qMapAverageColor->insert_or_assign(comment, m_qMapAverageColorOld->at(comment));
-            } else {
-                m_qMapAverageColor->insert_or_assign(comment, Qt::yellow);
-            }
-        }
+    for (const FiffEvoked& evoked : m_pEvokedSet->evoked) {
+        slCurrentAvrComments.push_back(evoked.comment);
     }
 
-    // Delete average color and activation if they are no longer present in the evoked set
-    std::erase_if(*m_qMapAverageActivation, [&](const auto& item) {
-        if (std::ranges::contains(slCurrentAvrComments, item.first)) {
-            return false;
-        }
-        m_qMapAverageActivationOld->insert_or_assign(item.first, item.second);
-        return true;
-    });
-
-    std::erase_if(*m_qMapAverageColor, [&](const auto& item) {
-        if (std::ranges::contains(slCurrentAvrComments, item.first)) {
-            return false;
-        }
-        m_qMapAverageColorOld->insert_or_assign(item.first, item.second);
-        return true;
-    });
+    const bool bActivationChanged = scene::reconcile_conditions(*m_qMapAverageActivation, *m_qMapAverageActivationOld, slCurrentAvrComments, true);
+    const bool bColorChanged = scene::reconcile_conditions(*m_qMapAverageColor, *m_qMapAverageColorOld, slCurrentAvrComments, QColor(Qt::yellow));
 
     // Only emit new colors and activations if evoked types were added or deleted
-    if (iSizeAvrColor != m_qMapAverageColor->size()) {
+    if (bColorChanged) {
         emit newAverageColorMap(m_qMapAverageColor);
     }
 
-    if (iSizeAvrActivation != m_qMapAverageActivation->size()) {
+    if (bActivationChanged) {
         emit newAverageActivationMap(m_qMapAverageActivation);
     }
 
@@ -521,16 +490,8 @@ qint32 EvokedSetModel::getNumPreStimSamples() const
     }
 
     if (!m_pEvokedSet->evoked.empty()) {
-        RowVectorXf times = m_pEvokedSet->evoked.front().times;
-
-        // Search for stim onset via times
-        for (int i = 0; i < times.cols(); i++) {
-            if (times(i) == 0.0f) {
-                break;
-            }
-
-            iPreSamples++;
-        }
+        const RowVectorXf& times = m_pEvokedSet->evoked.front().times;
+        iPreSamples = scene::pre_stimulus_samples(std::span<const float>(times.data(), static_cast<std::size_t>(times.size())));
     }
 
     return iPreSamples;

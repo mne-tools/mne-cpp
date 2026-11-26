@@ -32,6 +32,7 @@
 #include <mne/fiff/fiff_types.h>
 #include <mne/fiff/fiff_proj.h>
 #include <mne/dsp/filterkernel.h>
+#include <mne/scene/sweep_buffer.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -84,7 +85,7 @@ namespace mne::disp
 //=============================================================================================================
 
 typedef std::pair<const double*, int> RowVectorPair;
-typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixXdR;
+typedef scene::SweepBuffer::Matrix MatrixXdR;
 
 //=============================================================================================================
 /**
@@ -586,7 +587,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Moves the write position back to column 0 and archives the finished sweep's first values and triggers.
+     * Archives the finished sweep's triggers when the sweep buffer starts a new sweep.
      */
     void startNewSweep();
 
@@ -596,41 +597,30 @@ private:
      */
     void clearModel();
 
-    bool m_bProjActivated;           /**< Projections activated. */
-    bool m_bCompActivated;           /**< Compensator activated. */
-    bool m_bSpharaActivated;         /**< Sphara activated. */
-    bool m_bIsFreezed;               /**< Display is freezed. */
-    bool m_bDrawFilterFront;         /**< Flag whether to plot/write the delayed frontal part of the filtered signal. This flag is necessary to get rid of nasty signal jumps when changing the filter parameters. */
-    bool m_bPerformFiltering;        /**< Flag whether to activate/deactivate filtering. */
-    bool m_bTriggerDetectionActive;  /**< Trigger detection activation state. */
-    float m_fSps;                    /**< Sampling rate. */
-    double m_dTriggerThreshold;      /**< Trigger detection threshold. */
-    qint32 m_iT;                     /**< Time window. */
-    qint32 m_iDownsampling;          /**< Down sampling factor. */
-    qint32 m_iMaxSamples;            /**< Max samples per window. */
-    qint32 m_iCurrentSample;         /**< Current sample which holds the current position in the data matrix. */
-    qint32 m_iCurrentStartingSample; /**< Accumulates cumulative starting sample position when m_iCurrentSample resets to 0 */
-    qint32 m_iCurrentSampleFreeze;   /**< Current sample which holds the current position in the data matrix when freezing tool is active. */
-    qint32 m_iMaxFilterLength;       /**< Max order of the current filters. */
-    qint32 m_iCurrentBlockSize;      /**< Current block size. */
-    int m_iCurrentTriggerChIndex;    /**< The index of the current trigger channel. */
-    int m_iDistanceTimerSpacer;      /**< The distance for the horizontal time spacers in the view in ms. */
-    int m_iDetectedTriggers;         /**< Detected triggers since the last reset. */
+    bool m_bProjActivated;          /**< Projections activated. */
+    bool m_bCompActivated;          /**< Compensator activated. */
+    bool m_bSpharaActivated;        /**< Sphara activated. */
+    bool m_bDrawFilterFront;        /**< Flag whether to plot/write the delayed frontal part of the filtered signal. This flag is necessary to get rid of nasty signal jumps when changing the filter parameters. */
+    bool m_bPerformFiltering;       /**< Flag whether to activate/deactivate filtering. */
+    bool m_bTriggerDetectionActive; /**< Trigger detection activation state. */
+    float m_fSps;                   /**< Sampling rate. */
+    double m_dTriggerThreshold;     /**< Trigger detection threshold. */
+    qint32 m_iT;                    /**< Time window. */
+    qint32 m_iDownsampling;         /**< Down sampling factor. */
+    qint32 m_iMaxFilterLength;      /**< Max order of the current filters. */
+    int m_iCurrentTriggerChIndex;   /**< The index of the current trigger channel. */
+    int m_iDistanceTimerSpacer;     /**< The distance for the horizontal time spacers in the view in ms. */
+    int m_iDetectedTriggers;        /**< Detected triggers since the last reset. */
 
     std::string m_sCurrentTriggerCh;  /**< Current trigger channel which is beeing scanned. */
     std::string m_sFilterChannelType; /**< Kind of channel which is to be filtered. */
 
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Fiff info. */
 
-    Eigen::RowVectorXi m_vecBadIdcs;                   /**< Idcs of bad channels. */
-    Eigen::VectorXd m_vecLastBlockFirstValuesFiltered; /**< The first value of the last complete filtered data display block. */
-    Eigen::VectorXd m_vecLastBlockFirstValuesRaw;      /**< The first value of the last complete raw data display block. */
+    Eigen::RowVectorXi m_vecBadIdcs; /**< Idcs of bad channels. */
 
-    MatrixXdR m_matDataRaw;            /**< The raw data. */
-    MatrixXdR m_matDataFiltered;       /**< The filtered data. */
-    MatrixXdR m_matDataRawFreeze;      /**< The raw data in freeze mode. */
-    MatrixXdR m_matDataFilteredFreeze; /**< The raw filtered data in freeze mode. */
-    Eigen::MatrixXd m_matOverlap;      /**< Last overlap block for the back. */
+    scene::SweepBuffer m_sweep;   /**< The raw and filtered sweep, its write position and frozen copy. */
+    Eigen::MatrixXd m_matOverlap; /**< Last overlap block for the back. */
 
     Eigen::VectorXi m_vecIndicesFirstVV;       /**< The indices of the channels to pick for the first SPHARA operator in case of a VectorView system.*/
     Eigen::VectorXi m_vecIndicesSecondVV;      /**< The indices of the channels to pick for the second SPHARA operator in case of a VectorView system.*/
@@ -698,35 +688,29 @@ signals:
 
 inline qint32 RtFiffRawViewModel::getMaxSamples() const
 {
-    return m_iMaxSamples;
+    return m_sweep.window();
 }
 
 //=============================================================================================================
 
 inline qint32 RtFiffRawViewModel::getCurrentSampleIndex() const
 {
-    if (m_bIsFreezed) {
-        return m_iCurrentSampleFreeze;
+    if (m_sweep.frozen()) {
+        return m_sweep.frozen_write_position();
     }
 
     if (!m_filterKernel.empty() && m_bPerformFiltering) {
-        return m_iCurrentSample - m_iMaxFilterLength / 2;
+        return m_sweep.write_position() - m_iMaxFilterLength / 2;
     }
 
-    return m_iCurrentSample;
+    return m_sweep.write_position();
 }
 
 //=============================================================================================================
 
 inline double RtFiffRawViewModel::getLastBlockFirstValue(int row) const
 {
-    if (row > m_vecLastBlockFirstValuesFiltered.rows() || row > m_vecLastBlockFirstValuesRaw.rows())
-        return 0;
-
-    if (!m_filterKernel.empty())
-        return m_vecLastBlockFirstValuesFiltered[row];
-
-    return m_vecLastBlockFirstValuesRaw[row];
+    return m_sweep.first_value(row, !m_filterKernel.empty());
 }
 
 //=============================================================================================================
@@ -747,7 +731,7 @@ inline qint32 RtFiffRawViewModel::numVLines() const
 
 inline bool RtFiffRawViewModel::isFreezed() const
 {
-    return m_bIsFreezed;
+    return m_sweep.frozen();
 }
 
 //=============================================================================================================
@@ -775,7 +759,7 @@ inline std::vector<std::pair<int, double>> RtFiffRawViewModel::getDetectedTrigge
 {
     std::vector<std::pair<int, double>> triggerIndices;
 
-    if (m_bIsFreezed)
+    if (m_sweep.frozen())
         return m_qMapDetectedTriggerFreeze.contains(m_iCurrentTriggerChIndex) ? m_qMapDetectedTriggerFreeze.at(m_iCurrentTriggerChIndex) : triggerIndices;
 
     if (m_bTriggerDetectionActive) {
@@ -790,7 +774,7 @@ inline std::vector<std::pair<int, double>> RtFiffRawViewModel::getDetectedTrigge
 {
     std::vector<std::pair<int, double>> triggerIndices;
 
-    if (m_bIsFreezed)
+    if (m_sweep.frozen())
         return m_qMapDetectedTriggerOldFreeze.contains(m_iCurrentTriggerChIndex) ? m_qMapDetectedTriggerOldFreeze.at(m_iCurrentTriggerChIndex) : triggerIndices;
 
     if (m_bTriggerDetectionActive) {
@@ -849,7 +833,7 @@ inline int RtFiffRawViewModel::getCurrentOverlapAddDelay() const
 
 inline int RtFiffRawViewModel::getFirstSampleOffset() const
 {
-    return m_iCurrentStartingSample;
+    return m_sweep.sweep_start();
 }
 } // NAMESPACE
 

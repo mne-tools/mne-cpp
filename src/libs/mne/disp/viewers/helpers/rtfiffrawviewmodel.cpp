@@ -56,28 +56,6 @@ using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
-// DEFINE GLOBAL METHODS
-//=============================================================================================================
-
-namespace
-{
-
-/** Calls fn(iColumn, iOffset, iLength) for each piece of the span [iStart, iStart + iLength) wrapped into [0, iSize). */
-template<typename Fn>
-void forWrappedSpan(int iStart, int iLength, int iSize, Fn fn)
-{
-    iStart = ((iStart % iSize) + iSize) % iSize;
-    for (int iDone = 0; iDone < iLength;) {
-        const int iPiece = std::min(iLength - iDone, iSize - iStart);
-        fn(iStart, iDone, iPiece);
-        iDone += iPiece;
-        iStart = 0;
-    }
-}
-
-} // namespace
-
-//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -86,7 +64,6 @@ RtFiffRawViewModel::RtFiffRawViewModel(QObject* parent)
 , m_bProjActivated(false)
 , m_bCompActivated(false)
 , m_bSpharaActivated(false)
-, m_bIsFreezed(false)
 , m_bDrawFilterFront(true)
 , m_bPerformFiltering(false)
 , m_bTriggerDetectionActive(false)
@@ -94,12 +71,7 @@ RtFiffRawViewModel::RtFiffRawViewModel(QObject* parent)
 , m_dTriggerThreshold(0.01)
 , m_iT(10)
 , m_iDownsampling(10)
-, m_iMaxSamples(1024)
-, m_iCurrentSample(0)
-, m_iCurrentStartingSample(0)
-, m_iCurrentSampleFreeze(0)
 , m_iMaxFilterLength(128)
-, m_iCurrentBlockSize(0)
 , m_iCurrentTriggerChIndex(0)
 , m_iDistanceTimerSpacer(1000)
 , m_iDetectedTriggers(0)
@@ -159,29 +131,11 @@ QVariant RtFiffRawViewModel::data(const QModelIndex& index, int role) const
 
             switch (role) {
                 case Qt::DisplayRole: {
-                    if (m_bIsFreezed) {
-                        // data freeze
-                        if (!m_filterKernel.empty() && m_bPerformFiltering) {
-                            rowVectorPair.first = m_matDataFilteredFreeze.data() + row * m_matDataFilteredFreeze.cols();
-                            rowVectorPair.second = m_matDataFilteredFreeze.cols();
-                            v.setValue(rowVectorPair);
-                        } else {
-                            rowVectorPair.first = m_matDataRawFreeze.data() + row * m_matDataRawFreeze.cols();
-                            rowVectorPair.second = m_matDataRawFreeze.cols();
-                            v.setValue(rowVectorPair);
-                        }
-                    } else {
-                        // data stream
-                        if (!m_filterKernel.empty() && m_bPerformFiltering) {
-                            rowVectorPair.first = m_matDataFiltered.data() + row * m_matDataFiltered.cols();
-                            rowVectorPair.second = m_matDataFiltered.cols();
-                            v.setValue(rowVectorPair);
-                        } else {
-                            rowVectorPair.first = m_matDataRaw.data() + row * m_matDataRaw.cols();
-                            rowVectorPair.second = m_matDataRaw.cols();
-                            v.setValue(rowVectorPair);
-                        }
-                    }
+                    // The frozen copy while frozen
+                    const scene::SweepBuffer::Matrix& matData = m_sweep.layer(!m_filterKernel.empty() && m_bPerformFiltering);
+                    rowVectorPair.first = matData.data() + row * matData.cols();
+                    rowVectorPair.second = static_cast<int>(matData.cols());
+                    v.setValue(rowVectorPair);
 
                     return v;
                 }
@@ -311,18 +265,8 @@ void RtFiffRawViewModel::setFiffInfo(std::shared_ptr<mne::FiffInfo>& p_pFiffInfo
 
         resetSelection();
 
-        //Resize data matrix without touching the stored values
-        m_matDataRaw.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
-        m_matDataRaw.setZero();
-
-        m_matDataFiltered.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
-        m_matDataFiltered.setZero();
-
-        m_vecLastBlockFirstValuesFiltered.conservativeResize(m_pFiffInfo->chs.size());
-        m_vecLastBlockFirstValuesFiltered.setZero();
-
-        m_vecLastBlockFirstValuesRaw.conservativeResize(m_pFiffInfo->chs.size());
-        m_vecLastBlockFirstValuesRaw.setZero();
+        //Resize the sweep to the channels and clear it
+        m_sweep.resize(static_cast<int>(m_pFiffInfo->chs.size()), m_sweep.window(), true);
 
         m_matOverlap.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
 
@@ -358,25 +302,8 @@ void RtFiffRawViewModel::setSamplingInfo(float sps, int T, bool bSetZero)
 
     m_iT = T;
 
-    m_iMaxSamples = static_cast<qint32>(ceil(static_cast<double>(sps) * T));
-
-    //Resize data matrix without touching the stored values
-    m_matDataRaw.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
-    m_matDataFiltered.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
-    m_vecLastBlockFirstValuesRaw.conservativeResize(m_pFiffInfo->chs.size());
-    m_vecLastBlockFirstValuesFiltered.conservativeResize(m_pFiffInfo->chs.size());
-
-    if (bSetZero) {
-        m_matDataRaw.setZero();
-        m_matDataFiltered.setZero();
-        m_vecLastBlockFirstValuesRaw.setZero();
-        m_vecLastBlockFirstValuesFiltered.setZero();
-    }
-
-    if (m_iCurrentSample > m_iMaxSamples) {
-        m_iCurrentStartingSample += m_iCurrentSample;
-        m_iCurrentSample = 0;
-    }
+    //Resize the sweep without touching the stored values
+    m_sweep.resize(static_cast<int>(m_pFiffInfo->chs.size()), static_cast<int>(ceil(static_cast<double>(sps) * T)), bSetZero);
 
     endResetModel();
 }
@@ -385,16 +312,7 @@ void RtFiffRawViewModel::setSamplingInfo(float sps, int T, bool bSetZero)
 
 MatrixXd RtFiffRawViewModel::getLastBlock()
 {
-    const MatrixXdR& matData = (!m_filterKernel.empty() && m_bPerformFiltering) ? m_matDataFiltered : m_matDataRaw;
-
-    MatrixXd matBlock(matData.rows(), m_iCurrentBlockSize);
-    if (m_iCurrentBlockSize > 0) {
-        forWrappedSpan(m_iCurrentSample - m_iCurrentBlockSize, m_iCurrentBlockSize, static_cast<int>(matData.cols()), [&](int iCol, int iOffset, int iLength) {
-            matBlock.middleCols(iOffset, iLength) = matData.middleCols(iCol, iLength);
-        });
-    }
-
-    return matBlock;
+    return m_sweep.last_block(!m_filterKernel.empty() && m_bPerformFiltering);
 }
 
 //=============================================================================================================
@@ -402,15 +320,17 @@ MatrixXd RtFiffRawViewModel::getLastBlock()
 void RtFiffRawViewModel::addData(std::span<const MatrixXd> data)
 {
     //SSP
-    bool doProj = m_bProjActivated && m_matDataRaw.cols() > 0 && m_matDataRaw.rows() == m_matProj.cols() ? true : false;
+    bool doProj = m_bProjActivated && m_sweep.raw().cols() > 0 && m_sweep.raw().rows() == m_matProj.cols() ? true : false;
 
     //Compensator
-    bool doComp = m_bCompActivated && m_matDataRaw.cols() > 0 && m_matDataRaw.rows() == m_matComp.cols() ? true : false;
+    bool doComp = m_bCompActivated && m_sweep.raw().cols() > 0 && m_sweep.raw().rows() == m_matComp.cols() ? true : false;
 
     //SPHARA
-    bool doSphara = m_bSpharaActivated && m_matSparseSpharaMult.cols() > 0 && m_matDataRaw.rows() == m_matSparseSpharaMult.cols() ? true : false;
+    bool doSphara = m_bSpharaActivated && m_matSparseSpharaMult.cols() > 0 && m_sweep.raw().rows() == m_matSparseSpharaMult.cols() ? true : false;
 
-    const int iMaxCols = static_cast<int>(m_matDataRaw.cols());
+    MatrixXdR& matDataRaw = m_sweep.raw();
+    MatrixXdR& matDataFiltered = m_sweep.filtered();
+    const int iMaxCols = static_cast<int>(matDataRaw.cols());
     if (iMaxCols == 0) {
         return;
     }
@@ -419,7 +339,7 @@ void RtFiffRawViewModel::addData(std::span<const MatrixXd> data)
     for (qint32 b = 0; b < std::ssize(data); ++b) {
         const int nRow = static_cast<int>(data[b].rows());
 
-        if (nRow != m_matDataRaw.rows()) {
+        if (nRow != matDataRaw.rows()) {
             mne::Log::debug("incoming data does not match internal data row size. Returning...");
             return;
         }
@@ -439,16 +359,12 @@ void RtFiffRawViewModel::addData(std::span<const MatrixXd> data)
             lTriggers = mne::detect_trigger_flanks_max(matBlock, m_iCurrentTriggerChIndex, 0, m_dTriggerThreshold, true, 500);
         }
 
-        forWrappedSpan(m_iCurrentSample, nCol, iMaxCols, [&](int iCol, int iOffset, int iLength) {
-            if (iCol == 0 && m_iCurrentSample == iMaxCols) {
-                startNewSweep();
-            }
-
-            m_matDataRaw.middleCols(iCol, iLength) = matCorrected.middleCols(iOffset, iLength);
+        m_sweep.write(nCol, [this] { startNewSweep(); }, [&](int iCol, int iOffset, int iLength) {
+            matDataRaw.middleCols(iCol, iLength) = matCorrected.middleCols(iOffset, iLength);
             if (m_filterKernel.empty() || !m_bPerformFiltering) {
-                m_matDataFiltered.middleCols(iCol, iLength).setZero();
+                matDataFiltered.middleCols(iCol, iLength).setZero();
                 if (doSphara) {
-                    m_matDataRaw.middleCols(iCol, iLength) = m_matSparseSpharaMult * m_matDataRaw.middleCols(iCol, iLength);
+                    matDataRaw.middleCols(iCol, iLength) = m_matSparseSpharaMult * matDataRaw.middleCols(iCol, iLength);
                 }
             }
 
@@ -456,10 +372,7 @@ void RtFiffRawViewModel::addData(std::span<const MatrixXd> data)
                 if (trigger.sample >= iOffset && trigger.sample < iOffset + iLength) {
                     m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].push_back({iCol + trigger.sample - iOffset, trigger.value});
                 }
-            }
-
-            m_iCurrentSample = iCol + iLength;
-        });
+            } });
 
         if (!lTriggers.empty()) {
             m_iDetectedTriggers += static_cast<int>(lTriggers.size());
@@ -468,18 +381,16 @@ void RtFiffRawViewModel::addData(std::span<const MatrixXd> data)
 
         //Filter the whole block at once so the overlap-add stays continuous across the wrap
         if (!m_filterKernel.empty() && m_bPerformFiltering) {
-            const int iBlockStart = m_iCurrentSample - nCol;
+            const int iBlockStart = m_sweep.write_position() - nCol;
             filterDataBlock(matCorrected, iBlockStart);
 
             //Perform SPHARA on filtered data after actual filtering - SPHARA should be applied on the best possible data
             if (doSphara) {
-                forWrappedSpan(iBlockStart - m_iMaxFilterLength / 2, nCol, iMaxCols, [&](int iCol, int, int iLength) {
-                    m_matDataFiltered.middleCols(iCol, iLength) = m_matSparseSpharaMult * m_matDataFiltered.middleCols(iCol, iLength);
+                scene::for_wrapped_span(iBlockStart - m_iMaxFilterLength / 2, nCol, iMaxCols, [&](int iCol, int, int iLength) {
+                    matDataFiltered.middleCols(iCol, iLength) = m_matSparseSpharaMult * matDataFiltered.middleCols(iCol, iLength);
                 });
             }
         }
-
-        m_iCurrentBlockSize = std::min(nCol, iMaxCols);
     }
 
     //Update data content
@@ -492,14 +403,6 @@ void RtFiffRawViewModel::addData(std::span<const MatrixXd> data)
 
 void RtFiffRawViewModel::startNewSweep()
 {
-    m_iCurrentStartingSample += m_iCurrentSample;
-    m_iCurrentSample = 0;
-
-    if (!m_bIsFreezed) {
-        m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
-        m_vecLastBlockFirstValuesRaw = m_matDataRaw.col(0);
-    }
-
     //Store old detected triggers
     m_qMapDetectedTriggerOld = m_qMapDetectedTrigger;
 
@@ -602,15 +505,11 @@ void RtFiffRawViewModel::resetSelection()
 
 void RtFiffRawViewModel::toggleFreeze(const QModelIndex&)
 {
-    m_bIsFreezed = !m_bIsFreezed;
+    m_sweep.set_frozen(!m_sweep.frozen());
 
-    if (m_bIsFreezed) {
-        m_matDataRawFreeze = m_matDataRaw;
-        m_matDataFilteredFreeze = m_matDataFiltered;
+    if (m_sweep.frozen()) {
         m_qMapDetectedTriggerFreeze = m_qMapDetectedTrigger;
         m_qMapDetectedTriggerOldFreeze = m_qMapDetectedTriggerOld;
-
-        m_iCurrentSampleFreeze = m_iCurrentSample;
     }
 
     //Update data content
@@ -902,7 +801,8 @@ void RtFiffRawViewModel::filterDataBlock(const MatrixXd& data, int iDataIndex)
         }
     }
 
-    const int iMaxCols = static_cast<int>(m_matDataFiltered.cols());
+    MatrixXdR& matDataFiltered = m_sweep.filtered();
+    const int iMaxCols = static_cast<int>(matDataFiltered.cols());
     const int nCol = static_cast<int>(data.cols());
     const int iFilterDelay = m_iMaxFilterLength / 2;
 
@@ -920,16 +820,16 @@ void RtFiffRawViewModel::filterDataBlock(const MatrixXd& data, int iDataIndex)
 
             if (m_bDrawFilterFront) {
                 tempData.head(m_iMaxFilterLength) += m_matOverlap.row(iRow);
-                forWrappedSpan(iDataIndex - iFilterDelay, nCol, iMaxCols, [&](int iCol, int iOffset, int iLength) {
-                    m_matDataFiltered.row(iRow).segment(iCol, iLength) = tempData.segment(iOffset, iLength);
+                scene::for_wrapped_span(iDataIndex - iFilterDelay, nCol, iMaxCols, [&](int iCol, int iOffset, int iLength) {
+                    matDataFiltered.row(iRow).segment(iCol, iLength) = tempData.segment(iOffset, iLength);
                 });
             } else {
                 //The overlap belongs to the previous filter, so skip the start-up transient of the new one
-                forWrappedSpan(iDataIndex - iFilterDelay, m_iMaxFilterLength, iMaxCols, [&](int iCol, int, int iLength) {
-                    m_matDataFiltered.row(iRow).segment(iCol, iLength).setZero();
+                scene::for_wrapped_span(iDataIndex - iFilterDelay, m_iMaxFilterLength, iMaxCols, [&](int iCol, int, int iLength) {
+                    matDataFiltered.row(iRow).segment(iCol, iLength).setZero();
                 });
-                forWrappedSpan(iDataIndex - iFilterDelay + m_iMaxFilterLength, nCol - m_iMaxFilterLength, iMaxCols, [&](int iCol, int iOffset, int iLength) {
-                    m_matDataFiltered.row(iRow).segment(iCol, iLength) = tempData.segment(m_iMaxFilterLength + iOffset, iLength);
+                scene::for_wrapped_span(iDataIndex - iFilterDelay + m_iMaxFilterLength, nCol - m_iMaxFilterLength, iMaxCols, [&](int iCol, int iOffset, int iLength) {
+                    matDataFiltered.row(iRow).segment(iCol, iLength) = tempData.segment(m_iMaxFilterLength + iOffset, iLength);
                 });
             }
 
@@ -940,9 +840,9 @@ void RtFiffRawViewModel::filterDataBlock(const MatrixXd& data, int iDataIndex)
     m_bDrawFilterFront = true;
 
     //Fill filtered data with raw data if the channel was not filtered
-    forWrappedSpan(iDataIndex, nCol, iMaxCols, [&](int iCol, int iOffset, int iLength) {
+    scene::for_wrapped_span(iDataIndex, nCol, iMaxCols, [&](int iCol, int iOffset, int iLength) {
         for (int i : std::as_const(notFilterChannelIndex)) {
-            m_matDataFiltered.row(i).segment(iCol, iLength) = data.row(i).segment(iOffset, iLength);
+            matDataFiltered.row(i).segment(iCol, iLength) = data.row(i).segment(iOffset, iLength);
         }
     });
 }
@@ -953,12 +853,7 @@ void RtFiffRawViewModel::clearModel()
 {
     beginResetModel();
 
-    m_matDataRaw.setZero();
-    m_matDataFiltered.setZero();
-    m_matDataRawFreeze.setZero();
-    m_matDataFilteredFreeze.setZero();
-    m_vecLastBlockFirstValuesFiltered.setZero();
-    m_vecLastBlockFirstValuesRaw.setZero();
+    m_sweep.clear();
     m_matOverlap.setZero();
 
     endResetModel();
@@ -1039,15 +934,7 @@ void RtFiffRawViewModel::addEvent(int iSample)
 
 int RtFiffRawViewModel::getSampleAtColumn(int iColumn) const
 {
-    if (iColumn < 0 || iColumn >= m_iMaxSamples) {
-        return -1;
-    }
-
-    // Left of the write position is the current sweep, from it on the previous one
-    const int iWritePosition = m_bIsFreezed ? m_iCurrentSampleFreeze : m_iCurrentSample;
-    const int iSample = getFirstSampleOffset() + iColumn - (iColumn < iWritePosition ? 0 : m_iMaxSamples);
-
-    return iSample >= 0 ? iSample : -1;
+    return m_sweep.sample_at_column(iColumn);
 }
 
 //=============================================================================================================

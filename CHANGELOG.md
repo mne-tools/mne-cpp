@@ -319,6 +319,26 @@ aliases; replace the old spelling as below.
   instead of using `QPropertyAnimation`; its API and signals are unchanged.
   The dotted guide lines of `renderToImage()` use the scene's dot pattern.
   The Qt usage ceiling of `disp` drops to 4543 tokens.
+- The data behind the raw-data views moved to `mne_scene` as well.
+  `TraceBuffer` (`scene/trace_buffer.h`) stores the samples of the trace view
+  (replaced, or appended to with a capacity), resolves the channel
+  descriptions a host gives (`ChannelSpec`: name, type, colour, scale keys,
+  bad flag, virtual) against a scale map and a signal colour, computes the
+  RMS, and is a `TraceSource` that decimates and detrends its traces; changes
+  reach listeners as callbacks. `disp::ChannelDataModel` wraps it, describes
+  the channels of its `FiffInfo` (per-kind scales, colours and type labels)
+  and turns the callbacks into its unchanged signals; its API is unchanged
+  apart from the new `buffer()`, which `ChannelRhiRenderer` now reads as its
+  trace source. `SweepBuffer` (`scene/sweep_buffer.h`) is the sweeping window
+  of the real-time view: raw and filtered layers written at a wrapping write
+  position, new sweeps, the last block, the frozen copy and the sample under
+  a column; `disp::RtFiffRawViewModel` keeps its SSP, compensator, SPHARA,
+  filter and trigger processing (they need `mne_fiff` and `mne_dsp`) and
+  writes into it. `reconcile_conditions()` and `pre_stimulus_samples()`
+  (`scene/evoked_conditions.h`) do the per-condition colour and visibility
+  bookkeeping and the onset search of `disp::EvokedSetModel`.
+  `test_scene_trace_buffer` tests them without Qt. The Qt usage ceiling of
+  `disp` drops to 4529 tokens.
 - The camera, input handling, pane layout and head-up display of the 3-D brain
   view moved to `mne_scene` (which now links Eigen): `OrbitCamera`
   (`scene/camera.h`) computes the projection, view and model matrices, the

@@ -113,7 +113,8 @@ static QShader loadShader(const QString& filename)
 //=============================================================================================================
 
 /**
- * The channels of the renderer's model as the TraceView sees them: logical (filtered) channel indices.
+ * The channels of the renderer's model as the TraceView sees them: the model's scene::TraceBuffer under the
+ * logical (filtered) channel indices.
  */
 class ChannelRhiRenderer::TraceSourceAdapter : public scene::TraceSource
 {
@@ -131,39 +132,46 @@ public:
     std::optional<Channel> channel(int index) const override
     {
         const int ch = m_renderer.actualChannelAt(index);
-        if (!m_renderer.m_model || ch < 0)
+        const scene::TraceSource* source = buffer();
+        if (!source || ch < 0)
             return std::nullopt;
-        ChannelDisplayInfo info = m_renderer.m_model->channelInfo(ch);
-        return Channel{std::move(info.name), std::move(info.typeLabel), info.amplitudeMax, toSceneColor(info.color), info.bad};
+        return source->channel(ch);
     }
 
     float value_at(int index, int sample) const override
     {
         const int ch = m_renderer.actualChannelAt(index);
-        return (m_renderer.m_model && ch >= 0) ? m_renderer.m_model->sampleValueAt(ch, sample) : 0.f;
+        const scene::TraceSource* source = buffer();
+        return (source && ch >= 0) ? source->value_at(ch, sample) : 0.f;
     }
 
     int first_sample() const override
     {
-        const ChannelDataModel* model = m_renderer.m_model.data();
-        return (model && model->totalSamples() > 0) ? model->firstSample() : 0;
+        const scene::TraceSource* source = buffer();
+        return (source && source->sample_count() > 0) ? source->first_sample() : 0;
     }
 
     int sample_count() const override
     {
-        return m_renderer.m_model ? m_renderer.m_model->totalSamples() : 0;
+        const scene::TraceSource* source = buffer();
+        return source ? source->sample_count() : 0;
     }
 
     scene::TraceVertices vertices(int index, int first, int last, int pixelWidth) const override
     {
-        scene::TraceVertices result{first, {}};
         const int ch = m_renderer.actualChannelAt(index);
-        if (m_renderer.m_model && ch >= 0)
-            result.xy = m_renderer.m_model->decimatedVertices(ch, first, last, pixelWidth, result.first_sample);
-        return result;
+        const scene::TraceSource* source = buffer();
+        if (!source || ch < 0)
+            return {first, {}};
+        return source->vertices(ch, first, last, pixelWidth);
     }
 
 private:
+    const scene::TraceSource* buffer() const
+    {
+        return m_renderer.m_model ? &m_renderer.m_model->buffer() : nullptr;
+    }
+
     const ChannelRhiRenderer& m_renderer;
 };
 
@@ -622,9 +630,11 @@ std::vector<int> ChannelRhiRenderer::effectiveChannelIndices() const
 {
     if (!m_model)
         return {};
-    const ChannelDataModel* model = m_model.data();
-    return scene::visible_channels(model->channelCount(), m_filteredChannels, m_hideBadChannels,
-                                   [model](int channel) { return model->channelInfo(channel).bad; });
+    const scene::TraceBuffer& buffer = m_model->buffer();
+    return scene::visible_channels(buffer.channel_count(), m_filteredChannels, m_hideBadChannels, [&buffer](int channel) {
+        const std::optional<scene::TraceSource::Channel> info = buffer.channel(channel);
+        return info && info->bad;
+    });
 }
 
 //=============================================================================================================
