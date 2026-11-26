@@ -911,7 +911,13 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/scene/software-bindings',
         'api/scene/software-fragment',
         'api/scene/trace-frame-builder',
-        'api/scene/trace-overlay-uniforms'
+        'api/scene/trace-overlay-uniforms',
+        'api/scene/brain-frame-builder',
+        'api/scene/brain-surface-uniforms',
+        'api/scene/brain-instance-uniforms',
+        'api/scene/gpu-stream-view',
+        'api/scene/brain-surface-streams',
+        'api/scene/brain-instanced-streams'
       ],
     }
 ];

@@ -9539,9 +9539,15 @@
         "windows-2025-vs2026-qt-min": "absent"
       },
       "registry_classes": [
+        "BrainFrameBuilder",
+        "BrainInstanceUniforms",
+        "BrainInstancedStreams",
+        "BrainSurfaceStreams",
+        "BrainSurfaceUniforms",
         "BrainViewInteraction",
         "BrainViewOverlay",
         "CameraMatrices",
+        "GpuStreamView",
         "KeyEvent",
         "OrbitCamera",
         "PaneCamera",
