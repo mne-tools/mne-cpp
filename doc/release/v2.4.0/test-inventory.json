@@ -6,9 +6,9 @@
     "commit": "0800c9a1bf606c2df8c44e35fbb42ea13029b549"
   },
   "summary": {
-    "directories": 296,
+    "directories": 297,
     "registration": {
-      "unconditional": 283,
+      "unconditional": 284,
       "conditional": 10,
       "unregistered": 3
     },
@@ -75,6 +75,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
+          "test_scene_gpu_frame",
           "test_scene_render",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
@@ -178,6 +179,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
+          "test_scene_gpu_frame",
           "test_scene_render",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
@@ -281,6 +283,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
+          "test_scene_gpu_frame",
           "test_scene_render",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
@@ -384,6 +387,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
+          "test_scene_gpu_frame",
           "test_scene_render",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
@@ -487,6 +491,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
+          "test_scene_gpu_frame",
           "test_scene_render",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
@@ -590,6 +595,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_scene_brain_view",
+          "test_scene_gpu_frame",
           "test_scene_render",
           "test_scene_trace_buffer",
           "test_scene_trace_view"
@@ -9546,6 +9552,56 @@
       ]
     },
     {
+      "name": "test_scene_gpu_frame",
+      "cmake": "src/tests/test_scene_gpu_frame/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_scene_gpu_frame"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "GpuBuffer",
+        "GpuDraw",
+        "GpuFrame",
+        "GpuFrameTarget",
+        "GpuPass",
+        "GpuPipeline",
+        "GpuRect",
+        "GpuResources",
+        "GpuTexture",
+        "GpuTextureBinding",
+        "GpuUniformBlock",
+        "GpuVertexAttribute",
+        "GpuVertexBinding",
+        "SoftwareBindings",
+        "SoftwareFragment",
+        "SoftwareRenderer",
+        "SoftwareShader"
+      ]
+    },
+    {
       "name": "test_scene_render",
       "cmake": "src/tests/test_scene_render/CMakeLists.txt",
       "registration": {
@@ -9679,8 +9735,10 @@
       "registry_classes": [
         "PointerEvent",
         "TraceDraw",
+        "TraceFrameBuilder",
         "TraceGeometry",
         "TraceMarkers",
+        "TraceOverlayUniforms",
         "TraceSource",
         "TraceStyle",
         "TraceUniforms",

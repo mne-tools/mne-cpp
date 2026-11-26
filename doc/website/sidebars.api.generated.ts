@@ -891,7 +891,26 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/scene/brain-view-interaction',
         'api/scene/brain-view-overlay',
         'api/scene/trace-buffer',
-        'api/scene/sweep-buffer'
+        'api/scene/sweep-buffer',
+        'api/scene/gpu-resources',
+        'api/scene/gpu-frame',
+        'api/scene/gpu-frame-target',
+        'api/scene/gpu-pass',
+        'api/scene/gpu-draw',
+        'api/scene/gpu-pipeline',
+        'api/scene/gpu-buffer',
+        'api/scene/gpu-texture',
+        'api/scene/gpu-vertex-attribute',
+        'api/scene/gpu-vertex-binding',
+        'api/scene/gpu-uniform-block',
+        'api/scene/gpu-texture-binding',
+        'api/scene/gpu-rect',
+        'api/scene/software-renderer',
+        'api/scene/software-shader',
+        'api/scene/software-bindings',
+        'api/scene/software-fragment',
+        'api/scene/trace-frame-builder',
+        'api/scene/trace-overlay-uniforms'
       ],
     }
 ];

@@ -1,0 +1,83 @@
+---
+id: software-renderer
+title: "mne::scene::SoftwareRenderer"
+sidebar_label: SoftwareRenderer
+sidebar_position: 100
+---
+
+# SoftwareRenderer
+
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/software_renderer.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/software_renderer.h)
+
+`#include <mne/scene/software_renderer.h>`
+
+```cpp
+class mne::scene::SoftwareRenderer
+```
+
+Executes a [`GpuFrame`](/docs/api/scene/gpu-frame) on the CPU.
+
+Triangles are rasterized with perspective-correct varyings, near- and far-plane clipping, depth testing and face culling; lines and points are one pixel wide, as on the GPU backends. Figure textures are rasterized with `to_raster()`. The shaders of the views in mne_scene are registered on construction; `set_shader()` adds others. Draws whose shader is unknown are skipped.
+
+---
+
+## Public Methods
+
+### SoftwareRenderer()
+
+Creates a renderer with the shaders of the views in mne_scene.
+
+---
+
+### set_shader(id, shader)
+
+Adds or replaces a shader.
+
+**Parameters:**
+
+- **id** : *const std::string &*
+  Shader id the pipelines refer to.
+
+- **shader** : *[SoftwareShader](/docs/api/scene/software-shader)*
+  Implementation.
+
+---
+
+### has_shader(id)
+
+**Parameters:**
+
+- **id** : *const std::string &*
+  Shader id.
+
+**Returns:**
+
+- *bool* — Whether a shader with the id is registered.
+
+---
+
+### render(frame, resources)
+
+Renders a frame.
+
+**Parameters:**
+
+- **frame** : *const [GpuFrame](/docs/api/scene/gpu-frame) &*
+  Passes and draws.
+
+- **resources** : *const [GpuResources](/docs/api/scene/gpu-resources) &*
+  Buffers, textures and pipelines the frame refers to.
+
+**Returns:**
+
+- *[Image](/docs/api/scene/image)* — The target image, frame.pixel_width x frame.pixel_height, not premultiplied.
+
+---
+
+## Example
+
+No example of its own: CPU backend of the GPU frame description; exercised with golden images by test_scene_gpu_frame and test_scene_trace_view.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

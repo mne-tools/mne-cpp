@@ -1,0 +1,118 @@
+---
+id: trace-frame-builder
+title: "mne::scene::TraceFrameBuilder"
+sidebar_label: TraceFrameBuilder
+sidebar_position: 104
+---
+
+# TraceFrameBuilder
+
+**Namespace:** `mne::scene` &nbsp;·&nbsp; **Library:** Scene Library &nbsp;·&nbsp; **Source:** [`scene/trace_frame.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/scene/trace_frame.h)
+
+`#include <mne/scene/trace_frame.h>`
+
+```cpp
+class mne::scene::TraceFrameBuilder
+```
+
+Describes the frames of a trace view as [`GpuFrame`](/docs/api/scene/gpu-frame) for any backend.
+
+One pass clears to the background and draws one line strip per trace (shader "channeldata"), then the annotations, events and epoch markers with the per-second bands (shader "overlay" over a texture that spans `overlay_prefetch()` view widths on each side, so scrolling does not redraw it), then the crosshair, scalebars, ruler and annotation selection (shader "overlay" over a screen-sized texture). The builder keeps the vertex buffers, textures and pipelines in `resources()` and streams vertices through its [`TraceGeometry`](/docs/api/scene/trace-geometry).
+
+---
+
+## Public Methods
+
+### TraceFrameBuilder()
+
+Creates a builder with its pipelines and the vertex buffer of the overlay quad.
+
+---
+
+### geometry()
+
+**Returns:**
+
+- *[TraceGeometry](/docs/api/scene/trace-geometry) &* — The trace vertices; invalidate() them after a zoom or a data change.
+
+---
+
+### geometry()
+
+**Returns:**
+
+- *const [TraceGeometry](/docs/api/scene/trace-geometry) &* — The trace vertices.
+
+---
+
+### invalidate_overlay()
+
+Marks the annotation, event and epoch overlay as outdated, e.g.
+
+after the annotations changed.
+
+---
+
+### build(view, source, style, markers, metrics, target)
+
+Describes the next frame; streams vertices and redraws the textures as needed.
+
+**Parameters:**
+
+- **view** : *const [TraceView](/docs/api/scene/trace-view) &*
+  Viewport, overlays and annotations.
+
+- **source** : *const [TraceSource](/docs/api/scene/trace-source) &*
+  The channels.
+
+- **style** : *const [TraceStyle](/docs/api/scene/trace-style) &*
+  Colours and scales; the background is the clear colour, grid the per-second bands.
+
+- **markers** : *const [TraceMarkers](/docs/api/scene/trace-markers) &*
+  Events and epoch markers.
+
+- **metrics** : *const [TextMetrics](/docs/api/scene/text-metrics) &*
+  Measures the text of the overlays.
+
+- **target** : *const [GpuFrameTarget](/docs/api/scene/gpu-frame-target) &*
+  Size and pixel ratio of the target.
+
+**Returns:**
+
+- *[GpuFrame](/docs/api/scene/gpu-frame)* — The frame, referring to `resources()`.
+
+---
+
+### hud_texture()
+
+**Returns:**
+
+- *GpuHandle* — The texture of the crosshair, scalebars, ruler and annotation selection; 0 until first drawn.
+
+---
+
+### resources()
+
+**Returns:**
+
+- *const [GpuResources](/docs/api/scene/gpu-resources) &* — The buffers, textures and pipelines of the frames.
+
+---
+
+## Static Methods
+
+### overlay_prefetch()
+
+**Returns:**
+
+- *double* — How many view widths the overlay texture spans on each side of the view.
+
+---
+
+## Example
+
+No example of its own: Describes trace view frames for any GPU backend; driven by disp::ChannelRhiRenderer and exercised with a golden image by test_scene_trace_view.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

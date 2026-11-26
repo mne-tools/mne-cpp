@@ -2,8 +2,8 @@
   "schema_version": 1,
   "generated_by": "scripts/quality/audit_maintainability.py",
   "policy": "scripts/quality/maintainability_policy.json",
-  "scanned_files": 1688,
-  "scanned_lines": 432694,
+  "scanned_files": 1696,
+  "scanned_lines": 434581,
   "metrics": {
     "null_macro": {
       "total": 0,
