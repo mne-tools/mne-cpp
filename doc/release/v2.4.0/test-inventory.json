@@ -6,9 +6,9 @@
     "commit": "0800c9a1bf606c2df8c44e35fbb42ea13029b549"
   },
   "summary": {
-    "directories": 298,
+    "directories": 300,
     "registration": {
-      "unconditional": 285,
+      "unconditional": 287,
       "conditional": 10,
       "unregistered": 3
     },
@@ -62,6 +62,7 @@
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
+          "test_dsp_rt_raw_display",
           "test_math_kmeans",
           "test_math_matrix_io",
           "test_math_numerics",
@@ -79,7 +80,8 @@
           "test_scene_render",
           "test_scene_settings_form",
           "test_scene_trace_buffer",
-          "test_scene_trace_view"
+          "test_scene_trace_view",
+          "test_viewmodels"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -167,6 +169,7 @@
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
+          "test_dsp_rt_raw_display",
           "test_math_kmeans",
           "test_math_matrix_io",
           "test_math_numerics",
@@ -184,7 +187,8 @@
           "test_scene_render",
           "test_scene_settings_form",
           "test_scene_trace_buffer",
-          "test_scene_trace_view"
+          "test_scene_trace_view",
+          "test_viewmodels"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -272,6 +276,7 @@
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
+          "test_dsp_rt_raw_display",
           "test_math_kmeans",
           "test_math_matrix_io",
           "test_math_numerics",
@@ -289,7 +294,8 @@
           "test_scene_render",
           "test_scene_settings_form",
           "test_scene_trace_buffer",
-          "test_scene_trace_view"
+          "test_scene_trace_view",
+          "test_viewmodels"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -377,6 +383,7 @@
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
+          "test_dsp_rt_raw_display",
           "test_math_kmeans",
           "test_math_matrix_io",
           "test_math_numerics",
@@ -394,7 +401,8 @@
           "test_scene_render",
           "test_scene_settings_form",
           "test_scene_trace_buffer",
-          "test_scene_trace_view"
+          "test_scene_trace_view",
+          "test_viewmodels"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -482,6 +490,7 @@
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
+          "test_dsp_rt_raw_display",
           "test_math_kmeans",
           "test_math_matrix_io",
           "test_math_numerics",
@@ -499,7 +508,8 @@
           "test_scene_render",
           "test_scene_settings_form",
           "test_scene_trace_buffer",
-          "test_scene_trace_view"
+          "test_scene_trace_view",
+          "test_viewmodels"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -587,6 +597,7 @@
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
+          "test_dsp_rt_raw_display",
           "test_math_kmeans",
           "test_math_matrix_io",
           "test_math_numerics",
@@ -604,7 +615,8 @@
           "test_scene_render",
           "test_scene_settings_form",
           "test_scene_trace_buffer",
-          "test_scene_trace_view"
+          "test_scene_trace_view",
+          "test_viewmodels"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -3951,6 +3963,41 @@
         "windows-2025-vs2026-qt-min": "absent"
       },
       "registry_classes": []
+    },
+    {
+      "name": "test_dsp_rt_raw_display",
+      "cmake": "src/tests/test_dsp_rt_raw_display/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_rt_raw_display"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "DisplayCorrection",
+        "RtRawDisplay"
+      ]
     },
     {
       "name": "test_dsp_simulate",
@@ -11124,6 +11171,42 @@
       },
       "registry_classes": [
         "InvTrapMusic"
+      ]
+    },
+    {
+      "name": "test_viewmodels",
+      "cmake": "src/tests/test_viewmodels/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viewmodels"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "BidsTree",
+        "ChannelTable",
+        "SpectrumTable"
       ]
     },
     {

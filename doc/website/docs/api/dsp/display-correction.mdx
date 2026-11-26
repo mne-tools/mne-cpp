@@ -1,0 +1,119 @@
+---
+id: display-correction
+title: "mne::DisplayCorrection"
+sidebar_label: DisplayCorrection
+sidebar_position: 86
+---
+
+# DisplayCorrection
+
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/display_correction.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/dsp/display_correction.h)
+
+`#include <mne/dsp/display_correction.h>`
+
+```cpp
+class mne::DisplayCorrection
+```
+
+Builds and applies the SSP projector and the CTF compensator of a viewer.
+
+---
+
+## Public Methods
+
+### reset(channels)
+
+Resets both operators to the identity of `channels` channels and deactivates them.
+
+**Parameters:**
+
+- **channels** : *int*
+  Number of channels.
+
+---
+
+### update_projection(info)
+
+Rebuilds the SSP projector from the projectors and bad channels of `info`.
+
+The projector is active when at least one projector of `info` is active.
+
+**Parameters:**
+
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
+  Measurement info with the projectors and the bad channels.
+
+---
+
+### update_compensator(info, to)
+
+Rebuilds the compensator that takes the data from grade 0 to grade `to`.
+
+Grade 0 deactivates it.
+
+**Parameters:**
+
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
+  Measurement info with the compensation data.
+
+- **to** : *int*
+  Target compensation grade.
+
+---
+
+### apply(data)
+
+Applies the active operators to `data`.
+
+An operator whose size does not match the rows of `data`, or that is inactive, is skipped.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Data, channels by samples.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — The corrected data.
+
+---
+
+### projection_active()
+
+**Returns:**
+
+- *bool* — Whether at least one SSP projector is active.
+
+---
+
+### compensator_active()
+
+**Returns:**
+
+- *bool* — Whether a compensation grade other than 0 is selected.
+
+---
+
+### projector()
+
+**Returns:**
+
+- *const Eigen::MatrixXd &* — The dense SSP projector, with the columns of bad channels zeroed.
+
+---
+
+### compensator()
+
+**Returns:**
+
+- *const Eigen::MatrixXd &* — The dense compensator.
+
+---
+
+## Example
+
+No example of its own: SSP and compensator of the viewers; applied by disp::RtFiffRawViewModel and disp::EvokedSetModel and exercised by test_dsp_rt_raw_display, it has no standalone use without a viewer.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

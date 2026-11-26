@@ -229,6 +229,26 @@ Adds a Text field.
 
 ---
 
+### add_flag(key, value)
+
+Adds a flag: a Bool field that is never shown or stored, e.g.
+
+a mode of the host that conditions refer to.
+
+**Parameters:**
+
+- **key** : *const std::string &*
+  Field key.
+
+- **value** : *bool*
+  Default value.
+
+**Returns:**
+
+- *const [SettingField](/docs/api/scene/setting-field) &* — The stored field.
+
+---
+
 ### add_action(key, label, group)
 
 Adds an Action field, a button that triggers listeners.
@@ -452,7 +472,7 @@ Triggers an action: listeners hear its key without a value.
 
 **Returns:**
 
-- *bool* — Whether the field is shown, from its visible_if condition.
+- *bool* — Whether the field is shown: not hidden and its visible_if condition holds.
 
 ---
 

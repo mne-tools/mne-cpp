@@ -161,8 +161,8 @@
       "missing_tests": []
     },
     "dsp": {
-      "classes": 78,
-      "tested": 33,
+      "classes": 80,
+      "tested": 35,
       "untested": [
         "AnnotateAmplitudeParams",
         "AnnotateMusclParams",
@@ -480,6 +480,12 @@
         "StatsSourceMetrics",
         "StatsTtestResult"
       ],
+      "missing_tests": []
+    },
+    "viewmodels": {
+      "classes": 3,
+      "tested": 3,
+      "untested": [],
       "missing_tests": []
     }
   }

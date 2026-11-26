@@ -11,7 +11,7 @@
   },
   "gates": {
     "G1_test_integrity": {
-      "registered": 295,
+      "registered": 297,
       "conditional": 10,
       "unregistered": 3,
       "without_labels": 0,
@@ -64,6 +64,7 @@
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
+          "test_dsp_rt_raw_display",
           "test_math_kmeans",
           "test_math_matrix_io",
           "test_math_numerics",
@@ -81,7 +82,8 @@
           "test_scene_render",
           "test_scene_settings_form",
           "test_scene_trace_buffer",
-          "test_scene_trace_view"
+          "test_scene_trace_view",
+          "test_viewmodels"
         ],
         "macos-26-qt-min": [
           "test_acq_convert",
@@ -114,6 +116,7 @@
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
+          "test_dsp_rt_raw_display",
           "test_math_kmeans",
           "test_math_matrix_io",
           "test_math_numerics",
@@ -131,7 +134,8 @@
           "test_scene_render",
           "test_scene_settings_form",
           "test_scene_trace_buffer",
-          "test_scene_trace_view"
+          "test_scene_trace_view",
+          "test_viewmodels"
         ],
         "ubuntu-24.04": [
           "test_acq_convert",
@@ -164,6 +168,7 @@
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
+          "test_dsp_rt_raw_display",
           "test_math_kmeans",
           "test_math_matrix_io",
           "test_math_numerics",
@@ -181,7 +186,8 @@
           "test_scene_render",
           "test_scene_settings_form",
           "test_scene_trace_buffer",
-          "test_scene_trace_view"
+          "test_scene_trace_view",
+          "test_viewmodels"
         ],
         "ubuntu-24.04-qt-min": [
           "test_acq_convert",
@@ -214,6 +220,7 @@
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
+          "test_dsp_rt_raw_display",
           "test_math_kmeans",
           "test_math_matrix_io",
           "test_math_numerics",
@@ -231,7 +238,8 @@
           "test_scene_render",
           "test_scene_settings_form",
           "test_scene_trace_buffer",
-          "test_scene_trace_view"
+          "test_scene_trace_view",
+          "test_viewmodels"
         ],
         "windows-2025-vs2026": [
           "test_acq_convert",
@@ -264,6 +272,7 @@
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
+          "test_dsp_rt_raw_display",
           "test_math_kmeans",
           "test_math_matrix_io",
           "test_math_numerics",
@@ -281,7 +290,8 @@
           "test_scene_render",
           "test_scene_settings_form",
           "test_scene_trace_buffer",
-          "test_scene_trace_view"
+          "test_scene_trace_view",
+          "test_viewmodels"
         ],
         "windows-2025-vs2026-qt-min": [
           "test_acq_convert",
@@ -314,6 +324,7 @@
           "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
+          "test_dsp_rt_raw_display",
           "test_math_kmeans",
           "test_math_matrix_io",
           "test_math_numerics",
@@ -331,7 +342,8 @@
           "test_scene_render",
           "test_scene_settings_form",
           "test_scene_trace_buffer",
-          "test_scene_trace_view"
+          "test_scene_trace_view",
+          "test_viewmodels"
         ]
       },
       "ci_failures": 0,
@@ -355,12 +367,12 @@
       }
     },
     "G3_api_documentation": {
-      "public_api_units": 682,
+      "public_api_units": 687,
       "exported_not_registered": 2,
       "example_eligible": 457,
       "eligible_backed_percent": 99.56,
       "snippets": 501,
-      "registered_test_percent": 53.82
+      "registered_test_percent": 54.16
     },
     "G4_screenshots": {
       "referenced_images": 19,

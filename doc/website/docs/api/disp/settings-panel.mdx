@@ -17,7 +17,7 @@ class mne::disp::SettingsPanel
 
 Qt Widgets for a [`SettingsForm`](/docs/api/scene/settings-form).
 
-The panel shares the form with its host, so it outlives the host's members when Qt deletes it as a child. Fields are laid out in the order of the form, one group box per group (fields without a group come first, without a box). Custom fields get an empty container the host fills with its own widget (`customWidget()`).
+The panel shares the form with its host, so it outlives the host's members when Qt deletes it as a child. Fields are laid out in the order of the form, one group box per group (fields without a group come first, without a box); a group box hides while none of its fields shows, and hidden fields get no widget. Custom fields get an empty container the host fills with its own widget (`customWidget()`).
 
 ### Inheritance
 
@@ -84,7 +84,7 @@ Builds the widgets of a form.
 
 ### loadSettings(path)
 
-Reads the values stored under `path`; missing ones keep their current value.
+Reads the values stored under `path`; missing ones and fields that are not persistent keep their current value.
 
 **Parameters:**
 
@@ -95,7 +95,7 @@ Reads the values stored under `path`; missing ones keep their current value.
 
 ### saveSettings(path)
 
-Stores the values under `path`, one QSettings key per field.
+Stores the values under `path`, one QSettings key per persistent field.
 
 **Parameters:**
 

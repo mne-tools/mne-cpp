@@ -1,0 +1,284 @@
+---
+id: rt-raw-display
+title: "mne::RtRawDisplay"
+sidebar_label: RtRawDisplay
+sidebar_position: 87
+---
+
+# RtRawDisplay
+
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_raw_display.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/dsp/rt/rt_raw_display.h)
+
+`#include <mne/dsp/rt_raw_display.h>`
+
+```cpp
+class mne::RtRawDisplay
+```
+
+Prepares blocks of streamed raw data for a real-time viewer.
+
+---
+
+## Public Methods
+
+### set_info(info)
+
+Sets the measurement info: resets the SSP projector and compensator, the filter overlap, the filtered channels and the SPHARA channel indices.
+
+The info is shared, so later changes of its projectors and bad channels are picked up by the next `update_projection()`.
+
+**Parameters:**
+
+- **info** : *std::shared_ptr&lt; const [FiffInfo](/docs/api/fiff/fiff-info) &gt;*
+  Measurement info of the stream.
+
+---
+
+### update_projection()
+
+Rebuilds the SSP projector from the projectors and bad channels of the info.
+
+---
+
+### update_compensator(to)
+
+Rebuilds the compensator for the compensation grade `to`; 0 deactivates it.
+
+**Parameters:**
+
+- **to** : *int*
+  Target compensation grade.
+
+---
+
+### correction()
+
+**Returns:**
+
+- *const [DisplayCorrection](/docs/api/dsp/display-correction) &* — The SSP projector and compensator.
+
+---
+
+### load_sphara_bases(directory)
+
+Loads the SPHARA basis functions of VectorView, BabyMEG and EEG from `directory`.
+
+Missing files leave the respective basis empty, so SPHARA stays the identity for that system.
+
+**Parameters:**
+
+- **directory** : *const std::string &*
+  Directory with the SPHARA basis files.
+
+---
+
+### update_sphara_options(system, first, second)
+
+Rebuilds the SPHARA operator for `system` ("VectorView", "BabyMEG" or "EEG").
+
+**Parameters:**
+
+- **system** : *const std::string &*
+  Name of the sensor system.
+
+- **first** : *int*
+  Number of basis functions of the first sensor group.
+
+- **second** : *int*
+  Number of basis functions of the second sensor group (VectorView magnetometers).
+
+---
+
+### set_sphara_active(active)
+
+Turns SPHARA on or off.
+
+**Parameters:**
+
+- **active** : *bool*
+  Whether SPHARA is applied.
+
+---
+
+### applies_sphara(rows)
+
+**Parameters:**
+
+- **rows** : *Eigen::Index*
+  Number of channels of the data.
+
+**Returns:**
+
+- *bool* — Whether SPHARA is active and its operator matches `rows` channels.
+
+---
+
+### sphara_operator()
+
+**Returns:**
+
+- *const Eigen::SparseMatrix&lt; double &gt; &* — The SPHARA operator, channels by channels.
+
+---
+
+### set_filters(kernels)
+
+Sets the FIR kernels.
+
+The overlap is cleared and the start-up transient of the next block is dropped.
+
+**Parameters:**
+
+- **kernels** : *std::vector&lt; [FilterKernel](/docs/api/dsp/filter-kernel) &gt;*
+  Filter kernels, applied one after the other.
+
+---
+
+### set_filter_active(active)
+
+Turns filtering on or off.
+
+**Parameters:**
+
+- **active** : *bool*
+  Whether the filters are applied.
+
+---
+
+### filtering()
+
+**Returns:**
+
+- *bool* — Whether kernels are set and filtering is on.
+
+---
+
+### filters()
+
+**Returns:**
+
+- *const std::vector&lt; [FilterKernel](/docs/api/dsp/filter-kernel) &gt; &* — The FIR kernels.
+
+---
+
+### max_filter_length()
+
+**Returns:**
+
+- *int* — The longest kernel order, at least 1 once kernels were set.
+
+---
+
+### filter_delay()
+
+**Returns:**
+
+- *int* — How many samples the filter output lags behind its input.
+
+---
+
+### set_filter_channel_type(type)
+
+Selects the filtered channels: MEG, EEG, EOG, ECG and EMG channels whose name contains `type`, or all of them for "All".
+
+**Parameters:**
+
+- **type** : *const std::string &*
+  Channel name part or "All".
+
+---
+
+### filter_channel_type()
+
+**Returns:**
+
+- *const std::string &* — The channel name part that selects the filtered channels.
+
+---
+
+### clear_filter_state()
+
+Clears the filter overlap, e.g.
+
+when the display is cleared.
+
+---
+
+### set_trigger_detection(active, channel, threshold)
+
+Sets the trigger detection.
+
+**Parameters:**
+
+- **active** : *bool*
+  Whether flanks are detected.
+
+- **channel** : *int*
+  Row of the trigger channel.
+
+- **threshold** : *double*
+  Detection threshold.
+
+---
+
+### trigger_detection_active()
+
+**Returns:**
+
+- *bool* — Whether trigger flanks are detected.
+
+---
+
+### trigger_channel()
+
+**Returns:**
+
+- *int* — Row of the trigger channel.
+
+---
+
+### trigger_threshold()
+
+**Returns:**
+
+- *double* — Trigger detection threshold.
+
+---
+
+### correct(block)
+
+Applies SSP and compensator to `block` and detects trigger flanks on the uncorrected block.
+
+**Parameters:**
+
+- **block** : *const Eigen::MatrixXd &*
+  Raw data, channels by samples.
+
+**Returns:**
+
+- *Corrected* — The corrected block and its trigger flanks.
+
+---
+
+### filter(corrected)
+
+Filters the selected channels of a corrected block with overlap-add across blocks.
+
+**Parameters:**
+
+- **corrected** : *const Eigen::MatrixXd &*
+  `Corrected` data, channels by samples.
+
+**Returns:**
+
+- *std::optional&lt; Filtered &gt;* — The filtered block, or nothing when the block is shorter than the longest kernel.
+
+---
+
+## Example
+
+No example of its own: Display pre-processing of the real-time raw view; driven by disp::RtFiffRawViewModel and exercised by test_dsp_rt_raw_display, it has no standalone use without a real-time host.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

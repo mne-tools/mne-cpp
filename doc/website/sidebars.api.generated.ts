@@ -311,6 +311,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/dsp/derivation-rule',
         'api/dsp/dpss-result',
         'api/dsp/epoch-extractor-params',
+        'api/dsp/display-correction',
+        'api/dsp/rt-raw-display',
         'api/dsp/trigger-flank'
       ],
     },
@@ -922,6 +924,18 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/scene/settings-form',
         'api/scene/setting-field',
         'api/scene/setting-choice'
+      ],
+    },
+    {
+      type: 'category',
+      label: "View Models Library",
+      collapsible: true,
+      collapsed: true,
+      link: {type: 'doc', id: 'api/viewmodels/index'},
+      items: [
+        'api/viewmodels/channel-table',
+        'api/viewmodels/spectrum-table',
+        'api/viewmodels/bids-tree'
       ],
     }
 ];
