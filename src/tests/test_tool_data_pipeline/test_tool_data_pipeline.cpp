@@ -1292,6 +1292,55 @@ private slots:
     }
 
     //=========================================================================================================
+    // mne_render — raw traces and a surface with a source estimate, headless
+    //=========================================================================================================
+
+    void testRenderRawAndBrain()
+    {
+        if (!toolExists("mne_render"))
+            QSKIP("mne_render not found");
+        const QString rawFile = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
+        const QString surfFile = m_sResourcePath + "subjects/sample/surf/lh.white";
+        const QString stcFile = m_sResourcePath + "Result/parity/compute_raw_inverse/ref-lh.stc";
+        if (!QFile::exists(rawFile) || !QFile::exists(surfFile) || !QFile::exists(stcFile))
+            QSKIP("Raw, surface or source estimate data not available");
+
+        // Raw traces as PNG at twice the resolution and as SVG
+        const QString rawPng = m_tempDir.path() + "/render_raw.png";
+        runTool("mne_render", {"--raw", rawFile, "--out", rawPng, "--width", "400", "--height", "300", "--scale", "2", "--autoscale"}, 120000);
+        QImage raw(rawPng);
+        QCOMPARE(raw.size(), QSize(800, 600));
+        // Traces leave dark pixels on the light background
+        int ink = 0;
+        for (int y = 0; y < raw.height(); ++y)
+            ink += qGray(raw.pixel(400, y)) < 160 ? 1 : 0;
+        QVERIFY(ink > 0);
+        const QString rawSvg = m_tempDir.path() + "/render_raw.svg";
+        runTool("mne_render", {"--raw", rawFile, "--out", rawSvg, "--width", "400", "--height", "300", "--channels", "5"}, 120000);
+        QFile svg(rawSvg);
+        QVERIFY(svg.open(QIODevice::ReadOnly));
+        QCOMPARE(svg.readAll().count("<polyline"), 5);
+
+        // The left hemisphere with the source estimate seen from the left
+        const QString brainPng = m_tempDir.path() + "/render_brain.png";
+        runTool("mne_render", {"--surf", surfFile, "--stc", stcFile, "--out", brainPng, "--width", "320", "--height", "240"}, 120000);
+        QImage brain(brainPng);
+        QCOMPARE(brain.size(), QSize(320, 240));
+        QCOMPARE(brain.pixelColor(0, 0), QColor(Qt::black));
+        QVERIFY(qGray(brain.pixel(160, 120)) > 40);
+
+        // Wrong arguments fail
+        QString path = m_sBinDir + "/mne_render";
+#ifdef Q_OS_WIN
+        path += ".exe";
+#endif
+        QProcess process;
+        process.start(path, {"--out", brainPng});
+        QVERIFY(process.waitForFinished(60000));
+        QVERIFY(process.exitCode() != 0);
+    }
+
+    //=========================================================================================================
     // mne_convert_surface — FreeSurfer surface to tri format
     //=========================================================================================================
 

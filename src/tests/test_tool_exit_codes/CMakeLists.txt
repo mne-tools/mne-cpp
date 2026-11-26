@@ -117,6 +117,7 @@ set(CLI_TOOL_TARGETS
     mne_volume_source_space
     mne_rt_server
     mne_simu
+    mne_render
     mne_screenshot_regression
     mne_acq_tool
     mne_acq_bench

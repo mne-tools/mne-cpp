@@ -1,0 +1,69 @@
+---
+title: mne_render
+sidebar_label: mne_render
+---
+
+# mne_render
+
+## Overview
+
+`mne_render` renders raw data traces or a FreeSurfer surface with a source estimate to an image, without Qt, a
+window system or a GPU. It runs the same views as the Qt applications: the trace view of the raw browser and the
+3-D brain view, whose frames are executed by the software renderer of the `mne_scene` library. It is useful on
+servers and in batch scripts, e.g. for reports and figures.
+
+## Usage
+
+```bash
+mne_render --raw <file> --out <image.png|image.svg> [options]
+mne_render --surf <surface> [--stc <file.stc>] --out <image.png> [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--raw <file>` | Raw FIFF file whose traces are rendered. |
+| `--surf <file>` | FreeSurfer surface to render, e.g. `lh.white`; the curvature next to it is read too. |
+| `--out <file>` | Output image, `.png` or (raw data only) `.svg`. |
+| `--width <pixels>` | Image width in pixels (default: `1200`). |
+| `--height <pixels>` | Image height in pixels (default: `800`). |
+| `--scale <factor>` | Pixels per figure pixel of a PNG, e.g. `2` for high resolution (default: `1`). |
+| `--start <sec>` | Raw data: first second shown, from the start of the file (default: `0`). |
+| `--duration <sec>` | Raw data: seconds shown (default: `10`). |
+| `--channels <n>` | Raw data: number of channel rows (default: `20`). |
+| `--first-channel <n>` | Raw data: first channel row (default: `0`). |
+| `--autoscale` | Raw data: scale every channel type to five times the median standard deviation of its channels instead of the raw browser's default scales. |
+| `--scalebars` | Raw data: draw scalebars. |
+| `--stc <file>` | Surface: source estimate (`.stc`) of the hemisphere. |
+| `--time <sec>` | Surface: time of the source estimate in seconds (default: the first sample). |
+| `--smooth <n>` | Surface: smoothing steps that spread the source values over the surface (default: `10`). |
+| `--fthresh <value>` | Surface: lowest absolute value shown (default: 30 % of fmax). |
+| `--fmax <value>` | Surface: value at the top of the colour scale (default: the largest value). |
+| `--colormap <name>` | Surface: colour map, e.g. `Hot`, `Jet`, `Viridis` (default: `Hot`). |
+| `--view <name>` | Surface: camera, one of `top`, `perspective`, `front`, `left`, `bottom`, `back`, `right` (default: `left`). |
+| `--help` | Print help |
+| `--version` | Print version |
+
+## Description
+
+For raw data the traces, the alternating per-second bands and, with `--scalebars`, the scalebars are drawn as in
+the raw browser of MNE Browse and MNE Scan. PNG files are rendered through the GPU frame description of the trace
+view; SVG files are written from the trace figure as vector graphics.
+
+For a surface the source values at the time given by `--time` are spread over the surface by `--smooth` steps;
+vertices below `--fthresh` show the curvature in grey, the others the colour map from `--fthresh` to `--fmax`. The
+surface is lit as in the brain view of MNE Analyze.
+
+### Example
+
+```bash
+# Ten seconds of raw data at twice the resolution, scaled to the signals
+mne_render --raw sample_audvis_raw.fif --out raw.png --scale 2 --autoscale
+
+# The same as SVG, 30 channels from the 100th
+mne_render --raw sample_audvis_raw.fif --out raw.svg --channels 30 --first-channel 100
+
+# A source estimate on the left hemisphere at 100 ms
+mne_render --surf subjects/sample/surf/lh.white --stc sample-lh.stc --time 0.1 --out brain.png
+```

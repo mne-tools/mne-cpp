@@ -358,6 +358,10 @@ aliases; replace the old spelling as below.
   renders headless (`test_scene_brain_view` compares a golden PNG), and
   `test_disp3d_brain_window` checks the frames against the reflection of the
   `.qsb` shaders.
+- New tool `mne_render` renders raw data traces (PNG through the trace view's
+  GPU frames, or SVG) or a FreeSurfer surface with a source estimate (PNG)
+  headless, without Qt, a window system or a GPU, on the software backend of
+  `mne_scene`; `--autoscale` scales channel types to their signals.
   The Qt usage ceiling of `disp` drops to 4543 tokens.
 - The data behind the raw-data views moved to `mne_scene` as well.
   `TraceBuffer` (`scene/trace_buffer.h`) stores the samples of the trace view

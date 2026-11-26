@@ -135,6 +135,7 @@ option(BUILD_MNE_SIMU "Build MNE Simu" ON)
 
 # Visualization / testing
 option(BUILD_MNE_SCREENSHOT_REGRESSION "Build MNE Screenshot Regression" ON)
+option(BUILD_MNE_RENDER "Build MNE Render" ON)
 
 # Acquisition
 option(BUILD_MNE_ACQ_TOOL "Build the mne_acq command-line tool" ON)
@@ -424,6 +425,9 @@ if(NOT WASM)
   endif()
 
   # Visualization / testing
+  if(BUILD_MNE_RENDER)
+    add_subdirectory(visualization/mne_render)
+  endif()
   if(BUILD_MNE_SCREENSHOT_REGRESSION AND TARGET mne_disp3D)
     add_subdirectory(visualization/mne_screenshot_regression)
   endif()

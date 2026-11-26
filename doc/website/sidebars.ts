@@ -144,6 +144,7 @@ const sidebars: SidebarsConfig = {
                                 'manual/tools-make-uniform-stc',
                                 'manual/tools-map-data',
                                 'manual/tools-make-movie',
+                                'manual/tools-render',
                             ],
                         },
                         {
