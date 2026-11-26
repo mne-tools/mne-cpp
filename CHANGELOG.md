@@ -219,7 +219,9 @@ aliases; replace the old spelling as below.
 - `mne::RasterImage` (`base/raster_image.h`) fills anti-aliased polygons,
   draws text in a built-in bitmap font and writes PNG files, without a window
   system or Qt. Fills take an opacity, `fill_polygons()` fills overlapping
-  polygons as one area and `blend_pixel()` mixes a colour into a pixel.
+  polygons as one area and `blend_pixel()` mixes a colour into a pixel;
+  `decode_png()` and `load_png()` read 8-bit RGB and RGBA PNG files, e.g.
+  golden images of the Qt-free tests.
 - New library `mne_scene` (`mne/scene/`), Qt-free: `mne::scene::Canvas`
   records drawing calls that follow `QPainter` (pens, brushes with linear
   gradients, fonts, transforms, clips, opacity, cubic curves, text and images)

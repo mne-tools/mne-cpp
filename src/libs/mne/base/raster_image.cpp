@@ -27,7 +27,9 @@
 #include <array>
 #include <cmath>
 #include <fstream>
+#include <iterator>
 #include <limits>
+#include <string_view>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -408,6 +410,131 @@ std::vector<std::uint8_t> RasterImage::encode_png() const
     appendChunk(png, "IDAT", compressed);
     appendChunk(png, "IEND", {});
     return png;
+}
+
+//=============================================================================================================
+
+Expected<RasterImage> RasterImage::decode_png(std::span<const std::uint8_t> png)
+{
+    static constexpr std::array<std::uint8_t, 8> kSignature = {0x89, 'P', 'N', 'G', '\r', '\n', 0x1A, '\n'};
+    if (png.size() < kSignature.size() || !std::equal(kSignature.begin(), kSignature.end(), png.begin())) {
+        return fail(ErrorCode::Format, "not a PNG file");
+    }
+    const auto big32 = [&png](std::size_t at) {
+        return (std::uint32_t{png[at]} << 24) | (std::uint32_t{png[at + 1]} << 16) | (std::uint32_t{png[at + 2]} << 8) | std::uint32_t{png[at + 3]};
+    };
+
+    std::uint32_t width = 0;
+    std::uint32_t height = 0;
+    int channels = 0;
+    std::vector<std::uint8_t> compressed;
+    bool ended = false;
+    for (std::size_t at = kSignature.size(); at + 12 <= png.size() && !ended;) {
+        const std::size_t length = big32(at);
+        const std::string_view type(reinterpret_cast<const char*>(png.data() + at + 4), 4);
+        if (at + 12 + length > png.size()) {
+            return fail(ErrorCode::Format, "truncated PNG chunk {}", type);
+        }
+        const std::span<const std::uint8_t> data = png.subspan(at + 8, length);
+        if (type == "IHDR") {
+            if (length < 13) {
+                return fail(ErrorCode::Format, "short PNG header");
+            }
+            width = big32(at + 8);
+            height = big32(at + 12);
+            const std::uint8_t depth = data[8];
+            const std::uint8_t colorType = data[9];
+            const std::uint8_t interlace = data[12];
+            channels = colorType == 2 ? 3 : colorType == 6 ? 4
+                                                           : 0;
+            if (depth != 8 || channels == 0 || interlace != 0) {
+                return fail(ErrorCode::Format, "unsupported PNG (bit depth {}, colour type {}, interlace {}); 8-bit RGB or RGBA without interlace is read",
+                            depth, colorType, interlace);
+            }
+            if (width > 65535 || height > 65535) {
+                return fail(ErrorCode::Format, "PNG of {} x {} pixels is too large", width, height);
+            }
+        } else if (type == "IDAT") {
+            compressed.insert(compressed.end(), data.begin(), data.end());
+        } else if (type == "IEND") {
+            ended = true;
+        }
+        at += 12 + length;
+    }
+    if (channels == 0 || !ended) {
+        return fail(ErrorCode::Format, "PNG without header or end");
+    }
+
+    // Undo the per-row filters (None, Sub, Up, Average, Paeth)
+    const std::size_t stride = std::size_t{width} * static_cast<std::size_t>(channels);
+    std::vector<std::uint8_t> filtered((stride + 1) * height);
+    uLongf size = static_cast<uLongf>(filtered.size());
+    if (uncompress(filtered.data(), &size, compressed.data(), static_cast<uLong>(compressed.size())) != Z_OK || size != filtered.size()) {
+        return fail(ErrorCode::Format, "damaged PNG image data");
+    }
+    const auto bpp = static_cast<std::size_t>(channels);
+    std::vector<std::uint8_t> rows(stride * height);
+    for (std::size_t y = 0; y < height; ++y) {
+        const std::uint8_t filter = filtered[y * (stride + 1)];
+        const std::uint8_t* in = filtered.data() + y * (stride + 1) + 1;
+        std::uint8_t* out = rows.data() + y * stride;
+        const std::uint8_t* up = y > 0 ? out - stride : nullptr;
+        for (std::size_t i = 0; i < stride; ++i) {
+            const int a = i >= bpp ? out[i - bpp] : 0;
+            const int b = up ? up[i] : 0;
+            const int c = up && i >= bpp ? up[i - bpp] : 0;
+            int predictor = 0;
+            switch (filter) {
+                case 0:
+                    break;
+                case 1:
+                    predictor = a;
+                    break;
+                case 2:
+                    predictor = b;
+                    break;
+                case 3:
+                    predictor = (a + b) / 2;
+                    break;
+                case 4: {
+                    const int p = a + b - c;
+                    const int pa = std::abs(p - a);
+                    const int pb = std::abs(p - b);
+                    const int pc = std::abs(p - c);
+                    predictor = pa <= pb && pa <= pc ? a : pb <= pc ? b
+                                                                    : c;
+                    break;
+                }
+                default:
+                    return fail(ErrorCode::Format, "unknown PNG filter {}", filter);
+            }
+            out[i] = static_cast<std::uint8_t>(in[i] + predictor);
+        }
+    }
+
+    RasterImage image(static_cast<int>(width), static_cast<int>(height));
+    for (std::size_t pixel = 0; pixel < std::size_t{width} * height; ++pixel) {
+        for (std::size_t k = 0; k < 3; ++k) {
+            image.m_rgb[pixel * 3 + k] = rows[pixel * bpp + k];
+        }
+    }
+    return image;
+}
+
+//=============================================================================================================
+
+Expected<RasterImage> RasterImage::load_png(const std::filesystem::path& path)
+{
+    std::ifstream in(path, std::ios::binary);
+    if (!in) {
+        return fail(ErrorCode::Io, "cannot read {}", utf8_from_path(path));
+    }
+    const std::vector<std::uint8_t> bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+    Expected<RasterImage> image = decode_png(bytes);
+    if (!image) {
+        return fail(image.error().code, "{}: {}", utf8_from_path(path), image.error().what());
+    }
+    return image;
 }
 
 //=============================================================================================================

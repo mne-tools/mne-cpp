@@ -210,6 +210,31 @@ public:
      */
     std::vector<std::uint8_t> encode_png() const;
 
+    //=========================================================================================================
+    /**
+     * Decodes a PNG file of 8-bit RGB or RGBA pixels without interlacing, e.g. one written by encode_png();
+     * an alpha channel is dropped.
+     *
+     * @param[in] png   The file contents.
+     *
+     * @return The image, or a Format error for other or damaged files.
+     *
+     * @since 3.0.0
+     */
+    static Expected<RasterImage> decode_png(std::span<const std::uint8_t> png);
+
+    //=========================================================================================================
+    /**
+     * Reads a PNG file as decode_png() does.
+     *
+     * @param[in] path   Input file.
+     *
+     * @return The image, an Io error if the file cannot be read, or a Format error.
+     *
+     * @since 3.0.0
+     */
+    static Expected<RasterImage> load_png(const std::filesystem::path& path);
+
 private:
     void blend(int x, int y, Rgb color, int coverage);
     void fill_contours(std::span<const std::span<const PointF>> polygons, Rgb color, int opacity);

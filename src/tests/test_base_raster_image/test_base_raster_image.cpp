@@ -28,6 +28,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <numbers>
@@ -49,6 +50,7 @@ class TestBaseRasterImage : public QObject
 
 private slots:
     void pngDecodesToTheSamePixels();
+    void decodePngReadsOwnAndForeignFiles();
     void alignedRectangleCoversWholePixels();
     void triangleCoverageMatchesItsArea();
     void overlappingPolygonUsesTheNonZeroRule();
@@ -86,6 +88,53 @@ void TestBaseRasterImage::pngDecodesToTheSamePixels()
             QCOMPARE(qBlue(qt), int(own.b));
         }
     }
+}
+
+//=============================================================================================================
+
+void TestBaseRasterImage::decodePngReadsOwnAndForeignFiles()
+{
+    RasterImage image(23, 9, {10, 20, 30});
+    for (int y = 0; y < image.height(); ++y) {
+        for (int x = 0; x < image.width(); ++x) {
+            image.set_pixel(x, y, {static_cast<std::uint8_t>(11 * x), static_cast<std::uint8_t>(29 * y), static_cast<std::uint8_t>(x * y + 3)});
+        }
+    }
+    const auto samePixels = [&image](const RasterImage& other) {
+        if (other.width() != image.width() || other.height() != image.height()) {
+            return false;
+        }
+        return std::equal(image.rgb().begin(), image.rgb().end(), other.rgb().begin());
+    };
+
+    // Its own files
+    const Expected<RasterImage> own = RasterImage::decode_png(image.encode_png());
+    QVERIFY(own.has_value());
+    QVERIFY(samePixels(*own));
+
+    // RGB and RGBA files of another writer, which uses every row filter
+    QImage qt(image.width(), image.height(), QImage::Format_RGB888);
+    for (int y = 0; y < image.height(); ++y) {
+        for (int x = 0; x < image.width(); ++x) {
+            const Rgb c = image.pixel(x, y);
+            qt.setPixel(x, y, qRgb(c.r, c.g, c.b));
+        }
+    }
+    QTemporaryDir dir;
+    for (const QImage::Format format : {QImage::Format_RGB888, QImage::Format_RGBA8888}) {
+        const QString path = dir.filePath(QStringLiteral("qt%1.png").arg(int(format)));
+        QVERIFY(qt.convertToFormat(format).save(path, "PNG"));
+        const Expected<RasterImage> foreign = RasterImage::load_png(path.toStdString());
+        QVERIFY2(foreign.has_value(), foreign ? "" : foreign.error().what());
+        QVERIFY(samePixels(*foreign));
+    }
+
+    // Damaged and missing files
+    std::vector<std::uint8_t> damaged = image.encode_png();
+    damaged.resize(damaged.size() / 2);
+    QVERIFY(!RasterImage::decode_png(damaged).has_value());
+    QCOMPARE(RasterImage::decode_png(std::vector<std::uint8_t>{1, 2, 3}).error().code, ErrorCode::Format);
+    QCOMPARE(RasterImage::load_png(dir.filePath(QStringLiteral("missing.png")).toStdString()).error().code, ErrorCode::Io);
 }
 
 //=============================================================================================================
