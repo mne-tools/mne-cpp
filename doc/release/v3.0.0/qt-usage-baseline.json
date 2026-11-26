@@ -18,7 +18,7 @@
     }
   },
   "summary": {
-    "libraries": 28,
+    "libraries": 29,
     "qt_free": [
       "acq",
       "acq/devices",
@@ -46,7 +46,8 @@
       "pybridge",
       "report",
       "sts",
-      "viz"
+      "viz",
+      "viz/backends/sdl"
     ],
     "tokens": 6208,
     "gui_outside_design": []
@@ -265,7 +266,7 @@
       "by_category": {},
       "public_header_includes": 0,
       "q_object": 0,
-      "files": 82,
+      "files": 86,
       "modules": []
     },
     "viz/backends/qt": {
@@ -289,6 +290,14 @@
         "GuiPrivate",
         "Widgets"
       ]
+    },
+    "viz/backends/sdl": {
+      "tokens": 0,
+      "by_category": {},
+      "public_header_includes": 0,
+      "q_object": 0,
+      "files": 3,
+      "modules": []
     }
   }
 }

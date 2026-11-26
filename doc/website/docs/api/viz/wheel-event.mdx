@@ -25,29 +25,6 @@ The angle deltas follow the convention of most toolkits: one notch of a mouse wh
 
 No example of its own: Toolkit-neutral input value type passed to TraceView::handle_wheel(); hosts convert their native events to it.
 
-## Used in examples
-
-### [ex_scene_sdl](../../examples/viz/ex_scene_sdl.mdx)
-
-Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
-
-````cpp title="src/examples/ex_scene_sdl/main.cpp, line 264"
-    WheelEvent wheel;
-    wheel.x = event.wheel.mouse_x;
-    wheel.y = event.wheel.mouse_y;
-    // SDL counts notches, the scene eighths of a degree (120 per notch)
-    wheel.angle_delta_x = -120.0 * event.wheel.x;
-    wheel.angle_delta_y = 120.0 * event.wheel.y;
-    wheel.modifiers = modifiers_of(SDL_GetModState());
-    wheel.timestamp_ms = now;
-    view.handle_wheel(wheel);
-    break;
-}
-case SDL_EVENT_KEY_DOWN:
-    if (event.key.key == SDLK_C) {
-        view.set_crosshair_enabled(!view.crosshair_enabled());
-````
-
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -18,6 +18,7 @@ Every third-party component that MNE-CPP builds, ships, loads at run time or is 
 | Eigen | 5.0.1 | `MPL-2.0` | header-only | yes |
 | zlib | 1.4 | `Zlib` | system library, or built from the pinned release (SHA-256 checked) when the system has none | yes |
 | ONNX Runtime | 1.31.0 | `MIT` | dynamic, optional (USE_ONNXRUNTIME) | no |
+| SDL3 | 3.x, from the system or package manager | `Zlib` | dynamic, optional (BUILD_VIZ_SDL), not shipped | no |
 | DLPack | 1.3 | `Apache-2.0` | header-only, vendored in src/3rdparty/dlpack | no |
 | BrainFlow | 5.x, loaded at run time | `MIT` | runtime-loaded, not shipped | yes |
 | liblsl | 1.13 or newer, test only | `MIT` | test only: the reference peer that produces LSL outlets in test_acq_lsl; product code uses MNE-CPP's own LSL implementation | no |
@@ -58,6 +59,13 @@ Every third-party component that MNE-CPP builds, ships, loads at run time or is 
 - **Purpose:** Inference of user-supplied ONNX models.
 - **If it fails:** Wrong model output; a crash inside the runtime.
 - **Mitigation:** Optional; no built-in processing step depends on it. test_ml_models covers the model wrapper.
+
+### SDL3
+
+- **Used by:** mne_viz_sdl (the SDL3 backend of mne_viz) and ex_scene_sdl; nothing else
+- **Purpose:** Windows and input for the SDL3 backend of mne_viz.
+- **If it fails:** Wrong or frozen display in the SDL backend. Acquired data, processing results and files do not pass through SDL.
+- **Mitigation:** Frames are drawn by mne_viz's software renderer, which the golden-image tests cover without SDL; ex_scene_sdl runs on SDL's dummy video driver in the Qt-free CI job.
 
 ### DLPack
 

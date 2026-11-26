@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 527,
+    "exported_classes": 531,
     "exported_free_functions": 251,
-    "registered_classes": 685,
+    "registered_classes": 690,
     "exported_not_registered": 2,
     "registered_function_modules": 15,
-    "registered_header_only": 145,
+    "registered_header_only": 146,
     "registered_stale": 0,
-    "registered_with_test": 371,
+    "registered_with_test": 375,
     "registered_test_unresolved": 0,
-    "registered_with_example": 457,
+    "registered_with_example": 459,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 102,
     "registered_without_api_page": 0,
-    "with_snippet": 501,
-    "public_api_units": 687,
-    "example_eligible": 457,
-    "example_exempt": 230,
-    "eligible_backed_by_registry_example": 455,
-    "eligible_used_by_some_example": 389,
+    "with_snippet": 503,
+    "public_api_units": 692,
+    "example_eligible": 459,
+    "example_exempt": 233,
+    "eligible_backed_by_registry_example": 457,
+    "eligible_used_by_some_example": 391,
     "examples_on_disk": 82,
     "examples_built": 82
   },
@@ -225,13 +225,13 @@
       "with_snippet": 12
     },
     "viz": {
-      "public": 216,
-      "registered": 216,
-      "with_test": 145,
-      "eligible": 46,
-      "eligible_with_registry_example": 46,
-      "eligible_used_by_example": 37,
-      "with_snippet": 59
+      "public": 221,
+      "registered": 221,
+      "with_test": 149,
+      "eligible": 48,
+      "eligible_with_registry_example": 48,
+      "eligible_used_by_example": 39,
+      "with_snippet": 61
     }
   },
   "exported_free_functions": [
@@ -15468,6 +15468,29 @@
       "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
     },
     {
+      "name": "SdlHost",
+      "header": "viz/backends/sdl/sdl_host.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": "ex_scene_sdl",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
+      "snippets": [
+        "ex_scene_sdl/main.cpp#sdl_host_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz-sdl/sdl-host.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "AverageLayout",
       "header": "viz/figures/average_layout.h",
       "library": "viz",
@@ -16110,8 +16133,7 @@
       "example": "ex_scene",
       "example_state": "built",
       "including_examples": [
-        "ex_scene",
-        "ex_scene_sdl"
+        "ex_scene"
       ],
       "snippets": [
         "ex_scene/main.cpp#scene_usage",
@@ -16135,8 +16157,7 @@
       "example": "ex_scene",
       "example_state": "built",
       "including_examples": [
-        "ex_scene",
-        "ex_scene_sdl"
+        "ex_scene"
       ],
       "snippets": [
         "ex_scene/main.cpp#scene_usage",
@@ -16610,9 +16631,7 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [
-        "ex_scene_sdl"
-      ],
+      "including_examples": [],
       "snippets": [],
       "api_page": "doc/website/docs/api/viz/software-bindings.mdx",
       "python_equiv": null,
@@ -16631,9 +16650,7 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [
-        "ex_scene_sdl"
-      ],
+      "including_examples": [],
       "snippets": [],
       "api_page": "doc/website/docs/api/viz/software-fragment.mdx",
       "python_equiv": null,
@@ -16652,9 +16669,7 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [
-        "ex_scene_sdl"
-      ],
+      "including_examples": [],
       "snippets": [],
       "api_page": "doc/website/docs/api/viz/software-renderer.mdx",
       "python_equiv": null,
@@ -16673,9 +16688,7 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [
-        "ex_scene_sdl"
-      ],
+      "including_examples": [],
       "snippets": [],
       "api_page": "doc/website/docs/api/viz/software-shader.mdx",
       "python_equiv": null,
@@ -16694,9 +16707,7 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [
-        "ex_scene_sdl"
-      ],
+      "including_examples": [],
       "snippets": [],
       "api_page": "doc/website/docs/api/viz/trace-frame-builder.mdx",
       "python_equiv": null,
@@ -16715,14 +16726,92 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [
-        "ex_scene_sdl"
-      ],
+      "including_examples": [],
       "snippets": [],
       "api_page": "doc/website/docs/api/viz/trace-overlay-uniforms.mdx",
       "python_equiv": null,
       "example_eligible": false,
       "exempt_reason": "registry: Plain uniform-block value type of the trace overlay shader, written by TraceFrameBuilder."
+    },
+    {
+      "name": "Surface",
+      "header": "viz/host/surface.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_trace_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/viz/surface.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Interface a backend implements to host a view; mne::viz::sdl::SdlHost implements it and ex_scene_sdl uses it."
+    },
+    {
+      "name": "SurfaceClient",
+      "header": "viz/host/surface.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_trace_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/viz/surface-client.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Interface of a hosted view; TraceViewClient implements it and ex_scene_sdl shows one in SDL."
+    },
+    {
+      "name": "SurfaceSize",
+      "header": "viz/host/surface.h",
+      "library": "viz",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_trace_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/viz/surface-size.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Size value of Surface; passed by every backend to SurfaceClient::resize()."
+    },
+    {
+      "name": "TraceViewClient",
+      "header": "viz/host/trace_view_client.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_scene_trace_view",
+      "test_resolves": true,
+      "example": "ex_scene_sdl",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
+      "snippets": [
+        "ex_scene_sdl/main.cpp#trace_view_client_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/trace-view-client.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
     },
     {
       "name": "BidsTree",
@@ -17156,9 +17245,7 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [
-        "ex_scene_sdl"
-      ],
+      "including_examples": [],
       "snippets": [],
       "api_page": "doc/website/docs/api/viz/trace-markers.mdx",
       "python_equiv": null,
@@ -17215,9 +17302,7 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [
-        "ex_scene_sdl"
-      ],
+      "including_examples": [],
       "snippets": [],
       "api_page": "doc/website/docs/api/viz/trace-view.mdx",
       "python_equiv": null,
@@ -17236,9 +17321,7 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [
-        "ex_scene_sdl"
-      ],
+      "including_examples": [],
       "snippets": [],
       "api_page": "doc/website/docs/api/viz/view-animator.mdx",
       "python_equiv": null,

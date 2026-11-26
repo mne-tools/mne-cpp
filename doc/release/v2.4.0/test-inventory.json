@@ -9832,6 +9832,9 @@
       },
       "registry_classes": [
         "PointerEvent",
+        "Surface",
+        "SurfaceClient",
+        "SurfaceSize",
         "TraceDraw",
         "TraceFrameBuilder",
         "TraceGeometry",
@@ -9842,6 +9845,7 @@
         "TraceUniforms",
         "TraceVertices",
         "TraceView",
+        "TraceViewClient",
         "ViewAnimator",
         "WheelEvent"
       ]

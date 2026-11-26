@@ -37,6 +37,7 @@
     "inv": "Inverse",
     "fwd": "Forward",
     "viz_qt": "Visualization (Qt)",
+    "viz_sdl": "Visualization (SDL)",
     "viz": "Visualization",
     "dsp": "Signal Processing",
     "ieeg": "iEEG",
@@ -1817,6 +1818,7 @@
       "url": "/docs/examples/viz/ex_scene_sdl/",
       "library": "viz",
       "libraries": [
+        "viz_sdl",
         "viz"
       ],
       "tasks": [

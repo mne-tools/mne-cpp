@@ -70,6 +70,21 @@
       "version": "1.31.0"
     },
     {
+      "id": "sdl3",
+      "name": "SDL3",
+      "supplier": "SDL project (Sam Lantinga)",
+      "license": "Zlib",
+      "url": "https://www.libsdl.org",
+      "linkage": "dynamic, optional (BUILD_VIZ_SDL), not shipped",
+      "shipped": false,
+      "used_by": "mne_viz_sdl (the SDL3 backend of mne_viz) and ex_scene_sdl; nothing else",
+      "purpose": "Windows and input for the SDL3 backend of mne_viz.",
+      "risk": "Wrong or frozen display in the SDL backend. Acquired data, processing results and files do not pass through SDL.",
+      "mitigation": "Frames are drawn by mne_viz's software renderer, which the golden-image tests cover without SDL; ex_scene_sdl runs on SDL's dummy video driver in the Qt-free CI job.",
+      "safety_relevant": false,
+      "version": "3.x, from the system or package manager"
+    },
+    {
       "id": "dlpack",
       "name": "DLPack",
       "supplier": "DMLC",

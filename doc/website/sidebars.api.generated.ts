@@ -701,7 +701,11 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz/brain-instanced-streams',
         'api/viz/settings-form',
         'api/viz/setting-field',
-        'api/viz/setting-choice'
+        'api/viz/setting-choice',
+        'api/viz/surface-size',
+        'api/viz/surface',
+        'api/viz/surface-client',
+        'api/viz/trace-view-client'
       ],
     },
     {
@@ -854,6 +858,16 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/ieeg/ieeg-reference',
         'api/ieeg/ieeg-bipolar-pair',
         'api/ieeg/ieeg-surface-map'
+      ],
+    },
+    {
+      type: 'category',
+      label: "Visualization: SDL Backend",
+      collapsible: true,
+      collapsed: true,
+      link: {type: 'doc', id: 'api/viz-sdl/index'},
+      items: [
+        'api/viz-sdl/sdl-host'
       ],
     },
     {

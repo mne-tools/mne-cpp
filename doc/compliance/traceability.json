@@ -392,8 +392,8 @@
       "missing_tests": []
     },
     "viz": {
-      "classes": 88,
-      "tested": 88,
+      "classes": 92,
+      "tested": 92,
       "untested": [],
       "missing_tests": []
     },
@@ -472,6 +472,14 @@
         "TimeRulerWidget",
         "TriggerDetectionView",
         "VertexData"
+      ],
+      "missing_tests": []
+    },
+    "viz_sdl": {
+      "classes": 1,
+      "tested": 0,
+      "untested": [
+        "SdlHost"
       ],
       "missing_tests": []
     }

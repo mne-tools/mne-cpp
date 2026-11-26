@@ -23,29 +23,6 @@ A mouse or touch-pad pointer event in logical (device-independent) pixels of the
 
 No example of its own: Toolkit-neutral input value type passed to TraceView::handle_pointer(); hosts convert their native events to it.
 
-## Used in examples
-
-### [ex_scene_sdl](../../examples/viz/ex_scene_sdl.mdx)
-
-Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
-
-````cpp title="src/examples/ex_scene_sdl/main.cpp, line 240"
-    PointerEvent pointer;
-    pointer.type = event.type == SDL_EVENT_MOUSE_BUTTON_UP ? PointerEvent::Type::Release
-        : event.button.clicks == 2                         ? PointerEvent::Type::DoubleClick
-                                                           : PointerEvent::Type::Press;
-    pointer.x = event.button.x;
-    pointer.y = event.button.y;
-    pointer.button = button_of(event.button.button);
-    pointer.buttons = buttons_of(SDL_GetMouseState(nullptr, nullptr));
-    pointer.modifiers = modifiers_of(SDL_GetModState());
-    pointer.timestamp_ms = now;
-    view.handle_pointer(pointer);
-    break;
-}
-case SDL_EVENT_MOUSE_MOTION: {
-````
-
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -38,6 +38,26 @@ A key press.
 
 No example of its own: Toolkit-neutral input value type passed to BrainViewInteraction::handle_key(); hosts convert their native events to it.
 
+## Used in examples
+
+### [ex_scene_sdl](../../examples/viz/ex_scene_sdl.mdx)
+
+Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 151"
+host.set_key_handler([&](const KeyEvent& key) {
+    if (key.is_character(U'c')) {
+        view.set_crosshair_enabled(!view.crosshair_enabled());
+        return true;
+    }
+    if (key.key == Key::End) {
+        followEnd = true;
+        return true;
+    }
+    return false;
+});
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
