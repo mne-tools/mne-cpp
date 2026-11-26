@@ -16,10 +16,13 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <mne/disp/plots/helpers/rhiframerenderer.h>
 #include <mne/disp3D/view/brainviewcore.h>
 #include <mne/disp3D/view/brainwindow.h>
 #include <mne/disp3D/model/braintreemodel.h>
 #include <mne/fs/fs_surface.h>
+#include <mne/scene/brain_frame.h>
+#include <mne/scene/canvas.h>
 #include <rhi/qrhi.h>
 
 //=============================================================================================================
@@ -35,12 +38,17 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstdint>
 #include <memory>
+#include <span>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace mne;
 using namespace mne::disp;
 
 namespace
@@ -174,6 +182,12 @@ private slots:
      * Verifies that wheel and drag events sent to BrainWindow reach the core's camera.
      */
     void window_forwardsInput();
+
+    //=========================================================================================================
+    /**
+     * The brain view's frames feed every uniform block, sampler and vertex input of the disp3D shaders.
+     */
+    void frames_matchTheirShaders();
 
 private:
     QString m_dataDir;
@@ -463,6 +477,52 @@ void TestDisp3dBrainWindow::window_forwardsInput()
 
     core->setViewCount(1);
     window.hide();
+}
+
+//=============================================================================================================
+
+void TestDisp3dBrainWindow::frames_matchTheirShaders()
+{
+    // One triangle as a surface and as an instanced glyph shape, one glyph instance
+    const std::vector<float> geometry = {0.f, 0.f, 0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f};
+    const std::vector<std::uint32_t> colors = {0xff808080u, 0xff808080u, 0xff808080u};
+    const std::vector<std::uint32_t> indices = {0, 1, 2};
+    const std::vector<float> instance = {1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, 1.f, 0.f};
+    scene::BrainSurfaceStreams surface;
+    surface.geometry = {std::as_bytes(std::span(geometry)), 1};
+    surface.colors = {std::as_bytes(std::span(colors)), 1};
+    surface.annotations = {std::as_bytes(std::span(colors)), 1};
+    surface.indices = {std::as_bytes(std::span(indices)), 1};
+    surface.index_count = 3;
+    scene::BrainInstancedStreams glyphs;
+    glyphs.vertices = surface.geometry;
+    glyphs.instances = {std::as_bytes(std::span(instance)), 1};
+    glyphs.indices = surface.indices;
+    glyphs.index_count = 3;
+    glyphs.instance_count = 1;
+
+    scene::BrainFrameBuilder builder;
+    scene::GpuFrameTarget target;
+    target.pixel_width = 64;
+    target.pixel_height = 48;
+    const scene::GpuRect pane{0, 0, 64, 48};
+    builder.begin(target);
+    for (const scene::BrainShader shader : {scene::BrainShader::Standard, scene::BrainShader::Holographic, scene::BrainShader::Anatomical,
+                                            scene::BrainShader::XRay, scene::BrainShader::ShowNormals}) {
+        QVERIFY(builder.draw_surface(1, surface, shader, scene::BrainSurfaceUniforms{}, pane));
+    }
+    QVERIFY(builder.draw_instanced(2, glyphs, scene::BrainShader::Dipole, scene::BrainInstanceUniforms{}, pane));
+    QVERIFY(builder.draw_instanced(2, glyphs, scene::BrainShader::Electrode, scene::BrainInstanceUniforms{}, pane));
+    builder.draw_overlay(scene::Canvas(64, 48).display_list());
+    const scene::GpuFrame frame = builder.finish();
+
+    RhiFrameRenderer renderer;
+    renderer.addShaderPrefix(":/");
+    const std::vector<std::string> problems = renderer.checkShaders(frame, builder.resources());
+    for (const std::string& problem : problems) {
+        qWarning("%s", problem.c_str());
+    }
+    QVERIFY(problems.empty());
 }
 
 //=============================================================================================================

@@ -15,8 +15,11 @@
 //=============================================================================================================
 
 #include "rhiframerenderer.h"
+
 #include "scenepainter.h"
 #include <mne/base/log.h>
+#include <rhi/qrhi.h>
+#include <rhi/qshader.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -26,8 +29,6 @@
 #include <QFont>
 #include <QImage>
 #include <QPainter>
-#include <rhi/qrhi.h>
-#include <rhi/qshader.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -379,10 +380,12 @@ QRhiGraphicsPipeline* RhiFrameRenderer::Impl::pipeline(GpuHandle handle, const G
     created->setShaderStages({{QRhiShaderStage::Vertex, stages->first}, {QRhiShaderStage::Fragment, stages->second}});
     QRhiVertexInputLayout inputLayout;
     std::vector<QRhiVertexInputBinding> inputBindings;
+    inputBindings.reserve(source->bindings.size());
     for (const GpuVertexBinding& binding : source->bindings) {
         inputBindings.emplace_back(binding.stride, binding.per_instance ? QRhiVertexInputBinding::PerInstance : QRhiVertexInputBinding::PerVertex);
     }
     std::vector<QRhiVertexInputAttribute> attributes;
+    attributes.reserve(source->attributes.size());
     for (const GpuVertexAttribute& attribute : source->attributes) {
         attributes.emplace_back(attribute.binding, attribute.location, toRhi(attribute.format), attribute.offset);
     }

@@ -20,6 +20,7 @@
 #include "average_layout.h"
 #include "average_tile.h"
 #include "bar_chart.h"
+#include "brain_frame.h"
 #include "brain_view_interaction.h"
 #include "brain_view_overlay.h"
 #include "butterfly_plot.h"

@@ -135,6 +135,7 @@
     "test_scene_brain_view": {
       "generators": [],
       "fixtures": {
+        "src/tests/test_scene_brain_view/data/brain_frame.png": "933cf7a674ed1927350e2839aaf471a2f01166a0fe7c11d043a6d4e06acfac54",
         "src/tests/test_scene_brain_view/data/brain_view_overlay.svg": "026f3d6e401752ae57e9d14519d4d9b753f0a8bef62a77680c710fe6b8d46b06"
       }
     },

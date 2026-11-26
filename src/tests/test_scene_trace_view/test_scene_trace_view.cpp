@@ -14,7 +14,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/base/raster_image.h>
+#include "../common/scene_golden.h"
 #include <mne/scene/canvas.h>
 #include <mne/scene/software_renderer.h>
 #include <mne/scene/svg_renderer.h>
@@ -95,45 +95,6 @@ bool matches_golden(const std::string& svg, const std::string& path)
     std::fprintf(stderr, "%s differs at byte %zu\n expected: %s\n actual:   %s\n", path.c_str(), at,
                  expected.substr(from, 160).c_str(), svg.substr(from, 160).c_str());
     return false;
-}
-
-// Golden PNG comparison without Qt; small differences from floating-point contraction on other CPUs are tolerated
-bool matches_golden_png(const Image& image, const std::string& path)
-{
-    mne::RasterImage rgb(image.width, image.height);
-    for (int y = 0; y < image.height; ++y) {
-        for (int x = 0; x < image.width; ++x) {
-            const Color c = image.pixel(x, y);
-            rgb.set_pixel(x, y, {c.r, c.g, c.b});
-        }
-    }
-    const char* update = std::getenv("MNE_UPDATE_GOLDEN");
-    if (update && std::strcmp(update, "1") == 0) {
-        return rgb.save_png(path).has_value();
-    }
-    const mne::Expected<mne::RasterImage> expected = mne::RasterImage::load_png(path);
-    if (!expected) {
-        std::fprintf(stderr, "%s (run with MNE_UPDATE_GOLDEN=1)\n", expected.error().what());
-        return false;
-    }
-    if (expected->width() != rgb.width() || expected->height() != rgb.height()) {
-        std::fprintf(stderr, "%s: %d x %d instead of %d x %d\n", path.c_str(), rgb.width(), rgb.height(), expected->width(), expected->height());
-        return false;
-    }
-    int differing = 0;
-    for (int y = 0; y < rgb.height(); ++y) {
-        for (int x = 0; x < rgb.width(); ++x) {
-            const mne::Rgb a = rgb.pixel(x, y);
-            const mne::Rgb b = expected->pixel(x, y);
-            differing += std::max({std::abs(a.r - b.r), std::abs(a.g - b.g), std::abs(a.b - b.b)}) > 2 ? 1 : 0;
-        }
-    }
-    const int allowed = rgb.width() * rgb.height() / 500;
-    if (differing > allowed) {
-        std::fprintf(stderr, "%s: %d pixels differ (%d allowed)\n", path.c_str(), differing, allowed);
-        return false;
-    }
-    return true;
 }
 
 // 30 channels: three MEG magnetometers, then gradiometers and EEG; value = index + sample / 1000
@@ -1120,7 +1081,7 @@ void test_trace_frame()
     CHECK(resources.pipeline(frame.passes[0].draws[4].pipeline)->shader == "overlay");
     CHECK(frame.passes[0].draws[5].textures[0].texture == builder.hud_texture());
     SoftwareRenderer renderer;
-    CHECK(matches_golden_png(renderer.render(frame, resources), GOLDEN_DIR "/trace_frame.png"));
+    CHECK(scene_golden::matches_png(renderer.render(frame, resources), GOLDEN_DIR "/trace_frame.png"));
 
     // A small scroll reuses the vertices and the marker texture; the scalebars are drawn again
     const GpuHandle vertices = frame.passes[0].draws[0].vertex_buffers[0];

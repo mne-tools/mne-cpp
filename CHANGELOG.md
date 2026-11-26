@@ -349,6 +349,15 @@ aliases; replace the old spelling as below.
   samplers, vertex inputs). `ChannelRhiRenderer` renders the frames of
   `scene::TraceFrameBuilder` through it instead of its own QRhi code; its API
   is unchanged except that `hudImage()` returns the image by value.
+- `scene::BrainFrameBuilder` (`scene/brain_frame.h`) describes frames of the
+  3-D brain view as `GpuFrame`: surfaces with the standard, holographic
+  (back faces, then front faces), anatomical, x-ray and normals shaders,
+  instanced dipole and electrode glyphs, and a screen overlay, pane by pane;
+  mesh streams are uploaded only when their generation changes. The software
+  backend gains C++ counterparts of these disp3D shaders, so the brain view
+  renders headless (`test_scene_brain_view` compares a golden PNG), and
+  `test_disp3d_brain_window` checks the frames against the reflection of the
+  `.qsb` shaders.
   The Qt usage ceiling of `disp` drops to 4543 tokens.
 - The data behind the raw-data views moved to `mne_scene` as well.
   `TraceBuffer` (`scene/trace_buffer.h`) stores the samples of the trace view

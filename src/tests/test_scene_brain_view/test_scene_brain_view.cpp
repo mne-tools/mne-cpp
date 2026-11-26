@@ -15,11 +15,15 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "../common/scene_golden.h"
+#include <mne/scene/brain_frame.h>
 #include <mne/scene/brain_view_interaction.h>
 #include <mne/scene/brain_view_overlay.h>
 #include <mne/scene/camera.h>
+#include <mne/scene/canvas.h>
 #include <mne/scene/pane_layout.h>
 #include <mne/scene/ray_picking.h>
+#include <mne/scene/software_renderer.h>
 #include <mne/scene/svg_renderer.h>
 #include <mne/scene/text_metrics.h>
 
@@ -33,7 +37,10 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <array>
+#include <cstdint>
+#include <span>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -634,6 +641,141 @@ void test_overlay()
     CHECK(to_svg(overlay.draw(640, 480, metrics)).find("Vertices") == std::string::npos);
 }
 
+/** An icosphere of radius @p radius: six floats (position, normal) per vertex and 32-bit triangle indices. */
+struct Sphere
+{
+    std::vector<float> geometry;
+    std::vector<std::uint32_t> colors;
+    std::vector<std::uint32_t> annotations;
+    std::vector<std::uint32_t> indices;
+
+    Sphere(float radius, int subdivisions)
+    {
+        const float t = (1.f + std::sqrt(5.f)) / 2.f;
+        std::vector<Eigen::Vector3f> points = {{-1, t, 0}, {1, t, 0}, {-1, -t, 0}, {1, -t, 0}, {0, -1, t}, {0, 1, t}, {0, -1, -t}, {0, 1, -t}, {t, 0, -1}, {t, 0, 1}, {-t, 0, -1}, {-t, 0, 1}};
+        std::vector<std::array<std::uint32_t, 3>> faces = {{0, 11, 5}, {0, 5, 1}, {0, 1, 7}, {0, 7, 10}, {0, 10, 11}, {1, 5, 9}, {5, 11, 4}, {11, 10, 2}, {10, 7, 6}, {7, 1, 8}, {3, 9, 4}, {3, 4, 2}, {3, 2, 6}, {3, 6, 8}, {3, 8, 9}, {4, 9, 5}, {2, 4, 11}, {6, 2, 10}, {8, 6, 7}, {9, 8, 1}};
+        for (int level = 0; level < subdivisions; ++level) {
+            std::vector<std::array<std::uint32_t, 3>> finer;
+            for (const auto& face : faces) {
+                std::array<std::uint32_t, 3> mid{};
+                for (int e = 0; e < 3; ++e) {
+                    points.push_back((points[face[static_cast<std::size_t>(e)]] + points[face[static_cast<std::size_t>((e + 1) % 3)]]) * 0.5f);
+                    mid[static_cast<std::size_t>(e)] = static_cast<std::uint32_t>(points.size() - 1);
+                }
+                finer.push_back({face[0], mid[0], mid[2]});
+                finer.push_back({face[1], mid[1], mid[0]});
+                finer.push_back({face[2], mid[2], mid[1]});
+                finer.push_back({mid[0], mid[1], mid[2]});
+            }
+            faces = std::move(finer);
+        }
+        for (const Eigen::Vector3f& point : points) {
+            const Eigen::Vector3f n = point.normalized();
+            geometry.insert(geometry.end(), {n.x() * radius, n.y() * radius, n.z() * radius, n.x(), n.y(), n.z()});
+            // A "source estimate" growing towards +x, grey elsewhere; alpha is the curvature grey
+            const float activity = std::clamp(n.x(), 0.f, 1.f);
+            const auto red = static_cast<std::uint32_t>(120 + 135 * activity);
+            const auto green = static_cast<std::uint32_t>(120 + 60 * activity);
+            const auto blue = static_cast<std::uint32_t>(120 - 100 * activity);
+            colors.push_back(red | (green << 8) | (blue << 16) | (160u << 24));
+            annotations.push_back(n.y() > 0.f ? 0xff2080e0u : 0xff20c040u);
+        }
+        for (const auto& face : faces) {
+            indices.insert(indices.end(), face.begin(), face.end());
+        }
+    }
+
+    BrainSurfaceStreams streams(std::uint64_t generation = 1) const
+    {
+        BrainSurfaceStreams result;
+        result.geometry = {std::as_bytes(std::span(geometry)), generation};
+        result.colors = {std::as_bytes(std::span(colors)), generation};
+        result.annotations = {std::as_bytes(std::span(annotations)), generation};
+        result.indices = {std::as_bytes(std::span(indices)), generation};
+        result.index_count = static_cast<std::uint32_t>(indices.size());
+        return result;
+    }
+};
+
+void copy_matrix(const Eigen::Matrix4f& matrix, float (&target)[16])
+{
+    std::copy(matrix.data(), matrix.data() + 16, target);
+}
+
+void test_brain_frame()
+{
+    const int width = 200;
+    const int height = 150;
+    const Sphere brain(0.05f, 3);
+    const Sphere shell(0.065f, 2);
+    const Sphere glyph(1.f, 1);
+
+    OrbitCamera camera;
+    camera.set_scene_size(0.15f);
+    const CameraMatrices view = camera.single_view(Eigen::Quaternionf(Eigen::AngleAxisf(0.6f, Eigen::Vector3f::UnitY())), 1.f,
+                                                   static_cast<float>(width) / static_cast<float>(height));
+    BrainSurfaceUniforms surface;
+    copy_matrix(view.pvm(), surface.mvp);
+    std::copy(view.eye.data(), view.eye.data() + 3, surface.camera_pos);
+    const Eigen::Vector3f light = view.eye.normalized();
+    std::copy(light.data(), light.data() + 3, surface.light_dir);
+    surface.overlay_mode = 3.f;
+    BrainInstanceUniforms instances;
+    std::copy(std::begin(surface.mvp), std::end(surface.mvp), instances.mvp);
+    std::copy(view.eye.data(), view.eye.data() + 3, instances.camera_pos);
+    std::copy(light.data(), light.data() + 3, instances.light_dir);
+
+    // Two electrode contacts in front of the brain: unit spheres scaled to 6 mm, coloured, the second selected
+    std::vector<float> placement;
+    for (const auto& [x, selected] : {std::pair{-0.02f, 0.f}, std::pair{0.02f, 1.f}}) {
+        placement.insert(placement.end(), {0.006f, 0.f, 0.f, 0.f, 0.f, 0.006f, 0.f, 0.f, 0.f, 0.f, 0.006f, 0.f, x, 0.f, 0.055f, 1.f, 0.2f, 0.4f, 1.f, 1.f, selected});
+    }
+    BrainInstancedStreams electrodes;
+    electrodes.vertices = {std::as_bytes(std::span(glyph.geometry)), 1};
+    electrodes.instances = {std::as_bytes(std::span(placement)), 1};
+    electrodes.indices = {std::as_bytes(std::span(glyph.indices)), 1};
+    electrodes.index_count = static_cast<std::uint32_t>(glyph.indices.size());
+    electrodes.instance_count = 2;
+
+    // The brain (source estimate), the electrodes, a holographic head shell and an overlay label in one pane
+    BrainFrameBuilder builder;
+    GpuFrameTarget target;
+    target.pixel_width = width;
+    target.pixel_height = height;
+    const GpuRect pane{0, 0, width, height};
+    builder.begin(target, Color{20, 20, 30});
+    CHECK(builder.draw_surface(1, brain.streams(), BrainShader::Standard, surface, pane));
+    CHECK(builder.draw_instanced(2, electrodes, BrainShader::Electrode, instances, pane));
+    BrainSurfaceUniforms shellUniforms = surface;
+    shellUniforms.overlay_mode = 0.f;
+    CHECK(builder.draw_surface(3, shell.streams(), BrainShader::Holographic, shellUniforms, pane));
+    Canvas label(width, height);
+    label.set_pen(Color::white());
+    label.draw_text(Point{8, 16}, "lh 120 ms");
+    builder.draw_overlay(label.display_list());
+    GpuFrame frame = builder.finish();
+    // The holographic shell draws back faces, then front faces
+    CHECK(frame.passes.size() == 1 && frame.passes[0].draws.size() == 5 && builder.mesh_count() == 3);
+    SoftwareRenderer renderer;
+    CHECK(scene_golden::matches_png(renderer.render(frame, builder.resources()), GOLDEN_DIR "/brain_frame.png"));
+
+    // Unchanged generations reuse the buffers, a new one uploads again; glyph shaders draw no surface
+    const GpuHandle geometry = frame.passes[0].draws[0].vertex_buffers[0];
+    const std::uint64_t revision = builder.resources().buffer(geometry)->revision;
+    builder.begin(target);
+    CHECK(!builder.draw_surface(1, brain.streams(), BrainShader::Dipole, surface, pane));
+    CHECK(!builder.draw_instanced(2, electrodes, BrainShader::Standard, instances, pane));
+    CHECK(builder.draw_surface(1, brain.streams(), BrainShader::Anatomical, surface, pane));
+    CHECK(builder.resources().buffer(geometry)->revision == revision);
+    CHECK(builder.draw_surface(1, brain.streams(2), BrainShader::ShowNormals, surface, pane));
+    CHECK(builder.resources().buffer(geometry)->revision > revision);
+    frame = builder.finish();
+    CHECK(frame.passes[0].draws.size() == 2);
+    // Released meshes lose their buffers
+    builder.release(1);
+    CHECK(builder.mesh_count() == 2 && !builder.resources().buffer(geometry));
+}
+
 } // namespace
 
 //=============================================================================================================
@@ -653,6 +795,7 @@ int main()
         {"interaction_single_view", test_interaction_single_view},
         {"interaction_multi_view", test_interaction_multi_view},
         {"overlay", test_overlay},
+        {"brain_frame", test_brain_frame},
     };
     for (const auto& [name, test] : tests) {
         const int before = g_failures;

@@ -11,6 +11,7 @@ set(SOURCES
   average_layout.cpp
   average_tile.cpp
   bar_chart.cpp
+  brain_frame.cpp
   brain_view_interaction.cpp
   brain_view_overlay.cpp
   butterfly_plot.cpp
@@ -48,6 +49,7 @@ set(HEADERS
   average_layout.h
   average_tile.h
   bar_chart.h
+  brain_frame.h
   brain_view_interaction.h
   brain_view_overlay.h
   butterfly_plot.h
