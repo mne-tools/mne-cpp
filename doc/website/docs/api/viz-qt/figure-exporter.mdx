@@ -1,0 +1,92 @@
+---
+id: figure-exporter
+title: "mne::viz::qt::FigureExporter"
+sidebar_label: FigureExporter
+sidebar_position: 37
+---
+
+# FigureExporter
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/plots/helpers/figureexporter.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/plots/helpers/figureexporter.h)
+
+`#include <mne/viz/backends/qt/figureexporter.h>`
+
+```cpp
+class mne::viz::qt::FigureExporter
+```
+
+Writes captioned figures to `MNE_CPP_FIGURE_DIR`.
+
+```cpp title="src/examples/ex_disp_plots/main.cpp"
+// Written only when MNE_CPP_FIGURE_DIR names a directory
+FigureExporter::save(line, "line_plot", "LinePlot: one period of a sine wave.");
+```
+
+---
+
+## Static Methods
+
+### directory()
+
+Returns the directory figures are written to.
+
+**Returns:**
+
+- *std::filesystem::path* — The value of `MNE_CPP_FIGURE_DIR`, or an empty path when figures are not written.
+
+---
+
+### save(widget, name, caption, size)
+
+Renders `widget` offscreen at `size` and writes it as the next figure.
+
+**Parameters:**
+
+- **widget** : *QWidget &*
+  The widget to render; it is resized and never shown on screen.
+
+- **name** : *const std::string &*
+  File name stem; characters other than letters, digits, '-' and '*' become '*'.
+
+- **caption** : *const std::string &*
+  Caption shown below the figure.
+
+- **size** : *const QSize &*
+  Logical size of the figure in pixels.
+
+**Returns:**
+
+- *std::filesystem::path* — The path of the written PNG, or an empty path when figures are not written or writing failed.
+
+---
+
+### save(image, name, caption)
+
+Writes `image` as the next figure.
+
+**Parameters:**
+
+- **image** : *const QImage &*
+  The figure.
+
+- **name** : *const std::string &*
+  File name stem; characters other than letters, digits, '-' and '*' become '*'.
+
+- **caption** : *const std::string &*
+  Caption shown below the figure.
+
+**Returns:**
+
+- *std::filesystem::path* — The path of the written PNG, or an empty path when figures are not written or writing failed.
+
+---
+
+## Example
+
+- Start here: [ex_disp_plots](../../examples/viz_qt/ex_disp_plots.mdx) — Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+- Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
+- Build target: `ex_disp_plots` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

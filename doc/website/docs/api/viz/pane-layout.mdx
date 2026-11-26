@@ -1,0 +1,220 @@
+---
+id: pane-layout
+title: "mne::viz::PaneLayout"
+sidebar_label: PaneLayout
+sidebar_position: 54
+---
+
+# PaneLayout
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/views/pane_layout.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/views/pane_layout.h)
+
+`#include <mne/viz/pane_layout.h>`
+
+```cpp
+class mne::viz::PaneLayout
+```
+
+Splits a view into 1 to 4 panes with draggable splitters.
+
+Two panes sit side by side, three panes are one full-width pane above two, four panes form a 2 x 2 grid. The splitters sit at fractions of the width and height, clamped to 0.15 .. 0.85, and no pane gets narrower than the minimum pane size.
+
+---
+
+## Public Methods
+
+### split_x()
+
+**Returns:**
+
+- *float* — The horizontal splitter fraction.
+
+---
+
+### split_y()
+
+**Returns:**
+
+- *float* — The vertical splitter fraction.
+
+---
+
+### set_split_x(x)
+
+**Parameters:**
+
+- **x** : *float*
+  Horizontal splitter fraction, clamped to 0.15 .. 0.85.
+
+---
+
+### set_split_y(y)
+
+**Parameters:**
+
+- **y** : *float*
+  Vertical splitter fraction, clamped to 0.15 .. 0.85.
+
+---
+
+### reset_splits()
+
+Centres both splitters.
+
+---
+
+### hit_tolerance_px()
+
+**Returns:**
+
+- *int* — How far from a splitter the pointer still grabs it, in pixels.
+
+---
+
+### min_pane_px()
+
+**Returns:**
+
+- *int* — The minimum pane extent in pixels.
+
+---
+
+### separator_line_px()
+
+**Returns:**
+
+- *int* — The separator thickness in pixels.
+
+---
+
+### slot_rect(slot, pane_count, size)
+
+**Parameters:**
+
+- **slot** : *int*
+  Pane slot, 0 .. pane_count - 1.
+
+- **pane_count** : *int*
+  Number of panes.
+
+- **size** : *[PixelSize](/docs/api/viz/pixel-size)*
+  Size of the view.
+
+**Returns:**
+
+- *[PixelRect](/docs/api/viz/pixel-rect)* — The rectangle of the pane.
+
+---
+
+### hit_test_splitter(pos, pane_count, size)
+
+**Parameters:**
+
+- **pos** : *[Point](/docs/api/viz/point)*
+  Pointer position.
+
+- **pane_count** : *int*
+  Number of panes.
+
+- **size** : *[PixelSize](/docs/api/viz/pixel-size)*
+  Size of the view.
+
+**Returns:**
+
+- *SplitterHit* — The splitter under the pointer; with three panes the vertical splitter exists below the horizontal one only.
+
+---
+
+### viewport_index_at(pos, viewports, size)
+
+**Parameters:**
+
+- **pos** : *[Point](/docs/api/viz/point)*
+  Pointer position.
+
+- **viewports** : *std::span&lt; const int &gt;*
+  Viewport index of each slot, in slot order.
+
+- **size** : *[PixelSize](/docs/api/viz/pixel-size)*
+  Size of the view.
+
+**Returns:**
+
+- *int* — The viewport index of the pane under the pointer, or -1.
+
+---
+
+### inset_for_separator(pane, slot, pane_count)
+
+**Parameters:**
+
+- **pane** : *const [PixelRect](/docs/api/viz/pixel-rect) &*
+  Pane rectangle.
+
+- **slot** : *int*
+  Pane slot.
+
+- **pane_count** : *int*
+  Number of panes.
+
+**Returns:**
+
+- *[PixelRect](/docs/api/viz/pixel-rect)* — The pane rectangle without the separators on its right and bottom edges, where the 3-D scene is drawn.
+
+---
+
+### separator_geometries(pane_count, size)
+
+**Parameters:**
+
+- **pane_count** : *int*
+  Number of panes.
+
+- **size** : *[PixelSize](/docs/api/viz/pixel-size)*
+  Size of the view.
+
+**Returns:**
+
+- *Separators* — The separator rectangles.
+
+---
+
+### drag_splitter(pos, splitter, size)
+
+Moves the dragged splitter (or both) to the pointer.
+
+**Parameters:**
+
+- **pos** : *[Point](/docs/api/viz/point)*
+  Pointer position.
+
+- **splitter** : *SplitterHit*
+  Dragged splitter.
+
+- **size** : *[PixelSize](/docs/api/viz/pixel-size)*
+  Size of the view.
+
+---
+
+## Static Methods
+
+### cursor_for_hit(hit)
+
+**Parameters:**
+
+- **hit** : *SplitterHit*
+  Splitter under the pointer.
+
+**Returns:**
+
+- *CursorShape* — The pointer shape that shows the splitter.
+
+---
+
+## Example
+
+No example of its own: Pane geometry and splitters of the multi-view 3-D brain view; driven by BrainViewInteraction and wrapped by viz::qt::MultiViewLayout.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

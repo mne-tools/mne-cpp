@@ -1,0 +1,61 @@
+---
+id: software-bindings
+title: "mne::viz::SoftwareBindings"
+sidebar_label: SoftwareBindings
+sidebar_position: 76
+---
+
+# SoftwareBindings
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/gpu/software_renderer.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/gpu/software_renderer.h)
+
+`#include <mne/viz/software_renderer.h>`
+
+```cpp
+class mne::viz::SoftwareBindings
+```
+
+The uniform blocks and textures of a draw as a software shader reads them.
+
+---
+
+## Public Methods
+
+### uniforms(binding)
+
+**Parameters:**
+
+- **binding** : *int*
+  Binding number of the uniform block.
+
+**Returns:**
+
+- *T* — The block as `T`, the bytes missing from the draw's block (or of a missing block) zero.
+
+---
+
+### sample(binding, uv)
+
+Samples a texture with clamp-to-edge addressing and the texture's filter.
+
+**Parameters:**
+
+- **binding** : *int*
+  Binding number of the sampler.
+
+- **uv** : *const Eigen::Vector2f &*
+  Texture coordinates, (0, 0) at the top left of the image.
+
+**Returns:**
+
+- *Eigen::Vector4f* — RGBA from 0 to 1, or transparent black for a missing texture.
+
+---
+
+## Example
+
+No example of its own: Read-only view of a draw's uniform blocks and textures passed to software shaders.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

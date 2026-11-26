@@ -1,0 +1,153 @@
+---
+id: rhi-frame-renderer
+title: "mne::viz::qt::RhiFrameRenderer"
+sidebar_label: RhiFrameRenderer
+sidebar_position: 124
+---
+
+# RhiFrameRenderer
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/plots/helpers/rhiframerenderer.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/plots/helpers/rhiframerenderer.h)
+
+`#include <mne/viz/backends/qt/rhiframerenderer.h>`
+
+```cpp
+class mne::viz::qt::RhiFrameRenderer
+```
+
+Executes [`GpuFrame`](/docs/api/viz/gpu-frame) descriptions with QRhi.
+
+Use one renderer per QRhi and resource store; call `releaseResources()` before the QRhi goes away.
+
+---
+
+## Public Methods
+
+### RhiFrameRenderer()
+
+---
+
+### ~RhiFrameRenderer()
+
+---
+
+### RhiFrameRenderer()
+
+---
+
+### operator=()
+
+---
+
+### addShaderPrefix(prefix)
+
+Adds a resource directory where the shaders of an id are looked up: the files are the prefix followed by the id and ".vert.qsb" or ".frag.qsb".
+
+**Parameters:**
+
+- **prefix** : *const std::string &*
+  Resource path ending with '/', e.g. ":/disp/shaders/viewers/helpers/shaders/".
+
+---
+
+### setFont(font)
+
+Sets the font that fills in what the fonts of figure textures leave unset.
+
+**Parameters:**
+
+- **font** : *const QFont &*
+  Base font.
+
+---
+
+### render(rhi, target, cb, frame, resources)
+
+Uploads what changed and records the frame into `cb`.
+
+Passes after the first that clear no colour continue the previous QRhi pass; their depth is not cleared then.
+
+**Parameters:**
+
+- **rhi** : *QRhi **
+  The QRhi.
+
+- **target** : *QRhiRenderTarget **
+  Render target.
+
+- **cb** : *QRhiCommandBuffer **
+  [`Command`](/docs/api/viz/command) buffer of the current frame.
+
+- **frame** : *const [GpuFrame](/docs/api/viz/gpu-frame) &*
+  Passes and draws.
+
+- **resources** : *const [GpuResources](/docs/api/viz/gpu-resources) &*
+  Buffers, textures and pipelines the frame refers to.
+
+---
+
+### checkShaders(frame, resources)
+
+Compares the draws of a frame with the reflection of their shaders: every uniform block a draw sets has a block of the same size at its binding, every texture a sampler, and every vertex attribute of the pipeline an input of the same location and number of components; every block, sampler and input of a shader is set.
+
+**Parameters:**
+
+- **frame** : *const [GpuFrame](/docs/api/viz/gpu-frame) &*
+  Passes and draws.
+
+- **resources** : *const [GpuResources](/docs/api/viz/gpu-resources) &*
+  Pipelines the frame refers to.
+
+**Returns:**
+
+- *std::vector&lt; std::string &gt;* — The mismatches, empty if the frame fits its shaders.
+
+---
+
+### textureImage(texture)
+
+**Parameters:**
+
+- **texture** : *viz::GpuHandle*
+  Handle of a texture of the last rendered frame.
+
+**Returns:**
+
+- *QImage* — The image last uploaded for the texture, with the figure's device pixel ratio, or a null image.
+
+---
+
+### releaseResources()
+
+Releases every QRhi object.
+
+---
+
+## Static Methods
+
+### frameTarget(rhi, target, devicePixelRatio)
+
+**Parameters:**
+
+- **rhi** : *QRhi **
+  The QRhi.
+
+- **target** : *QRhiRenderTarget **
+  Render target.
+
+- **devicePixelRatio** : *double*
+  Pixels per logical pixel.
+
+**Returns:**
+
+- *[GpuFrameTarget](/docs/api/viz/gpu-frame-target)* — What a producer needs to know about the target, with QRhi's clip-space correction.
+
+---
+
+## Example
+
+No example of its own: QRhi backend of viz::GpuFrame used by ChannelRhiRenderer; exercised by test_disp_channel_window.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

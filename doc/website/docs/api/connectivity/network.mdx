@@ -15,11 +15,11 @@ sidebar_position: 16
 class mne::Network
 ```
 
-[Graph](/docs/api/disp/graph) container for one functional-connectivity result.
+[Graph](/docs/api/viz-qt/graph) container for one functional-connectivity result.
 
-Holds the nodes (channel / source positions) and the edges (per-frequency weight matrices + scalar band-averaged weights), the metric name ("COH", "PLI", "GC", ...), the threshold that marks edges active, and the [`VisualizationInfo`](/docs/api/connectivity/visualization-info) read by the disp3D rendering layer. Edges are read-only once added so that the cached weight ranges stay consistent.
+Holds the nodes (channel / source positions) and the edges (per-frequency weight matrices + scalar band-averaged weights), the metric name ("COH", "PLI", "GC", ...), the threshold that marks edges active, and the [`VisualizationInfo`](/docs/api/connectivity/visualization-info) read by the mne_viz_qt rendering layer. Edges are read-only once added so that the cached weight ranges stay consistent.
 
-[Graph](/docs/api/disp/graph) container for one connectivity metric; nodes + weighted edges + threshold/visualisation state.
+[Graph](/docs/api/viz-qt/graph) container for one connectivity metric; nodes + weighted edges + threshold/visualisation state.
 
 ```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
 Network network("manual");
@@ -37,7 +37,7 @@ const std::size_t strongEdges = network.edge_count(EdgeSet::thresholded);
 const int hubDegree = network.degree(1);
 const int hubStrongDegree = network.degree(1, EdgeSet::thresholded);
 const double hubStrength = network.strength(1);
-network.set_visualization_info({.coloring = VisualizationInfo::Coloring::fixed, // how disp3D colours the network
+network.set_visualization_info({.coloring = VisualizationInfo::Coloring::fixed, // how mne_viz_qt colours the network
                                 .edge_color = Eigen::Vector4i(0, 0, 255, 255)});
 ```
 
@@ -430,7 +430,7 @@ Compare connectivity metrics side by side on the same averaged sensor- or source
 std::vector<Network> lNetworks = compute_connectivity(conSettings);
 ````
 
-Also used in [ex_disp3d_scene](../../examples/disp3D/ex_disp3d_scene.mdx), [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx).
+Also used in [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx), [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx).
 
 ## Authors of this file
 

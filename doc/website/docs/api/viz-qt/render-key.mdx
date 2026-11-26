@@ -1,0 +1,56 @@
+---
+id: render-key
+title: "mne::viz::qt::RenderKey"
+sidebar_label: RenderKey
+sidebar_position: 116
+---
+
+# RenderKey
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/core/rendertypes.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/core/rendertypes.h)
+
+`#include <mne/viz/backends/qt/rendertypes.h>`
+
+```cpp
+class mne::viz::qt::RenderKey
+```
+
+Identity of a renderable in the renderer's GPU resource cache.
+
+The renderer drops the GPU copies of a renderable once its key is destroyed. A copied renderable gets a key of its own, so it never shares GPU buffers with the original.
+
+---
+
+## Public Methods
+
+### RenderKey()
+
+---
+
+### RenderKey()
+
+---
+
+### operator=()
+
+---
+
+### id()
+
+**Returns:**
+
+- *const void ** — Address that identifies the renderable while it lives.
+
+---
+
+### token()
+
+**Returns:**
+
+- *std::weak_ptr&lt; const void &gt;* — Token that expires when the renderable is destroyed.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

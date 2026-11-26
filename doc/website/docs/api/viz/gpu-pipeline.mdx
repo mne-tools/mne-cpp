@@ -1,0 +1,30 @@
+---
+id: gpu-pipeline
+title: "mne::viz::GpuPipeline"
+sidebar_label: GpuPipeline
+sidebar_position: 66
+---
+
+# GpuPipeline
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/gpu/gpu_frame.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/gpu/gpu_frame.h)
+
+`#include <mne/viz/gpu_frame.h>`
+
+```cpp
+struct mne::viz::GpuPipeline
+```
+
+A graphics pipeline: shader, vertex layout and fixed-function state.
+
+The uniform blocks and textures the shader reads are given per draw ([`GpuDraw`](/docs/api/viz/gpu-draw)) by the binding numbers of the shader.
+
+---
+
+## Example
+
+No example of its own: Value type of a pipeline description stored in GpuResources.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

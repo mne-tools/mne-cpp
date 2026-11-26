@@ -1,0 +1,118 @@
+---
+id: project-settings-view
+title: "mne::viz::qt::ProjectSettingsView"
+sidebar_label: ProjectSettingsView
+sidebar_position: 47
+---
+
+# ProjectSettingsView
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/viewers/projectsettingsview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/viewers/projectsettingsview.h)
+
+`#include <mne/viz/backends/qt/projectsettingsview.h>`
+
+```cpp
+class mne::viz::qt::ProjectSettingsView
+```
+
+Output-path / filename-template panel for recording and export sessions.
+
+Resolves user-edited templates with `S` / `T` / `P` placeholders into the absolute file path used by the recording plugin.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- ProjectSettingsView
+    click AbstractView href "../../viz-qt/abstract-view/"
+```
+
+---
+
+## Public Methods
+
+### ProjectSettingsView(sSettingsPath, sDataPath, sCurrentProject, sCurrentSubject, sCurrentParadigm, parent)
+
+---
+
+### ~ProjectSettingsView()
+
+---
+
+### setRecordingElapsedTime(mSecsElapsed)
+
+Sets elapsed time to input parameter.
+
+**Parameters:**
+
+- **mSecsElapsed** : *int*
+  elapsed tim in milliseconds
+
+---
+
+### getCurrentFileName()
+
+Updates and gets current file name based on project and subject.
+
+**Returns:**
+
+- *QString* — file name
+
+---
+
+### triggerFileNameUpdate()
+
+Updates file name based on current project and subject.
+
+---
+
+### hideFileNameUi()
+
+Hides file name ui elements.
+
+---
+
+### showFileNameUi()
+
+Shows file name ui elements.
+
+---
+
+### hideParadigmUi()
+
+Hides paradigm ui elements.
+
+---
+
+### showParadigmUi()
+
+Shows paradigm ui elements.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
+- Limin Sun &lt;limin.sun@childrens.harvard.edu&gt;
+- Matti Hamalainen &lt;msh@nmr.mgh.harvard.edu&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;

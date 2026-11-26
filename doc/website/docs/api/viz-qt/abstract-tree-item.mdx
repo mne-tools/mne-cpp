@@ -1,0 +1,97 @@
+---
+id: abstract-tree-item
+title: "mne::viz::qt::AbstractTreeItem"
+sidebar_label: AbstractTreeItem
+sidebar_position: 80
+---
+
+# AbstractTreeItem
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/model/items/abstracttreeitem.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/model/items/abstracttreeitem.h)
+
+`#include <mne/viz/backends/qt/abstracttreeitem.h>`
+
+```cpp
+class mne::viz::qt::AbstractTreeItem
+```
+
+Base tree item providing check-state, visibility, and data-role storage for all 3-D scene items.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QStandardItem <|-- AbstractTreeItem
+    AbstractTreeItem <|-- BemTreeItem
+    click BemTreeItem href "../../viz-qt/bem-tree-item/"
+    AbstractTreeItem <|-- DigitizerTreeItem
+    click DigitizerTreeItem href "../../viz-qt/digitizer-tree-item/"
+    AbstractTreeItem <|-- DipoleTreeItem
+    click DipoleTreeItem href "../../viz-qt/dipole-tree-item/"
+    AbstractTreeItem <|-- NetworkTreeItem
+    click NetworkTreeItem href "../../viz-qt/network-tree-item/"
+    AbstractTreeItem <|-- SensorTreeItem
+    click SensorTreeItem href "../../viz-qt/sensor-tree-item/"
+    AbstractTreeItem <|-- SourceSpaceTreeItem
+    click SourceSpaceTreeItem href "../../viz-qt/source-space-tree-item/"
+    AbstractTreeItem <|-- SurfaceTreeItem
+    click SurfaceTreeItem href "../../viz-qt/surface-tree-item/"
+```
+
+---
+
+## Public Methods
+
+### AbstractTreeItem(text, type)
+
+---
+
+### ~AbstractTreeItem()
+
+---
+
+### type()
+
+---
+
+### setVisible(visible)
+
+---
+
+### isVisible()
+
+---
+
+### setTransform(transform)
+
+---
+
+### transform()
+
+---
+
+### setColor(color)
+
+---
+
+### color()
+
+---
+
+### setAlpha(alpha)
+
+---
+
+### alpha()
+
+---
+
+## Static Methods
+
+### itemTypeId(type)
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

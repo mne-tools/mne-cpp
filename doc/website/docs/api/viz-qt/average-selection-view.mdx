@@ -1,0 +1,122 @@
+---
+id: average-selection-view
+title: "mne::viz::qt::AverageSelectionView"
+sidebar_label: AverageSelectionView
+sidebar_position: 5
+---
+
+# AverageSelectionView
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/viewers/averageselectionview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/viewers/averageselectionview.h)
+
+`#include <mne/viz/backends/qt/averageselectionview.h>`
+
+```cpp
+class mne::viz::qt::AverageSelectionView
+```
+
+Tabular picker for active / colour of each averaged condition in the current evoked set.
+
+Emits `newAverageActivationMap` and `newAverageColorMap` whenever the user toggles a row or changes a colour; consumers refresh their evoked plots accordingly.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- AverageSelectionView
+    click AbstractView href "../../viz-qt/abstract-view/"
+```
+
+---
+
+## Public Methods
+
+### AverageSelectionView(sSettingsPath, parent, f)
+
+Constructs a [`AverageSelectionView`](/docs/api/viz-qt/average-selection-view) which is a child of parent.
+
+**Parameters:**
+
+- **sSettingsPath** : *const QString &*
+  Settings path under which the widget persists its state (empty = no persistence).
+
+- **parent** : *QWidget **
+  parent of widget.
+
+- **f** : *Qt::WindowFlags*
+  Qt window flags passed to the QWidget constructor.
+
+---
+
+### ~AverageSelectionView()
+
+Destroys the [`AverageSelectionView`](/docs/api/viz-qt/average-selection-view).
+
+---
+
+### getAverageColor()
+
+Get the current average colors.
+
+**Returns:**
+
+- *std::shared_ptr&lt; std::map&lt; std::string, QColor &gt; &gt;* — Pointer to the current average colors.
+
+---
+
+### getAverageActivation()
+
+Get the current average activations.
+
+**Returns:**
+
+- *std::shared_ptr&lt; std::map&lt; std::string, bool &gt; &gt;* — Pointer to the current average activations.
+
+---
+
+### setAverageColor(qMapAverageColor)
+
+Set the average colors.
+
+**Parameters:**
+
+- **qMapAverageColor** : *const std::shared_ptr&lt; std::map&lt; std::string, QColor &gt; &gt; &*
+  Pointer to the new average colors.
+
+---
+
+### setAverageActivation(qMapAverageActivation)
+
+Set the average activations.
+
+**Parameters:**
+
+- **qMapAverageActivation** : *const std::shared_ptr&lt; std::map&lt; std::string, bool &gt; &gt; &*
+  Pointer to the new average activations.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

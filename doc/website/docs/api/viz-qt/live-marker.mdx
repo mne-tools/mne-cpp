@@ -1,0 +1,44 @@
+---
+id: live-marker
+title: "mne::viz::qt::LiveMarker"
+sidebar_label: LiveMarker
+sidebar_position: 93
+---
+
+# LiveMarker
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/view/brainviewcore.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/view/brainviewcore.h)
+
+`#include <mne/viz/backends/qt/brainviewcore.h>`
+
+```cpp
+struct mne::viz::qt::LiveMarker
+```
+
+Lightweight live overlay marker rendered as a single sphere.
+
+Used by `BrainViewCore::setLiveMarkers` to draw transient markers (e.g. digitizer tracker tip, orientation axes) without going through the model pipeline or recalculating scene bounds.
+
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+BrainView view; // QRhi widget; nothing is rendered until it is shown
+view.setViewCount(2);
+const bool twoPanes = view.viewCount() == 2 && view.viewMode() == BrainView::MultiView;
+LiveMarker trackerTip;
+trackerTip.position = QVector3D(0.0f, 0.08f, 0.04f);
+trackerTip.color = Qt::yellow;
+view.setLiveMarkers({trackerTip}); // transient, does not move the camera
+view.clearLiveMarkers();
+view.setViewCount(1);
+```
+
+---
+
+## Example
+
+- Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

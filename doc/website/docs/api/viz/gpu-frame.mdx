@@ -1,0 +1,30 @@
+---
+id: gpu-frame
+title: "mne::viz::GpuFrame"
+sidebar_label: GpuFrame
+sidebar_position: 62
+---
+
+# GpuFrame
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/gpu/gpu_frame.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/gpu/gpu_frame.h)
+
+`#include <mne/viz/gpu_frame.h>`
+
+```cpp
+struct mne::viz::GpuFrame
+```
+
+Everything drawn in one frame.
+
+[`Clip`](/docs/api/viz/clip) space is that of OpenGL: x and y from -1 to 1 with y up, depth from -1 (near) to 1 (far). A backend with another convention tells the producer through `GpuFrameTarget::clip_correction`, which the producer applies to its projections, as the shaders take the final positions from their uniforms.
+
+---
+
+## Example
+
+No example of its own: Value type of one frame's passes and draws, built by TraceFrameBuilder and executed by SoftwareRenderer or viz::qt::RhiFrameRenderer.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

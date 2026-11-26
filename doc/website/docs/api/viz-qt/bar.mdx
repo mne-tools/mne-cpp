@@ -1,0 +1,135 @@
+---
+id: bar
+title: "mne::viz::qt::Bar"
+sidebar_label: Bar
+sidebar_position: 7
+---
+
+# Bar
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/plots/bar.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/plots/bar.h)
+
+`#include <mne/viz/backends/qt/bar.h>`
+
+```cpp
+class mne::viz::qt::Bar
+```
+
+[`Bar`](/docs/api/viz-qt/bar) chart / histogram QWidget rendering Eigen class-limit + frequency vectors with QPainter.
+
+Templated on the value type so callers can pass either integer or floating bin limits. Use `setData` to install a new dataset and `updatePlot` to refresh an existing chart in place; each bar is labelled with its class limits in data units.
+
+```cpp title="src/examples/ex_disp_plots/main.cpp"
+Bar bar("Amplitude histogram");
+VectorXd classLimits(5); // class edges
+classLimits << 0.0, 1.0, 2.0, 3.0, 4.0;
+VectorXi counts(4); // counts per class
+counts << 5, 20, 10, 15;
+bar.setData(classLimits, counts, 2); // 2 digits on the axis labels
+bar.setXLabel("Amplitude");
+bar.setYLabel("Count");
+```
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QWidget <|-- Bar
+```
+
+---
+
+## Public Methods
+
+### Bar(title, parent)
+
+The constructor for [`Bar`](/docs/api/viz-qt/bar).
+
+**Parameters:**
+
+- **title** : *const QString &*
+  Title drawn above the bar chart (default empty).
+
+- **parent** : *QWidget **
+  Parent widget (default nullptr).
+
+---
+
+### setData(matClassLimitData, matClassFrequencyData, iPrecisionValue)
+
+Sets new data to the bar chart.
+
+**Parameters:**
+
+- **matClassLimitData** : *const Eigen::Matrix&lt; T, Eigen::Dynamic, 1 &gt; &*
+  vector input filled with class limits.
+
+- **matClassFrequencyData** : *const Eigen::Matrix&lt; int, Eigen::Dynamic, 1 &gt; &*
+  vector input filled with class frequency to the corresponding class.
+
+- **iPrecisionValue** : *int*
+  significant digits of the class limits on the x axis.
+
+---
+
+### setData(matClassLimitData, matClassFrequencyData, iPrecisionValue)
+
+---
+
+### updatePlot(matClassLimitData, matClassFrequencyData, iPrecisionValue)
+
+Updates the bar plot with the new data.
+
+**Parameters:**
+
+- **matClassLimitData** : *const Eigen::Matrix&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; &*
+  vector input filled with class limits.
+
+- **matClassFrequencyData** : *const Eigen::Matrix&lt; int, Eigen::Dynamic, Eigen::Dynamic &gt; &*
+  vector input filled with class frequency to the corresponding class.
+
+- **iPrecisionValue** : *int*
+  significant digits of the class limits on the x axis.
+
+---
+
+### setXLabel(label)
+
+Sets the label of the x axis, e.g.
+
+the quantity and unit of the class limits.
+
+**Parameters:**
+
+- **label** : *const QString &*
+  The x axis label.
+
+---
+
+### setYLabel(label)
+
+Sets the label of the y axis.
+
+**Parameters:**
+
+- **label** : *const QString &*
+  The y axis label.
+
+---
+
+## Example
+
+- Start here: [ex_disp_plots](../../examples/viz_qt/ex_disp_plots.mdx) — Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+- Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
+- Build target: `ex_disp_plots` (runs under CTest)
+
+## Authors of this file
+
+- Ricky Tjen &lt;ricky270@student.sgu.ac.id&gt;
+- Matti Hamalainen &lt;msh@nmr.mgh.harvard.edu&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Andreas Griesshammer &lt;ag@fieldlineinc.com&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
+- Lars Debor &lt;Lars.Debor@tu-ilmenau.de&gt;

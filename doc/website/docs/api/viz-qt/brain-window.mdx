@@ -1,0 +1,127 @@
+---
+id: brain-window
+title: "mne::viz::qt::BrainWindow"
+sidebar_label: BrainWindow
+sidebar_position: 128
+---
+
+# BrainWindow
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/view/brainwindow.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/view/brainwindow.h)
+
+`#include <mne/viz/backends/qt/brainwindow.h>`
+
+```cpp
+class mne::viz::qt::BrainWindow
+```
+
+[`BrainWindow`](/docs/api/viz-qt/brain-window) is a QWindow that renders a [`BrainViewCore`](/docs/api/viz-qt/brain-view-core) through its own QRhi and swap chain.
+
+It needs only QtGui, so it also serves applications without Qt Widgets; widget applications embed it with a window container.
+
+Clicking the name label of a multi-view pane emits `viewportPresetMenuRequested()`; the application may offer the camera presets and apply the choice with `BrainViewCore::setViewportCameraPreset`.
+
+Widgets-free QWindow host of the 3-D brain view with its own QRhi, swap chain and input forwarding.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QWindow <|-- BrainWindow
+```
+
+---
+
+## Public Methods
+
+### BrainWindow(api, parent)
+
+Constructor.
+
+The QRhi and the swap chain are created when the window is first exposed.
+
+**Parameters:**
+
+- **api** : *GraphicsApi*
+  Graphics API of the window's QRhi.
+
+- **parent** : *QWindow **
+  Parent window.
+
+---
+
+### ~BrainWindow()
+
+Destructor.
+
+Frees the scene's GPU resources before the QRhi.
+
+---
+
+### core()
+
+**Returns:**
+
+- *[BrainViewCore](/docs/api/viz-qt/brain-view-core) ** — The core holding scene, camera and overlay state; use it to load data and drive the view.
+
+---
+
+### graphicsApi()
+
+**Returns:**
+
+- *GraphicsApi* — The graphics API resolved for this window (never `GraphicsApi::Platform`).
+
+---
+
+### rhi()
+
+**Returns:**
+
+- *QRhi ** — The window's QRhi, or nullptr before the first expose or if it could not be created.
+
+---
+
+### swapChain()
+
+**Returns:**
+
+- *QRhiSwapChain ** — The window's swap chain, or nullptr before the first expose.
+
+---
+
+### hasSwapChain()
+
+**Returns:**
+
+- *bool* — Whether the swap chain has been created with a non-empty size.
+
+---
+
+### frameCount()
+
+**Returns:**
+
+- *int* — Number of frames recorded since the window was created.
+
+---
+
+### grabFrame()
+
+Render a frame now and read the back buffer back, including the 2-D overlay.
+
+`BrainViewCore::takeScreenshot()` and `BrainViewCore::savePng()` leave the overlay out.
+
+**Returns:**
+
+- *QImage* — The frame, or a null image when the window is not exposed or cannot render.
+
+---
+
+## Example
+
+No example of its own: Native QWindow that needs an exposed platform surface; covered by the Null-backend test.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

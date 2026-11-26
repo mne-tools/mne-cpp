@@ -1,0 +1,73 @@
+---
+id: brain-tree-model
+title: "mne::viz::qt::BrainTreeModel"
+sidebar_label: BrainTreeModel
+sidebar_position: 84
+---
+
+# BrainTreeModel
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/model/braintreemodel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/model/braintreemodel.h)
+
+`#include <mne/viz/backends/qt/braintreemodel.h>`
+
+```cpp
+class mne::viz::qt::BrainTreeModel
+```
+
+Hierarchical item model organizing all 3-D scene objects (surfaces, sensors, sources, networks) for QTreeView.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QStandardItemModel <|-- BrainTreeModel
+```
+
+---
+
+## Public Methods
+
+### BrainTreeModel(parent)
+
+---
+
+### ~BrainTreeModel()
+
+---
+
+### addSurface(subject, hemi, surfType, surface)
+
+---
+
+### addAnnotation(subject, hemi, annotation)
+
+---
+
+### addBemSurface(subject, bemName, bemSurf)
+
+---
+
+### addSensors(type, items)
+
+---
+
+### addDipoles(set)
+
+---
+
+### addDigitizerData(digitizerPoints)
+
+---
+
+### addSourceSpace(srcSpace)
+
+---
+
+### addNetwork(network, name)
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

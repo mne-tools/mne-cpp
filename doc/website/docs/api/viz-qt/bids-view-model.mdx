@@ -1,0 +1,63 @@
+---
+id: bids-view-model
+title: "mne::viz::qt::BidsViewModel"
+sidebar_label: BidsViewModel
+sidebar_position: 9
+---
+
+# BidsViewModel
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/viewers/helpers/bidsviewmodel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/viewers/helpers/bidsviewmodel.h)
+
+`#include <mne/viz/backends/qt/bidsviewmodel.h>`
+
+```cpp
+class mne::viz::qt::BidsViewModel
+```
+
+QStandardItemModel mirroring the BIDS dataset hierarchy (subjects / sessions / runs / derivatives).
+
+Rebuilds itself from a top-level dataset path; item roles carry the absolute path, BIDS entity type and loadable-by-this-app flag so the host [`BidsView`](/docs/api/viz-qt/bids-view) can dispatch double-clicks without re-walking the file system.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QStandardItemModel <|-- BidsViewModel
+```
+
+---
+
+## Public Methods
+
+### BidsViewModel(pParent)
+
+Constructs the Analyze Data Model.
+
+**Parameters:**
+
+- **pParent** : *QObject **
+  Parent QObject (default nullptr).
+
+---
+
+### ~BidsViewModel()
+
+Destroys the Analyze Data Model.
+
+---
+
+### tree()
+
+**Returns:**
+
+- *const [BidsTree](/docs/api/viz/bids-tree) &* — The toolkit-independent tree this model mirrors.
+
+---
+
+## Authors of this file
+
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -1,0 +1,80 @@
+---
+id: sphara-settings-view
+title: "mne::viz::qt::SpharaSettingsView"
+sidebar_label: SpharaSettingsView
+sidebar_position: 58
+---
+
+# SpharaSettingsView
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/viewers/spharasettingsview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/viewers/spharasettingsview.h)
+
+`#include <mne/viz/backends/qt/spharasettingsview.h>`
+
+```cpp
+class mne::viz::qt::SpharaSettingsView
+```
+
+SPHARA spatial-filter configuration panel (per-modality basis order spinboxes).
+
+An activation `QCheckBox` plus per-modality basis-order spinboxes (MAG, GRAD, EEG) forwarded to the `rtprocessing` SPHARA decomposition.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- SpharaSettingsView
+    click AbstractView href "../../viz-qt/abstract-view/"
+```
+
+---
+
+## Public Methods
+
+### SpharaSettingsView(sSettingsPath, parent, f)
+
+Constructs a [`SpharaSettingsView`](/docs/api/viz-qt/sphara-settings-view) which is a child of parent.
+
+**Parameters:**
+
+- **sSettingsPath** : *const QString &*
+  Settings path under which the widget persists its state (empty = no persistence).
+
+- **parent** : *QWidget **
+  parent of widget.
+
+- **f** : *Qt::WindowFlags*
+  Qt window flags passed to the QWidget constructor.
+
+---
+
+### ~SpharaSettingsView()
+
+Destroys the [`SpharaSettingsView`](/docs/api/viz-qt/sphara-settings-view).
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

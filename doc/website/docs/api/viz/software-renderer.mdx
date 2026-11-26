@@ -1,0 +1,99 @@
+---
+id: software-renderer
+title: "mne::viz::SoftwareRenderer"
+sidebar_label: SoftwareRenderer
+sidebar_position: 74
+---
+
+# SoftwareRenderer
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/gpu/software_renderer.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/gpu/software_renderer.h)
+
+`#include <mne/viz/software_renderer.h>`
+
+```cpp
+class mne::viz::SoftwareRenderer
+```
+
+Executes a [`GpuFrame`](/docs/api/viz/gpu-frame) on the CPU.
+
+Triangles are rasterized with perspective-correct varyings, near- and far-plane clipping, depth testing and face culling; lines and points are one pixel wide, as on the GPU backends. Figure textures are rasterized with `to_raster()`. The shaders of the views in mne_scene are registered on construction; `set_shader()` adds others. Draws whose shader is unknown are skipped.
+
+---
+
+## Public Methods
+
+### SoftwareRenderer()
+
+Creates a renderer with the shaders of the views in mne_scene.
+
+---
+
+### set_shader(id, shader)
+
+Adds or replaces a shader.
+
+**Parameters:**
+
+- **id** : *const std::string &*
+  Shader id the pipelines refer to.
+
+- **shader** : *[SoftwareShader](/docs/api/viz/software-shader)*
+  Implementation.
+
+---
+
+### has_shader(id)
+
+**Parameters:**
+
+- **id** : *const std::string &*
+  Shader id.
+
+**Returns:**
+
+- *bool* — Whether a shader with the id is registered.
+
+---
+
+### render(frame, resources)
+
+Renders a frame.
+
+**Parameters:**
+
+- **frame** : *const [GpuFrame](/docs/api/viz/gpu-frame) &*
+  Passes and draws.
+
+- **resources** : *const [GpuResources](/docs/api/viz/gpu-resources) &*
+  Buffers, textures and pipelines the frame refers to.
+
+**Returns:**
+
+- *[Image](/docs/api/viz/image)* — The target image, frame.pixel_width x frame.pixel_height, not premultiplied.
+
+---
+
+## Example
+
+No example of its own: CPU backend of the GPU frame description; exercised with golden images by test_scene_gpu_frame and test_scene_trace_view.
+
+## Used in examples
+
+### [ex_scene_sdl](../../examples/viz/ex_scene_sdl.mdx)
+
+Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 221"
+style.background = Color{250, 250, 250};
+TraceMarkers markers;
+const ApproximateTextMetrics metrics;
+SoftwareRenderer renderer;
+SDL_Texture* texture = nullptr;
+int textureWidth = 0;
+int textureHeight = 0;
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

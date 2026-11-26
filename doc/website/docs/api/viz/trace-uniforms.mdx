@@ -1,0 +1,30 @@
+---
+id: trace-uniforms
+title: "mne::viz::TraceUniforms"
+sidebar_label: TraceUniforms
+sidebar_position: 42
+---
+
+# TraceUniforms
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/views/trace_geometry.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/views/trace_geometry.h)
+
+`#include <mne/viz/trace_geometry.h>`
+
+```cpp
+struct mne::viz::TraceUniforms
+```
+
+Shader parameters of one drawn trace.
+
+The layout is the uniform block of channeldata.vert / channeldata.frag (std140, 52 bytes): copy the struct as is into a uniform buffer slot.
+
+---
+
+## Example
+
+No example of its own: Plain uniform-block value type produced by TraceGeometry::draws() and copied into a GPU buffer.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

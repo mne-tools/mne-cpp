@@ -1,0 +1,141 @@
+---
+id: dipole-object
+title: "mne::viz::qt::DipoleObject"
+sidebar_label: DipoleObject
+sidebar_position: 91
+---
+
+# DipoleObject
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/renderable/dipoleobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/renderable/dipoleobject.h)
+
+`#include <mne/viz/backends/qt/dipoleobject.h>`
+
+```cpp
+class mne::viz::qt::DipoleObject
+```
+
+Renderable dipole object that builds instanced arrow geometry from an [`InvEcdSet`](/docs/api/inv/inv-ecd-set) and provides its CPU streams for instanced rendering.
+
+Renderable dipole arrow set with instanced GPU rendering.
+
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+InvEcdSet dipoles;
+InvEcd strong;
+strong.rd = Vector3f(0.0f, 0.0f, 0.05f);
+strong.Q = Vector3f(0.0f, 0.0f, 20e-9f);
+InvEcd weak;
+weak.rd = Vector3f(0.03f, 0.0f, 0.05f);
+weak.Q = Vector3f(10e-9f, 0.0f, 0.0f);
+dipoles.push_back(strong);
+dipoles.push_back(weak);
+DipoleObject dipoleGlyphs;
+dipoleGlyphs.load(dipoles); // one cone per dipole, scaled by moment
+float dipoleDistance = 0.0f;
+const int pickedDipole = dipoleGlyphs.intersect(QVector3D(0.03f, 0.0f, 0.2f), QVector3D(0.0f, 0.0f, -1.0f), dipoleDistance);
+```
+
+---
+
+## Public Methods
+
+### DipoleObject()
+
+---
+
+### ~DipoleObject()
+
+---
+
+### load(ecdSet)
+
+---
+
+### applyTransform(trans)
+
+---
+
+### streams()
+
+**Returns:**
+
+- *[InstancedStreams](/docs/api/viz-qt/instanced-streams)* — CPU streams of the arrow shape and of one instance per dipole.
+
+---
+
+### renderKey()
+
+**Returns:**
+
+- *const [RenderKey](/docs/api/viz-qt/render-key) &* — Identity of this object in the renderer's GPU cache.
+
+---
+
+### indexCount()
+
+---
+
+### instanceCount()
+
+---
+
+### isVisible()
+
+---
+
+### setVisible(visible)
+
+---
+
+### boundingBox(min, max)
+
+Axis-aligned bounds of the (transformed) dipole positions.
+
+**Parameters:**
+
+- **min** : *QVector3D &*
+  Minimum corner.
+
+- **max** : *QVector3D &*
+  Maximum corner.
+
+**Returns:**
+
+- *bool* — False if no dipoles are loaded.
+
+---
+
+### setSelected(index, selected)
+
+---
+
+### intersect(rayOrigin, rayDir, dist)
+
+Test ray intersection with dipoles.
+
+**Parameters:**
+
+- **rayOrigin** : *const QVector3D &*
+  [`Ray`](/docs/api/viz/ray) origin in world space.
+
+- **rayDir** : *const QVector3D &*
+  [`Ray`](/docs/api/viz/ray) direction (normalized).
+
+- **dist** : *float &*
+  Distance to intersection.
+
+**Returns:**
+
+- *int* — Index of intersected dipole, or -1 if none.
+
+---
+
+## Example
+
+- Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

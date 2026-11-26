@@ -1,0 +1,161 @@
+---
+id: polyline-object
+title: "mne::viz::qt::PolylineObject"
+sidebar_label: PolylineObject
+sidebar_position: 98
+---
+
+# PolylineObject
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/renderable/polylineobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/renderable/polylineobject.h)
+
+`#include <mne/viz/backends/qt/polylineobject.h>`
+
+```cpp
+class mne::viz::qt::PolylineObject
+```
+
+Renders an ordered sequence of points as connected line segments.
+
+Each segment is one instance of a unit cylinder, using the same instance layout as [`DipoleObject`](/docs/api/viz-qt/dipole-object) and [`NetworkObject`](/docs/api/viz-qt/network-object) so the existing Dipole pipeline can draw it without a dedicated shader.
+
+Connected line segments through an ordered list of points.
+
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+// Head-position track: N points draw N - 1 tube segments; repeated positions are skipped
+PolylineObject track;
+track.setPoints({Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.001f, 0.0f, 0.0f), Vector3f(0.002f, 0.001f, 0.0f)});
+track.setRadius(0.0005f);
+track.setGradient(Qt::blue, Qt::red); // oldest to newest
+```
+
+---
+
+## Public Methods
+
+### PolylineObject()
+
+Constructs a [`PolylineObject`](/docs/api/viz-qt/polyline-object) without any points.
+
+---
+
+### ~PolylineObject()
+
+Destroys the [`PolylineObject`](/docs/api/viz-qt/polyline-object).
+
+---
+
+### setPoints(vecPoints)
+
+Sets the points of the polyline.
+
+Fewer than two points clears the object, since a single point has no segment to draw.
+
+**Parameters:**
+
+- **vecPoints** : *const std::vector&lt; Eigen::Vector3f &gt; &*
+  Points in scene coordinates, in order.
+
+---
+
+### clear()
+
+Clears all points.
+
+---
+
+### setRadius(fRadius)
+
+Sets the radius of the drawn segments.
+
+**Parameters:**
+
+- **fRadius** : *float*
+  Segment radius in scene units.
+
+---
+
+### setGradient(startColor, endColor)
+
+Sets the colours the segments are graded between from start to end.
+
+Grading the line makes the direction of travel readable without any extra decoration.
+
+**Parameters:**
+
+- **startColor** : *const QColor &*
+  Colour of the first segment.
+
+- **endColor** : *const QColor &*
+  Colour of the last segment.
+
+---
+
+### streams()
+
+**Returns:**
+
+- *[InstancedStreams](/docs/api/viz-qt/instanced-streams)* — CPU streams of the unit segment mesh and of one instance per segment.
+
+---
+
+### renderKey()
+
+**Returns:**
+
+- *const [RenderKey](/docs/api/viz-qt/render-key) &* — Identity of this object in the renderer's GPU cache.
+
+---
+
+### indexCount()
+
+**Returns:**
+
+- *int* — Number of indices in the unit segment mesh.
+
+---
+
+### instanceCount()
+
+**Returns:**
+
+- *int* — Number of segment instances, one less than the number of points.
+
+---
+
+### isVisible()
+
+**Returns:**
+
+- *bool* — Whether the polyline is drawn.
+
+---
+
+### setVisible(bVisible)
+
+Sets whether the polyline is drawn.
+
+**Parameters:**
+
+- **bVisible** : *bool*
+  True to draw the polyline.
+
+---
+
+### hasData()
+
+**Returns:**
+
+- *bool* — Whether there is at least one segment to draw.
+
+---
+
+## Example
+
+- Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

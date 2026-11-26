@@ -24,7 +24,7 @@ const std::size_t strongEdges = network.edge_count(EdgeSet::thresholded);
 const int hubDegree = network.degree(1);
 const int hubStrongDegree = network.degree(1, EdgeSet::thresholded);
 const double hubStrength = network.strength(1);
-network.set_visualization_info({.coloring = VisualizationInfo::Coloring::fixed, // how disp3D colours the network
+network.set_visualization_info({.coloring = VisualizationInfo::Coloring::fixed, // how mne_viz_qt colours the network
                                 .edge_color = Eigen::Vector4i(0, 0, 255, 255)});
 ```
 
@@ -74,7 +74,7 @@ Connectivity metrics on synthetic data with a known coupling.
 const int hubDegree = network.degree(1);
 const int hubStrongDegree = network.degree(1, EdgeSet::thresholded);
 const double hubStrength = network.strength(1);
-network.set_visualization_info({.coloring = VisualizationInfo::Coloring::fixed, // how disp3D colours the network
+network.set_visualization_info({.coloring = VisualizationInfo::Coloring::fixed, // how mne_viz_qt colours the network
                                 .edge_color = Eigen::Vector4i(0, 0, 255, 255)});
 ok &= expect(adjacency(1, 0) == 0.9 && adjacency(2, 1) == 0.2 && strongEdges == 1 && network.visualization_info().edge_color(2) == 255,
              "manual network: mirrored adjacency, one edge above 0.5");

@@ -12,7 +12,7 @@ Contextual minimum-norm estimate (CMNE) of the auditory evoked response in both 
 
 <ExampleFacts name="ex_inverse_cmne" />
 
-**Libraries:** [Inverse](../../api/inv/index.mdx), [Visualization](../../api/disp/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx)
+**Libraries:** [Inverse](../../api/inv/index.mdx), [Visualization (Qt)](../../api/viz-qt/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx)
 
 ## What it demonstrates
 
@@ -121,7 +121,7 @@ The documented classes this example uses most:
 | [`InvSourceEstimate`](../../api/inv/inv-source-estimate.mdx) | Inverse |
 | [`FiffCov`](../../api/fiff/fiff-cov.mdx) | FIFF I/O |
 | [`FiffEvoked`](../../api/fiff/fiff-evoked.mdx) | FIFF I/O |
-| [`FigureExporter`](../../api/disp/figure-exporter.mdx) | Visualization |
+| [`FigureExporter`](../../api/viz-qt/figure-exporter.mdx) | Visualization (Qt) |
 | [`FsAnnotationSet`](../../api/fs/fs-annotation-set.mdx) | FreeSurfer |
 | [`FsLabel`](../../api/fs/fs-label.mdx) | FreeSurfer |
 | [`FsSurfaceSet`](../../api/fs/fs-surface-set.mdx) | FreeSurfer |
@@ -169,8 +169,8 @@ The documented classes this example uses most:
 #include <mne/fs/fs_label.h>
 #include <mne/fs/fs_surfaceset.h>
 
-#include <mne/disp/plots/helpers/figureexporter.h>
-#include <mne/disp/plots/lineplot.h>
+#include <mne/viz/backends/qt/plots/helpers/figureexporter.h>
+#include <mne/viz/backends/qt/plots/lineplot.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -195,7 +195,7 @@ The documented classes this example uses most:
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 using namespace Eigen;
 

@@ -1,0 +1,159 @@
+---
+id: brain-frame-builder
+title: "mne::viz::BrainFrameBuilder"
+sidebar_label: BrainFrameBuilder
+sidebar_position: 80
+---
+
+# BrainFrameBuilder
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/gpu/brain_frame.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/gpu/brain_frame.h)
+
+`#include <mne/viz/brain_frame.h>`
+
+```cpp
+class mne::viz::BrainFrameBuilder
+```
+
+Describes the frames of the brain view as [`GpuFrame`](/docs/api/viz/gpu-frame) for any backend.
+
+A frame is begun with `begin()`, filled pane by pane with surfaces, instanced glyphs and the screen overlay in drawing order, and taken with `finish()`. Meshes are identified by a key of the caller; their streams are copied into `resources()` when their generation changes, and dropped when a frame does not draw them for a while or on `release()`.
+
+---
+
+## Public Methods
+
+### BrainFrameBuilder()
+
+Creates a builder with the pipelines of every brain shader.
+
+---
+
+### begin(target, clear)
+
+Starts a frame.
+
+**Parameters:**
+
+- **target** : *const [GpuFrameTarget](/docs/api/viz/gpu-frame-target) &*
+  Size and pixel ratio of the target.
+
+- **clear** : *[Color](/docs/api/viz/color)*
+  Colour the frame clears to.
+
+---
+
+### draw_surface(key, streams, shader, uniforms, viewport)
+
+Draws a surface; holographic and x-ray surfaces draw their back faces first.
+
+**Parameters:**
+
+- **key** : *std::uint64_t*
+  Identity of the mesh, e.g. the address of its owner.
+
+- **streams** : *const [BrainSurfaceStreams](/docs/api/viz/brain-surface-streams) &*
+  Vertex and index streams.
+
+- **shader** : *BrainShader*
+  Surface shader: Standard, Holographic, Anatomical, XRay or ShowNormals.
+
+- **uniforms** : *const [BrainSurfaceUniforms](/docs/api/viz/brain-surface-uniforms) &*
+  Shader parameters.
+
+- **viewport** : *const [GpuRect](/docs/api/viz/gpu-rect) &*
+  Pane in target pixels.
+
+**Returns:**
+
+- *bool* — Whether anything was drawn: false for empty streams or a glyph shader.
+
+---
+
+### draw_instanced(key, streams, shader, uniforms, viewport)
+
+Draws instanced glyphs.
+
+**Parameters:**
+
+- **key** : *std::uint64_t*
+  Identity of the mesh.
+
+- **streams** : *const [BrainInstancedStreams](/docs/api/viz/brain-instanced-streams) &*
+  Shape and instance streams.
+
+- **shader** : *BrainShader*
+  Dipole (translucent) or Electrode (opaque).
+
+- **uniforms** : *const [BrainInstanceUniforms](/docs/api/viz/brain-instance-uniforms) &*
+  Shader parameters.
+
+- **viewport** : *const [GpuRect](/docs/api/viz/gpu-rect) &*
+  Pane in target pixels.
+
+**Returns:**
+
+- *bool* — Whether anything was drawn: false for empty streams or a surface shader.
+
+---
+
+### draw_overlay(overlay, scale)
+
+Blends a screen-sized overlay over everything drawn so far, e.g.
+
+labels and pane separators.
+
+**Parameters:**
+
+- **overlay** : *std::variant&lt; [Image](/docs/api/viz/image), [DisplayList](/docs/api/viz/display-list) &gt;*
+  RGBA pixels (not premultiplied) of the target size, or a figure of the logical size.
+
+- **scale** : *double*
+  Texture pixels per figure pixel of a figure.
+
+---
+
+### finish()
+
+Ends the frame and drops the buffers of meshes undrawn for kUnusedFrames frames.
+
+**Returns:**
+
+- *[GpuFrame](/docs/api/viz/gpu-frame)* — The frame, referring to `resources()`.
+
+---
+
+### release(key)
+
+Drops the buffers of a mesh.
+
+**Parameters:**
+
+- **key** : *std::uint64_t*
+  Identity of the mesh.
+
+---
+
+### mesh_count()
+
+**Returns:**
+
+- *int* — The number of meshes with buffers.
+
+---
+
+### resources()
+
+**Returns:**
+
+- *const [GpuResources](/docs/api/viz/gpu-resources) &* — The buffers, textures and pipelines of the frames.
+
+---
+
+## Example
+
+No example of its own: Describes brain view frames for any GPU backend; exercised with a golden image by test_scene_brain_view and against the 3-D shaders of mne_viz_qt by test_disp3d_brain_window.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

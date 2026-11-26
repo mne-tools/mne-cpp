@@ -12,7 +12,7 @@ Average a raw recording and localize dipole pairs with RAP-MUSIC on a parcellati
 
 <ExampleFacts name="ex_clustered_inverse_rap_music_raw" />
 
-**Libraries:** [Inverse](../../api/inv/index.mdx), [3D Visualization](../../api/disp3-d/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Base](../../api/base/index.mdx)
+**Libraries:** [Inverse](../../api/inv/index.mdx), [Visualization (Qt)](../../api/viz-qt/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Base](../../api/base/index.mdx)
 
 ## Background
 
@@ -55,12 +55,12 @@ The documented classes this example uses most:
 |---|---|
 | [`Log`](../../api/base/log.mdx) | Base |
 | [`MNEEpochData`](../../api/mne/mne-epoch-data.mdx) | MNE Core |
-| [`BrainView`](../../api/disp3-d/brain-view.mdx) | 3D Visualization |
+| [`BrainView`](../../api/viz-qt/brain-view.mdx) | Visualization (Qt) |
 | [`FiffEvents`](../../api/fiff/fiff-events.mdx) | FIFF I/O |
 | [`FiffEvoked`](../../api/fiff/fiff-evoked.mdx) | FIFF I/O |
 | [`InvSourceEstimate`](../../api/inv/inv-source-estimate.mdx) | Inverse |
 | [`MNEForwardSolution`](../../api/mne/mne-forward-solution.mdx) | MNE Core |
-| [`BrainTreeModel`](../../api/disp3-d/brain-tree-model.mdx) | 3D Visualization |
+| [`BrainTreeModel`](../../api/viz-qt/brain-tree-model.mdx) | Visualization (Qt) |
 
 ## Used in the API reference
 
@@ -102,8 +102,8 @@ The documented classes this example uses most:
 #include <mne/mne/mne_epoch_data_list.h>
 #include <mne/inv/inv_source_estimate.h>
 #include <mne/inv/rap_music/inv_rap_music.h>
-#include <mne/disp3D/view/brainview.h>
-#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
 #include <mne/base/log.h>
 
 //=============================================================================================================
@@ -129,7 +129,7 @@ The documented classes this example uses most:
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // MAIN

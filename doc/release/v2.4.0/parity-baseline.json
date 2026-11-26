@@ -1493,7 +1493,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "mne::disp layout I/O",
+      "mne_cpp": "mne::viz::qt layout I/O",
       "python": "mne.channels.read_layout",
       "claimed": "implemented",
       "equivalence": null,

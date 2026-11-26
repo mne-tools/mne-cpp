@@ -1,0 +1,40 @@
+---
+id: trace-vertices
+title: "mne::viz::TraceVertices"
+sidebar_label: TraceVertices
+sidebar_position: 45
+---
+
+# TraceVertices
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/views/trace_source.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/views/trace_source.h)
+
+`#include <mne/viz/trace_source.h>`
+
+```cpp
+struct mne::viz::TraceVertices
+```
+
+Vertices of one channel trace over a sample window.
+
+`xy` holds interleaved (x, y) pairs: x is the sample offset from `first_sample` (fractional for decimated traces), y the value in physical units. This is the vertex layout of the trace shader (vec2 per vertex, drawn as a line strip).
+
+---
+
+## Public Methods
+
+### vertex_count()
+
+**Returns:**
+
+- *int* — The number of vertices.
+
+---
+
+## Example
+
+No example of its own: Value type of interleaved trace vertices returned by TraceSource::vertices().
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

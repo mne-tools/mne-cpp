@@ -1,0 +1,43 @@
+---
+id: ray
+title: "mne::viz::Ray"
+sidebar_label: Ray
+sidebar_position: 52
+---
+
+# Ray
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/views/ray_picking.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/views/ray_picking.h)
+
+`#include <mne/viz/ray_picking.h>`
+
+```cpp
+struct mne::viz::Ray
+```
+
+A ray in world space.
+
+---
+
+## Public Methods
+
+### at(t)
+
+**Parameters:**
+
+- **t** : *float*
+  Distance along the ray.
+
+**Returns:**
+
+- *Eigen::Vector3f* — The point at distance `t`.
+
+---
+
+## Example
+
+No example of its own: Pick ray of the 3-D brain view built by ray_from_pixel(); used by viz::qt::BrainViewCore and the 3-D renderables of mne_viz_qt' picking.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

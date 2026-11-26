@@ -1,0 +1,48 @@
+---
+id: gpu-texture
+title: "mne::viz::GpuTexture"
+sidebar_label: GpuTexture
+sidebar_position: 68
+---
+
+# GpuTexture
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/gpu/gpu_frame.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/gpu/gpu_frame.h)
+
+`#include <mne/viz/gpu_frame.h>`
+
+```cpp
+struct mne::viz::GpuTexture
+```
+
+A texture: RGBA pixels or a figure the backend rasterizes, and a revision that changes with it.
+
+A figure lets every backend draw text and shapes with its own painter, e.g. the QRhi backend with QPainter and the toolkit's fonts, at `scale` texture pixels per figure pixel on a transparent ground.
+
+---
+
+## Public Methods
+
+### pixel_width()
+
+**Returns:**
+
+- *int* — The width in pixels.
+
+---
+
+### pixel_height()
+
+**Returns:**
+
+- *int* — The height in pixels.
+
+---
+
+## Example
+
+No example of its own: Value type of texture contents stored in GpuResources.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

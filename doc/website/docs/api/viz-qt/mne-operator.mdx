@@ -1,0 +1,51 @@
+---
+id: mne-operator
+title: "mne::viz::qt::MNEOperator"
+sidebar_label: MNEOperator
+sidebar_position: 39
+---
+
+# MNEOperator
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/viewers/helpers/mneoperator.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/viewers/helpers/mneoperator.h)
+
+`#include <mne/viz/backends/qt/mneoperator.h>`
+
+```cpp
+class mne::viz::qt::MNEOperator
+```
+
+Light-weight wrapper describing one MNE pre-processing operator (FIR / SSP / compensation).
+
+Stores the operator type, display name, active flag and the underlying matrix / kernel reference so [`ChannelInfoModel`](/docs/api/viz-qt/channel-info-model) can track which operators a channel is currently subject to.
+
+---
+
+## Public Methods
+
+### MNEOperator()
+
+---
+
+### MNEOperator(obj)
+
+---
+
+### MNEOperator(type)
+
+---
+
+### ~MNEOperator()
+
+Destructor.
+
+---
+
+## Authors of this file
+
+- Florian Schlembach &lt;fschlembach@web.de&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
+- Matti Hamalainen &lt;msh@nmr.mgh.harvard.edu&gt;
+- Jens Haueisen &lt;jens.haueisen@tu-ilmenau.de&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;

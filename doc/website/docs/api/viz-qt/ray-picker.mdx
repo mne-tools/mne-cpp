@@ -1,0 +1,110 @@
+---
+id: ray-picker
+title: "mne::viz::qt::RayPicker"
+sidebar_label: RayPicker
+sidebar_position: 100
+---
+
+# RayPicker
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/input/raypicker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/input/raypicker.h)
+
+`#include <mne/viz/backends/qt/raypicker.h>`
+
+```cpp
+class mne::viz::qt::RayPicker
+```
+
+Stateless ray-picking utility.
+
+Given camera matrices, a screen position, and the scene contents, this class casts a ray and returns a [`RayHit`](/docs/api/viz-qt/ray-hit) describing the closest intersection. It has no state of its own — hover tracking is handled by the caller.
+
+[`Ray`](/docs/api/viz/ray) casting and intersection testing.
+
+---
+
+## Static Methods
+
+### unproject(screenPos, paneRect, pvm, rayOrigin, rayDir)
+
+Unproject a screen position to a world-space ray.
+
+**Parameters:**
+
+- **screenPos** : *const QPoint &*
+  2D cursor position (widget coords).
+
+- **paneRect** : *const QRect &*
+  Rectangle of the active viewport pane.
+
+- **pvm** : *const QMatrix4x4 &*
+  Combined projection × view × model matrix.
+
+- **rayOrigin** : *QVector3D &*
+  [`Ray`](/docs/api/viz/ray) origin (world space).
+
+- **rayDir** : *QVector3D &*
+  [`Ray`](/docs/api/viz/ray) direction (normalised, world space).
+
+**Returns:**
+
+- *bool* — True if the unproject succeeded.
+
+---
+
+### pick(rayOrigin, rayDir, subView, surfaces, itemSurfaceMap, itemDipoleMap)
+
+Cast a ray against all surfaces in the scene.
+
+**Parameters:**
+
+- **rayOrigin** : *const QVector3D &*
+  World-space ray origin.
+
+- **rayDir** : *const QVector3D &*
+  World-space ray direction (normalised).
+
+- **subView** : *const [SubView](/docs/api/viz-qt/sub-view) &*
+  Active [`SubView`](/docs/api/viz-qt/sub-view) (for visibility / surface type filtering).
+
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz-qt/brain-surface) &gt; &gt; &*
+  Map of surface key → [`BrainSurface`](/docs/api/viz-qt/brain-surface).
+
+- **itemSurfaceMap** : *const std::map&lt; const QStandardItem *, std::shared_ptr&lt; [BrainSurface](/docs/api/viz-qt/brain-surface) &gt; &gt; &*
+  Map of tree item → [`BrainSurface`](/docs/api/viz-qt/brain-surface) (for reverse lookup).
+
+- **itemDipoleMap** : *const std::map&lt; const QStandardItem *, std::shared_ptr&lt; [DipoleObject](/docs/api/viz-qt/dipole-object) &gt; &gt; &*
+  Map of tree item → [`DipoleObject`](/docs/api/viz-qt/dipole-object).
+
+**Returns:**
+
+- *[RayHit](/docs/api/viz-qt/ray-hit)* — [`RayHit`](/docs/api/viz-qt/ray-hit) for the closest hit.
+
+---
+
+### buildLabel(result, itemSurfaceMap, surfaces)
+
+Build a display label from a [`RayHit`](/docs/api/viz-qt/ray-hit).
+
+This examines the surface key, annotation data, and item type to produce a human-readable hover label.
+
+**Parameters:**
+
+- **result** : *const [RayHit](/docs/api/viz-qt/ray-hit) &*
+  [`RayHit`](/docs/api/viz-qt/ray-hit) from `pick()`.
+
+- **itemSurfaceMap** : *const std::map&lt; const QStandardItem *, std::shared_ptr&lt; [BrainSurface](/docs/api/viz-qt/brain-surface) &gt; &gt; &*
+  Map for reverse item → surface lookup.
+
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz-qt/brain-surface) &gt; &gt; &*
+  [`FsSurface`](/docs/api/fs/fs-surface) map for key-based lookup.
+
+**Returns:**
+
+- *std::string* — Display label string.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

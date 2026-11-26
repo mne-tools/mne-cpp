@@ -1,0 +1,61 @@
+---
+id: pixel-rect
+title: "mne::viz::PixelRect"
+sidebar_label: PixelRect
+sidebar_position: 55
+---
+
+# PixelRect
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/views/pane_layout.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/views/pane_layout.h)
+
+`#include <mne/viz/pane_layout.h>`
+
+```cpp
+struct mne::viz::PixelRect
+```
+
+Rectangle in whole pixels; it covers the pixels x .
+
+. x + width - 1 and y .. y + height - 1.
+
+---
+
+## Public Methods
+
+### empty()
+
+**Returns:**
+
+- *bool* — Whether the rectangle covers no pixel.
+
+---
+
+### contains(p)
+
+**Parameters:**
+
+- **p** : *[Point](/docs/api/viz/point)*
+  [`Point`](/docs/api/viz/point).
+
+**Returns:**
+
+- *bool* — Whether `p` lies in one of the pixels of the rectangle (right and bottom edges excluded).
+
+---
+
+### to_rect()
+
+**Returns:**
+
+- *[Rect](/docs/api/viz/rect)* — The rectangle in floating-point coordinates.
+
+---
+
+## Example
+
+No example of its own: Integer rectangle value type of MultiViewLayout and BrainViewOverlay.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

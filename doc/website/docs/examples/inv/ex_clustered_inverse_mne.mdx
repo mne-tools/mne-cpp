@@ -12,7 +12,7 @@ Cluster the forward solution by cortical parcellation and compute an MNE, dSPM o
 
 <ExampleFacts name="ex_clustered_inverse_mne" />
 
-**Libraries:** [Inverse](../../api/inv/index.mdx), [3D Visualization](../../api/disp3-d/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Math](../../api/math/index.mdx), [Base](../../api/base/index.mdx)
+**Libraries:** [Inverse](../../api/inv/index.mdx), [Visualization (Qt)](../../api/viz-qt/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Math](../../api/math/index.mdx), [Base](../../api/base/index.mdx)
 
 ## Background
 
@@ -51,18 +51,16 @@ The documented classes this example uses most:
 | Class | Library |
 |---|---|
 | [`Log`](../../api/base/log.mdx) | Base |
-| [`BrainView`](../../api/disp3-d/brain-view.mdx) | 3D Visualization |
+| [`BrainView`](../../api/viz-qt/brain-view.mdx) | Visualization (Qt) |
 | [`InvSourceEstimate`](../../api/inv/inv-source-estimate.mdx) | Inverse |
 | [`Linalg`](../../api/math/linalg.mdx) | Math |
-| [`BrainTreeModel`](../../api/disp3-d/brain-tree-model.mdx) | 3D Visualization |
+| [`BrainTreeModel`](../../api/viz-qt/brain-tree-model.mdx) | Visualization (Qt) |
 | [`FiffCov`](../../api/fiff/fiff-cov.mdx) | FIFF I/O |
 | [`FiffEvoked`](../../api/fiff/fiff-evoked.mdx) | FIFF I/O |
 | [`FiffInfo`](../../api/fiff/fiff-info.mdx) | FIFF I/O |
 
 ## Used in the API reference
 
-- [BrainTreeModel](../../api/disp3-d/brain-tree-model.mdx)
-- [BrainView](../../api/disp3-d/brain-view.mdx)
 - [FsAnnotationSet](../../api/fs/fs-annotation-set.mdx)
 - [FsAnnotation](../../api/fs/fs-annotation.mdx)
 - [FsSurfaceSet](../../api/fs/fs-surface-set.mdx)
@@ -100,8 +98,8 @@ The documented classes this example uses most:
 #include <mne/fiff/fiff_evoked.h>
 #include <mne/inv/inv_source_estimate.h>
 #include <mne/inv/minimum_norm/inv_minimum_norm.h>
-#include <mne/disp3D/view/brainview.h>
-#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
 #include <mne/math/linalg.h>
 #include <mne/base/log.h>
 
@@ -127,7 +125,7 @@ The documented classes this example uses most:
 
 using namespace mne;
 using namespace Eigen;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // MAIN

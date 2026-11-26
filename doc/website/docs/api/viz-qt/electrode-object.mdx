@@ -1,0 +1,288 @@
+---
+id: electrode-object
+title: "mne::viz::qt::ElectrodeObject"
+sidebar_label: ElectrodeObject
+sidebar_position: 64
+---
+
+# ElectrodeObject
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/renderable/electrodeobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/renderable/electrodeobject.h)
+
+`#include <mne/viz/backends/qt/electrodeobject.h>`
+
+```cpp
+class mne::viz::qt::ElectrodeObject
+```
+
+Renderable sEEG / ECoG electrodes: contact spheres plus lead bodies.
+
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+std::vector<IeegContact> shaft(4); // LH1..LH4, 3.5 mm apart: grouped into the sEEG depth lead "LH"
+for (int k = 0; k < 4; ++k) {
+    shaft[k].name = "LH" + std::to_string(k + 1);
+    shaft[k].position = Eigen::Vector3f(0.010f + 0.0035f * float(k), -0.020f, 0.005f); // surface RAS, metres
+}
+ElectrodeObject electrodes; // a view of the implantation, drawn by BrainView::setElectrodes()
+electrodes.setImplantation(IeegImplantation(shaft));
+electrodes.selectContact("LH3");
+float contactDistance = 0.0f;
+const int pickedContact = electrodes.intersect(QVector3D(0.017f, -0.020f, 1.0f), QVector3D(0.0f, 0.0f, -1.0f), contactDistance);
+```
+
+---
+
+## Public Methods
+
+### ElectrodeObject()
+
+---
+
+### ~ElectrodeObject()
+
+---
+
+### setImplantation(implantation)
+
+Draw an implantation.
+
+Clears the selection, hover and contact colours.
+
+**Parameters:**
+
+- **implantation** : *const [IeegImplantation](/docs/api/ieeg/ieeg-implantation) &*
+  Contacts and leads, positions in the frame of the surfaces.
+
+---
+
+### implantation()
+
+**Returns:**
+
+- *const [IeegImplantation](/docs/api/ieeg/ieeg-implantation) &* — The drawn implantation.
+
+---
+
+### totalContactCount()
+
+**Returns:**
+
+- *int* — Total number of contacts.
+
+---
+
+### setContactValues(values, colormap)
+
+Colour contacts by value through a colormap spanning [min(0, smallest), largest].
+
+Contacts without a value keep the colour of their lead.
+
+**Parameters:**
+
+- **values** : *const std::map&lt; std::string, float &gt; &*
+  Map of contact name -&gt; scalar value.
+
+- **colormap** : *const std::string &*
+  [`ColorMap`](/docs/api/viz-qt/color-map) name.
+
+---
+
+### clearContactValues()
+
+Restore the lead colours of all contacts.
+
+---
+
+### surfaceColors(vertices, distance)
+
+Paint the contact values onto a surface, as MNE-Python's stc_near_sensors: each vertex takes the distance-weighted mean of the contacts within reach and fades out with the summed weight.
+
+ECoG contacts are first moved onto the surface; depth contacts are not.
+
+**Parameters:**
+
+- **vertices** : *const Eigen::MatrixX3f &*
+  Surface vertex positions in the frame of the implantation, metres.
+
+- **distance** : *double*
+  Reach of each contact in metres.
+
+**Returns:**
+
+- *std::vector&lt; uint32_t &gt;* — ABGR colour per vertex, transparent away from the contacts; empty without values.
+
+---
+
+### selectContact(name)
+
+Select a contact by name.
+
+Clears the previous selection.
+
+**Parameters:**
+
+- **name** : *const std::string &*
+  Contact name to select.
+
+---
+
+### clearSelection()
+
+Clear the contact selection.
+
+---
+
+### selectedContact()
+
+**Returns:**
+
+- *std::string* — Name of the currently selected contact, or empty string if none.
+
+---
+
+### setHoveredContact(index)
+
+Highlight one contact while the pointer is over it, without changing the selection.
+
+**Parameters:**
+
+- **index** : *int*
+  Contact index (as returned by `intersect`), or -1 for none.
+
+---
+
+### hoveredContact()
+
+**Returns:**
+
+- *int* — Hovered contact index, or -1.
+
+---
+
+### intersect(rayOrigin, rayDir, dist)
+
+Intersect a ray with the contact spheres.
+
+**Parameters:**
+
+- **rayOrigin** : *const QVector3D &*
+  [`Ray`](/docs/api/viz/ray) origin.
+
+- **rayDir** : *const QVector3D &*
+  Normalised ray direction.
+
+- **dist** : *float &*
+  Distance to the nearest hit.
+
+**Returns:**
+
+- *int* — Index of the nearest contact hit, or -1.
+
+---
+
+### contactAt(index)
+
+**Parameters:**
+
+- **index** : *int*
+  Contact index.
+
+**Returns:**
+
+- *const [IeegContact](/docs/api/ieeg/ieeg-contact) ** — The contact, or nullptr when out of range.
+
+---
+
+### contactLabel(index)
+
+**Parameters:**
+
+- **index** : *int*
+  Contact index.
+
+**Returns:**
+
+- *std::string* — Hover text, e.g. "LA3 (depth lead LA)", or an empty string when out of range.
+
+---
+
+### contactStreams()
+
+**Returns:**
+
+- *[InstancedStreams](/docs/api/viz-qt/instanced-streams)* — Instanced streams of the contact spheres (one instance per contact).
+
+---
+
+### bodyStreams()
+
+**Returns:**
+
+- *[InstancedStreams](/docs/api/viz-qt/instanced-streams)* — Instanced streams of the lead bodies (unit cylinders: shafts and ties).
+
+---
+
+### contactRenderKey()
+
+**Returns:**
+
+- *const [RenderKey](/docs/api/viz-qt/render-key) &* — Identity of the contact mesh in the renderer's GPU cache.
+
+---
+
+### bodyRenderKey()
+
+**Returns:**
+
+- *const [RenderKey](/docs/api/viz-qt/render-key) &* — Identity of the body mesh in the renderer's GPU cache.
+
+---
+
+### isVisible()
+
+---
+
+### setVisible(visible)
+
+---
+
+### boundingBoxMin()
+
+**Returns:**
+
+- *QVector3D* — Axis-aligned bounding box minimum corner (with contact-radius padding).
+
+---
+
+### boundingBoxMax()
+
+**Returns:**
+
+- *QVector3D* — Axis-aligned bounding box maximum corner (with contact-radius padding).
+
+---
+
+## Static Methods
+
+### leadColor(index)
+
+**Parameters:**
+
+- **index** : *int*
+  Lead index.
+
+**Returns:**
+
+- *QColor* — Lead colour: golden-angle hues, so neighbouring leads differ clearly.
+
+---
+
+## Example
+
+- Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

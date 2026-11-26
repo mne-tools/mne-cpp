@@ -1,0 +1,169 @@
+---
+id: interpolation
+title: "mne::viz::qt::Interpolation"
+sidebar_label: Interpolation
+sidebar_position: 66
+---
+
+# Interpolation
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/helpers/interpolation.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/helpers/interpolation.h)
+
+`#include <mne/viz/backends/qt/interpolation.h>`
+
+```cpp
+class mne::viz::qt::Interpolation
+```
+
+This class holds methods for creating distance-based weight matrices and for interpolating signals.
+
+This class holds methods for creating distance-based weight matrices and for interpolating signals
+
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+std::shared_ptr<SparseMatrix<float>> weights = Interpolation::createInterpolationMat(projected, distances, Interpolation::linear); // inverse-distance weights
+const VectorXf atVertices = Interpolation::interpolateSignal(*weights, Vector2f(1.0f, 4.0f));                                      // one value per sensor
+```
+
+---
+
+## Public Methods
+
+### Interpolation()
+
+---
+
+## Static Methods
+
+### createInterpolationMat(vecProjectedSensors, matDistanceTable, interpolationFunction, dCancelDist, vecExcludeIndex)
+
+createInterpolationMat Calculates the weight matrix for interpolation.
+
+**Parameters:**
+
+- **vecProjectedSensors** : *const Eigen::VectorXi &*
+  Mesh vertex index of each sensor (one column per sensor).
+
+- **matDistanceTable** : *const std::shared_ptr&lt; Eigen::MatrixXd &gt; &*
+  Distance table (nVertices x nSensors), e.g. from `GeometryInfo::scdc`.
+
+- **interpolationFunction** : *double(*)(double)*
+  Distance function whose inverse magnitude gives the weight.
+
+- **dCancelDist** : *const double*
+  Distances at or above this value get zero weight.
+
+- **vecExcludeIndex** : *const Eigen::VectorXi &*
+  Sensor column indices that are not pinned to their own vertex.
+
+**Returns:**
+
+- *std::shared_ptr&lt; Eigen::SparseMatrix&lt; float &gt; &gt;* — Row-normalised sparse weight matrix (nVertices x nSensors), or an empty matrix if the table is empty.
+
+---
+
+### interpolateSignal(matInterpolationMatrix, vecMeasurementData)
+
+interpolateSignal Interpolates sensor data using the weight matrix (shared pointer version).
+
+**Parameters:**
+
+- **matInterpolationMatrix** : *const std::shared_ptr&lt; Eigen::SparseMatrix&lt; float &gt; &gt; &*
+  Weight matrix (nVertices x nSensors).
+
+- **vecMeasurementData** : *const std::shared_ptr&lt; Eigen::VectorXf &gt; &*
+  Sensor values (nSensors).
+
+**Returns:**
+
+- *Eigen::VectorXf* — Interpolated vertex values, or an empty vector on dimension mismatch.
+
+---
+
+### interpolateSignal(matInterpolationMatrix, vecMeasurementData)
+
+interpolateSignal Interpolates sensor data using the weight matrix (reference version).
+
+**Parameters:**
+
+- **matInterpolationMatrix** : *const Eigen::SparseMatrix&lt; float &gt; &*
+  Weight matrix (nVertices x nSensors).
+
+- **vecMeasurementData** : *const Eigen::VectorXf &*
+  Sensor values (nSensors).
+
+**Returns:**
+
+- *Eigen::VectorXf* — Interpolated vertex values, or an empty vector on dimension mismatch.
+
+---
+
+### linear(dIn)
+
+linear Identity interpolation function.
+
+**Parameters:**
+
+- **dIn** : *const double*
+  Input distance.
+
+**Returns:**
+
+- *double* — dIn unchanged.
+
+---
+
+### gaussian(dIn)
+
+gaussian Gaussian interpolation function (sigma=1).
+
+**Parameters:**
+
+- **dIn** : *const double*
+  Input distance.
+
+**Returns:**
+
+- *double* — exp(-dIn^2 / 2).
+
+---
+
+### square(dIn)
+
+square Negative parabola interpolation function with y-offset of 1.
+
+**Parameters:**
+
+- **dIn** : *const double*
+  Input distance.
+
+**Returns:**
+
+- *double* — max(1 - dIn^2 / 9, 0).
+
+---
+
+### cubic(dIn)
+
+cubic Cubic hyperbola interpolation function.
+
+**Parameters:**
+
+- **dIn** : *const double*
+  Input distance.
+
+**Returns:**
+
+- *double* — dIn^3.
+
+---
+
+## Example
+
+- Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Authors of this file
+
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

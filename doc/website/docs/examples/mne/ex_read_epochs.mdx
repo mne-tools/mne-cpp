@@ -12,7 +12,7 @@ Read stimulus-locked epochs from a raw FIFF recording with event selection and a
 
 <ExampleFacts name="ex_read_epochs" />
 
-**Libraries:** [Visualization](../../api/disp/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Base](../../api/base/index.mdx)
+**Libraries:** [Visualization (Qt)](../../api/viz-qt/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Base](../../api/base/index.mdx)
 
 ## Results
 
@@ -72,8 +72,8 @@ The documented classes this example uses most:
 | [`MNEEpochData`](../../api/mne/mne-epoch-data.mdx) | MNE Core |
 | [`FiffEvents`](../../api/fiff/fiff-events.mdx) | FIFF I/O |
 | [`FiffRawData`](../../api/fiff/fiff-raw-data.mdx) | FIFF I/O |
-| [`FigureExporter`](../../api/disp/figure-exporter.mdx) | Visualization |
-| [`ImageSc`](../../api/disp/image-sc.mdx) | Visualization |
+| [`FigureExporter`](../../api/viz-qt/figure-exporter.mdx) | Visualization (Qt) |
+| [`ImageSc`](../../api/viz-qt/image-sc.mdx) | Visualization (Qt) |
 | [`Log`](../../api/base/log.mdx) | Base |
 | [`MNEEpochDataList`](../../api/mne/mne-epoch-data-list.mdx) | MNE Core |
 
@@ -104,8 +104,8 @@ The documented classes this example uses most:
 #include <mne/fiff/fiff.h>
 #include <mne/mne/mne.h>
 #include <mne/mne/mne_epoch_data_list.h>
-#include <mne/disp/plots/helpers/figureexporter.h>
-#include <mne/disp/plots/imagesc.h>
+#include <mne/viz/backends/qt/plots/helpers/figureexporter.h>
+#include <mne/viz/backends/qt/plots/imagesc.h>
 #include <mne/base/log.h>
 
 //=============================================================================================================
@@ -128,7 +128,7 @@ The documented classes this example uses most:
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 using namespace Eigen;
 

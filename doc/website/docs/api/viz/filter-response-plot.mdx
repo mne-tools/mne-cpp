@@ -1,0 +1,197 @@
+---
+id: filter-response-plot
+title: "mne::viz::FilterResponsePlot"
+sidebar_label: FilterResponsePlot
+sidebar_position: 17
+---
+
+# FilterResponsePlot
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/figures/filter_response_plot.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/figures/filter_response_plot.h)
+
+:::info[Python equivalent]
+`mne.viz.plot_filter` in MNE-Python.
+:::
+
+`#include <mne/viz/filter_response_plot.h>`
+
+```cpp
+class mne::viz::FilterResponsePlot
+```
+
+Magnitude response of a filter from 0 Hz to the Nyquist frequency, in dB relative to its maximum.
+
+The response is normalised to its largest value, so the pass band sits at 0 dB, and cut at the floor (-100 dB by default). Cut-off frequencies are vertical marker lines. When the response has more points than the plot has pixels, each pixel column draws the lowest and highest value it covers, so narrow notches stay visible.
+
+```cpp title="src/examples/ex_scene/main.cpp"
+// Magnitude of a 5-pole Butterworth low pass at 30 Hz, sampled at 250 Hz
+std::vector<double> magnitude(501);
+for (std::size_t i = 0; i < magnitude.size(); ++i) {
+    magnitude[i] = 1.0 / std::sqrt(1.0 + std::pow(static_cast<double>(i) * 0.25 / 30.0, 10));
+}
+FilterResponsePlot response;
+response.set_title("Low pass 30 Hz");
+response.set_response(magnitude, 125.0);
+response.set_cutoffs({30.0});
+const DisplayList responseFigure = response.render(480, 320, metrics, Font{"", 0.0, 13.0});
+```
+
+---
+
+## Public Methods
+
+### set_response(magnitude, nyquist)
+
+Sets the response.
+
+**Parameters:**
+
+- **magnitude** : *std::vector&lt; double &gt;*
+  Linear magnitude |H(f)| at frequencies spaced evenly from 0 Hz to `nyquist`, both included.
+
+- **nyquist** : *double*
+  Nyquist frequency in Hz, half the sampling frequency.
+
+---
+
+### set_cutoffs(frequencies)
+
+Sets the cut-off frequencies drawn as markers.
+
+**Parameters:**
+
+- **frequencies** : *std::vector&lt; double &gt;*
+  Frequencies in Hz; those outside 0 Hz to the Nyquist frequency are not drawn.
+
+---
+
+### set_title(title)
+
+Sets the title above the plot, e.g.
+
+the filter's name.
+
+**Parameters:**
+
+- **title** : *std::string*
+  Title text.
+
+---
+
+### set_floor_db(db)
+
+Sets the lowest level shown; lower values are drawn at it.
+
+**Parameters:**
+
+- **db** : *double*
+  Floor in dB, below 0 (default -100).
+
+---
+
+### set_colors(foreground, cutoff)
+
+Sets the colours.
+
+**Parameters:**
+
+- **foreground** : *[Color](/docs/api/viz/color)*
+  Text, frame, grid and response (default black).
+
+- **cutoff** : *[Color](/docs/api/viz/color)*
+  Cut-off markers (default red).
+
+---
+
+### magnitude_db()
+
+**Returns:**
+
+- *std::vector&lt; double &gt;* — The response in dB relative to its maximum, cut at the floor; empty without a response.
+
+---
+
+### nyquist()
+
+**Returns:**
+
+- *double* — The Nyquist frequency in Hz.
+
+---
+
+### cutoffs()
+
+**Returns:**
+
+- *const std::vector&lt; double &gt; &* — The cut-off frequencies in Hz.
+
+---
+
+### draw(canvas, metrics, font)
+
+Draws the plot onto `canvas`, filling its size.
+
+**Parameters:**
+
+- **canvas** : *[Canvas](/docs/api/viz/canvas) &*
+  [`Canvas`](/docs/api/viz/canvas) to draw on.
+
+- **metrics** : *const [TextMetrics](/docs/api/viz/text-metrics) &*
+  Text metrics of the backend, for the margins.
+
+- **font** : *const [Font](/docs/api/viz/font) &*
+  [`Font`](/docs/api/viz/font) of the tick labels; the title is larger and bold.
+
+---
+
+### render(width, height, metrics, font)
+
+**Parameters:**
+
+- **width** : *double*
+  Width of the figure in pixels.
+
+- **height** : *double*
+  Height of the figure in pixels.
+
+- **metrics** : *const [TextMetrics](/docs/api/viz/text-metrics) &*
+  Text metrics of the backend.
+
+- **font** : *const [Font](/docs/api/viz/font) &*
+  [`Font`](/docs/api/viz/font) of the tick labels.
+
+**Returns:**
+
+- *[DisplayList](/docs/api/viz/display-list)* — The plot as a display list.
+
+---
+
+## Example
+
+- Start here: [ex_scene](../../examples/viz/ex_scene.mdx) — Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+- Full source: [`src/examples/ex_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_scene/main.cpp)
+- Build target: `ex_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_scene](../../examples/viz/ex_scene.mdx)
+
+Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+
+````cpp title="src/examples/ex_scene/main.cpp, line 118"
+FilterResponsePlot response;
+response.set_title("Low pass 30 Hz");
+response.set_response(magnitude, 125.0);
+response.set_cutoffs({30.0});
+const DisplayList responseFigure = response.render(480, 320, metrics, Font{"", 0.0, 13.0});
+ok &= expect(std::abs(response.magnitude_db()[120] + 3.0103) < 1e-3 && !responseFigure.commands.empty(),
+             "the filter response is -3 dB at its cut-off");
+ok &= expect(figure.commands.size() == 2 && svg && png && std::filesystem::file_size(dir / "plot.svg") > 0,
+             "a figure was recorded and a line plot written as SVG and PNG");
+ok &= expect(to_svg(figure).find("Hello scene") != std::string::npos, "the figure's text is in its SVG document");
+ok &= expect(to_raster(figure).pixel(60, 45) == Rgb{70, 130, 180}, "the figure's rectangle is filled in its image");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

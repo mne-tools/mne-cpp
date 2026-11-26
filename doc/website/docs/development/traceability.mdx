@@ -27,8 +27,6 @@ sidebar_label: Traceability
 | bids | no | 14 | 5 | 36 % |
 | connectivity | no | 20 | 6 | 30 % |
 | decoding | no | 5 | 4 | 80 % |
-| disp | no | 75 | 17 | 23 % |
-| disp3D | no | 53 | 40 | 75 % |
 | fs | no | 8 | 4 | 50 % |
 | ieeg | no | 6 | 6 | 100 % |
 | ml | no | 4 | 4 | 100 % |
@@ -36,8 +34,8 @@ sidebar_label: Traceability
 | mri | no | 8 | 0 | 0 % |
 | pybridge | no | 4 | 4 | 100 % |
 | report | no | 1 | 1 | 100 % |
-| scene | no | 85 | 85 | 100 % |
-| viewmodels | no | 3 | 3 | 100 % |
+| viz | no | 88 | 88 | 100 % |
+| viz_qt | no | 128 | 57 | 45 % |
 
 ## Classes without a named test
 
@@ -52,8 +50,7 @@ sidebar_label: Traceability
 - **bids**: `AbstractFormatReader`, `BidsChannel`, `BidsCoordinateSystem`, `BidsDatasetDescription`, `BidsElectrode`, `BidsEvent`, `BidsTsv`, `BrainVisionChannelInfo`, `BrainVisionMarker`
 - **connectivity**: `AbstractMetric`, `Coherency`, `ConnectivitySettings`, `Correlation`, `CrossCorrelation`, `DebiasedSquaredWeightedPhaseLagIndex`, `ImagCoherence`, `MvarModel`, `Network`, `NetworkEdge`, `NetworkNode`, `UnbiasedSquaredPhaseLagIndex`, `VisualizationInfo`, `WeightedPhaseLagIndex`
 - **decoding**: `IcaLabelResult`
-- **disp**: `AbstractView`, `ApplyToView`, `ArtifactSettingsView`, `AverageLayoutView`, `AverageSelectionView`, `AveragingSettingsView`, `Bar`, `BidsView`, `BidsViewModel`, `ButterflyView`, `ChannelDataModel`, `ChannelDisplayInfo`, `ChannelInfoModel`, `ChannelLabelPanel`, `ChannelSelectionView`, `ColorMap`, `CompensatorView`, `ConnectivitySettingsView`, `Control3DView`, `CoregSettingsView`, `CovarianceSettingsView`, `DipoleFitView`, `DraggableFramelessWidget`, `EvokedSetModel`, `FiffRawViewSettings`, `FilterDesignView`, `FilterSettingsView`, `FrequencySpectrumDelegate`, `FrequencySpectrumModel`, `FwdSettingsView`, `Graph`, `HpiSettingsView`, `ImageSc`, `LinePlot`, `MNEOperator`, `MinimumNormSettingsView`, `ModalitySelectionView`, `MultiView`, `MultiViewWindow`, `OverviewBarWidget`, `Plot`, `ProgressView`, `ProjectSettingsView`, `ProjectorsView`, `QuickControlView`, `ScaleControl`, `ScalingView`, `SelectionItem`, `SpectrumSettingsView`, `SpectrumView`, `SpharaSettingsView`, `Spline`, `TFplot`, `TfSettingsView`, `TimeRulerEventMark`, `TimeRulerReferenceMark`, `TimeRulerWidget`, `TriggerDetectionView`
-- **disp3D**: `AbstractTreeItem`, `ElectrodeObject`, `GeometryInfo`, `Interpolation`, `LiveMarker`, `MultimodalScene`, `PickResult`, `RtSensorInterpolationMatWorker`, `RtSourceDataWorker`, `RtSourceInterpolationMatWorker`, `SceneLayer`, `SensorTreeItem`, `VertexData`
 - **fs**: `FsAnnotationSet`, `FsAtlasLookup`, `FsColortable`, `FsSurfaceSet`
 - **mna**: `MnaFileRef`, `MnaGraph`, `MnaGraphExecutor`, `MnaIO`, `MnaNode`, `MnaOpRegistry`, `MnaOpSchema`, `MnaOpSchemaAttr`, `MnaOpSchemaPort`, `MnaParamBinding`, `MnaParamTree`, `MnaPort`, `MnaProject`, `MnaProvenance`, `MnaRecording`, `MnaRegistryLoader`, `MnaScript`, `MnaSession`, `MnaSubject`, `MnaVerification`, `MnaVerificationCheck`, `MnaVerificationResult`
 - **mri**: `MriCorFifIO`, `MriCorIO`, `MriMghIO`, `MriNiftiIO`, `MriSlice`, `MriSliceImage`, `MriSlicer`, `MriVolData`
+- **viz_qt**: `AbstractTreeItem`, `AbstractView`, `ApplyToView`, `ArtifactSettingsView`, `AverageLayoutView`, `AverageSelectionView`, `AveragingSettingsView`, `Bar`, `BidsView`, `BidsViewModel`, `ButterflyView`, `ChannelDataModel`, `ChannelDisplayInfo`, `ChannelInfoModel`, `ChannelLabelPanel`, `ChannelSelectionView`, `ColorMap`, `CompensatorView`, `ConnectivitySettingsView`, `Control3DView`, `CoregSettingsView`, `CovarianceSettingsView`, `DipoleFitView`, `DraggableFramelessWidget`, `ElectrodeObject`, `EvokedSetModel`, `FiffRawViewSettings`, `FilterDesignView`, `FilterSettingsView`, `FrequencySpectrumDelegate`, `FrequencySpectrumModel`, `FwdSettingsView`, `GeometryInfo`, `Graph`, `HpiSettingsView`, `ImageSc`, `Interpolation`, `LinePlot`, `LiveMarker`, `MNEOperator`, `MinimumNormSettingsView`, `ModalitySelectionView`, `MultiView`, `MultiViewWindow`, `MultimodalScene`, `OverviewBarWidget`, `PickResult`, `Plot`, `ProgressView`, `ProjectSettingsView`, `ProjectorsView`, `QuickControlView`, `RtSensorInterpolationMatWorker`, `RtSourceDataWorker`, `RtSourceInterpolationMatWorker`, `ScaleControl`, `ScalingView`, `SceneLayer`, `SelectionItem`, `SensorTreeItem`, `SpectrumSettingsView`, `SpectrumView`, `SpharaSettingsView`, `Spline`, `TFplot`, `TfSettingsView`, `TimeRulerEventMark`, `TimeRulerReferenceMark`, `TimeRulerWidget`, `TriggerDetectionView`, `VertexData`

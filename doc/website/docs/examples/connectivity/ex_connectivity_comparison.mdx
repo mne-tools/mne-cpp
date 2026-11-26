@@ -12,7 +12,7 @@ Compare connectivity metrics side by side on the same averaged sensor- or source
 
 <ExampleFacts name="ex_connectivity_comparison" />
 
-**Libraries:** [Connectivity](../../api/connectivity/index.mdx), [Inverse](../../api/inv/index.mdx), [3D Visualization](../../api/disp3-d/index.mdx), [Visualization](../../api/disp/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Base](../../api/base/index.mdx)
+**Libraries:** [Connectivity](../../api/connectivity/index.mdx), [Inverse](../../api/inv/index.mdx), [Visualization (Qt)](../../api/viz-qt/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Base](../../api/base/index.mdx)
 
 ## Background
 
@@ -57,21 +57,20 @@ The documented classes this example uses most:
 
 | Class | Library |
 |---|---|
-| [`ConnectivitySettingsView`](../../api/disp/connectivity-settings-view.mdx) | Visualization |
+| [`ConnectivitySettingsView`](../../api/viz-qt/connectivity-settings-view.mdx) | Visualization (Qt) |
 | [`InvSourceEstimate`](../../api/inv/inv-source-estimate.mdx) | Inverse |
 | [`MNEForwardSolution`](../../api/mne/mne-forward-solution.mdx) | MNE Core |
-| [`BrainView`](../../api/disp3-d/brain-view.mdx) | 3D Visualization |
+| [`BrainView`](../../api/viz-qt/brain-view.mdx) | Visualization (Qt) |
 | [`InvMinimumNorm`](../../api/inv/inv-minimum-norm.mdx) | Inverse |
 | [`Log`](../../api/base/log.mdx) | Base |
 | [`VisualizationInfo`](../../api/connectivity/visualization-info.mdx) | Connectivity |
-| [`BrainTreeModel`](../../api/disp3-d/brain-tree-model.mdx) | 3D Visualization |
+| [`BrainTreeModel`](../../api/viz-qt/brain-tree-model.mdx) | Visualization (Qt) |
 
 ## Used in the API reference
 
 - [ConnectivitySettings](../../api/connectivity/connectivity-settings.mdx)
 - [Network](../../api/connectivity/network.mdx)
 - [VisualizationInfo](../../api/connectivity/visualization-info.mdx)
-- [ConnectivitySettingsView](../../api/disp/connectivity-settings-view.mdx)
 - [MNEForwardSolution](../../api/mne/mne-forward-solution.mdx)
 
 ## Source
@@ -99,10 +98,10 @@ The documented classes this example uses most:
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp3D/view/brainview.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
 #include <mne/base/string_utils.h>
-#include <mne/disp3D/model/braintreemodel.h>
-#include <mne/disp3D/model/items/networktreeitem.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/model/items/networktreeitem.h>
 #include <mne/connectivity/compute_connectivity.h>
 #include <mne/connectivity/connectivitysettings.h>
 #include <mne/connectivity/network/network.h>
@@ -117,7 +116,7 @@ The documented classes this example uses most:
 #include <mne/inv/minimum_norm/inv_minimum_norm.h>
 #include <mne/base/log.h>
 #include <mne/fiff/fiff_events.h>
-#include <mne/disp/viewers/connectivitysettingsview.h>
+#include <mne/viz/backends/qt/viewers/connectivitysettingsview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -143,7 +142,7 @@ The documented classes this example uses most:
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 using namespace Eigen;
 

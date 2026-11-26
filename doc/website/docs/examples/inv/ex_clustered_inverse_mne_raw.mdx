@@ -12,7 +12,7 @@ Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parc
 
 <ExampleFacts name="ex_clustered_inverse_mne_raw" />
 
-**Libraries:** [Inverse](../../api/inv/index.mdx), [3D Visualization](../../api/disp3-d/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Math](../../api/math/index.mdx), [Base](../../api/base/index.mdx)
+**Libraries:** [Inverse](../../api/inv/index.mdx), [Visualization (Qt)](../../api/viz-qt/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Math](../../api/math/index.mdx), [Base](../../api/base/index.mdx)
 
 ## Build and run
 
@@ -54,17 +54,15 @@ The documented classes this example uses most:
 | [`Log`](../../api/base/log.mdx) | Base |
 | [`InvSourceEstimate`](../../api/inv/inv-source-estimate.mdx) | Inverse |
 | [`MNEEpochData`](../../api/mne/mne-epoch-data.mdx) | MNE Core |
-| [`BrainView`](../../api/disp3-d/brain-view.mdx) | 3D Visualization |
+| [`BrainView`](../../api/viz-qt/brain-view.mdx) | Visualization (Qt) |
 | [`FiffEvents`](../../api/fiff/fiff-events.mdx) | FIFF I/O |
 | [`Linalg`](../../api/math/linalg.mdx) | Math |
 | [`MNEForwardSolution`](../../api/mne/mne-forward-solution.mdx) | MNE Core |
-| [`BrainTreeModel`](../../api/disp3-d/brain-tree-model.mdx) | 3D Visualization |
+| [`BrainTreeModel`](../../api/viz-qt/brain-tree-model.mdx) | Visualization (Qt) |
 
 ## Used in the API reference
 
 - [Error](../../api/base/error.mdx)
-- [BrainTreeModel](../../api/disp3-d/brain-tree-model.mdx)
-- [BrainView](../../api/disp3-d/brain-view.mdx)
 - [FiffEvents](../../api/fiff/fiff-events.mdx)
 - [FsAnnotationSet](../../api/fs/fs-annotation-set.mdx)
 - [FsAnnotation](../../api/fs/fs-annotation.mdx)
@@ -109,8 +107,8 @@ The documented classes this example uses most:
 #include <mne/inv/inv_source_estimate.h>
 #include <time.h>
 #include <mne/inv/minimum_norm/inv_minimum_norm.h>
-#include <mne/disp3D/view/brainview.h>
-#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
 #include <mne/math/linalg.h>
 #include <mne/base/log.h>
 
@@ -139,7 +137,7 @@ The documented classes this example uses most:
 
 using namespace mne;
 using namespace Eigen;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // MAIN

@@ -3,24 +3,22 @@
   "generated_by": "scripts/quality/audit_qt_usage.py",
   "policy": "scripts/quality/qt_usage_policy.json",
   "qt_by_design": [
-    "disp",
-    "disp3D"
+    "viz/backends/qt"
   ],
   "kept": {
-    "disp": {
+    "viz/backends/qt": {
       "SvgWriter (QPaintEngine)": "Replaces QSvgGenerator so the vector export of widgets needs Qt Gui only; dropping the Qt Svg module raised the disp ceilings once (tokens 6025 -> 6159, public header includes 110 -> 112).",
       "QWindow hosts and scene viewports (phase 3)": "ChannelWindow (QWindow + QRhi swap chain) next to the ChannelRhiView QRhiWidget host, and SceneViewport replacing the QGraphicsView scenes, raised the disp ceilings once (tokens 4846 -> 4885, public header includes 82 -> 89); the QRhiWidget hosts go with phase 4.",
       "Qt input translation shared with the brain view": "toScenePointerEvent() and toSceneWheelEvent() (plots/helpers/sceneinput.h), which ChannelRhiRenderer and disp3D's BrainViewCore share instead of each translating Qt events, raised the disp ceilings once (tokens 4543 -> 4549); the brain view's camera, input, layout and overlay moving to mne_scene lowered disp3D from 1961 to 1807 tokens.",
       "QRhi backend of the GPU frame description": "RhiFrameRenderer (plots/helpers/rhiframerenderer.h) executes the Qt-free scene::GpuFrame of any view with QRhi: pipelines, buffers, textures and shader reflection checks in one place instead of in each renderer. ChannelRhiRenderer lost its own QRhi code to it, net raising the disp ceilings once (tokens 4529 -> 4546); the brain view moving onto it lowers disp3D.",
       "Generic settings panel builder": "SettingsPanel (viewers/settingspanel.h) builds the Qt Widgets of any Qt-free scene::SettingsForm, so a new toolkit needs one builder instead of a hand-written view per panel; the builder raised the disp ceilings once (tokens 4546 -> 4601); the covariance, spectrum, averaging, filter, artifact and time-frequency settings views ported onto it lowered them again (tokens 4601 -> 4519).",
-      "Qt adapters of the Qt-free view models": "ChannelInfoModel, FrequencySpectrumModel and BidsViewModel became adapters of mne_viewmodels (ChannelTable, SpectrumTable, BidsTree), and RtFiffRawViewModel and EvokedSetModel hand their SSP, compensator, SPHARA, filtering and trigger detection to mne_dsp (RtRawDisplay, DisplayCorrection). The adapters convert between the view models and QVariant, QStandardItem and QModelIndex, which raised the 'other' category once (1315 -> 1329) while the total fell (tokens 4519 -> 4403)."
-    },
-    "disp3D": {
-      "BrainWindow host and GPU overlay (phase 3)": "BrainWindow (QWindow + QRhi swap chain), the forwarding BrainView host and the overlay painted into the GPU pass instead of child QLabels raised the disp3D ceilings once (tokens 1633 -> 1961); the QRhiWidget host goes with phase 4."
+      "Qt adapters of the Qt-free view models": "ChannelInfoModel, FrequencySpectrumModel and BidsViewModel became adapters of mne_viewmodels (ChannelTable, SpectrumTable, BidsTree), and RtFiffRawViewModel and EvokedSetModel hand their SSP, compensator, SPHARA, filtering and trigger detection to mne_dsp (RtRawDisplay, DisplayCorrection). The adapters convert between the view models and QVariant, QStandardItem and QModelIndex, which raised the 'other' category once (1315 -> 1329) while the total fell (tokens 4519 -> 4403).",
+      "BrainWindow host and GPU overlay (phase 3)": "BrainWindow (QWindow + QRhi swap chain), the forwarding BrainView host and the overlay painted into the GPU pass instead of child QLabels raised the disp3D ceilings once (tokens 1633 -> 1961); the QRhiWidget host goes with phase 4.",
+      "One Qt backend library": "mne_disp and mne_disp3D merged into mne_viz_qt (src/libs/mne/viz/backends/qt), the Qt backend of mne_viz; their ceilings add up (tokens 4403 + 1807 -> 6208, public header includes 87 + 73 -> 159), minus the two export headers that became one."
     }
   },
   "summary": {
-    "libraries": 30,
+    "libraries": 28,
     "qt_free": [
       "acq",
       "acq/devices",
@@ -47,11 +45,10 @@
       "mri",
       "pybridge",
       "report",
-      "scene",
       "sts",
-      "viewmodels"
+      "viz"
     ],
-    "tokens": 6210,
+    "tokens": 6208,
     "gui_outside_design": []
   },
   "libraries": {
@@ -142,50 +139,6 @@
       "q_object": 0,
       "files": 9,
       "modules": []
-    },
-    "disp": {
-      "tokens": 4403,
-      "by_category": {
-        "containers": 14,
-        "files": 90,
-        "global": 834,
-        "gui": 904,
-        "objects_signals": 508,
-        "other": 1329,
-        "strings": 715,
-        "time": 9
-      },
-      "public_header_includes": 87,
-      "q_object": 62,
-      "files": 147,
-      "modules": [
-        "Core",
-        "GuiPrivate",
-        "Widgets"
-      ]
-    },
-    "disp3D": {
-      "tokens": 1807,
-      "by_category": {
-        "containers": 5,
-        "files": 13,
-        "global": 177,
-        "gui": 1083,
-        "objects_signals": 149,
-        "other": 244,
-        "strings": 131,
-        "time": 5
-      },
-      "public_header_includes": 73,
-      "q_object": 14,
-      "files": 88,
-      "modules": [
-        "Core",
-        "Gui",
-        "GuiPrivate",
-        "ShaderTools",
-        "Widgets"
-      ]
     },
     "dsp": {
       "tokens": 0,
@@ -299,14 +252,6 @@
       "files": 3,
       "modules": []
     },
-    "scene": {
-      "tokens": 0,
-      "by_category": {},
-      "public_header_includes": 0,
-      "q_object": 0,
-      "files": 76,
-      "modules": []
-    },
     "sts": {
       "tokens": 0,
       "by_category": {},
@@ -315,13 +260,35 @@
       "files": 16,
       "modules": []
     },
-    "viewmodels": {
+    "viz": {
       "tokens": 0,
       "by_category": {},
       "public_header_includes": 0,
       "q_object": 0,
-      "files": 7,
+      "files": 82,
       "modules": []
+    },
+    "viz/backends/qt": {
+      "tokens": 6208,
+      "by_category": {
+        "containers": 19,
+        "files": 103,
+        "global": 1009,
+        "gui": 1987,
+        "objects_signals": 657,
+        "other": 1573,
+        "strings": 846,
+        "time": 14
+      },
+      "public_header_includes": 159,
+      "q_object": 76,
+      "files": 234,
+      "modules": [
+        "Core",
+        "Gui",
+        "GuiPrivate",
+        "Widgets"
+      ]
     }
   }
 }

@@ -1,0 +1,55 @@
+---
+id: trace-style
+title: "mne::viz::TraceStyle"
+sidebar_label: TraceStyle
+sidebar_position: 44
+---
+
+# TraceStyle
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/views/trace_geometry.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/views/trace_geometry.h)
+
+`#include <mne/viz/trace_geometry.h>`
+
+```cpp
+struct mne::viz::TraceStyle
+```
+
+How traces are coloured and scaled.
+
+---
+
+## Static Methods
+
+### bad_color()
+
+**Returns:**
+
+- *[Color](/docs/api/viz/color)* — The colour of bad channels.
+
+---
+
+## Example
+
+No example of its own: Value type of trace colours and scales passed to TraceGeometry and draw_trace_figure().
+
+## Used in examples
+
+### [ex_scene_sdl](../../examples/viz/ex_scene_sdl.mdx)
+
+Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 220"
+TraceStyle style;
+style.background = Color{250, 250, 250};
+TraceMarkers markers;
+const ApproximateTextMetrics metrics;
+SoftwareRenderer renderer;
+SDL_Texture* texture = nullptr;
+int textureWidth = 0;
+int textureHeight = 0;
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

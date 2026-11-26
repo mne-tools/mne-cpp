@@ -1,0 +1,736 @@
+---
+id: trace-view
+title: "mne::viz::TraceView"
+sidebar_label: TraceView
+sidebar_position: 37
+---
+
+# TraceView
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/views/trace_view.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/views/trace_view.h)
+
+`#include <mne/viz/trace_view.h>`
+
+```cpp
+class mne::viz::TraceView
+```
+
+Viewport and interaction state of a raw-data trace view, without a GUI toolkit.
+
+[`TraceView`](/docs/api/viz/trace-view) knows which samples and channel rows a view of a given size shows, handles pointer and wheel input (wheel zoom and scrolling, drag scrolling with inertia, the right-button ruler, annotation range selection and boundary resizing, the crosshair) and draws the overlays on top of the traces (crosshair, scalebars, ruler and annotation selection) into a [`Canvas`](/docs/api/viz/canvas). It does not animate or render traces: what the host has to do is reported through `Effects`, e.g. animate a scroll, change the cursor or redraw.
+
+Positions are logical (device-independent) pixels with x = 0 at the left edge of the traces.
+
+---
+
+## Public Methods
+
+### set_effects(effects)
+
+Sets the reactions of the host.
+
+**Parameters:**
+
+- **effects** : *Effects*
+  Callbacks; empty ones are skipped.
+
+---
+
+### set_source(source)
+
+Sets the channels shown.
+
+**Parameters:**
+
+- **source** : *const [TraceSource](/docs/api/viz/trace-source) **
+  Channel source, not owned; nullptr for none.
+
+---
+
+### source()
+
+**Returns:**
+
+- *const [TraceSource](/docs/api/viz/trace-source) ** — The channel source or nullptr.
+
+---
+
+### set_view_size(width, height)
+
+Sets the size of the view in logical pixels.
+
+**Parameters:**
+
+- **width** : *int*
+  Width.
+
+- **height** : *int*
+  Height.
+
+---
+
+### view_width()
+
+**Returns:**
+
+- *int* — The width of the view.
+
+---
+
+### view_height()
+
+**Returns:**
+
+- *int* — The height of the view.
+
+---
+
+### scroll_sample()
+
+**Returns:**
+
+- *double* — The absolute sample at the left edge.
+
+---
+
+### samples_per_pixel()
+
+**Returns:**
+
+- *double* — Samples per logical pixel.
+
+---
+
+### set_scroll_sample(sample)
+
+Sets the sample at the left edge, clamped with `clamp_scroll_sample()`; reports scroll_changed.
+
+**Parameters:**
+
+- **sample** : *double*
+  Absolute sample.
+
+**Returns:**
+
+- *bool* — Whether the position changed.
+
+---
+
+### set_samples_per_pixel(spp)
+
+Sets the horizontal zoom (at least 1e-4); reports zoom_changed.
+
+**Parameters:**
+
+- **spp** : *double*
+  Samples per pixel.
+
+**Returns:**
+
+- *bool* — Whether the zoom changed.
+
+---
+
+### clamp_scroll_sample(sample)
+
+**Parameters:**
+
+- **sample** : *double*
+  Wanted left-edge sample.
+
+**Returns:**
+
+- *double* — `sample`, not before the first loaded sample (or 0) and, if the last file sample is known, not so far that the view passes the end of the file.
+
+---
+
+### scroll_to(target, duration_ms)
+
+Scrolls to a sample, animated by the host if `duration_ms` is positive.
+
+**Parameters:**
+
+- **target** : *double*
+  Left-edge sample.
+
+- **duration_ms** : *int*
+  Animation duration; 0 sets the position at once.
+
+---
+
+### scroll_by(delta, duration_ms)
+
+Scrolls by a number of samples; steps during a running scroll animation add up.
+
+**Parameters:**
+
+- **delta** : *double*
+  Samples (negative = earlier).
+
+- **duration_ms** : *int*
+  Animation duration; 0 scrolls at once.
+
+---
+
+### zoom_to(spp, duration_ms)
+
+Zooms to a number of samples per pixel, animated by the host if `duration_ms` is positive.
+
+**Parameters:**
+
+- **spp** : *double*
+  Target samples per pixel.
+
+- **duration_ms** : *int*
+  Animation duration; 0 zooms at once.
+
+---
+
+### stop_scroll_animations()
+
+Asks the host to stop the scroll animations (stop_animations).
+
+---
+
+### scroll_animation_finished()
+
+Must be called by the host when a scroll animation started by `scroll_to()` reached its end.
+
+---
+
+### scroll_animation_running()
+
+**Returns:**
+
+- *bool* — Whether a scroll animation of `scroll_to()` runs.
+
+---
+
+### scroll_target()
+
+**Returns:**
+
+- *double* — The end of the running scroll animation.
+
+---
+
+### visible_first_sample()
+
+**Returns:**
+
+- *int* — The first visible sample, the scroll sample truncated.
+
+---
+
+### visible_sample_count()
+
+**Returns:**
+
+- *int* — The number of visible samples, the width times the samples per pixel truncated.
+
+---
+
+### sample_at(x)
+
+**Parameters:**
+
+- **x** : *double*
+  Horizontal position.
+
+**Returns:**
+
+- *double* — The absolute sample under `x`.
+
+---
+
+### set_sfreq(sfreq)
+
+Sets the sampling frequency used for time labels.
+
+**Parameters:**
+
+- **sfreq** : *double*
+  Sampling frequency in Hz (negative values become 0).
+
+---
+
+### sfreq()
+
+**Returns:**
+
+- *double* — The sampling frequency in Hz.
+
+---
+
+### set_first_file_sample(first)
+
+Sets the absolute index of the first sample of the file (time 0).
+
+**Parameters:**
+
+- **first** : *int*
+  Absolute sample.
+
+**Returns:**
+
+- *bool* — Whether the value changed.
+
+---
+
+### first_file_sample()
+
+**Returns:**
+
+- *int* — The first file sample.
+
+---
+
+### set_last_file_sample(last)
+
+Sets the absolute index of the last sample of the file.
+
+**Parameters:**
+
+- **last** : *int*
+  Absolute sample, or -1 if unknown (scrolling is then unlimited).
+
+---
+
+### last_file_sample()
+
+**Returns:**
+
+- *int* — The last file sample or -1.
+
+---
+
+### total_channels()
+
+**Returns:**
+
+- *int* — The number of logical channels of the source (0 without a source).
+
+---
+
+### set_first_visible_channel(channel)
+
+Sets the first visible channel row, clamped so the window stays filled; reports channel_offset_changed.
+
+**Parameters:**
+
+- **channel** : *int*
+  Logical channel index.
+
+**Returns:**
+
+- *bool* — Whether the first visible channel changed.
+
+---
+
+### first_visible_channel()
+
+**Returns:**
+
+- *int* — The first visible logical channel.
+
+---
+
+### set_visible_channel_count(count)
+
+Sets the number of channel rows shown at once.
+
+**Parameters:**
+
+- **count** : *int*
+  Rows (at least 1).
+
+**Returns:**
+
+- *bool* — Whether the count changed.
+
+---
+
+### visible_channel_count()
+
+**Returns:**
+
+- *int* — The number of channel rows shown at once.
+
+---
+
+### visible_rows()
+
+**Returns:**
+
+- *int* — The number of rows that show a channel: the row count limited by the remaining channels.
+
+---
+
+### set_butterfly_mode(enabled)
+
+Overlays all channels of a type in one lane (the groups of the source).
+
+**Parameters:**
+
+- **enabled** : *bool*
+  Butterfly mode on or off.
+
+**Returns:**
+
+- *bool* — Whether the mode changed.
+
+---
+
+### butterfly_mode()
+
+**Returns:**
+
+- *bool* — Whether butterfly mode is on.
+
+---
+
+### set_frozen(frozen)
+
+Freezes scrolling by wheel and drag; freezing stops running scroll animations.
+
+Clicks still report their sample.
+
+**Parameters:**
+
+- **frozen** : *bool*
+  Frozen or not.
+
+---
+
+### frozen()
+
+**Returns:**
+
+- *bool* — Whether scrolling is frozen.
+
+---
+
+### set_wheel_scrolls_channels(channels)
+
+Sets whether the vertical wheel scrolls channel rows (true) or time (false).
+
+**Parameters:**
+
+- **channels** : *bool*
+  Wheel mode.
+
+---
+
+### wheel_scrolls_channels()
+
+**Returns:**
+
+- *bool* — Whether the vertical wheel scrolls channels.
+
+---
+
+### set_scroll_speed_factor(factor)
+
+Sets the multiplier of wheel scrolling in time.
+
+**Parameters:**
+
+- **factor** : *double*
+  Factor, clamped to 0.25 .. 4.
+
+---
+
+### scroll_speed_factor()
+
+**Returns:**
+
+- *double* — The wheel scroll multiplier.
+
+---
+
+### set_annotations(annotations)
+
+Sets the annotation spans.
+
+**Parameters:**
+
+- **annotations** : *std::vector&lt; Annotation &gt;*
+  Spans.
+
+---
+
+### annotations()
+
+**Returns:**
+
+- *const std::vector&lt; Annotation &gt; &* — The annotation spans, including a boundary that is being dragged.
+
+---
+
+### set_annotation_selection_enabled(enabled)
+
+Enables annotation editing: the right button selects a new range, the left button drags boundaries.
+
+**Parameters:**
+
+- **enabled** : *bool*
+  Editing on or off.
+
+---
+
+### annotation_selection_enabled()
+
+**Returns:**
+
+- *bool* — Whether annotation editing is enabled.
+
+---
+
+### hit_test_annotation_boundary(x, is_start)
+
+**Parameters:**
+
+- **x** : *double*
+  Horizontal position.
+
+- **is_start** : *bool &*
+  Whether the start boundary was hit.
+
+**Returns:**
+
+- *int* — The index of the first annotation with a boundary within 5 pixels of `x`, or -1.
+
+---
+
+### annotation_dragging()
+
+**Returns:**
+
+- *bool* — Whether an annotation boundary is being dragged.
+
+---
+
+### selection()
+
+**Returns:**
+
+- *const Selection &* — The annotation range being selected.
+
+---
+
+### set_crosshair_enabled(enabled)
+
+Enables the crosshair; disabling it forgets the pointer position.
+
+**Parameters:**
+
+- **enabled** : *bool*
+  Crosshair on or off.
+
+**Returns:**
+
+- *bool* — Whether the setting changed.
+
+---
+
+### crosshair_enabled()
+
+**Returns:**
+
+- *bool* — Whether the crosshair is enabled.
+
+---
+
+### crosshair_x()
+
+**Returns:**
+
+- *int* — The crosshair x, -1 while the pointer was not tracked.
+
+---
+
+### crosshair_y()
+
+**Returns:**
+
+- *int* — The crosshair y, -1 while the pointer was not tracked.
+
+---
+
+### set_clock_time_format(clock)
+
+Sets whether the crosshair label shows clock time (mm:ss.zzz) or seconds.
+
+**Parameters:**
+
+- **clock** : *bool*
+  Clock time or seconds.
+
+---
+
+### clock_time_format()
+
+**Returns:**
+
+- *bool* — Whether the crosshair label shows clock time.
+
+---
+
+### set_scalebars_visible(visible)
+
+Shows a scalebar per channel type in the bottom-right corner.
+
+**Parameters:**
+
+- **visible** : *bool*
+  Scalebars on or off.
+
+**Returns:**
+
+- *bool* — Whether the setting changed.
+
+---
+
+### scalebars_visible()
+
+**Returns:**
+
+- *bool* — Whether the scalebars are shown.
+
+---
+
+### ruler()
+
+**Returns:**
+
+- *const Ruler &* — The ruler.
+
+---
+
+### overlays_visible()
+
+**Returns:**
+
+- *bool* — Whether `draw_overlays()` draws anything: crosshair, scalebars, ruler or annotation selection.
+
+---
+
+### cursor_data()
+
+**Returns:**
+
+- *std::optional&lt; CursorData &gt;* — What lies under the crosshair, or nothing without a crosshair position or channel.
+
+---
+
+### draw_overlays(canvas, metrics, font)
+
+Draws the crosshair, scalebars, ruler and annotation selection into (0, 0, width, height) of `canvas`.
+
+**Parameters:**
+
+- **canvas** : *[Canvas](/docs/api/viz/canvas) &*
+  [`Canvas`](/docs/api/viz/canvas).
+
+- **metrics** : *const [TextMetrics](/docs/api/viz/text-metrics) &*
+  Measures the labels.
+
+- **font** : *const [Font](/docs/api/viz/font) &*
+  Base font of the labels; its size is replaced by the overlay sizes (8 to 9 points).
+
+---
+
+### render_overlays(metrics, font)
+
+**Parameters:**
+
+- **metrics** : *const [TextMetrics](/docs/api/viz/text-metrics) &*
+  Measures the labels.
+
+- **font** : *const [Font](/docs/api/viz/font) &*
+  Base font of the labels.
+
+**Returns:**
+
+- *[DisplayList](/docs/api/viz/display-list)* — The overlays as a transparent figure of the view size.
+
+---
+
+### handle_wheel(event)
+
+Handles a wheel event: Ctrl zooms, horizontal swipes scroll time, the vertical wheel scrolls channels or time.
+
+**Parameters:**
+
+- **event** : *const [WheelEvent](/docs/api/viz/wheel-event) &*
+  Wheel event.
+
+**Returns:**
+
+- *bool* — True (the event is always used).
+
+---
+
+### handle_pointer(event)
+
+Handles a pointer event: ruler and annotation selection (right button), drag scrolling with inertia (left button, or middle / Alt+left without inertia), annotation boundary resizing, clicks, crosshair tracking and double clicks on channel rows.
+
+**Parameters:**
+
+- **event** : *const [PointerEvent](/docs/api/viz/pointer-event) &*
+  Pointer event.
+
+**Returns:**
+
+- *bool* — Whether the event was used; a host may pass unused events on.
+
+---
+
+## Static Methods
+
+### ruler_snap(dx, dy)
+
+**Parameters:**
+
+- **dx** : *int*
+  Horizontal distance from the press position.
+
+- **dy** : *int*
+  Vertical distance from the press position.
+
+**Returns:**
+
+- *RulerSnap* — The axis lock of the ruler: free below 8 pixels, horizontal or vertical if one distance is more than twice the other.
+
+---
+
+## Example
+
+No example of its own: Interaction state of the raw-data trace view; driven by viz::qt::ChannelRhiRenderer and exercised by test_scene_trace_view, it has no standalone use without a trace host.
+
+## Used in examples
+
+### [ex_scene_sdl](../../examples/viz/ex_scene_sdl.mdx)
+
+Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 188"
+TraceView view;
+ViewAnimator animator;
+TraceFrameBuilder builder;
+bool followEnd = true;
+bool following = false; // the scroll below is the example's, not the user's
+TraceView::Effects effects;
+effects.animate_scroll = [&](const TraceView::ScrollAnimation& animation) {
+    animator.start_scroll(animation, static_cast<std::int64_t>(SDL_GetTicks()));
+};
+effects.animate_zoom = [&](const TraceView::ZoomAnimation& animation) {
+    animator.start_zoom(animation, static_cast<std::int64_t>(SDL_GetTicks()));
+};
+effects.stop_animations = [&] {
+    animator.stop_scroll();
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

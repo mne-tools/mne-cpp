@@ -1,0 +1,99 @@
+---
+id: t-fplot
+title: "mne::viz::qt::TFplot"
+sidebar_label: TFplot
+sidebar_position: 60
+---
+
+# TFplot
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/plots/tfplot.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/plots/tfplot.h)
+
+`#include <mne/viz/backends/qt/tfplot.h>`
+
+```cpp
+class mne::viz::qt::TFplot
+```
+
+Time-frequency power image of a spectrogram: time in seconds, frequency in Hz, normalized power.
+
+Row k of the spectrogram is the FFT bin at k * sample_rate / N Hz, where N, the number of columns, is the FFT length; column j is the time tmin + j / sample_rate s.
+
+```cpp title="src/examples/ex_disp_plots/main.cpp"
+MatrixXd tf = MatrixXd::Zero(50, 100);  // 100 samples at 100 Hz: 50 frequency rows of 1 Hz x 100 times
+tf.middleRows(20, 10).setConstant(1.0); // power in the 20-29 Hz bins
+TFplot tfPlot(tf, 100.0, 0.0, 50.0, Jet);
+```
+
+### Inheritance
+
+```mermaid
+classDiagram
+    ImageSc <|-- TFplot
+    click ImageSc href "../../viz-qt/image-sc/"
+```
+
+---
+
+## Public Methods
+
+### TFplot(tf_matrix, sample_rate, lower_frq, upper_frq, cmap, tmin)
+
+Plots the frequency bins from `lower_frq` to `upper_frq`.
+
+**Parameters:**
+
+- **tf_matrix** : *const Eigen::MatrixXd &*
+  [`Spectrogram`](/docs/api/dsp/spectrogram) power, N/2 frequency bins x N time samples.
+
+- **sample_rate** : *qreal*
+  Sample rate of the signal in Hz.
+
+- **lower_frq** : *qreal*
+  Lowest frequency to plot in Hz.
+
+- **upper_frq** : *qreal*
+  Highest frequency to plot in Hz.
+
+- **cmap** : *ColorMaps*
+  Colour map.
+
+- **tmin** : *qreal*
+  Time of the first sample in s, e.g. the start of an epoch.
+
+---
+
+### TFplot(tf_matrix, sample_rate, cmap, tmin)
+
+Plots all frequency bins.
+
+**Parameters:**
+
+- **tf_matrix** : *const Eigen::MatrixXd &*
+  [`Spectrogram`](/docs/api/dsp/spectrogram) power, N/2 frequency bins x N time samples.
+
+- **sample_rate** : *qreal*
+  Sample rate of the signal in Hz.
+
+- **cmap** : *ColorMaps*
+  Colour map.
+
+- **tmin** : *qreal*
+  Time of the first sample in s, e.g. the start of an epoch.
+
+---
+
+## Example
+
+- Start here: [ex_disp_plots](../../examples/viz_qt/ex_disp_plots.mdx) — Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+- Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
+- Build target: `ex_disp_plots` (runs under CTest)
+
+## Authors of this file
+
+- Martin Henfling &lt;martin.henfling@tu-ilmenau.de&gt;
+- Daniel Knobl &lt;daniel.knobl@tu-ilmenau.de&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

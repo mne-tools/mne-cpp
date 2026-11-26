@@ -1,0 +1,42 @@
+---
+id: gpu-frame-target
+title: "mne::viz::GpuFrameTarget"
+sidebar_label: GpuFrameTarget
+sidebar_position: 63
+---
+
+# GpuFrameTarget
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/gpu/gpu_frame.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/gpu/gpu_frame.h)
+
+`#include <mne/viz/gpu_frame.h>`
+
+```cpp
+struct mne::viz::GpuFrameTarget
+```
+
+What a producer needs to know about the target before it builds a frame.
+
+---
+
+## Example
+
+No example of its own: Value type of the target size, pixel ratio and clip-space correction a backend hands to a frame producer.
+
+## Used in examples
+
+### [ex_scene_sdl](../../examples/viz/ex_scene_sdl.mdx)
+
+Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 313"
+GpuFrameTarget frameTarget;
+frameTarget.pixel_width = pixelWidth;
+frameTarget.pixel_height = pixelHeight;
+frameTarget.device_pixel_ratio = logicalWidth > 0 ? static_cast<double>(pixelWidth) / logicalWidth : 1.0;
+const Image image = renderer.render(builder.build(view, buffer, style, markers, metrics, frameTarget), builder.resources());
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

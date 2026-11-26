@@ -1,0 +1,102 @@
+---
+id: channel-rhi-host
+title: "mne::viz::qt::ChannelRhiHost"
+sidebar_label: ChannelRhiHost
+sidebar_position: 122
+---
+
+# ChannelRhiHost
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/viewers/helpers/channelrhirenderer.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/viewers/helpers/channelrhirenderer.h)
+
+`#include <mne/viz/backends/qt/channelrhirenderer.h>`
+
+```cpp
+class mne::viz::qt::ChannelRhiHost
+```
+
+Services a host surface provides to a [`ChannelRhiRenderer`](/docs/api/viz-qt/channel-rhi-renderer).
+
+Implemented by the widget host [`ChannelRhiView`](/docs/api/viz-qt/channel-rhi-view) and the window host [`ChannelWindow`](/docs/api/viz-qt/channel-window).
+
+---
+
+## Public Methods
+
+### ~ChannelRhiHost()
+
+Destroys the host interface.
+
+---
+
+### requestFrame()
+
+Schedules a new frame (asynchronously).
+
+---
+
+### logicalSize()
+
+Returns the size of the render surface in logical (device-independent) pixels.
+
+**Returns:**
+
+- *QSize* — The logical surface size.
+
+---
+
+### surfaceDevicePixelRatio()
+
+Returns the ratio between physical and logical pixels of the render surface.
+
+**Returns:**
+
+- *qreal* — The device pixel ratio.
+
+---
+
+### setCursorShape(shape)
+
+Sets the mouse cursor shape shown over the surface.
+
+**Parameters:**
+
+- **shape** : *Qt::CursorShape*
+  The cursor shape.
+
+---
+
+### unsetCursorShape()
+
+Restores the default mouse cursor of the surface.
+
+---
+
+### setMouseTracking(enabled)
+
+Enables or disables delivery of mouse move events without a pressed button.
+
+**Parameters:**
+
+- **enabled** : *bool*
+  True to track the mouse.
+
+---
+
+### font()
+
+Returns the font used for the overlay labels (crosshair, scalebars, ruler).
+
+**Returns:**
+
+- *QFont* — The host font.
+
+---
+
+## Example
+
+No example of its own: Abstract host interface implemented by display surfaces, not used directly by applications.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

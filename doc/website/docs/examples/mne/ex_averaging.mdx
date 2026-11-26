@@ -12,7 +12,7 @@ Average stimulus-locked epochs of a raw FIFF recording into an evoked response, 
 
 <ExampleFacts name="ex_averaging" />
 
-**Libraries:** [Visualization](../../api/disp/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Base](../../api/base/index.mdx)
+**Libraries:** [Visualization (Qt)](../../api/viz-qt/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Base](../../api/base/index.mdx)
 
 ## Results
 
@@ -76,8 +76,8 @@ The documented classes this example uses most:
 | [`FiffEvents`](../../api/fiff/fiff-events.mdx) | FIFF I/O |
 | [`FiffEvoked`](../../api/fiff/fiff-evoked.mdx) | FIFF I/O |
 | [`FiffRawData`](../../api/fiff/fiff-raw-data.mdx) | FIFF I/O |
-| [`FigureExporter`](../../api/disp/figure-exporter.mdx) | Visualization |
-| [`LinePlot`](../../api/disp/line-plot.mdx) | Visualization |
+| [`FigureExporter`](../../api/viz-qt/figure-exporter.mdx) | Visualization (Qt) |
+| [`LinePlot`](../../api/viz-qt/line-plot.mdx) | Visualization (Qt) |
 | [`Log`](../../api/base/log.mdx) | Base |
 | [`MNEEpochDataList`](../../api/mne/mne-epoch-data-list.mdx) | MNE Core |
 
@@ -114,8 +114,8 @@ The documented classes this example uses most:
 #include <mne/mne/mne.h>
 #include <mne/mne/mne_epoch_data_list.h>
 #include <mne/base/log.h>
-#include <mne/disp/plots/helpers/figureexporter.h>
-#include <mne/disp/plots/lineplot.h>
+#include <mne/viz/backends/qt/plots/helpers/figureexporter.h>
+#include <mne/viz/backends/qt/plots/lineplot.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -137,7 +137,7 @@ The documented classes this example uses most:
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace mne;
 using namespace Eigen;
 

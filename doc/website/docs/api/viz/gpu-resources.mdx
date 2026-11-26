@@ -1,0 +1,172 @@
+---
+id: gpu-resources
+title: "mne::viz::GpuResources"
+sidebar_label: GpuResources
+sidebar_position: 61
+---
+
+# GpuResources
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/gpu/gpu_frame.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/gpu/gpu_frame.h)
+
+`#include <mne/viz/gpu_frame.h>`
+
+```cpp
+class mne::viz::GpuResources
+```
+
+Buffers, textures and pipelines a view keeps across frames.
+
+A handle stays valid until its resource is released and is not reused by the store, so a backend can keep one GPU object per handle and upload again when the revision changed.
+
+---
+
+## Public Methods
+
+### create_buffer(usage)
+
+Adds an empty buffer.
+
+**Parameters:**
+
+- **usage** : *GpuBufferUsage*
+  What the buffer holds.
+
+**Returns:**
+
+- *GpuHandle* — The handle.
+
+---
+
+### set_buffer_data(buffer, bytes)
+
+Replaces the contents of a buffer.
+
+**Parameters:**
+
+- **buffer** : *GpuHandle*
+  Handle of a buffer of this store; others are ignored.
+
+- **bytes** : *std::span&lt; const std::byte &gt;*
+  New contents.
+
+---
+
+### set_buffer_values(buffer, values)
+
+Replaces the contents of a buffer with trivially copyable values.
+
+**Parameters:**
+
+- **buffer** : *GpuHandle*
+  Handle of a buffer of this store; others are ignored.
+
+- **values** : *std::span&lt; const T &gt;*
+  New contents.
+
+---
+
+### create_texture(texture)
+
+Adds a texture.
+
+**Parameters:**
+
+- **texture** : *[GpuTexture](/docs/api/viz/gpu-texture)*
+  Texture; the store sets its revision.
+
+**Returns:**
+
+- *GpuHandle* — The handle.
+
+---
+
+### set_texture(texture, content, scale)
+
+Replaces the contents of a texture and keeps its filter.
+
+**Parameters:**
+
+- **texture** : *GpuHandle*
+  Handle of a texture of this store; others are ignored.
+
+- **content** : *std::variant&lt; [Image](/docs/api/viz/image), [DisplayList](/docs/api/viz/display-list) &gt;*
+  Pixels or a figure.
+
+- **scale** : *double*
+  Texture pixels per figure pixel of a figure.
+
+---
+
+### create_pipeline(pipeline)
+
+Adds a pipeline.
+
+**Parameters:**
+
+- **pipeline** : *[GpuPipeline](/docs/api/viz/gpu-pipeline)*
+  Description.
+
+**Returns:**
+
+- *GpuHandle* — The handle.
+
+---
+
+### release(handle)
+
+Releases a buffer, texture or pipeline; its handle becomes invalid.
+
+**Parameters:**
+
+- **handle** : *GpuHandle*
+  Handle; 0 and unknown handles are ignored.
+
+---
+
+### buffer(handle)
+
+**Parameters:**
+
+- **handle** : *GpuHandle*
+  Handle.
+
+**Returns:**
+
+- *const [GpuBuffer](/docs/api/viz/gpu-buffer) ** — The buffer, or nullptr if `handle` is no buffer of this store.
+
+---
+
+### texture(handle)
+
+**Parameters:**
+
+- **handle** : *GpuHandle*
+  Handle.
+
+**Returns:**
+
+- *const [GpuTexture](/docs/api/viz/gpu-texture) ** — The texture, or nullptr if `handle` is no texture of this store.
+
+---
+
+### pipeline(handle)
+
+**Parameters:**
+
+- **handle** : *GpuHandle*
+  Handle.
+
+**Returns:**
+
+- *const [GpuPipeline](/docs/api/viz/gpu-pipeline) ** — The pipeline, or nullptr if `handle` is no pipeline of this store.
+
+---
+
+## Example
+
+No example of its own: Store of buffers, textures and pipelines filled by frame producers such as TraceFrameBuilder; exercised by test_scene_gpu_frame.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

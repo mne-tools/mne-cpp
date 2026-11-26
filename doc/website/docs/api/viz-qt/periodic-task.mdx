@@ -1,0 +1,60 @@
+---
+id: periodic-task
+title: "mne::viz::qt::PeriodicTask"
+sidebar_label: PeriodicTask
+sidebar_position: 68
+---
+
+# PeriodicTask
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/workers/periodictask.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/workers/periodictask.h)
+
+`#include <mne/viz/backends/qt/periodictask.h>`
+
+```cpp
+class mne::viz::qt::PeriodicTask
+```
+
+Calls a tick function every `interval` while running.
+
+The first tick fires one interval after start(). Ticks never overlap and do not queue up: a tick that overruns pushes the next one back. stop() does not interrupt a tick that is already running.
+
+---
+
+## Public Methods
+
+### PeriodicTask(tick)
+
+---
+
+### ~PeriodicTask()
+
+---
+
+### PeriodicTask()
+
+---
+
+### operator=()
+
+---
+
+### start(interval)
+
+---
+
+### stop()
+
+---
+
+### setInterval(interval)
+
+---
+
+### isRunning()
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

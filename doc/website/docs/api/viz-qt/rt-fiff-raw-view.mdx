@@ -1,0 +1,454 @@
+---
+id: rt-fiff-raw-view
+title: "mne::viz::qt::RtFiffRawView"
+sidebar_label: RtFiffRawView
+sidebar_position: 50
+---
+
+# RtFiffRawView
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/viewers/rtfiffrawview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/viewers/rtfiffrawview.h)
+
+`#include <mne/viz/backends/qt/rtfiffrawview.h>`
+
+```cpp
+class mne::viz::qt::RtFiffRawView
+```
+
+QTableView-based real-time FIFF raw-data browser host.
+
+Owns the scrollbars, the marker / annotation machinery and the trigger-channel overlay; delegates per-row painting to [`RtFiffRawViewDelegate`](/docs/api/viz-qt/rt-fiff-raw-view-delegate) and data access to [`RtFiffRawViewModel`](/docs/api/viz-qt/rt-fiff-raw-view-model).
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- RtFiffRawView
+    click AbstractView href "../../viz-qt/abstract-view/"
+```
+
+---
+
+## Public Methods
+
+### RtFiffRawView(sSettingsPath, parent, f)
+
+Constructs a [`RtFiffRawView`](/docs/api/viz-qt/rt-fiff-raw-view) which is a child of parent.
+
+**Parameters:**
+
+- **sSettingsPath** : *const QString &*
+  Settings path under which the widget persists its state (empty = no persistence).
+
+- **parent** : *QWidget **
+  The parent of widget.
+
+- **f** : *Qt::WindowFlags*
+  Qt window flags passed to the QWidget constructor.
+
+---
+
+### ~RtFiffRawView()
+
+Destroys the [`RtFiffRawView`](/docs/api/viz-qt/rt-fiff-raw-view).
+
+---
+
+### updateViewport()
+
+Update the viewport.
+
+This, e.g., necessary if this widget was set to a QDockWidget which changes its floating state.
+
+---
+
+### setSettingsPath(sSettingsPath)
+
+Set the path where to store the settings of this widget via QSettings.
+
+Note that this will also trigger a reload of the stored settings.
+
+**Parameters:**
+
+- **sSettingsPath** : *const QString &*
+  The new settings path.
+
+---
+
+### init(info)
+
+Initilaizes the [`RtFiffRawView`](/docs/api/viz-qt/rt-fiff-raw-view) based on a [`FiffInfo`](/docs/api/fiff/fiff-info).
+
+**Parameters:**
+
+- **info** : *std::shared_ptr&lt; [FiffInfo](/docs/api/fiff/fiff-info) &gt; &*
+  The [`FiffInfo`](/docs/api/fiff/fiff-info).
+
+---
+
+### addData(lMatData)
+
+Add data to the view.
+
+**Parameters:**
+
+- **lMatData** : *std::span&lt; const Eigen::MatrixXd &gt;*
+  The new data.
+
+---
+
+### getLastBlock()
+
+Get the latest data block from the underlying model.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — The last data block.
+
+---
+
+### eventFilter(object, event)
+
+Is called when mouse wheel is used.
+
+Function is selecting the tool (freezing/annotation);
+
+**Parameters:**
+
+- **object** : *QObject **
+  Object the event was sent to.
+
+- **event** : *QEvent **
+  The intercepted event.
+
+---
+
+### setBackgroundColor(backgroundColor)
+
+Broadcast the background color changes made in the QuickControl widget.
+
+**Parameters:**
+
+- **backgroundColor** : *const QColor &*
+  The new background color.
+
+---
+
+### getBackgroundColor()
+
+Returns the current background color.
+
+**Returns:**
+
+- *QColor* — The current background color.
+
+---
+
+### getScalingMap()
+
+Get the current scaling map.
+
+**Returns:**
+
+- *std::map&lt; int, float &gt;* — The current scaling map.
+
+---
+
+### setScalingMap(scaleMap)
+
+Broadcast channel scaling.
+
+**Parameters:**
+
+- **scaleMap** : *const std::map&lt; int, float &gt; &*
+  QMap with scaling values which is to be broadcasted to the model.
+
+---
+
+### setSignalColor(signalColor)
+
+Set the signal color.
+
+**Parameters:**
+
+- **signalColor** : *const QColor &*
+  The new signal color.
+
+---
+
+### getSignalColor()
+
+Returns the signal color.
+
+**Returns:**
+
+- *QColor* — The current signal color.
+
+---
+
+### hideBadChannels()
+
+Hides/shows all bad channels in the view.
+
+---
+
+### getBadChannelHideStatus()
+
+Get whether the bad channels are currently hidden or not.
+
+**Returns:**
+
+- *bool* — The current bad channel hidden status.
+
+---
+
+### showSelectedChannelsOnly(selectedChannels)
+
+Only shows the channels defined in the QStringList selectedChannels.
+
+**Parameters:**
+
+- **selectedChannels** : *const std::vector&lt; std::string &gt; &*
+  list of all channel names which are currently selected in the selection manager.
+
+---
+
+### setZoom(zoomFac)
+
+Sets new zoom factor.
+
+**Parameters:**
+
+- **zoomFac** : *double*
+  time window size;.
+
+---
+
+### getZoom()
+
+Get the current zoom.
+
+**Returns:**
+
+- *double* — The current zoom.
+
+---
+
+### setWindowSize(T)
+
+Sets new time window size.
+
+**Parameters:**
+
+- **T** : *int*
+  time window size;.
+
+---
+
+### getWindowSize()
+
+Get the current window size.
+
+**Returns:**
+
+- *int* — The current window size.
+
+---
+
+### takeScreenshot(fileName)
+
+Renders a screenshot of the view and saves it to the passed path.
+
+SVG and PNG supported.
+
+**Parameters:**
+
+- **fileName** : *const QString &*
+  The file name and path where to store the screenshot.
+
+---
+
+### updateProjection(projs)
+
+Update the SSP projection.
+
+**Parameters:**
+
+- **projs** : *const std::vector&lt; [FiffProj](/docs/api/fiff/fiff-proj) &gt; &*
+  The new projectors.
+
+---
+
+### updateCompensator(to)
+
+Update the compensator.
+
+**Parameters:**
+
+- **to** : *int*
+  Compensator to use in fiff constant format `FiffCtfComp.kind` (NOT `FiffCtfComp.ctfkind`).
+
+---
+
+### updateSpharaActivation(state)
+
+Update the SPHARA operator.
+
+**Parameters:**
+
+- **state** : *bool*
+  The current state of teh SPHARA tool.
+
+---
+
+### updateSpharaOptions(sSytemType, nBaseFctsFirst, nBaseFctsSecond)
+
+Update the SPHARA operator.
+
+**Parameters:**
+
+- **sSytemType** : *const QString &*
+  The current acquisition system type (VectorView, BabyMEG, EEG).
+
+- **nBaseFctsFirst** : *int*
+  The new number of basis function to use for the first SPHARA operator.
+
+- **nBaseFctsSecond** : *int*
+  The new number of basis function to use for the second SPHARA operator.
+
+---
+
+### setFilter(filterData)
+
+Filter parameters changed.
+
+**Parameters:**
+
+- **filterData** : *const [FilterKernel](/docs/api/dsp/filter-kernel) &*
+  the currently active filter.
+
+---
+
+### setFilterActive(state)
+
+Filter avtivated.
+
+**Parameters:**
+
+- **state** : *bool*
+  filter on/off flag.
+
+---
+
+### setFilterChannelType(channelType)
+
+Sets the type of channel which are to be filtered.
+
+**Parameters:**
+
+- **channelType** : *const QString &*
+  the channel type which is to be filtered (EEG, MEG, All).
+
+---
+
+### triggerInfoChanged(colorMap, active, triggerCh, threshold)
+
+markChBad marks the selected channels as bad/good in m_chInfolist
+
+**Parameters:**
+
+- **colorMap** : *const std::map&lt; double, QColor &gt; &*
+  color for each trigger channel.
+
+- **active** : *bool*
+  real time trigger detection active.
+
+- **triggerCh** : *const std::string &*
+  current trigger channel to scan.
+
+- **threshold** : *double*
+  threshold for the detection process.
+
+---
+
+### setDistanceTimeSpacer(value)
+
+distanceTimeSpacerChanged changes the distance of the time spacers
+
+**Parameters:**
+
+- **value** : *int*
+  the new distance for the time spacers.
+
+---
+
+### getDistanceTimeSpacer()
+
+Returns teh current distance between time spacers.
+
+**Returns:**
+
+- *int* — The current distance between the time spacers.
+
+---
+
+### resetTriggerCounter()
+
+resetTriggerCounter resets the trigger counter
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+### getSamplingFreq()
+
+Getter fcn for Sampling Frequency member.
+
+**Returns:**
+
+- *float* — Sampling frequency in Hz.
+
+---
+
+### setCrosshairEnabled(enabled)
+
+Shows a crosshair at the mouse position and reports the value under it via `cursorDataChanged()`, like [`ChannelDataView`](/docs/api/viz-qt/channel-data-view).
+
+**Parameters:**
+
+- **enabled** : *bool*
+  Whether the crosshair is shown.
+
+---
+
+### crosshairEnabled()
+
+**Returns:**
+
+- *bool* — Whether the crosshair is shown.
+
+---
+
+## Authors of this file
+
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Matti Hamalainen &lt;msh@nmr.mgh.harvard.edu&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

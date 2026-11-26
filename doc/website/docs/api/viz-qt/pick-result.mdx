@@ -1,0 +1,47 @@
+---
+id: pick-result
+title: "mne::viz::qt::PickResult"
+sidebar_label: PickResult
+sidebar_position: 75
+---
+
+# PickResult
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/scene/pickresult.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/scene/pickresult.h)
+
+`#include <mne/viz/backends/qt/pickresult.h>`
+
+```cpp
+struct mne::viz::qt::PickResult
+```
+
+Uniform payload for object-id picking across the multimodal scene.
+
+Producers fill in only the fields relevant to their ``kind``. Consumers (Pick dock, status bar, MRI ortho viewer, time-course panel) read the generic fields (``kind``, ``world``, ``objectId``, ``label``, ``value``) plus any kind-specific fields they understand.
+
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+// A picker reports the contact under the cursor; the host reads the most recent pick back
+const bool hitBefore = isHit(scene.lastPick());
+PickResult contactPick;
+contactPick.kind = PickKind::ElectrodeContact;
+contactPick.sourceId = "seeg_LH";
+const IeegContact& first = electrodes.implantation().contacts().front();
+contactPick.world = QVector3D(first.position.x(), first.position.y(), first.position.z());
+contactPick.label = QString::fromStdString(first.name);
+contactPick.value = 3.5f;
+contactPick.timeSample = 120;
+scene.reportPick(contactPick);
+const PickResult& lastPick = scene.lastPick();
+```
+
+---
+
+## Example
+
+- Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

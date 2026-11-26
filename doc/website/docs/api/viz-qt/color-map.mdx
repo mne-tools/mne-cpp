@@ -1,0 +1,213 @@
+---
+id: color-map
+title: "mne::viz::qt::ColorMap"
+sidebar_label: ColorMap
+sidebar_position: 17
+---
+
+# ColorMap
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/plots/helpers/colormap.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/plots/helpers/colormap.h)
+
+`#include <mne/viz/backends/qt/colormap.h>`
+
+```cpp
+class mne::viz::qt::ColorMap
+```
+
+Static lookup helpers mapping scalar values to `QRgb` / `QColor` across all mne_disp palettes.
+
+The `valueToXxx` accessors map any value in $[0,1]$ to a colour without instantiating an object; `mne::viz::map_color()` is the Qt-free equivalent. Bundled palettes include Viridis, Jet, Hot, HotNeg1, HotNeg2, Bone, Cool, RedBlue and the MNE-Python `hot` variant.
+
+```cpp title="src/examples/ex_disp_plots/main.cpp"
+const QRgb low = ColorMap::valueToColor(0.0, "Viridis"); // v in [0, 1]
+const QRgb mid = ColorMap::valueToColor(0.5, "Viridis");
+const QRgb jet = ColorMap::valueToJet(0.25);
+```
+
+---
+
+## Public Methods
+
+### ColorMap()
+
+Default constructor.
+
+---
+
+### ~ColorMap()
+
+Destructs the [`ColorMap`](/docs/api/viz-qt/color-map) class.
+
+---
+
+## Static Methods
+
+### valueToColor(v, sMap)
+
+Returns a Jet RGB to a given double value [0,1] and a colormap specified by sMap.
+
+If no matching colormap was found return Jet.
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [0,1].
+
+- **sMap** : *const QString &*
+  the colormap to choose.
+
+**Returns:**
+
+- *QRgb* — the corresponding RGB value.
+
+---
+
+### valueToJet(v)
+
+Returns a Jet RGB to a given double value [0,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [0,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding Jet RGB.
+
+---
+
+### valueToHot(v)
+
+Returns a Hot RGB to a given double value [0,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [0,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding Hot RGB.
+
+---
+
+### valueToHotNegative1(v)
+
+Returns a negative skewed hot RGB to a given double value [0,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [0,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding negative skewed Hot RGB.
+
+---
+
+### valueToHotNegative2(v)
+
+Returns a negative skewed hot RGB to a given double value [0,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [0,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding negative skewed Hot RGB.
+
+---
+
+### valueToBone(v)
+
+Returns a Bone RGB to a given double value [0,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [0,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding Bone RGB.
+
+---
+
+### valueToRedBlue(v)
+
+Returns a RedBlue RGB to a given double value [-1,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [-1,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding Bone RGB.
+
+---
+
+### valueToCool(v)
+
+Returns a Cool RGB to a given double value [-1,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [-1,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding Cool RGB.
+
+---
+
+### valueToViridis(v)
+
+Returns a Viridis RGB to a given double value [-1,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [-1,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding Cool RGB.
+
+---
+
+### valueToViridisNegated(v)
+
+Returns a negated Viridis RGB to a given double value [-1,1].
+
+**Parameters:**
+
+- **v** : *double*
+  the double which has to be part of the intervall [-1,1].
+
+**Returns:**
+
+- *QRgb* — the corresponding Cool RGB.
+
+---
+
+## Example
+
+- Start here: [ex_disp_plots](../../examples/viz_qt/ex_disp_plots.mdx) — Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+- Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
+- Build target: `ex_disp_plots` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
+- Matti Hamalainen &lt;msh@nmr.mgh.harvard.edu&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;

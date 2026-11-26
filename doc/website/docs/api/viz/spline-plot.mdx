@@ -1,0 +1,284 @@
+---
+id: spline-plot
+title: "mne::viz::SplinePlot"
+sidebar_label: SplinePlot
+sidebar_position: 12
+---
+
+# SplinePlot
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/figures/spline_plot.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/figures/spline_plot.h)
+
+`#include <mne/viz/spline_plot.h>`
+
+```cpp
+class mne::viz::SplinePlot
+```
+
+A histogram as a Catmull-Rom curve through the class marks, with left, middle and right thresholds.
+
+Once thresholds are set, the background between them shows a colour map: its lower half from the left to the middle threshold, its upper half from the middle to the right one.
+
+```cpp title="src/examples/ex_scene/main.cpp"
+// Qt:   QPainter p(&widget); p.setPen(...); p.drawRect(...); p.drawText(...);
+Canvas canvas(200, 120, Color::white());
+canvas.set_antialiasing(true);
+canvas.set_pen(Pen{{50, 100, 150}, 1.5});
+canvas.set_brush(Brush::solid({70, 130, 180}));
+canvas.draw_rounded_rect({20, 20, 80, 50}, 6, 6);
+canvas.set_pen(Color::black());
+canvas.draw_text(Rect{0, 80, 200, 30}, Align::Center, "Hello scene");
+const DisplayList figure = canvas.take();
+
+// A plot: the same model a disp widget shows on screen
+std::vector<double> x;
+std::vector<double> y;
+for (int i = 0; i < 100; ++i) {
+    x.push_back(i * 0.01);
+    y.push_back(std::sin(2 * 3.14159265358979 * 5 * x.back()));
+}
+LineChart plot;
+plot.set_title("5 Hz sine");
+plot.set_x_label("time (s)");
+plot.add_series(x, y, "signal");
+const ApproximateTextMetrics metrics;
+const DisplayList chart = plot.render(480, 320, metrics, Font{"", 0.0, 13.0});
+
+const Expected<void> svg = write_svg(chart, dir / "plot.svg");
+const Expected<void> png = to_raster(chart).save_png(dir / "plot.png");
+```
+
+---
+
+## Public Methods
+
+### set_title(title)
+
+Sets the title above the plot.
+
+**Parameters:**
+
+- **title** : *std::string*
+  Title text.
+
+---
+
+### set_x_label(label)
+
+Sets the label below the x axis.
+
+**Parameters:**
+
+- **label** : *std::string*
+  Label text.
+
+---
+
+### set_y_label(label)
+
+Sets the label left of the y axis.
+
+**Parameters:**
+
+- **label** : *std::string*
+  Label text.
+
+---
+
+### set_classes(classMarks, minX, maxX)
+
+Sets the histogram and clears the thresholds (left at the minimum, middle and right at the maximum).
+
+**Parameters:**
+
+- **classMarks** : *std::vector&lt; [Point](/docs/api/viz/point) &gt;*
+  Centre and count of each class.
+
+- **minX** : *double*
+  Lower limit of the first class.
+
+- **maxX** : *double*
+  Upper limit of the last class.
+
+---
+
+### class_marks()
+
+**Returns:**
+
+- *const std::vector&lt; [Point](/docs/api/viz/point) &gt; &* — The class marks.
+
+---
+
+### min_x()
+
+**Returns:**
+
+- *double* — The lower end of the x axis.
+
+---
+
+### max_x()
+
+**Returns:**
+
+- *double* — The upper end of the x axis.
+
+---
+
+### set_thresholds(left, middle, right)
+
+Sets the three thresholds and shows them.
+
+**Parameters:**
+
+- **left** : *double*
+  X value of the left threshold.
+
+- **middle** : *double*
+  X value of the middle threshold.
+
+- **right** : *double*
+  X value of the right threshold.
+
+---
+
+### has_thresholds()
+
+**Returns:**
+
+- *bool* — Whether thresholds are shown.
+
+---
+
+### left_threshold()
+
+**Returns:**
+
+- *double* — The left threshold.
+
+---
+
+### middle_threshold()
+
+**Returns:**
+
+- *double* — The middle threshold.
+
+---
+
+### right_threshold()
+
+**Returns:**
+
+- *double* — The right threshold.
+
+---
+
+### set_colormap(name)
+
+Sets the colour map of the background, by name (see `map_color()`); none if empty.
+
+**Parameters:**
+
+- **name** : *std::string*
+  Colour map name, none if empty.
+
+---
+
+### data_to_pixel_x(x, width)
+
+**Parameters:**
+
+- **x** : *double*
+  X value.
+
+- **width** : *double*
+  Width of the plot in pixels.
+
+**Returns:**
+
+- *double* — The horizontal pixel of `x` in a plot of `width`.
+
+---
+
+### data_to_pixel_y(y, height)
+
+**Parameters:**
+
+- **y** : *double*
+  Count.
+
+- **height** : *double*
+  Height of the plot in pixels.
+
+**Returns:**
+
+- *double* — The vertical pixel of count `y` in a plot of `height`.
+
+---
+
+### pixel_to_data_x(px, width)
+
+**Parameters:**
+
+- **px** : *double*
+  Horizontal pixel.
+
+- **width** : *double*
+  Width of the plot in pixels.
+
+**Returns:**
+
+- *double* — The x value at horizontal pixel `px` in a plot of `width`.
+
+---
+
+### draw(canvas, metrics, font)
+
+Draws the plot into the rectangle (0, 0, width, height) of `canvas`.
+
+**Parameters:**
+
+- **canvas** : *[Canvas](/docs/api/viz/canvas) &*
+  [`Canvas`](/docs/api/viz/canvas).
+
+- **metrics** : *const [TextMetrics](/docs/api/viz/text-metrics) &*
+  Measures the labels.
+
+- **font** : *const [Font](/docs/api/viz/font) &*
+  [`Font`](/docs/api/viz/font) of the labels; the title is bold.
+
+---
+
+### render(width, height, metrics, font)
+
+**Parameters:**
+
+- **width** : *double*
+  Width in pixels.
+
+- **height** : *double*
+  Height in pixels.
+
+- **metrics** : *const [TextMetrics](/docs/api/viz/text-metrics) &*
+  Measures the text.
+
+- **font** : *const [Font](/docs/api/viz/font) &*
+  [`Font`](/docs/api/viz/font) of the text.
+
+**Returns:**
+
+- *[DisplayList](/docs/api/viz/display-list)* — The plot as a figure of `width` x `height` on white.
+
+---
+
+## Example
+
+- Start here: [ex_scene](../../examples/viz/ex_scene.mdx) — Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+- Full source: [`src/examples/ex_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_scene/main.cpp)
+- Build target: `ex_scene` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -1,0 +1,225 @@
+---
+id: spectrum-table
+title: "mne::viz::SpectrumTable"
+sidebar_label: SpectrumTable
+sidebar_position: 2
+---
+
+# SpectrumTable
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/models/spectrum_table.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/models/spectrum_table.h)
+
+`#include <mne/viz/spectrum_table.h>`
+
+```cpp
+class mne::viz::SpectrumTable
+```
+
+Spectra, channel selection and frequency axis of a spectrum viewer.
+
+---
+
+## Public Methods
+
+### set_info(info)
+
+Sets the measurement info and selects all its channels.
+
+**Parameters:**
+
+- **info** : *std::shared_ptr&lt; [FiffInfo](/docs/api/fiff/fiff-info) &gt;*
+  Measurement info; its sampling frequency defines the frequency axis.
+
+---
+
+### info()
+
+**Returns:**
+
+- *const std::shared_ptr&lt; [FiffInfo](/docs/api/fiff/fiff-info) &gt; &* — The measurement info.
+
+---
+
+### set_scale(scale)
+
+Sets the spacing of the frequency axis used from the next spectrum with a new length on.
+
+**Parameters:**
+
+- **scale** : *Scale*
+  Spacing of the frequency axis.
+
+---
+
+### set_data(data)
+
+Sets the latest spectra.
+
+A new number of frequency bins rebuilds the frequency axis and resets the band.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Spectra, channels by frequency bins from 0 Hz to the Nyquist frequency.
+
+---
+
+### row_count()
+
+**Returns:**
+
+- *int* — Number of selected channels, i.e. rows.
+
+---
+
+### channel(row)
+
+**Parameters:**
+
+- **row** : *int*
+  Row of the table.
+
+**Returns:**
+
+- *int* — The channel shown in `row`, or 0 when `row` is not selected.
+
+---
+
+### channel_name(row)
+
+**Parameters:**
+
+- **row** : *int*
+  Row of the table.
+
+**Returns:**
+
+- *std::string* — Name of the channel shown in `row`, empty without info.
+
+---
+
+### spectrum(row)
+
+**Parameters:**
+
+- **row** : *int*
+  Row of the table.
+
+**Returns:**
+
+- *std::optional&lt; Eigen::RowVectorXd &gt;* — The shown spectrum of the channel in `row` (the frozen one while frozen), or nothing before data for that channel arrived.
+
+---
+
+### select(channels)
+
+Shows the given channels, skipping channels the info does not have.
+
+**Parameters:**
+
+- **channels** : *const std::vector&lt; int &gt; &*
+  Channel indices in display order.
+
+---
+
+### reset_selection()
+
+Shows all channels of the info.
+
+---
+
+### selection()
+
+**Returns:**
+
+- *const std::map&lt; int, int &gt; &* — Map from row to channel index.
+
+---
+
+### toggle_frozen()
+
+Freezes or unfreezes the shown spectra; freezing keeps a copy of the current ones.
+
+---
+
+### frozen()
+
+**Returns:**
+
+- *bool* — Whether the shown spectra are frozen.
+
+---
+
+### set_bounds(lower, upper)
+
+Cuts the frequency axis to a band and renormalises it to [0, 1] over the band.
+
+**Parameters:**
+
+- **lower** : *float*
+  Lower band edge in Hz.
+
+- **upper** : *float*
+  Upper band edge in Hz.
+
+**Returns:**
+
+- *bool* — False when no spectrum arrived yet, so there is no axis to cut.
+
+---
+
+### freq_scale()
+
+**Returns:**
+
+- *const Eigen::RowVectorXd &* — Normalised frequency axis, 0 to 1 over all bins.
+
+---
+
+### freq_scale_bound()
+
+**Returns:**
+
+- *const Eigen::RowVectorXd &* — Frequency axis normalised to 0 to 1 over the band.
+
+---
+
+### lower_bin()
+
+**Returns:**
+
+- *int* — Bin of the lower band edge.
+
+---
+
+### upper_bin()
+
+**Returns:**
+
+- *int* — Bin of the upper band edge.
+
+---
+
+### bins()
+
+**Returns:**
+
+- *int* — Number of frequency bins of the latest spectra.
+
+---
+
+### data_rows()
+
+**Returns:**
+
+- *int* — Number of channels of the latest spectra.
+
+---
+
+## Example
+
+No example of its own: View model of the spectrum viewer; adapted by viz::qt::FrequencySpectrumModel and exercised by test_viewmodels, it has no standalone use without a view.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

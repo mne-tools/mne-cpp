@@ -36,9 +36,8 @@
     "sts": "Statistics",
     "inv": "Inverse",
     "fwd": "Forward",
-    "disp3D": "3D Visualization",
-    "disp": "Visualization",
-    "scene": "Figures",
+    "viz_qt": "Visualization (Qt)",
+    "viz": "Visualization",
     "dsp": "Signal Processing",
     "ieeg": "iEEG",
     "bids": "BIDS",
@@ -65,7 +64,7 @@
       "library": "acq",
       "libraries": [
         "acq",
-        "disp"
+        "viz_qt"
       ],
       "tasks": [
         "real-time"
@@ -86,7 +85,7 @@
       "library": "acq",
       "libraries": [
         "acq",
-        "disp",
+        "viz_qt",
         "dsp"
       ],
       "tasks": [
@@ -146,7 +145,7 @@
       "library": "acq",
       "libraries": [
         "acq",
-        "disp",
+        "viz_qt",
         "fiff"
       ],
       "tasks": [
@@ -168,7 +167,7 @@
       "library": "acq",
       "libraries": [
         "acq",
-        "disp"
+        "viz_qt"
       ],
       "tasks": [
         "real-time"
@@ -187,7 +186,7 @@
       "url": "/docs/examples/mne/ex_averaging/",
       "library": "mne",
       "libraries": [
-        "disp",
+        "viz_qt",
         "mne",
         "fiff",
         "base"
@@ -294,7 +293,7 @@
       "library": "inv",
       "libraries": [
         "inv",
-        "disp3D",
+        "viz_qt",
         "fs",
         "fiff",
         "math",
@@ -322,7 +321,7 @@
       "library": "inv",
       "libraries": [
         "inv",
-        "disp3D",
+        "viz_qt",
         "fs",
         "mne",
         "fiff",
@@ -349,7 +348,7 @@
       "library": "inv",
       "libraries": [
         "inv",
-        "disp3D",
+        "viz_qt",
         "fs",
         "mne",
         "fiff",
@@ -374,7 +373,7 @@
       "library": "inv",
       "libraries": [
         "inv",
-        "disp3D",
+        "viz_qt",
         "fs",
         "mne",
         "fiff",
@@ -447,8 +446,7 @@
       "libraries": [
         "connectivity",
         "inv",
-        "disp3D",
-        "disp",
+        "viz_qt",
         "dsp",
         "fs",
         "mne",
@@ -478,8 +476,7 @@
       "libraries": [
         "connectivity",
         "inv",
-        "disp3D",
-        "disp",
+        "viz_qt",
         "fs",
         "mne",
         "fiff",
@@ -506,7 +503,7 @@
       "library": "connectivity",
       "libraries": [
         "connectivity",
-        "disp"
+        "viz_qt"
       ],
       "tasks": [
         "connectivity"
@@ -548,10 +545,10 @@
       "title": "Coregister digitizer points to the head surface",
       "brief": "Coregistration workflow: fit digitizer points to the head surface with ICP",
       "thumbnail": "",
-      "url": "/docs/examples/disp3D/ex_coreg/",
-      "library": "disp3D",
+      "url": "/docs/examples/viz_qt/ex_coreg/",
+      "library": "viz_qt",
       "libraries": [
-        "disp3D",
+        "viz_qt",
         "base"
       ],
       "tasks": [
@@ -589,10 +586,10 @@
       "title": "Plot raw data as image, line and time-frequency maps",
       "brief": "Disp library widgets: image map, line plot and time-frequency plot of raw data",
       "thumbnail": "/img/examples/ex_disp/01_image_sc.png",
-      "url": "/docs/examples/disp/ex_disp/",
-      "library": "disp",
+      "url": "/docs/examples/viz_qt/ex_disp/",
+      "library": "viz_qt",
       "libraries": [
-        "disp",
+        "viz_qt",
         "dsp",
         "mne",
         "fiff",
@@ -612,12 +609,12 @@
       "title": "Build a 3D scene of sensors, electrodes and MRI slices",
       "brief": "Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers",
       "thumbnail": "",
-      "url": "/docs/examples/disp3D/ex_disp3d_scene/",
-      "library": "disp3D",
+      "url": "/docs/examples/viz_qt/ex_disp3d_scene/",
+      "library": "viz_qt",
       "libraries": [
         "connectivity",
         "inv",
-        "disp3D",
+        "viz_qt",
         "ieeg"
       ],
       "tasks": [
@@ -637,11 +634,11 @@
       "title": "Show a source estimate on the cortex in 3D",
       "brief": "Compute a clustered MNE, dSPM or sLORETA estimate of the sample evoked response and show it on the cortex with Disp3D",
       "thumbnail": "",
-      "url": "/docs/examples/disp3D/ex_disp_3D/",
-      "library": "disp3D",
+      "url": "/docs/examples/viz_qt/ex_disp_3D/",
+      "library": "viz_qt",
       "libraries": [
         "inv",
-        "disp3D",
+        "viz_qt",
         "fs",
         "mne",
         "fiff",
@@ -663,10 +660,10 @@
       "title": "Plot types and colour maps",
       "brief": "Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps",
       "thumbnail": "/img/examples/ex_disp_plots/01_line_plot.png",
-      "url": "/docs/examples/disp/ex_disp_plots/",
-      "library": "disp",
+      "url": "/docs/examples/viz_qt/ex_disp_plots/",
+      "library": "viz_qt",
       "libraries": [
-        "disp",
+        "viz_qt",
         "dsp"
       ],
       "tasks": [
@@ -731,7 +728,7 @@
       "url": "/docs/examples/dsp/ex_dsp_filter/",
       "library": "dsp",
       "libraries": [
-        "disp",
+        "viz_qt",
         "dsp"
       ],
       "tasks": [
@@ -822,7 +819,7 @@
       "url": "/docs/examples/dsp/ex_dsp_spectral/",
       "library": "dsp",
       "libraries": [
-        "disp",
+        "viz_qt",
         "dsp"
       ],
       "tasks": [
@@ -1024,7 +1021,7 @@
       "url": "/docs/examples/fs/ex_fs_surface/",
       "library": "fs",
       "libraries": [
-        "disp3D",
+        "viz_qt",
         "fs",
         "base"
       ],
@@ -1071,7 +1068,7 @@
       "library": "inv",
       "libraries": [
         "inv",
-        "disp",
+        "viz_qt",
         "fs",
         "mne",
         "fiff",
@@ -1138,11 +1135,11 @@
       "title": "Interpolate sensor values onto a surface",
       "brief": "Map evoked MEG values onto a surface mesh with surface-constrained distances (GeometryInfo) and interpolation weights",
       "thumbnail": "",
-      "url": "/docs/examples/disp3D/ex_interpolation/",
-      "library": "disp3D",
+      "url": "/docs/examples/viz_qt/ex_interpolation/",
+      "library": "viz_qt",
       "libraries": [
         "inv",
-        "disp3D",
+        "viz_qt",
         "mne",
         "fiff",
         "base"
@@ -1264,7 +1261,7 @@
       "library": "inv",
       "libraries": [
         "inv",
-        "disp",
+        "viz_qt",
         "fs",
         "mne",
         "fiff"
@@ -1290,7 +1287,7 @@
       "library": "inv",
       "libraries": [
         "inv",
-        "disp",
+        "viz_qt",
         "mne",
         "fiff",
         "base"
@@ -1316,7 +1313,7 @@
       "library": "inv",
       "libraries": [
         "inv",
-        "disp3D",
+        "viz_qt",
         "fs",
         "mne",
         "fiff",
@@ -1344,7 +1341,7 @@
       "library": "inv",
       "libraries": [
         "inv",
-        "disp3D",
+        "viz_qt",
         "fs",
         "mne",
         "fiff",
@@ -1370,7 +1367,7 @@
       "library": "inv",
       "libraries": [
         "inv",
-        "disp3D",
+        "viz_qt",
         "fs",
         "mne",
         "fiff",
@@ -1607,7 +1604,7 @@
       "url": "/docs/examples/mne/ex_read_epochs/",
       "library": "mne",
       "libraries": [
-        "disp",
+        "viz_qt",
         "mne",
         "fiff",
         "base"
@@ -1633,7 +1630,7 @@
       "url": "/docs/examples/mne/ex_read_evoked/",
       "library": "mne",
       "libraries": [
-        "disp",
+        "viz_qt",
         "mne",
         "fiff",
         "base"
@@ -1681,10 +1678,10 @@
       "title": "Show a source space with its parcellation in 3D",
       "brief": "Read a forward solution and show its source space with the FreeSurfer parcellation in 3D",
       "thumbnail": "",
-      "url": "/docs/examples/disp3D/ex_read_fwd_disp_3D/",
-      "library": "disp3D",
+      "url": "/docs/examples/viz_qt/ex_read_fwd_disp_3D/",
+      "library": "viz_qt",
       "libraries": [
-        "disp3D",
+        "viz_qt",
         "fs",
         "mne",
         "base"
@@ -1708,7 +1705,7 @@
       "url": "/docs/examples/mne/ex_read_raw/",
       "library": "mne",
       "libraries": [
-        "disp",
+        "viz_qt",
         "mne",
         "fiff",
         "base"
@@ -1777,7 +1774,7 @@
       "library": "inv",
       "libraries": [
         "inv",
-        "disp3D",
+        "viz_qt",
         "fs",
         "mne",
         "fiff",
@@ -1798,10 +1795,10 @@
       "title": "Draw figures and plots without Qt and write them as SVG and PNG",
       "brief": "Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt",
       "thumbnail": "",
-      "url": "/docs/examples/scene/ex_scene/",
-      "library": "scene",
+      "url": "/docs/examples/viz/ex_scene/",
+      "library": "viz",
       "libraries": [
-        "scene"
+        "viz"
       ],
       "tasks": [
         "visualization"
@@ -1817,10 +1814,10 @@
       "title": "Run the trace view in an SDL3 window instead of Qt",
       "brief": "Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit",
       "thumbnail": "",
-      "url": "/docs/examples/scene/ex_scene_sdl/",
-      "library": "scene",
+      "url": "/docs/examples/viz/ex_scene_sdl/",
+      "library": "viz",
       "libraries": [
-        "scene"
+        "viz"
       ],
       "tasks": [
         "visualization",
@@ -1837,10 +1834,10 @@
       "title": "Multitaper spectra and cross-spectral density",
       "brief": "Multitaper spectra, power spectral density and cross-spectral density of random test signals",
       "thumbnail": "/img/examples/ex_spectral/01_hanning.png",
-      "url": "/docs/examples/disp/ex_spectral/",
-      "library": "disp",
+      "url": "/docs/examples/viz_qt/ex_spectral/",
+      "library": "viz_qt",
       "libraries": [
-        "disp",
+        "viz_qt",
         "mne",
         "math",
         "base"
@@ -1863,7 +1860,7 @@
       "library": "inv",
       "libraries": [
         "inv",
-        "disp3D",
+        "viz_qt",
         "fs",
         "mne",
         "fiff",
@@ -1902,10 +1899,10 @@
       "title": "Time-frequency plot of an evoked channel",
       "brief": "Spectrogram of one evoked channel shown as a time-frequency plot",
       "thumbnail": "/img/examples/ex_tf_plot/01_spectrogram.png",
-      "url": "/docs/examples/disp/ex_tf_plot/",
-      "library": "disp",
+      "url": "/docs/examples/viz_qt/ex_tf_plot/",
+      "library": "viz_qt",
       "libraries": [
-        "disp",
+        "viz_qt",
         "dsp",
         "fiff",
         "base"
@@ -2313,7 +2310,7 @@
           "start": false,
           "title": "Time-frequency plot of an evoked channel",
           "brief": "Spectrogram of one evoked channel shown as a time-frequency plot",
-          "url": "/docs/examples/disp/ex_tf_plot/"
+          "url": "/docs/examples/viz_qt/ex_tf_plot/"
         }
       ]
     },

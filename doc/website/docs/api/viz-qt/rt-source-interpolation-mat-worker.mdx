@@ -1,0 +1,165 @@
+---
+id: rt-source-interpolation-mat-worker
+title: "mne::viz::qt::RtSourceInterpolationMatWorker"
+sidebar_label: RtSourceInterpolationMatWorker
+sidebar_position: 72
+---
+
+# RtSourceInterpolationMatWorker
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/workers/rtsourceinterpolationmatworker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/workers/rtsourceinterpolationmatworker.h)
+
+`#include <mne/viz/backends/qt/rtsourceinterpolationmatworker.h>`
+
+```cpp
+class mne::viz::qt::RtSourceInterpolationMatWorker
+```
+
+[`RtSourceInterpolationMatWorker`](/docs/api/viz-qt/rt-source-interpolation-mat-worker) computes sparse source-to-vertex interpolation matrices in a background thread.
+
+This worker encapsulates the expensive `GeometryInfo::scdc()` (geodesic distance computation) and `Interpolation::createInterpolationMat()` calls that were previously performed either in [`StcLoadingWorker`](/docs/api/viz-qt/stc-loading-worker) (at load time only) or not recomputed at all when parameters changed at runtime.
+
+The worker for each hemisphere stores:
+
+- [`FsSurface`](/docs/api/fs/fs-surface) vertex positions and neighbor topology
+- Source vertex indices (from the STC file)
+- Cancel distance and interpolation function
+
+When any parameter changes, `computeInterpolationMatrix()` can be called (typically via a queued connection) to recompute the sparse interpolation matrix on the worker thread. When done, the result is emitted via newInterpolationMatrixAvailable().
+
+Background worker for computing source interpolation matrices.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- RtSourceInterpolationMatWorker
+```
+
+---
+
+## Public Methods
+
+### RtSourceInterpolationMatWorker(parent)
+
+Constructor.
+
+**Parameters:**
+
+- **parent** : *QObject **
+  Parent QObject.
+
+---
+
+### setInterpolationFunction(sInterpolationFunction)
+
+Set the interpolation function used for weight computation.
+
+Available functions: "linear", "gaussian", "square", "cubic" (default).
+
+**Parameters:**
+
+- **sInterpolationFunction** : *const std::string &*
+  Function name.
+
+---
+
+### setCancelDistance(dCancelDist)
+
+Set the cancel distance used in SCDC distance calculations.
+
+Distances larger than this are ignored (coefficients set to zero).
+
+**Parameters:**
+
+- **dCancelDist** : *double*
+  Cancel distance in meters (default: 0.05).
+
+---
+
+### setInterpolationInfoLeft(matVertices, vecNeighborVertices, vecSourceVertices)
+
+Set the surface and source geometry for the left hemisphere.
+
+**Parameters:**
+
+- **matVertices** : *const Eigen::MatrixX3f &*
+  Vertex positions (nVerts x 3).
+
+- **vecNeighborVertices** : *const std::vector&lt; Eigen::VectorXi &gt; &*
+  Per-vertex neighbor index lists.
+
+- **vecSourceVertices** : *const Eigen::VectorXi &*
+  Source vertex indices into the surface.
+
+---
+
+### setInterpolationInfoRight(matVertices, vecNeighborVertices, vecSourceVertices)
+
+Set the surface and source geometry for the right hemisphere.
+
+**Parameters:**
+
+- **matVertices** : *const Eigen::MatrixX3f &*
+  Vertex positions (nVerts x 3).
+
+- **vecNeighborVertices** : *const std::vector&lt; Eigen::VectorXi &gt; &*
+  Per-vertex neighbor index lists.
+
+- **vecSourceVertices** : *const Eigen::VectorXi &*
+  Source vertex indices into the surface.
+
+---
+
+### setVisualizationType(iVisType)
+
+Set the visualization type.
+
+When set to AnnotationBased, the worker emits annotation matrices instead of interpolation matrices.
+
+**Parameters:**
+
+- **iVisType** : *int*
+  `VisualizationType` enum value.
+
+---
+
+### setAnnotationInfoLeft(vecLabelIds, lLabels, vecVertNo)
+
+Set annotation info for the left hemisphere.
+
+Required for AnnotationBased visualization.
+
+**Parameters:**
+
+- **vecLabelIds** : *const Eigen::VectorXi &*
+  Per-vertex label IDs for the surface.
+
+- **lLabels** : *const std::vector&lt; [FsLabel](/docs/api/fs/fs-label) &gt; &*
+  List of FreeSurfer Labels.
+
+- **vecVertNo** : *const Eigen::VectorXi &*
+  Source-space vertex numbers.
+
+---
+
+### setAnnotationInfoRight(vecLabelIds, lLabels, vecVertNo)
+
+Set annotation info for the right hemisphere.
+
+**Parameters:**
+
+- **vecLabelIds** : *const Eigen::VectorXi &*
+  Per-vertex label IDs for the surface.
+
+- **lLabels** : *const std::vector&lt; [FsLabel](/docs/api/fs/fs-label) &gt; &*
+  List of FreeSurfer Labels.
+
+- **vecVertNo** : *const Eigen::VectorXi &*
+  Source-space vertex numbers.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

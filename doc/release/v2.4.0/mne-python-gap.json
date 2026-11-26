@@ -2217,7 +2217,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "implemented",
-      "mne_cpp": "mne::disp layout I/O",
+      "mne_cpp": "mne::viz::qt layout I/O",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""

@@ -1,0 +1,213 @@
+---
+id: channel-table
+title: "mne::viz::ChannelTable"
+sidebar_label: ChannelTable
+sidebar_position: 1
+---
+
+# ChannelTable
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/models/channel_table.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/models/channel_table.h)
+
+`#include <mne/viz/channel_table.h>`
+
+```cpp
+class mne::viz::ChannelTable
+```
+
+Channel rows and their presentation attributes for a channel information table.
+
+---
+
+## Public Methods
+
+### ChannelTable()
+
+Creates an empty table.
+
+---
+
+### set_info(info)
+
+Sets the measurement info; aliases start as the channel names and are mapped to layout names.
+
+**Parameters:**
+
+- **info** : *std::shared_ptr&lt; [FiffInfo](/docs/api/fiff/fiff-info) &gt;*
+  Measurement info, shared with the caller.
+
+---
+
+### info()
+
+**Returns:**
+
+- *const std::shared_ptr&lt; [FiffInfo](/docs/api/fiff/fiff-info) &gt; &* — The measurement info.
+
+---
+
+### set_layout(layout)
+
+Sets the 2-D sensor layout and maps the channels to it again.
+
+**Parameters:**
+
+- **layout** : *std::map&lt; std::string, std::array&lt; double, 2 &gt; &gt;*
+  Position of each layout channel name.
+
+---
+
+### clear()
+
+Drops the info, the layout and all names.
+
+---
+
+### row_count()
+
+**Returns:**
+
+- *int* — Number of channels.
+
+---
+
+### text(row, column)
+
+**Parameters:**
+
+- **row** : *int*
+  Row of a channel.
+
+- **column** : *Column*
+  A column.
+
+**Returns:**
+
+- *std::string* — The display text of the cell, empty for a row outside the table.
+
+---
+
+### meg_type(row)
+
+**Parameters:**
+
+- **row** : *int*
+  Row of a channel.
+
+**Returns:**
+
+- *std::string* — "MEG_grad", "MEG_mag" or "non_MEG".
+
+---
+
+### position(row)
+
+**Parameters:**
+
+- **row** : *int*
+  Row of a channel.
+
+**Returns:**
+
+- *std::array&lt; double, 2 &gt;* — Position of the channel's layout name, (0, 0) when the layout lacks it.
+
+---
+
+### digitizer_cm(row)
+
+**Parameters:**
+
+- **row** : *int*
+  Row of a channel.
+
+**Returns:**
+
+- *Eigen::Vector3f* — Coil origin in cm.
+
+---
+
+### is_bad(row)
+
+**Parameters:**
+
+- **row** : *int*
+  Row of a channel.
+
+**Returns:**
+
+- *bool* — Whether the channel is bad.
+
+---
+
+### aliases()
+
+**Returns:**
+
+- *const std::vector&lt; std::string &gt; &* — The alias names.
+
+---
+
+### mapped_names()
+
+**Returns:**
+
+- *const std::vector&lt; std::string &gt; &* — The layout names of all channels.
+
+---
+
+### index_of_original(name)
+
+**Parameters:**
+
+- **name** : *const std::string &*
+  Original channel name.
+
+**Returns:**
+
+- *int* — Row of the channel, or -1.
+
+---
+
+### index_of_mapped(name)
+
+**Parameters:**
+
+- **name** : *const std::string &*
+  Layout channel name.
+
+**Returns:**
+
+- *int* — Row of the channel, or -1.
+
+---
+
+### bad_channels()
+
+**Returns:**
+
+- *StringList* — The bad channels of the info.
+
+---
+
+## Static Methods
+
+### header(column)
+
+**Parameters:**
+
+- **column** : *Column*
+  A column.
+
+**Returns:**
+
+- *std::string* — The header text of `column`.
+
+---
+
+## Example
+
+No example of its own: View model of the channel information table; adapted by viz::qt::ChannelInfoModel and exercised by test_viewmodels, it has no standalone use without a view.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

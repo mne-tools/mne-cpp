@@ -1,0 +1,115 @@
+---
+id: trigger-detection-view
+title: "mne::viz::qt::TriggerDetectionView"
+sidebar_label: TriggerDetectionView
+sidebar_position: 63
+---
+
+# TriggerDetectionView
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/viewers/triggerdetectionview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/viewers/triggerdetectionview.h)
+
+`#include <mne/viz/backends/qt/triggerdetectionview.h>`
+
+```cpp
+class mne::viz::qt::TriggerDetectionView
+```
+
+Stim-channel chooser plus threshold spinbox for on-line trigger detection.
+
+Picks the stim channel to monitor, sets the rising-edge threshold and resets the detected-event list; detected events feed the averaging pipeline and the [`ChannelDataView`](/docs/api/viz-qt/channel-data-view) trigger overlay.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- TriggerDetectionView
+    click AbstractView href "../../viz-qt/abstract-view/"
+```
+
+---
+
+## Public Methods
+
+### TriggerDetectionView(sSettingsPath, parent, f)
+
+Constructs a [`TriggerDetectionView`](/docs/api/viz-qt/trigger-detection-view) which is a child of parent.
+
+**Parameters:**
+
+- **sSettingsPath** : *const QString &*
+  Settings path under which the widget persists its state (empty = no persistence).
+
+- **parent** : *QWidget **
+  parent of widget.
+
+- **f** : *Qt::WindowFlags*
+  Qt window flags passed to the QWidget constructor.
+
+---
+
+### ~TriggerDetectionView()
+
+Destroys the [`TriggerDetectionView`](/docs/api/viz-qt/trigger-detection-view).
+
+---
+
+### init(pFiffInfo)
+
+Init the view.
+
+**Parameters:**
+
+- **pFiffInfo** : *const std::shared_ptr&lt; [FiffInfo](/docs/api/fiff/fiff-info) &gt; &*
+  Measurement info whose STIM channels populate the trigger channel list; ignored if null.
+
+---
+
+### setNumberDetectedTriggersAndTypes(totalNumberDetections, mapDetectedTriggers)
+
+Set total number of detected triggers and trigger types.
+
+**Parameters:**
+
+- **totalNumberDetections** : *int*
+  The numger of detected triggers.
+
+- **mapDetectedTriggers** : *const std::map&lt; int, std::vector&lt; std::pair&lt; int, double &gt; &gt; &gt; &*
+  The currently detected triggers.
+
+---
+
+### getSelectedStimChannel()
+
+Gets currently selected STIM channel in GUI.
+
+**Returns:**
+
+- *std::string* — currently selected STIM channel.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -12,7 +12,7 @@ Restrict the forward solution to selected parcellation labels and localize dipol
 
 <ExampleFacts name="ex_roi_clustered_inverse_pwl_rap_music" />
 
-**Libraries:** [Inverse](../../api/inv/index.mdx), [3D Visualization](../../api/disp3-d/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Base](../../api/base/index.mdx)
+**Libraries:** [Inverse](../../api/inv/index.mdx), [Visualization (Qt)](../../api/viz-qt/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Base](../../api/base/index.mdx)
 
 ## Build and run
 
@@ -48,9 +48,9 @@ The documented classes this example uses most:
 | [`Log`](../../api/base/log.mdx) | Base |
 | [`InvSourceEstimate`](../../api/inv/inv-source-estimate.mdx) | Inverse |
 | [`MNEForwardSolution`](../../api/mne/mne-forward-solution.mdx) | MNE Core |
-| [`BrainView`](../../api/disp3-d/brain-view.mdx) | 3D Visualization |
+| [`BrainView`](../../api/viz-qt/brain-view.mdx) | Visualization (Qt) |
 | [`FsLabel`](../../api/fs/fs-label.mdx) | FreeSurfer |
-| [`BrainTreeModel`](../../api/disp3-d/brain-tree-model.mdx) | 3D Visualization |
+| [`BrainTreeModel`](../../api/viz-qt/brain-tree-model.mdx) | Visualization (Qt) |
 | [`FiffRawData`](../../api/fiff/fiff-raw-data.mdx) | FIFF I/O |
 | [`FsAnnotation`](../../api/fs/fs-annotation.mdx) | FreeSurfer |
 
@@ -86,8 +86,8 @@ The documented classes this example uses most:
 #include <mne/mne/mne.h>
 #include <mne/inv/inv_source_estimate.h>
 #include <mne/inv/rap_music/inv_pwl_rap_music.h>
-#include <mne/disp3D/view/brainview.h>
-#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
 #include <mne/base/log.h>
 
 //=============================================================================================================
@@ -110,7 +110,7 @@ The documented classes this example uses most:
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // MAIN

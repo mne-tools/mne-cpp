@@ -1,0 +1,40 @@
+---
+id: ray-hit
+title: "mne::viz::qt::RayHit"
+sidebar_label: RayHit
+sidebar_position: 99
+---
+
+# RayHit
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/input/raypicker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/input/raypicker.h)
+
+`#include <mne/viz/backends/qt/raypicker.h>`
+
+```cpp
+struct mne::viz::qt::RayHit
+```
+
+Result of a ray–mesh intersection test containing the hit point, triangle index, and distance.
+
+Describes the result of a ray-pick operation.
+
+---
+
+## Public Methods
+
+### displayLabel()
+
+Build a human-readable display label for the hit object.
+
+Includes annotation region, sensor name, BEM compartment, etc.
+
+**Returns:**
+
+- *std::string* — Display label string, empty if no hit.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

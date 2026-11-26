@@ -1,0 +1,554 @@
+---
+id: channel-data-view
+title: "mne::viz::qt::ChannelDataView"
+sidebar_label: ChannelDataView
+sidebar_position: 12
+---
+
+# ChannelDataView
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/viewers/channeldataview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/viewers/channeldataview.h)
+
+`#include <mne/viz/backends/qt/channeldataview.h>`
+
+```cpp
+class mne::viz::qt::ChannelDataView
+```
+
+Composite real-time multi-channel raw scroller assembling label panel, table view, time ruler and scrollbars.
+
+Acts as the user-facing host of the [`ChannelDataModel`](/docs/api/viz-qt/channel-data-model) and [`RtFiffRawViewDelegate`](/docs/api/viz-qt/rt-fiff-raw-view-delegate) pair, exposing playback / zoom / channel-selection signals consumed by the surrounding plugin GUI.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- ChannelDataView
+    click AbstractView href "../../viz-qt/abstract-view/"
+```
+
+---
+
+## Public Methods
+
+### ChannelDataView(sSettingsPath, parent, f)
+
+Constructs a [`ChannelDataView`](/docs/api/viz-qt/channel-data-view).
+
+**Parameters:**
+
+- **sSettingsPath** : *const QString &*
+  QSettings prefix for persistent GUI settings.
+
+- **parent** : *QWidget **
+  Parent widget.
+
+- **f** : *Qt::WindowFlags*
+  Window flags.
+
+---
+
+### ~ChannelDataView()
+
+---
+
+### init(pInfo)
+
+Initialise the view from a [`FiffInfo`](/docs/api/fiff/fiff-info) (channel names, types, sampling rate).
+
+**Parameters:**
+
+- **pInfo** : *const std::shared_ptr&lt; [FiffInfo](/docs/api/fiff/fiff-info) &gt; &*
+  Shared pointer to [`FiffInfo`](/docs/api/fiff/fiff-info).
+
+---
+
+### setData(matData, firstSample)
+
+Replace all buffered data.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Channels × samples matrix.
+
+- **firstSample** : *int*
+  Absolute sample index of column 0.
+
+---
+
+### addData(matData)
+
+Append new samples (real-time streaming use-case).
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Channels × new-samples matrix.
+
+---
+
+### scrollToSample(sample, animate)
+
+Scroll to the given absolute sample index.
+
+**Parameters:**
+
+- **sample** : *int*
+  Target left-edge sample.
+
+- **animate** : *bool*
+  If true, animate with a smooth cubic ease-out.
+
+---
+
+### setWindowSize(seconds)
+
+Set the visible time window (in seconds).
+
+This adjusts samplesPerPixel to fit the requested duration.
+
+**Parameters:**
+
+- **seconds** : *float*
+  Duration of the visible window.
+
+---
+
+### windowSize()
+
+Get the current visible time window in seconds.
+
+**Returns:**
+
+- *float* — Visible window duration in seconds.
+
+---
+
+### setZoom(factor)
+
+Set the zoom factor (&gt; 1 = zoom in, &lt; 1 = zoom out relative to default).
+
+**Parameters:**
+
+- **factor** : *double*
+  Zoom multiplier applied to the default samples-per-pixel.
+
+---
+
+### zoom()
+
+Return the current zoom factor.
+
+**Returns:**
+
+- *double* — Zoom multiplier relative to the default samples-per-pixel (at least 0.001).
+
+---
+
+### setBackgroundColor(color)
+
+Set the background colour of the rendering surface.
+
+**Parameters:**
+
+- **color** : *const QColor &*
+  New background colour.
+
+---
+
+### backgroundColor()
+
+---
+
+### setSignalColor(color)
+
+Set the default signal line colour (used for channel types without a type-specific colour).
+
+**Parameters:**
+
+- **color** : *const QColor &*
+  New signal colour.
+
+---
+
+### signalColor()
+
+---
+
+### setScalingMap(scaleMap)
+
+Set the per-channel-type amplitude scale map.
+
+Keys should be FIFF channel kind constants (FIFFV_MEG_CH, FIFFV_EEG_CH, …).
+
+**Parameters:**
+
+- **scaleMap** : *const std::map&lt; int, float &gt; &*
+  Map from FIFF kind to physical amplitude (e.g. 1.2e-12 for MEG).
+
+---
+
+### scalingMap()
+
+---
+
+### hideBadChannels(hide)
+
+Show or hide channels marked bad.
+
+**Parameters:**
+
+- **hide** : *bool*
+  If true, bad channels are collapsed to zero height.
+
+---
+
+### badChannelsHidden()
+
+---
+
+### setChannelFilter(names)
+
+Restrict the view to a named subset of channels.
+
+Channels not in `names` are hidden immediately. Pass an empty list to restore all channels.
+
+**Parameters:**
+
+- **names** : *const std::vector&lt; std::string &gt; &*
+  List of channel names to show (case-sensitive).
+
+---
+
+### setRemoveDC(dc)
+
+Enable or disable DC (mean) removal applied at render time.
+
+Takes effect immediately — the view redraws with the current data.
+
+**Parameters:**
+
+- **dc** : *bool*
+  true = subtract per-channel mean from each rendered window.
+
+---
+
+### setDetrendMode(mode)
+
+Set the detrending mode for on-the-fly trend removal during rendering.
+
+None = raw, Mean = DC offset, Linear = least-squares linear fit.
+
+**Parameters:**
+
+- **mode** : *DetrendMode*
+  The `DetrendMode` to use.
+
+---
+
+### detrendMode()
+
+---
+
+### setFileBounds(first, last)
+
+Set the absolute sample indices of the file's first and last samples.
+
+The scrollbar range and mouse-pan clamp use these to prevent scrolling outside the actual file boundaries regardless of the ring-buffer state.
+
+**Parameters:**
+
+- **first** : *int*
+  Absolute sample index of the file's first sample.
+
+- **last** : *int*
+  Absolute sample index of the file's last sample.
+
+---
+
+### setEvents(events)
+
+Set the list of event / stimulus markers to display as coloured vertical lines.
+
+Pass an empty vector to clear all markers.
+
+**Parameters:**
+
+- **events** : *const std::vector&lt; [ChannelRhiView](/docs/api/viz-qt/channel-rhi-view)::EventMarker &gt; &*
+  List of EventMarker objects.
+
+---
+
+### setEpochMarkers(triggerSamples)
+
+---
+
+### setEpochMarkersVisible(visible)
+
+---
+
+### epochMarkersVisible()
+
+---
+
+### setClippingVisible(visible)
+
+---
+
+### clippingVisible()
+
+---
+
+### setZScoreMode(enabled)
+
+---
+
+### zScoreMode()
+
+---
+
+### setReferenceMarkers(markers)
+
+Set the list of persistent sample/reference markers shown in the time ruler.
+
+**Parameters:**
+
+- **markers** : *const std::vector&lt; [TimeRulerReferenceMark](/docs/api/viz-qt/time-ruler-reference-mark) &gt; &*
+  Reference markers to display in the ruler.
+
+---
+
+### setAnnotations(annotations)
+
+Set the list of annotation spans to display as translucent overlays.
+
+**Parameters:**
+
+- **annotations** : *const std::vector&lt; [ChannelRhiView](/docs/api/viz-qt/channel-rhi-view)::AnnotationSpan &gt; &*
+  List of AnnotationSpan objects.
+
+---
+
+### setAnnotationSelectionEnabled(enabled)
+
+Enable or disable annotation span selection in the raw browser.
+
+**Parameters:**
+
+- **enabled** : *bool*
+  True to allow selecting annotation spans with the mouse.
+
+---
+
+### setEventsVisible(visible)
+
+---
+
+### eventsVisible()
+
+---
+
+### setAnnotationsVisible(visible)
+
+---
+
+### annotationsVisible()
+
+---
+
+### setOverviewBarVisible(visible)
+
+---
+
+### overviewBarVisible()
+
+---
+
+### setScrollSpeedFactor(factor)
+
+---
+
+### scrollSpeedFactor()
+
+---
+
+### sortChannelsByType()
+
+---
+
+### resetChannelOrder()
+
+---
+
+### setCrosshairEnabled(enabled)
+
+Enable or disable the crosshair cursor with coordinate readout.
+
+**Parameters:**
+
+- **enabled** : *bool*
+  True to show the crosshair and its time/amplitude readout.
+
+---
+
+### crosshairEnabled()
+
+---
+
+### renderToImage(size)
+
+Render the channel traces as currently shown into an image, without the GPU (see `ChannelRhiView::renderToImage()`).
+
+Usable offscreen, e.g. for reports.
+
+**Parameters:**
+
+- **size** : *const QSize &*
+  Output size in pixels; an invalid size (default) uses the plot size.
+
+**Returns:**
+
+- *QImage* — The rendered image, or a null image if the size is empty.
+
+---
+
+### setScalebarsVisible(visible)
+
+Show or hide per-channel-type amplitude scalebars.
+
+**Parameters:**
+
+- **visible** : *bool*
+  True to draw the scalebars.
+
+---
+
+### scalebarsVisible()
+
+---
+
+### setButterflyMode(enabled)
+
+Toggle butterfly mode (overlay all same-type channels).
+
+**Parameters:**
+
+- **enabled** : *bool*
+  True to overlay channels of the same type in one lane.
+
+---
+
+### butterflyMode()
+
+---
+
+### toggleTimeFormat()
+
+Toggle time format between float seconds and HH:MM:SS clock time.
+
+---
+
+### setClockTimeFormat(useClock)
+
+Set clock time format on the ruler.
+
+**Parameters:**
+
+- **useClock** : *bool*
+  True for HH:MM:SS clock time, false for float seconds.
+
+---
+
+### clockTimeFormat()
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+### firstVisibleSample()
+
+Returns the first currently visible sample.
+
+**Returns:**
+
+- *int* — Absolute index of the first visible sample, or 0 if no render view exists.
+
+---
+
+### visibleSampleCount()
+
+---
+
+### signalViewportRect()
+
+Returns the geometry of the actual QRHI signal viewport in ChannelDataView-local coordinates.
+
+**Returns:**
+
+- *QRect* — Viewport rectangle, or a null QRect if no render view exists.
+
+---
+
+### sampleToViewportX(sample)
+
+Maps an absolute sample index to an x coordinate inside the signal viewport.
+
+**Parameters:**
+
+- **sample** : *int*
+  Absolute sample index.
+
+**Returns:**
+
+- *int* — x position in ChannelDataView-local coordinates.
+
+---
+
+### viewportXToSample(x)
+
+Maps a ChannelDataView-local x coordinate inside the signal viewport to an absolute sample index.
+
+**Parameters:**
+
+- **x** : *int*
+  ChannelDataView-local x coordinate.
+
+**Returns:**
+
+- *int* — Absolute sample index at the requested x position.
+
+---
+
+### model()
+
+Returns the underlying data model (non-owning pointer).
+
+Use for advanced configuration such as setMaxStoredSamples().
+
+**Returns:**
+
+- *[ChannelDataModel](/docs/api/viz-qt/channel-data-model) ** — Non-owning pointer to the [`ChannelDataModel`](/docs/api/viz-qt/channel-data-model).
+
+---
+
+## Authors of this file
+
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

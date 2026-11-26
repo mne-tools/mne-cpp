@@ -1,0 +1,43 @@
+---
+id: key-event
+title: "mne::viz::KeyEvent"
+sidebar_label: KeyEvent
+sidebar_position: 48
+---
+
+# KeyEvent
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/views/input_event.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/views/input_event.h)
+
+`#include <mne/viz/input_event.h>`
+
+```cpp
+struct mne::viz::KeyEvent
+```
+
+A key press.
+
+---
+
+## Public Methods
+
+### is_character(c)
+
+**Parameters:**
+
+- **c** : *char32_t*
+  A letter or another printable character.
+
+**Returns:**
+
+- *bool* — Whether this is the key of `c`, ignoring the case of letters.
+
+---
+
+## Example
+
+No example of its own: Toolkit-neutral input value type passed to BrainViewInteraction::handle_key(); hosts convert their native events to it.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

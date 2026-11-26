@@ -1,0 +1,30 @@
+---
+id: selection-item
+title: "mne::viz::qt::SelectionItem"
+sidebar_label: SelectionItem
+sidebar_position: 55
+---
+
+# SelectionItem
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/viewers/helpers/selectionitem.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/viewers/helpers/selectionitem.h)
+
+`#include <mne/viz/backends/qt/selectionitem.h>`
+
+```cpp
+class mne::viz::qt::SelectionItem
+```
+
+The channels picked in a sensor layout: names, numbers, kinds, units and layout positions, one entry per channel in each vector.
+
+[`ChannelSelectionView`](/docs/api/viz-qt/channel-selection-view) emits it when the selection changes; [`AverageLayoutView`](/docs/api/viz-qt/average-layout-view) and the analysis plugins show only these channels.
+
+---
+
+## Authors of this file
+
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
+- Matti Hamalainen &lt;msh@nmr.mgh.harvard.edu&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;

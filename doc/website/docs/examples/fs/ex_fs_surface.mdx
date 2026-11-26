@@ -12,7 +12,7 @@ Load the pial, inflated, original and white FreeSurfer surfaces of a subject and
 
 <ExampleFacts name="ex_fs_surface" />
 
-**Libraries:** [3D Visualization](../../api/disp3-d/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [Base](../../api/base/index.mdx)
+**Libraries:** [Visualization (Qt)](../../api/viz-qt/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [Base](../../api/base/index.mdx)
 
 ## Build and run
 
@@ -38,8 +38,8 @@ The documented classes this example uses most:
 | Class | Library |
 |---|---|
 | [`FsSurfaceSet`](../../api/fs/fs-surface-set.mdx) | FreeSurfer |
-| [`BrainTreeModel`](../../api/disp3-d/brain-tree-model.mdx) | 3D Visualization |
-| [`BrainView`](../../api/disp3-d/brain-view.mdx) | 3D Visualization |
+| [`BrainTreeModel`](../../api/viz-qt/brain-tree-model.mdx) | Visualization (Qt) |
+| [`BrainView`](../../api/viz-qt/brain-view.mdx) | Visualization (Qt) |
 | [`FsSurface`](../../api/fs/fs-surface.mdx) | FreeSurfer |
 
 ## Used in the API reference
@@ -69,8 +69,8 @@ The documented classes this example uses most:
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/disp3D/view/brainview.h>
-#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
 
 #include <mne/fs/fs_surfaceset.h>
 
@@ -88,7 +88,7 @@ The documented classes this example uses most:
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // MAIN
@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
 
 ## Related examples
 
-- [Coregister digitizer points to the head surface](../disp3D/ex_coreg.mdx) — Coregistration workflow: fit digitizer points to the head surface with ICP.
+- [Coregister digitizer points to the head surface](../viz_qt/ex_coreg.mdx) — Coregistration workflow: fit digitizer points to the head surface with ICP.
 - [Read FreeSurfer surfaces, labels and atlases](../fs/ex_fs.mdx) — FreeSurfer library: surfaces, curvature, parcellations, labels and an atlas volume.
 - [BEM surfaces, source spaces and epochs](../fs/ex_mne_api.mdx) — MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 

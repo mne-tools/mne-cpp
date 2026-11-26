@@ -12,7 +12,7 @@ Average epochs of a raw recording and compute an MNE, dSPM or sLORETA source est
 
 <ExampleFacts name="ex_inverse_mne_raw" />
 
-**Libraries:** [Inverse](../../api/inv/index.mdx), [3D Visualization](../../api/disp3-d/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Math](../../api/math/index.mdx), [Base](../../api/base/index.mdx)
+**Libraries:** [Inverse](../../api/inv/index.mdx), [Visualization (Qt)](../../api/viz-qt/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Math](../../api/math/index.mdx), [Base](../../api/base/index.mdx)
 
 ## Background
 
@@ -58,10 +58,10 @@ The documented classes this example uses most:
 |---|---|
 | [`Log`](../../api/base/log.mdx) | Base |
 | [`MNEEpochData`](../../api/mne/mne-epoch-data.mdx) | MNE Core |
-| [`BrainView`](../../api/disp3-d/brain-view.mdx) | 3D Visualization |
+| [`BrainView`](../../api/viz-qt/brain-view.mdx) | Visualization (Qt) |
 | [`FiffEvents`](../../api/fiff/fiff-events.mdx) | FIFF I/O |
 | [`InvSourceEstimate`](../../api/inv/inv-source-estimate.mdx) | Inverse |
-| [`BrainTreeModel`](../../api/disp3-d/brain-tree-model.mdx) | 3D Visualization |
+| [`BrainTreeModel`](../../api/viz-qt/brain-tree-model.mdx) | Visualization (Qt) |
 | [`Error`](../../api/base/error.mdx) | Base |
 | [`FiffCov`](../../api/fiff/fiff-cov.mdx) | FIFF I/O |
 
@@ -101,8 +101,8 @@ The documented classes this example uses most:
 #include <mne/inv/inv_source_estimate.h>
 #include <time.h>
 #include <mne/inv/minimum_norm/inv_minimum_norm.h>
-#include <mne/disp3D/view/brainview.h>
-#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/viz/backends/qt/3d/view/brainview.h>
+#include <mne/viz/backends/qt/3d/model/braintreemodel.h>
 #include <mne/math/linalg.h>
 #include <mne/base/log.h>
 
@@ -130,7 +130,7 @@ The documented classes this example uses most:
 
 using namespace mne;
 using namespace Eigen;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // MAIN

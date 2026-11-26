@@ -1,0 +1,102 @@
+---
+id: brush
+title: "mne::viz::Brush"
+sidebar_label: Brush
+sidebar_position: 18
+---
+
+# Brush
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/figures/style.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/figures/style.h)
+
+`#include <mne/viz/style.h>`
+
+```cpp
+struct mne::viz::Brush
+```
+
+The fill of shapes: nothing, one colour, or a linear gradient.
+
+---
+
+## Public Methods
+
+### visible()
+
+**Returns:**
+
+- *bool* — Whether the brush fills anything.
+
+---
+
+### color_at(t)
+
+**Parameters:**
+
+- **t** : *double*
+  Position along a gradient, 0 to 1 (clamped).
+
+**Returns:**
+
+- *[Color](/docs/api/viz/color)* — The gradient colour at `t`, interpolated linearly between the stops.
+
+---
+
+## Static Methods
+
+### solid(color)
+
+**Parameters:**
+
+- **color** : *[Color](/docs/api/viz/color)*
+  Fill colour.
+
+**Returns:**
+
+- *[Brush](/docs/api/viz/brush)* — A solid fill with `color`.
+
+---
+
+### linear_gradient(start, end, stops)
+
+**Parameters:**
+
+- **start** : *[Point](/docs/api/viz/point)*
+  Start point, in the coordinates of the shape.
+
+- **end** : *[Point](/docs/api/viz/point)*
+  End point, in the coordinates of the shape.
+
+- **stops** : *std::vector&lt; [GradientStop](/docs/api/viz/gradient-stop) &gt;*
+  Colours by increasing position.
+
+**Returns:**
+
+- *[Brush](/docs/api/viz/brush)* — A linear gradient from `start` to `end`.
+
+---
+
+## Example
+
+No example of its own: Fill of shapes; a value type set on Canvas, used in the ex_scene snippet through Brush::solid().
+
+## Used in examples
+
+### [ex_scene](../../examples/viz/ex_scene.mdx)
+
+Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+
+````cpp title="src/examples/ex_scene/main.cpp, line 85"
+Canvas canvas(200, 120, Color::white());
+canvas.set_antialiasing(true);
+canvas.set_pen(Pen{{50, 100, 150}, 1.5});
+canvas.set_brush(Brush::solid({70, 130, 180}));
+canvas.draw_rounded_rect({20, 20, 80, 50}, 6, 6);
+canvas.set_pen(Color::black());
+canvas.draw_text(Rect{0, 80, 200, 30}, Align::Center, "Hello scene");
+const DisplayList figure = canvas.take();
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

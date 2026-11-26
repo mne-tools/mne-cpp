@@ -1,0 +1,211 @@
+---
+id: sensor-layout
+title: "mne::viz::SensorLayout"
+sidebar_label: SensorLayout
+sidebar_position: 35
+---
+
+# SensorLayout
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/figures/sensor_layout.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/figures/sensor_layout.h)
+
+`#include <mne/viz/sensor_layout.h>`
+
+```cpp
+class mne::viz::SensorLayout
+```
+
+Sensors of a 2-D layout (an .lout file) as labelled dots, with their selection.
+
+A sensor at layout position (x, y) sits at (10 x, -10 y) in scene coordinates, y pointing down. Hidden sensors are neither drawn nor hit; sensors that cannot be selected are drawn faint. Clicks and rubber bands change the selection as in a QGraphicsScene: without `extend` they replace it, with `extend` (Ctrl held) a click toggles one sensor and a band adds to the selection.
+
+```cpp title="src/examples/ex_scene/main.cpp"
+// Three sensors of an .lout layout; the click selects the middle one, as in the channel selection view
+SensorLayout sensors;
+sensors.set_sensors({{"MEG 0111", {0.0, 0.0}}, {"MEG 0121", {6.0, 0.0}}, {"MEG 0131", {12.0, 0.0}}});
+sensors.click(sensors.scene_position(1), false);
+Canvas sensorCanvas(240, 100, Color::white());
+sensorCanvas.translate(40, 60);
+sensors.draw(sensorCanvas, metrics, Font{"", 0.0, 13.0});
+```
+
+---
+
+## Public Methods
+
+### set_sensors(sensors)
+
+Sets the sensors, drawn in this order, so later ones lie on top.
+
+**Parameters:**
+
+- **sensors** : *std::vector&lt; Sensor &gt;*
+  The sensors.
+
+---
+
+### sensors()
+
+**Returns:**
+
+- *const std::vector&lt; Sensor &gt; &* — The sensors.
+
+---
+
+### sensors()
+
+**Returns:**
+
+- *std::vector&lt; Sensor &gt; &* — The sensors, to change their state.
+
+---
+
+### scene_position(index)
+
+**Parameters:**
+
+- **index** : *std::size_t*
+  Index of a sensor.
+
+**Returns:**
+
+- *[Point](/docs/api/viz/point)* — The centre of its dot in scene coordinates.
+
+---
+
+### sensor_rect(index)
+
+**Parameters:**
+
+- **index** : *std::size_t*
+  Index of a sensor.
+
+**Returns:**
+
+- *[Rect](/docs/api/viz/rect)* — The area of its dot and name in scene coordinates, which clicks and bands hit.
+
+---
+
+### bounds()
+
+**Returns:**
+
+- *[Rect](/docs/api/viz/rect)* — The area of the visible sensors in scene coordinates; empty without any.
+
+---
+
+### sensor_at(point)
+
+**Parameters:**
+
+- **point** : *[Point](/docs/api/viz/point)*
+  [`Point`](/docs/api/viz/point) in scene coordinates.
+
+**Returns:**
+
+- *int* — The index of the topmost visible, selectable sensor at `point`, or -1.
+
+---
+
+### click(point, extend)
+
+Changes the selection as a click at `point` does.
+
+**Parameters:**
+
+- **point** : *[Point](/docs/api/viz/point)*
+  [`Point`](/docs/api/viz/point) in scene coordinates.
+
+- **extend** : *bool*
+  Toggle the sensor there instead of selecting only it (Ctrl held).
+
+**Returns:**
+
+- *bool* — Whether the selection changed.
+
+---
+
+### select_in(band, extend)
+
+Selects the visible, selectable sensors whose area intersects `band`.
+
+**Parameters:**
+
+- **band** : *const [Rect](/docs/api/viz/rect) &*
+  Rubber band in scene coordinates.
+
+- **extend** : *bool*
+  Add to the selection instead of replacing it (Ctrl held).
+
+**Returns:**
+
+- *bool* — Whether the selection changed.
+
+---
+
+### select_names(names)
+
+Selects the sensors named in `names` and deselects all others.
+
+**Parameters:**
+
+- **names** : *const std::vector&lt; std::string &gt; &*
+  Names of the sensors to select.
+
+**Returns:**
+
+- *bool* — Whether the selection changed.
+
+---
+
+### selected()
+
+**Returns:**
+
+- *std::vector&lt; std::size_t &gt;* — The indices of the selected sensors, in order.
+
+---
+
+### draw(canvas, metrics, font)
+
+Draws the sensors in scene coordinates with the current transform of `canvas`.
+
+**Parameters:**
+
+- **canvas** : *[Canvas](/docs/api/viz/canvas) &*
+  [`Canvas`](/docs/api/viz/canvas) to draw on.
+
+- **metrics** : *const [TextMetrics](/docs/api/viz/text-metrics) &*
+  Text metrics of the backend, to centre the names.
+
+- **font** : *const [Font](/docs/api/viz/font) &*
+  [`Font`](/docs/api/viz/font) of the names.
+
+---
+
+## Example
+
+- Start here: [ex_scene](../../examples/viz/ex_scene.mdx) — Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+- Full source: [`src/examples/ex_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_scene/main.cpp)
+- Build target: `ex_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_scene](../../examples/viz/ex_scene.mdx)
+
+Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+
+````cpp title="src/examples/ex_scene/main.cpp, line 132"
+// Three sensors of an .lout layout; the click selects the middle one, as in the channel selection view
+SensorLayout sensors;
+sensors.set_sensors({{"MEG 0111", {0.0, 0.0}}, {"MEG 0121", {6.0, 0.0}}, {"MEG 0131", {12.0, 0.0}}});
+sensors.click(sensors.scene_position(1), false);
+Canvas sensorCanvas(240, 100, Color::white());
+sensorCanvas.translate(40, 60);
+sensors.draw(sensorCanvas, metrics, Font{"", 0.0, 13.0});
+ok &= expect(sensors.selected() == std::vector<std::size_t>{1}, "a click selects the sensor under it");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

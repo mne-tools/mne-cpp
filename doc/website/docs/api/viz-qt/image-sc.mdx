@@ -1,0 +1,224 @@
+---
+id: image-sc
+title: "mne::viz::qt::ImageSc"
+sidebar_label: ImageSc
+sidebar_position: 35
+---
+
+# ImageSc
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/plots/imagesc.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/plots/imagesc.h)
+
+`#include <mne/viz/backends/qt/imagesc.h>`
+
+```cpp
+class mne::viz::qt::ImageSc
+```
+
+False-colour heat-map QWidget visualising an Eigen matrix with selectable colour map.
+
+Accepts `MatrixXd`, `MatrixXf` and `MatrixXi` inputs and draws them as an [`ImagePlot`](/docs/api/viz/image-plot), which renders without Qt as well.
+
+```cpp title="src/examples/ex_disp_plots/main.cpp"
+MatrixXd ramp(4, 8);
+for (int r = 0; r < ramp.rows(); ++r) {
+    for (int c = 0; c < ramp.cols(); ++c) {
+        ramp(r, c) = c; // rises left to right
+    }
+}
+ImageSc image(ramp); // min..max mapped to 0..1, "Hot" by default
+image.setColorMap("Viridis");
+image.setTitle("ramp");
+image.setExtent(0.0, 0.7, 4.0, 1.0); // columns at 0 .. 0.7 s, rows 1 .. 4 from the top
+image.setXLabel("Time [s]");
+image.setYLabel("Trial");
+image.setColorbarLabel("Value");
+```
+
+### Inheritance
+
+```mermaid
+classDiagram
+    Graph <|-- ImageSc
+    click Graph href "../../viz-qt/graph/"
+    ImageSc <|-- TFplot
+    click TFplot href "../../viz-qt/t-fplot/"
+```
+
+---
+
+## Public Methods
+
+### ImageSc(parent)
+
+Creates the scaled image view.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  Parent QObject (optional).
+
+---
+
+### ImageSc(p_dMat, parent)
+
+Creates the scaled image view with a given double matrix.
+
+**Parameters:**
+
+- **p_dMat** : *Eigen::MatrixXd &*
+  The double data matrix.
+
+- **parent** : *QWidget **
+  Parent QObject (optional).
+
+---
+
+### ImageSc(p_fMat, parent)
+
+Creates the scaled image view with a given float matrix.
+
+**Parameters:**
+
+- **p_fMat** : *Eigen::MatrixXf &*
+  The float data matrix.
+
+- **parent** : *QWidget **
+  Parent QObject (optional).
+
+---
+
+### ImageSc(p_iMat, parent)
+
+Creates the scaled image view with a given integer matrix.
+
+**Parameters:**
+
+- **p_iMat** : *Eigen::MatrixXi &*
+  The integer data matrix.
+
+- **parent** : *QWidget **
+  Parent QObject (optional).
+
+---
+
+### ~ImageSc()
+
+Destructs the [`ImageSc`](/docs/api/viz-qt/image-sc) object.
+
+---
+
+### init()
+
+Initializes the [`ImageSc`](/docs/api/viz-qt/image-sc) object.
+
+---
+
+### updateData(p_dMat)
+
+Updates the scaled image view with a given double matrix.
+
+**Parameters:**
+
+- **p_dMat** : *Eigen::MatrixXd &*
+  The double data matrix.
+
+---
+
+### updateData(p_fMat)
+
+Updates the scaled image view with a given float matrix.
+
+**Parameters:**
+
+- **p_fMat** : *Eigen::MatrixXf &*
+  The float data matrix.
+
+---
+
+### updateData(p_iMat)
+
+Updates the scaled image view with a given integer matrix.
+
+**Parameters:**
+
+- **p_iMat** : *Eigen::MatrixXi &*
+  The integer data matrix.
+
+---
+
+### setColorMap(p_sColorMap)
+
+Sets the color map to use, e.g.
+
+"Jet", "Hot", "Bone"
+
+**Parameters:**
+
+- **p_sColorMap** : *const QString &*
+  The colormap to use.
+
+---
+
+### setExtent(left, right, bottom, top)
+
+Labels the axes in data units instead of column and row indices, as matplotlib's `imshow`(extent=...).
+
+**Parameters:**
+
+- **left** : *double*
+  X value of the first column.
+
+- **right** : *double*
+  X value of the last column.
+
+- **bottom** : *double*
+  Y value of the last row, drawn at the bottom.
+
+- **top** : *double*
+  Y value of the first row, drawn at the top.
+
+---
+
+### setColorRange(min, max)
+
+Maps `min` and `max` to the ends of the colour map instead of the data minimum and maximum; values outside are clipped.
+
+A range symmetric around zero centres diverging maps such as "RedBlue".
+
+**Parameters:**
+
+- **min** : *double*
+  Value drawn with the low end of the colour map.
+
+- **max** : *double*
+  Value drawn with the high end of the colour map.
+
+---
+
+### setColorbarLabel(label)
+
+Names the quantity the colour bar shows, e.g.
+
+"Power (normalized)".
+
+**Parameters:**
+
+- **label** : *const QString &*
+  The colour bar label; empty hides it.
+
+---
+
+## Example
+
+- Start here: [ex_disp_plots](../../examples/viz_qt/ex_disp_plots.mdx) — Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+- Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
+- Build target: `ex_disp_plots` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
+- Matti Hamalainen &lt;msh@nmr.mgh.harvard.edu&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;

@@ -38,8 +38,6 @@ Public API units (exported classes, registered function namespaces and header-on
 | `com` | 5 | 5 | 5 | 5 | 5 | 5 | 5 |
 | `connectivity` | 20 | 20 | 6 | 19 | 19 | 17 | 20 |
 | `decoding` | 5 | 5 | 4 | 5 | 5 | 5 | 5 |
-| `disp` | 75 | 75 | 17 | 11 | 11 | 11 | 11 |
-| `disp3D` | 53 | 53 | 40 | 18 | 18 | 16 | 20 |
 | `dsp` | 80 | 80 | 35 | 78 | 78 | 78 | 78 |
 | `fiff` | 39 | 39 | 13 | 39 | 39 | 37 | 39 |
 | `fs` | 8 | 8 | 4 | 8 | 8 | 8 | 8 |
@@ -54,9 +52,8 @@ Public API units (exported classes, registered function namespaces and header-on
 | `mri` | 8 | 8 | 0 | 8 | 8 | 8 | 8 |
 | `pybridge` | 4 | 4 | 4 | 4 | 4 | 4 | 4 |
 | `report` | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
-| `scene` | 85 | 85 | 85 | 17 | 17 | 10 | 28 |
 | `sts` | 12 | 12 | 8 | 12 | 12 | 12 | 12 |
-| `viewmodels` | 3 | 3 | 3 | 0 | 0 | 0 | 0 |
+| `viz` | 216 | 216 | 145 | 46 | 46 | 37 | 59 |
 
 ## Registry drift
 

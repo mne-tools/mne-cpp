@@ -10,7 +10,7 @@
       "url": "https://www.qt.io",
       "linkage": "dynamic or static",
       "shipped": true,
-      "used_by": "disp, disp3D, applications, CLI tools; not the acquisition, processing or file I/O libraries",
+      "used_by": "mne_viz_qt (the Qt backend of mne_viz), applications, CLI tools; not the acquisition, processing or file I/O libraries",
       "purpose": "Windows, widgets, painting, GPU rendering through QRhi, the applications' event loop.",
       "risk": "Wrong, stale or frozen display; a crashed application. Acquired data, processing results and files do not pass through Qt.",
       "mitigation": "The libraries that acquire, process and store data build and pass their tests without Qt (Qt-free SDK job on three platforms). Qt use is ratcheted per library (audit_qt_usage.py) and per module (audit_qt_modules.py). Display tests run offscreen in CI.",

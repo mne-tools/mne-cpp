@@ -1,0 +1,113 @@
+---
+id: settings-panel
+title: "mne::viz::qt::SettingsPanel"
+sidebar_label: SettingsPanel
+sidebar_position: 125
+---
+
+# SettingsPanel
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/viewers/settingspanel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/viewers/settingspanel.h)
+
+`#include <mne/viz/backends/qt/settingspanel.h>`
+
+```cpp
+class mne::viz::qt::SettingsPanel
+```
+
+Qt Widgets for a [`SettingsForm`](/docs/api/viz/settings-form).
+
+The panel shares the form with its host, so it outlives the host's members when Qt deletes it as a child. Fields are laid out in the order of the form, one group box per group (fields without a group come first, without a box); a group box hides while none of its fields shows, and hidden fields get no widget. Custom fields get an empty container the host fills with its own widget (`customWidget()`).
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QWidget <|-- SettingsPanel
+```
+
+---
+
+## Public Methods
+
+### SettingsPanel(form, parent)
+
+Builds the widgets of a form.
+
+**Parameters:**
+
+- **form** : *std::shared_ptr&lt; [SettingsForm](/docs/api/viz/settings-form) &gt;*
+  Form, shared with the host.
+
+- **parent** : *QWidget **
+  Parent widget.
+
+---
+
+### ~SettingsPanel()
+
+---
+
+### form()
+
+**Returns:**
+
+- *[SettingsForm](/docs/api/viz/settings-form) &* — The form.
+
+---
+
+### editor(key)
+
+**Parameters:**
+
+- **key** : *const std::string &*
+  Field key.
+
+**Returns:**
+
+- *QWidget ** — The editor of a field (or the button of an action, or the container of a custom field), or nullptr.
+
+---
+
+### customWidget(key)
+
+**Parameters:**
+
+- **key** : *const std::string &*
+  `Key` of a Custom field.
+
+**Returns:**
+
+- *QWidget ** — The container to put the host's widget in, with an empty vertical layout, or nullptr.
+
+---
+
+### loadSettings(path)
+
+Reads the values stored under `path`; missing ones and fields that are not persistent keep their current value.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  QSettings group of the panel, e.g. "MNESCAN/Averaging"; empty does nothing.
+
+---
+
+### saveSettings(path)
+
+Stores the values under `path`, one QSettings key per persistent field.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  QSettings group of the panel; empty does nothing.
+
+---
+
+## Example
+
+No example of its own: Qt Widgets builder of viz::SettingsForm used inside the settings views; exercised by test_disp_viewers.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -1,0 +1,180 @@
+---
+id: abstract-view
+title: "mne::viz::qt::AbstractView"
+sidebar_label: AbstractView
+sidebar_position: 1
+---
+
+# AbstractView
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/viewers/abstractview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/viewers/abstractview.h)
+
+`#include <mne/viz/backends/qt/abstractview.h>`
+
+```cpp
+class mne::viz::qt::AbstractView
+```
+
+Base widget for every dockable settings panel in mne_disp; centralises GUI / processing mode and settings persistence.
+
+Subclasses override `updateGuiMode`, `updateProcessingMode` and `saveSettings` / `loadSettings` to react to mode changes and to round-trip their state through `QSettings`. The class deliberately exposes no domain-specific API.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QWidget <|-- AbstractView
+    AbstractView <|-- ApplyToView
+    click ApplyToView href "../../viz-qt/apply-to-view/"
+    AbstractView <|-- ArtifactSettingsView
+    click ArtifactSettingsView href "../../viz-qt/artifact-settings-view/"
+    AbstractView <|-- AverageLayoutView
+    click AverageLayoutView href "../../viz-qt/average-layout-view/"
+    AbstractView <|-- AverageSelectionView
+    click AverageSelectionView href "../../viz-qt/average-selection-view/"
+    AbstractView <|-- AveragingSettingsView
+    click AveragingSettingsView href "../../viz-qt/averaging-settings-view/"
+    AbstractView <|-- BidsView
+    click BidsView href "../../viz-qt/bids-view/"
+    AbstractView <|-- ChannelDataView
+    click ChannelDataView href "../../viz-qt/channel-data-view/"
+    AbstractView <|-- ChannelSelectionView
+    click ChannelSelectionView href "../../viz-qt/channel-selection-view/"
+    AbstractView <|-- CompensatorView
+    click CompensatorView href "../../viz-qt/compensator-view/"
+    AbstractView <|-- ConnectivitySettingsView
+    click ConnectivitySettingsView href "../../viz-qt/connectivity-settings-view/"
+    AbstractView <|-- Control3DView
+    click Control3DView href "../../viz-qt/control3-d-view/"
+    AbstractView <|-- CoregSettingsView
+    click CoregSettingsView href "../../viz-qt/coreg-settings-view/"
+    AbstractView <|-- CovarianceSettingsView
+    click CovarianceSettingsView href "../../viz-qt/covariance-settings-view/"
+    AbstractView <|-- DipoleFitView
+    click DipoleFitView href "../../viz-qt/dipole-fit-view/"
+    AbstractView <|-- FiffRawViewSettings
+    click FiffRawViewSettings href "../../viz-qt/fiff-raw-view-settings/"
+    AbstractView <|-- FilterDesignView
+    click FilterDesignView href "../../viz-qt/filter-design-view/"
+    AbstractView <|-- FilterSettingsView
+    click FilterSettingsView href "../../viz-qt/filter-settings-view/"
+    AbstractView <|-- FwdSettingsView
+    click FwdSettingsView href "../../viz-qt/fwd-settings-view/"
+    AbstractView <|-- HpiSettingsView
+    click HpiSettingsView href "../../viz-qt/hpi-settings-view/"
+    AbstractView <|-- MinimumNormSettingsView
+    click MinimumNormSettingsView href "../../viz-qt/minimum-norm-settings-view/"
+    AbstractView <|-- ModalitySelectionView
+    click ModalitySelectionView href "../../viz-qt/modality-selection-view/"
+    AbstractView <|-- ProgressView
+    click ProgressView href "../../viz-qt/progress-view/"
+    AbstractView <|-- ProjectSettingsView
+    click ProjectSettingsView href "../../viz-qt/project-settings-view/"
+    AbstractView <|-- ProjectorsView
+    click ProjectorsView href "../../viz-qt/projectors-view/"
+    AbstractView <|-- RtFiffRawView
+    click RtFiffRawView href "../../viz-qt/rt-fiff-raw-view/"
+    AbstractView <|-- ScalingView
+    click ScalingView href "../../viz-qt/scaling-view/"
+    AbstractView <|-- SpectrumSettingsView
+    click SpectrumSettingsView href "../../viz-qt/spectrum-settings-view/"
+    AbstractView <|-- SpectrumView
+    click SpectrumView href "../../viz-qt/spectrum-view/"
+    AbstractView <|-- SpharaSettingsView
+    click SpharaSettingsView href "../../viz-qt/sphara-settings-view/"
+    AbstractView <|-- TfSettingsView
+    click TfSettingsView href "../../viz-qt/tf-settings-view/"
+    AbstractView <|-- TriggerDetectionView
+    click TriggerDetectionView href "../../viz-qt/trigger-detection-view/"
+```
+
+---
+
+## Public Methods
+
+### AbstractView(parent, f)
+
+Constructs a [`AbstractView`](/docs/api/viz-qt/abstract-view) which is a child of parent.
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  parent of widget.
+
+- **f** : *Qt::WindowFlags*
+  Qt window flags passed to the QWidget constructor.
+
+---
+
+### setGuiMode(mode)
+
+Sets the GUI of this view to a specific mode.
+
+Clinical = 0, Research = 0.
+
+**Parameters:**
+
+- **mode** : *GuiMode*
+  The new mode.
+
+---
+
+### setProcessingMode(mode)
+
+Sets the GUI of this view to a specific mode.
+
+RealTime = 0, Offline = 0.
+
+**Parameters:**
+
+- **mode** : *ProcessingMode*
+  The new mode.
+
+---
+
+### saveSettings()
+
+Saves all important settings of this view via QSettings.
+
+---
+
+### loadSettings()
+
+Loads and inits all important settings of this view via QSettings.
+
+---
+
+### updateGuiMode(mode)
+
+Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
+
+**Parameters:**
+
+- **mode** : *GuiMode*
+  The new mode (Clinical=0, Research=1).
+
+---
+
+### updateProcessingMode(mode)
+
+Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
+
+**Parameters:**
+
+- **mode** : *ProcessingMode*
+  The new mode (RealTime=0, Offline=1).
+
+---
+
+### clearView()
+
+Clears the view.
+
+---
+
+## Authors of this file
+
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

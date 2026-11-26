@@ -32,7 +32,7 @@ Every third-party component that MNE-CPP builds, ships, loads at run time or is 
 
 ### Qt
 
-- **Used by:** disp, disp3D, applications, CLI tools; not the acquisition, processing or file I/O libraries
+- **Used by:** mne_viz_qt (the Qt backend of mne_viz), applications, CLI tools; not the acquisition, processing or file I/O libraries
 - **Modules:** Core, Gui, GuiPrivate, ShaderTools, Widgets (requested by the CMake files of the libraries, applications and tools)
 - **Purpose:** Windows, widgets, painting, GPU rendering through QRhi, the applications' event loop.
 - **If it fails:** Wrong, stale or frozen display; a crashed application. Acquired data, processing results and files do not pass through Qt.

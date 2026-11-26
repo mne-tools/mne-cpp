@@ -1,0 +1,169 @@
+---
+id: spline
+title: "mne::viz::qt::Spline"
+sidebar_label: Spline
+sidebar_position: 59
+---
+
+# Spline
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/plots/spline.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/plots/spline.h)
+
+`#include <mne/viz/backends/qt/spline.h>`
+
+```cpp
+class mne::viz::qt::Spline
+```
+
+Histogram QWidget with cubic-spline overlay and interactive threshold markers.
+
+Click-drag drops left / middle / right threshold lines that are emitted as data-space coordinates; otherwise the API mirrors [`Bar`](/docs/api/viz-qt/bar) (`setData` / `updatePlot` templates).
+
+```cpp title="src/examples/ex_disp_plots/main.cpp"
+Spline spline(nullptr, "Amplitude spline");
+spline.setData(classLimits, counts);
+spline.setThreshold(QVector3D(1.0f, 2.0f, 3.0f)); // three vertical marker lines
+spline.setXLabel("Amplitude");
+spline.setYLabel("Count");
+```
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QWidget <|-- Spline
+```
+
+---
+
+## Public Methods
+
+### Spline(parent, title)
+
+The constructor for [`Spline`](/docs/api/viz-qt/spline).
+
+**Parameters:**
+
+- **parent** : *QWidget **
+  sets the behaviour of [`Spline`](/docs/api/viz-qt/spline) as an object, defaults to no parent QWidget.
+
+- **title** : *const QString &*
+  title drawn above the histogram, defaults to "Spline Histogram".
+
+---
+
+### setData(matClassLimitData, matClassFrequencyData)
+
+creates a spline histogram from 2 vectors: class limits and class frequency
+
+**Parameters:**
+
+- **matClassLimitData** : *const Eigen::Matrix&lt; T, Eigen::Dynamic, 1 &gt; &*
+  vector input filled with class limits.
+
+- **matClassFrequencyData** : *const Eigen::Matrix&lt; int, Eigen::Dynamic, 1 &gt; &*
+  vector input filled with class frequency to the corresponding class.
+
+---
+
+### setData(matClassLimitData, matClassFrequencyData)
+
+---
+
+### updatePlot(matClassLimitData, matClassFrequencyData)
+
+Updates the spline with new data.
+
+**Parameters:**
+
+- **matClassLimitData** : *const Eigen::Matrix&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; &*
+  vector input filled with class limits.
+
+- **matClassFrequencyData** : *const Eigen::VectorXi &*
+  vector input filled with class frequency to the corresponding class.
+
+---
+
+### mousePressEvent(event)
+
+constructor for mouse press event behaviour to create threshold lines and signal emit
+
+**Parameters:**
+
+- **event** : *QMouseEvent **
+  mouse press input.
+
+---
+
+### setThreshold(vecThresholdValues)
+
+setThreshold takes in QVector3D value and creates the corresponding lines in the histogram
+
+**Parameters:**
+
+- **vecThresholdValues** : *const QVector3D &*
+  QVector3D consisting of 3 values corresponding to the threshold lines.
+
+---
+
+### getThreshold()
+
+getThreshold retrieves the current threshold values
+
+**Returns:**
+
+- *const QVector3D &* — returns QVector3D corresponding to the x-axis value of the threshold lines.
+
+---
+
+### setColorMap(colorMap)
+
+setColorMap sets the color mapping on the histogram background
+
+**Parameters:**
+
+- **colorMap** : *const QString &*
+  qstring of the color gradient from user input.
+
+---
+
+### setXLabel(label)
+
+Sets the label of the x axis, e.g.
+
+the quantity and unit of the class limits.
+
+**Parameters:**
+
+- **label** : *const QString &*
+  The x axis label.
+
+---
+
+### setYLabel(label)
+
+Sets the label of the y axis.
+
+**Parameters:**
+
+- **label** : *const QString &*
+  The y axis label.
+
+---
+
+## Example
+
+- Start here: [ex_disp_plots](../../examples/viz_qt/ex_disp_plots.mdx) — Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+- Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
+- Build target: `ex_disp_plots` (runs under CTest)
+
+## Authors of this file
+
+- Ricky Tjen &lt;ricky270@student.sgu.ac.id&gt;
+- Matti Hamalainen &lt;msh@nmr.mgh.harvard.edu&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Andreas Griesshammer &lt;ag@fieldlineinc.com&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
+- Lars Debor &lt;Lars.Debor@tu-ilmenau.de&gt;

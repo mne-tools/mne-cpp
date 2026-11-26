@@ -1,0 +1,203 @@
+---
+id: video-overlay
+title: "mne::viz::qt::VideoOverlay"
+sidebar_label: VideoOverlay
+sidebar_position: 74
+---
+
+# VideoOverlay
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/renderable/videooverlay.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/renderable/videooverlay.h)
+
+`#include <mne/viz/backends/qt/videooverlay.h>`
+
+```cpp
+class mne::viz::qt::VideoOverlay
+```
+
+Camera-facing textured quad rendered at a focus point in the 3-D scene.
+
+The overlay displays any live RGB/video frame "as a small cut-out view" on top of the 3-D scene. It is a billboarded square positioned at `focusPosition` with side length `sizeMeters`, textured with the latest video frame.
+
+This class is a passive data holder: [`BrainRenderer`](/docs/api/viz-qt/brain-renderer) owns the GPU resources (vertex buffer, texture, sampler, pipeline) and reads from here each frame.
+
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+VideoOverlay overlay; // CPU-side state; the renderer uploads frame() when frameGeneration() changes
+overlay.setEnabled(true);
+overlay.setFocusPosition(QVector3D(0.0f, 0.0f, 0.08f));
+overlay.setSizeMeters(0.05f);
+QImage frame(64, 48, QImage::Format_RGB32);
+frame.fill(Qt::darkGreen);
+overlay.setFrame(frame);
+overlay.setFrame(QImage()); // null frames are ignored
+```
+
+---
+
+## Public Methods
+
+### VideoOverlay()
+
+---
+
+### isEnabled()
+
+---
+
+### setEnabled(enabled)
+
+---
+
+### focusPosition()
+
+**Returns:**
+
+- *QVector3D* — World-space centre of the overlay quad (metres).
+
+---
+
+### setFocusPosition(pos)
+
+---
+
+### sizeMeters()
+
+**Returns:**
+
+- *float* — Side length of the overlay quad (metres).
+
+---
+
+### setSizeMeters(size)
+
+---
+
+### frame()
+
+**Returns:**
+
+- *const QImage &* — Latest video frame (CPU-side). Empty until a frame arrives.
+
+---
+
+### hasFrame()
+
+---
+
+### setFrame(image)
+
+Push a new video frame; bumps the generation counter so the GPU re-uploads.
+
+**Parameters:**
+
+- **image** : *const QImage &*
+  New video frame; null images are ignored.
+
+---
+
+### frameGeneration()
+
+Monotonic counter, incremented on every `setFrame()` call.
+
+**Returns:**
+
+- *quint64* — Current video frame generation.
+
+---
+
+### opacity()
+
+**Returns:**
+
+- *float* — Overall opacity of the overlay [0..1].
+
+---
+
+### setOpacity(opacity)
+
+---
+
+### upHint()
+
+Hint direction used as the quad's "up" axis.
+
+When set (non-zero), the quad's long edge is perpendicular to this direction instead of using the default world-up billboard.
+
+**Returns:**
+
+- *QVector3D* — Up-hint direction, or a zero vector if unset.
+
+---
+
+### setUpHint(dir)
+
+---
+
+### isDepthEnabled()
+
+**Returns:**
+
+- *bool* — Whether depth-based parallax relief is enabled.
+
+---
+
+### setDepthEnabled(enabled)
+
+---
+
+### setDepthFrame(image)
+
+Push a new monocular depth map (single-channel or RGBA grayscale).
+
+**Parameters:**
+
+- **image** : *const QImage &*
+  New depth map; null images are ignored.
+
+---
+
+### depthFrame()
+
+---
+
+### hasDepthFrame()
+
+---
+
+### depthFrameGeneration()
+
+---
+
+### depthScale()
+
+**Returns:**
+
+- *float* — POM displacement scale in UV space [0..1].
+
+---
+
+### setDepthScale(scale)
+
+---
+
+### depthSteps()
+
+**Returns:**
+
+- *int* — Number of POM ray-march steps (quality vs. performance).
+
+---
+
+### setDepthSteps(steps)
+
+---
+
+## Example
+
+- Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

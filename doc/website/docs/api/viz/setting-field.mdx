@@ -1,0 +1,51 @@
+---
+id: setting-field
+title: "mne::viz::SettingField"
+sidebar_label: SettingField
+sidebar_position: 87
+---
+
+# SettingField
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/forms/settings_form.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/forms/settings_form.h)
+
+`#include <mne/viz/settings_form.h>`
+
+```cpp
+struct mne::viz::SettingField
+```
+
+A field of a settings panel.
+
+---
+
+## Example
+
+No example of its own: Value type describing one field of a SettingsForm.
+
+## Used in examples
+
+### [ex_scene](../../examples/viz/ex_scene.mdx)
+
+Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+
+````cpp title="src/examples/ex_scene/main.cpp, line 156"
+SettingsForm form("Averaging");
+form.add_int("trials", "Number of trials", 10, 1, 1000, 1, {}, "General");
+form.add_bool("baseline", "Baseline correction", false, "Baseline");
+SettingField from;
+from.key = "baseline_from";
+from.kind = SettingField::Kind::Int;
+from.label = "From";
+from.unit = " ms";
+from.minimum = -1000;
+from.maximum = 0;
+from.group = "Baseline";
+from.enabled_if = "baseline";
+form.add(from);
+int heard = 0;
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

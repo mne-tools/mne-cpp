@@ -12,7 +12,7 @@ Pick an acquisition device or its simulator, watch it, record it to FIFF and pla
 
 <ExampleFacts name="ex_acq_devices" />
 
-**Libraries:** [Acquisition](../../api/acq/index.mdx), [Visualization](../../api/disp/index.mdx)
+**Libraries:** [Acquisition](../../api/acq/index.mdx), [Visualization (Qt)](../../api/viz-qt/index.mdx)
 
 ## What it demonstrates
 
@@ -66,8 +66,6 @@ The documented classes this example uses most:
 - [AcqRecorder](../../api/acq/acq-recorder.mdx)
 - [AcqSchemeInfo](../../api/acq/acq-scheme-info.mdx)
 - [AcqUri](../../api/acq/acq-uri.mdx)
-- [ChannelDataView](../../api/disp/channel-data-view.mdx)
-- [ChannelRhiView](../../api/disp/channel-rhi-view.mdx)
 
 ## Source
 
@@ -107,7 +105,7 @@ The documented classes this example uses most:
 #include <mne/acq/fiff/acq_fiff_replay.h>
 #include <mne/acq/fiff/acq_recorder.h>
 #include <mne/acq/lsl/acq_lsl.h>
-#include <mne/disp/viewers/channeldataview.h>
+#include <mne/viz/backends/qt/viewers/channeldataview.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -153,7 +151,7 @@ The documented classes this example uses most:
 //=============================================================================================================
 
 using namespace mne;
-using namespace mne::disp;
+using namespace mne::viz::qt;
 using namespace std::chrono_literals;
 
 //=============================================================================================================

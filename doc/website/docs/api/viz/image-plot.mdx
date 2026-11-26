@@ -1,0 +1,300 @@
+---
+id: image-plot
+title: "mne::viz::ImagePlot"
+sidebar_label: ImagePlot
+sidebar_position: 13
+---
+
+# ImagePlot
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/figures/image_plot.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/figures/image_plot.h)
+
+`#include <mne/viz/image_plot.h>`
+
+```cpp
+class mne::viz::ImagePlot
+```
+
+A matrix as an image: each value coloured by a colour map, with axes, title and a colour bar.
+
+Without an extent, the axes count columns and rows; with one, the first and last column and row centres sit at the given data values. The colour range is the data range unless set.
+
+```cpp title="src/examples/ex_scene/main.cpp"
+// Qt:   QPainter p(&widget); p.setPen(...); p.drawRect(...); p.drawText(...);
+Canvas canvas(200, 120, Color::white());
+canvas.set_antialiasing(true);
+canvas.set_pen(Pen{{50, 100, 150}, 1.5});
+canvas.set_brush(Brush::solid({70, 130, 180}));
+canvas.draw_rounded_rect({20, 20, 80, 50}, 6, 6);
+canvas.set_pen(Color::black());
+canvas.draw_text(Rect{0, 80, 200, 30}, Align::Center, "Hello scene");
+const DisplayList figure = canvas.take();
+
+// A plot: the same model a disp widget shows on screen
+std::vector<double> x;
+std::vector<double> y;
+for (int i = 0; i < 100; ++i) {
+    x.push_back(i * 0.01);
+    y.push_back(std::sin(2 * 3.14159265358979 * 5 * x.back()));
+}
+LineChart plot;
+plot.set_title("5 Hz sine");
+plot.set_x_label("time (s)");
+plot.add_series(x, y, "signal");
+const ApproximateTextMetrics metrics;
+const DisplayList chart = plot.render(480, 320, metrics, Font{"", 0.0, 13.0});
+
+const Expected<void> svg = write_svg(chart, dir / "plot.svg");
+const Expected<void> png = to_raster(chart).save_png(dir / "plot.png");
+```
+
+---
+
+## Public Methods
+
+### ImagePlot()
+
+---
+
+### set_data(rows, cols, values)
+
+Sets the matrix; nothing changes if it is empty.
+
+**Parameters:**
+
+- **rows** : *int*
+  Rows.
+
+- **cols** : *int*
+  Columns.
+
+- **values** : *std::vector&lt; double &gt;*
+  rows * cols values, row by row.
+
+---
+
+### rows()
+
+**Returns:**
+
+- *int* — The rows of the matrix.
+
+---
+
+### cols()
+
+**Returns:**
+
+- *int* — The columns of the matrix.
+
+---
+
+### values()
+
+**Returns:**
+
+- *const std::vector&lt; double &gt; &* — The matrix as given, row by row.
+
+---
+
+### has_data()
+
+**Returns:**
+
+- *bool* — Whether a matrix is set.
+
+---
+
+### set_colormap(name)
+
+Sets the colour map by name (see `map_color()`).
+
+**Parameters:**
+
+- **name** : *std::string*
+  Colour map name.
+
+---
+
+### colormap()
+
+**Returns:**
+
+- *const std::string &* — The colour map name.
+
+---
+
+### set_color_range(min, max)
+
+Maps `min` to the low and `max` to the high end of the colour map, instead of the data range.
+
+**Parameters:**
+
+- **min** : *double*
+  Value at the low end of the colour map.
+
+- **max** : *double*
+  Value at the high end of the colour map.
+
+---
+
+### color_min()
+
+**Returns:**
+
+- *double* — The value at the low end of the colour map.
+
+---
+
+### color_max()
+
+**Returns:**
+
+- *double* — The value at the high end of the colour map.
+
+---
+
+### set_extent(left, right, bottom, top)
+
+Places the first and last column centres at `left` and `right`, the last and first row at `bottom` and `top`.
+
+**Parameters:**
+
+- **left** : *double*
+  X value of the first column.
+
+- **right** : *double*
+  X value of the last column.
+
+- **bottom** : *double*
+  Y value of the last row.
+
+- **top** : *double*
+  Y value of the first row.
+
+---
+
+### extent()
+
+**Returns:**
+
+- *std::array&lt; double, 4 &gt;* — The extent as left, right, bottom and top; all 0 until `set_extent()`.
+
+---
+
+### set_title(title)
+
+Sets the title above the image.
+
+**Parameters:**
+
+- **title** : *std::string*
+  Title text.
+
+---
+
+### set_x_label(label)
+
+Sets the label below the x axis.
+
+**Parameters:**
+
+- **label** : *std::string*
+  Label text.
+
+---
+
+### set_y_label(label)
+
+Sets the label left of the y axis.
+
+**Parameters:**
+
+- **label** : *std::string*
+  Label text.
+
+---
+
+### set_colorbar_label(label)
+
+Sets the label of the colour bar.
+
+**Parameters:**
+
+- **label** : *std::string*
+  Label text.
+
+---
+
+### colorbar_label()
+
+**Returns:**
+
+- *const std::string &* — The label of the colour bar.
+
+---
+
+### normalized()
+
+**Returns:**
+
+- *const std::vector&lt; double &gt; &* — The matrix mapped to [0, 1] by the colour range, row by row.
+
+---
+
+### image()
+
+**Returns:**
+
+- *const std::shared_ptr&lt; const [Image](/docs/api/viz/image) &gt; &* — The colour-mapped matrix, one pixel per value; null without data.
+
+---
+
+### draw(canvas, metrics, font)
+
+Draws the plot into the rectangle (0, 0, width, height) of `canvas`; nothing without data.
+
+**Parameters:**
+
+- **canvas** : *[Canvas](/docs/api/viz/canvas) &*
+  [`Canvas`](/docs/api/viz/canvas).
+
+- **metrics** : *const [TextMetrics](/docs/api/viz/text-metrics) &*
+  Measures the labels.
+
+- **font** : *const [Font](/docs/api/viz/font) &*
+  [`Font`](/docs/api/viz/font) of ticks and labels; the title is bold and 1.25 times larger.
+
+---
+
+### render(width, height, metrics, font)
+
+**Parameters:**
+
+- **width** : *double*
+  Width in pixels.
+
+- **height** : *double*
+  Height in pixels.
+
+- **metrics** : *const [TextMetrics](/docs/api/viz/text-metrics) &*
+  Measures the text.
+
+- **font** : *const [Font](/docs/api/viz/font) &*
+  [`Font`](/docs/api/viz/font) of the text.
+
+**Returns:**
+
+- *[DisplayList](/docs/api/viz/display-list)* — The plot as a figure of `width` x `height` on white.
+
+---
+
+## Example
+
+- Start here: [ex_scene](../../examples/viz/ex_scene.mdx) — Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+- Full source: [`src/examples/ex_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_scene/main.cpp)
+- Build target: `ex_scene` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -1,0 +1,151 @@
+---
+id: network-object
+title: "mne::viz::qt::NetworkObject"
+sidebar_label: NetworkObject
+sidebar_position: 96
+---
+
+# NetworkObject
+
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/renderable/networkobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/renderable/networkobject.h)
+
+`#include <mne/viz/backends/qt/networkobject.h>`
+
+```cpp
+class mne::viz::qt::NetworkObject
+```
+
+[`NetworkObject`](/docs/api/viz-qt/network-object) renders connectivity network nodes (instanced spheres) and edges (instanced cylinders) using the same instanced rendering pipeline as [`DipoleObject`](/docs/api/viz-qt/dipole-object).
+
+Renderable connectivity network visualization.
+
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+Network graph("coherence");
+for (int i = 0; i < 3; ++i) {
+    graph.add_node(Vector3f::Constant(0.01f * static_cast<float>(i)));
+}
+graph.add_edge(NetworkEdge(0, 1, MatrixXd::Constant(1, 1, 0.9)));
+graph.add_edge(NetworkEdge(1, 2, MatrixXd::Constant(1, 1, 0.3)));
+NetworkObject networkGlyphs;
+networkGlyphs.load(graph, "Viridis"); // spheres for nodes, cylinders for edges
+const int edgesAll = networkGlyphs.edgeInstanceCount();
+networkGlyphs.setThreshold(0.5); // keep only the strong 0-1 link
+```
+
+---
+
+## Public Methods
+
+### NetworkObject()
+
+Default constructor.
+
+---
+
+### ~NetworkObject()
+
+Destructor.
+
+---
+
+### load(network, sColormap)
+
+Load network data and generate node/edge instances.
+
+**Parameters:**
+
+- **network** : *const [Network](/docs/api/connectivity/network) &*
+  The connectivity network to visualize.
+
+- **sColormap** : *const std::string &*
+  `Colormap` name for weight-based coloring (e.g. "Viridis", "Hot").
+
+---
+
+### setThreshold(dThreshold)
+
+Update the threshold and regenerate visible edges/nodes.
+
+**Parameters:**
+
+- **dThreshold** : *double*
+  New threshold value (0.0 – 1.0).
+
+---
+
+### setColormap(sColormap)
+
+Set the colormap used for edge/node coloring.
+
+**Parameters:**
+
+- **sColormap** : *const std::string &*
+  `Colormap` name (e.g. "Hot", "Viridis", "Jet").
+
+---
+
+### nodeStreams()
+
+**Returns:**
+
+- *[InstancedStreams](/docs/api/viz-qt/instanced-streams)* — CPU streams of the node sphere and of one instance per node.
+
+---
+
+### edgeStreams()
+
+**Returns:**
+
+- *[InstancedStreams](/docs/api/viz-qt/instanced-streams)* — CPU streams of the edge cylinder and of one instance per edge.
+
+---
+
+### nodeInstanceCount()
+
+**Returns:**
+
+- *int* — Number of nodes drawn, i.e. those touching an edge above the threshold.
+
+---
+
+### edgeInstanceCount()
+
+**Returns:**
+
+- *int* — Number of edges drawn above the threshold.
+
+---
+
+### nodeRenderKey()
+
+**Returns:**
+
+- *const [RenderKey](/docs/api/viz-qt/render-key) &* — Identities of the node and edge meshes in the renderer's GPU cache.
+
+---
+
+### edgeRenderKey()
+
+---
+
+### isVisible()
+
+---
+
+### setVisible(visible)
+
+---
+
+### hasData()
+
+---
+
+## Example
+
+- Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
