@@ -1,23 +1,23 @@
 ---
 id: polyline-object
-title: "mne::viz::qt::PolylineObject"
+title: "mne::viz::PolylineObject"
 sidebar_label: PolylineObject
-sidebar_position: 98
+sidebar_position: 122
 ---
 
 # PolylineObject
 
-**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/renderable/polylineobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/renderable/polylineobject.h)
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/polylineobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/polylineobject.h)
 
-`#include <mne/viz/backends/qt/polylineobject.h>`
+`#include <mne/viz/polylineobject.h>`
 
 ```cpp
-class mne::viz::qt::PolylineObject
+class mne::viz::PolylineObject
 ```
 
 Renders an ordered sequence of points as connected line segments.
 
-Each segment is one instance of a unit cylinder, using the same instance layout as [`DipoleObject`](/docs/api/viz-qt/dipole-object) and [`NetworkObject`](/docs/api/viz-qt/network-object) so the existing Dipole pipeline can draw it without a dedicated shader.
+Each segment is one instance of a unit cylinder, using the same instance layout as [`DipoleObject`](/docs/api/viz/dipole-object) and [`NetworkObject`](/docs/api/viz/network-object) so the existing Dipole pipeline can draw it without a dedicated shader.
 
 Connected line segments through an ordered list of points.
 
@@ -26,7 +26,7 @@ Connected line segments through an ordered list of points.
 PolylineObject track;
 track.setPoints({Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.001f, 0.0f, 0.0f), Vector3f(0.002f, 0.001f, 0.0f)});
 track.setRadius(0.0005f);
-track.setGradient(Qt::blue, Qt::red); // oldest to newest
+track.setGradient(Color{0, 0, 255, 255}, Color{255, 0, 0, 255}); // oldest to newest
 ```
 
 ---
@@ -35,13 +35,13 @@ track.setGradient(Qt::blue, Qt::red); // oldest to newest
 
 ### PolylineObject()
 
-Constructs a [`PolylineObject`](/docs/api/viz-qt/polyline-object) without any points.
+Constructs a [`PolylineObject`](/docs/api/viz/polyline-object) without any points.
 
 ---
 
 ### ~PolylineObject()
 
-Destroys the [`PolylineObject`](/docs/api/viz-qt/polyline-object).
+Destroys the [`PolylineObject`](/docs/api/viz/polyline-object).
 
 ---
 
@@ -83,10 +83,10 @@ Grading the line makes the direction of travel readable without any extra decora
 
 **Parameters:**
 
-- **startColor** : *const QColor &*
+- **startColor** : *const [Color](/docs/api/viz/color) &*
   Colour of the first segment.
 
-- **endColor** : *const QColor &*
+- **endColor** : *const [Color](/docs/api/viz/color) &*
   Colour of the last segment.
 
 ---
@@ -155,6 +155,21 @@ Sets whether the polyline is drawn.
 - Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 312"
+// Head-position track: N points draw N - 1 tube segments; repeated positions are skipped
+PolylineObject track;
+track.setPoints({Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.001f, 0.0f, 0.0f), Vector3f(0.002f, 0.001f, 0.0f)});
+track.setRadius(0.0005f);
+track.setGradient(Color{0, 0, 255, 255}, Color{255, 0, 0, 255}); // oldest to newest
+ok &= expect(track.hasData() && track.instanceCount() == 2, "PolylineObject: four positions with one repeat give two segments");
+````
 
 ## Authors of this file
 

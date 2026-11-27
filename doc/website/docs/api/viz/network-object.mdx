@@ -1,21 +1,21 @@
 ---
 id: network-object
-title: "mne::viz::qt::NetworkObject"
+title: "mne::viz::NetworkObject"
 sidebar_label: NetworkObject
-sidebar_position: 96
+sidebar_position: 121
 ---
 
 # NetworkObject
 
-**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/renderable/networkobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/renderable/networkobject.h)
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/networkobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/networkobject.h)
 
-`#include <mne/viz/backends/qt/networkobject.h>`
+`#include <mne/viz/networkobject.h>`
 
 ```cpp
-class mne::viz::qt::NetworkObject
+class mne::viz::NetworkObject
 ```
 
-[`NetworkObject`](/docs/api/viz-qt/network-object) renders connectivity network nodes (instanced spheres) and edges (instanced cylinders) using the same instanced rendering pipeline as [`DipoleObject`](/docs/api/viz-qt/dipole-object).
+[`NetworkObject`](/docs/api/viz/network-object) renders connectivity network nodes (instanced spheres) and edges (instanced cylinders) using the same instanced rendering pipeline as [`DipoleObject`](/docs/api/viz/dipole-object).
 
 Renderable connectivity network visualization.
 
@@ -145,6 +145,23 @@ Set the colormap used for edge/node coloring.
 - Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 301"
+graph.add_edge(NetworkEdge(0, 1, MatrixXd::Constant(1, 1, 0.9)));
+graph.add_edge(NetworkEdge(1, 2, MatrixXd::Constant(1, 1, 0.3)));
+NetworkObject networkGlyphs;
+networkGlyphs.load(graph, "Viridis"); // spheres for nodes, cylinders for edges
+const int edgesAll = networkGlyphs.edgeInstanceCount();
+networkGlyphs.setThreshold(0.5); // keep only the strong 0-1 link
+ok &= expect(edgesAll == 2 && networkGlyphs.edgeInstanceCount() == 1 && networkGlyphs.nodeInstanceCount() == 2,
+             "NetworkObject: thresholding at 0.5 leaves one edge and its two nodes");
+````
 
 ## Authors of this file
 

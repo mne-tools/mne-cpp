@@ -392,9 +392,10 @@
       "missing_tests": []
     },
     "viz": {
-      "classes": 100,
-      "tested": 97,
+      "classes": 104,
+      "tested": 100,
       "untested": [
+        "ElectrodeObject",
         "GeometryInfo",
         "Interpolation",
         "VertexData"
@@ -402,8 +403,8 @@
       "missing_tests": []
     },
     "viz_qt": {
-      "classes": 120,
-      "tested": 52,
+      "classes": 116,
+      "tested": 49,
       "untested": [
         "AbstractTreeItem",
         "AbstractView",
@@ -429,7 +430,6 @@
         "CovarianceSettingsView",
         "DipoleFitView",
         "DraggableFramelessWidget",
-        "ElectrodeObject",
         "EvokedSetModel",
         "FiffRawViewSettings",
         "FilterDesignView",

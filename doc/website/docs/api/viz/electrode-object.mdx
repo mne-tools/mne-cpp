@@ -1,18 +1,18 @@
 ---
 id: electrode-object
-title: "mne::viz::qt::ElectrodeObject"
+title: "mne::viz::ElectrodeObject"
 sidebar_label: ElectrodeObject
-sidebar_position: 64
+sidebar_position: 119
 ---
 
 # ElectrodeObject
 
-**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/renderable/electrodeobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/renderable/electrodeobject.h)
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/electrodeobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/electrodeobject.h)
 
-`#include <mne/viz/backends/qt/electrodeobject.h>`
+`#include <mne/viz/electrodeobject.h>`
 
 ```cpp
-class mne::viz::qt::ElectrodeObject
+class mne::viz::ElectrodeObject
 ```
 
 Renderable sEEG / ECoG electrodes: contact spheres plus lead bodies.
@@ -27,7 +27,7 @@ ElectrodeObject electrodes; // a view of the implantation, drawn by BrainView::s
 electrodes.setImplantation(IeegImplantation(shaft));
 electrodes.selectContact("LH3");
 float contactDistance = 0.0f;
-const int pickedContact = electrodes.intersect(QVector3D(0.017f, -0.020f, 1.0f), QVector3D(0.0f, 0.0f, -1.0f), contactDistance);
+const int pickedContact = electrodes.intersect(Vector3f(0.017f, -0.020f, 1.0f), Vector3f(0.0f, 0.0f, -1.0f), contactDistance);
 ```
 
 ---
@@ -83,7 +83,7 @@ Contacts without a value keep the colour of their lead.
   Map of contact name -&gt; scalar value.
 
 - **colormap** : *const std::string &*
-  [`ColorMap`](/docs/api/viz-qt/color-map) name.
+  mne::viz::ColorMap name.
 
 ---
 
@@ -165,10 +165,10 @@ Intersect a ray with the contact spheres.
 
 **Parameters:**
 
-- **rayOrigin** : *const QVector3D &*
+- **rayOrigin** : *const Eigen::Vector3f &*
   [`Ray`](/docs/api/viz/ray) origin.
 
-- **rayDir** : *const QVector3D &*
+- **rayDir** : *const Eigen::Vector3f &*
   Normalised ray direction.
 
 - **dist** : *float &*
@@ -250,7 +250,7 @@ Intersect a ray with the contact spheres.
 
 **Returns:**
 
-- *QVector3D* — Axis-aligned bounding box minimum corner (with contact-radius padding).
+- *Eigen::Vector3f* — Axis-aligned bounding box minimum corner (with contact-radius padding).
 
 ---
 
@@ -258,7 +258,7 @@ Intersect a ray with the contact spheres.
 
 **Returns:**
 
-- *QVector3D* — Axis-aligned bounding box maximum corner (with contact-radius padding).
+- *Eigen::Vector3f* — Axis-aligned bounding box maximum corner (with contact-radius padding).
 
 ---
 
@@ -273,7 +273,7 @@ Intersect a ray with the contact spheres.
 
 **Returns:**
 
-- *QColor* — Lead colour: golden-angle hues, so neighbouring leads differ clearly.
+- *[Color](/docs/api/viz/color)* — Lead colour: golden-angle hues, so neighbouring leads differ clearly.
 
 ---
 
@@ -282,6 +282,22 @@ Intersect a ray with the contact spheres.
 - Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 143"
+ElectrodeObject electrodes; // a view of the implantation, drawn by BrainView::setElectrodes()
+electrodes.setImplantation(IeegImplantation(shaft));
+electrodes.selectContact("LH3");
+float contactDistance = 0.0f;
+const int pickedContact = electrodes.intersect(Vector3f(0.017f, -0.020f, 1.0f), Vector3f(0.0f, 0.0f, -1.0f), contactDistance);
+ok &= expect(electrodes.totalContactCount() == 4 && electrodes.selectedContact() == "LH3" && electrodes.contactStreams().instanceCount == 4 && electrodes.bodyStreams().instanceCount == 1 && electrodes.contactLabel(pickedContact) == "LH3 (depth lead LH)",
+             "ElectrodeObject: 4 contacts on one shaft, a ray through LH3 picks it");
+````
 
 ## Authors of this file
 

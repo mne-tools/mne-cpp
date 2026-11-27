@@ -200,7 +200,7 @@ dipoles.push_back(weak);
 DipoleObject dipoleGlyphs;
 dipoleGlyphs.load(dipoles); // one cone per dipole, scaled by moment
 float dipoleDistance = 0.0f;
-const int pickedDipole = dipoleGlyphs.intersect(QVector3D(0.03f, 0.0f, 0.2f), QVector3D(0.0f, 0.0f, -1.0f), dipoleDistance);
+const int pickedDipole = dipoleGlyphs.intersect(Vector3f(0.03f, 0.0f, 0.2f), Vector3f(0.0f, 0.0f, -1.0f), dipoleDistance);
 ````
 
 ## Authors of this file

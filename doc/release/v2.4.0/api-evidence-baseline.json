@@ -4,7 +4,7 @@
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
     "exported_classes": 531,
-    "exported_free_functions": 251,
+    "exported_free_functions": 253,
     "registered_classes": 690,
     "exported_not_registered": 2,
     "registered_function_modules": 15,
@@ -1357,6 +1357,16 @@
     },
     {
       "name": "map_color",
+      "header": "viz/figures/colormap.h",
+      "library": "viz"
+    },
+    {
+      "name": "color_from_hsl",
+      "header": "viz/figures/colormap.h",
+      "library": "viz"
+    },
+    {
+      "name": "darker",
       "header": "viz/figures/colormap.h",
       "library": "viz"
     },
@@ -13174,98 +13184,6 @@
       "exempt_reason": "header prefix 'viz/backends/qt/3d/model/': Scene-graph item owned and driven by BrainView; not constructed directly by library users."
     },
     {
-      "name": "DipoleObject",
-      "header": "viz/backends/qt/3d/renderable/dipoleobject.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": "test_disp3d_brainview",
-      "test_resolves": true,
-      "example": "ex_disp3d_scene",
-      "example_state": "built",
-      "including_examples": [
-        "ex_disp3d_scene"
-      ],
-      "snippets": [
-        "ex_disp3d_scene/main.cpp#dipole_object_usage"
-      ],
-      "api_page": "doc/website/docs/api/viz-qt/dipole-object.mdx",
-      "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
-    },
-    {
-      "name": "ElectrodeObject",
-      "header": "viz/backends/qt/3d/renderable/electrodeobject.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": "ex_disp3d_scene",
-      "example_state": "built",
-      "including_examples": [
-        "ex_disp3d_scene"
-      ],
-      "snippets": [
-        "ex_disp3d_scene/main.cpp#electrode_object_usage"
-      ],
-      "api_page": "doc/website/docs/api/viz-qt/electrode-object.mdx",
-      "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
-    },
-    {
-      "name": "NetworkObject",
-      "header": "viz/backends/qt/3d/renderable/networkobject.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": "test_disp3d_brainview",
-      "test_resolves": true,
-      "example": "ex_disp3d_scene",
-      "example_state": "built",
-      "including_examples": [
-        "ex_disp3d_scene"
-      ],
-      "snippets": [
-        "ex_disp3d_scene/main.cpp#network_object_usage"
-      ],
-      "api_page": "doc/website/docs/api/viz-qt/network-object.mdx",
-      "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
-    },
-    {
-      "name": "PolylineObject",
-      "header": "viz/backends/qt/3d/renderable/polylineobject.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": "test_disp3d_brainview",
-      "test_resolves": true,
-      "example": "ex_disp3d_scene",
-      "example_state": "built",
-      "including_examples": [
-        "ex_disp3d_scene"
-      ],
-      "snippets": [
-        "ex_disp3d_scene/main.cpp#polyline_object_usage"
-      ],
-      "api_page": "doc/website/docs/api/viz-qt/polyline-object.mdx",
-      "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
-    },
-    {
       "name": "SliceObject",
       "header": "viz/backends/qt/3d/renderable/sliceobject.h",
       "library": "viz",
@@ -15367,6 +15285,52 @@
       "exempt_reason": null
     },
     {
+      "name": "DipoleObject",
+      "header": "viz/brain/dipoleobject.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_disp3d_brainview",
+      "test_resolves": true,
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#dipole_object_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/dipole-object.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "ElectrodeObject",
+      "header": "viz/brain/electrodeobject.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#electrode_object_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/electrode-object.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "GeometryInfo",
       "header": "viz/brain/geometryinfo.h",
       "library": "viz",
@@ -15433,6 +15397,52 @@
         "ex_disp3d_scene/main.cpp#mesh_factory_usage"
       ],
       "api_page": "doc/website/docs/api/viz/mesh-factory.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "NetworkObject",
+      "header": "viz/brain/networkobject.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_disp3d_brainview",
+      "test_resolves": true,
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#network_object_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/network-object.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "PolylineObject",
+      "header": "viz/brain/polylineobject.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_disp3d_brainview",
+      "test_resolves": true,
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#polyline_object_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/polyline-object.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null

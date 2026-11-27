@@ -211,7 +211,7 @@ ElectrodeObject electrodes; // a view of the implantation, drawn by BrainView::s
 electrodes.setImplantation(IeegImplantation(shaft));
 electrodes.selectContact("LH3");
 float contactDistance = 0.0f;
-const int pickedContact = electrodes.intersect(QVector3D(0.017f, -0.020f, 1.0f), QVector3D(0.0f, 0.0f, -1.0f), contactDistance);
+const int pickedContact = electrodes.intersect(Vector3f(0.017f, -0.020f, 1.0f), Vector3f(0.0f, 0.0f, -1.0f), contactDistance);
 ok &= expect(electrodes.totalContactCount() == 4 && electrodes.selectedContact() == "LH3" && electrodes.contactStreams().instanceCount == 4 && electrodes.bodyStreams().instanceCount == 1 && electrodes.contactLabel(pickedContact) == "LH3 (depth lead LH)",
              "ElectrodeObject: 4 contacts on one shaft, a ray through LH3 picks it");
 ````
