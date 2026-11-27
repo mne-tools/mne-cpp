@@ -17,14 +17,16 @@
  * colour buffers to the bound @ref mne::viz::BrainSurface on every frame.
  */
 
-#ifndef RTSENSORSTREAMMANAGER_H
-#define RTSENSORSTREAMMANAGER_H
+#ifndef VIZ_QT_RTSENSORSTREAMMANAGER_H
+#define VIZ_QT_RTSENSORSTREAMMANAGER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "../../viz_qt_global.h"
+
+#include <mne/viz/brain/realtime/sensorstreamsession.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -33,47 +35,17 @@
 #include <QObject>
 
 //=============================================================================================================
-// EIGEN INCLUDES
+// DEFINE NAMESPACE mne::viz::qt
 //=============================================================================================================
-
-#include <Eigen/Core>
-
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-namespace mne::viz
-{
-class BrainSurface;
-} // namespace mne::viz
-
-namespace mne::viz
-{
-class SensorFieldMapper;
-} // namespace mne::viz
 
 namespace mne::viz::qt
 {
-class RtSensorDataController;
+
 //=============================================================================================================
 /**
- * Manages real-time sensor data streaming via RtSensorDataController.
- *
- * BrainView delegates all sensor streaming operations to this component,
- * keeping its own code free of the RtSensorDataController lifecycle.
- *
- * @brief    Real-time sensor streaming lifecycle manager.
+ * @brief Qt face of @ref mne::viz::SensorStreamSession as a QObject: the same API, with the results as signals on this object's thread.
  */
-class VIZQTSHARED_EXPORT RtSensorStreamManager : public QObject
+class VIZQTSHARED_EXPORT RtSensorStreamManager : public QObject, public viz::SensorStreamSession
 {
     Q_OBJECT
 
@@ -82,7 +54,7 @@ public:
     /**
      * Constructor.
      *
-     * @param[in] parent    Parent QObject.
+     * @param[in] parent     Parent QObject.
      */
     explicit RtSensorStreamManager(QObject* parent = nullptr);
 
@@ -91,78 +63,6 @@ public:
      * Destructor.
      */
     ~RtSensorStreamManager() override;
-
-    // ── Streaming control ──────────────────────────────────────────────
-
-    /**
-     * Start real-time sensor streaming for the given modality.
-     *
-     * Reads mapping matrices, pick vectors, evoked data, and colourmap
-     * from the provided @p fieldMapper.  Validates that the target surface
-     * key exists in @p surfaces.
-     *
-     * @param[in] modality    "MEG" or "EEG".
-     * @param[in] fieldMapper Sensor-field mapper with built mapping data.
-     * @param[in] surfaces    FsSurface map for target-surface validation.
-     * @return true if streaming was started successfully.
-     */
-    bool startStreaming(const std::string& modality,
-                        const SensorFieldMapper& fieldMapper,
-                        const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces);
-
-    /** Stop real-time sensor streaming. */
-    void stopStreaming();
-
-    /** @return true while real-time sensor streaming is active. */
-    bool isStreaming() const
-    {
-        return m_isStreaming;
-    }
-
-    /** @return the active modality ("MEG" or "EEG"), or empty. */
-    std::string modality() const
-    {
-        return m_modality;
-    }
-
-    // ── Data input ─────────────────────────────────────────────────────
-
-    /**
-     * Push a single measurement vector into the streaming queue.
-     *
-     * @param[in] data   One sample of sensor values; ignored if no controller exists.
-     */
-    void pushData(const Eigen::VectorXf& data);
-
-    // ── Parameter control ──────────────────────────────────────────────
-
-    /**
-     * Set the streaming playback interval in milliseconds.
-     *
-     * @param[in] msec   Interval between streamed samples in milliseconds.
-     */
-    void setInterval(int msec);
-
-    /**
-     * Enable or disable looping of the streaming queue.
-     *
-     * @param[in] enabled   True to replay the queue from the start when it ends.
-     */
-    void setLooping(bool enabled);
-
-    /**
-     * Set the number of averages for smoothing.
-     *
-     * @param[in] numAvr   Number of consecutive samples averaged per frame.
-     */
-    void setAverages(int numAvr);
-
-    /**
-     * Set the colormap used for colour mapping.
-     *
-     * @param[in] name   Colormap name (e.g. "MNE", "Jet").
-     */
-    void setColormap(const std::string& name);
 
 signals:
     //=========================================================================================================
@@ -175,13 +75,8 @@ signals:
      */
     void colorsAvailable(const std::string& surfaceKey,
                          const std::vector<uint32_t>& colors);
-
-private:
-    std::unique_ptr<RtSensorDataController> m_controller; /**< Real-time sensor data controller. */
-    bool m_isStreaming = false;                           /**< True while streaming is active. */
-    std::string m_modality;                               /**< Active modality: "MEG" or "EEG". */
 };
 
 } // namespace mne::viz::qt
 
-#endif // RTSENSORSTREAMMANAGER_H
+#endif // VIZ_QT_RTSENSORSTREAMMANAGER_H

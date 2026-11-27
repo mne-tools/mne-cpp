@@ -14787,6 +14787,42 @@
       "guide": null,
       "python_equiv": null,
       "python_url": null
+    },
+    {
+      "name": "SensorStreamSession",
+      "module": "viz",
+      "header": "viz/brain/realtime/sensorstreamsession.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_disp3d_brainview",
+      "example": null,
+      "status": "documented",
+      "documented": true,
+      "sidebar_position": 136,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
+    },
+    {
+      "name": "SourceEstimateSession",
+      "module": "viz",
+      "header": "viz/brain/sourceestimatesession.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_disp3d_brainview",
+      "example": null,
+      "status": "documented",
+      "documented": true,
+      "sidebar_position": 137,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Model of the brain view that loads .stc files on a thread and streams them; BrainView owns it through qt::SourceEstimateManager, exercised by test_disp3d_brainview."
     }
   ],
   "parity": {

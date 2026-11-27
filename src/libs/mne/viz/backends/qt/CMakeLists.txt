@@ -230,6 +230,7 @@ set(HEADERS
     3d/workers/rtsourcedatacontroller.h
     3d/workers/rtsensordatacontroller.h
     qtconversions.h
+    qtdispatcher.h
     qtsettingsstore.h
 )
 

@@ -19,6 +19,7 @@ set(SOURCES
   brain/polylineobject.cpp
   brain/realtime/periodictask.cpp
   brain/realtime/rtsensordataworker.cpp
+  brain/realtime/sensorstreamsession.cpp
   brain/realtime/rtsensorstream.cpp
   brain/realtime/rtsourcestream.cpp
   brain/realtime/rtsensorinterpolationmatworker.cpp
@@ -26,6 +27,7 @@ set(SOURCES
   brain/realtime/rtsourceinterpolationmatworker.cpp
   brain/realtime/stcloadingworker.cpp
   brain/sensorfieldmapper.cpp
+  brain/sourceestimatesession.cpp
   brain/sourceestimateoverlay.cpp
   brain/viewstate.cpp
   figures/average_layout.cpp
@@ -83,6 +85,7 @@ set(HEADERS
   brain/polylineobject.h
   brain/realtime/periodictask.h
   brain/realtime/rtsensordataworker.h
+  brain/realtime/sensorstreamsession.h
   brain/realtime/rtsensorstream.h
   brain/realtime/rtsourcestream.h
   brain/realtime/rtsensorinterpolationmatworker.h
@@ -91,6 +94,7 @@ set(HEADERS
   brain/realtime/stcloadingworker.h
   brain/rendertypes.h
   brain/sensorfieldmapper.h
+  brain/sourceestimatesession.h
   brain/sourceestimateoverlay.h
   brain/surfacekeys.h
   brain/viewstate.h
@@ -118,6 +122,7 @@ set(HEADERS
   gpu/gpu_frame.h
   gpu/software_renderer.h
   gpu/trace_frame.h
+  host/dispatcher.h
   host/settings_store.h
   host/surface.h
   host/trace_view_client.h

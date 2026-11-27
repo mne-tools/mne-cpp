@@ -436,6 +436,14 @@ aliases; replace the old spelling as below.
   threads and report results to callbacks. `qt::RtSensorDataController` and
   `qt::RtSourceDataController` derive from them, keep their API, and emit the
   results as signals on their own thread.
+- Background work of the brain view reaches its owner through a
+  `viz::Dispatcher` (`viz/host/dispatcher.h`) that the host provides:
+  `qt::queuedDispatcher(QObject*)` posts to a Qt event loop,
+  `viz::immediate_dispatcher()` runs tasks at once. With it,
+  `viz::SourceEstimateSession` (loading, time navigation and streaming of
+  `.stc` files) and `viz::SensorStreamSession` (streaming a sensor field map)
+  are Qt-free; `qt::SourceEstimateManager` and `qt::RtSensorStreamManager`
+  derive from them, keep their API and emit their signals.
 - Views run in any backend through `viz/host/surface.h`: a backend implements
   `viz::Surface` (redraw requests, clock, pointer shape) and drives a
   `viz::SurfaceClient` (resize, pointer, wheel and key events, animation

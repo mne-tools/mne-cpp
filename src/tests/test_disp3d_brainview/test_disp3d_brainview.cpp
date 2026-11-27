@@ -43,6 +43,7 @@
 #include <mne/viz/backends/qt/3d/scene/sourceestimatemanager.h>
 #include <mne/viz/backends/qt/3d/scene/rtsensorstreammanager.h>
 #include <mne/viz/brain/realtime/stcloadingworker.h>
+#include <mne/viz/brain/sourceestimatesession.h>
 #include <mne/viz/brain/brainsurface.h>
 #include <mne/viz/backends/qt/3d/input/cameracontroller.h>
 #include <mne/viz/backends/qt/3d/input/raypicker.h>
@@ -96,7 +97,11 @@
 //=============================================================================================================
 
 #include <algorithm>
+#include <atomic>
 #include <format>
+#include <map>
+#include <memory>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -1145,6 +1150,21 @@ void TestDisp3dBrainView::stcLoadingWorker_basics()
     QVERIFY(std::fabs(mat->coeff(3, 1) - 1.0f) < 1e-6f);
     QVERIFY(progressSpy.size() > 2);
     QCOMPARE(progressSpy.last().at(0).toInt(), 100);
+
+    // The Qt-free session loads in the background and, with the immediate dispatcher, reports on the loading thread
+    {
+        auto lhPial = std::make_shared<BrainSurface>();
+        lhPial->createFromData(rr, tris, toColor(QColor(Qt::gray)));
+        const std::map<std::string, std::shared_ptr<BrainSurface>> surfaces = {{"lh_pial", lhPial}};
+        SourceEstimateSession session;
+        std::atomic<int> loadedPoints{-1};
+        session.setLoadedCallback([&](int numTimePoints) { loadedPoints = numTimePoints; });
+        QVERIFY(session.load(lhPath.toStdU16String(), {}, surfaces, "pial"));
+        QTRY_VERIFY(loadedPoints.load() >= 0);
+        QCOMPARE(loadedPoints.load(), 3);
+        QCOMPARE(session.numTimePoints(), 3);
+        QCOMPARE(session.closestIndex(0.0015f), 2);
+    }
 
     // Cancelled before it starts: no matrix, failure
     StcLoadingWorker cancelled(lhPath.toStdU16String(), {}, &lhSurface, &rhSurface, 0.05);
