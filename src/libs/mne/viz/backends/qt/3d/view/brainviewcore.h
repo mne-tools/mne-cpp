@@ -35,7 +35,7 @@
 #include "../../viz_qt_global.h"
 #include "../../../../brain/rendertypes.h"
 #include "multiviewlayout.h"
-#include "../core/viewstate.h"
+#include "../../../../brain/viewstate.h"
 #include "../input/cameracontroller.h"
 #include "../scene/sensorfieldmapper.h"
 #include "../scene/sourceestimatemanager.h"

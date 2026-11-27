@@ -31,15 +31,9 @@
 //=============================================================================================================
 
 #include "../../viz_qt_global.h"
-#include "../core/viewstate.h"
+#include "../../../../brain/viewstate.h"
 #include <mne/fiff/fiff_evoked.h>
 #include <mne/fiff/fiff_coord_trans.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QString>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -153,7 +147,6 @@ public:
     void setColormap(const std::string& name)
     {
         m_colormap = name;
-        m_colormapQt = QString::fromStdString(name);
     }
 
     const std::string& colormap() const
@@ -359,7 +352,6 @@ private:
     int m_timePoint = 0;
     bool m_megOnHead = false;
     std::string m_colormap = "MNE";
-    QString m_colormapQt = QStringLiteral("MNE"); // Same name for mne::viz::qt::ColorMap, which takes a QString
 
     std::string m_megSurfaceKey;
     std::string m_eegSurfaceKey;

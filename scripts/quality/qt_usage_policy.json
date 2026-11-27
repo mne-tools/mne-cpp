@@ -18,7 +18,8 @@
       "Generic settings panel builder": "SettingsPanel (viewers/settingspanel.h) builds the Qt Widgets of any Qt-free scene::SettingsForm, so a new toolkit needs one builder instead of a hand-written view per panel; the builder raised the disp ceilings once (tokens 4546 -> 4601); the covariance, spectrum, averaging, filter, artifact and time-frequency settings views ported onto it lowered them again (tokens 4601 -> 4519).",
       "Qt adapters of the Qt-free view models": "ChannelInfoModel, FrequencySpectrumModel and BidsViewModel became adapters of mne_viewmodels (ChannelTable, SpectrumTable, BidsTree), and RtFiffRawViewModel and EvokedSetModel hand their SSP, compensator, SPHARA, filtering and trigger detection to mne_dsp (RtRawDisplay, DisplayCorrection). The adapters convert between the view models and QVariant, QStandardItem and QModelIndex, which raised the 'other' category once (1315 -> 1329) while the total fell (tokens 4519 -> 4403).",
       "BrainWindow host and GPU overlay (phase 3)": "BrainWindow (QWindow + QRhi swap chain), the forwarding BrainView host and the overlay painted into the GPU pass instead of child QLabels raised the disp3D ceilings once (tokens 1633 -> 1961); the QRhiWidget host goes with phase 4.",
-      "One Qt backend library": "mne_disp and mne_disp3D merged into mne_viz_qt (src/libs/mne/viz/backends/qt), the Qt backend of mne_viz; their ceilings add up (tokens 4403 + 1807 -> 6208, public header includes 87 + 73 -> 159), minus the two export headers that became one."
+      "One Qt backend library": "mne_disp and mne_disp3D merged into mne_viz_qt (src/libs/mne/viz/backends/qt), the Qt backend of mne_viz; their ceilings add up (tokens 4403 + 1807 -> 6208, public header includes 87 + 73 -> 159), minus the two export headers that became one.",
+      "QSettings adapter of viz::SettingsStore": "QtSettingsStore (qtsettingsstore.h) converts between viz::SettingValue and QVariant so the brain view's per-pane state (SubView, ViewVisibilityProfile) could leave the backend for mne_viz; the QVariant/QMetaType switch raised objects_signals once (657 -> 667) while the move lowered tokens (5942 -> 5922) and public header includes (150 -> 145)."
     }
   },
   "ceilings": {
@@ -158,8 +159,8 @@
       "modules": []
     },
     "viz/backends/qt": {
-      "tokens": 5942,
-      "public_header_includes": 150,
+      "tokens": 5922,
+      "public_header_includes": 145,
       "modules": [
         "Core",
         "Gui",
@@ -168,12 +169,12 @@
       ],
       "by_category": {
         "containers": 19,
-        "files": 103,
-        "global": 954,
-        "gui": 1787,
-        "objects_signals": 657,
-        "other": 1570,
-        "strings": 838,
+        "files": 98,
+        "global": 953,
+        "gui": 1783,
+        "objects_signals": 667,
+        "other": 1567,
+        "strings": 821,
         "time": 14
       }
     },

@@ -22,7 +22,7 @@
 #include "../../../../brain/brainsurface.h"
 #include "../workers/stcloadingworker.h"
 #include "../workers/rtsourcedatacontroller.h"
-#include "../core/viewstate.h"
+#include "../../../../brain/viewstate.h"
 
 //=============================================================================================================
 // STL INCLUDES

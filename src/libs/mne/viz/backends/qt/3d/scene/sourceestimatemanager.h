@@ -60,13 +60,16 @@ namespace mne::viz
 class BrainSurface;
 } // namespace mne::viz
 
+namespace mne::viz
+{
+struct SubView;
+} // namespace mne::viz
+
 namespace mne::viz::qt
 {
 class SourceEstimateOverlay;
 class StcLoadingWorker;
 class RtSourceDataController;
-struct SubView;
-
 //=============================================================================================================
 /**
  * Manages source estimate data: async loading, time-point navigation,

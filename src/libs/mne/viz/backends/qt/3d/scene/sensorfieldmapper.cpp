@@ -28,7 +28,7 @@
 #include <mne/fiff/fiff_coord_trans.h>
 #include <mne/fwd/fwd_coil_set.h>
 #include <mne/fs/fs_surface.h>
-#include <mne/viz/backends/qt/plots/helpers/colormap.h>
+#include <mne/viz/figures/colormap.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -587,14 +587,8 @@ void SensorFieldMapper::apply(
             double norm = (mapped(i) / maxAbs) * 0.5 + 0.5;
             norm = std::clamp(norm, 0.0, 1.0);
 
-            QRgb rgb = (m_colormap == "MNE")
-                ? mneAnalyzeColor(norm)
-                : mne::viz::qt::ColorMap::valueToColor(norm, m_colormapQt);
-
-            uint32_t r = qRed(rgb);
-            uint32_t g = qGreen(rgb);
-            uint32_t b = qBlue(rgb);
-            colors[i] = packABGR(r, g, b);
+            const Color rgb = (m_colormap == "MNE") ? mneAnalyzeColor(norm) : map_color(m_colormap, norm);
+            colors[i] = packABGR(rgb.r, rgb.g, rgb.b);
         }
         surface->applySourceEstimateColors(colors);
 

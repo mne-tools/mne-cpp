@@ -11,7 +11,7 @@
  *
  * CameraController is the Qt-typed adapter of the toolkit-neutral
  * @ref mne::viz::OrbitCamera, which does the maths. It is widget-agnostic: it takes the visible scene
- * centroid + extent and a per-pane @ref mne::viz::qt::SubView and produces the
+ * centroid + extent and a per-pane @ref mne::viz::SubView and produces the
  * @ref mne::viz::qt::CameraResult bundle (projection, view, model, eye position,
  * look-at and up vector) consumed by @ref mne::viz::qt::BrainRenderer.
  *
@@ -31,7 +31,7 @@
 //=============================================================================================================
 
 #include "../../viz_qt_global.h"
-#include "../core/viewstate.h"
+#include "../../../../brain/viewstate.h"
 
 //=============================================================================================================
 // QT INCLUDES

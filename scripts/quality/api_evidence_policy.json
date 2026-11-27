@@ -5,7 +5,6 @@
     "viz/backends/qt/3d/model/": "Scene-graph item owned and driven by BrainView; not constructed directly by library users.",
     "viz/backends/qt/3d/workers/": "Background worker owned by a real-time view; its behaviour is exercised through the owning view.",
     "viz/backends/qt/3d/core/": "Renderer internals behind the BrainView/MultimodalScene facade.",
-    "viz/backends/qt/3d/geometry/": "Renderer internals behind the BrainView/MultimodalScene facade.",
     "viz/backends/qt/3d/input/": "Interaction handler of an interactive view; evidenced by GUI tests."
   },
   "exempt_name_suffixes": {

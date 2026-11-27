@@ -31,6 +31,7 @@
 #include "../core/dataloader.h"
 #include "../input/raypicker.h"
 #include "../../qtconversions.h"
+#include "../../qtsettingsstore.h"
 #include "../../../../brain/meshfactory.h"
 #include "../model/braintreemodel.h"
 #include "../model/items/surfacetreeitem.h"
@@ -1405,11 +1406,12 @@ void BrainViewCore::loadMultiViewSettings()
     }
 
     // Delegate per-SubView serialization
-    m_singleView.load(settings, "single_", cameraRotation);
+    const QtSettingsStore store(settings);
+    m_singleView.load(store, "single_", cameraRotation);
     // The single view turns by the camera rotation, which is stored on its own
     m_singleView.rotation = cameraRotation;
     for (int i = 0; i < std::ssize(m_subViews); ++i)
-        m_subViews[i].load(settings, QStringLiteral("multi%1_").arg(i), cameraRotation);
+        m_subViews[i].load(store, std::format("multi{}_", i), cameraRotation);
 
     const int maxIdx = static_cast<int>(m_subViews.size()) - 1;
     m_visualizationEditTarget = normalizedVisualizationTarget(
@@ -1452,9 +1454,10 @@ void BrainViewCore::saveMultiViewSettings() const
     settings.setValue("infoPanelVisible", m_infoPanelVisible);
 
     // Delegate per-SubView serialization
-    m_singleView.save(settings, "single_");
+    QtSettingsStore store(settings);
+    m_singleView.save(store, "single_");
     for (int i = 0; i < std::ssize(m_subViews); ++i)
-        m_subViews[i].save(settings, QStringLiteral("multi%1_").arg(i));
+        m_subViews[i].save(store, std::format("multi{}_", i));
 
     settings.endGroup();
 }

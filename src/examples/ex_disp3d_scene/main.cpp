@@ -24,6 +24,8 @@
 #include <mne/viz/brain/brainsurface.h>
 #include <mne/viz/brain/meshfactory.h>
 #include <mne/viz/brain/rendertypes.h>
+#include <mne/viz/brain/viewstate.h>
+#include <mne/viz/host/settings_store.h>
 #include <mne/viz/brain/dipoleobject.h>
 #include <mne/viz/brain/electrodeobject.h>
 #include <mne/ieeg/ieeg_implantation.h>
@@ -316,6 +318,19 @@ int main(int argc, char* argv[])
     track.setGradient(Color{0, 0, 255, 255}, Color{255, 0, 0, 255}); // oldest to newest
     //! [polyline_object_usage]
     ok &= expect(track.hasData() && track.instanceCount() == 2, "PolylineObject: four positions with one repeat give two segments");
+
+    //! [view_state_usage]
+    // A pane's camera, shaders and layer visibility survive a restart through any SettingsStore
+    MemorySettingsStore viewSettings; // QtSettingsStore puts the same keys into a QSettings
+    SubView pane = SubView::defaultForIndex(2);
+    pane.surfaceType = "inflated";
+    pane.visibility.setObjectVisible("dipoles", false);
+    pane.save(viewSettings, "multi2_");
+    SubView restored;
+    restored.load(viewSettings, "multi2_");
+    //! [view_state_usage]
+    ok &= expect(restored.surfaceType == "inflated" && restored.brainShader == pane.brainShader && !restored.visibility.isObjectVisible("dipoles"),
+                 "SubView: surface, shader and visibility round-trip through a settings store");
 
     //! [multi_view_layout_usage]
     MultiViewLayout layout;

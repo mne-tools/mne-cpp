@@ -16,8 +16,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/viz/backends/qt/3d/core/viewstate.h>
+#include <mne/viz/brain/viewstate.h>
 #include <mne/viz/brain/rendertypes.h>
+#include <mne/viz/host/settings_store.h>
+#include <mne/viz/backends/qt/qtsettingsstore.h>
 #include <mne/viz/backends/qt/3d/core/surfacekeys.h>
 
 //=============================================================================================================
@@ -52,6 +54,8 @@ private slots:
     void testSetObjectVisibleByName();
     void testIsObjectVisibleByName();
     void testVisibilityLoadSave();
+    void testSubViewLoadSave();
+    void testSettingsStoreConversions();
 
     // ── SubView ───────────────────────────────────────────────────────
     void testSubViewDefaults();
@@ -191,24 +195,77 @@ void TestDisp3dViewState::testVisibilityLoadSave()
     // Save
     {
         QSettings settings(settingsPath, QSettings::IniFormat);
+        QtSettingsStore store(settings);
         ViewVisibilityProfile vp;
         vp.lh = false;
         vp.sensMeg = true;
         vp.network = true;
-        vp.save(settings, prefix);
+        vp.save(store, prefix.toStdString());
     }
 
     // Load
     {
         QSettings settings(settingsPath, QSettings::IniFormat);
+        const QtSettingsStore store(settings);
         ViewVisibilityProfile vp;
-        vp.load(settings, prefix);
+        vp.load(store, prefix.toStdString());
         QCOMPARE(vp.lh, false);
         QCOMPARE(vp.sensMeg, true);
         QCOMPARE(vp.network, true);
         // rh should have been saved as default (true)
         QCOMPARE(vp.rh, true);
     }
+}
+
+//=============================================================================================================
+
+void TestDisp3dViewState::testSubViewLoadSave()
+{
+    // An INI file hands every value back as text; the store converts it to the field's type
+    QTemporaryDir tmpDir;
+    QVERIFY(tmpDir.isValid());
+    const QString settingsPath = tmpDir.path() + "/test_subview.ini";
+    {
+        QSettings settings(settingsPath, QSettings::IniFormat);
+        QtSettingsStore store(settings);
+        SubView sv;
+        sv.surfaceType = "inflated";
+        sv.brainShader = Holographic;
+        sv.zoom = 1.5f;
+        sv.preset = 3;
+        sv.visibility.dipoles = false;
+        sv.save(store, "multi2_");
+    }
+    QSettings settings(settingsPath, QSettings::IniFormat);
+    const QtSettingsStore store(settings);
+    SubView sv;
+    sv.load(store, "multi2_");
+    QCOMPARE(sv.surfaceType, std::string("inflated"));
+    QCOMPARE(sv.brainShader, Holographic);
+    QCOMPARE(sv.zoom, 1.5f);
+    QCOMPARE(sv.preset, 3);
+    QVERIFY(!sv.visibility.dipoles);
+    QVERIFY(sv.rotation.isApprox(Eigen::Quaternionf::Identity()));
+}
+
+//=============================================================================================================
+
+void TestDisp3dViewState::testSettingsStoreConversions()
+{
+    MemorySettingsStore store;
+    store.set_value("flag", std::string("true"));
+    store.set_value("off", std::string("0"));
+    store.set_value("count", 2.6);
+    store.set_value("text", 7);
+    store.set_value("junk", std::string("abc"));
+
+    QVERIFY(store.read_bool("flag", false));
+    QVERIFY(!store.read_bool("off", true));
+    QCOMPARE(store.read_int("count", 0), 3);
+    QCOMPARE(store.read_string("text", ""), std::string("7"));
+    QCOMPARE(store.read_double("junk", -1.0), -1.0);
+    QVERIFY(store.read_bool("missing", true));
+    QVERIFY(!store.contains("missing"));
 }
 
 //=============================================================================================================
@@ -404,15 +461,13 @@ void TestDisp3dViewState::testMneAnalyzeColorRange()
 {
     // Test that the colormap returns valid colors across the full range
     for (double v = 0.0; v <= 1.0; v += 0.1) {
-        QRgb c = mneAnalyzeColor(v);
-        QVERIFY(qRed(c) >= 0 && qRed(c) <= 255);
-        QVERIFY(qGreen(c) >= 0 && qGreen(c) <= 255);
-        QVERIFY(qBlue(c) >= 0 && qBlue(c) <= 255);
+        const Color c = mneAnalyzeColor(v);
+        QCOMPARE(c.a, std::uint8_t(255));
     }
 
     // At 0.5 (zero field) should be gray
-    QRgb mid = mneAnalyzeColor(0.5);
-    int r = qRed(mid), g = qGreen(mid), b = qBlue(mid);
+    const Color mid = mneAnalyzeColor(0.5);
+    const int r = mid.r, g = mid.g, b = mid.b;
     // All channels should be similar (grayish)
     QVERIFY(qAbs(r - g) < 30);
     QVERIFY(qAbs(g - b) < 30);

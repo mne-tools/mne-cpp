@@ -405,6 +405,13 @@ aliases; replace the old spelling as below.
   (Eigen positions and transforms, `viz::Color`); `viz/brain/instancing.h`
   builds their model matrices, and `viz::color_from_hsl` and `viz::darker`
   join the colour maps in `viz/figures/colormap.h`.
+- Views persist their state through `viz::SettingsStore`
+  (`viz/host/settings_store.h`): typed reads of key/value pairs from any
+  storage, with `MemorySettingsStore` in memory and `qt::QtSettingsStore` on a
+  `QSettings`. The per-pane state of the brain view, `SubView` and
+  `ViewVisibilityProfile`, moved to `viz/brain/viewstate.h` and loads and
+  saves through it; `perspectivePresetRotation`/`multiViewPresetOffset`
+  return `Eigen::Quaternionf` and `mneAnalyzeColor` a `viz::Color`.
 - Views run in any backend through `viz/host/surface.h`: a backend implements
   `viz::Surface` (redraw requests, clock, pointer shape) and drives a
   `viz::SurfaceClient` (resize, pointer, wheel and key events, animation

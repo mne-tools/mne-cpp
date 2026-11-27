@@ -9,39 +9,31 @@
  * @date     March 2026
  * @brief    Per-viewport state (camera preset, zoom, pan, visibility filter) and serialisation helpers.
  *
- * A mne_viz_qt scene can be displayed either in a single interactive
- * viewport or in a 2x2 multi-view grid. @ref mne::viz::qt::SubView holds the
+ * A brain view can be displayed either in a single interactive
+ * viewport or in a 2x2 multi-view grid. @ref mne::viz::SubView holds the
  * per-pane camera state &mdash; preset (Top / Left / Front /
  * Perspective), zoom, pan offset and rotation quaternion &mdash;
- * and @ref mne::viz::qt::ViewVisibilityProfile holds the per-pane visibility mask
+ * and @ref mne::viz::ViewVisibilityProfile holds the per-pane visibility mask
  * (hide skin in the cortex view, hide dipoles in the sensor view,
  * ...).
  *
- * Both structs are POD-like and round-trip through @c QSettings so
- * the user's last camera and per-pane filter are restored when the
- * host application is relaunched.
+ * Both structs are POD-like and round-trip through a
+ * @ref mne::viz::SettingsStore so the user's last camera and per-pane filter
+ * are restored when the host application is relaunched.
  */
 
-#ifndef VIEWSTATE_H
-#define VIEWSTATE_H
+#ifndef VIZ_VIEWSTATE_H
+#define VIZ_VIEWSTATE_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
-#include "../../../../brain/rendertypes.h"
+#include "../viz_global.h"
+#include "rendertypes.h"
 
-#include <mne/viz/views/camera.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QString>
-#include <QQuaternion>
-#include <QVariant>
-#include <QColor>
+#include "../figures/style.h"
+#include "../views/camera.h"
 
 //=============================================================================================================
 // STL INCLUDES
@@ -57,14 +49,13 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QSettings;
-
 namespace mne::viz
 {
 class BrainSurface;
+class SettingsStore;
 } // namespace mne::viz
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 //=============================================================================================================
 /**
@@ -75,8 +66,10 @@ namespace mne::viz::qt
  * Every viewport (single-view or multi-view pane) carries an independent
  * visibility profile so that each pane can show a different combination of
  * objects.
+ *
+ * @snippet ex_disp3d_scene/main.cpp view_state_usage
  */
-struct VIZQTSHARED_EXPORT ViewVisibilityProfile
+struct VIZSHARED_EXPORT ViewVisibilityProfile
 {
     bool lh = true;
     bool rh = true;
@@ -128,7 +121,7 @@ struct VIZQTSHARED_EXPORT ViewVisibilityProfile
      * @param[in] settings Settings store to read from.
      * @param[in] prefix   QSettings key prefix (e.g. "singleVis_").
      */
-    void load(const QSettings& settings, const QString& prefix);
+    void load(const SettingsStore& settings, const std::string& prefix);
 
     //=========================================================================================================
     /**
@@ -137,7 +130,7 @@ struct VIZQTSHARED_EXPORT ViewVisibilityProfile
      * @param[out] settings  Settings store to write to.
      * @param[in]  prefix    QSettings key prefix.
      */
-    void save(QSettings& settings, const QString& prefix) const;
+    void save(SettingsStore& settings, const std::string& prefix) const;
 };
 
 //=============================================================================================================
@@ -151,8 +144,10 @@ struct VIZQTSHARED_EXPORT ViewVisibilityProfile
  * and, through its toolkit-neutral @ref mne::viz::PaneCamera base, the zoom,
  * pan, camera rotation and view preset — everything that can differ between
  * two viewports showing the same scene.
+ *
+ * @snippet ex_disp3d_scene/main.cpp view_state_usage
  */
-struct VIZQTSHARED_EXPORT SubView : viz::PaneCamera
+struct VIZSHARED_EXPORT SubView : viz::PaneCamera
 {
     // ── Per-view render configuration ──────────────────────────────────
     std::string surfaceType = "pial";
@@ -217,7 +212,7 @@ struct VIZQTSHARED_EXPORT SubView : viz::PaneCamera
      * @param[in] prefix    Key prefix (e.g. "multi0_").
      * @param[in] fallbackRotation  Rotation to use if no saved quaternion exists.
      */
-    void load(const QSettings& settings, const QString& prefix,
+    void load(const SettingsStore& settings, const std::string& prefix,
               const Eigen::Quaternionf& fallbackRotation = Eigen::Quaternionf::Identity());
 
     /**
@@ -226,7 +221,7 @@ struct VIZQTSHARED_EXPORT SubView : viz::PaneCamera
      * @param[out] settings  Settings store to write to.
      * @param[in]  prefix    Key prefix (e.g. "multi0_").
      */
-    void save(QSettings& settings, const QString& prefix) const;
+    void save(SettingsStore& settings, const std::string& prefix) const;
 
     // ── Factory ─────────────────────────────────────────────────────────
 
@@ -252,7 +247,7 @@ struct VIZQTSHARED_EXPORT SubView : viz::PaneCamera
  *
  * @return Rotation built from Euler angles (-45, -40, -130) degrees.
  */
-VIZQTSHARED_EXPORT QQuaternion perspectivePresetRotation();
+VIZSHARED_EXPORT Eigen::Quaternionf perspectivePresetRotation();
 
 /**
  * Human-readable name for a multi-view preset index (0–6).
@@ -260,7 +255,7 @@ VIZQTSHARED_EXPORT QQuaternion perspectivePresetRotation();
  * @param[in] preset  Preset index (0=Top, 1=Perspective, ..., 6=Right).
  * @return Preset name such as "Front"; out-of-range indices return "Top".
  */
-VIZQTSHARED_EXPORT std::string multiViewPresetName(int preset);
+VIZSHARED_EXPORT std::string multiViewPresetName(int preset);
 
 /**
  * Camera rotation quaternion for a multi-view preset index (0–6).
@@ -268,7 +263,7 @@ VIZQTSHARED_EXPORT std::string multiViewPresetName(int preset);
  * @param[in] preset  Preset index (0=Top, 1=Perspective, ..., 6=Right).
  * @return Camera rotation for the preset; out-of-range indices return the Top rotation.
  */
-VIZQTSHARED_EXPORT QQuaternion multiViewPresetOffset(int preset);
+VIZSHARED_EXPORT Eigen::Quaternionf multiViewPresetOffset(int preset);
 
 /**
  * Whether a preset is a perspective (free-rotate) camera rather than an
@@ -277,7 +272,7 @@ VIZQTSHARED_EXPORT QQuaternion multiViewPresetOffset(int preset);
  * @param[in] preset  Preset index (0=Top, 1=Perspective, ..., 6=Right).
  * @return True only for preset 1 (Perspective).
  */
-VIZQTSHARED_EXPORT bool multiViewPresetIsPerspective(int preset);
+VIZSHARED_EXPORT bool multiViewPresetIsPerspective(int preset);
 
 //=============================================================================================================
 // FREE FUNCTIONS — enum ↔ string conversion
@@ -291,7 +286,7 @@ VIZQTSHARED_EXPORT bool multiViewPresetIsPerspective(int preset);
  *                     compatibility, but callers should pass viewportCount-1.
  * @return Target index clamped to [-1, maxIndex].
  */
-VIZQTSHARED_EXPORT int normalizedVisualizationTarget(int target, int maxIndex = 3);
+VIZSHARED_EXPORT int normalizedVisualizationTarget(int target, int maxIndex = 3);
 
 /**
  * Convert a shader name ("Standard", "Holographic", "Anatomical") to enum.
@@ -299,7 +294,7 @@ VIZQTSHARED_EXPORT int normalizedVisualizationTarget(int target, int maxIndex = 
  * @param[in] name  Shader name; "XRay" is also recognised.
  * @return Matching ShaderMode, or Standard for unknown names.
  */
-VIZQTSHARED_EXPORT ShaderMode shaderModeFromName(std::string_view name);
+VIZSHARED_EXPORT ShaderMode shaderModeFromName(std::string_view name);
 
 /**
  * Convert a ShaderMode enum to display string.
@@ -307,7 +302,7 @@ VIZQTSHARED_EXPORT ShaderMode shaderModeFromName(std::string_view name);
  * @param[in] mode  Shader mode to convert.
  * @return "Holographic", "Anatomical", or "Standard" for all other modes.
  */
-VIZQTSHARED_EXPORT std::string shaderModeName(ShaderMode mode);
+VIZSHARED_EXPORT std::string shaderModeName(ShaderMode mode);
 
 /**
  * Convert a visualization mode name to enum.
@@ -315,7 +310,7 @@ VIZQTSHARED_EXPORT std::string shaderModeName(ShaderMode mode);
  * @param[in] name  Mode name ("Annotation", "Scientific", "Source Estimate").
  * @return Matching VisualizationMode, or ModeSurface for unknown names.
  */
-VIZQTSHARED_EXPORT VisualizationMode visualizationModeFromName(std::string_view name);
+VIZSHARED_EXPORT VisualizationMode visualizationModeFromName(std::string_view name);
 
 /**
  * Convert a VisualizationMode enum to display string.
@@ -323,7 +318,7 @@ VIZQTSHARED_EXPORT VisualizationMode visualizationModeFromName(std::string_view 
  * @param[in] mode  Visualization mode to convert.
  * @return "Annotation", "Scientific", "Source Estimate", or "Surface".
  */
-VIZQTSHARED_EXPORT std::string visualizationModeName(VisualizationMode mode);
+VIZSHARED_EXPORT std::string visualizationModeName(VisualizationMode mode);
 
 //=============================================================================================================
 // FREE FUNCTIONS — colormap
@@ -338,24 +333,9 @@ VIZQTSHARED_EXPORT std::string visualizationModeName(VisualizationMode mode);
  * @param[in] v   Normalised value in [0,1].
  * @return        Packed QRgb colour.
  */
-VIZQTSHARED_EXPORT QRgb mneAnalyzeColor(double v);
+VIZSHARED_EXPORT Color mneAnalyzeColor(double v);
 
-//=============================================================================================================
-// FREE FUNCTIONS — QSettings helpers
-//=============================================================================================================
 
-/**
- * Read a boolean from QSettings with a default fallback.
- *
- * @param[in] value     Value read from QSettings.
- * @param[in] fallback  Result to use when the value is invalid (key missing).
- * @return The value converted to bool, or fallback if the value is invalid.
- */
-inline bool isTrue(const QVariant& value, bool fallback)
-{
-    return value.isValid() ? value.toBool() : fallback;
-}
+} // namespace mne::viz
 
-} // namespace mne::viz::qt
-
-#endif // VIEWSTATE_H
+#endif // VIZ_VIEWSTATE_H

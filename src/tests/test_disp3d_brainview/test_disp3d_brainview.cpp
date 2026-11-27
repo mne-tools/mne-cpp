@@ -59,7 +59,7 @@
 #include <mne/fwd/fwd_field_map.h>
 #include <mne/viz/backends/qt/plots/helpers/colormap.h>
 #include <mne/inv/inv_source_estimate.h>
-#include <mne/viz/backends/qt/3d/core/viewstate.h>
+#include <mne/viz/brain/viewstate.h>
 #include <mne/viz/backends/qt/qtconversions.h>
 #include <mne/fiff/fiff_dig_point.h>
 #include <mne/fiff/fiff_constants.h>

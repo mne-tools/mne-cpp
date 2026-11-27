@@ -551,7 +551,7 @@ void Align3DView::applyViewConfiguration()
     static constexpr int kFallbackMultiViewPresets[4] = {1, 2, 3, 0};
 
     m_pBrainView->resetSingleViewCameraState();
-    m_pBrainView->setInitialCameraRotation(multiViewPresetOffset(m_cameraPreset));
+    m_pBrainView->setInitialCameraRotation(toQt(multiViewPresetOffset(m_cameraPreset)));
 
     if (viewCount > 1) {
         for (int i = 0; i < viewCount; ++i) {

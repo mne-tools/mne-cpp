@@ -16,15 +16,8 @@
 
 #include "viewstate.h"
 
-#include "../../../../brain/brainsurface.h"
-#include "../view/brainrenderer.h"
-#include "../../qtconversions.h"
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QSettings>
+#include "brainsurface.h"
+#include "../host/settings_store.h"
 
 //=============================================================================================================
 // STL INCLUDES
@@ -32,9 +25,10 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <limits>
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -146,62 +140,62 @@ void ViewVisibilityProfile::setObjectVisible(std::string_view object, bool visib
 
 //=============================================================================================================
 
-void ViewVisibilityProfile::load(const QSettings& settings, const QString& prefix)
+void ViewVisibilityProfile::load(const SettingsStore& settings, const std::string& prefix)
 {
-    lh = isTrue(settings.value(prefix + "lh"), lh);
-    rh = isTrue(settings.value(prefix + "rh"), rh);
-    bemHead = isTrue(settings.value(prefix + "bemHead"), bemHead);
-    bemOuterSkull = isTrue(settings.value(prefix + "bemOuterSkull"), bemOuterSkull);
-    bemInnerSkull = isTrue(settings.value(prefix + "bemInnerSkull"), bemInnerSkull);
-    sensMeg = isTrue(settings.value(prefix + "sensMeg"), sensMeg);
-    sensMegGrad = isTrue(settings.value(prefix + "sensMegGrad"), sensMegGrad);
-    sensMegMag = isTrue(settings.value(prefix + "sensMegMag"), sensMegMag);
-    sensMegHelmet = isTrue(settings.value(prefix + "sensMegHelmet"), sensMegHelmet);
-    sensEeg = isTrue(settings.value(prefix + "sensEeg"), sensEeg);
-    dig = isTrue(settings.value(prefix + "dig"), dig);
-    digCardinal = isTrue(settings.value(prefix + "digCardinal"), digCardinal);
-    digHpi = isTrue(settings.value(prefix + "digHpi"), digHpi);
-    digEeg = isTrue(settings.value(prefix + "digEeg"), digEeg);
-    digExtra = isTrue(settings.value(prefix + "digExtra"), digExtra);
-    megFieldMap = isTrue(settings.value(prefix + "megFieldMap"), megFieldMap);
-    eegFieldMap = isTrue(settings.value(prefix + "eegFieldMap"), eegFieldMap);
-    megFieldContours = isTrue(settings.value(prefix + "megFieldContours"), megFieldContours);
-    eegFieldContours = isTrue(settings.value(prefix + "eegFieldContours"), eegFieldContours);
-    dipoles = isTrue(settings.value(prefix + "dipoles"), dipoles);
-    sourceSpace = isTrue(settings.value(prefix + "sourceSpace"), sourceSpace);
-    network = isTrue(settings.value(prefix + "network"), network);
-    megFieldMapOnHead = isTrue(settings.value(prefix + "megFieldMapOnHead"), megFieldMapOnHead);
-    mriSlices = isTrue(settings.value(prefix + "mriSlices"), mriSlices);
+    lh = settings.read_bool(prefix + "lh", lh);
+    rh = settings.read_bool(prefix + "rh", rh);
+    bemHead = settings.read_bool(prefix + "bemHead", bemHead);
+    bemOuterSkull = settings.read_bool(prefix + "bemOuterSkull", bemOuterSkull);
+    bemInnerSkull = settings.read_bool(prefix + "bemInnerSkull", bemInnerSkull);
+    sensMeg = settings.read_bool(prefix + "sensMeg", sensMeg);
+    sensMegGrad = settings.read_bool(prefix + "sensMegGrad", sensMegGrad);
+    sensMegMag = settings.read_bool(prefix + "sensMegMag", sensMegMag);
+    sensMegHelmet = settings.read_bool(prefix + "sensMegHelmet", sensMegHelmet);
+    sensEeg = settings.read_bool(prefix + "sensEeg", sensEeg);
+    dig = settings.read_bool(prefix + "dig", dig);
+    digCardinal = settings.read_bool(prefix + "digCardinal", digCardinal);
+    digHpi = settings.read_bool(prefix + "digHpi", digHpi);
+    digEeg = settings.read_bool(prefix + "digEeg", digEeg);
+    digExtra = settings.read_bool(prefix + "digExtra", digExtra);
+    megFieldMap = settings.read_bool(prefix + "megFieldMap", megFieldMap);
+    eegFieldMap = settings.read_bool(prefix + "eegFieldMap", eegFieldMap);
+    megFieldContours = settings.read_bool(prefix + "megFieldContours", megFieldContours);
+    eegFieldContours = settings.read_bool(prefix + "eegFieldContours", eegFieldContours);
+    dipoles = settings.read_bool(prefix + "dipoles", dipoles);
+    sourceSpace = settings.read_bool(prefix + "sourceSpace", sourceSpace);
+    network = settings.read_bool(prefix + "network", network);
+    megFieldMapOnHead = settings.read_bool(prefix + "megFieldMapOnHead", megFieldMapOnHead);
+    mriSlices = settings.read_bool(prefix + "mriSlices", mriSlices);
 }
 
 //=============================================================================================================
 
-void ViewVisibilityProfile::save(QSettings& settings, const QString& prefix) const
+void ViewVisibilityProfile::save(SettingsStore& settings, const std::string& prefix) const
 {
-    settings.setValue(prefix + "lh", lh);
-    settings.setValue(prefix + "rh", rh);
-    settings.setValue(prefix + "bemHead", bemHead);
-    settings.setValue(prefix + "bemOuterSkull", bemOuterSkull);
-    settings.setValue(prefix + "bemInnerSkull", bemInnerSkull);
-    settings.setValue(prefix + "sensMeg", sensMeg);
-    settings.setValue(prefix + "sensMegGrad", sensMegGrad);
-    settings.setValue(prefix + "sensMegMag", sensMegMag);
-    settings.setValue(prefix + "sensMegHelmet", sensMegHelmet);
-    settings.setValue(prefix + "sensEeg", sensEeg);
-    settings.setValue(prefix + "dig", dig);
-    settings.setValue(prefix + "digCardinal", digCardinal);
-    settings.setValue(prefix + "digHpi", digHpi);
-    settings.setValue(prefix + "digEeg", digEeg);
-    settings.setValue(prefix + "digExtra", digExtra);
-    settings.setValue(prefix + "megFieldMap", megFieldMap);
-    settings.setValue(prefix + "eegFieldMap", eegFieldMap);
-    settings.setValue(prefix + "megFieldContours", megFieldContours);
-    settings.setValue(prefix + "eegFieldContours", eegFieldContours);
-    settings.setValue(prefix + "dipoles", dipoles);
-    settings.setValue(prefix + "sourceSpace", sourceSpace);
-    settings.setValue(prefix + "network", network);
-    settings.setValue(prefix + "megFieldMapOnHead", megFieldMapOnHead);
-    settings.setValue(prefix + "mriSlices", mriSlices);
+    settings.set_value(prefix + "lh", lh);
+    settings.set_value(prefix + "rh", rh);
+    settings.set_value(prefix + "bemHead", bemHead);
+    settings.set_value(prefix + "bemOuterSkull", bemOuterSkull);
+    settings.set_value(prefix + "bemInnerSkull", bemInnerSkull);
+    settings.set_value(prefix + "sensMeg", sensMeg);
+    settings.set_value(prefix + "sensMegGrad", sensMegGrad);
+    settings.set_value(prefix + "sensMegMag", sensMegMag);
+    settings.set_value(prefix + "sensMegHelmet", sensMegHelmet);
+    settings.set_value(prefix + "sensEeg", sensEeg);
+    settings.set_value(prefix + "dig", dig);
+    settings.set_value(prefix + "digCardinal", digCardinal);
+    settings.set_value(prefix + "digHpi", digHpi);
+    settings.set_value(prefix + "digEeg", digEeg);
+    settings.set_value(prefix + "digExtra", digExtra);
+    settings.set_value(prefix + "megFieldMap", megFieldMap);
+    settings.set_value(prefix + "eegFieldMap", eegFieldMap);
+    settings.set_value(prefix + "megFieldContours", megFieldContours);
+    settings.set_value(prefix + "eegFieldContours", eegFieldContours);
+    settings.set_value(prefix + "dipoles", dipoles);
+    settings.set_value(prefix + "sourceSpace", sourceSpace);
+    settings.set_value(prefix + "network", network);
+    settings.set_value(prefix + "megFieldMapOnHead", megFieldMapOnHead);
+    settings.set_value(prefix + "mriSlices", mriSlices);
 }
 
 //=============================================================================================================
@@ -302,9 +296,9 @@ void SubView::applyOverlayToSurfaces(
 // Camera presets
 //=============================================================================================================
 
-QQuaternion perspectivePresetRotation()
+Eigen::Quaternionf perspectivePresetRotation()
 {
-    return toQQuaternion(viz::perspective_preset_rotation());
+    return viz::perspective_preset_rotation();
 }
 
 //=============================================================================================================
@@ -316,9 +310,9 @@ std::string multiViewPresetName(int preset)
 
 //=============================================================================================================
 
-QQuaternion multiViewPresetOffset(int preset)
+Eigen::Quaternionf multiViewPresetOffset(int preset)
 {
-    return toQQuaternion(viz::view_preset_rotation(preset));
+    return viz::view_preset_rotation(preset);
 }
 
 //=============================================================================================================
@@ -412,7 +406,7 @@ std::string visualizationModeName(VisualizationMode mode)
 // Colormap
 //=============================================================================================================
 
-QRgb mneAnalyzeColor(double v)
+Color mneAnalyzeColor(double v)
 {
     double x = 2.0 * v - 1.0;
     x = std::clamp(x, -1.0, 1.0);
@@ -442,34 +436,33 @@ QRgb mneAnalyzeColor(double v)
     int g = static_cast<int>(std::round((gg[seg] + t * (gg[seg + 1] - gg[seg])) * 255.0));
     int b = static_cast<int>(std::round((bb[seg] + t * (bb[seg + 1] - bb[seg])) * 255.0));
 
-    return qRgb(std::clamp(r, 0, 255), std::clamp(g, 0, 255), std::clamp(b, 0, 255));
+    return {static_cast<std::uint8_t>(std::clamp(r, 0, 255)), static_cast<std::uint8_t>(std::clamp(g, 0, 255)), static_cast<std::uint8_t>(std::clamp(b, 0, 255)), 255};
 }
 
 //=============================================================================================================
 // SubView serialisation
 //=============================================================================================================
 
-void SubView::load(const QSettings& settings, const QString& prefix,
+void SubView::load(const SettingsStore& settings, const std::string& prefix,
                    const Eigen::Quaternionf& fallbackRotation)
 {
-    surfaceType = settings.value(prefix + "surfaceType", QString::fromStdString(surfaceType)).toString().toStdString();
-    brainShader = shaderModeFromName(settings.value(prefix + "shader", QString::fromStdString(shaderModeName(brainShader))).toString().toStdString());
-    bemShader = shaderModeFromName(settings.value(prefix + "bemShader", QString::fromStdString(shaderModeName(bemShader))).toString().toStdString());
-    overlayMode = visualizationModeFromName(settings.value(prefix + "overlay", QString::fromStdString(visualizationModeName(overlayMode))).toString().toStdString());
+    surfaceType = settings.read_string(prefix + "surfaceType", surfaceType);
+    brainShader = shaderModeFromName(settings.read_string(prefix + "shader", shaderModeName(brainShader)));
+    bemShader = shaderModeFromName(settings.read_string(prefix + "bemShader", shaderModeName(bemShader)));
+    overlayMode = visualizationModeFromName(settings.read_string(prefix + "overlay", visualizationModeName(overlayMode)));
 
     visibility.load(settings, prefix + "vis_");
 
-    zoom = settings.value(prefix + "zoom", zoom).toFloat();
-    pan = Eigen::Vector2f(settings.value(prefix + "panX", pan.x()).toFloat(), settings.value(prefix + "panY", pan.y()).toFloat());
-    preset = viz::clamp_view_preset(settings.value(prefix + "preset", preset).toInt());
+    zoom = static_cast<float>(settings.read_double(prefix + "zoom", zoom));
+    pan = Eigen::Vector2f(static_cast<float>(settings.read_double(prefix + "panX", pan.x())), static_cast<float>(settings.read_double(prefix + "panY", pan.y())));
+    preset = viz::clamp_view_preset(settings.read_int(prefix + "preset", preset));
 
     const bool hasQuat = settings.contains(prefix + "perspRotW") && settings.contains(prefix + "perspRotX") && settings.contains(prefix + "perspRotY") && settings.contains(prefix + "perspRotZ");
     if (hasQuat) {
-        const float w = settings.value(prefix + "perspRotW", 1.0f).toFloat();
-        const float x = settings.value(prefix + "perspRotX", 0.0f).toFloat();
-        const float y = settings.value(prefix + "perspRotY", 0.0f).toFloat();
-        const float z = settings.value(prefix + "perspRotZ", 0.0f).toFloat();
-        rotation = Eigen::Quaternionf(w, x, y, z);
+        const auto component = [&](const char* name, double fallback) {
+            return static_cast<float>(settings.read_double(prefix + name, fallback));
+        };
+        rotation = Eigen::Quaternionf(component("perspRotW", 1.0), component("perspRotX", 0.0), component("perspRotY", 0.0), component("perspRotZ", 0.0));
         if (rotation.squaredNorm() <= std::numeric_limits<float>::epsilon()) {
             rotation = Eigen::Quaternionf::Identity();
         } else {
@@ -482,24 +475,24 @@ void SubView::load(const QSettings& settings, const QString& prefix,
 
 //=============================================================================================================
 
-void SubView::save(QSettings& settings, const QString& prefix) const
+void SubView::save(SettingsStore& settings, const std::string& prefix) const
 {
-    settings.setValue(prefix + "surfaceType", QString::fromStdString(surfaceType));
-    settings.setValue(prefix + "shader", QString::fromStdString(shaderModeName(brainShader)));
-    settings.setValue(prefix + "bemShader", QString::fromStdString(shaderModeName(bemShader)));
-    settings.setValue(prefix + "overlay", QString::fromStdString(visualizationModeName(overlayMode)));
+    settings.set_value(prefix + "surfaceType", surfaceType);
+    settings.set_value(prefix + "shader", shaderModeName(brainShader));
+    settings.set_value(prefix + "bemShader", shaderModeName(bemShader));
+    settings.set_value(prefix + "overlay", visualizationModeName(overlayMode));
 
     visibility.save(settings, prefix + "vis_");
 
-    settings.setValue(prefix + "zoom", zoom);
-    settings.setValue(prefix + "panX", pan.x());
-    settings.setValue(prefix + "panY", pan.y());
-    settings.setValue(prefix + "preset", preset);
+    settings.set_value(prefix + "zoom", static_cast<double>(zoom));
+    settings.set_value(prefix + "panX", static_cast<double>(pan.x()));
+    settings.set_value(prefix + "panY", static_cast<double>(pan.y()));
+    settings.set_value(prefix + "preset", preset);
 
-    settings.setValue(prefix + "perspRotW", rotation.w());
-    settings.setValue(prefix + "perspRotX", rotation.x());
-    settings.setValue(prefix + "perspRotY", rotation.y());
-    settings.setValue(prefix + "perspRotZ", rotation.z());
+    settings.set_value(prefix + "perspRotW", static_cast<double>(rotation.w()));
+    settings.set_value(prefix + "perspRotX", static_cast<double>(rotation.x()));
+    settings.set_value(prefix + "perspRotY", static_cast<double>(rotation.y()));
+    settings.set_value(prefix + "perspRotZ", static_cast<double>(rotation.z()));
 }
 
-} // namespace mne::viz::qt
+} // namespace mne::viz

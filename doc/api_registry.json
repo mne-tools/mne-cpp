@@ -12311,8 +12311,8 @@
     },
     {
       "name": "SubView",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/3d/core/viewstate.h",
+      "module": "viz",
+      "header": "viz/brain/viewstate.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -12323,7 +12323,12 @@
       "sidebar_position": 110,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#view_state_usage"
+      ],
+      "example_mode": "run"
     },
     {
       "name": "SurfaceTreeItem",
@@ -12364,8 +12369,8 @@
     },
     {
       "name": "ViewVisibilityProfile",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/3d/core/viewstate.h",
+      "module": "viz",
+      "header": "viz/brain/viewstate.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -12376,7 +12381,12 @@
       "sidebar_position": 113,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#view_state_usage"
+      ],
+      "example_mode": "run"
     },
     {
       "name": "GpuStream",
@@ -14678,6 +14688,66 @@
       "guide": null,
       "python_equiv": null,
       "python_url": null
+    },
+    {
+      "name": "SettingsStore",
+      "module": "viz",
+      "header": "viz/host/settings_store.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_disp3d_viewstate",
+      "status": "documented",
+      "documented": true,
+      "sidebar_position": 123,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null,
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#view_state_usage"
+      ],
+      "example_mode": "run"
+    },
+    {
+      "name": "MemorySettingsStore",
+      "module": "viz",
+      "header": "viz/host/settings_store.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_disp3d_viewstate",
+      "status": "documented",
+      "documented": true,
+      "sidebar_position": 124,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null,
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#view_state_usage"
+      ],
+      "example_mode": "run"
+    },
+    {
+      "name": "QtSettingsStore",
+      "module": "viz_qt",
+      "header": "viz/backends/qt/qtsettingsstore.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_disp3d_viewstate",
+      "status": "documented",
+      "documented": true,
+      "sidebar_position": 129,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Adapter of viz::SettingsStore onto QSettings that BrainView persists through; the example shows the store interface with MemorySettingsStore."
     }
   ],
   "parity": {

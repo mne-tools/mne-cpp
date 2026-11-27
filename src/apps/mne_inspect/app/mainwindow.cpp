@@ -19,7 +19,7 @@
 
 #include <mne/viz/backends/qt/3d/view/brainview.h>
 #include <mne/viz/backends/qt/3d/model/braintreemodel.h>
-#include <mne/viz/backends/qt/3d/core/viewstate.h>
+#include <mne/viz/brain/viewstate.h>
 #include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
 #include <mne/viz/backends/qt/3d/scene/pickresult.h>
 #include <mne/fs/fs_surface.h>

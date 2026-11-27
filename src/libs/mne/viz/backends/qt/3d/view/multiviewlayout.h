@@ -13,7 +13,7 @@
  * perspective, Top-right orthographic top, Bottom-left
  * orthographic left, Bottom-right orthographic front) inside the
  * owning QRhiWidget, honours user-dragged splitter ratios, and
- * publishes the per-pane @ref mne::viz::qt::SubView so the camera and renderer
+ * publishes the per-pane @ref mne::viz::SubView so the camera and renderer
  * can set viewport / scissor and pick the right matrix preset. It is the
  * Qt-typed adapter of the toolkit-neutral @ref mne::viz::PaneLayout.
  */

@@ -30,6 +30,7 @@ set(QT_NO_PRIVATE_MODULE_WARNING ON)
 find_package(Qt6 REQUIRED COMPONENTS GuiPrivate ShaderTools)
 
 set(SOURCES
+    qtsettingsstore.cpp
     plots/imagesc.cpp
     plots/plot.cpp
     plots/graph.cpp
@@ -105,7 +106,6 @@ set(SOURCES
     viewers/helpers/frequencyspectrummodel.cpp
     viewers/helpers/bidsviewmodel.cpp
     3d/core/dataloader.cpp
-    3d/core/viewstate.cpp
     3d/input/cameracontroller.cpp
     3d/input/raypicker.cpp
     3d/model/braintreemodel.cpp
@@ -215,7 +215,6 @@ set(HEADERS
     viewers/helpers/bidsviewmodel.h
     3d/core/surfacekeys.h
     3d/core/dataloader.h
-    3d/core/viewstate.h
     3d/input/cameracontroller.h
     3d/input/raypicker.h
     3d/model/braintreemodel.h
@@ -250,6 +249,7 @@ set(HEADERS
     3d/workers/rtsensorinterpolationmatworker.h
     3d/workers/rtsourceinterpolationmatworker.h
     qtconversions.h
+    qtsettingsstore.h
 )
 
 set(UI

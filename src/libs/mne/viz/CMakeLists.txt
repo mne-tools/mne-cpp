@@ -16,6 +16,7 @@ set(SOURCES
   brain/meshfactory.cpp
   brain/networkobject.cpp
   brain/polylineobject.cpp
+  brain/viewstate.cpp
   figures/average_layout.cpp
   figures/average_tile.cpp
   figures/bar_chart.cpp
@@ -38,6 +39,7 @@ set(SOURCES
   gpu/gpu_frame.cpp
   gpu/software_renderer.cpp
   gpu/trace_frame.cpp
+  host/settings_store.cpp
   host/surface.cpp
   host/trace_view_client.cpp
   models/bids_tree.cpp
@@ -62,12 +64,13 @@ set(HEADERS
   brain/dipoleobject.h
   brain/electrodeobject.h
   brain/geometryinfo.h
+  brain/instancing.h
   brain/interpolation.h
   brain/meshfactory.h
-  brain/instancing.h
   brain/networkobject.h
   brain/polylineobject.h
   brain/rendertypes.h
+  brain/viewstate.h
   figures/average_layout.h
   figures/average_tile.h
   figures/bar_chart.h
@@ -92,6 +95,7 @@ set(HEADERS
   gpu/gpu_frame.h
   gpu/software_renderer.h
   gpu/trace_frame.h
+  host/settings_store.h
   host/surface.h
   host/trace_view_client.h
   models/bids_tree.h
