@@ -50,6 +50,7 @@ set(SOURCES
   figures/vector_plot.cpp
   forms/settings_form.cpp
   panels/compensator_panel.cpp
+  panels/forward_panel.cpp
   panels/panel.cpp
   panels/projectors_panel.cpp
   gpu/brain_frame.cpp
@@ -127,6 +128,7 @@ set(HEADERS
   figures/vector_plot.h
   forms/settings_form.h
   panels/compensator_panel.h
+  panels/forward_panel.h
   panels/panel.h
   panels/projectors_panel.h
   gpu/brain_frame.h

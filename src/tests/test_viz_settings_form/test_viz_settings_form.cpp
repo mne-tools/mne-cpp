@@ -17,6 +17,8 @@
 #include <mne/viz/forms/settings_form.h>
 #include <mne/viz/host/settings_store.h>
 #include <mne/viz/panels/compensator_panel.h>
+#include <mne/viz/panels/forward_panel.h>
+#include <mne/fiff/fiff_constants.h>
 #include <mne/viz/panels/projectors_panel.h>
 
 //=============================================================================================================
@@ -281,6 +283,49 @@ void test_projectors_panel()
     CHECK(restored.gui_mode() == Panel::GuiMode::Clinical && restored.processing_mode() == Panel::ProcessingMode::Offline);
 }
 
+void test_forward_panel()
+{
+    ForwardPanel panel;
+    CHECK(panel.id() == "FwdSettingsView" && !panel.atlas_loaded() && panel.clustering() && panel.cluster_sources() == 200);
+    int computations = 0;
+    std::vector<bool> clusterings;
+    ForwardPanel::Callbacks callbacks;
+    callbacks.compute = [&computations] {
+        ++computations;
+    };
+    callbacks.clustering_changed = [&clusterings](bool on) {
+        clusterings.push_back(on);
+    };
+    panel.set_callbacks(std::move(callbacks));
+
+    // States show as toned text
+    panel.set_status(static_cast<int>(ForwardPanel::Status::NotClustered));
+    CHECK(panel.form().get<std::string>("status") == "Not Clustered" && panel.form().field("status")->tone == SettingField::Tone::Warning);
+    panel.set_status(42);
+    CHECK(panel.form().get<std::string>("status") == "Finished" && panel.form().field("status")->tone == SettingField::Tone::Positive);
+
+    panel.set_solution_information(1, FIFFV_COORD_MRI, 8000, 306, 2);
+    CHECK(panel.form().get<std::string>("sourceOrientation") == "free" && panel.form().get<std::string>("coordinateFrame") == "MRI Space");
+    CHECK(panel.form().get<std::string>("sources") == "8000");
+
+    // Without an atlas clustering cannot be switched on
+    panel.form().set_value("cluster", false);
+    panel.form().set_value("cluster", true);
+    CHECK(!panel.clustering() && (clusterings == std::vector<bool>{false}));
+    CHECK(panel.form().field("atlasStatus")->tone == SettingField::Tone::Warning);
+    CHECK(!panel.set_atlas_directory("/nonexistent-atlas-directory"));
+
+    // Range and the compute button
+    panel.form().set_value("clusterSources", 5000);
+    CHECK(panel.cluster_sources() == 999);
+    panel.form().trigger("compute");
+    CHECK(computations == 1);
+    // Nothing of the forward panel is stored
+    MemorySettingsStore store;
+    panel.save(store, "app");
+    CHECK(store.values().empty());
+}
+
 } // namespace
 
 //=============================================================================================================
@@ -297,6 +342,7 @@ int main()
         {"info_paths_colors_and_removal", test_info_paths_colors_and_removal},
         {"compensator_panel", test_compensator_panel},
         {"projectors_panel", test_projectors_panel},
+        {"forward_panel", test_forward_panel},
     };
     for (const auto& [name, test] : tests) {
         const int before = g_failures;

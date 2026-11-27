@@ -1252,10 +1252,6 @@
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/viz/backends/qt/viewers/fwdsettingsview.h": {
-      "modernize-use-nullptr": 1,
-      "modernize-use-override": 6
-    },
     "src/libs/mne/viz/backends/qt/viewers/helpers/bidsviewmodel.cpp": {
       "bugprone-switch-missing-default-case": 1
     },

@@ -21,7 +21,8 @@
 #include "rtfwd.h"
 
 #include "FormFiles/rtfwdsetupwidget.h"
-#include <mne/viz/backends/qt/viewers/fwdsettingsview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/forward_panel.h>
 #include <mne/fwd/compute_fwd/compute_fwd_settings.h>
 #include <mne/fwd/compute_fwd/compute_fwd.h>
 #include <mne/inv/hpi/inv_hpi_fit.h>
@@ -37,7 +38,9 @@
 //=============================================================================================================
 
 #include <QtCore/QtPlugin>
+#include <QCoreApplication>
 #include <QFile>
+#include <QPointer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -248,31 +251,48 @@ void RtFwd::initPluginControlWidgets()
     if (bFiffInfo) {
         std::vector<std::unique_ptr<QWidget>> controlWidgets;
 
-        FwdSettingsView* pFwdSettingsView = makeControlWidget<FwdSettingsView>(controlWidgets, QString("MNESCAN/%1/").arg(this->getName()));
+        const std::filesystem::path atlasDir = path_from_utf8(
+            (QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/label").toStdString());
+        auto panel = std::make_shared<ForwardPanel>(atlasDir);
+        PanelWidget* pFwdWidget = makeControlWidget<PanelWidget>(controlWidgets, panel, QString("MNESCAN/%1/").arg(this->getName()));
         connect(this, &RtFwd::guiModeChanged,
-                pFwdSettingsView, &FwdSettingsView::setGuiMode);
-        pFwdSettingsView->setObjectName("widget_");
+                pFwdWidget, &PanelWidget::setGuiMode);
+        pFwdWidget->setObjectName("widget_");
 
-        // connect incoming signals
-        connect(pFwdSettingsView, &FwdSettingsView::recompStatusChanged,
-                this, &RtFwd::onRecompStatusChanged);
-        connect(pFwdSettingsView, &FwdSettingsView::clusteringStatusChanged,
-                this, &RtFwd::onClusteringStatusChanged);
-        connect(pFwdSettingsView, &FwdSettingsView::atlasDirChanged,
-                this, &RtFwd::onAtlasDirChanged);
-        connect(pFwdSettingsView, &FwdSettingsView::clusterNumberChanged,
-                this, &RtFwd::onClusterNumberChanged);
-        connect(pFwdSettingsView, &FwdSettingsView::doForwardComputation,
-                this, &RtFwd::onDoForwardComputation);
+        // What the panel reports
+        const QPointer<RtFwd> plugin(this);
+        ForwardPanel::Callbacks callbacks;
+        callbacks.compute = [plugin] {
+            if (plugin) {
+                plugin->onDoForwardComputation();
+            }
+        };
+        callbacks.recomputation_changed = [plugin](bool on) {
+            if (plugin) {
+                plugin->onRecompStatusChanged(on);
+            }
+        };
+        callbacks.clustering_changed = [plugin](bool on) {
+            if (plugin) {
+                plugin->onClusteringStatusChanged(on);
+            }
+        };
+        callbacks.cluster_sources_changed = [plugin](int sources) {
+            if (plugin) {
+                plugin->onClusterNumberChanged(sources);
+            }
+        };
+        callbacks.atlas_changed = [plugin](const std::filesystem::path& directory, const std::shared_ptr<FsAnnotationSet>& annotations) {
+            if (plugin) {
+                plugin->onAtlasDirChanged(directory, annotations);
+            }
+        };
+        panel->set_callbacks(std::move(callbacks));
 
-        // connect outgoing signals
-        connect(this, &RtFwd::statusInformationChanged,
-                pFwdSettingsView, &FwdSettingsView::setRecomputationStatus, Qt::BlockingQueuedConnection);
-        connect(this, &RtFwd::fwdSolutionAvailable,
-                pFwdSettingsView, &FwdSettingsView::setSolutionInformation, Qt::BlockingQueuedConnection);
-        connect(this, &RtFwd::clusteringAvailable,
-                pFwdSettingsView, &FwdSettingsView::setClusteredInformation, Qt::BlockingQueuedConnection);
-
+        // What the computation reports, from its thread to the panel's
+        connect(this, &RtFwd::statusInformationChanged, pFwdWidget, [panel](int status) { panel->set_status(status); }, Qt::BlockingQueuedConnection);
+        connect(this, &RtFwd::fwdSolutionAvailable, pFwdWidget, [panel](fiff_int_t sourceOri, fiff_int_t coordFrame, int sources, int channels, int spaces) { panel->set_solution_information(sourceOri, coordFrame, sources, channels, spaces); }, Qt::BlockingQueuedConnection);
+        connect(this, &RtFwd::clusteringAvailable, pFwdWidget, [panel](int sources) { panel->set_clustered_information(sources); }, Qt::BlockingQueuedConnection);
 
         offerControlWidgets(std::move(controlWidgets));
 

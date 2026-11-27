@@ -54,7 +54,6 @@ set(SOURCES
     viewers/dipolefitview.cpp
     viewers/filterdesignview.cpp
     viewers/averagelayoutview.cpp
-    viewers/fwdsettingsview.cpp
     viewers/helpers/scalecontrol.cpp
     viewers/progressview.cpp
     viewers/spectrumview.cpp
@@ -151,7 +150,6 @@ set(HEADERS
     viewers/dipolefitview.h
     viewers/filterdesignview.h
     viewers/averagelayoutview.h
-    viewers/fwdsettingsview.h
     viewers/helpers/scalecontrol.h
     viewers/progressview.h
     viewers/spectrumview.h
@@ -236,7 +234,6 @@ set(UI
     viewers/formfiles/coregsettingsview.ui
     viewers/formfiles/dipolefitview.ui
     viewers/formfiles/filterdesignview.ui
-    viewers/formfiles/fwdsettingsview.ui
     viewers/formfiles/scalecontrol.ui
     viewers/formfiles/progressview.ui
     viewers/formfiles/channelselectionview.ui

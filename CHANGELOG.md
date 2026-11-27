@@ -413,7 +413,7 @@ aliases; replace the old spelling as below.
   generic Qt building blocks move to `viz/backends/qt/kit/` (`SettingsPanel`,
   `PanelWidget`). `CompensatorView` and `ProjectorsView` are replaced by
   `viz::CompensatorPanel` and `viz::ProjectorsPanel` (their settings are
-  stored under new keys). `SettingsForm` gains read-only Info fields with a
+  stored under new keys), and `FwdSettingsView` by `viz::ForwardPanel`. `SettingsForm` gains read-only Info fields with a
   tone, Directory and Color fields, `add_path()` and `remove()`;
   `SettingsPanel` rebuilds its rows when fields are added or removed.
 - `ChannelRhiRenderer` hosts a `viz::TraceViewClient`, the same trace view

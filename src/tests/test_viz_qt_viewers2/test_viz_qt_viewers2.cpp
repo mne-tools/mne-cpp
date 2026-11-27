@@ -9,7 +9,7 @@
  * @date     March, 2026
  * @brief    Tests for additional disp viewer widget classes and helper models.
  *           Covers: HpiSettingsView, CoregSettingsView, ArtifactSettingsView,
- *           FwdSettingsView, FiffRawViewSettings, ProjectSettingsView, BidsView,
+ *           PanelWidget (forward solution), FiffRawViewSettings, ProjectSettingsView, BidsView,
  *           ChannelSelectionView, AverageLayoutView, AverageSelectionView,
  *           ButterflyView, SpectrumView, RtFiffRawViewModel, EvokedSetModel,
  *           ChannelInfoModel, and RtFiffRawView.
@@ -26,7 +26,8 @@
 #include <mne/viz/backends/qt/viewers/hpisettingsview.h>
 #include <mne/viz/backends/qt/viewers/coregsettingsview.h>
 #include <mne/viz/backends/qt/viewers/artifactsettingsview.h>
-#include <mne/viz/backends/qt/viewers/fwdsettingsview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/forward_panel.h>
 #include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
 #include <mne/viz/backends/qt/viewers/projectsettingsview.h>
 #include <mne/viz/backends/qt/viewers/filterdesignview.h>
@@ -435,9 +436,10 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies that FwdSettingsView constructs and survives all lifecycle transitions.
+     * Verifies the forward solution panel in its Qt host: status, solution summary, switches, the atlas directory
+     * (clustering needs both a2009s annotations) and the compute button.
      */
-    void fwdSettingsView_lifecycle();
+    void forwardPanel_inPanelWidget();
 
     //=========================================================================================================
     /**
@@ -1538,75 +1540,92 @@ void TestVizQtViewers2::artifactSettingsView_lifecycle()
 
 //=============================================================================================================
 
-void TestVizQtViewers2::fwdSettingsView_lifecycle()
+void TestVizQtViewers2::forwardPanel_inPanelWidget()
 {
-    FwdSettingsView view("test_viz_qt_viewers2");
-
+    auto panel = std::make_shared<ForwardPanel>();
+    PanelWidget view(panel, QStringLiteral("test_viz_qt_viewers2"));
     view.setGuiMode(AbstractView::GuiMode::Clinical);
-    view.setGuiMode(AbstractView::GuiMode::Research);
-    view.setProcessingMode(AbstractView::ProcessingMode::RealTime);
     view.setProcessingMode(AbstractView::ProcessingMode::Offline);
-    view.saveSettings();
-    view.loadSettings();
-    view.clearView();
+    QCOMPARE(panel->processing_mode(), Panel::ProcessingMode::Offline);
+
+    std::vector<bool> recomputations;
+    std::vector<bool> clusterings;
+    std::vector<int> clusterSources;
+    std::vector<std::filesystem::path> atlases;
+    int computations = 0;
+    ForwardPanel::Callbacks callbacks;
+    callbacks.compute = [&computations] {
+        ++computations;
+    };
+    callbacks.recomputation_changed = [&recomputations](bool on) {
+        recomputations.push_back(on);
+    };
+    callbacks.clustering_changed = [&clusterings](bool on) {
+        clusterings.push_back(on);
+    };
+    callbacks.cluster_sources_changed = [&clusterSources](int sources) {
+        clusterSources.push_back(sources);
+    };
+    callbacks.atlas_changed = [&atlases](const std::filesystem::path& directory, const std::shared_ptr<FsAnnotationSet>&) {
+        atlases.push_back(directory);
+    };
+    panel->set_callbacks(std::move(callbacks));
 
     // Status feedback for each computation state
-    auto* feedback = view.findChild<QLabel*>(QStringLiteral("m_label_recomputationFeedback"));
+    auto* feedback = qobject_cast<QLabel*>(view.formPanel()->editor("status"));
     QVERIFY(feedback);
     const QStringList states = {QStringLiteral("Initializing"), QStringLiteral("Computing"),
                                 QStringLiteral("Recomputing"), QStringLiteral("Clustering"),
                                 QStringLiteral("Not Computed"), QStringLiteral("Not Clustered"),
                                 QStringLiteral("Finished")};
     for (int status = 0; status < states.size(); ++status) {
-        view.setRecomputationStatus(status);
+        panel->set_status(status);
         QCOMPARE(feedback->text(), states.at(status));
     }
 
     // Solution information
-    const auto text = [&view](const char* name) {
-        return view.findChild<QLineEdit*>(QLatin1String(name))->text();
+    const auto text = [&view](const char* key) {
+        return qobject_cast<QLabel*>(view.formPanel()->editor(key))->text();
     };
     for (const auto& [frame, frameName] : {std::pair{FIFFV_COORD_HEAD, "Head Space"},
                                            std::pair{FIFFV_COORD_MRI, "MRI Space"},
                                            std::pair{FIFFV_COORD_DEVICE, "Unknown"}}) {
-        view.setSolutionInformation(frame == FIFFV_COORD_MRI ? 1 : 0, frame, 7498, 306, 2);
-        QCOMPARE(text("m_lineEdit_sCoordFrame"), QLatin1String(frameName));
+        panel->set_solution_information(frame == FIFFV_COORD_MRI ? 1 : 0, frame, 7498, 306, 2);
+        QCOMPARE(text("coordinateFrame"), QLatin1String(frameName));
     }
-    QCOMPARE(text("m_lineEdit_sSourceOri"), QStringLiteral("fixed"));
-    QCOMPARE(text("m_lineEdit_iNDipole"), QStringLiteral("7498"));
-    QCOMPARE(text("m_lineEdit_iNChan"), QStringLiteral("306"));
-    QCOMPARE(text("m_lineEdit_iNSourceSpace"), QStringLiteral("2"));
-    view.setClusteredInformation(200);
-    QCOMPARE(text("m_lineEdit_iNDipoleClustered"), QStringLiteral("200"));
+    QCOMPARE(text("sourceOrientation"), QStringLiteral("fixed"));
+    QCOMPARE(text("sources"), QStringLiteral("7498"));
+    QCOMPARE(text("channels"), QStringLiteral("306"));
+    QCOMPARE(text("sourceSpaces"), QStringLiteral("2"));
+    panel->set_clustered_information(200);
+    QCOMPARE(text("clusteredSources"), QStringLiteral("200"));
 
     // Recomputation and cluster number
-    QSignalSpy recompSpy(&view, &FwdSettingsView::recompStatusChanged);
-    view.findChild<QCheckBox*>(QStringLiteral("m_checkBox_bDoRecomputation"))->click();
-    QVERIFY(view.getRecomputationStatusChanged());
-    QCOMPARE(recompSpy.takeFirst().at(0).toBool(), true);
-    QSignalSpy clusterNumberSpy(&view, &FwdSettingsView::clusterNumberChanged);
-    view.findChild<QSpinBox*>(QStringLiteral("m_spinBox_iNDipoleClustered"))->setValue(150);
-    QCOMPARE(view.getClusterNumber(), 150);
-    QCOMPARE(clusterNumberSpy.takeFirst().at(0).toInt(), 150);
+    view.findChild<QCheckBox*>(QStringLiteral("recompute"))->click();
+    QVERIFY(panel->recomputation());
+    QCOMPARE(recomputations, std::vector<bool>({true}));
+    auto* sources = view.findChild<QSpinBox*>(QStringLiteral("clusterSources"));
+    sources->setValue(150);
+    emit sources->editingFinished();
+    QCOMPARE(panel->cluster_sources(), 150);
+    QCOMPARE(clusterSources, std::vector<int>({150}));
 
     // Atlas directory: a directory without the a2009s annotations is not loaded
-    auto* atlasStat = view.findChild<QLabel*>(QStringLiteral("m_qLabel_atlasStat"));
+    auto* atlasDirectory = view.formPanel()->editor("atlasDirectory")->findChild<QLineEdit*>();
     QTemporaryDir atlasDir;
     QVERIFY(atlasDir.isValid());
-    QSignalSpy atlasSpy(&view, &FwdSettingsView::atlasDirChanged);
-    chooseFileInNextDialog(atlasDir.path());
-    QMetaObject::invokeMethod(view.findChild<QPushButton*>(QStringLiteral("m_qPushButton_AtlasDirDialog")), "released");
-    QCOMPARE(atlasStat->text(), QStringLiteral("not loaded"));
-    QVERIFY(atlasSpy.isEmpty());
+    atlasDirectory->setText(atlasDir.path());
+    emit atlasDirectory->textEdited(atlasDirectory->text());
+    QCOMPARE(text("atlasStatus"), QStringLiteral("not loaded"));
+    QVERIFY(atlases.empty());
 
-    // Clustering needs an annotation set: without one the box is unchecked again after a warning
-    QSignalSpy clusteringSpy(&view, &FwdSettingsView::clusteringStatusChanged);
-    auto* clustering = view.findChild<QCheckBox*>(QStringLiteral("m_checkBox_bDoClustering"));
-    clustering->setChecked(false);
-    clickNextMessageBoxButton(QStringLiteral("OK"));
+    // Clustering needs an annotation set: without one the box turns off again and the status asks for one
+    auto* clustering = view.findChild<QCheckBox*>(QStringLiteral("cluster"));
     clustering->click();
-    QVERIFY(!view.getClusteringStatusChanged());
-    QVERIFY(clusteringSpy.isEmpty());
+    clustering->click();
+    QVERIFY(!panel->clustering() && !clustering->isChecked());
+    QVERIFY(clusterings.size() == 1 && !clusterings.front());
+    QVERIFY(text("atlasStatus").startsWith(QStringLiteral("not loaded")));
 
     // With both hemispheres' a2009s annotations the atlas loads and clustering is allowed
     const QString label = QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/subjects/sample/label/");
@@ -1614,20 +1633,16 @@ void TestVizQtViewers2::fwdSettingsView_lifecycle()
         QVERIFY(QFile::copy(label + hemi + QStringLiteral(".aparc.annot"),
                             atlasDir.filePath(hemi + QStringLiteral(".aparc.a2009s.annot"))));
     }
-    chooseFileInNextDialog(atlasDir.path());
-    QMetaObject::invokeMethod(view.findChild<QPushButton*>(QStringLiteral("m_qPushButton_AtlasDirDialog")), "released");
-    QCOMPARE(atlasStat->text(), QStringLiteral("loaded"));
-    QCOMPARE(atlasSpy.size(), 1);
-    QCOMPARE(atlasSpy.at(0).at(0).value<std::filesystem::path>(), std::filesystem::path(atlasDir.path().toStdU16String()));
+    atlasDirectory->setText(atlasDir.path() + QLatin1Char('/'));
+    emit atlasDirectory->textEdited(atlasDirectory->text());
+    QCOMPARE(text("atlasStatus"), QStringLiteral("loaded"));
+    QCOMPARE(atlases.size(), 1);
     clustering->click();
-    QVERIFY(view.getClusteringStatusChanged());
-    QCOMPARE(clusteringSpy.takeFirst().at(0).toBool(), true);
+    QVERIFY(panel->clustering());
+    QCOMPARE(clusterings.back(), true);
 
-    QSignalSpy computeSpy(&view, &FwdSettingsView::doForwardComputation);
-    view.findChild<QPushButton*>(QStringLiteral("m_qPushButton_ComputeForward"))->click();
-    QCOMPARE(computeSpy.size(), 1);
-
-    QApplication::processEvents();
+    view.findChild<QPushButton*>(QStringLiteral("compute"))->click();
+    QCOMPARE(computations, 1);
 }
 
 //=============================================================================================================
