@@ -46,6 +46,7 @@
 
 using namespace CONTROLMANAGERPLUGIN;
 using namespace mne::analyze;
+using namespace mne::viz;
 using namespace mne::viz::qt;
 
 //=============================================================================================================

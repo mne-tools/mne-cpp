@@ -47,6 +47,7 @@
 //=============================================================================================================
 
 using namespace COVARIANCEPLUGIN;
+using namespace mne::viz;
 using namespace mne::viz::qt;
 using namespace mne::scan;
 using namespace mne;

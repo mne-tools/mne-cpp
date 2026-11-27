@@ -11819,8 +11819,8 @@
     },
     {
       "name": "BrainSurface",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/3d/renderable/brainsurface.h",
+      "module": "viz",
+      "header": "viz/brain/brainsurface.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -11833,7 +11833,7 @@
       "example_mode": "run",
       "status": "documented",
       "documented": true,
-      "sidebar_position": 83,
+      "sidebar_position": 117,
       "guide": null,
       "python_equiv": null,
       "python_url": null
@@ -12015,16 +12015,21 @@
     },
     {
       "name": "MeshFactory",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/3d/geometry/meshfactory.h",
+      "module": "viz",
+      "header": "viz/brain/meshfactory.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
       "sklearn": null,
       "test": "test_disp3d_headless",
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#mesh_factory_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "documented": true,
-      "sidebar_position": 94,
+      "sidebar_position": 118,
       "guide": null,
       "python_equiv": null,
       "python_url": null
@@ -12338,8 +12343,8 @@
     },
     {
       "name": "VertexData",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/3d/renderable/brainsurface.h",
+      "module": "viz",
+      "header": "viz/brain/brainsurface.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -12375,13 +12380,18 @@
     },
     {
       "name": "GpuStream",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/3d/core/rendertypes.h",
+      "module": "viz",
+      "header": "viz/brain/rendertypes.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
       "sklearn": null,
       "test": "test_disp3d_brainsurface",
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#render_streams_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "documented": true,
       "sidebar_position": 114,
@@ -12391,13 +12401,18 @@
     },
     {
       "name": "InstancedStreams",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/3d/core/rendertypes.h",
+      "module": "viz",
+      "header": "viz/brain/rendertypes.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
       "sklearn": null,
       "test": "test_disp3d_brainview",
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#render_streams_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "documented": true,
       "sidebar_position": 115,
@@ -12407,13 +12422,18 @@
     },
     {
       "name": "RenderKey",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/3d/core/rendertypes.h",
+      "module": "viz",
+      "header": "viz/brain/rendertypes.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
       "sklearn": null,
       "test": "test_disp3d_brainview",
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#render_streams_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "documented": true,
       "sidebar_position": 116,

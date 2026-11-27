@@ -6,6 +6,7 @@
 #include <QColor>
 #include <mne/viz/backends/qt/plots/helpers/colormap.h>
 
+using namespace mne::viz;
 using namespace mne::viz::qt;
 
 class TestDispColormap : public QObject

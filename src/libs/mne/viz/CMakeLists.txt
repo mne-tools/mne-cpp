@@ -8,8 +8,10 @@ project(mne_viz
 )
 
 set(SOURCES
+  brain/brainsurface.cpp
   brain/geometryinfo.cpp
   brain/interpolation.cpp
+  brain/meshfactory.cpp
   figures/average_layout.cpp
   figures/average_tile.cpp
   figures/bar_chart.cpp
@@ -52,8 +54,11 @@ set(SOURCES
 )
 
 set(HEADERS
+  brain/brainsurface.h
   brain/geometryinfo.h
   brain/interpolation.h
+  brain/meshfactory.h
+  brain/rendertypes.h
   figures/average_layout.h
   figures/average_tile.h
   figures/bar_chart.h
@@ -113,10 +118,13 @@ mne_warn_on_narrowing(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..> $<INSTALL_INTERFACE:include>)
 
 # Eigen carries the vectors, matrices and quaternions of the 3-D camera and picking; the view models read
-# the measurement info of mne_fiff
+# the measurement info of mne_fiff, and the brain view's content reads FreeSurfer surfaces and BEMs
 target_link_libraries(${PROJECT_NAME} PUBLIC
   mne_base
+  mne_math
   mne_fiff
+  mne_fs
+  mne_mne
   Eigen3::Eigen)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_VIZ_LIBRARY)

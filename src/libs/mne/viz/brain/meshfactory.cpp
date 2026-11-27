@@ -16,7 +16,7 @@
 
 #include "meshfactory.h"
 
-#include "../renderable/brainsurface.h"
+#include "brainsurface.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -33,7 +33,7 @@
 #include <utility>
 #include <vector>
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -43,7 +43,7 @@ namespace mne::viz::qt
 namespace
 {
 
-Eigen::Matrix3f extractRotation(const QMatrix4x4& m)
+Eigen::Matrix3f extractRotation(const Eigen::Matrix4f& m)
 {
     Eigen::Matrix3f rot;
     for (int r = 0; r < 3; ++r)
@@ -132,9 +132,9 @@ int MeshFactory::sphereVertexCount(int subdivisions)
 
 //=============================================================================================================
 
-std::shared_ptr<BrainSurface> MeshFactory::createSphere(const QVector3D& center,
+std::shared_ptr<BrainSurface> MeshFactory::createSphere(const Eigen::Vector3f& center,
                                                         float radius,
-                                                        const QColor& color,
+                                                        const Color& color,
                                                         int subdivisions)
 {
     std::vector<Eigen::Vector3f> verts;
@@ -165,9 +165,9 @@ std::shared_ptr<BrainSurface> MeshFactory::createSphere(const QVector3D& center,
 
 //=============================================================================================================
 
-std::shared_ptr<BrainSurface> MeshFactory::createPlate(const QVector3D& center,
-                                                       const QMatrix4x4& orientation,
-                                                       const QColor& color,
+std::shared_ptr<BrainSurface> MeshFactory::createPlate(const Eigen::Vector3f& center,
+                                                       const Eigen::Matrix4f& orientation,
+                                                       const Color& color,
                                                        float size)
 {
     const float hw = size / 2.0f;
@@ -211,9 +211,9 @@ std::shared_ptr<BrainSurface> MeshFactory::createPlate(const QVector3D& center,
 
 //=============================================================================================================
 
-std::shared_ptr<BrainSurface> MeshFactory::createBarbell(const QVector3D& center,
-                                                         const QMatrix4x4& orientation,
-                                                         const QColor& color,
+std::shared_ptr<BrainSurface> MeshFactory::createBarbell(const Eigen::Vector3f& center,
+                                                         const Eigen::Matrix4f& orientation,
+                                                         const Color& color,
                                                          float size)
 {
     const Eigen::Matrix3f rot = extractRotation(orientation);
@@ -227,7 +227,7 @@ std::shared_ptr<BrainSurface> MeshFactory::createBarbell(const QVector3D& center
     std::vector<Eigen::Vector3i> allTris;
 
     // ── Helper: append a sphere ────────────────────────────────────────
-    auto appendSphere = [&](const QVector3D& pos, float radius) {
+    auto appendSphere = [&](const Eigen::Vector3f& pos, float radius) {
         std::vector<Eigen::Vector3f> sv;
         std::vector<Eigen::Vector3i> sf;
         buildIcosphere(sv, sf, 1); // single subdivision
@@ -279,7 +279,7 @@ std::shared_ptr<BrainSurface> MeshFactory::createBarbell(const QVector3D& center
     };
 
     // Build the barbell
-    QVector3D axis(rot(0, 1), rot(1, 1), rot(2, 1));
+    const Eigen::Vector3f axis(rot(0, 1), rot(1, 1), rot(2, 1));
     appendSphere(center + axis * halfSpan, sphereR);
     appendSphere(center - axis * halfSpan, sphereR);
     appendRod();
@@ -301,28 +301,28 @@ std::shared_ptr<BrainSurface> MeshFactory::createBarbell(const QVector3D& center
 
 //=============================================================================================================
 
-std::shared_ptr<BrainSurface> MeshFactory::createCylinder(const QVector3D& from,
-                                                          const QVector3D& to,
+std::shared_ptr<BrainSurface> MeshFactory::createCylinder(const Eigen::Vector3f& from,
+                                                          const Eigen::Vector3f& to,
                                                           float radius,
-                                                          const QColor& color,
+                                                          const Color& color,
                                                           int sides)
 {
     if (sides < 3)
         sides = 3;
 
-    const QVector3D axis = to - from;
-    const float length = axis.length();
+    const Eigen::Vector3f axis = to - from;
+    const float length = axis.norm();
     if (length < 1e-8f)
         return std::make_shared<BrainSurface>();
 
-    const QVector3D axisN = axis / length;
+    const Eigen::Vector3f axisN = axis / length;
 
     // Build an orthonormal basis (axisN, u, v)
-    QVector3D u = QVector3D::crossProduct(axisN, QVector3D(0, 0, 1));
-    if (u.lengthSquared() < 1e-6f)
-        u = QVector3D::crossProduct(axisN, QVector3D(1, 0, 0));
+    Eigen::Vector3f u = axisN.cross(Eigen::Vector3f(0, 0, 1));
+    if (u.squaredNorm() < 1e-6f)
+        u = axisN.cross(Eigen::Vector3f(1, 0, 0));
     u.normalize();
-    const QVector3D v = QVector3D::crossProduct(axisN, u).normalized();
+    const Eigen::Vector3f v = axisN.cross(u).normalized();
 
     // Two rings of vertices (bottom = from, top = to) + 2 center caps
     const int nVerts = 2 * sides + 2;
@@ -339,8 +339,8 @@ std::shared_ptr<BrainSurface> MeshFactory::createCylinder(const QVector3D& from,
         const float angle = kTwoPi * static_cast<float>(i) / static_cast<float>(sides);
         const float ca = std::cos(angle);
         const float sa = std::sin(angle);
-        const QVector3D normal = (u * ca + v * sa);
-        const QVector3D pos = from + normal * radius;
+        const Eigen::Vector3f normal = (u * ca + v * sa);
+        const Eigen::Vector3f pos = from + normal * radius;
         verts(i, 0) = pos.x();
         verts(i, 1) = pos.y();
         verts(i, 2) = pos.z();
@@ -354,8 +354,8 @@ std::shared_ptr<BrainSurface> MeshFactory::createCylinder(const QVector3D& from,
         const float angle = kTwoPi * static_cast<float>(i) / static_cast<float>(sides);
         const float ca = std::cos(angle);
         const float sa = std::sin(angle);
-        const QVector3D normal = (u * ca + v * sa);
-        const QVector3D pos = to + normal * radius;
+        const Eigen::Vector3f normal = (u * ca + v * sa);
+        const Eigen::Vector3f pos = to + normal * radius;
         verts(sides + i, 0) = pos.x();
         verts(sides + i, 1) = pos.y();
         verts(sides + i, 2) = pos.z();
@@ -420,9 +420,9 @@ std::shared_ptr<BrainSurface> MeshFactory::createCylinder(const QVector3D& from,
 
 //=============================================================================================================
 
-std::shared_ptr<BrainSurface> MeshFactory::createBatchedSpheres(const std::vector<QVector3D>& positions,
+std::shared_ptr<BrainSurface> MeshFactory::createBatchedSpheres(const std::vector<Eigen::Vector3f>& positions,
                                                                 float radius,
-                                                                const QColor& color,
+                                                                const Color& color,
                                                                 int subdivisions)
 {
     if (positions.empty())
@@ -457,7 +457,7 @@ std::shared_ptr<BrainSurface> MeshFactory::createBatchedSpheres(const std::vecto
     Eigen::MatrixX3i allTris(nPts * nTPerPt, 3);
 
     for (int p = 0; p < nPts; ++p) {
-        const QVector3D& pos = positions[p];
+        const Eigen::Vector3f& pos = positions[p];
         const int vOff = p * nVPerPt;
         const int tOff = p * nTPerPt;
         for (int iv = 0; iv < nVPerPt; ++iv) {
@@ -479,4 +479,4 @@ std::shared_ptr<BrainSurface> MeshFactory::createBatchedSpheres(const std::vecto
     return surf;
 }
 
-} // namespace mne::viz::qt
+} // namespace mne::viz

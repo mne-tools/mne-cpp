@@ -27,6 +27,7 @@
 #include <QSignalSpy>
 #include <QtTest>
 
+using namespace mne::viz;
 using namespace mne::viz::qt;
 
 //=============================================================================================================

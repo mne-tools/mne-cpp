@@ -17,7 +17,7 @@
 //=============================================================================================================
 
 #include <mne/viz/backends/qt/3d/core/viewstate.h>
-#include <mne/viz/backends/qt/3d/core/rendertypes.h>
+#include <mne/viz/brain/rendertypes.h>
 #include <mne/viz/backends/qt/3d/core/surfacekeys.h>
 
 //=============================================================================================================
@@ -30,6 +30,7 @@
 #include <QTemporaryDir>
 #include <QtTest>
 
+using namespace mne::viz;
 using namespace mne::viz::qt;
 
 //=============================================================================================================

@@ -16,7 +16,7 @@
 
 #include "cameracontroller.h"
 
-#include "../core/qteigen_p.h"
+#include "../../qtconversions.h"
 
 namespace mne::viz::qt
 {

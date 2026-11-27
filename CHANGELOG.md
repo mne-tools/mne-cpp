@@ -395,6 +395,11 @@ aliases; replace the old spelling as below.
   `GeometryInfo` (surface-constrained distances) and `Interpolation`
   (sensor-to-surface interpolation matrices), from
   `viz/backends/qt/3d/helpers/` to `viz/brain/` (`mne::viz`).
+- `BrainSurface`, `MeshFactory` and the render types (`rendertypes.h`) moved
+  to `viz/brain/` and no longer use Qt: positions, normals and transforms are
+  `Eigen::Vector3f`/`Eigen::Matrix4f`, colours are `viz::Color`. Qt code
+  converts with the public `viz/backends/qt/qtconversions.h` (`toEigen`,
+  `toQVector3D`, `toQMatrix`, `toColor`, `toQColor`).
 - Views run in any backend through `viz/host/surface.h`: a backend implements
   `viz::Surface` (redraw requests, clock, pointer shape) and drives a
   `viz::SurfaceClient` (resize, pointer, wheel and key events, animation

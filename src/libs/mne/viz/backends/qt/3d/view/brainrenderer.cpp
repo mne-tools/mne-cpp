@@ -19,7 +19,7 @@
 #include <mne/base/log.h>
 
 #include <rhi/qrhi.h>
-#include "../renderable/brainsurface.h"
+#include "../../../../brain/brainsurface.h"
 #include "../renderable/dipoleobject.h"
 #include "../renderable/electrodeobject.h"
 #include "../renderable/networkobject.h"

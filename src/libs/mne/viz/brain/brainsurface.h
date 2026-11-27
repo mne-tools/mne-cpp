@@ -10,13 +10,13 @@
  * @brief    Renderable cortical / BEM mesh: CPU geometry, colour and annotation streams for the renderer.
  *
  * BrainSurface is the core 3-D primitive of mne_viz_qt. It owns the CPU
- * streams the renderer uploads: geometry (@ref mne::viz::qt::VertexData,
+ * streams the renderer uploads: geometry (@ref mne::viz::VertexData,
  * position and normal), packed-ABGR colour, packed-ABGR annotation
  * colour and the triangle indices. Each stream has its own generation,
  * so a source-estimate frame re-uploads only the 4-byte colour stream.
  *
  * Per-vertex colour is computed once on the CPU from one of four
- * sources selected by @ref mne::viz::qt::VisualizationMode &mdash; flat base colour,
+ * sources selected by @ref mne::viz::VisualizationMode &mdash; flat base colour,
  * FsAnnotation parcellation, scientific curvature shading (Lambertian
  * ambient + sulcal darkening), or a source-time-course value mapped
  * through the active colormap &mdash; then packed into the second
@@ -29,25 +29,19 @@
  * cortex, skin, skull or generic shell for alpha / lighting tuning.
  */
 
-#ifndef BRAINSURFACE_H
-#define BRAINSURFACE_H
+#ifndef VIZ_BRAINSURFACE_H
+#define VIZ_BRAINSURFACE_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
-#include "../core/rendertypes.h"
+#include "../viz_global.h"
+#include "../figures/style.h"
+#include "rendertypes.h"
 #include <mne/fs/fs_surface.h>
 #include <mne/fs/fs_annotation.h>
 #include <mne/mne/mne_bem.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QVector3D>
-#include <QColor>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -70,7 +64,7 @@
 // STRUCTS
 //=============================================================================================================
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 /**
@@ -80,8 +74,8 @@ namespace mne::viz::qt
  */
 struct VertexData
 {
-    QVector3D pos;
-    QVector3D norm;
+    Eigen::Vector3f pos = Eigen::Vector3f::Zero();  /**< Position. */
+    Eigen::Vector3f norm = Eigen::Vector3f::Zero(); /**< Normal. */
 };
 
 //=============================================================================================================
@@ -92,7 +86,7 @@ struct VertexData
  *
  * @snippet ex_disp3d_scene/main.cpp brain_surface_usage
  */
-class VIZQTSHARED_EXPORT BrainSurface
+class VIZSHARED_EXPORT BrainSurface
 {
 public:
     //=========================================================================================================
@@ -194,7 +188,7 @@ public:
      * @param[in] surf       Input BEM surface.
      * @param[in] color      Base color for the surface.
      */
-    void fromBemSurface(const mne::MNEBemSurface& surf, const QColor& color = Qt::white);
+    void fromBemSurface(const mne::MNEBemSurface& surf, const Color& color = Color::white());
 
     //=========================================================================================================
     /**
@@ -204,7 +198,7 @@ public:
      * @param[in] triangles  Mx3 matrix of triangle indices.
      * @param[in] color      FsSurface color.
      */
-    void createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3i& triangles, const QColor& color);
+    void createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3i& triangles, const Color& color);
 
     //=========================================================================================================
     /**
@@ -215,7 +209,7 @@ public:
      * @param[in] triangles  Mx3 matrix of triangle indices.
      * @param[in] color      FsSurface color.
      */
-    void createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3f& normals, const Eigen::MatrixX3i& triangles, const QColor& color);
+    void createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3f& normals, const Eigen::MatrixX3i& triangles, const Color& color);
 
     //=========================================================================================================
     /**
@@ -266,7 +260,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @return Geometry stream (@ref mne::viz::qt::VertexData per vertex).
+     * @return Geometry stream (@ref mne::viz::VertexData per vertex).
      */
     GpuStream geometryStream() const;
 
@@ -376,7 +370,7 @@ public:
      * @param[out] min       Minimum coordinates.
      * @param[out] max       Maximum coordinates.
      */
-    void boundingBox(QVector3D& min, QVector3D& max) const;
+    void boundingBox(Eigen::Vector3f& min, Eigen::Vector3f& max) const;
 
     //=========================================================================================================
     /**
@@ -391,7 +385,7 @@ public:
      * @param[in, out] vertexIdx Index of the vertex closest to the intersection.
      * @return True if intersected.
      */
-    bool intersects(const QVector3D& rayOrigin, const QVector3D& rayDir, float& dist, int& vertexIdx) const;
+    bool intersects(const Eigen::Vector3f& rayOrigin, const Eigen::Vector3f& rayDir, float& dist, int& vertexIdx) const;
 
     //=========================================================================================================
     /**
@@ -423,7 +417,7 @@ public:
      *
      * @param[in] m          Transformation matrix.
      */
-    void transform(const QMatrix4x4& m);
+    void transform(const Eigen::Matrix4f& m);
 
     //=========================================================================================================
     /**
@@ -432,7 +426,7 @@ public:
      *
      * @param[in] m          Transformation matrix.
      */
-    void applyTransform(const QMatrix4x4& m);
+    void applyTransform(const Eigen::Matrix4f& m);
 
     //=========================================================================================================
     /**
@@ -465,7 +459,7 @@ public:
      *
      * @param[in] color   New colour; its alpha is the opacity of the holographic shader.
      */
-    void setColor(const QColor& color);
+    void setColor(const Color& color);
 
     void setSelected(bool selected);
     bool isSelected() const
@@ -498,7 +492,7 @@ public:
 
 private:
     void updateVertexColors();
-    void setGeometry(std::vector<VertexData> vertices, std::vector<uint32_t> indices, const QColor& color);
+    void setGeometry(std::vector<VertexData> vertices, std::vector<uint32_t> indices, const Color& color);
     void markGeometryDirty();
 
     std::vector<VertexData> m_vertexData;
@@ -510,13 +504,13 @@ private:
     uint32_t m_indexCount = 0;
 
     RenderKey m_renderKey;
-    quint64 m_geometryGeneration = 0;
-    quint64 m_colorGeneration = 0;
-    quint64 m_annotationGeneration = 0;
-    quint64 m_indexGeneration = 0;
+    std::uint64_t m_geometryGeneration = 0;
+    std::uint64_t m_colorGeneration = 0;
+    std::uint64_t m_annotationGeneration = 0;
+    std::uint64_t m_indexGeneration = 0;
 
-    QColor m_defaultColor = Qt::white;
-    QColor m_baseColor = Qt::white;
+    Color m_defaultColor = Color::white();
+    Color m_baseColor = Color::white();
 
     mne::FsAnnotation m_annotation;
     bool m_hasAnnotation = false;
@@ -532,8 +526,8 @@ private:
     int m_hemi = -1; // 0=lh, 1=rh
     TissueType m_tissueType = TissueUnknown;
 
-    mutable QVector3D m_aabbMin;
-    mutable QVector3D m_aabbMax;
+    mutable Eigen::Vector3f m_aabbMin = Eigen::Vector3f::Zero();
+    mutable Eigen::Vector3f m_aabbMax = Eigen::Vector3f::Zero();
     mutable bool m_bAABBDirty = true;
 
     // Bounding volume hierarchy over the triangles, built on the first pick after a geometry change
@@ -542,6 +536,6 @@ private:
     mutable std::shared_ptr<const Bvh> m_bvh;
 };
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // BRAINSURFACE_H
+#endif // VIZ_BRAINSURFACE_H

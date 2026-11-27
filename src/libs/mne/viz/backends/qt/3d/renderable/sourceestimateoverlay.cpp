@@ -18,8 +18,8 @@
 
 #include <mne/base/log.h>
 
-#include "brainsurface.h"
-#include "../core/rendertypes.h"
+#include "../../../../brain/brainsurface.h"
+#include "../../../../brain/rendertypes.h"
 #include "../../../../brain/interpolation.h"
 #include "../../../../brain/geometryinfo.h"
 #include <mne/viz/backends/qt/plots/helpers/colormap.h>

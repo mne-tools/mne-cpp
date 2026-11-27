@@ -12,7 +12,7 @@
  * RayPicker unprojects the current mouse position through the
  * active camera into a world-space ray and tests it against every
  * selectable scene primitive: per-triangle Moller-Trumbore against
- * @ref mne::viz::qt::BrainSurface meshes, per-arrow segment / cylinder for
+ * @ref mne::viz::BrainSurface meshes, per-arrow segment / cylinder for
  * @ref mne::viz::qt::DipoleObject and ECoG electrodes, and per-sphere for
  * source-space points and digitizer fiducials.
  *
@@ -50,10 +50,13 @@
 #include <memory>
 #include <string>
 
+namespace mne::viz
+{
+class BrainSurface;
+} // namespace mne::viz
+
 namespace mne::viz::qt
 {
-
-class BrainSurface;
 class DipoleObject;
 
 //=============================================================================================================

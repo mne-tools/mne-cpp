@@ -10,7 +10,7 @@
  * @brief    Qt-RHI scene renderer: shader pipelines, lighting, dual render targets and per-frame draw orchestration for mne_viz_qt.
  *
  * BrainRenderer is the only object in mne_viz_qt that talks directly to
- * QRhi. It creates the shader pipelines for every @ref mne::viz::qt::ShaderMode
+ * QRhi. It creates the shader pipelines for every @ref mne::viz::ShaderMode
  * (Standard Phong, Holographic, Anatomical, Dipole arrows, XRay,
  * ShowNormals), allocates the dual @c rtClear / @c rtPreserve render
  * targets needed for the multi-pass cortex + overlay composition, and
@@ -22,7 +22,7 @@
  * slot per draw. All slots and uploads of a frame are prepared before its
  * render pass, which then only binds and draws.
  *
- * All scene objects (@ref mne::viz::qt::BrainSurface, @ref mne::viz::qt::DipoleObject,
+ * All scene objects (@ref mne::viz::BrainSurface, @ref mne::viz::qt::DipoleObject,
  * @ref mne::viz::qt::NetworkObject, @ref mne::viz::qt::VideoOverlay) are accepted through opaque
  * pointers so the renderer never pulls in the heavy headers of the
  * modalities it draws.
@@ -36,7 +36,7 @@
 //=============================================================================================================
 
 #include "../../viz_qt_global.h"
-#include "../core/rendertypes.h"
+#include "../../../../brain/rendertypes.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -65,10 +65,13 @@ class QRhiRenderBuffer;
 class QRhiTextureRenderTarget;
 class QImage;
 
+namespace mne::viz
+{
+class BrainSurface;
+} // namespace mne::viz
+
 namespace mne::viz::qt
 {
-
-class BrainSurface;
 class DipoleObject;
 class ElectrodeObject;
 class NetworkObject;

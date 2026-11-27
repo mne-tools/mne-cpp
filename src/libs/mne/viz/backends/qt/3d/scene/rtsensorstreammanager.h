@@ -14,7 +14,7 @@
  * colour updates on the target head / helmet surface). It owns the
  * @ref mne::viz::qt::RtSensorDataController plus the dense MEG / EEG mapping
  * matrix produced by @ref mne::viz::qt::SensorFieldMapper and forwards new
- * colour buffers to the bound @ref mne::viz::qt::BrainSurface on every frame.
+ * colour buffers to the bound @ref mne::viz::BrainSurface on every frame.
  */
 
 #ifndef RTSENSORSTREAMMANAGER_H
@@ -51,10 +51,13 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace mne::viz
+{
+class BrainSurface;
+} // namespace mne::viz
+
 namespace mne::viz::qt
 {
-
-class BrainSurface;
 class RtSensorDataController;
 class SensorFieldMapper;
 

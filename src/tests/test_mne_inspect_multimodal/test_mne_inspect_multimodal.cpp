@@ -41,6 +41,7 @@
 #include <QTest>
 #include <QVector3D>
 
+using namespace mne::viz;
 using namespace mne::viz::qt;
 using namespace ELECTRODESPLUGIN;
 using namespace MRISLICESPLUGIN;

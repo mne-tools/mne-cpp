@@ -19,7 +19,7 @@
 #include <mne/base/log.h>
 
 #include "../renderable/sourceestimateoverlay.h"
-#include "../renderable/brainsurface.h"
+#include "../../../../brain/brainsurface.h"
 #include "../workers/stcloadingworker.h"
 #include "../workers/rtsourcedatacontroller.h"
 #include "../core/viewstate.h"

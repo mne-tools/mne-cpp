@@ -16,9 +16,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/viz/backends/qt/3d/renderable/brainsurface.h>
-#include <mne/viz/backends/qt/3d/geometry/meshfactory.h>
-#include <mne/viz/backends/qt/3d/core/rendertypes.h>
+#include <mne/viz/brain/brainsurface.h>
+#include <mne/viz/brain/meshfactory.h>
+#include <mne/viz/brain/rendertypes.h>
+#include <mne/viz/backends/qt/qtconversions.h>
 #include <mne/fs/fs_annotation.h>
 
 //=============================================================================================================
@@ -44,6 +45,7 @@
 
 #include <cmath>
 
+using namespace mne::viz;
 using namespace mne::viz::qt;
 
 //=============================================================================================================
@@ -110,7 +112,7 @@ void TestDisp3dBrainSurface::createMinimalSurface(BrainSurface& surf)
     Eigen::MatrixX3i tris(1, 3);
     tris << 0, 1, 2;
 
-    surf.createFromData(verts, tris, Qt::gray);
+    surf.createFromData(verts, tris, toColor(QColor(Qt::gray)));
 }
 
 void TestDisp3dBrainSurface::createQuadSurface(BrainSurface& surf)
@@ -125,7 +127,7 @@ void TestDisp3dBrainSurface::createQuadSurface(BrainSurface& surf)
     tris << 0, 1, 2,
         0, 2, 3;
 
-    surf.createFromData(verts, tris, Qt::blue);
+    surf.createFromData(verts, tris, toColor(QColor(Qt::blue)));
 }
 
 //=============================================================================================================
@@ -169,7 +171,7 @@ void TestDisp3dBrainSurface::testCreateFromDataWithNormals()
     tris << 0, 1, 2;
 
     BrainSurface surf;
-    surf.createFromData(verts, normals, tris, Qt::red);
+    surf.createFromData(verts, normals, tris, toColor(QColor(Qt::red)));
 
     QCOMPARE(surf.vertexCount(), (uint32_t)3);
 
@@ -277,7 +279,7 @@ void TestDisp3dBrainSurface::testVertexNormals()
     tris << 0, 1, 2;
 
     BrainSurface surf;
-    surf.createFromData(verts, normals, tris, Qt::gray);
+    surf.createFromData(verts, normals, tris, toColor(QColor(Qt::gray)));
 
     Eigen::MatrixX3f readNormals = surf.vertexNormals();
     QCOMPARE(readNormals.rows(), 3);
@@ -311,7 +313,7 @@ void TestDisp3dBrainSurface::testBoundingBox()
     BrainSurface surf;
     createQuadSurface(surf);
 
-    QVector3D minPt, maxPt;
+    Eigen::Vector3f minPt, maxPt;
     surf.boundingBox(minPt, maxPt);
 
     // Quad spans [0,1] x [0,1] x [0,0]
@@ -332,7 +334,7 @@ void TestDisp3dBrainSurface::testVertexCount()
     QCOMPARE(surf.vertexCount(), (uint32_t)4);
     QCOMPARE(surf.indexCount(), (uint32_t)6); // 2 triangles = 6 indices
     // Without explicit normals the face normals are used: the quad lies in z = 0
-    QCOMPARE(surf.vertexDataRef()[2].norm, QVector3D(0.0f, 0.0f, 1.0f));
+    QVERIFY((surf.vertexDataRef()[2].norm - Eigen::Vector3f(0.0f, 0.0f, 1.0f)).norm() < 1e-6f);
 }
 
 // Source estimate colors
@@ -427,8 +429,8 @@ void TestDisp3dBrainSurface::testElementLabels()
 void TestDisp3dBrainSurface::testIntersectsSphere()
 {
     // 5120 triangles, radius 1 cm: every ray from above hits the near cap within the facet error
-    auto sphere = MeshFactory::createSphere(QVector3D(0, 0, 0), 0.01f, Qt::red, 4);
-    const QVector3D down(0.0f, 0.0f, -1.0f);
+    auto sphere = MeshFactory::createSphere(Eigen::Vector3f(0, 0, 0), 0.01f, mne::viz::Color{255, 0, 0, 255}, 4);
+    const Eigen::Vector3f down(0.0f, 0.0f, -1.0f);
     float dist = 0.0f;
     int vertex = -1;
     for (int ix = -9; ix <= 9; ++ix) {
@@ -436,7 +438,7 @@ void TestDisp3dBrainSurface::testIntersectsSphere()
             const float x = 0.001f * float(ix);
             const float y = 0.001f * float(iy);
             const float r2 = x * x + y * y;
-            const bool hit = sphere->intersects(QVector3D(x, y, 1.0f), down, dist, vertex);
+            const bool hit = sphere->intersects(Eigen::Vector3f(x, y, 1.0f), down, dist, vertex);
             if (r2 > 0.0099f * 0.0099f) {
                 QVERIFY(!hit || r2 < 0.0101f * 0.0101f);
                 continue;
@@ -444,18 +446,18 @@ void TestDisp3dBrainSurface::testIntersectsSphere()
             QVERIFY2(hit, qPrintable(QStringLiteral("missed at %1, %2").arg(x).arg(y)));
             QVERIFY(qAbs(dist - (1.0f - std::sqrt(0.0001f - r2))) < 3e-4f);
             // The picked vertex is a corner of the hit facet, so it lies near the hit point
-            QVERIFY((sphere->vertexDataRef()[vertex].pos - QVector3D(x, y, 1.0f - dist)).length() < 1.5e-3f);
+            QVERIFY((sphere->vertexDataRef()[vertex].pos - Eigen::Vector3f(x, y, 1.0f - dist)).norm() < 1.5e-3f);
         }
     }
 
     // Moving the mesh rebuilds the hierarchy; a ray pointing away never hits
     QMatrix4x4 shift;
     shift.translate(0.05f, 0.0f, 0.0f);
-    sphere->applyTransform(shift);
-    QVERIFY(!sphere->intersects(QVector3D(0.0f, 0.0f, 1.0f), down, dist, vertex));
-    QVERIFY(sphere->intersects(QVector3D(0.05f, 0.0f, 1.0f), down, dist, vertex));
+    sphere->applyTransform(toEigen(shift));
+    QVERIFY(!sphere->intersects(Eigen::Vector3f(0.0f, 0.0f, 1.0f), down, dist, vertex));
+    QVERIFY(sphere->intersects(Eigen::Vector3f(0.05f, 0.0f, 1.0f), down, dist, vertex));
     QVERIFY(qAbs(dist - 0.99f) < 3e-4f);
-    QVERIFY(!sphere->intersects(QVector3D(0.05f, 0.0f, 1.0f), -down, dist, vertex));
+    QVERIFY(!sphere->intersects(Eigen::Vector3f(0.05f, 0.0f, 1.0f), -down, dist, vertex));
     QCOMPARE(vertex, -1);
 }
 
@@ -465,13 +467,13 @@ void TestDisp3dBrainSurface::testIntersectsSphere()
 
 void TestDisp3dBrainSurface::testMeshFactorySphere()
 {
-    auto sphere = MeshFactory::createSphere(QVector3D(0, 0, 0), 0.01f, Qt::red, 1);
+    auto sphere = MeshFactory::createSphere(Eigen::Vector3f(0, 0, 0), 0.01f, mne::viz::Color{255, 0, 0, 255}, 1);
     QVERIFY(sphere != nullptr);
     QVERIFY(sphere->vertexCount() > 0);
     QVERIFY(sphere->indexCount() > 0);
 
     // Bounding box should be roughly centered at origin with radius 0.01
-    QVector3D minPt, maxPt;
+    Eigen::Vector3f minPt, maxPt;
     sphere->boundingBox(minPt, maxPt);
     QVERIFY(maxPt.x() > 0);
     QVERIFY(minPt.x() < 0);
@@ -481,10 +483,7 @@ void TestDisp3dBrainSurface::testMeshFactorySphere()
 
 void TestDisp3dBrainSurface::testMeshFactoryPlate()
 {
-    QMatrix4x4 identity;
-    identity.setToIdentity();
-
-    auto plate = MeshFactory::createPlate(QVector3D(0, 0, 0), identity, Qt::green, 0.01f);
+    auto plate = MeshFactory::createPlate(Eigen::Vector3f(0, 0, 0), Eigen::Matrix4f::Identity(), mne::viz::Color{0, 255, 0, 255}, 0.01f);
     QVERIFY(plate != nullptr);
     QVERIFY(plate->vertexCount() > 0);
     QVERIFY(plate->indexCount() > 0);
@@ -494,10 +493,7 @@ void TestDisp3dBrainSurface::testMeshFactoryPlate()
 
 void TestDisp3dBrainSurface::testMeshFactoryBarbell()
 {
-    QMatrix4x4 identity;
-    identity.setToIdentity();
-
-    auto barbell = MeshFactory::createBarbell(QVector3D(0, 0, 0), identity, Qt::blue, 0.01f);
+    auto barbell = MeshFactory::createBarbell(Eigen::Vector3f(0, 0, 0), Eigen::Matrix4f::Identity(), mne::viz::Color{0, 0, 255, 255}, 0.01f);
     QVERIFY(barbell != nullptr);
     QVERIFY(barbell->vertexCount() > 0);
     QVERIFY(barbell->indexCount() > 0);

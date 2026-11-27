@@ -16,11 +16,11 @@
 
 #include "raypicker.h"
 
-#include "../renderable/brainsurface.h"
+#include "../../../../brain/brainsurface.h"
 #include "../renderable/dipoleobject.h"
 #include "../model/items/abstracttreeitem.h"
 #include "../model/items/digitizertreeitem.h"
-#include "../core/qteigen_p.h"
+#include "../../qtconversions.h"
 
 #include <mne/viz/views/ray_picking.h>
 
@@ -96,7 +96,7 @@ RayHit RayPicker::pick(const QVector3D& rayOrigin,
 
         float dist = 0.0f;
         int vertexIdx = -1;
-        if (surf->intersects(rayOrigin, rayDir, dist, vertexIdx)) {
+        if (surf->intersects(toEigen(rayOrigin), toEigen(rayDir), dist, vertexIdx)) {
             if (dist < closestDist) {
                 closestDist = dist;
                 result.hit = true;

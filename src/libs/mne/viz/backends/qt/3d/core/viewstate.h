@@ -30,7 +30,7 @@
 //=============================================================================================================
 
 #include "../../viz_qt_global.h"
-#include "rendertypes.h"
+#include "../../../../brain/rendertypes.h"
 
 #include <mne/viz/views/camera.h>
 
@@ -59,11 +59,13 @@
 
 class QSettings;
 
+namespace mne::viz
+{
+class BrainSurface;
+} // namespace mne::viz
+
 namespace mne::viz::qt
 {
-
-class BrainSurface;
-
 //=============================================================================================================
 /**
  * @brief Per-view toggle flags controlling which data layers (brain, sensors, sources, network) are visible.

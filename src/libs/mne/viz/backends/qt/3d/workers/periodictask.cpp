@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <utility>
 
+using namespace mne::viz;
 using namespace mne::viz::qt;
 
 //=============================================================================================================

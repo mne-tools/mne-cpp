@@ -40,6 +40,7 @@
 #include <cmath>
 #include <thread>
 
+using namespace mne::viz;
 using namespace mne::viz::qt;
 
 //=============================================================================================================

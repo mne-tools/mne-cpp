@@ -18,7 +18,7 @@
 
 #include <mne/viz/brain/interpolation.h>
 #include <mne/viz/brain/geometryinfo.h>
-#include <mne/viz/backends/qt/3d/geometry/meshfactory.h>
+#include <mne/viz/brain/meshfactory.h>
 #include <mne/viz/backends/qt/3d/core/dataloader.h>
 #include <mne/viz/backends/qt/3d/workers/rtsourcedatacontroller.h>
 #include <mne/viz/backends/qt/3d/workers/rtsensordatacontroller.h>
@@ -208,43 +208,39 @@ private slots:
     void meshFactory_createSphere()
     {
         auto sphere = MeshFactory::createSphere(
-            QVector3D(0, 0, 0), 0.01f, Qt::red, 1);
+            Eigen::Vector3f(0, 0, 0), 0.01f, mne::viz::Color{255, 0, 0, 255}, 1);
         QVERIFY(sphere != nullptr);
     }
 
     void meshFactory_createSphereSubdiv0()
     {
         auto sphere = MeshFactory::createSphere(
-            QVector3D(1, 2, 3), 0.05f, Qt::blue, 0);
+            Eigen::Vector3f(1, 2, 3), 0.05f, mne::viz::Color{0, 0, 255, 255}, 0);
         QVERIFY(sphere != nullptr);
     }
 
     void meshFactory_createPlate()
     {
-        QMatrix4x4 orientation;
-        orientation.setToIdentity();
         auto plate = MeshFactory::createPlate(
-            QVector3D(0, 0, 0), orientation, Qt::green, 0.02f);
+            Eigen::Vector3f(0, 0, 0), Eigen::Matrix4f::Identity(), mne::viz::Color{0, 255, 0, 255}, 0.02f);
         QVERIFY(plate != nullptr);
     }
 
     void meshFactory_createBarbell()
     {
-        QMatrix4x4 orientation;
-        orientation.setToIdentity();
         auto barbell = MeshFactory::createBarbell(
-            QVector3D(0, 0, 0), orientation, Qt::yellow, 0.02f);
+            Eigen::Vector3f(0, 0, 0), Eigen::Matrix4f::Identity(), mne::viz::Color{255, 255, 0, 255}, 0.02f);
         QVERIFY(barbell != nullptr);
     }
 
     void meshFactory_createBatchedSpheres()
     {
-        std::vector<QVector3D> positions;
-        positions.push_back(QVector3D(0, 0, 0));
-        positions.push_back(QVector3D(0.1f, 0, 0));
-        positions.push_back(QVector3D(0, 0.1f, 0));
+        std::vector<Eigen::Vector3f> positions;
+        positions.push_back(Eigen::Vector3f(0, 0, 0));
+        positions.push_back(Eigen::Vector3f(0.1f, 0, 0));
+        positions.push_back(Eigen::Vector3f(0, 0.1f, 0));
 
-        auto batched = MeshFactory::createBatchedSpheres(positions, 0.005f, Qt::white, 0);
+        auto batched = MeshFactory::createBatchedSpheres(positions, 0.005f, mne::viz::Color::white(), 0);
         QVERIFY(batched != nullptr);
     }
 

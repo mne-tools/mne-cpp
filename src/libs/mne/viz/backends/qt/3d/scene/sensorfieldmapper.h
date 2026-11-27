@@ -56,11 +56,13 @@
 #include <string>
 #include <vector>
 
+namespace mne::viz
+{
+class BrainSurface;
+} // namespace mne::viz
+
 namespace mne::viz::qt
 {
-
-class BrainSurface;
-
 //=============================================================================================================
 /**
  * Encapsulates sensor-to-surface field mapping for MEG and EEG sensors.

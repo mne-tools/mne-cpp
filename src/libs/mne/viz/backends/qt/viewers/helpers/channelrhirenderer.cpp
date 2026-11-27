@@ -43,6 +43,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace mne::viz;
 using namespace mne::viz::qt;
 namespace scene = mne::viz;
 

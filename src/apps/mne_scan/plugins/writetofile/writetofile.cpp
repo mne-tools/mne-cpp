@@ -45,6 +45,7 @@
 
 using namespace WRITETOFILEPLUGIN;
 using namespace mne::scan;
+using namespace mne::viz;
 using namespace mne::viz::qt;
 using namespace mne;
 using namespace Eigen;

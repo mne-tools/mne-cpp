@@ -56,11 +56,13 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace mne::viz
+{
+class BrainSurface;
+} // namespace mne::viz
+
 namespace mne::viz::qt
 {
-
-class BrainSurface;
-
 //=============================================================================================================
 /**
  * StcLoadingWorker performs source estimate loading and interpolation matrix computation

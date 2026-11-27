@@ -16,7 +16,7 @@
 
 #include "dipoleobject.h"
 
-#include "../core/qteigen_p.h"
+#include "../../qtconversions.h"
 
 #include <mne/viz/views/ray_picking.h>
 

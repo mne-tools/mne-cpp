@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 using namespace MRISLICESPLUGIN;
+using namespace mne::viz;
 using namespace mne::viz::qt;
 using namespace mne;
 

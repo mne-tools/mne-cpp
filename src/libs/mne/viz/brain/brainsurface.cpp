@@ -21,11 +21,11 @@
 #include <mne/viz/views/ray_picking.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
-#include <QMatrix3x3>
-#include <QMatrix4x4>
+#include <Eigen/Geometry>
+#include <Eigen/LU>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -39,7 +39,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 namespace
@@ -91,27 +91,27 @@ void BrainSurface::markGeometryDirty()
 
 GpuStream BrainSurface::geometryStream() const
 {
-    return {m_vertexData.data(), quint32(m_vertexData.size() * sizeof(VertexData)), m_geometryGeneration};
+    return {m_vertexData.data(), static_cast<std::uint32_t>(m_vertexData.size() * sizeof(VertexData)), m_geometryGeneration};
 }
 
 GpuStream BrainSurface::colorStream() const
 {
-    return {m_colors.data(), quint32(m_colors.size() * sizeof(uint32_t)), m_colorGeneration};
+    return {m_colors.data(), static_cast<std::uint32_t>(m_colors.size() * sizeof(uint32_t)), m_colorGeneration};
 }
 
 GpuStream BrainSurface::annotationStream() const
 {
-    return {m_annotationColors.data(), quint32(m_annotationColors.size() * sizeof(uint32_t)), m_annotationGeneration};
+    return {m_annotationColors.data(), static_cast<std::uint32_t>(m_annotationColors.size() * sizeof(uint32_t)), m_annotationGeneration};
 }
 
 GpuStream BrainSurface::indexStream() const
 {
-    return {m_indexData.data(), quint32(m_indexData.size() * sizeof(uint32_t)), m_indexGeneration};
+    return {m_indexData.data(), static_cast<std::uint32_t>(m_indexData.size() * sizeof(uint32_t)), m_indexGeneration};
 }
 
 //=============================================================================================================
 
-void BrainSurface::setGeometry(std::vector<VertexData> vertices, std::vector<uint32_t> indices, const QColor& color)
+void BrainSurface::setGeometry(std::vector<VertexData> vertices, std::vector<uint32_t> indices, const Color& color)
 {
     m_vertexData = std::move(vertices);
     m_originalVertexData = m_vertexData;
@@ -144,28 +144,28 @@ void BrainSurface::fromSurface(const mne::FsSurface& surf)
 
     std::vector<VertexData> vertices(rr.rows());
     for (int i = 0; i < rr.rows(); ++i)
-        vertices[i] = {QVector3D(rr(i, 0), rr(i, 1), rr(i, 2)), QVector3D(nn(i, 0), nn(i, 1), nn(i, 2))};
+        vertices[i] = {Eigen::Vector3f(rr(i, 0), rr(i, 1), rr(i, 2)), Eigen::Vector3f(nn(i, 0), nn(i, 1), nn(i, 2))};
     std::vector<uint32_t> indices(tris.rows() * 3);
     for (int i = 0; i < tris.rows(); ++i)
         for (int j = 0; j < 3; ++j)
             indices[3 * i + j] = tris(i, j);
-    setGeometry(std::move(vertices), std::move(indices), Qt::white);
+    setGeometry(std::move(vertices), std::move(indices), Color::white());
 }
 
 //=============================================================================================================
 
-void BrainSurface::fromBemSurface(const mne::MNEBemSurface& surf, const QColor& color)
+void BrainSurface::fromBemSurface(const mne::MNEBemSurface& surf, const Color& color)
 {
     m_curvature.clear();
 
-    const int nVerts = surf.rr.rows();
+    const auto nVerts = static_cast<int>(surf.rr.rows());
     Eigen::MatrixX3f nn = surf.nn;
     if (nn.rows() != nVerts) {
         nn = mne::FsSurface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
     }
     std::vector<VertexData> vertices(nVerts);
     for (int i = 0; i < nVerts; ++i)
-        vertices[i] = {QVector3D(surf.rr(i, 0), surf.rr(i, 1), surf.rr(i, 2)), QVector3D(nn(i, 0), nn(i, 1), nn(i, 2))};
+        vertices[i] = {Eigen::Vector3f(surf.rr(i, 0), surf.rr(i, 1), surf.rr(i, 2)), Eigen::Vector3f(nn(i, 0), nn(i, 1), nn(i, 2))};
     std::vector<uint32_t> indices(surf.itris.rows() * 3);
     for (int i = 0; i < surf.itris.rows(); ++i)
         for (int j = 0; j < 3; ++j)
@@ -173,18 +173,18 @@ void BrainSurface::fromBemSurface(const mne::MNEBemSurface& surf, const QColor& 
     setGeometry(std::move(vertices), std::move(indices), color);
 }
 
-void BrainSurface::createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3i& triangles, const QColor& color)
+void BrainSurface::createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3i& triangles, const Color& color)
 {
     createFromData(vertices, mne::FsSurface::compute_normals(vertices, triangles), triangles, color);
 }
 
-void BrainSurface::createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3f& normals, const Eigen::MatrixX3i& triangles, const QColor& color)
+void BrainSurface::createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3f& normals, const Eigen::MatrixX3i& triangles, const Color& color)
 {
     m_curvature.clear();
 
     std::vector<VertexData> verts(vertices.rows());
     for (int i = 0; i < vertices.rows(); ++i)
-        verts[i] = {QVector3D(vertices(i, 0), vertices(i, 1), vertices(i, 2)), QVector3D(normals(i, 0), normals(i, 1), normals(i, 2))};
+        verts[i] = {Eigen::Vector3f(vertices(i, 0), vertices(i, 1), vertices(i, 2)), Eigen::Vector3f(normals(i, 0), normals(i, 1), normals(i, 2))};
     std::vector<uint32_t> indices(triangles.rows() * 3);
     for (int i = 0; i < triangles.rows(); ++i)
         for (int j = 0; j < 3; ++j)
@@ -314,13 +314,13 @@ void BrainSurface::clearSourceEstimateColors()
 
 void BrainSurface::setUseDefaultColor(bool useDefault)
 {
-    m_baseColor = useDefault ? m_defaultColor : Qt::white;
+    m_baseColor = useDefault ? m_defaultColor : Color::white();
     updateVertexColors();
 }
 
 //=============================================================================================================
 
-void BrainSurface::setColor(const QColor& color)
+void BrainSurface::setColor(const Color& color)
 {
     m_defaultColor = color;
     m_baseColor = color;
@@ -336,7 +336,7 @@ void BrainSurface::updateVertexColors()
             m_colors[i] = packABGR(val, val, val, val);
         }
     } else {
-        std::ranges::fill(m_colors, packABGR(m_baseColor.red(), m_baseColor.green(), m_baseColor.blue(), m_baseColor.alpha()));
+        std::ranges::fill(m_colors, packABGR(m_baseColor.r, m_baseColor.g, m_baseColor.b, m_baseColor.a));
     }
 
     // Source-estimate colours stay in the colour stream: each view selects its overlay by uniform
@@ -370,46 +370,29 @@ float BrainSurface::maxX() const
 void BrainSurface::translateX(float offset)
 {
     for (auto& v : m_vertexData) {
-        v.pos.setX(v.pos.x() + offset);
+        v.pos.x() += offset;
     }
     markGeometryDirty();
 }
 
 //=============================================================================================================
 
-void BrainSurface::transform(const QMatrix4x4& m)
+void BrainSurface::transform(const Eigen::Matrix4f& m)
 {
-    // Extract 3x3 normal matrix (inverse transpose of upper-left 3x3)
-    // QMatrix4x4::normalMatrix() returns QMatrix3x3.
-    QMatrix3x3 normalMat = m.normalMatrix();
+    // Normals transform with the inverse transpose of the upper-left 3x3, so non-uniform scales keep them normal
+    const Eigen::Matrix3f normalMat = m.topLeftCorner<3, 3>().inverse().transpose();
 
     for (auto& v : m_vertexData) {
-        // Transform position
-        v.pos = m.map(v.pos);
-
-        // Transform normal
-        // Note: QMatrix3x3 * QVector3D isn't directly supported by some Qt versions conveniently,
-        // but let's assume standard multiplication works or do manually.
-        // Actually QVector3D operator*(QMatrix4x4) exists but is row-vector mul.
-        // QMatrix4x4 operator*(QVector3D) is standard column-vector mul.
-
-        // Use generic map method or just manual multiply if needed.
-        // Easier: mapVector for vectors (ignores translation) but needs to be normal matrix for non-uniform scales.
-        // If scale is uniform, mapVector is fine.
-
-        // Let's do it manually to be safe with QMatrix3x3
-        const float* d = normalMat.constData();
-        float nx = d[0] * v.norm.x() + d[3] * v.norm.y() + d[6] * v.norm.z();
-        float ny = d[1] * v.norm.x() + d[4] * v.norm.y() + d[7] * v.norm.z();
-        float nz = d[2] * v.norm.x() + d[5] * v.norm.y() + d[8] * v.norm.z();
-        v.norm = QVector3D(nx, ny, nz).normalized();
+        const Eigen::Vector4f p = m * v.pos.homogeneous();
+        v.pos = p.head<3>() / p.w();
+        v.norm = (normalMat * v.norm).normalized();
     }
     markGeometryDirty();
 }
 
 //=============================================================================================================
 
-void BrainSurface::applyTransform(const QMatrix4x4& m)
+void BrainSurface::applyTransform(const Eigen::Matrix4f& m)
 {
     m_vertexData = m_originalVertexData;
     if (!m.isIdentity()) {
@@ -471,7 +454,7 @@ Eigen::MatrixX3f BrainSurface::verticesAsMatrix() const
 
 //=============================================================================================================
 
-void BrainSurface::boundingBox(QVector3D& min, QVector3D& max) const
+void BrainSurface::boundingBox(Eigen::Vector3f& min, Eigen::Vector3f& max) const
 {
     if (!m_bAABBDirty) {
         min = m_aabbMin;
@@ -480,8 +463,8 @@ void BrainSurface::boundingBox(QVector3D& min, QVector3D& max) const
     }
 
     if (m_vertexData.empty()) {
-        min = QVector3D(0, 0, 0);
-        max = QVector3D(0, 0, 0);
+        min = Eigen::Vector3f(0, 0, 0);
+        max = Eigen::Vector3f(0, 0, 0);
         return;
     }
 
@@ -489,13 +472,8 @@ void BrainSurface::boundingBox(QVector3D& min, QVector3D& max) const
     max = m_vertexData[0].pos;
 
     for (const auto& v : m_vertexData) {
-        min.setX(std::min(min.x(), v.pos.x()));
-        min.setY(std::min(min.y(), v.pos.y()));
-        min.setZ(std::min(min.z(), v.pos.z()));
-
-        max.setX(std::max(max.x(), v.pos.x()));
-        max.setY(std::max(max.y(), v.pos.y()));
-        max.setZ(std::max(max.z(), v.pos.z()));
+        min = min.cwiseMin(v.pos);
+        max = max.cwiseMax(v.pos);
     }
 
     m_aabbMin = min;
@@ -515,8 +493,8 @@ struct BrainSurface::Bvh
     };
     std::vector<Node> nodes;
     std::vector<int> triangles; // triangle indices, grouped by leaf
-    quint64 geometryGeneration = 0;
-    quint64 indexGeneration = 0;
+    std::uint64_t geometryGeneration = 0;
+    std::uint64_t indexGeneration = 0;
 };
 
 namespace
@@ -525,7 +503,7 @@ constexpr int kBvhLeafSize = 4;
 // Pads node bounds so a ray grazing a flat, axis-aligned box still enters it
 constexpr float kBvhPad = 1e-6f;
 
-void growBox(float* lo, float* hi, const QVector3D& p)
+void growBox(float* lo, float* hi, const Eigen::Vector3f& p)
 {
     for (int a = 0; a < 3; ++a) {
         lo[a] = std::min(lo[a], p[a]);
@@ -653,7 +631,7 @@ const BrainSurface::Bvh& BrainSurface::bvh() const
 
 //=============================================================================================================
 
-bool BrainSurface::intersects(const QVector3D& rayOrigin, const QVector3D& rayDir, float& dist, int& vertexIdx) const
+bool BrainSurface::intersects(const Eigen::Vector3f& rayOrigin, const Eigen::Vector3f& rayDir, float& dist, int& vertexIdx) const
 {
     vertexIdx = -1;
     if (m_vertexData.empty() || m_indexData.size() < 3)
@@ -696,9 +674,9 @@ bool BrainSurface::intersects(const QVector3D& rayOrigin, const QVector3D& rayDi
 
         for (int i = node.first; i < node.first + node.count; ++i) {
             const int t = tree.triangles[size_t(i)];
-            const QVector3D& v0 = m_vertexData[m_indexData[3 * t]].pos;
-            const QVector3D& v1 = m_vertexData[m_indexData[3 * t + 1]].pos;
-            const QVector3D& v2 = m_vertexData[m_indexData[3 * t + 2]].pos;
+            const Eigen::Vector3f& v0 = m_vertexData[m_indexData[3 * t]].pos;
+            const Eigen::Vector3f& v1 = m_vertexData[m_indexData[3 * t + 1]].pos;
+            const Eigen::Vector3f& v2 = m_vertexData[m_indexData[3 * t + 2]].pos;
             const std::optional<double> hitT = viz::intersect_ray_triangle(ray, {v0.x(), v0.y(), v0.z()}, {v1.x(), v1.y(), v1.z()},
                                                                            {v2.x(), v2.y(), v2.z()});
             if (hitT && *hitT < closestDist) {
@@ -712,11 +690,11 @@ bool BrainSurface::intersects(const QVector3D& rayOrigin, const QVector3D& rayDi
         return false;
 
     // The vertex of the hit triangle nearest to the hit point, used for region lookup
-    const QVector3D hit = rayOrigin + float(closestDist) * rayDir;
+    const Eigen::Vector3f hit = rayOrigin + static_cast<float>(closestDist) * rayDir;
     float best = std::numeric_limits<float>::max();
     for (int k = 0; k < 3; ++k) {
         const int v = int(m_indexData[3 * closestTriangle + k]);
-        const float d = (m_vertexData[v].pos - hit).lengthSquared();
+        const float d = (m_vertexData[v].pos - hit).squaredNorm();
         if (d < best) {
             best = d;
             vertexIdx = v;
@@ -789,4 +767,4 @@ std::optional<uint32_t> BrainSurface::selectedLabel() const
     return std::nullopt;
 }
 
-} // namespace mne::viz::qt
+} // namespace mne::viz

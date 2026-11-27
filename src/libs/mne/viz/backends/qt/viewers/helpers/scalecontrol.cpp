@@ -18,6 +18,7 @@
 
 #include <QInputDialog>
 
+using namespace mne::viz;
 using namespace mne::viz::qt;
 
 const static float m_dDefaultMin(0.0f);

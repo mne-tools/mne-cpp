@@ -43,7 +43,7 @@
 #include <mne/viz/backends/qt/3d/scene/sourceestimatemanager.h>
 #include <mne/viz/backends/qt/3d/scene/rtsensorstreammanager.h>
 #include <mne/viz/backends/qt/3d/workers/stcloadingworker.h>
-#include <mne/viz/backends/qt/3d/renderable/brainsurface.h>
+#include <mne/viz/brain/brainsurface.h>
 #include <mne/viz/backends/qt/3d/input/cameracontroller.h>
 #include <mne/viz/backends/qt/3d/input/raypicker.h>
 #include <mne/viz/backends/qt/3d/renderable/dipoleobject.h>
@@ -60,6 +60,7 @@
 #include <mne/viz/backends/qt/plots/helpers/colormap.h>
 #include <mne/inv/inv_source_estimate.h>
 #include <mne/viz/backends/qt/3d/core/viewstate.h>
+#include <mne/viz/backends/qt/qtconversions.h>
 #include <mne/fiff/fiff_dig_point.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_coord_trans_set.h>
@@ -101,6 +102,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace mne::viz;
 using namespace mne::viz::qt;
 using namespace mne;
 
@@ -967,7 +969,7 @@ void TestDisp3dBrainView::sourceEstimateManager_basics()
     Eigen::MatrixX3i tris(2, 3);
     tris << 0, 1, 2, 1, 3, 2;
     auto lh = std::make_shared<BrainSurface>();
-    lh->createFromData(rr, tris, Qt::gray);
+    lh->createFromData(rr, tris, toColor(QColor(Qt::gray)));
     lh->setHemi(0);
     surfaces.insert_or_assign("lh_pial", lh);
 
@@ -1037,7 +1039,7 @@ void TestDisp3dBrainView::rtSensorStreamManager_basics()
     Eigen::MatrixX3i tris(4, 3);
     tris << 0, 2, 4, 2, 1, 4, 1, 3, 4, 3, 0, 4;
     auto head = std::make_shared<BrainSurface>();
-    head->createFromData(rr, tris, Qt::gray);
+    head->createFromData(rr, tris, toColor(QColor(Qt::gray)));
     surfaces.insert_or_assign("bem_head", head);
     QVERIFY(mapper.buildMapping(surfaces, mne::FiffCoordTrans(), false));
     QVERIFY(!manager.startStreaming("ECoG", mapper, surfaces));
@@ -1105,7 +1107,7 @@ void TestDisp3dBrainView::stcLoadingWorker_basics()
     rr << 0.0f, 0.0f, 0.0f, 0.01f, 0.0f, 0.0f, 0.0f, 0.01f, 0.0f, 0.01f, 0.01f, 0.0f;
     Eigen::MatrixX3i tris(2, 3);
     tris << 0, 1, 2, 1, 3, 2;
-    lhSurface.createFromData(rr, tris, Qt::gray);
+    lhSurface.createFromData(rr, tris, toColor(QColor(Qt::gray)));
     StcLoadingWorker loader(lhPath.toStdU16String(), {}, &lhSurface, &rhSurface, 0.05);
     QSignalSpy loadedSpy(&loader, &StcLoadingWorker::finished);
     QSignalSpy progressSpy(&loader, &StcLoadingWorker::progress);
@@ -1486,7 +1488,7 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
     Eigen::MatrixX3i tris(4, 3);
     tris << 0, 2, 1, 0, 1, 3, 0, 3, 2, 1, 2, 3;
     BrainSurface surface;
-    surface.createFromData(rr, tris, Qt::gray);
+    surface.createFromData(rr, tris, toColor(QColor(Qt::gray)));
     mne::InvEcd ecd;
     ecd.rd = Eigen::Vector3f(0.0f, 0.0f, 0.05f);
     ecd.Q = Eigen::Vector3f(1e-8f, 0.0f, 0.0f);
@@ -1532,7 +1534,7 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
 
     // The uniform buffer grows to one slot per draw (at most 16384); a whole frame must stay usable when it overflows
     QTest::failOnWarning(QRegularExpression(QStringLiteral("exhausted|uniform buffer|inside a render pass")));
-    const auto modes = {mne::viz::qt::Standard, mne::viz::qt::Holographic, mne::viz::qt::Anatomical, mne::viz::qt::XRay, mne::viz::qt::ShowNormals};
+    const auto modes = {mne::viz::Standard, mne::viz::Holographic, mne::viz::Anatomical, mne::viz::XRay, mne::viz::ShowNormals};
     for (int frameIndex = 0; frameIndex < 2; ++frameIndex) {
         QRhiCommandBuffer* cb = nullptr;
         QCOMPARE(rhi->beginOffscreenFrame(&cb), QRhi::FrameOpSuccess);
@@ -1588,8 +1590,8 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
         renderer.issueElectrodeDraw(cb, &electrodes, electrodeOffset);
         renderer.issueVideoOverlayDraw(cb, &video, nullptr, quadOffset);
         renderer.issueVideoOverlayDraw(cb, &video, &surface, decalOffset);
-        renderer.issueSurfaceDraw(cb, &surface, mne::viz::qt::Standard, last);
-        renderer.issueSurfaceDraw(cb, &surface, mne::viz::qt::Standard, -1);
+        renderer.issueSurfaceDraw(cb, &surface, mne::viz::Standard, last);
+        renderer.issueSurfaceDraw(cb, &surface, mne::viz::Standard, -1);
 
         // QRhi forbids resource updates inside a pass, so preparing one there is refused
         QRhiResourceUpdateBatch* late = rhi->nextResourceUpdateBatch();
@@ -1607,7 +1609,7 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
         renderer.endPass(cb);
 
         renderer.beginPreservingPass(cb);
-        renderer.issueSurfaceDraw(cb, &surface, mne::viz::qt::Standard, surfaceOffset);
+        renderer.issueSurfaceDraw(cb, &surface, mne::viz::Standard, surfaceOffset);
         renderer.endPass(cb);
         QCOMPARE(rhi->endOffscreenFrame(), QRhi::FrameOpSuccess);
     }
@@ -1615,7 +1617,7 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
     // GPU copies of destroyed renderables are freed at the next frame
     {
         BrainSurface transient;
-        transient.createFromData(rr, tris, Qt::gray);
+        transient.createFromData(rr, tris, toColor(QColor(Qt::gray)));
         QRhiCommandBuffer* cb = nullptr;
         QCOMPARE(rhi->beginOffscreenFrame(&cb), QRhi::FrameOpSuccess);
         renderer.newFrame();
@@ -1650,7 +1652,7 @@ void TestDisp3dBrainView::brainRenderer_uniformSlotsDoNotOverlap()
     BrainRenderer::SceneData scene;
     scene.cameraPos = QVector3D(0.0f, 0.0f, 1.0f);
     scene.lightDir = QVector3D(0.0f, 0.0f, 1.0f);
-    scene.overlayMode = static_cast<float>(mne::viz::qt::ModeScientific);
+    scene.overlayMode = static_cast<float>(mne::viz::ModeScientific);
 
     const bool hasOpenGl = QGuiApplicationPrivate::platformIntegration()->hasCapability(QPlatformIntegration::OpenGL);
     std::unique_ptr<QOffscreenSurface> glSurface(hasOpenGl ? QRhiGles2InitParams::newFallbackSurface() : nullptr);
@@ -1668,9 +1670,9 @@ void TestDisp3dBrainView::brainRenderer_uniformSlotsDoNotOverlap()
         QVERIFY(rhi);
         ++tested;
         BrainSurface left;
-        left.createFromData(rrLeft, tris, Qt::red);
+        left.createFromData(rrLeft, tris, toColor(QColor(Qt::red)));
         BrainSurface right;
-        right.createFromData(rrRight, tris, Qt::green);
+        right.createFromData(rrRight, tris, toColor(QColor(Qt::green)));
         const QSize size(64, 32);
         std::unique_ptr<QRhiTexture> color(rhi->newTexture(QRhiTexture::RGBA8, size, 1, QRhiTexture::RenderTarget | QRhiTexture::UsedAsTransferSource));
         QVERIFY(color->create());
@@ -1690,8 +1692,8 @@ void TestDisp3dBrainView::brainRenderer_uniformSlotsDoNotOverlap()
         QVERIFY2(second >= 256, qPrintable(QStringLiteral("%1: second slot at byte %2").arg(rhi->backendName()).arg(second)));
         QCOMPARE(second % rhi->ubufAlignment(), 0);
         renderer.beginFrame(cb, updates);
-        renderer.issueSurfaceDraw(cb, &left, mne::viz::qt::Standard, first);
-        renderer.issueSurfaceDraw(cb, &right, mne::viz::qt::Standard, second);
+        renderer.issueSurfaceDraw(cb, &left, mne::viz::Standard, first);
+        renderer.issueSurfaceDraw(cb, &right, mne::viz::Standard, second);
         renderer.endPass(cb);
         QRhiReadbackResult readback;
         QRhiResourceUpdateBatch* read = rhi->nextResourceUpdateBatch();
@@ -1778,7 +1780,7 @@ void TestDisp3dBrainView::rayPicker_basics()
         Eigen::MatrixX3i tris(2, 3);
         tris << 0, 1, 2, 1, 3, 2;
         auto surface = std::make_shared<BrainSurface>();
-        surface->createFromData(rr, tris, Qt::gray);
+        surface->createFromData(rr, tris, toColor(QColor(Qt::gray)));
         return surface;
     };
     surfaces.insert_or_assign("bem_outer_skin", plane(1.0f));
@@ -1989,7 +1991,7 @@ void TestDisp3dBrainView::brainSurface_advanced()
         0.0f, 0.01f, 0.0f;
     Eigen::MatrixX3i tris(1, 3);
     tris << 0, 1, 2;
-    surf.createFromData(verts, tris, QColor(200, 200, 200));
+    surf.createFromData(verts, tris, toColor(QColor(QColor(200, 200, 200))));
 
     QCOMPARE(surf.vertexPositions().rows(), 3);
     QCOMPARE(surf.vertexNormals().rows(), 3);
@@ -2004,23 +2006,23 @@ void TestDisp3dBrainView::brainSurface_advanced()
     surf.setUseDefaultColor(true);
     surf.setUseDefaultColor(false);
     QCOMPARE(surf.colorsRef()[1], packABGR(255, 255, 255, 255));
-    surf.setColor(QColor(10, 20, 30, 128));
+    surf.setColor(toColor(QColor(10, 20, 30, 128)));
     QCOMPARE(surf.colorsRef()[1], packABGR(10, 20, 30, 128));
     surf.setUseDefaultColor(true);
     QCOMPARE(surf.colorsRef()[1], packABGR(10, 20, 30, 128));
     // Placing the surface keeps its colours
     QMatrix4x4 shift;
     shift.translate(0.0f, 0.0f, 0.01f);
-    surf.applyTransform(shift);
-    QCOMPARE(surf.vertexDataRef()[1].pos, QVector3D(0.01f, 0.0f, 0.01f));
+    surf.applyTransform(toEigen(shift));
+    QVERIFY((surf.vertexDataRef()[1].pos - Eigen::Vector3f(0.01f, 0.0f, 0.01f)).norm() < 1e-6f);
     QCOMPARE(surf.colorsRef()[1], packABGR(10, 20, 30, 128));
-    surf.applyTransform(QMatrix4x4());
-    QCOMPARE(surf.vertexDataRef()[1].pos, QVector3D(0.01f, 0.0f, 0.0f));
+    surf.applyTransform(Eigen::Matrix4f::Identity());
+    QVERIFY((surf.vertexDataRef()[1].pos - Eigen::Vector3f(0.01f, 0.0f, 0.0f)).norm() < 1e-6f);
     QCOMPARE(surf.colorsRef()[1], packABGR(10, 20, 30, 128));
-    surf.setVisualizationMode(mne::viz::qt::ModeSurface);
-    surf.setVisualizationMode(mne::viz::qt::ModeScientific);
-    surf.setVisualizationMode(mne::viz::qt::ModeSourceEstimate);
-    surf.setVisualizationMode(mne::viz::qt::ModeAnnotation);
+    surf.setVisualizationMode(mne::viz::ModeSurface);
+    surf.setVisualizationMode(mne::viz::ModeScientific);
+    surf.setVisualizationMode(mne::viz::ModeSourceEstimate);
+    surf.setVisualizationMode(mne::viz::ModeAnnotation);
 
     // applySourceEstimateColors
     std::vector<uint32_t> colors(3, 0xFF808080u);
@@ -2031,7 +2033,7 @@ void TestDisp3dBrainView::brainSurface_advanced()
     QCOMPARE(vm.rows(), 3);
 
     // boundingBox
-    QVector3D bMin, bMax;
+    Eigen::Vector3f bMin, bMax;
     surf.boundingBox(bMin, bMax);
     QVERIFY(bMax.x() >= bMin.x());
 
@@ -2042,7 +2044,7 @@ void TestDisp3dBrainView::brainSurface_advanced()
     // intersects — ray passing through the triangle plane
     float dist = 0.0f;
     int vIdx = -1;
-    surf.intersects(QVector3D(0.002f, 0.002f, 1.0f), QVector3D(0, 0, -1), dist, vIdx);
+    surf.intersects(Eigen::Vector3f(0.002f, 0.002f, 1.0f), Eigen::Vector3f(0, 0, -1), dist, vIdx);
 
     // getAnnotation* without loaded annotation
     surf.getAnnotationLabel(0);
@@ -2485,7 +2487,7 @@ void TestDisp3dBrainView::sourceEstimateOverlay_colorsSurface()
     Eigen::MatrixX3i tris(2, 3);
     tris << 0, 1, 2, 1, 3, 2;
     BrainSurface surface;
-    surface.createFromData(rr, tris, Qt::gray);
+    surface.createFromData(rr, tris, toColor(QColor(Qt::gray)));
     surface.setHemi(0);
 
     // Time 0: vertex 2 is at the maximum (opaque, top of the map); vertex 0 at the minimum is transparent
@@ -2520,7 +2522,7 @@ void TestDisp3dBrainView::sourceEstimateOverlay_colorsSurface()
 
     // A surface of the other hemisphere without data stays untouched
     BrainSurface other;
-    other.createFromData(rr, tris, Qt::gray);
+    other.createFromData(rr, tris, toColor(QColor(Qt::gray)));
     other.setHemi(2);
     const uint32_t before = other.colorsRef()[0];
     overlay.applyToSurface(&other, 0);

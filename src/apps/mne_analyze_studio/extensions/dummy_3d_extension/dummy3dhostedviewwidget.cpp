@@ -38,6 +38,7 @@
 #include <memory>
 
 using namespace MNEANALYZESTUDIO;
+using namespace mne::viz;
 using namespace mne::viz::qt;
 
 namespace

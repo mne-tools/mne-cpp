@@ -60,6 +60,7 @@
 using namespace RTCLUSTMNEPLUGIN;
 using namespace mne;
 using namespace mne::scan;
+using namespace mne::viz;
 using namespace mne::viz::qt;
 using namespace Eigen;
 

@@ -18,7 +18,7 @@
 
 #include "surfacekeys.h"
 #include "../model/items/sensortreeitem.h"
-#include "../renderable/brainsurface.h"
+#include "../../../../brain/brainsurface.h"
 #include <mne/fiff/fiff_evoked_set.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_stream.h>
@@ -238,7 +238,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const std::filesystem::path
                     }
 
                     auto helmetSurface = std::make_shared<BrainSurface>();
-                    helmetSurface->fromBemSurface(helmetSurf, QColor(0, 0, 77, 200));
+                    helmetSurface->fromBemSurface(helmetSurf, viz::Color{0, 0, 77, 200});
                     helmetSurface->setVisible(true);
                     result.helmetSurface = helmetSurface;
                 } else {
@@ -309,7 +309,7 @@ std::shared_ptr<BrainSurface> DataLoader::loadHelmetSurface(
     }
 
     auto surface = std::make_shared<BrainSurface>();
-    surface->fromBemSurface(helmetSurf, QColor(0, 0, 77, 200));
+    surface->fromBemSurface(helmetSurf, viz::Color{0, 0, 77, 200});
     surface->setVisible(true);
 
     return surface;

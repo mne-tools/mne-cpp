@@ -14,7 +14,7 @@
  * mapping matrix produced by @ref mne::viz::qt::SensorFieldMapper, applies
  * symmetric normalisation around zero, maps through the active
  * MEG / EEG colormap and packs the result as ABGR uint32 ready for
- * direct upload into the target @ref mne::viz::qt::BrainSurface colour slot.
+ * direct upload into the target @ref mne::viz::BrainSurface colour slot.
  *
  * All public setters are mutex-protected so the controller can
  * swap the mapping matrix or change colormap mid-stream.

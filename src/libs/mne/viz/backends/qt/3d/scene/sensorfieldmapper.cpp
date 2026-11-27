@@ -15,11 +15,12 @@
 //=============================================================================================================
 
 #include "sensorfieldmapper.h"
+#include "../../qtconversions.h"
 
 #include <mne/base/log.h>
 
-#include "../renderable/brainsurface.h"
-#include "../core/rendertypes.h"
+#include "../../../../brain/brainsurface.h"
+#include "../../../../brain/rendertypes.h"
 #include <mne/base/string_utils.h>
 #include <mne/fwd/fwd_field_map.h>
 #include <mne/fiff/fiff_ch_info.h>
@@ -557,13 +558,13 @@ void SensorFieldMapper::apply(
 
         auto surface = surfaces[key];
         if (!visible || !mat || pick.size() == 0) {
-            surface->setVisualizationMode(mne::viz::qt::ModeSurface);
+            surface->setVisualizationMode(mne::viz::ModeSurface);
             updateContourSurfaces(surfaces, contourPrefix, *surface,
                                   std::vector<float>(), 0.0f, false);
             return;
         }
         if (mat->cols() != pick.size()) {
-            surface->setVisualizationMode(mne::viz::qt::ModeSurface);
+            surface->setVisualizationMode(mne::viz::ModeSurface);
             updateContourSurfaces(surfaces, contourPrefix, *surface,
                                   std::vector<float>(), 0.0f, false);
             return;
@@ -819,7 +820,7 @@ void SensorFieldMapper::updateContourSurfaces(
         if (!csurf) {
             csurf = std::make_shared<BrainSurface>();
         }
-        csurf->createFromData(rr, nn, tris, color);
+        csurf->createFromData(rr, nn, tris, toColor(color));
         csurf->setVisible(true);
     };
 

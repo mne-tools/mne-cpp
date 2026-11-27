@@ -20,7 +20,7 @@
 #include <mne/base/string_utils.h>
 
 #include "brainrenderer.h"
-#include "../renderable/brainsurface.h"
+#include "../../../../brain/brainsurface.h"
 #include "../renderable/dipoleobject.h"
 #include "../renderable/electrodeobject.h"
 #include "../renderable/networkobject.h"
@@ -30,8 +30,8 @@
 #include "../core/surfacekeys.h"
 #include "../core/dataloader.h"
 #include "../input/raypicker.h"
-#include "../core/qteigen_p.h"
-#include "../geometry/meshfactory.h"
+#include "../../qtconversions.h"
+#include "../../../../brain/meshfactory.h"
 #include "../model/braintreemodel.h"
 #include "../model/items/surfacetreeitem.h"
 #include "../model/items/bemtreeitem.h"
@@ -217,8 +217,7 @@ BrainViewCore::BrainViewCore(BrainViewHost* host, QObject* parent)
     updateOverlayLayout();
 
     // Setup Debug Pointer: Semi-transparent sphere for subtle intersection indicator
-    m_debugPointerSurface = MeshFactory::createSphere(QVector3D(0, 0, 0), 0.002f,
-                                                      QColor(200, 255, 255, 160));
+    m_debugPointerSurface = MeshFactory::createSphere(Eigen::Vector3f::Zero(), 0.002f, Color{200, 255, 255, 160});
 
     // ── Connect SourceEstimateManager signals ─────────────────────────
     connect(&m_sourceManager, &SourceEstimateManager::loaded,
@@ -511,7 +510,7 @@ void BrainViewCore::onRowsInserted(const QModelIndex& parent, int first, int las
             auto brainSurf = std::make_shared<BrainSurface>();
 
             // Load BEM geometry with color from item
-            brainSurf->fromBemSurface(bemSurfData, itemColor(*bemItem));
+            brainSurf->fromBemSurface(bemSurfData, toColor(itemColor(*bemItem)));
 
             brainSurf->setVisible(bemItem->isVisible());
 
@@ -546,15 +545,15 @@ void BrainViewCore::onRowsInserted(const QModelIndex& parent, int first, int las
                 parentText = sensItem->parent()->text();
 
             if (parentText.contains("MEG/Grad") && sensItem->hasOrientation()) {
-                brainSurf = MeshFactory::createBarbell(sensItem->position(), sensItem->orientation(),
-                                                       itemColor(*sensItem), sensItem->scale());
+                brainSurf = MeshFactory::createBarbell(toEigen(sensItem->position()), toEigen(sensItem->orientation()),
+                                                       toColor(itemColor(*sensItem)), sensItem->scale());
             } else if (parentText.contains("MEG/Mag") && sensItem->hasOrientation()) {
-                brainSurf = MeshFactory::createPlate(sensItem->position(), sensItem->orientation(),
-                                                     itemColor(*sensItem), sensItem->scale());
+                brainSurf = MeshFactory::createPlate(toEigen(sensItem->position()), toEigen(sensItem->orientation()),
+                                                     toColor(itemColor(*sensItem)), sensItem->scale());
             } else {
                 // EEG and other sensors: smooth icosphere
-                brainSurf = MeshFactory::createSphere(sensItem->position(), sensItem->scale(),
-                                                      itemColor(*sensItem));
+                brainSurf = MeshFactory::createSphere(toEigen(sensItem->position()), sensItem->scale(),
+                                                      toColor(itemColor(*sensItem)));
             }
 
             brainSurf->setVisible(sensItem->isVisible());
@@ -586,8 +585,8 @@ void BrainViewCore::onRowsInserted(const QModelIndex& parent, int first, int las
             if (positions.empty())
                 continue;
 
-            auto brainSurf = MeshFactory::createBatchedSpheres(positions, srcItem->scale(),
-                                                               itemColor(*srcItem));
+            auto brainSurf = MeshFactory::createBatchedSpheres(toEigen(positions), srcItem->scale(),
+                                                               toColor(itemColor(*srcItem)));
             brainSurf->setVisible(srcItem->isVisible());
             m_itemSurfaceMap[item] = brainSurf;
 
@@ -602,8 +601,8 @@ void BrainViewCore::onRowsInserted(const QModelIndex& parent, int first, int las
             if (positions.empty())
                 continue;
 
-            auto brainSurf = MeshFactory::createBatchedSpheres(positions, digItem->scale(),
-                                                               itemColor(*digItem));
+            auto brainSurf = MeshFactory::createBatchedSpheres(toEigen(positions), digItem->scale(),
+                                                               toColor(itemColor(*digItem)));
             brainSurf->setVisible(digItem->isVisible());
 
             m_itemSurfaceMap[item] = brainSurf;
@@ -637,7 +636,7 @@ void BrainViewCore::onRowsInserted(const QModelIndex& parent, int first, int las
         }
 
         if (m_itemSurfaceMap.contains(item))
-            m_itemSurfaceMap[item]->applyTransform(itemTransform(item));
+            m_itemSurfaceMap[item]->applyTransform(toEigen(itemTransform(item)));
 
         // Check children recursively
         if (m_model->hasChildren(index)) {
@@ -668,10 +667,10 @@ void BrainViewCore::onDataChanged(const QModelIndex& topLeft, const QModelIndex&
                     m_vertexCountDirty = true;
                 }
                 if ((roles.contains(AbstractTreeItem::ColorRole) || roles.contains(AbstractTreeItem::AlphaRole)) && absItem->color().isValid()) {
-                    surf->setColor(itemColor(*absItem));
+                    surf->setColor(toColor(itemColor(*absItem)));
                 }
                 if (roles.contains(AbstractTreeItem::TransformRole)) {
-                    surf->applyTransform(itemTransform(item));
+                    surf->applyTransform(toEigen(itemTransform(item)));
                     transformChanged = true;
                 }
                 if (roles.contains(SurfaceTreeItem::AnnotationDataRole)) {
@@ -732,8 +731,9 @@ void BrainViewCore::updateSceneBounds()
     // Iterate over all surfaces
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
         if (it->second->isVisible()) {
-            QVector3D sMin, sMax;
-            it->second->boundingBox(sMin, sMax);
+            Eigen::Vector3f sMinEigen, sMaxEigen;
+            it->second->boundingBox(sMinEigen, sMaxEigen);
+            QVector3D sMin = toQVector3D(sMinEigen), sMax = toQVector3D(sMaxEigen);
 
             min.setX(std::min(min.x(), sMin.x()));
             min.setY(std::min(min.y(), sMin.y()));
@@ -776,7 +776,7 @@ void BrainViewCore::updateSceneBounds()
 
 void BrainViewCore::setShaderMode(const std::string& modeName)
 {
-    const mne::viz::qt::ShaderMode mode = shaderModeFromName(modeName);
+    const mne::viz::ShaderMode mode = shaderModeFromName(modeName);
     subViewForTarget(m_visualizationEditTarget).brainShader = mode;
 
     m_brainShaderMode = mode;
@@ -927,8 +927,8 @@ void BrainViewCore::updateInflatedSurfaceTransforms()
     auto lhSurf = lhIt->second;
     auto rhSurf = rhIt->second;
 
-    lhSurf->applyTransform(itemTransform(itemForSurface(lhSurf)));
-    rhSurf->applyTransform(itemTransform(itemForSurface(rhSurf)));
+    lhSurf->applyTransform(toEigen(itemTransform(itemForSurface(lhSurf))));
+    rhSurf->applyTransform(toEigen(itemTransform(itemForSurface(rhSurf))));
 
     if (!needsInflated) {
         return;
@@ -947,7 +947,7 @@ void BrainViewCore::updateInflatedSurfaceTransforms()
 
 void BrainViewCore::setBemShaderMode(const std::string& modeName)
 {
-    const mne::viz::qt::ShaderMode mode = shaderModeFromName(modeName);
+    const mne::viz::ShaderMode mode = shaderModeFromName(modeName);
 
     subViewForTarget(m_visualizationEditTarget).bemShader = mode;
 
@@ -1033,7 +1033,7 @@ void BrainViewCore::setDipoleVisible(bool visible)
 
 void BrainViewCore::setVisualizationMode(const std::string& modeName)
 {
-    const mne::viz::qt::VisualizationMode mode = visualizationModeFromName(modeName);
+    const mne::viz::VisualizationMode mode = visualizationModeFromName(modeName);
     SubView& sv = subViewForTarget(m_visualizationEditTarget);
     sv.overlayMode = mode;
 
@@ -1742,7 +1742,7 @@ void BrainViewCore::renderFrame(QRhi* rhi, int sampleCount, QRhiCommandBuffer* c
     struct DrawItem
     {
         BrainSurface* surface;
-        mne::viz::qt::ShaderMode mode;
+        mne::viz::ShaderMode mode;
         float overlayMode;
         float distSq;      // for transparent back-to-front sort
         int uniformOffset; // filled by prepareSurfaceDraw
@@ -1808,7 +1808,7 @@ void BrainViewCore::renderFrame(QRhi* rhi, int sampleCount, QRhiCommandBuffer* c
 
         // Pass 1: Opaque Surfaces (Brain surfaces)
         // Use viewport-specific shader from subview
-        mne::viz::qt::ShaderMode currentShader = sv.brainShader;
+        mne::viz::ShaderMode currentShader = sv.brainShader;
         const std::string overlayName = visualizationModeName(sv.overlayMode);
 
         // Collect matched brain surface keys for this pane's info panel
@@ -1841,7 +1841,7 @@ void BrainViewCore::renderFrame(QRhi* rhi, int sampleCount, QRhiCommandBuffer* c
         // Determine per-viewport field-map visibility
         const bool megFieldVisible = sv.visibility.megFieldMap;
         const bool eegFieldVisible = sv.visibility.eegFieldMap;
-        const mne::viz::qt::ShaderMode currentBemShader = sv.bemShader;
+        const mne::viz::ShaderMode currentBemShader = sv.bemShader;
         const std::string& megFieldKey = m_fieldMapper.megSurfaceKey();
         const std::string& eegFieldKey = m_fieldMapper.eegSurfaceKey();
 
@@ -1862,16 +1862,17 @@ void BrainViewCore::renderFrame(QRhi* rhi, int sampleCount, QRhiCommandBuffer* c
                 if (!surf->isVisible())
                     continue;
                 if (key.starts_with("dig_live_t_") || key.starts_with("dig_ray_") || key.starts_with("dig_probe_")) {
-                    QVector3D bmin, bmax;
-                    surf->boundingBox(bmin, bmax);
+                    Eigen::Vector3f bminEigen, bmaxEigen;
+                    surf->boundingBox(bminEigen, bmaxEigen);
+                    QVector3D bmin = toQVector3D(bminEigen), bmax = toQVector3D(bmaxEigen);
                     QVector3D ctr = (bmin + bmax) * 0.5f;
                     float dist = (sceneData.cameraPos - ctr).lengthSquared();
-                    transparentDraws.push_back({surf, mne::viz::qt::Holographic,
-                                                static_cast<float>(mne::viz::qt::ModeScientific),
+                    transparentDraws.push_back({surf, mne::viz::Holographic,
+                                                static_cast<float>(mne::viz::ModeScientific),
                                                 dist, -1});
                 } else {
                     opaqueDraws.push_back({surf, currentShader,
-                                           static_cast<float>(mne::viz::qt::ModeScientific),
+                                           static_cast<float>(mne::viz::ModeScientific),
                                            0.0f, -1});
                 }
             } else {
@@ -1884,17 +1885,18 @@ void BrainViewCore::renderFrame(QRhi* rhi, int sampleCount, QRhiCommandBuffer* c
                 if (!surf->isVisible())
                     continue;
 
-                QVector3D bmin, bmax;
-                surf->boundingBox(bmin, bmax);
+                Eigen::Vector3f bminEigen, bmaxEigen;
+                surf->boundingBox(bminEigen, bmaxEigen);
+                QVector3D bmin = toQVector3D(bminEigen), bmax = toQVector3D(bmaxEigen);
                 QVector3D center = (bmin + bmax) * 0.5f;
                 float dist = (sceneData.cameraPos - center).lengthSquared();
 
-                auto mode = isBem ? currentBemShader : mne::viz::qt::Holographic;
-                float itemOverlay = static_cast<float>(mne::viz::qt::ModeScientific);
+                auto mode = isBem ? currentBemShader : mne::viz::Holographic;
+                float itemOverlay = static_cast<float>(mne::viz::ModeScientific);
                 if (key == megFieldKey && !megFieldVisible)
-                    itemOverlay = static_cast<float>(mne::viz::qt::ModeSurface);
+                    itemOverlay = static_cast<float>(mne::viz::ModeSurface);
                 else if (key == eegFieldKey && !eegFieldVisible)
-                    itemOverlay = static_cast<float>(mne::viz::qt::ModeSurface);
+                    itemOverlay = static_cast<float>(mne::viz::ModeSurface);
 
                 transparentDraws.push_back({surf, mode, itemOverlay, dist, -1});
             }
@@ -1998,7 +2000,7 @@ void BrainViewCore::renderFrame(QRhi* rhi, int sampleCount, QRhiCommandBuffer* c
         m_renderer->issueNetworkDraw(cb, m_network.get(), pane.networkOffset);
         m_renderer->issuePolylineDraw(cb, m_headPath.get(), pane.headPathOffset);
 
-        m_renderer->issueSurfaceDraw(cb, m_debugPointerSurface.get(), mne::viz::qt::Holographic, pane.pointerOffset);
+        m_renderer->issueSurfaceDraw(cb, m_debugPointerSurface.get(), mne::viz::Holographic, pane.pointerOffset);
     }
 
     // Labels and pane separators on top of every pane
@@ -2517,8 +2519,9 @@ bool BrainViewCore::bemTopVertexInMri(QVector3D& pos) const
         return false;
 
     const BrainSurface* surf = it->second.get();
-    QVector3D bmin, bmax;
-    surf->boundingBox(bmin, bmax);
+    Eigen::Vector3f bminEigen, bmaxEigen;
+    surf->boundingBox(bminEigen, bmaxEigen);
+    QVector3D bmin = toQVector3D(bminEigen), bmax = toQVector3D(bmaxEigen);
 
     // Top of head = max Z in MRI/surface-RAS (Z = superior)
     pos = QVector3D((bmin.x() + bmax.x()) * 0.5f,
@@ -2689,7 +2692,7 @@ void BrainViewCore::refreshSensorTransforms()
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
         if ((it->first.starts_with("sens_") || it->first.starts_with("dig_")) && it->second) {
             const QStandardItem* item = itemForSurface(it->second);
-            it->second->applyTransform(item ? itemTransform(item) : qmat);
+            it->second->applyTransform(toEigen(item ? itemTransform(item) : qmat));
         }
     }
     for (auto it = m_itemDipoleMap.cbegin(); it != m_itemDipoleMap.cend(); ++it) {
@@ -3006,7 +3009,7 @@ void BrainViewCore::setLiveMarkers(const std::vector<LiveMarker>& markers)
 
     for (std::size_t i = 0; i < markers.size(); ++i) {
         auto surf = MeshFactory::createBatchedSpheres(
-            {markers[i].position}, markers[i].radius, markers[i].color);
+            {toEigen(markers[i].position)}, markers[i].radius, toColor(markers[i].color));
         surf->setVisible(true);
         m_surfaces[std::format("{}{}", markers[i].transparent ? "dig_live_t_" : "dig_live_", i)] = surf;
     }
@@ -3039,7 +3042,7 @@ void BrainViewCore::setLiveRay(const QVector3D& from, const QVector3D& to,
     // Remove previous ray surface
     m_surfaces.erase("dig_ray_0");
 
-    auto surf = MeshFactory::createCylinder(from, to, radius, color);
+    auto surf = MeshFactory::createCylinder(toEigen(from), toEigen(to), radius, toColor(color));
     surf->setVisible(true);
     m_surfaces["dig_ray_0"] = surf;
 
@@ -3081,21 +3084,21 @@ void BrainViewCore::setProbeVisualization(const QVector3D& tip, const QVector3D&
     if (length > 0.0f && !direction.isNull()) {
         const QVector3D shaftEnd = tip - direction * length;
         constexpr float kShaftRadius = 0.0015f;
-        auto shaft = MeshFactory::createCylinder(tip, shaftEnd, kShaftRadius, color);
+        auto shaft = MeshFactory::createCylinder(toEigen(tip), toEigen(shaftEnd), kShaftRadius, toColor(color));
         shaft->setVisible(true);
         m_surfaces["dig_probe_shaft"] = shaft;
     }
 
     // Tip: the focal point of the probe
     constexpr float kTipRadius = 0.0010f; // 1.0 mm
-    auto tipSurf = MeshFactory::createBatchedSpheres({tip}, kTipRadius, color);
+    auto tipSurf = MeshFactory::createBatchedSpheres({toEigen(tip)}, kTipRadius, toColor(color));
     tipSurf->setVisible(true);
     m_surfaces["dig_probe_tip"] = tipSurf;
 
     // Glow aura: subtle halo around the tip
     if (glowColor.alpha() > 0) {
         constexpr float kGlowTipRadius = 0.003f; // 3 mm glow
-        auto tipGlow = MeshFactory::createBatchedSpheres({tip}, kGlowTipRadius, glowColor);
+        auto tipGlow = MeshFactory::createBatchedSpheres({toEigen(tip)}, kGlowTipRadius, toColor(glowColor));
         tipGlow->setVisible(true);
         m_surfaces["dig_probe_tipglow"] = tipGlow;
     }
@@ -3123,7 +3126,7 @@ void BrainViewCore::setProbeVisualization(const QVector3D& tip, const QVector3D&
         for (const auto& c : cross) {
             const QVector3D from = tip - c.dir * kCrossLen;
             const QVector3D to = tip + c.dir * kCrossLen;
-            auto cyl = MeshFactory::createCylinder(from, to, kCrossRadius, c.color);
+            auto cyl = MeshFactory::createCylinder(toEigen(from), toEigen(to), kCrossRadius, toColor(c.color));
             cyl->setVisible(true);
             m_surfaces[c.key] = cyl;
         }
@@ -3162,19 +3165,19 @@ void BrainViewCore::setProbeVisualization(const QVector3D& tip, const QVector3D&
             const QVector3D negEnd = tip - a.dir * kAxisLen;
 
             // Full axis cylinder from -axis to +axis through the tip
-            auto cyl = MeshFactory::createCylinder(negEnd, posEnd, kAxisRadius, a.color);
+            auto cyl = MeshFactory::createCylinder(toEigen(negEnd), toEigen(posEnd), kAxisRadius, toColor(a.color));
             cyl->setVisible(true);
             m_surfaces[a.cylKey] = cyl;
 
             // Positive tip: larger sphere (the "+" end)
-            auto posTip = MeshFactory::createBatchedSpheres({posEnd}, kPosTipR, a.color);
+            auto posTip = MeshFactory::createBatchedSpheres({toEigen(posEnd)}, kPosTipR, toColor(a.color));
             posTip->setVisible(true);
             m_surfaces[a.posTipKey] = posTip;
 
             // Negative tip: smaller dot (the "-" end)
             QColor dimColor = a.color;
             dimColor.setAlpha(120);
-            auto negTip = MeshFactory::createBatchedSpheres({negEnd}, kNegTipR, dimColor);
+            auto negTip = MeshFactory::createBatchedSpheres({toEigen(negEnd)}, kNegTipR, toColor(dimColor));
             negTip->setVisible(true);
             m_surfaces[a.negTipKey] = negTip;
         }
@@ -3223,7 +3226,7 @@ void BrainViewCore::setStaticMarkers(const std::vector<LiveMarker>& markers)
 
     for (std::size_t i = 0; i < markers.size(); ++i) {
         auto surf = MeshFactory::createBatchedSpheres(
-            {markers[i].position}, markers[i].radius, markers[i].color);
+            {toEigen(markers[i].position)}, markers[i].radius, toColor(markers[i].color));
         surf->setVisible(true);
         m_surfaces[std::format("dig_static_{}", i)] = surf;
     }
@@ -3458,7 +3461,7 @@ bool BrainViewCore::intersectWorldRay(const QVector3D& origin, const QVector3D& 
     if (headIt != m_surfaces.cend() && headIt->second) {
         float dist = 0.0f;
         int vertexIdx = -1;
-        if (headIt->second->intersects(origin, direction, dist, vertexIdx) && dist < closestDist) {
+        if (headIt->second->intersects(toEigen(origin), toEigen(direction), dist, vertexIdx) && dist < closestDist) {
             closestDist = dist;
             hitPoint = origin + dist * direction;
             found = true;
@@ -3473,7 +3476,7 @@ bool BrainViewCore::intersectWorldRay(const QVector3D& origin, const QVector3D& 
                 continue;
             float dist = 0.0f;
             int vertexIdx = -1;
-            if (surf->intersects(origin, direction, dist, vertexIdx) && dist < closestDist) {
+            if (surf->intersects(toEigen(origin), toEigen(direction), dist, vertexIdx) && dist < closestDist) {
                 closestDist = dist;
                 hitPoint = origin + dist * direction;
                 found = true;

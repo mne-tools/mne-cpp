@@ -13,30 +13,24 @@
  * from any mne_viz_qt translation unit without forcing a recompile of
  * every shader pipeline when a new render mode is added.
  *
- * @ref mne::viz::qt::ShaderMode selects between the Standard Phong lighting model,
+ * @ref mne::viz::ShaderMode selects between the Standard Phong lighting model,
  * Holographic (translucent fresnel), Anatomical (matte tissue),
  * Dipole (instanced arrow shader), XRay (additive front-faces) and
  * ShowNormals (debug visualisation of vertex normals). @ref
- * mne::viz::qt::VisualizationMode selects how per-vertex colour is computed in the
+ * mne::viz::VisualizationMode selects how per-vertex colour is computed in the
  * fragment shader: from the base surface tint, from FsAnnotation
  * parcellation, from a scientific (curvature-shaded) palette, or
  * from a source-time-course overlay.
  */
 
-#ifndef RENDERTYPES_H
-#define RENDERTYPES_H
+#ifndef VIZ_RENDERTYPES_H
+#define VIZ_RENDERTYPES_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtGlobal>
+#include "../viz_global.h"
 
 //=============================================================================================================
 // STL INCLUDES
@@ -48,7 +42,7 @@
 #include <span>
 #include <vector>
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -103,17 +97,21 @@ enum VisualizationMode
  *
  * Renderables own only CPU data; the renderer keeps the GPU copies and uploads a stream again
  * when its generation changes. The data must stay valid until the next change of the renderable.
+ *
+ * @snippet ex_disp3d_scene/main.cpp render_streams_usage
  */
 struct GpuStream
 {
-    const void* data = nullptr; /**< First byte, or nullptr when the stream is empty. */
-    quint32 bytes = 0;          /**< Size in bytes. */
-    quint64 generation = 0;     /**< Bumped by the owner on every change of the data. */
+    const void* data = nullptr;   /**< First byte, or nullptr when the stream is empty. */
+    std::uint32_t bytes = 0;      /**< Size in bytes. */
+    std::uint64_t generation = 0; /**< Bumped by the owner on every change of the data. */
 };
 
 //=============================================================================================================
 /**
  * @brief CPU streams of an instanced mesh: one shape (vertices, indices) drawn once per instance.
+ *
+ * @snippet ex_disp3d_scene/main.cpp render_streams_usage
  */
 struct InstancedStreams
 {
@@ -130,6 +128,8 @@ struct InstancedStreams
  *
  * The renderer drops the GPU copies of a renderable once its key is destroyed. A copied
  * renderable gets a key of its own, so it never shares GPU buffers with the original.
+ *
+ * @snippet ex_disp3d_scene/main.cpp render_streams_usage
  */
 class RenderKey
 {
@@ -177,6 +177,6 @@ std::vector<std::byte> toByteBuffer(const std::vector<T>& records)
     return {bytes.begin(), bytes.end()};
 }
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // RENDERTYPES_H
+#endif // VIZ_RENDERTYPES_H

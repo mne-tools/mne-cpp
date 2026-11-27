@@ -17,7 +17,8 @@
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_raw_data.h>
 #include <mne/fiff/fiff_evoked.h>
-#include <mne/viz/backends/qt/3d/renderable/brainsurface.h>
+#include <mne/viz/brain/brainsurface.h>
+#include <mne/viz/backends/qt/qtconversions.h>
 
 #include <Eigen/Core>
 
@@ -27,6 +28,7 @@
 
 using namespace Eigen;
 using namespace mne;
+using namespace mne::viz;
 using namespace mne::viz::qt;
 
 namespace
@@ -197,7 +199,7 @@ void TestSensorFieldMapper::fieldMapsMatchPython()
     MatrixX3i tris(4, 3);
     tris << 0, 2, 4, 2, 1, 4, 1, 3, 4, 3, 0, 4;
     auto head = std::make_shared<BrainSurface>();
-    head->createFromData(rr, tris, Qt::gray);
+    head->createFromData(rr, tris, toColor(QColor(Qt::gray)));
     std::map<std::string, std::shared_ptr<BrainSurface>> surfaces{{"bem_head", head}};
 
     SensorFieldMapper mapper;
@@ -244,7 +246,7 @@ void TestSensorFieldMapper::fieldMapsMatchPython()
         0.06f, 0.11f;
     const MatrixX3f helmetNn = helmetRr.rowwise().normalized();
     auto helmet = std::make_shared<BrainSurface>();
-    helmet->createFromData(helmetRr, helmetNn, tris, Qt::gray);
+    helmet->createFromData(helmetRr, helmetNn, tris, toColor(QColor(Qt::gray)));
     surfaces.insert_or_assign("sens_surface_meg", helmet);
     QVERIFY(mapper.buildMapping(surfaces, FiffCoordTrans(), false));
     QCOMPARE(mapper.megSurfaceKey(), std::string("sens_surface_meg"));

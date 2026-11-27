@@ -13,7 +13,7 @@
  * mne_viz_qt &mdash; subdivided icosahedron spheres for source-space and
  * digitizer points, oriented plates for MEG magnetometers, barbell
  * shapes for gradiometers, cylinders for sensor leads and connectivity
- * edges. Each primitive is returned as a fully populated @ref mne::viz::qt::BrainSurface
+ * edges. Each primitive is returned as a fully populated @ref mne::viz::BrainSurface
  * with interleaved position / normal / colour vertex data so it
  * drops straight into the standard render pipeline.
  *
@@ -24,22 +24,15 @@
  * rest of mne_viz_qt obeys.
  */
 
-#ifndef MESHFACTORY_H
-#define MESHFACTORY_H
+#ifndef VIZ_MESHFACTORY_H
+#define VIZ_MESHFACTORY_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QVector3D>
-#include <QMatrix4x4>
-#include <QColor>
+#include "../figures/style.h"
+#include "../viz_global.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -54,11 +47,13 @@
 #include <memory>
 #include <vector>
 
-namespace mne::viz::qt
+namespace mne::viz
 {
-
 class BrainSurface;
+} // namespace mne::viz
 
+namespace mne::viz
+{
 //=============================================================================================================
 /**
  * @brief Static factory for procedural mesh primitives.
@@ -66,8 +61,10 @@ class BrainSurface;
  * All methods return fully constructed BrainSurface objects ready for rendering.
  * This eliminates duplicated icosahedron / plate / barbell code that was spread
  * across BrainView::onRowsInserted.
+ *
+ * @snippet ex_disp3d_scene/main.cpp mesh_factory_usage
  */
-class VIZQTSHARED_EXPORT MeshFactory
+class VIZSHARED_EXPORT MeshFactory
 {
 public:
     MeshFactory() = delete; // Static-only class
@@ -82,9 +79,9 @@ public:
      * @param[in] subdivisions  Number of subdivision passes (0 = 20 tris, 1 = 80 tris).
      * @return Shared pointer to the created BrainSurface.
      */
-    static std::shared_ptr<BrainSurface> createSphere(const QVector3D& center,
+    static std::shared_ptr<BrainSurface> createSphere(const Eigen::Vector3f& center,
                                                       float radius,
-                                                      const QColor& color,
+                                                      const Color& color,
                                                       int subdivisions = 1);
 
     //=========================================================================================================
@@ -97,9 +94,9 @@ public:
      * @param[in] size       Side length in meters (plate is size × size × thin).
      * @return Shared pointer to the created BrainSurface.
      */
-    static std::shared_ptr<BrainSurface> createPlate(const QVector3D& center,
-                                                     const QMatrix4x4& orientation,
-                                                     const QColor& color,
+    static std::shared_ptr<BrainSurface> createPlate(const Eigen::Vector3f& center,
+                                                     const Eigen::Matrix4f& orientation,
+                                                     const Color& color,
                                                      float size);
 
     //=========================================================================================================
@@ -113,9 +110,9 @@ public:
      * @param[in] size       Overall size scale in meters.
      * @return Shared pointer to the created BrainSurface.
      */
-    static std::shared_ptr<BrainSurface> createBarbell(const QVector3D& center,
-                                                       const QMatrix4x4& orientation,
-                                                       const QColor& color,
+    static std::shared_ptr<BrainSurface> createBarbell(const Eigen::Vector3f& center,
+                                                       const Eigen::Matrix4f& orientation,
+                                                       const Color& color,
                                                        float size);
 
     //=========================================================================================================
@@ -131,9 +128,9 @@ public:
      * @param[in] subdivisions  Number of subdivision passes per sphere.
      * @return Shared pointer to the batched BrainSurface.
      */
-    static std::shared_ptr<BrainSurface> createBatchedSpheres(const std::vector<QVector3D>& positions,
+    static std::shared_ptr<BrainSurface> createBatchedSpheres(const std::vector<Eigen::Vector3f>& positions,
                                                               float radius,
-                                                              const QColor& color,
+                                                              const Color& color,
                                                               int subdivisions = 1);
 
     //=========================================================================================================
@@ -147,10 +144,10 @@ public:
      * @param[in] sides    Number of sides around the circumference (min 3).
      * @return Shared pointer to the created BrainSurface.
      */
-    static std::shared_ptr<BrainSurface> createCylinder(const QVector3D& from,
-                                                        const QVector3D& to,
+    static std::shared_ptr<BrainSurface> createCylinder(const Eigen::Vector3f& from,
+                                                        const Eigen::Vector3f& to,
                                                         float radius,
-                                                        const QColor& color,
+                                                        const Color& color,
                                                         int sides = 12);
 
     //=========================================================================================================
@@ -176,6 +173,6 @@ private:
                                int subdivisions);
 };
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // MESHFACTORY_H
+#endif // VIZ_MESHFACTORY_H

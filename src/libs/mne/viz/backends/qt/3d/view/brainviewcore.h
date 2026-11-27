@@ -33,7 +33,7 @@
 //=============================================================================================================
 
 #include "../../viz_qt_global.h"
-#include "../core/rendertypes.h"
+#include "../../../../brain/rendertypes.h"
 #include "multiviewlayout.h"
 #include "../core/viewstate.h"
 #include "../input/cameracontroller.h"
@@ -89,12 +89,16 @@ namespace mne
 class Network;
 }
 
+namespace mne::viz
+{
+class BrainSurface;
+} // namespace mne::viz
+
 namespace mne::viz::qt
 {
 
 class BrainTreeModel;
 class BrainRenderer;
-class BrainSurface;
 class DipoleObject;
 class ElectrodeObject;
 class NetworkObject;

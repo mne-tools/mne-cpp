@@ -21,7 +21,9 @@
 
 #include <mne/viz/brain/geometryinfo.h>
 #include <mne/viz/brain/interpolation.h>
-#include <mne/viz/backends/qt/3d/renderable/brainsurface.h>
+#include <mne/viz/brain/brainsurface.h>
+#include <mne/viz/brain/meshfactory.h>
+#include <mne/viz/brain/rendertypes.h>
 #include <mne/viz/backends/qt/3d/renderable/dipoleobject.h>
 #include <mne/viz/backends/qt/3d/renderable/electrodeobject.h>
 #include <mne/ieeg/ieeg_implantation.h>
@@ -34,6 +36,7 @@
 #include <mne/viz/backends/qt/3d/scene/sensorfieldmapper.h>
 #include <mne/viz/backends/qt/3d/view/brainview.h>
 #include <mne/viz/backends/qt/3d/view/multiviewlayout.h>
+#include <mne/viz/backends/qt/qtconversions.h>
 
 #include <mne/connectivity/network/network.h>
 #include <mne/inv/dipole_fit/inv_ecd_set.h>
@@ -227,15 +230,26 @@ int main(int argc, char* argv[])
     MatrixX3i patchTriangles(2, 3);
     patchTriangles << 0, 1, 2, 0, 2, 3;
     BrainSurface patch;
-    patch.createFromData(patchVertices, patchTriangles, Qt::gray);
+    patch.createFromData(patchVertices, patchTriangles, toColor(QColor(Qt::gray)));
     patch.setHemi(0);
     float hitDistance = 0.0f;
     int hitVertex = -1;
-    const bool picked = patch.intersects(QVector3D(0.019f, 0.019f, 0.05f), QVector3D(0.0f, 0.0f, -1.0f), hitDistance, hitVertex);
+    const bool picked = patch.intersects(Eigen::Vector3f(0.019f, 0.019f, 0.05f), Eigen::Vector3f(0.0f, 0.0f, -1.0f), hitDistance, hitVertex);
     const VertexData& corner = patch.vertexDataRef().at(2); // interleaved position, normal and packed ABGR colour
     //! [brain_surface_usage]
-    ok &= expect(picked && std::abs(hitDistance - 0.05f) < 1e-6f && hitVertex == 2 && corner.pos == QVector3D(0.02f, 0.02f, 0.0f) && std::abs(std::abs(corner.norm.z()) - 1.0f) < 1e-6f,
+    ok &= expect(picked && std::abs(hitDistance - 0.05f) < 1e-6f && hitVertex == 2 && corner.pos == Eigen::Vector3f(0.02f, 0.02f, 0.0f) && std::abs(std::abs(corner.norm.z()) - 1.0f) < 1e-6f,
                  "BrainSurface: a downward ray hits the patch 5 cm below, nearest vertex 2");
+
+    //! [mesh_factory_usage]
+    // A 5 mm marker sphere above the patch and a 2 cm rod along x, both ready for the renderer
+    const auto marker = MeshFactory::createSphere(Eigen::Vector3f(0.01f, 0.01f, 0.05f), 0.005f, Color{255, 0, 0, 255}, 1);
+    const auto rod = MeshFactory::createCylinder(Eigen::Vector3f::Zero(), Eigen::Vector3f(0.02f, 0.0f, 0.0f), 0.001f, Color{0, 0, 255, 255});
+    Eigen::Vector3f markerMin;
+    Eigen::Vector3f markerMax;
+    marker->boundingBox(markerMin, markerMax);
+    //! [mesh_factory_usage]
+    ok &= expect(static_cast<int>(marker->vertexCount()) == MeshFactory::sphereVertexCount(1) && rod->indexCount() > 0 && std::abs(markerMax.z() - 0.055f) < 1e-4f,
+                 "MeshFactory: the marker sphere spans 5 mm around its centre, the rod has triangles");
 
     //! [source_estimate_overlay_usage]
     // Source estimate on vertices 0 and 2 only; the others stay cortex grey
@@ -269,6 +283,15 @@ int main(int argc, char* argv[])
     //! [dipole_object_usage]
     ok &= expect(dipoleGlyphs.instanceCount() == 2 && pickedDipole == 1 && dipoleDistance > 0.13f && dipoleDistance < 0.15f,
                  std::format("DipoleObject: a ray through the second dipole picks index {} at {:g} m", pickedDipole, dipoleDistance));
+
+    //! [render_streams_usage]
+    // What a renderer uploads: CPU streams with generations, cached under the renderable's key
+    const GpuStream patchGeometry = patch.geometryStream();
+    const InstancedStreams glyphStreams = dipoleGlyphs.streams();
+    const RenderKey& patchKey = patch.renderKey();
+    //! [render_streams_usage]
+    ok &= expect(patchGeometry.bytes == 4 * sizeof(VertexData) && glyphStreams.instanceCount == 2 && patchKey.id() != nullptr,
+                 "Render streams: four patch vertices, two dipole instances, a live render key");
 
     //! [network_object_usage]
     Network graph("coherence");

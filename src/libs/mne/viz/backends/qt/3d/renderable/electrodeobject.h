@@ -28,7 +28,7 @@
 //=============================================================================================================
 
 #include "../../viz_qt_global.h"
-#include "../core/rendertypes.h"
+#include "../../../../brain/rendertypes.h"
 
 #include <mne/ieeg/ieeg_implantation.h>
 

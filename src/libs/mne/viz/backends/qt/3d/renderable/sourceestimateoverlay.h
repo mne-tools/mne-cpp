@@ -18,8 +18,8 @@
  * The vector is then mapped through a configurable colormap (Hot,
  * Jet, MNE) with adjustable normalisation thresholds (fmin, fmid,
  * fmax) and the resulting ABGR bytes are written into the
- * secondary colour slot of the target @ref mne::viz::qt::BrainSurface &mdash; the
- * renderer simply switches @ref mne::viz::qt::VisualizationMode to
+ * secondary colour slot of the target @ref mne::viz::BrainSurface &mdash; the
+ * renderer simply switches @ref mne::viz::VisualizationMode to
  * @c ModeSourceEstimate and the cortex lights up without any
  * geometry change.
  */
@@ -62,11 +62,13 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace mne::viz
+{
+class BrainSurface;
+} // namespace mne::viz
+
 namespace mne::viz::qt
 {
-
-class BrainSurface;
-
 //=============================================================================================================
 /**
  * SourceEstimateOverlay manages source estimate data (.stc files) and applies

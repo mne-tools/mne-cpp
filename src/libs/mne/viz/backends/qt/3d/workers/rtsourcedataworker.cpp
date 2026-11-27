@@ -18,7 +18,7 @@
 
 #include <mne/base/log.h>
 
-#include "../core/rendertypes.h"
+#include "../../../../brain/rendertypes.h"
 #include <mne/viz/backends/qt/plots/helpers/colormap.h>
 
 //=============================================================================================================
@@ -30,6 +30,7 @@
 #include <vector>
 #include <utility>
 
+using namespace mne::viz;
 using namespace mne::viz::qt;
 
 //=============================================================================================================

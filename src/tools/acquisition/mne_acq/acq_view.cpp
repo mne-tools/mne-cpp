@@ -46,6 +46,7 @@
 //=============================================================================================================
 
 using namespace mne;
+using namespace mne::viz;
 using namespace mne::viz::qt;
 using namespace std::chrono_literals;
 

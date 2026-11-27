@@ -12,7 +12,7 @@
  * Source-space points come from @ref mne::MNESourceSpaces (the
  * decimated cortical grid used by the forward model). Each
  * hemisphere is rendered as a single batched-sphere mesh built by
- * @ref mne::viz::qt::MeshFactory::createBatchedSpheres so the typical
+ * @ref mne::viz::MeshFactory::createBatchedSpheres so the typical
  * ~7500-point ico-4 grid stays at one draw call per hemisphere.
  */
 

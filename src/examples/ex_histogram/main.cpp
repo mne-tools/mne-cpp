@@ -71,6 +71,7 @@
 
 using namespace mne;
 using namespace std;
+using namespace mne::viz;
 using namespace mne::viz::qt;
 using namespace Eigen;
 

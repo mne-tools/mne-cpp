@@ -16,7 +16,7 @@
 
 #include "stcloadingworker.h"
 
-#include "../renderable/brainsurface.h"
+#include "../../../../brain/brainsurface.h"
 #include "../../../../brain/interpolation.h"
 #include "../../../../brain/geometryinfo.h"
 

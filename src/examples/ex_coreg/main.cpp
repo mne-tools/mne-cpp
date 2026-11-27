@@ -58,6 +58,7 @@
 
 using namespace Eigen;
 using namespace mne;
+using namespace mne::viz;
 using namespace mne::viz::qt;
 
 //=============================================================================================================

@@ -45,6 +45,7 @@
 
 using namespace COREGISTRATIONPLUGIN;
 using namespace mne::analyze;
+using namespace mne::viz;
 using namespace mne::viz::qt;
 using namespace mne;
 

@@ -16,9 +16,9 @@
 
 #include "viewstate.h"
 
-#include "../renderable/brainsurface.h"
+#include "../../../../brain/brainsurface.h"
 #include "../view/brainrenderer.h"
-#include "qteigen_p.h"
+#include "../../qtconversions.h"
 
 //=============================================================================================================
 // QT INCLUDES

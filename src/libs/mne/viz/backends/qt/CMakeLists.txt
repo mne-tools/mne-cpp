@@ -106,7 +106,6 @@ set(SOURCES
     viewers/helpers/bidsviewmodel.cpp
     3d/core/dataloader.cpp
     3d/core/viewstate.cpp
-    3d/geometry/meshfactory.cpp
     3d/input/cameracontroller.cpp
     3d/input/raypicker.cpp
     3d/model/braintreemodel.cpp
@@ -119,7 +118,6 @@ set(SOURCES
     3d/model/items/digitizertreeitem.cpp
     3d/model/items/digitizersettreeitem.cpp
     3d/model/items/networktreeitem.cpp
-    3d/renderable/brainsurface.cpp
     3d/renderable/sourceestimateoverlay.cpp
     3d/renderable/dipoleobject.cpp
     3d/renderable/electrodeobject.cpp
@@ -222,8 +220,6 @@ set(HEADERS
     3d/core/surfacekeys.h
     3d/core/dataloader.h
     3d/core/viewstate.h
-    3d/core/rendertypes.h
-    3d/geometry/meshfactory.h
     3d/input/cameracontroller.h
     3d/input/raypicker.h
     3d/model/braintreemodel.h
@@ -236,7 +232,6 @@ set(HEADERS
     3d/model/items/digitizertreeitem.h
     3d/model/items/digitizersettreeitem.h
     3d/model/items/networktreeitem.h
-    3d/renderable/brainsurface.h
     3d/renderable/sourceestimateoverlay.h
     3d/renderable/dipoleobject.h
     3d/renderable/electrodeobject.h
@@ -262,7 +257,7 @@ set(HEADERS
     3d/workers/rtsensordatacontroller.h
     3d/workers/rtsensorinterpolationmatworker.h
     3d/workers/rtsourceinterpolationmatworker.h
-    3d/core/qteigen_p.h
+    qtconversions.h
 )
 
 set(UI

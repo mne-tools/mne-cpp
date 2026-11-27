@@ -59,10 +59,13 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace mne::viz
+{
+class BrainSurface;
+} // namespace mne::viz
+
 namespace mne::viz::qt
 {
-
-class BrainSurface;
 class SensorTreeItem;
 
 //=============================================================================================================

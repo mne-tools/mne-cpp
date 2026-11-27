@@ -39,6 +39,7 @@
 #include <QTextStream>
 
 using namespace ELECTRODESPLUGIN;
+using namespace mne::viz;
 using namespace mne::viz::qt;
 using namespace mne;
 

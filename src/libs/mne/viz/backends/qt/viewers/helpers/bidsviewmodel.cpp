@@ -38,6 +38,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace mne::viz;
 using namespace mne::viz::qt;
 using mne::viz::BidsTree;
 
