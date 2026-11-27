@@ -17,7 +17,8 @@
       "One Qt backend library": "mne_disp and mne_disp3D merged into mne_viz_qt (src/libs/mne/viz/backends/qt), the Qt backend of mne_viz; their ceilings add up (tokens 4403 + 1807 -> 6208, public header includes 87 + 73 -> 159), minus the two export headers that became one.",
       "QSettings adapter of viz::SettingsStore": "QtSettingsStore (qtsettingsstore.h) converts between viz::SettingValue and QVariant so the brain view's per-pane state (SubView, ViewVisibilityProfile) could leave the backend for mne_viz; the QVariant/QMetaType switch raised objects_signals once (657 -> 667) while the move lowered tokens (5942 -> 5922) and public header includes (150 -> 145).",
       "Queued hand-over of Qt-free worker callbacks": "The real-time controllers and SourceEstimateManager hand the std::function callbacks of the workers that moved to viz/brain/realtime over to their own thread with QMetaObject::invokeMethod(..., Qt::QueuedConnection), as the queued signal connections did before; this raised the global category once (950 -> 954) while the move lowered tokens (5857 -> 5805) and public header includes (140 -> 135).",
-      "Qt dispatcher of viz::Dispatcher": "qtdispatcher.h (queuedDispatcher) posts the tasks of Qt-free brain view models to a QObject's event loop, so SourceEstimateSession and SensorStreamSession could leave the backend; the public header raised public header includes once (135 -> 137) and objects_signals (620 -> 621)."
+      "Qt dispatcher of viz::Dispatcher": "qtdispatcher.h (queuedDispatcher) posts the tasks of Qt-free brain view models to a QObject's event loop, so SourceEstimateSession and SensorStreamSession could leave the backend; the public header raised public header includes once (135 -> 137) and objects_signals (620 -> 621).",
+      "Mipmapped textures of the GPU frame description": "RhiFrameRenderer generating mipmaps for GpuTexture::mipmaps (the depth frame of the video decal) raised the viz/backends/qt ceilings once (tokens 5774 -> 5785, gui 1711 -> 1722); BrainViewCore moving onto BrainFrameBuilder and RhiFrameRenderer lowers them again."
     }
   },
   "summary": {
@@ -52,7 +53,7 @@
       "viz",
       "viz/backends/sdl"
     ],
-    "tokens": 5774,
+    "tokens": 5785,
     "gui_outside_design": []
   },
   "libraries": {
@@ -273,12 +274,12 @@
       "modules": []
     },
     "viz/backends/qt": {
-      "tokens": 5774,
+      "tokens": 5785,
       "by_category": {
         "containers": 19,
         "files": 98,
         "global": 945,
-        "gui": 1711,
+        "gui": 1722,
         "objects_signals": 616,
         "other": 1562,
         "strings": 809,

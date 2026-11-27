@@ -97,6 +97,93 @@ Draws instanced glyphs.
 
 ---
 
+### draw_slice(key, image, quad, uniforms, viewport)
+
+Draws an MRI slice: a textured quad whose dark voxels are discarded, blended behind opaque geometry.
+
+**Parameters:**
+
+- **key** : *std::uint64_t*
+  Identity of the slice; also identifies its texture.
+
+- **image** : *const [BrainTextureView](/docs/api/viz/brain-texture-view) &*
+  Slice image; the shader reads the red channel as intensity.
+
+- **quad** : *std::span&lt; const float, 20 &gt;*
+  Four corners, each position (3 floats) and texture coordinates (2 floats), as a strip.
+
+- **uniforms** : *const [BrainSliceUniforms](/docs/api/viz/brain-slice-uniforms) &*
+  Shader parameters.
+
+- **viewport** : *const [GpuRect](/docs/api/viz/gpu-rect) &*
+  Pane in target pixels.
+
+**Returns:**
+
+- *bool* — Whether anything was drawn: false without an image.
+
+---
+
+### draw_video_billboard(key, frame, quad, uniforms, viewport)
+
+Draws a video frame as a round disk facing the camera, over everything drawn before.
+
+**Parameters:**
+
+- **key** : *std::uint64_t*
+  Identity of the disk; also identifies its texture. Panes that each face their own camera need keys of their own, since a key holds one quad per frame.
+
+- **frame** : *const [BrainTextureView](/docs/api/viz/brain-texture-view) &*
+  Video frame.
+
+- **quad** : *std::span&lt; const float, 20 &gt;*
+  Four corners, each position (3 floats) and texture coordinates (2 floats), as a strip.
+
+- **uniforms** : *const [BrainVideoBillboardUniforms](/docs/api/viz/brain-video-billboard-uniforms) &*
+  Shader parameters.
+
+- **viewport** : *const [GpuRect](/docs/api/viz/gpu-rect) &*
+  Pane in target pixels.
+
+**Returns:**
+
+- *bool* — Whether anything was drawn: false without a frame.
+
+---
+
+### draw_video_decal(key, streams, textureKey, frame, depth, uniforms, viewport)
+
+Projects a video frame onto a surface as a decal; with a depth frame the decal follows its relief.
+
+**Parameters:**
+
+- **key** : *std::uint64_t*
+  Identity of the surface mesh, as for `draw_surface()`.
+
+- **streams** : *const [BrainSurfaceStreams](/docs/api/viz/brain-surface-streams) &*
+  Vertex and index streams of the surface.
+
+- **textureKey** : *std::uint64_t*
+  Identity of the video textures.
+
+- **frame** : *const [BrainTextureView](/docs/api/viz/brain-texture-view) &*
+  Video frame.
+
+- **depth** : *const [BrainTextureView](/docs/api/viz/brain-texture-view) &*
+  Depth frame, or none for a flat decal.
+
+- **uniforms** : *const [BrainVideoDecalUniforms](/docs/api/viz/brain-video-decal-uniforms) &*
+  Shader parameters.
+
+- **viewport** : *const [GpuRect](/docs/api/viz/gpu-rect) &*
+  Pane in target pixels.
+
+**Returns:**
+
+- *bool* — Whether anything was drawn: false without streams or frame.
+
+---
+
 ### draw_overlay(overlay, scale)
 
 Blends a screen-sized overlay over everything drawn so far, e.g.
@@ -125,12 +212,12 @@ Ends the frame and drops the buffers of meshes undrawn for kUnusedFrames frames.
 
 ### release(key)
 
-Drops the buffers of a mesh.
+Drops the buffers of a mesh and the textures of that key.
 
 **Parameters:**
 
 - **key** : *std::uint64_t*
-  Identity of the mesh.
+  Identity of the mesh or textured draw.
 
 ---
 

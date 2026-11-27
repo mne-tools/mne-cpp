@@ -737,7 +737,11 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz/source-estimate-session',
         'api/viz/pick-result',
         'api/viz/scene-layer',
-        'api/viz/scene-state'
+        'api/viz/scene-state',
+        'api/viz/brain-slice-uniforms',
+        'api/viz/brain-video-billboard-uniforms',
+        'api/viz/brain-video-decal-uniforms',
+        'api/viz/brain-texture-view'
       ],
     },
     {

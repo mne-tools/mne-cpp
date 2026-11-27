@@ -1,0 +1,30 @@
+---
+id: brain-video-decal-uniforms
+title: "mne::viz::BrainVideoDecalUniforms"
+sidebar_label: BrainVideoDecalUniforms
+sidebar_position: 143
+---
+
+# BrainVideoDecalUniforms
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/gpu/brain_frame.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/gpu/brain_frame.h)
+
+`#include <mne/viz/brain_frame.h>`
+
+```cpp
+struct mne::viz::BrainVideoDecalUniforms
+```
+
+The uniform block of the video decal on a surface (binding 0 of video_decal and video_decal_depth).
+
+The depth shader reads depth_params after the block of video_decal; the builder passes the bytes each shader declares.
+
+---
+
+## Example
+
+No example of its own: Plain uniform-block value type of the video decal shaders, written by the brain view per draw.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
