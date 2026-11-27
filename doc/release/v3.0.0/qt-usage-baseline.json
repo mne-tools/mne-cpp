@@ -15,7 +15,8 @@
       "Qt adapters of the Qt-free view models": "ChannelInfoModel, FrequencySpectrumModel and BidsViewModel became adapters of mne_viewmodels (ChannelTable, SpectrumTable, BidsTree), and RtFiffRawViewModel and EvokedSetModel hand their SSP, compensator, SPHARA, filtering and trigger detection to mne_dsp (RtRawDisplay, DisplayCorrection). The adapters convert between the view models and QVariant, QStandardItem and QModelIndex, which raised the 'other' category once (1315 -> 1329) while the total fell (tokens 4519 -> 4403).",
       "BrainWindow host and GPU overlay (phase 3)": "BrainWindow (QWindow + QRhi swap chain), the forwarding BrainView host and the overlay painted into the GPU pass instead of child QLabels raised the disp3D ceilings once (tokens 1633 -> 1961); the QRhiWidget host goes with phase 4.",
       "One Qt backend library": "mne_disp and mne_disp3D merged into mne_viz_qt (src/libs/mne/viz/backends/qt), the Qt backend of mne_viz; their ceilings add up (tokens 4403 + 1807 -> 6208, public header includes 87 + 73 -> 159), minus the two export headers that became one.",
-      "QSettings adapter of viz::SettingsStore": "QtSettingsStore (qtsettingsstore.h) converts between viz::SettingValue and QVariant so the brain view's per-pane state (SubView, ViewVisibilityProfile) could leave the backend for mne_viz; the QVariant/QMetaType switch raised objects_signals once (657 -> 667) while the move lowered tokens (5942 -> 5922) and public header includes (150 -> 145)."
+      "QSettings adapter of viz::SettingsStore": "QtSettingsStore (qtsettingsstore.h) converts between viz::SettingValue and QVariant so the brain view's per-pane state (SubView, ViewVisibilityProfile) could leave the backend for mne_viz; the QVariant/QMetaType switch raised objects_signals once (657 -> 667) while the move lowered tokens (5942 -> 5922) and public header includes (150 -> 145).",
+      "Queued hand-over of Qt-free worker callbacks": "The real-time controllers and SourceEstimateManager hand the std::function callbacks of the workers that moved to viz/brain/realtime over to their own thread with QMetaObject::invokeMethod(..., Qt::QueuedConnection), as the queued signal connections did before; this raised the global category once (950 -> 954) while the move lowered tokens (5857 -> 5805) and public header includes (140 -> 135)."
     }
   },
   "summary": {
@@ -50,7 +51,7 @@
       "viz",
       "viz/backends/sdl"
     ],
-    "tokens": 5857,
+    "tokens": 5805,
     "gui_outside_design": []
   },
   "libraries": {
@@ -267,24 +268,24 @@
       "by_category": {},
       "public_header_includes": 0,
       "q_object": 0,
-      "files": 115,
+      "files": 127,
       "modules": []
     },
     "viz/backends/qt": {
-      "tokens": 5857,
+      "tokens": 5805,
       "by_category": {
         "containers": 19,
         "files": 98,
-        "global": 950,
-        "gui": 1728,
-        "objects_signals": 667,
-        "other": 1564,
-        "strings": 817,
+        "global": 954,
+        "gui": 1725,
+        "objects_signals": 622,
+        "other": 1562,
+        "strings": 811,
         "time": 14
       },
-      "public_header_includes": 140,
-      "q_object": 76,
-      "files": 210,
+      "public_header_includes": 135,
+      "q_object": 71,
+      "files": 198,
       "modules": [
         "Core",
         "Gui",

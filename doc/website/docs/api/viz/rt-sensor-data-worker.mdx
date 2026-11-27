@@ -1,47 +1,35 @@
 ---
 id: rt-sensor-data-worker
-title: "mne::viz::qt::RtSensorDataWorker"
+title: "mne::viz::RtSensorDataWorker"
 sidebar_label: RtSensorDataWorker
-sidebar_position: 69
+sidebar_position: 129
 ---
 
 # RtSensorDataWorker
 
-**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/workers/rtsensordataworker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/workers/rtsensordataworker.h)
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/realtime/rtsensordataworker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/realtime/rtsensordataworker.h)
 
-`#include <mne/viz/backends/qt/rtsensordataworker.h>`
+`#include <mne/viz/rtsensordataworker.h>`
 
 ```cpp
-class mne::viz::qt::RtSensorDataWorker
+class mne::viz::RtSensorDataWorker
 ```
 
-[`RtSensorDataWorker`](/docs/api/viz-qt/rt-sensor-data-worker) processes incoming sensor measurement data in a background thread.
+[`RtSensorDataWorker`](/docs/api/viz/rt-sensor-data-worker) processes incoming sensor measurement data in a background thread.
 
 It manages a data queue, performs averaging, applies a dense mapping matrix (MEG or EEG sensor → surface vertex), normalises values symmetrically, and converts them to per-vertex ABGR colours for rendering.
 
-This worker is driven by a timer in the [`RtSensorDataController`](/docs/api/viz-qt/rt-sensor-data-controller) and follows the same architecture as [`RtSourceDataWorker`](/docs/api/viz-qt/rt-source-data-worker), adapted for dense sensor-to-surface mapping instead of sparse source interpolation.
+This worker is driven by a timer in the [RtSensorDataController](/docs/api/viz-qt/rt-sensor-data-controller) and follows the same architecture as [`RtSourceDataWorker`](/docs/api/viz/rt-source-data-worker), adapted for dense sensor-to-surface mapping instead of sparse source interpolation.
 
 Background worker for real-time sensor data streaming.
-
-### Inheritance
-
-```mermaid
-classDiagram
-    QObject <|-- RtSensorDataWorker
-```
 
 ---
 
 ## Public Methods
 
-### RtSensorDataWorker(parent)
+### RtSensorDataWorker()
 
 Constructor.
-
-**Parameters:**
-
-- **parent** : *QObject **
-  Parent QObject.
 
 ---
 
@@ -146,12 +134,46 @@ Set the sampling frequency of the incoming data.
 
 Toggle between emitting per-vertex color data (smoothed) and raw sensor values.
 
-When enabled (default), `streamData()` performs mapping + normalization + color conversion and emits `newRtSensorColors()`. When disabled, it emits `newRtRawSensorData()` with the raw measurement vector, which can be used for GPU-side mapping.
+When enabled (default), `streamData()` performs mapping + normalization + color conversion and emits newRtSensorColors(). When disabled, it emits newRtRawSensorData() with the raw measurement vector, which can be used for GPU-side mapping.
 
 **Parameters:**
 
 - **bStreamSmoothedData** : *bool*
   True for smoothed colors (default), false for raw.
+
+---
+
+### streamData()
+
+Stream one frame of data.
+
+Called by the controller's timer. Pops data from the queue, averages, maps to surface, normalises symmetrically, and emits per-vertex colors.
+
+---
+
+### setNewRtSensorColorsCallback(callback)
+
+Set the callback for newRtSensorColors.
+
+Called when new per-vertex color data is ready for rendering. It runs on the thread that produced the result.
+
+**Parameters:**
+
+- **callback** : *std::function&lt; void(const std::string &, const std::vector&lt; uint32_t &gt; &)&gt;*
+  Receives (surfaceKey, colors); empty to drop the results.
+
+---
+
+### setNewRtRawSensorDataCallback(callback)
+
+Set the callback for newRtRawSensorData.
+
+Called when raw (non-mapped) sensor data is available. It runs on the thread that produced the result.
+
+**Parameters:**
+
+- **callback** : *std::function&lt; void(const Eigen::VectorXf &)&gt;*
+  Receives (data); empty to drop the results.
 
 ---
 

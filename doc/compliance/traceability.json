@@ -392,19 +392,22 @@
       "missing_tests": []
     },
     "viz": {
-      "classes": 111,
-      "tested": 107,
+      "classes": 117,
+      "tested": 110,
       "untested": [
         "ElectrodeObject",
         "GeometryInfo",
         "Interpolation",
+        "RtSensorInterpolationMatWorker",
+        "RtSourceDataWorker",
+        "RtSourceInterpolationMatWorker",
         "VertexData"
       ],
       "missing_tests": []
     },
     "viz_qt": {
-      "classes": 112,
-      "tested": 45,
+      "classes": 106,
+      "tested": 42,
       "untested": [
         "AbstractTreeItem",
         "AbstractView",
@@ -455,9 +458,6 @@
         "ProjectSettingsView",
         "ProjectorsView",
         "QuickControlView",
-        "RtSensorInterpolationMatWorker",
-        "RtSourceDataWorker",
-        "RtSourceInterpolationMatWorker",
         "ScaleControl",
         "ScalingView",
         "SceneLayer",

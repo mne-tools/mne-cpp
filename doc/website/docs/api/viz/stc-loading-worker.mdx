@@ -1,36 +1,29 @@
 ---
 id: stc-loading-worker
-title: "mne::viz::qt::StcLoadingWorker"
+title: "mne::viz::StcLoadingWorker"
 sidebar_label: StcLoadingWorker
-sidebar_position: 109
+sidebar_position: 133
 ---
 
 # StcLoadingWorker
 
-**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/workers/stcloadingworker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/workers/stcloadingworker.h)
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/realtime/stcloadingworker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/realtime/stcloadingworker.h)
 
-`#include <mne/viz/backends/qt/stcloadingworker.h>`
+`#include <mne/viz/stcloadingworker.h>`
 
 ```cpp
-class mne::viz::qt::StcLoadingWorker
+class mne::viz::StcLoadingWorker
 ```
 
-[`StcLoadingWorker`](/docs/api/viz-qt/stc-loading-worker) performs source estimate loading and interpolation matrix computation in a background thread to avoid blocking the UI.
+[`StcLoadingWorker`](/docs/api/viz/stc-loading-worker) performs source estimate loading and interpolation matrix computation in a background thread to avoid blocking the UI.
 
 Background worker that loads source estimate (STC) files and emits loaded data for visualization.
-
-### Inheritance
-
-```mermaid
-classDiagram
-    QObject <|-- StcLoadingWorker
-```
 
 ---
 
 ## Public Methods
 
-### StcLoadingWorker(lhPath, rhPath, lhSurface, rhSurface, cancelDist, parent)
+### StcLoadingWorker(lhPath, rhPath, lhSurface, rhSurface, cancelDist)
 
 Constructor.
 
@@ -50,9 +43,6 @@ Constructor.
 
 - **cancelDist** : *double*
   Cancel distance for interpolation.
-
-- **parent** : *QObject **
-  Parent object.
 
 ---
 
@@ -135,6 +125,53 @@ Thread-safe; takes effect at the next progress check.
 **Returns:**
 
 - *bool* — true if cancellation has been requested.
+
+---
+
+### process()
+
+Perform the loading and computation work.
+
+This slot should be called after moving the worker to a thread.
+
+---
+
+### setProgressCallback(callback)
+
+Set the callback for progress.
+
+Called to report progress. It runs on the thread that produced the result.
+
+**Parameters:**
+
+- **callback** : *std::function&lt; void(int, const std::string &)&gt;*
+  Receives (percent, message); empty to drop the results.
+
+---
+
+### setFinishedCallback(callback)
+
+Set the callback for finished.
+
+Called when loading is complete. It runs on the thread that produced the result.
+
+**Parameters:**
+
+- **callback** : *std::function&lt; void(bool)&gt;*
+  Receives (success); empty to drop the results.
+
+---
+
+### setErrorCallback(callback)
+
+Set the callback for error.
+
+Called when an error occurs. It runs on the thread that produced the result.
+
+**Parameters:**
+
+- **callback** : *std::function&lt; void(const std::string &)&gt;*
+  Receives (message); empty to drop the results.
 
 ---
 

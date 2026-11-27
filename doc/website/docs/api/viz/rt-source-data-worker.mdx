@@ -1,47 +1,35 @@
 ---
 id: rt-source-data-worker
-title: "mne::viz::qt::RtSourceDataWorker"
+title: "mne::viz::RtSourceDataWorker"
 sidebar_label: RtSourceDataWorker
-sidebar_position: 71
+sidebar_position: 131
 ---
 
 # RtSourceDataWorker
 
-**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/workers/rtsourcedataworker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/workers/rtsourcedataworker.h)
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/realtime/rtsourcedataworker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/realtime/rtsourcedataworker.h)
 
-`#include <mne/viz/backends/qt/rtsourcedataworker.h>`
+`#include <mne/viz/rtsourcedataworker.h>`
 
 ```cpp
-class mne::viz::qt::RtSourceDataWorker
+class mne::viz::RtSourceDataWorker
 ```
 
-[`RtSourceDataWorker`](/docs/api/viz-qt/rt-source-data-worker) processes incoming source estimate data in a background thread.
+[`RtSourceDataWorker`](/docs/api/viz/rt-source-data-worker) processes incoming source estimate data in a background thread.
 
 It manages a data queue, performs averaging, applies interpolation matrices, and converts source values to per-vertex ABGR colors for rendering.
 
-This worker is driven by a timer in the [`RtSourceDataController`](/docs/api/viz-qt/rt-source-data-controller).
+This worker is driven by a timer in the [RtSourceDataController](/docs/api/viz-qt/rt-source-data-controller).
 
 Background worker for real-time source estimate streaming.
-
-### Inheritance
-
-```mermaid
-classDiagram
-    QObject <|-- RtSourceDataWorker
-```
 
 ---
 
 ## Public Methods
 
-### RtSourceDataWorker(parent)
+### RtSourceDataWorker()
 
 Constructor.
-
-**Parameters:**
-
-- **parent** : *QObject **
-  Parent QObject.
 
 ---
 
@@ -151,7 +139,7 @@ Set the sampling frequency of the incoming data.
 
 Toggle between emitting interpolated color data (smoothed) and raw source values split by hemisphere.
 
-When enabled (default), `streamData()` performs interpolation + colormap conversion and emits `newRtSmoothedData()`. When disabled, it emits `newRtRawData()` with the raw source values per hemisphere, which can be used for GPU-side interpolation.
+When enabled (default), `streamData()` performs interpolation + colormap conversion and emits newRtSmoothedData(). When disabled, it emits newRtRawData() with the raw source values per hemisphere, which can be used for GPU-side interpolation.
 
 **Parameters:**
 
@@ -173,6 +161,40 @@ Sub-threshold vertices will display these colors instead of being transparent.
 
 - **baseColorsRh** : *const std::vector&lt; uint32_t &gt; &*
   Per-vertex ABGR colors for the right hemisphere.
+
+---
+
+### streamData()
+
+Stream one frame of data.
+
+Called by the controller's timer. Pops data from the queue, averages, interpolates, and emits per-vertex colors.
+
+---
+
+### setNewRtSmoothedDataCallback(callback)
+
+Set the callback for newRtSmoothedData.
+
+Called when new interpolated color data is ready for rendering. It runs on the thread that produced the result.
+
+**Parameters:**
+
+- **callback** : *std::function&lt; void(const std::vector&lt; uint32_t &gt; &, const std::vector&lt; uint32_t &gt; &)&gt;*
+  Receives (colorsLh, colorsRh); empty to drop the results.
+
+---
+
+### setNewRtRawDataCallback(callback)
+
+Set the callback for newRtRawData.
+
+Called when new raw (non-interpolated) data is available. It runs on the thread that produced the result.
+
+**Parameters:**
+
+- **callback** : *std::function&lt; void(const Eigen::VectorXd &, const Eigen::VectorXd &)&gt;*
+  Receives (dataLh, dataRh); empty to drop the results.
 
 ---
 

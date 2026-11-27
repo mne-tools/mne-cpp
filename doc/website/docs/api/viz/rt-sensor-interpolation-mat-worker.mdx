@@ -1,21 +1,21 @@
 ---
 id: rt-sensor-interpolation-mat-worker
-title: "mne::viz::qt::RtSensorInterpolationMatWorker"
+title: "mne::viz::RtSensorInterpolationMatWorker"
 sidebar_label: RtSensorInterpolationMatWorker
-sidebar_position: 70
+sidebar_position: 130
 ---
 
 # RtSensorInterpolationMatWorker
 
-**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/workers/rtsensorinterpolationmatworker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/workers/rtsensorinterpolationmatworker.h)
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/realtime/rtsensorinterpolationmatworker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/realtime/rtsensorinterpolationmatworker.h)
 
-`#include <mne/viz/backends/qt/rtsensorinterpolationmatworker.h>`
+`#include <mne/viz/rtsensorinterpolationmatworker.h>`
 
 ```cpp
-class mne::viz::qt::RtSensorInterpolationMatWorker
+class mne::viz::RtSensorInterpolationMatWorker
 ```
 
-[`RtSensorInterpolationMatWorker`](/docs/api/viz-qt/rt-sensor-interpolation-mat-worker) computes dense sensor-to-surface field-mapping matrices in a background thread.
+[`RtSensorInterpolationMatWorker`](/docs/api/viz/rt-sensor-interpolation-mat-worker) computes dense sensor-to-surface field-mapping matrices in a background thread.
 
 This worker encapsulates the expensive `mne::FwdFieldMap::computeMegMapping()` and computeEegMapping() calls that were previously performed synchronously on the main thread inside [BrainView](/docs/api/viz-qt/brain-view)::buildSensorFieldMapping().
 
@@ -25,25 +25,13 @@ Thread-safety: all public setters are mutex-protected and schedule a recomputati
 
 Background worker for computing sensor field mapping matrices.
 
-### Inheritance
-
-```mermaid
-classDiagram
-    QObject <|-- RtSensorInterpolationMatWorker
-```
-
 ---
 
 ## Public Methods
 
-### RtSensorInterpolationMatWorker(parent)
+### RtSensorInterpolationMatWorker()
 
 Constructor.
-
-**Parameters:**
-
-- **parent** : *QObject **
-  Parent QObject.
 
 ---
 
@@ -129,6 +117,40 @@ Triggers recomputation if changed.
 
 - **bads** : *const std::vector&lt; std::string &gt; &*
   List of bad channel names.
+
+---
+
+### computeMapping()
+
+Compute the sensor-to-surface mapping matrices.
+
+This slot can be called directly or connected to a signal. The computation reads the stored parameters and builds dense mapping matrices via `mne::FwdFieldMap::computeMegMapping()` / computeEegMapping().
+
+---
+
+### setNewMegMappingAvailableCallback(callback)
+
+Set the callback for newMegMappingAvailable.
+
+Called when new MEG mapping data is available. It runs on the thread that produced the result.
+
+**Parameters:**
+
+- **callback** : *std::function&lt; void(const std::string &, std::shared_ptr&lt; Eigen::MatrixXf &gt;, const std::vector&lt; int &gt; &)&gt;*
+  Receives (surfaceKey, mappingMat, pick); empty to drop the results.
+
+---
+
+### setNewEegMappingAvailableCallback(callback)
+
+Set the callback for newEegMappingAvailable.
+
+Called when new EEG mapping data is available. It runs on the thread that produced the result.
+
+**Parameters:**
+
+- **callback** : *std::function&lt; void(const std::string &, std::shared_ptr&lt; Eigen::MatrixXf &gt;, const std::vector&lt; int &gt; &)&gt;*
+  Receives (surfaceKey, mappingMat, pick); empty to drop the results.
 
 ---
 

@@ -1,23 +1,23 @@
 ---
 id: rt-source-interpolation-mat-worker
-title: "mne::viz::qt::RtSourceInterpolationMatWorker"
+title: "mne::viz::RtSourceInterpolationMatWorker"
 sidebar_label: RtSourceInterpolationMatWorker
-sidebar_position: 72
+sidebar_position: 132
 ---
 
 # RtSourceInterpolationMatWorker
 
-**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/workers/rtsourceinterpolationmatworker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/workers/rtsourceinterpolationmatworker.h)
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/realtime/rtsourceinterpolationmatworker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/realtime/rtsourceinterpolationmatworker.h)
 
-`#include <mne/viz/backends/qt/rtsourceinterpolationmatworker.h>`
+`#include <mne/viz/rtsourceinterpolationmatworker.h>`
 
 ```cpp
-class mne::viz::qt::RtSourceInterpolationMatWorker
+class mne::viz::RtSourceInterpolationMatWorker
 ```
 
-[`RtSourceInterpolationMatWorker`](/docs/api/viz-qt/rt-source-interpolation-mat-worker) computes sparse source-to-vertex interpolation matrices in a background thread.
+[`RtSourceInterpolationMatWorker`](/docs/api/viz/rt-source-interpolation-mat-worker) computes sparse source-to-vertex interpolation matrices in a background thread.
 
-This worker encapsulates the expensive `GeometryInfo::scdc()` (geodesic distance computation) and `Interpolation::createInterpolationMat()` calls that were previously performed either in [`StcLoadingWorker`](/docs/api/viz-qt/stc-loading-worker) (at load time only) or not recomputed at all when parameters changed at runtime.
+This worker encapsulates the expensive `GeometryInfo::scdc()` (geodesic distance computation) and `Interpolation::createInterpolationMat()` calls that were previously performed either in [`StcLoadingWorker`](/docs/api/viz/stc-loading-worker) (at load time only) or not recomputed at all when parameters changed at runtime.
 
 The worker for each hemisphere stores:
 
@@ -29,25 +29,13 @@ When any parameter changes, `computeInterpolationMatrix()` can be called (typica
 
 Background worker for computing source interpolation matrices.
 
-### Inheritance
-
-```mermaid
-classDiagram
-    QObject <|-- RtSourceInterpolationMatWorker
-```
-
 ---
 
 ## Public Methods
 
-### RtSourceInterpolationMatWorker(parent)
+### RtSourceInterpolationMatWorker()
 
 Constructor.
-
-**Parameters:**
-
-- **parent** : *QObject **
-  Parent QObject.
 
 ---
 
@@ -157,6 +145,40 @@ Set annotation info for the right hemisphere.
 
 - **vecVertNo** : *const Eigen::VectorXi &*
   Source-space vertex numbers.
+
+---
+
+### computeInterpolationMatrix()
+
+Compute the interpolation matrices for both hemispheres.
+
+This slot performs the heavy SCDC + interpolation matrix computation. It should be called from a worker thread via a queued connection.
+
+---
+
+### setNewInterpolationMatrixLeftAvailableCallback(callback)
+
+Set the callback for newInterpolationMatrixLeftAvailable.
+
+Called when a new left hemisphere interpolation matrix is available. It runs on the thread that produced the result.
+
+**Parameters:**
+
+- **callback** : *std::function&lt; void(std::shared_ptr&lt; Eigen::SparseMatrix&lt; float &gt; &gt;)&gt;*
+  Receives (interpMat); empty to drop the results.
+
+---
+
+### setNewInterpolationMatrixRightAvailableCallback(callback)
+
+Set the callback for newInterpolationMatrixRightAvailable.
+
+Called when a new right hemisphere interpolation matrix is available. It runs on the thread that produced the result.
+
+**Parameters:**
+
+- **callback** : *std::function&lt; void(std::shared_ptr&lt; Eigen::SparseMatrix&lt; float &gt; &gt;)&gt;*
+  Receives (interpMat); empty to drop the results.
 
 ---
 
