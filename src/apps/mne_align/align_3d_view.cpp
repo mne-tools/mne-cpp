@@ -32,8 +32,8 @@ using namespace MNEALIGN;
 using namespace mne::viz;
 using namespace mne::viz::qt;
 using mne::viz::qt::MultimodalScene;
-using mne::viz::qt::SceneLayer;
-using mne::viz::qt::SceneLayerKind;
+using mne::viz::SceneLayer;
+using mne::viz::SceneLayerKind;
 
 namespace
 {

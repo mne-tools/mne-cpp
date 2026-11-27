@@ -9635,8 +9635,8 @@
     },
     {
       "name": "PickResult",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/3d/scene/pickresult.h",
+      "module": "viz",
+      "header": "viz/brain/pickresult.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -9649,15 +9649,15 @@
       "example_mode": "run",
       "status": "documented",
       "documented": true,
-      "sidebar_position": 75,
+      "sidebar_position": 138,
       "guide": null,
       "python_equiv": null,
       "python_url": null
     },
     {
       "name": "SceneLayer",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/3d/scene/multimodalscene.h",
+      "module": "viz",
+      "header": "viz/brain/scenestate.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -9670,7 +9670,7 @@
       "example_mode": "run",
       "status": "documented",
       "documented": true,
-      "sidebar_position": 76,
+      "sidebar_position": 139,
       "guide": null,
       "python_equiv": null,
       "python_url": null
@@ -14823,6 +14823,27 @@
       "python_url": null,
       "example_exempt": true,
       "example_exempt_reason": "Model of the brain view that loads .stc files on a thread and streams them; BrainView owns it through qt::SourceEstimateManager, exercised by test_disp3d_brainview."
+    },
+    {
+      "name": "SceneState",
+      "module": "viz",
+      "header": "viz/brain/scenestate.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_multimodal_scene",
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#multimodal_scene_usage"
+      ],
+      "example_mode": "run",
+      "status": "documented",
+      "documented": true,
+      "sidebar_position": 140,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
     }
   ],
   "parity": {

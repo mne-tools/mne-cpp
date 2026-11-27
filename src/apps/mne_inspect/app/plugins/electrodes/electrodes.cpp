@@ -37,6 +37,7 @@
 #include <QHash>
 #include <QStringList>
 #include <QTextStream>
+#include <QVector3D>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -331,14 +332,14 @@ void ElectrodesPlugin::handlePick(const PickResult& pick)
     if (pick.kind != PickKind::ElectrodeContact) {
         return;
     }
-    if (!pick.sourceId.isEmpty() && pick.sourceId != sceneLayerId()) {
+    if (!pick.sourceId.empty() && QString::fromStdString(pick.sourceId) != sceneLayerId()) {
         return;
     }
-    if (pick.label.isEmpty()) {
+    if (pick.label.empty()) {
         return;
     }
-    m_object->selectContact(pick.label.toStdString());
-    emit contactPicked(pick.label);
+    m_object->selectContact(pick.label);
+    emit contactPicked(QString::fromStdString(pick.label));
 }
 
 //=============================================================================================================

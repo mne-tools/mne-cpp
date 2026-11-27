@@ -19,7 +19,7 @@
 #include <mri_slices.h>
 
 #include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
-#include <mne/viz/backends/qt/3d/scene/pickresult.h>
+#include <mne/viz/brain/pickresult.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -135,7 +135,7 @@ void TestMriSlicesPlugin::handlePickIgnoresOtherKinds()
 
     PickResult pick;
     pick.kind = PickKind::CorticalVertex;
-    pick.world = QVector3D(5.0f, 5.0f, 5.0f);
+    pick.world = Eigen::Vector3f(5.0f, 5.0f, 5.0f);
     plugin.handlePick(pick);
 
     QCOMPARE(spy.count(), 0);
@@ -151,7 +151,7 @@ void TestMriSlicesPlugin::handlePickMriVoxelMovesCrosshair()
 
     PickResult pick;
     pick.kind = PickKind::MriVoxel;
-    pick.world = QVector3D(10.0f, 20.0f, 30.0f);
+    pick.world = Eigen::Vector3f(10.0f, 20.0f, 30.0f);
     plugin.handlePick(pick);
 
     QCOMPARE(spy.count(), 1);

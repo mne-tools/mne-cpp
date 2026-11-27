@@ -21,6 +21,7 @@
 #include "plugins/electrodes/electrodes.h"
 #include "plugins/mri_slices/mri_slices.h"
 #include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
+#include <mne/viz/backends/qt/qtconversions.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -107,12 +108,12 @@ void PickReadoutModel::handlePick(const PickResult& pick)
         case PickKind::CorticalVertex:
         case PickKind::ElectrodeContact:
             if (m_mriSlices) {
-                m_mriSlices->setVoxelOfInterest(pick.world);
+                m_mriSlices->setVoxelOfInterest(toQVector3D(pick.world));
             }
             break;
         case PickKind::MriVoxel:
             if (m_electrodes) {
-                m_electrodes->highlightNearest(pick.world);
+                m_electrodes->highlightNearest(toQVector3D(pick.world));
             }
             break;
         default:
@@ -151,7 +152,7 @@ void PickReadoutModel::formatRows(const PickResult& pick)
         return;
     }
 
-    m_worldRow = QStringLiteral("World: %1").arg(formatVec(pick.world));
+    m_worldRow = QStringLiteral("World: %1").arg(formatVec(toQVector3D(pick.world)));
     m_valueRow = std::isnan(pick.value)
         ? QStringLiteral("Value: —")
         : QStringLiteral("Value: %1").arg(pick.value, 0, 'f', 4);
@@ -159,9 +160,9 @@ void PickReadoutModel::formatRows(const PickResult& pick)
     switch (pick.kind) {
         case PickKind::ElectrodeContact: {
             m_labelRow = QStringLiteral("Contact: %1")
-                             .arg(pick.label.isEmpty() ? QStringLiteral("?") : pick.label);
+                             .arg(pick.label.empty() ? QStringLiteral("?") : QString::fromStdString(pick.label));
             if (m_mriSlices && m_mriSlices->volume()) {
-                const Eigen::Vector3f vox = m_mriSlices->voxelFromWorld(pick.world);
+                const Eigen::Vector3f vox = m_mriSlices->voxelFromWorld(toQVector3D(pick.world));
                 m_voxelRow = QStringLiteral("MRI voxel: (%1, %2, %3)")
                                  .arg(static_cast<int>(std::lround(vox.x())))
                                  .arg(static_cast<int>(std::lround(vox.y())))
@@ -179,14 +180,14 @@ void PickReadoutModel::formatRows(const PickResult& pick)
                              .arg(hemi)
                              .arg(pick.objectId);
             m_voxelRow = QStringLiteral("Source: %1")
-                             .arg(pick.sourceId.isEmpty() ? QStringLiteral("—")
-                                                          : pick.sourceId);
+                             .arg(pick.sourceId.empty() ? QStringLiteral("—")
+                                                        : QString::fromStdString(pick.sourceId));
             break;
         }
         case PickKind::MriVoxel: {
             m_labelRow = QStringLiteral("MRI: %1")
-                             .arg(pick.sourceId.isEmpty() ? QStringLiteral("voxel")
-                                                          : pick.sourceId);
+                             .arg(pick.sourceId.empty() ? QStringLiteral("voxel")
+                                                        : QString::fromStdString(pick.sourceId));
             m_voxelRow = QStringLiteral("Voxel: (%1, %2, %3) ori=%4")
                              .arg(static_cast<int>(std::lround(pick.voxel.x())))
                              .arg(static_cast<int>(std::lround(pick.voxel.y())))
@@ -199,10 +200,10 @@ void PickReadoutModel::formatRows(const PickResult& pick)
         case PickKind::Bem:
         case PickKind::Custom:
             m_labelRow = QStringLiteral("%1: %2")
-                             .arg(pick.sourceId.isEmpty() ? QStringLiteral("Pick")
-                                                          : pick.sourceId)
-                             .arg(pick.label.isEmpty() ? QStringLiteral("(unnamed)")
-                                                       : pick.label);
+                             .arg(pick.sourceId.empty() ? QStringLiteral("Pick")
+                                                        : QString::fromStdString(pick.sourceId))
+                             .arg(pick.label.empty() ? QStringLiteral("(unnamed)")
+                                                     : QString::fromStdString(pick.label));
             m_voxelRow = QStringLiteral("ObjectId: %1").arg(pick.objectId);
             break;
         case PickKind::None:

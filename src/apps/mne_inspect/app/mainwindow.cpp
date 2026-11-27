@@ -21,7 +21,8 @@
 #include <mne/viz/backends/qt/3d/model/braintreemodel.h>
 #include <mne/viz/brain/viewstate.h>
 #include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
-#include <mne/viz/backends/qt/3d/scene/pickresult.h>
+#include <mne/viz/backends/qt/qtconversions.h>
+#include <mne/viz/brain/pickresult.h>
 #include <mne/fs/fs_surface.h>
 #include <mne/fs/fs_surfaceset.h>
 #include <mne/fs/fs_annotation.h>
@@ -971,11 +972,11 @@ void MainWindow::setupConnections()
                 m_brainView->setElectrodeValues(values);
             });
     connect(m_brainView, &BrainView::electrodeContactClicked, this, [this](const QString& name, const QVector3D& position) {
-        mne::viz::qt::PickResult pick;
-        pick.kind = mne::viz::qt::PickKind::ElectrodeContact;
-        pick.world = position;
-        pick.label = name;
-        pick.sourceId = m_electrodesPlugin.sceneLayerId();
+        mne::viz::PickResult pick;
+        pick.kind = mne::viz::PickKind::ElectrodeContact;
+        pick.world = toEigen(position);
+        pick.label = name.toStdString();
+        pick.sourceId = m_electrodesPlugin.sceneLayerId().toStdString();
         m_scene.reportPick(pick);
     });
 
@@ -3218,7 +3219,7 @@ void MainWindow::createLayersDock()
     lay->addStretch(1);
 
     // Toggling a kind-checkbox flips visibility on every layer of that kind.
-    auto toggleKind = [this](mne::viz::qt::SceneLayerKind kind, bool visible) {
+    auto toggleKind = [this](mne::viz::SceneLayerKind kind, bool visible) {
         const auto layers = m_scene.layers();
         for (const auto& layer : layers) {
             if (layer.kind == kind) {
@@ -3227,21 +3228,21 @@ void MainWindow::createLayersDock()
         }
     };
     connect(m_layerBrainCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
-        toggleKind(mne::viz::qt::SceneLayerKind::BrainSurface, v);
+        toggleKind(mne::viz::SceneLayerKind::BrainSurface, v);
     });
     connect(m_layerElectrodesCheck, &QCheckBox::toggled, this, [this, toggleKind](bool v) {
-        toggleKind(mne::viz::qt::SceneLayerKind::Electrode, v);
+        toggleKind(mne::viz::SceneLayerKind::Electrode, v);
         m_electrodesPlugin.electrodeObject()->setVisible(v);
         m_brainView->update();
     });
     connect(m_layerMriCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
-        toggleKind(mne::viz::qt::SceneLayerKind::MriSlice, v);
+        toggleKind(mne::viz::SceneLayerKind::MriSlice, v);
     });
     connect(m_layerSensorsCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
-        toggleKind(mne::viz::qt::SceneLayerKind::Sensor, v);
+        toggleKind(mne::viz::SceneLayerKind::Sensor, v);
     });
     connect(m_layerSourceOverlayCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
-        toggleKind(mne::viz::qt::SceneLayerKind::SourceOverlay, v);
+        toggleKind(mne::viz::SceneLayerKind::SourceOverlay, v);
     });
 
     m_layersDock->setWidget(body);

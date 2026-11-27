@@ -24,7 +24,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/viz/backends/qt/3d/scene/pickresult.h>
+#include <mne/viz/brain/pickresult.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -102,7 +102,7 @@ public:
     //=========================================================================================================
     /** @return Most recent pick payload (default-constructed before the
      *  first hit). */
-    const mne::viz::qt::PickResult& lastPick() const
+    const mne::viz::PickResult& lastPick() const
     {
         return m_lastPick;
     }
@@ -145,7 +145,7 @@ public slots:
      * Drive the model from a synthesised pick. Called by the scene's
      * `picked` signal in normal operation; tests can call this directly.
      */
-    void handlePick(const mne::viz::qt::PickResult& pick);
+    void handlePick(const mne::viz::PickResult& pick);
 
 signals:
     /** Emitted whenever any of the four rows change. */
@@ -153,13 +153,13 @@ signals:
 
 private:
     void clearRows();
-    void formatRows(const mne::viz::qt::PickResult& pick);
+    void formatRows(const mne::viz::PickResult& pick);
     static QString formatVec(const QVector3D& v);
 
     mne::viz::qt::MultimodalScene* m_scene = nullptr;
     ELECTRODESPLUGIN::ElectrodesPlugin* m_electrodes = nullptr;
     MRISLICESPLUGIN::MriSlicesPlugin* m_mriSlices = nullptr;
-    mne::viz::qt::PickResult m_lastPick;
+    mne::viz::PickResult m_lastPick;
     QString m_labelRow;
     QString m_worldRow;
     QString m_voxelRow;

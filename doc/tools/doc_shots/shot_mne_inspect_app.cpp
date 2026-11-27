@@ -47,7 +47,7 @@
 #include "plugins/mri_slices/mri_slices.h"
 
 #include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
-#include <mne/viz/backends/qt/3d/scene/pickresult.h>
+#include <mne/viz/brain/pickresult.h>
 
 #include <QApplication>
 #include <QDockWidget>
@@ -58,8 +58,8 @@
 #include <QString>
 #include <QVector3D>
 
-using mne::viz::qt::PickKind;
-using mne::viz::qt::PickResult;
+using mne::viz::PickKind;
+using mne::viz::PickResult;
 
 namespace DOCSHOTS
 {
@@ -88,22 +88,22 @@ void injectPick(MainWindow& mw, const QJsonObject& spec)
         pick.kind = PickKind::ElectrodeContact;
         const QJsonArray target = spec.value(QStringLiteral("target")).toArray();
         if (target.size() >= 2) {
-            pick.sourceId = QStringLiteral("seeg_%1").arg(target.at(0).toString());
-            pick.label = target.at(1).toString();
+            pick.sourceId = QStringLiteral("seeg_%1").arg(target.at(0).toString()).toStdString();
+            pick.label = target.at(1).toString().toStdString();
         } else if (target.size() == 1) {
-            pick.label = target.at(0).toString();
+            pick.label = target.at(0).toString().toStdString();
         }
-        pick.world = QVector3D(0.0f, 0.01f, 0.02f);
+        pick.world = Eigen::Vector3f(0.0f, 0.01f, 0.02f);
     } else if (kindStr == QLatin1String("voxel")) {
         pick.kind = PickKind::MriVoxel;
-        pick.label = QStringLiteral("voxel(16,16,16)");
-        pick.voxel = QVector3D(16, 16, 16);
-        pick.world = QVector3D(0.0f, 0.0f, 0.0f);
+        pick.label = "voxel(16,16,16)";
+        pick.voxel = Eigen::Vector3f(16.0f, 16.0f, 16.0f);
+        pick.world = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
         pick.sliceOrientation = 0;
     } else if (kindStr == QLatin1String("vertex")) {
         pick.kind = PickKind::CorticalVertex;
         pick.hemisphere = 0;
-        pick.label = QStringLiteral("LH vertex 0");
+        pick.label = "LH vertex 0";
         pick.objectId = 0;
     } else {
         return; // unknown pick kind — silently ignored

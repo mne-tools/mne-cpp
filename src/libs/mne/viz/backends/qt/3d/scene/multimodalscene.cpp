@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.1
  * @date     May 2026
- * @brief    Ordered scene-layer iteration, draw orchestration and picking routing across all mne_viz_qt modalities.
+ * @brief    MultimodalScene emits the changes of viz::SceneState as Qt signals.
  */
 
 //=============================================================================================================
@@ -16,292 +16,27 @@
 
 #include "multimodalscene.h"
 
-#include <mne/base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtGlobal>
-
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <algorithm>
-#include <cstddef>
-#include <limits>
-#include <vector>
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne::viz;
 using namespace mne::viz::qt;
 
+//=============================================================================================================
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
 MultimodalScene::MultimodalScene(QObject* parent)
 : QObject(parent)
 {
+    // The scene state changes on the caller's thread, so the callbacks emit directly
+    setLayersChangedCallback([this]() { emit layersChanged(); });
+    setTimeSampleChangedCallback([this](int sample) { emit timeSampleChanged(sample); });
+    setTimeCursorChangedCallback([this](double seconds) { emit timeCursorChanged(seconds); });
+    setOverlayThresholdsChangedCallback([this](float fmin, float fmid, float fmax) { emit overlayThresholdsChanged(fmin, fmid, fmax); });
+    setPickedCallback([this](const mne::viz::PickResult& pick) { emit picked(pick); });
 }
 
 //=============================================================================================================
 
 MultimodalScene::~MultimodalScene() = default;
-
-//=============================================================================================================
-
-void MultimodalScene::addLayer(SceneLayer layer)
-{
-    if (layer.id.empty()) {
-        mne::Log::warning("MultimodalScene::addLayer: refusing to add layer with empty id");
-        return;
-    }
-
-    const auto it = m_indexById.find(layer.id);
-    if (it != m_indexById.end()) {
-        m_layers[it->second] = std::move(layer);
-    } else {
-        m_indexById.insert_or_assign(layer.id, m_layers.size());
-        m_layers.push_back(std::move(layer));
-    }
-    rebuildOrder();
-    emit layersChanged();
-}
-
-//=============================================================================================================
-
-bool MultimodalScene::removeLayer(const std::string& id)
-{
-    const auto it = m_indexById.find(id);
-    if (it == m_indexById.end()) {
-        return false;
-    }
-    m_layers.erase(m_layers.begin() + static_cast<std::ptrdiff_t>(it->second));
-    rebuildOrder();
-    emit layersChanged();
-    return true;
-}
-
-//=============================================================================================================
-
-void MultimodalScene::clear()
-{
-    if (m_layers.empty()) {
-        return;
-    }
-    m_layers.clear();
-    m_indexById.clear();
-    emit layersChanged();
-}
-
-//=============================================================================================================
-
-std::vector<SceneLayer> MultimodalScene::layers() const
-{
-    return m_layers;
-}
-
-//=============================================================================================================
-
-const SceneLayer* MultimodalScene::findLayer(const std::string& id) const
-{
-    const auto it = m_indexById.find(id);
-    if (it == m_indexById.end()) {
-        return nullptr;
-    }
-    return &m_layers.at(it->second);
-}
-
-//=============================================================================================================
-
-void MultimodalScene::setLayerVisible(const std::string& id, bool visible)
-{
-    const auto it = m_indexById.find(id);
-    if (it == m_indexById.end()) {
-        return;
-    }
-    if (m_layers[it->second].visible == visible) {
-        return;
-    }
-    m_layers[it->second].visible = visible;
-    emit layersChanged();
-}
-
-//=============================================================================================================
-
-void MultimodalScene::setLayerOpacity(const std::string& id, float opacity)
-{
-    const auto it = m_indexById.find(id);
-    if (it == m_indexById.end()) {
-        return;
-    }
-    opacity = std::clamp(opacity, 0.0f, 1.0f);
-    if (qFuzzyCompare(m_layers[it->second].opacity + 1.0f, opacity + 1.0f)) {
-        return;
-    }
-    m_layers[it->second].opacity = opacity;
-    emit layersChanged();
-}
-
-//=============================================================================================================
-
-int MultimodalScene::currentTimeSample() const
-{
-    return m_currentTimeSample;
-}
-
-//=============================================================================================================
-
-void MultimodalScene::setCurrentTimeSample(int sample)
-{
-    if (sample < 0) {
-        sample = -1;
-    }
-    if (sample == m_currentTimeSample) {
-        return;
-    }
-    m_currentTimeSample = sample;
-    emit timeSampleChanged(sample);
-}
-
-//=============================================================================================================
-
-double MultimodalScene::timeCursor() const
-{
-    return m_timeCursor;
-}
-
-//=============================================================================================================
-
-void MultimodalScene::setTimeCursor(double seconds)
-{
-    if (qFuzzyCompare(seconds + 1.0, m_timeCursor + 1.0)) {
-        return;
-    }
-    m_timeCursor = seconds;
-    emit timeCursorChanged(seconds);
-}
-
-//=============================================================================================================
-
-float MultimodalScene::overlayFmin() const
-{
-    return m_overlayFmin;
-}
-
-//=============================================================================================================
-
-float MultimodalScene::overlayFmid() const
-{
-    return m_overlayFmid;
-}
-
-//=============================================================================================================
-
-float MultimodalScene::overlayFmax() const
-{
-    return m_overlayFmax;
-}
-
-//=============================================================================================================
-
-void MultimodalScene::setOverlayThresholds(float fmin, float fmid, float fmax)
-{
-    // Clamp to monotone fmin <= fmid <= fmax.
-    if (fmid < fmin) {
-        fmid = fmin;
-    }
-    if (fmax < fmid) {
-        fmax = fmid;
-    }
-    const bool same = qFuzzyCompare(fmin + 1.0f, m_overlayFmin + 1.0f) && qFuzzyCompare(fmid + 1.0f, m_overlayFmid + 1.0f) && qFuzzyCompare(fmax + 1.0f, m_overlayFmax + 1.0f);
-    if (same) {
-        return;
-    }
-    m_overlayFmin = fmin;
-    m_overlayFmid = fmid;
-    m_overlayFmax = fmax;
-    emit overlayThresholdsChanged(fmin, fmid, fmax);
-}
-
-//=============================================================================================================
-
-const PickResult& MultimodalScene::lastPick() const
-{
-    return m_lastPick;
-}
-
-//=============================================================================================================
-
-void MultimodalScene::reportPick(const PickResult& pick)
-{
-    m_lastPick = pick;
-    emit picked(pick);
-}
-
-//=============================================================================================================
-
-void MultimodalScene::worldBounds(QVector3D& bbMin, QVector3D& bbMax) const
-{
-    constexpr float fmax = std::numeric_limits<float>::max();
-    constexpr float flow = std::numeric_limits<float>::lowest();
-    bbMin = QVector3D(fmax, fmax, fmax);
-    bbMax = QVector3D(flow, flow, flow);
-
-    bool anyHit = false;
-    for (const auto& layer : m_layers) {
-        if (!layer.visible) {
-            continue;
-        }
-        const auto it = m_boundsFns.find(static_cast<int>(layer.kind));
-        if (it == m_boundsFns.end() || !it->second) {
-            continue;
-        }
-        QVector3D mn;
-        QVector3D mx;
-        if (!it->second(layer, mn, mx)) {
-            continue;
-        }
-        bbMin.setX(std::min(bbMin.x(), mn.x()));
-        bbMin.setY(std::min(bbMin.y(), mn.y()));
-        bbMin.setZ(std::min(bbMin.z(), mn.z()));
-        bbMax.setX(std::max(bbMax.x(), mx.x()));
-        bbMax.setY(std::max(bbMax.y(), mx.y()));
-        bbMax.setZ(std::max(bbMax.z(), mx.z()));
-        anyHit = true;
-    }
-
-    if (!anyHit) {
-        bbMin = QVector3D(-1.0f, -1.0f, -1.0f);
-        bbMax = QVector3D(1.0f, 1.0f, 1.0f);
-    }
-}
-
-//=============================================================================================================
-
-void MultimodalScene::registerBoundsFn(SceneLayerKind kind, BoundsFn fn)
-{
-    m_boundsFns.insert_or_assign(static_cast<int>(kind), std::move(fn));
-}
-
-//=============================================================================================================
-
-void MultimodalScene::rebuildOrder()
-{
-    // Stable sort by (kind, drawOrder); insertion order is preserved as tie-breaker.
-    std::stable_sort(m_layers.begin(), m_layers.end(),
-                     [](const SceneLayer& a, const SceneLayer& b) {
-                         if (a.kind != b.kind) {
-                             return static_cast<int>(a.kind) < static_cast<int>(b.kind);
-                         }
-                         return a.drawOrder < b.drawOrder;
-                     });
-    m_indexById.clear();
-    m_indexById.reserve(m_layers.size());
-    for (std::size_t i = 0; i < m_layers.size(); ++i) {
-        m_indexById.insert_or_assign(m_layers[i].id, i);
-    }
-}

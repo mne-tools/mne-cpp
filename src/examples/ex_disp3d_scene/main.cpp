@@ -183,13 +183,11 @@ int main(int argc, char* argv[])
 
     //! [multimodal_scene_usage]
     MultimodalScene scene;
-    scene.registerBoundsFn(SceneLayerKind::Electrode, [](const SceneLayer& layer, QVector3D& bbMin, QVector3D& bbMax) {
+    scene.registerBoundsFn(SceneLayerKind::Electrode, [](const SceneLayer& layer, Vector3f& bbMin, Vector3f& bbMax) {
         const auto* object = static_cast<const ElectrodeObject*>(layer.payload.get());
         const Eigen::MatrixX3f positions = object->implantation().positions();
-        const Eigen::Vector3f lo = positions.colwise().minCoeff().transpose();
-        const Eigen::Vector3f hi = positions.colwise().maxCoeff().transpose();
-        bbMin = QVector3D(lo.x(), lo.y(), lo.z());
-        bbMax = QVector3D(hi.x(), hi.y(), hi.z());
+        bbMin = positions.colwise().minCoeff().transpose();
+        bbMax = positions.colwise().maxCoeff().transpose();
         return true;
     });
     SceneLayer layer;
@@ -200,15 +198,15 @@ int main(int argc, char* argv[])
     layer.payload = payload;
     scene.addLayer(layer);
     scene.setOverlayThresholds(2.0f, 4.0f, 8.0f);
-    QVector3D bbMin;
-    QVector3D bbMax;
+    Vector3f bbMin;
+    Vector3f bbMax;
     scene.worldBounds(bbMin, bbMax); // union over visible layers with a bounds function
     //! [multimodal_scene_usage]
-    ok &= expect(scene.layers().size() == 1 && bbMin == QVector3D(0.010f, -0.020f, 0.005f) && bbMax == QVector3D(0.0205f, -0.020f, 0.005f) && scene.overlayFmid() == 4.0f,
+    ok &= expect(scene.layers().size() == 1 && bbMin.isApprox(Vector3f(0.010f, -0.020f, 0.005f)) && bbMax.isApprox(Vector3f(0.0205f, -0.020f, 0.005f)) && scene.overlayFmid() == 4.0f,
                  "MultimodalScene bounds equal the electrode extent");
     scene.setLayerVisible("seeg_LH", false);
     scene.worldBounds(bbMin, bbMax);
-    ok &= expect(bbMin == QVector3D(-1.0f, -1.0f, -1.0f) && bbMax == QVector3D(1.0f, 1.0f, 1.0f), "Hiding the only layer falls back to the unit cube");
+    ok &= expect(bbMin == Vector3f::Constant(-1.0f) && bbMax == Vector3f::Constant(1.0f), "Hiding the only layer falls back to the unit cube");
 
     //! [pick_result_usage]
     // A picker reports the contact under the cursor; the host reads the most recent pick back
@@ -217,14 +215,14 @@ int main(int argc, char* argv[])
     contactPick.kind = PickKind::ElectrodeContact;
     contactPick.sourceId = "seeg_LH";
     const IeegContact& first = electrodes.implantation().contacts().front();
-    contactPick.world = QVector3D(first.position.x(), first.position.y(), first.position.z());
-    contactPick.label = QString::fromStdString(first.name);
+    contactPick.world = first.position;
+    contactPick.label = first.name;
     contactPick.value = 3.5f;
     contactPick.timeSample = 120;
     scene.reportPick(contactPick);
     const PickResult& lastPick = scene.lastPick();
     //! [pick_result_usage]
-    ok &= expect(!hitBefore && isHit(lastPick) && lastPick.sourceId == "seeg_LH" && lastPick.world == QVector3D(0.010f, -0.020f, 0.005f) && lastPick.value == 3.5f &&
+    ok &= expect(!hitBefore && isHit(lastPick) && lastPick.sourceId == "seeg_LH" && lastPick.world.isApprox(Vector3f(0.010f, -0.020f, 0.005f)) && lastPick.value == 3.5f &&
                      lastPick.objectId == -1,
                  "MultimodalScene keeps the reported contact pick");
 

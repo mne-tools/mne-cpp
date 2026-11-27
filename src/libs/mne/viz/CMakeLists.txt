@@ -27,6 +27,7 @@ set(SOURCES
   brain/realtime/rtsourceinterpolationmatworker.cpp
   brain/realtime/stcloadingworker.cpp
   brain/sensorfieldmapper.cpp
+  brain/scenestate.cpp
   brain/sourceestimatesession.cpp
   brain/sourceestimateoverlay.cpp
   brain/viewstate.cpp
@@ -82,20 +83,22 @@ set(HEADERS
   brain/interpolation.h
   brain/meshfactory.h
   brain/networkobject.h
+  brain/pickresult.h
   brain/polylineobject.h
   brain/realtime/periodictask.h
   brain/realtime/rtsensordataworker.h
-  brain/realtime/sensorstreamsession.h
-  brain/realtime/rtsensorstream.h
-  brain/realtime/rtsourcestream.h
   brain/realtime/rtsensorinterpolationmatworker.h
+  brain/realtime/rtsensorstream.h
   brain/realtime/rtsourcedataworker.h
   brain/realtime/rtsourceinterpolationmatworker.h
+  brain/realtime/rtsourcestream.h
+  brain/realtime/sensorstreamsession.h
   brain/realtime/stcloadingworker.h
   brain/rendertypes.h
   brain/sensorfieldmapper.h
-  brain/sourceestimatesession.h
+  brain/scenestate.h
   brain/sourceestimateoverlay.h
+  brain/sourceestimatesession.h
   brain/surfacekeys.h
   brain/viewstate.h
   figures/average_layout.h

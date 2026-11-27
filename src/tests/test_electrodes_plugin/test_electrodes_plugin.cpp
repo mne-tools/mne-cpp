@@ -20,7 +20,7 @@
 
 #include <mne/viz/brain/electrodeobject.h>
 #include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
-#include <mne/viz/backends/qt/3d/scene/pickresult.h>
+#include <mne/viz/brain/pickresult.h>
 #include <mne/ieeg/ieeg_implantation.h>
 #include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
@@ -317,8 +317,8 @@ void TestElectrodesPlugin::handlePickIgnoresOtherKinds()
 
     PickResult pick;
     pick.kind = PickKind::CorticalVertex;
-    pick.label = QStringLiteral("LA0");
-    pick.sourceId = plugin.sceneLayerId();
+    pick.label = "LA0";
+    pick.sourceId = plugin.sceneLayerId().toStdString();
     plugin.handlePick(pick);
 
     QCOMPARE(spy.count(), 0);
@@ -334,8 +334,8 @@ void TestElectrodesPlugin::handlePickIgnoresOtherSourceIds()
 
     PickResult pick;
     pick.kind = PickKind::ElectrodeContact;
-    pick.label = QStringLiteral("LA0");
-    pick.sourceId = QStringLiteral("some_other_layer");
+    pick.label = "LA0";
+    pick.sourceId = "some_other_layer";
     plugin.handlePick(pick);
 
     QCOMPARE(spy.count(), 0);
@@ -353,8 +353,8 @@ void TestElectrodesPlugin::handlePickSelectsContact()
 
     PickResult pick;
     pick.kind = PickKind::ElectrodeContact;
-    pick.label = QStringLiteral("LA0");
-    pick.sourceId = plugin.sceneLayerId();
+    pick.label = "LA0";
+    pick.sourceId = plugin.sceneLayerId().toStdString();
     plugin.handlePick(pick);
 
     QCOMPARE(spy.count(), 1);

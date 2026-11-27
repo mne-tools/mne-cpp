@@ -219,7 +219,6 @@ set(HEADERS
     3d/renderable/sliceobject.h
     3d/renderable/videooverlay.h
     3d/scene/multimodalscene.h
-    3d/scene/pickresult.h
     3d/scene/rtsensorstreammanager.h
     3d/scene/sourceestimatemanager.h
     3d/view/brainview.h

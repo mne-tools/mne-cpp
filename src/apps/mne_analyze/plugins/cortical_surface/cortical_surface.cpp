@@ -21,6 +21,7 @@
 
 #include <anShared/Management/communicator.h>
 #include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
+#include <mne/viz/backends/qt/qtconversions.h>
 #include <mne/fs/fs_annotation.h>
 #include <mne/fs/fs_label.h>
 #include <mne/fs/fs_label_utils.h>
@@ -1154,10 +1155,10 @@ bool CorticalSurface::pickVertex(const QVector3D& worldPoint)
     if (m_pScene) {
         PickResult pr;
         pr.kind = PickKind::CorticalVertex;
-        pr.world = worldPoint;
+        pr.world = toEigen(worldPoint);
         pr.objectId = bestVertex;
         pr.hemisphere = bestHemi;
-        pr.sourceId = (bestHemi == 0) ? QStringLiteral("cortex_lh") : QStringLiteral("cortex_rh");
+        pr.sourceId = (bestHemi == 0) ? "cortex_lh" : "cortex_rh";
         m_pScene->reportPick(pr);
     }
 

@@ -15,7 +15,7 @@
 //=============================================================================================================
 
 #include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
-#include <mne/viz/backends/qt/3d/scene/pickresult.h>
+#include <mne/viz/brain/pickresult.h>
 #include <mne/viz/brain/electrodeobject.h>
 #include <mne/ieeg/ieeg_implantation.h>
 
@@ -81,14 +81,14 @@ void TestMultimodalScene::testPickResultDefaults()
 {
     PickResult r;
     QCOMPARE(r.kind, PickKind::None);
-    QCOMPARE(r.objectId, qint64(-1));
+    QCOMPARE(r.objectId, std::int64_t(-1));
     QCOMPARE(r.hemisphere, -1);
     QCOMPARE(r.sliceOrientation, -1);
     QCOMPARE(r.timeSample, -1);
     QVERIFY(std::isnan(r.value));
-    QVERIFY(r.label.isEmpty());
-    QVERIFY(r.sourceId.isEmpty());
-    QVERIFY(r.extras.isEmpty());
+    QVERIFY(r.label.empty());
+    QVERIFY(r.sourceId.empty());
+    QVERIFY(r.extras.empty());
 }
 
 void TestMultimodalScene::testIsHitHelper()
@@ -301,15 +301,15 @@ void TestMultimodalScene::testReportPickStoresLastAndEmits()
     p.kind = PickKind::ElectrodeContact;
     p.objectId = 17;
     p.label = "LH3";
-    p.world = QVector3D(1.0f, 2.0f, 3.0f);
+    p.world = Eigen::Vector3f(1.0f, 2.0f, 3.0f);
     p.sourceId = "seeg_LH";
 
     s.reportPick(p);
 
     QCOMPARE(spy.count(), 1);
     QCOMPARE(s.lastPick().kind, PickKind::ElectrodeContact);
-    QCOMPARE(s.lastPick().label, QString("LH3"));
-    QCOMPARE(s.lastPick().objectId, qint64(17));
+    QCOMPARE(s.lastPick().label, std::string("LH3"));
+    QCOMPARE(s.lastPick().objectId, std::int64_t(17));
 }
 
 //=============================================================================================================
@@ -319,11 +319,11 @@ void TestMultimodalScene::testReportPickStoresLastAndEmits()
 void TestMultimodalScene::testWorldBoundsFallsBackToUnitCubeWhenEmpty()
 {
     MultimodalScene s;
-    QVector3D mn;
-    QVector3D mx;
+    Eigen::Vector3f mn;
+    Eigen::Vector3f mx;
     s.worldBounds(mn, mx);
-    QCOMPARE(mn, QVector3D(-1, -1, -1));
-    QCOMPARE(mx, QVector3D(1, 1, 1));
+    QVERIFY(mn == Eigen::Vector3f::Constant(-1.0f));
+    QVERIFY(mx == Eigen::Vector3f::Constant(1.0f));
 }
 
 void TestMultimodalScene::testWorldBoundsUnionWithRegisteredFn()
@@ -334,22 +334,22 @@ void TestMultimodalScene::testWorldBoundsUnionWithRegisteredFn()
 
     // Each Custom layer reports a fixed AABB via the extras map.
     s.registerBoundsFn(SceneLayerKind::Custom,
-                       [](const SceneLayer& l, QVector3D& mn, QVector3D& mx) {
+                       [](const SceneLayer& l, Eigen::Vector3f& mn, Eigen::Vector3f& mx) {
                            if (l.id == "a") {
-                               mn = QVector3D(-1, -1, -1);
-                               mx = QVector3D(1, 1, 1);
+                               mn = Eigen::Vector3f::Constant(-1.0f);
+                               mx = Eigen::Vector3f::Constant(1.0f);
                                return true;
                            }
-                           mn = QVector3D(2, 2, 2);
-                           mx = QVector3D(3, 3, 3);
+                           mn = Eigen::Vector3f::Constant(2.0f);
+                           mx = Eigen::Vector3f::Constant(3.0f);
                            return true;
                        });
 
-    QVector3D mn;
-    QVector3D mx;
+    Eigen::Vector3f mn;
+    Eigen::Vector3f mx;
     s.worldBounds(mn, mx);
-    QCOMPARE(mn, QVector3D(-1, -1, -1));
-    QCOMPARE(mx, QVector3D(3, 3, 3));
+    QVERIFY(mn == Eigen::Vector3f::Constant(-1.0f));
+    QVERIFY(mx == Eigen::Vector3f::Constant(3.0f));
 }
 
 //=============================================================================================================

@@ -11,35 +11,36 @@
  *
  * Every renderable that supports picking (BrainSurface triangles,
  * DipoleObject arrow instances, ElectrodeObject contacts,
- * SliceObject voxels) returns a @ref mne::viz::qt::PickResult so the host GUI can
- * react with a single switch on @ref mne::viz::qt::PickResult::kind "PickResult::kind" regardless of
+ * SliceObject voxels) returns a @ref mne::viz::PickResult so the host GUI can
+ * react with a single switch on @ref mne::viz::PickResult::kind "PickResult::kind" regardless of
  * which primitive was hit.
  */
 
-#ifndef DISP3DLIB_PICKRESULT_H
-#define DISP3DLIB_PICKRESULT_H
+#ifndef VIZ_PICKRESULT_H
+#define VIZ_PICKRESULT_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
+#include "../viz_global.h"
 
 //=============================================================================================================
-// QT INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QVariantMap>
-#include <QVector3D>
+#include <Eigen/Core>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstdint>
 #include <limits>
+#include <map>
+#include <string>
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -47,7 +48,7 @@ namespace mne::viz::qt
  * @brief Kind of object that produced a 3-D pick.
  *
  * The enum is intentionally flat (rather than a class hierarchy) so that
- * `PickResult` stays a trivially copyable POD that can be queued, signalled,
+ * `PickResult` stays a plain value type that can be queued, signalled,
  * and serialized without owning any GPU resources.
  */
 enum class PickKind
@@ -73,22 +74,22 @@ enum class PickKind
  *
  * @snippet ex_disp3d_scene/main.cpp pick_result_usage
  */
-struct VIZQTSHARED_EXPORT PickResult
+struct VIZSHARED_EXPORT PickResult
 {
     /** What was hit. `None` means the ray missed every renderable. */
     PickKind kind = PickKind::None;
 
     /** Hit position in world (MRI surface RAS) coordinates. */
-    QVector3D world;
+    Eigen::Vector3f world = Eigen::Vector3f::Zero();
 
     /** Stable identifier for the picked element within its renderable
      *  (e.g. cortical vertex index, contact name hash, voxel linear index).
-     *  Using `qint64` lets a single field carry vertex indices, packed
+     *  Using `std::int64_t` lets a single field carry vertex indices, packed
      *  triplets and small string hashes. -1 means unset. */
-    qint64 objectId = -1;
+    std::int64_t objectId = -1;
 
     /** Human-readable label (contact name, vertex coordinate string, …). */
-    QString label;
+    std::string label;
 
     /** Optional scalar overlay value at the picked element (uV, dSPM, MRI
      *  intensity). NaN means "not provided". */
@@ -98,7 +99,7 @@ struct VIZQTSHARED_EXPORT PickResult
      *  MultimodalScene when the renderable was added. Lets consumers
      *  route the pick back to the originating layer (e.g. "cortex_lh",
      *  "mri_axial", "seeg_LH"). */
-    QString sourceId;
+    std::string sourceId;
 
     //--------------------------------------------------------------------
     // Kind-specific fields. Producers fill in only what applies.
@@ -108,7 +109,7 @@ struct VIZQTSHARED_EXPORT PickResult
     int hemisphere = -1;
 
     /** Voxel coordinates for `MriVoxel`. */
-    QVector3D voxel;
+    Eigen::Vector3f voxel = Eigen::Vector3f::Zero();
 
     /** MRI slice orientation index for `MriVoxel`
      *  (0 = axial, 1 = coronal, 2 = sagittal). */
@@ -117,11 +118,9 @@ struct VIZQTSHARED_EXPORT PickResult
     /** Time index for time-varying overlays (`-1` = not time-resolved). */
     int timeSample = -1;
 
-    /** Catch-all for renderable-specific extras (shaft name, atlas region,
-     *  dipole amplitude vector, …). Kept as `QVariantMap` rather than
-     *  `QJsonObject` so producers can ship `QVector3D` / `Eigen` types
-     *  without going through JSON. */
-    QVariantMap extras;
+    /** Catch-all for renderable-specific extras as text by key (shaft name,
+     *  atlas region, dipole amplitude, …). */
+    std::map<std::string, std::string> extras;
 };
 
 //=============================================================================================================
@@ -134,6 +133,6 @@ inline bool isHit(const PickResult& r) noexcept
     return r.kind != PickKind::None;
 }
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // DISP3DLIB_PICKRESULT_H
+#endif // VIZ_PICKRESULT_H

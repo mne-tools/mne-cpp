@@ -444,6 +444,15 @@ aliases; replace the old spelling as below.
   `.stc` files) and `viz::SensorStreamSession` (streaming a sensor field map)
   are Qt-free; `qt::SourceEstimateManager` and `qt::RtSensorStreamManager`
   derive from them, keep their API and emit their signals.
+- The state of a multimodal scene is Qt-free: `viz::SceneState`
+  (`viz/brain/scenestate.h`) holds the layer stack (`SceneLayer`,
+  `SceneLayerKind`), the shared time, overlay thresholds and the last pick,
+  and reports changes to callbacks; `qt::MultimodalScene` derives from it and
+  emits them as signals. `worldBounds` and the bounds functions use
+  `Eigen::Vector3f`. `PickResult` (`viz/brain/pickresult.h`) holds
+  `Eigen::Vector3f` positions, `std::string` labels and ids, a
+  `std::int64_t` object id and `std::map<std::string, std::string>` extras
+  instead of Qt types.
 - Views run in any backend through `viz/host/surface.h`: a backend implements
   `viz::Surface` (redraw requests, clock, pointer shape) and drives a
   `viz::SurfaceClient` (resize, pointer, wheel and key events, animation

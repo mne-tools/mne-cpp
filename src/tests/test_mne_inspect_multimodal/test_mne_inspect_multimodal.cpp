@@ -30,7 +30,7 @@
 
 #include <mne/viz/brain/electrodeobject.h>
 #include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
-#include <mne/viz/backends/qt/3d/scene/pickresult.h>
+#include <mne/viz/brain/pickresult.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -210,9 +210,9 @@ void TestMneInspectMultimodal::pickContactDrivesReadoutAndJumpsMri()
 
     PickResult pick;
     pick.kind = PickKind::ElectrodeContact;
-    pick.label = QStringLiteral("LA2");
-    pick.world = QVector3D(0.0f, 0.0f, 0.02f);
-    pick.sourceId = electrodes.sceneLayerId();
+    pick.label = "LA2";
+    pick.world = Eigen::Vector3f(0.0f, 0.0f, 0.02f);
+    pick.sourceId = electrodes.sceneLayerId().toStdString();
     pick.value = 12.5f;
     scene.reportPick(pick);
 
@@ -249,10 +249,10 @@ void TestMneInspectMultimodal::pickMriVoxelHighlightsNearestContact()
 
     PickResult pick;
     pick.kind = PickKind::MriVoxel;
-    pick.world = QVector3D(0.0f, 0.0f, 0.011f); // closest to LA1 (z=0.01)
-    pick.voxel = QVector3D(10.0f, 20.0f, 30.0f);
+    pick.world = Eigen::Vector3f(0.0f, 0.0f, 0.011f); // closest to LA1 (z=0.01)
+    pick.voxel = Eigen::Vector3f(10.0f, 20.0f, 30.0f);
     pick.sliceOrientation = 0;
-    pick.sourceId = QStringLiteral("mri_axial");
+    pick.sourceId = "mri_axial";
     scene.reportPick(pick);
 
     QCOMPARE(readoutSpy.count(), 1);
@@ -286,11 +286,11 @@ void TestMneInspectMultimodal::pickCorticalVertexFormatsReadout()
 
     PickResult pick;
     pick.kind = PickKind::CorticalVertex;
-    pick.world = QVector3D(-0.030f, 0.012f, 0.045f);
+    pick.world = Eigen::Vector3f(-0.030f, 0.012f, 0.045f);
     pick.hemisphere = 0;
     pick.objectId = 12345;
     pick.value = -1.75f;
-    pick.sourceId = QStringLiteral("cortex_lh");
+    pick.sourceId = "cortex_lh";
     scene.reportPick(pick);
 
     QCOMPARE(readoutSpy.count(), 1);

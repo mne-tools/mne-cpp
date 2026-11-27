@@ -25,7 +25,7 @@
 //=============================================================================================================
 
 #include <mne/viz/backends/qt/3d/renderable/sliceobject.h>
-#include <mne/viz/backends/qt/3d/scene/pickresult.h>
+#include <mne/viz/brain/pickresult.h>
 #include <mne/mri/mri_vol_data.h>
 
 //=============================================================================================================
@@ -219,7 +219,7 @@ public slots:
      * Pick callback. If `pick.kind == PickKind::MriVoxel`, snap the
      * crosshair to `pick.world` and emit @ref crosshairChanged.
      */
-    void handlePick(const mne::viz::qt::PickResult& pick);
+    void handlePick(const mne::viz::PickResult& pick);
 
 signals:
     /** Emitted when a new volume is loaded. */

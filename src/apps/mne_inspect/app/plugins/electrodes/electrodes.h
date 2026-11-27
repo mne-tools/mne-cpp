@@ -26,7 +26,7 @@
 //=============================================================================================================
 
 #include <mne/viz/brain/electrodeobject.h>
-#include <mne/viz/backends/qt/3d/scene/pickresult.h>
+#include <mne/viz/brain/pickresult.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -79,7 +79,7 @@ enum class ElectrodeSource
  *   - Hand the resulting `mne::viz::ElectrodeObject` to the host through
  *     @ref electrodeObject() and register it as a `SceneLayerKind::Electrode`
  *     layer when @ref attachScene() has been called.
- *   - Translate scene picks (`mne::viz::qt::PickResult` with
+ *   - Translate scene picks (`mne::viz::PickResult` with
  *     `kind == ElectrodeContact`) into a contact-name selection and emit
  *     @ref contactPicked.
  *
@@ -275,7 +275,7 @@ public slots:
      * pick originated from this plugin's layer, update the contact
      * selection and emit @ref contactPicked.
      */
-    void handlePick(const mne::viz::qt::PickResult& pick);
+    void handlePick(const mne::viz::PickResult& pick);
 
 signals:
     /** Emitted when the underlying ElectrodeObject is replaced. */
