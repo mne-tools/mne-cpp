@@ -4778,8 +4778,8 @@
     },
     {
       "name": "ElectrodeObject",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/3d/renderable/electrodeobject.h",
+      "module": "viz",
+      "header": "viz/brain/electrodeobject.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -4792,7 +4792,7 @@
       "example_mode": "run",
       "status": "documented",
       "documented": true,
-      "sidebar_position": 64,
+      "sidebar_position": 119,
       "guide": null,
       "python_equiv": null,
       "python_url": null
@@ -11957,8 +11957,8 @@
     },
     {
       "name": "DipoleObject",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/3d/renderable/dipoleobject.h",
+      "module": "viz",
+      "header": "viz/brain/dipoleobject.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -11971,7 +11971,7 @@
       "example_mode": "run",
       "status": "documented",
       "documented": true,
-      "sidebar_position": 91,
+      "sidebar_position": 120,
       "guide": null,
       "python_equiv": null,
       "python_url": null
@@ -12057,8 +12057,8 @@
     },
     {
       "name": "NetworkObject",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/3d/renderable/networkobject.h",
+      "module": "viz",
+      "header": "viz/brain/networkobject.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -12071,7 +12071,7 @@
       "example_mode": "run",
       "status": "documented",
       "documented": true,
-      "sidebar_position": 96,
+      "sidebar_position": 121,
       "guide": null,
       "python_equiv": null,
       "python_url": null
@@ -12094,8 +12094,8 @@
     },
     {
       "name": "PolylineObject",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/3d/renderable/polylineobject.h",
+      "module": "viz",
+      "header": "viz/brain/polylineobject.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -12108,7 +12108,7 @@
       "example_mode": "run",
       "status": "documented",
       "documented": true,
-      "sidebar_position": 98,
+      "sidebar_position": 122,
       "guide": null,
       "python_equiv": null,
       "python_url": null

@@ -89,6 +89,28 @@ VIZSHARED_EXPORT Color map_color(Colormap map, double value);
  */
 VIZSHARED_EXPORT Color map_color(std::string_view name, double value);
 
+/**
+ * Colour from hue, saturation and lightness.
+ *
+ * @param[in] hue          Hue in [0, 1), wrapping around.
+ * @param[in] saturation   Saturation in [0, 1].
+ * @param[in] lightness    Lightness in [0, 1].
+ * @param[in] alpha        Opacity in [0, 1].
+ * @return The colour.
+ * @since 3.0.0
+ */
+VIZSHARED_EXPORT Color color_from_hsl(double hue, double saturation, double lightness, double alpha = 1.0);
+
+/**
+ * Darker version of a colour, scaling its value (HSV) by 100 / @p factor like QColor::darker.
+ *
+ * @param[in] color    The colour.
+ * @param[in] factor   Darkening in percent; 150 gives a colour at two thirds of the value. 100 or less returns @p color.
+ * @return The darker colour, with the opacity of @p color.
+ * @since 3.0.0
+ */
+VIZSHARED_EXPORT Color darker(Color color, int factor = 200);
+
 } // namespace mne::viz
 
 #endif // VIZ_COLORMAP_H

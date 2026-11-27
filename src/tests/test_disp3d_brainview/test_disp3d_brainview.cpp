@@ -23,7 +23,7 @@
 #include <mne/base/log.h>
 #include <mne/viz/backends/qt/3d/view/brainrenderer.h>
 #include <rhi/qrhi.h>
-#include <mne/viz/backends/qt/3d/renderable/polylineobject.h>
+#include <mne/viz/brain/polylineobject.h>
 #include <mne/viz/backends/qt/3d/view/multiviewlayout.h>
 #include <mne/viz/backends/qt/3d/model/braintreemodel.h>
 #include <mne/viz/backends/qt/3d/model/items/abstracttreeitem.h>
@@ -46,10 +46,10 @@
 #include <mne/viz/brain/brainsurface.h>
 #include <mne/viz/backends/qt/3d/input/cameracontroller.h>
 #include <mne/viz/backends/qt/3d/input/raypicker.h>
-#include <mne/viz/backends/qt/3d/renderable/dipoleobject.h>
-#include <mne/viz/backends/qt/3d/renderable/electrodeobject.h>
+#include <mne/viz/brain/dipoleobject.h>
+#include <mne/viz/brain/electrodeobject.h>
 #include <mne/ieeg/ieeg_implantation.h>
-#include <mne/viz/backends/qt/3d/renderable/networkobject.h>
+#include <mne/viz/brain/networkobject.h>
 #include <mne/viz/backends/qt/3d/renderable/sourceestimateoverlay.h>
 #include <mne/viz/backends/qt/3d/renderable/sliceobject.h>
 #include <mne/viz/backends/qt/3d/renderable/videooverlay.h>
@@ -2070,14 +2070,15 @@ void TestDisp3dBrainView::dipoleObject_basics()
 
     // intersect on empty instance data — returns -1 immediately
     float dist = 0.0f;
-    int idx = obj.intersect(QVector3D(0, 0, 1), QVector3D(0, 0, -1), dist);
+    int idx = obj.intersect(Eigen::Vector3f(0, 0, 1), Eigen::Vector3f(0, 0, -1), dist);
     QCOMPARE(idx, -1);
 
     // setSelected with out-of-range indices — must not crash
     obj.setSelected(-1, true);
     obj.setSelected(0, false);
 
-    QVector3D bMin, bMax;
+    Eigen::Vector3f bMin;
+    Eigen::Vector3f bMax;
     QVERIFY(!obj.boundingBox(bMin, bMax));
 
     QApplication::processEvents();
@@ -2372,33 +2373,35 @@ void TestDisp3dBrainView::dipoleObject_extended()
     QVERIFY(obj.instanceCount() > 0);
 
     // The bounds span the dipole positions
-    QVector3D pos, bMax;
+    Eigen::Vector3f pos;
+    Eigen::Vector3f bMax;
     QVERIFY(obj.boundingBox(pos, bMax));
-    QVERIFY((pos - QVector3D(-0.01f, 0.01f, 0.03f)).length() < 1e-7f);
-    QVERIFY((bMax - QVector3D(0.01f, 0.02f, 0.04f)).length() < 1e-7f);
+    QVERIFY((pos - Eigen::Vector3f(-0.01f, 0.01f, 0.03f)).norm() < 1e-7f);
+    QVERIFY((bMax - Eigen::Vector3f(0.01f, 0.02f, 0.04f)).norm() < 1e-7f);
 
     // applyTransform places the loaded dipoles; it replaces the previous transform instead of stacking on it,
     // so a transform can be re-applied whenever it changes
     const auto minCorner = [&obj] {
-        QVector3D lo, hi;
+        Eigen::Vector3f lo;
+        Eigen::Vector3f hi;
         obj.boundingBox(lo, hi);
         return lo;
     };
-    QMatrix4x4 identity;
+    const Eigen::Matrix4f identity = Eigen::Matrix4f::Identity();
     obj.applyTransform(identity);
-    QCOMPARE(minCorner(), pos);
+    QVERIFY(minCorner() == pos);
 
-    QMatrix4x4 translate;
-    translate.translate(0.01f, 0.0f, 0.0f);
+    Eigen::Matrix4f translate = Eigen::Matrix4f::Identity();
+    translate(0, 3) = 0.01f;
     obj.applyTransform(translate);
     obj.applyTransform(translate);
-    QVERIFY((minCorner() - (pos + QVector3D(0.01f, 0.0f, 0.0f))).length() < 1e-7f);
+    QVERIFY((minCorner() - (pos + Eigen::Vector3f(0.01f, 0.0f, 0.0f))).norm() < 1e-7f);
     obj.applyTransform(identity);
-    QVERIFY((minCorner() - pos).length() < 1e-7f);
+    QVERIFY((minCorner() - pos).norm() < 1e-7f);
 
     // intersect — ray casting against cone geometry
     float dist = 0.0f;
-    int hitIdx = obj.intersect(QVector3D(0, 10, 0), QVector3D(0, -1, 0), dist);
+    int hitIdx = obj.intersect(Eigen::Vector3f(0, 10, 0), Eigen::Vector3f(0, -1, 0), dist);
     Q_UNUSED(hitIdx);
     Q_UNUSED(dist);
 

@@ -9,37 +9,29 @@
  * @date     March 2026
  * @brief    Instanced connectivity-graph renderable: node spheres and edge cylinders coloured by weight through a named colormap.
  *
- * NetworkObject mirrors the @ref mne::viz::qt::DipoleObject instancing pattern
+ * NetworkObject mirrors the @ref mne::viz::DipoleObject instancing pattern
  * but splits the scene into two meshes &mdash; nodes (spheres) and
  * edges (cylinders) &mdash; each with its own vertex / index / instance
  * buffer triple. The node mesh re-uses the dipole instance layout
  * for shader compatibility (model + colour + isSelected), so a
  * single pipeline serves both renderables.
  *
- * @ref mne::viz::qt::NetworkObject::setColormap "setColormap" selects the palette (Viridis, Hot, Jet, ...) used
- * to map edge weight to RGBA; @ref mne::viz::qt::NetworkObject::setThreshold "setThreshold" prunes edges and
+ * @ref mne::viz::NetworkObject::setColormap "setColormap" selects the palette (Viridis, Hot, Jet, ...) used
+ * to map edge weight to RGBA; @ref mne::viz::NetworkObject::setThreshold "setThreshold" prunes edges and
  * nodes below a normalised cut-off and regenerates the instance
  * stream without touching the underlying @ref mne::Network.
  */
 
-#ifndef NETWORKOBJECT_H
-#define NETWORKOBJECT_H
+#ifndef VIZ_NETWORKOBJECT_H
+#define VIZ_NETWORKOBJECT_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
-#include "../../../../brain/rendertypes.h"
+#include "../viz_global.h"
+#include "rendertypes.h"
 #include <mne/connectivity/network/network.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QMatrix4x4>
-#include <QVector3D>
-#include <QColor>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -49,7 +41,7 @@
 #include <string>
 #include <vector>
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -61,7 +53,7 @@ namespace mne::viz::qt
  *
  * @snippet ex_disp3d_scene/main.cpp network_object_usage
  */
-class VIZQTSHARED_EXPORT NetworkObject
+class VIZSHARED_EXPORT NetworkObject
 {
 public:
     //=========================================================================================================
@@ -191,8 +183,8 @@ private:
     std::vector<std::byte> m_nodeInstanceData;
     int m_nodeIndexCount = 0;
     int m_nodeInstanceCount = 0;
-    quint64 m_nodeGeometryGeneration = 0;
-    quint64 m_nodeInstanceGeneration = 0;
+    std::uint64_t m_nodeGeometryGeneration = 0;
+    std::uint64_t m_nodeInstanceGeneration = 0;
 
     // ── Edge GPU resources ──────────────────────────────────────────────
     std::vector<std::byte> m_edgeVertexData;
@@ -200,12 +192,12 @@ private:
     std::vector<std::byte> m_edgeInstanceData;
     int m_edgeIndexCount = 0;
     int m_edgeInstanceCount = 0;
-    quint64 m_edgeGeometryGeneration = 0;
-    quint64 m_edgeInstanceGeneration = 0;
+    std::uint64_t m_edgeGeometryGeneration = 0;
+    std::uint64_t m_edgeInstanceGeneration = 0;
 
     bool m_visible = true;
 };
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // NETWORKOBJECT_H
+#endif // VIZ_NETWORKOBJECT_H

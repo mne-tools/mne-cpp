@@ -20,24 +20,18 @@
  * Positions are in metres, in the frame of the brain surfaces (FreeSurfer surface RAS).
  */
 
-#ifndef ELECTRODEOBJECT_H
-#define ELECTRODEOBJECT_H
+#ifndef VIZ_ELECTRODEOBJECT_H
+#define VIZ_ELECTRODEOBJECT_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
-#include "../../../../brain/rendertypes.h"
+#include "../viz_global.h"
+#include "../figures/style.h"
+#include "rendertypes.h"
 
 #include <mne/ieeg/ieeg_implantation.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QColor>
-#include <QVector3D>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -45,6 +39,7 @@
 
 #include <cstddef>
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -52,7 +47,7 @@
 // DEFINE NAMESPACE mne::viz::qt
 //=============================================================================================================
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -61,7 +56,7 @@ namespace mne::viz::qt
  *
  * @snippet ex_disp3d_scene/main.cpp electrode_object_usage
  */
-class VIZQTSHARED_EXPORT ElectrodeObject
+class VIZSHARED_EXPORT ElectrodeObject
 {
 public:
     // Drawn sizes in metres. Real contacts are about 0.8 mm (depth) and 4 mm (subdural) across;
@@ -80,7 +75,7 @@ public:
      * @param[in] index  Lead index.
      * @return Lead colour: golden-angle hues, so neighbouring leads differ clearly.
      */
-    static QColor leadColor(int index);
+    static Color leadColor(int index);
 
     //=========================================================================================================
     /**
@@ -109,7 +104,7 @@ public:
      * Contacts without a value keep the colour of their lead.
      *
      * @param[in] values    Map of contact name -> scalar value.
-     * @param[in] colormap  mne::viz::qt::ColorMap name.
+     * @param[in] colormap  mne::viz::ColorMap name.
      */
     void setContactValues(const std::map<std::string, float>& values, const std::string& colormap = "Hot");
 
@@ -172,7 +167,7 @@ public:
      * @param[out] dist       Distance to the nearest hit.
      * @return Index of the nearest contact hit, or -1.
      */
-    int intersect(const QVector3D& rayOrigin, const QVector3D& rayDir, float& dist) const;
+    int intersect(const Eigen::Vector3f& rayOrigin, const Eigen::Vector3f& rayDir, float& dist) const;
 
     /**
      * @param[in] index  Contact index.
@@ -222,12 +217,12 @@ public:
     /**
      * @return Axis-aligned bounding box minimum corner (with contact-radius padding).
      */
-    QVector3D boundingBoxMin() const;
+    Eigen::Vector3f boundingBoxMin() const;
 
     /**
      * @return Axis-aligned bounding box maximum corner (with contact-radius padding).
      */
-    QVector3D boundingBoxMax() const;
+    Eigen::Vector3f boundingBoxMax() const;
 
 private:
     /** Per-instance layout shared with the renderer's instanced pipelines. */
@@ -243,16 +238,16 @@ private:
     float contactRadius(int contact) const;
 
     mne::IeegImplantation m_implantation;
-    std::vector<int> m_leadOfContact;    /**< Lead index per contact. */
-    std::vector<QColor> m_contactColors; /**< Per contact; invalid uses the lead colour. */
+    std::vector<int> m_leadOfContact;                  /**< Lead index per contact. */
+    std::vector<std::optional<Color>> m_contactColors; /**< Per contact; none uses the lead colour. */
     std::map<std::string, float> m_contactValues;
     std::string m_colormap;
     float m_valueMin = 0.0f;
     float m_valueMax = 0.0f;
     int m_selectedContact = -1;
     int m_hoveredContact = -1;
-    QVector3D m_bbMin;
-    QVector3D m_bbMax;
+    Eigen::Vector3f m_bbMin = Eigen::Vector3f::Zero();
+    Eigen::Vector3f m_bbMax = Eigen::Vector3f::Zero();
     bool m_visible = true;
 
     // Unit sphere and unit cylinder (along +y, centred) shared by all instances
@@ -266,8 +261,8 @@ private:
     std::vector<std::byte> m_contactInstances;
     std::vector<std::byte> m_bodyInstances;
     int m_bodyCount = 0;
-    quint64 m_contactGeneration = 0;
-    quint64 m_bodyGeneration = 0;
+    std::uint64_t m_contactGeneration = 0;
+    std::uint64_t m_bodyGeneration = 0;
     RenderKey m_contactRenderKey;
     RenderKey m_bodyRenderKey;
 
@@ -278,6 +273,6 @@ private:
     int leadOf(int contact) const;
 };
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // ELECTRODEOBJECT_H
+#endif // VIZ_ELECTRODEOBJECT_H

@@ -15,7 +15,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/viz/backends/qt/3d/renderable/electrodeobject.h>
+#include <mne/viz/brain/electrodeobject.h>
 #include <mne/ieeg/ieeg_implantation.h>
 
 //=============================================================================================================
@@ -24,14 +24,12 @@
 
 #include <QtTest>
 #include <QObject>
-#include <QVector3D>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace mne::viz;
-using namespace mne::viz::qt;
 using namespace mne;
 
 namespace
@@ -173,8 +171,8 @@ void TestElectrodeObject::testBoundingBox()
     const IeegImplantation implantation = createTestImplantation(2, 5);
     obj.setImplantation(implantation);
 
-    const QVector3D bbMin = obj.boundingBoxMin();
-    const QVector3D bbMax = obj.boundingBoxMax();
+    const Eigen::Vector3f bbMin = obj.boundingBoxMin();
+    const Eigen::Vector3f bbMax = obj.boundingBoxMax();
     const float pad = ElectrodeObject::kDepthContactRadius - 1e-6f;
     for (const IeegContact& contact : implantation.contacts()) {
         for (int k = 0; k < 3; ++k) {
@@ -227,11 +225,11 @@ void TestElectrodeObject::testGeometryGeneration()
 
     // Drawn sizes follow the lead type: depth contacts are smaller than subdural ones
     float dist = 0.0f;
-    const QVector3D down(0.0f, 0.0f, -1.0f);
-    QCOMPARE(obj.intersect(QVector3D(ElectrodeObject::kDepthContactRadius * 0.9f, 0.0f, 1.0f), down, dist), 3);
+    const Eigen::Vector3f down(0.0f, 0.0f, -1.0f);
+    QCOMPARE(obj.intersect(Eigen::Vector3f(ElectrodeObject::kDepthContactRadius * 0.9f, 0.0f, 1.0f), down, dist), 3);
     QVERIFY(qAbs(dist - (1.0f - 0.0105f - 0.00048f)) < 1e-4f);
-    QCOMPARE(obj.intersect(QVector3D(ElectrodeObject::kDepthContactRadius * 1.1f, 0.0f, 1.0f), down, dist), -1);
-    QCOMPARE(obj.intersect(QVector3D(0.05f + ElectrodeObject::kDepthContactRadius * 1.1f, 0.0f, 1.0f), down, dist), 4);
+    QCOMPARE(obj.intersect(Eigen::Vector3f(ElectrodeObject::kDepthContactRadius * 1.1f, 0.0f, 1.0f), down, dist), -1);
+    QCOMPARE(obj.intersect(Eigen::Vector3f(0.05f + ElectrodeObject::kDepthContactRadius * 1.1f, 0.0f, 1.0f), down, dist), 4);
     QCOMPARE(obj.contactLabel(4), QString("ST1 (strip ST)"));
     QCOMPARE(obj.contactAt(9)->name, QString("GR2"));
     QVERIFY(obj.contactAt(12) == nullptr);

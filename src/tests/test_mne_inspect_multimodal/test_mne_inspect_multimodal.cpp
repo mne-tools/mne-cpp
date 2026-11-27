@@ -28,7 +28,7 @@
 #include <electrodes.h>
 #include <mri_slices.h>
 
-#include <mne/viz/backends/qt/3d/renderable/electrodeobject.h>
+#include <mne/viz/brain/electrodeobject.h>
 #include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
 #include <mne/viz/backends/qt/3d/scene/pickresult.h>
 

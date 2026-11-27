@@ -400,6 +400,11 @@ aliases; replace the old spelling as below.
   `Eigen::Vector3f`/`Eigen::Matrix4f`, colours are `viz::Color`. Qt code
   converts with the public `viz/backends/qt/qtconversions.h` (`toEigen`,
   `toQVector3D`, `toQMatrix`, `toColor`, `toQColor`).
+- The instanced glyphs of the brain view, `DipoleObject`, `ElectrodeObject`,
+  `NetworkObject` and `PolylineObject`, moved to `viz/brain/` without Qt
+  (Eigen positions and transforms, `viz::Color`); `viz/brain/instancing.h`
+  builds their model matrices, and `viz::color_from_hsl` and `viz::darker`
+  join the colour maps in `viz/figures/colormap.h`.
 - Views run in any backend through `viz/host/surface.h`: a backend implements
   `viz::Surface` (redraw requests, clock, pointer shape) and drives a
   `viz::SurfaceClient` (resize, pointer, wheel and key events, animation

@@ -9,9 +9,13 @@ project(mne_viz
 
 set(SOURCES
   brain/brainsurface.cpp
+  brain/dipoleobject.cpp
+  brain/electrodeobject.cpp
   brain/geometryinfo.cpp
   brain/interpolation.cpp
   brain/meshfactory.cpp
+  brain/networkobject.cpp
+  brain/polylineobject.cpp
   figures/average_layout.cpp
   figures/average_tile.cpp
   figures/bar_chart.cpp
@@ -55,9 +59,14 @@ set(SOURCES
 
 set(HEADERS
   brain/brainsurface.h
+  brain/dipoleobject.h
+  brain/electrodeobject.h
   brain/geometryinfo.h
   brain/interpolation.h
   brain/meshfactory.h
+  brain/instancing.h
+  brain/networkobject.h
+  brain/polylineobject.h
   brain/rendertypes.h
   figures/average_layout.h
   figures/average_tile.h
@@ -125,6 +134,9 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   mne_fiff
   mne_fs
   mne_mne
+  mne_inv
+  mne_connectivity
+  mne_ieeg
   Eigen3::Eigen)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_VIZ_LIBRARY)

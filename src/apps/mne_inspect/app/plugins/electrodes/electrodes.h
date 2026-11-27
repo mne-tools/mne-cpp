@@ -9,7 +9,7 @@
  * @date     May, 2026
  * @brief    ElectrodesPlugin — mne_inspect plugin that loads an sEEG / ECoG
  *           implantation from BIDS, FIFF or CSV into an mne::IeegImplantation,
- *           draws it through mne::viz::qt::ElectrodeObject, and publishes the
+ *           draws it through mne::viz::ElectrodeObject, and publishes the
  *           selection through MultimodalScene.
  *
  *           NOTE: mne_inspect does not yet ship a plugin loader. The plugin
@@ -25,7 +25,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/viz/backends/qt/3d/renderable/electrodeobject.h>
+#include <mne/viz/brain/electrodeobject.h>
 #include <mne/viz/backends/qt/3d/scene/pickresult.h>
 
 //=============================================================================================================
@@ -76,7 +76,7 @@ enum class ElectrodeSource
  *     FIFF (`FiffDigPointSet`) or CSV (`label,x,y,z[,lead,type]`).
  *   - Group contacts into the depth leads, strips and grids of an
  *     `mne::IeegImplantation`.
- *   - Hand the resulting `mne::viz::qt::ElectrodeObject` to the host through
+ *   - Hand the resulting `mne::viz::ElectrodeObject` to the host through
  *     @ref electrodeObject() and register it as a `SceneLayerKind::Electrode`
  *     layer when @ref attachScene() has been called.
  *   - Translate scene picks (`mne::viz::qt::PickResult` with
@@ -213,7 +213,7 @@ public:
     /**
      * @return Underlying renderable. Owned by the plugin; never null.
      */
-    mne::viz::qt::ElectrodeObject* electrodeObject() const
+    mne::viz::ElectrodeObject* electrodeObject() const
     {
         return m_object.get();
     }
@@ -292,7 +292,7 @@ private:
     void publishToScene();
     void rebuild(const mne::IeegImplantation& implantation);
 
-    std::unique_ptr<mne::viz::qt::ElectrodeObject> m_object;
+    std::unique_ptr<mne::viz::ElectrodeObject> m_object;
     mne::viz::qt::MultimodalScene* m_scene = nullptr;
     ElectrodeSource m_source = ElectrodeSource::None;
     QString m_sourcePath;

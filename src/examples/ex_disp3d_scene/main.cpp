@@ -24,11 +24,11 @@
 #include <mne/viz/brain/brainsurface.h>
 #include <mne/viz/brain/meshfactory.h>
 #include <mne/viz/brain/rendertypes.h>
-#include <mne/viz/backends/qt/3d/renderable/dipoleobject.h>
-#include <mne/viz/backends/qt/3d/renderable/electrodeobject.h>
+#include <mne/viz/brain/dipoleobject.h>
+#include <mne/viz/brain/electrodeobject.h>
 #include <mne/ieeg/ieeg_implantation.h>
-#include <mne/viz/backends/qt/3d/renderable/networkobject.h>
-#include <mne/viz/backends/qt/3d/renderable/polylineobject.h>
+#include <mne/viz/brain/networkobject.h>
+#include <mne/viz/brain/polylineobject.h>
 #include <mne/viz/backends/qt/3d/renderable/sliceobject.h>
 #include <mne/viz/backends/qt/3d/renderable/sourceestimateoverlay.h>
 #include <mne/viz/backends/qt/3d/renderable/videooverlay.h>
@@ -144,7 +144,7 @@ int main(int argc, char* argv[])
     electrodes.setImplantation(IeegImplantation(shaft));
     electrodes.selectContact("LH3");
     float contactDistance = 0.0f;
-    const int pickedContact = electrodes.intersect(QVector3D(0.017f, -0.020f, 1.0f), QVector3D(0.0f, 0.0f, -1.0f), contactDistance);
+    const int pickedContact = electrodes.intersect(Vector3f(0.017f, -0.020f, 1.0f), Vector3f(0.0f, 0.0f, -1.0f), contactDistance);
     //! [electrode_object_usage]
     ok &= expect(electrodes.totalContactCount() == 4 && electrodes.selectedContact() == "LH3" && electrodes.contactStreams().instanceCount == 4 && electrodes.bodyStreams().instanceCount == 1 && electrodes.contactLabel(pickedContact) == "LH3 (depth lead LH)",
                  "ElectrodeObject: 4 contacts on one shaft, a ray through LH3 picks it");
@@ -279,7 +279,7 @@ int main(int argc, char* argv[])
     DipoleObject dipoleGlyphs;
     dipoleGlyphs.load(dipoles); // one cone per dipole, scaled by moment
     float dipoleDistance = 0.0f;
-    const int pickedDipole = dipoleGlyphs.intersect(QVector3D(0.03f, 0.0f, 0.2f), QVector3D(0.0f, 0.0f, -1.0f), dipoleDistance);
+    const int pickedDipole = dipoleGlyphs.intersect(Vector3f(0.03f, 0.0f, 0.2f), Vector3f(0.0f, 0.0f, -1.0f), dipoleDistance);
     //! [dipole_object_usage]
     ok &= expect(dipoleGlyphs.instanceCount() == 2 && pickedDipole == 1 && dipoleDistance > 0.13f && dipoleDistance < 0.15f,
                  std::format("DipoleObject: a ray through the second dipole picks index {} at {:g} m", pickedDipole, dipoleDistance));
@@ -313,7 +313,7 @@ int main(int argc, char* argv[])
     PolylineObject track;
     track.setPoints({Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.001f, 0.0f, 0.0f), Vector3f(0.002f, 0.001f, 0.0f)});
     track.setRadius(0.0005f);
-    track.setGradient(Qt::blue, Qt::red); // oldest to newest
+    track.setGradient(Color{0, 0, 255, 255}, Color{255, 0, 0, 255}); // oldest to newest
     //! [polyline_object_usage]
     ok &= expect(track.hasData() && track.instanceCount() == 2, "PolylineObject: four positions with one repeat give two segments");
 

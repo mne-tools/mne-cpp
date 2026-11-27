@@ -16,27 +16,28 @@
 
 #include "networkobject.h"
 
-#include <mne/viz/backends/qt/plots/helpers/colormap.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QQuaternion>
+#include "instancing.h"
+#include "../figures/colormap.h"
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <map>
 #include <numbers>
+#include <string>
+#include <vector>
 
 using namespace mne;
 using namespace mne::viz;
-using namespace mne::viz::qt;
+using namespace mne::viz;
 using namespace Eigen;
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -53,18 +54,18 @@ NetworkObject::~NetworkObject() = default;
 
 InstancedStreams NetworkObject::nodeStreams() const
 {
-    return {{m_nodeVertexData.data(), static_cast<quint32>(m_nodeVertexData.size()), m_nodeGeometryGeneration},
-            {m_nodeIndexData.data(), static_cast<quint32>(m_nodeIndexData.size()), m_nodeGeometryGeneration},
-            {m_nodeInstanceData.data(), static_cast<quint32>(m_nodeInstanceCount * sizeof(InstanceData)), m_nodeInstanceGeneration},
+    return {{m_nodeVertexData.data(), static_cast<std::uint32_t>(m_nodeVertexData.size()), m_nodeGeometryGeneration},
+            {m_nodeIndexData.data(), static_cast<std::uint32_t>(m_nodeIndexData.size()), m_nodeGeometryGeneration},
+            {m_nodeInstanceData.data(), static_cast<std::uint32_t>(m_nodeInstanceCount * sizeof(InstanceData)), m_nodeInstanceGeneration},
             m_nodeIndexCount,
             m_nodeInstanceCount};
 }
 
 InstancedStreams NetworkObject::edgeStreams() const
 {
-    return {{m_edgeVertexData.data(), static_cast<quint32>(m_edgeVertexData.size()), m_edgeGeometryGeneration},
-            {m_edgeIndexData.data(), static_cast<quint32>(m_edgeIndexData.size()), m_edgeGeometryGeneration},
-            {m_edgeInstanceData.data(), static_cast<quint32>(m_edgeInstanceCount * sizeof(InstanceData)), m_edgeInstanceGeneration},
+    return {{m_edgeVertexData.data(), static_cast<std::uint32_t>(m_edgeVertexData.size()), m_edgeGeometryGeneration},
+            {m_edgeIndexData.data(), static_cast<std::uint32_t>(m_edgeIndexData.size()), m_edgeGeometryGeneration},
+            {m_edgeInstanceData.data(), static_cast<std::uint32_t>(m_edgeInstanceCount * sizeof(InstanceData)), m_edgeInstanceGeneration},
             m_edgeIndexCount,
             m_edgeInstanceCount};
 }
@@ -114,19 +115,19 @@ void NetworkObject::createNodeGeometry()
     // Start with icosahedron
     const float t = (1.0f + std::sqrt(5.0f)) / 2.0f;
 
-    std::vector<QVector3D> vertices = {
-        QVector3D(-1, t, 0).normalized() * radius,
-        QVector3D(1, t, 0).normalized() * radius,
-        QVector3D(-1, -t, 0).normalized() * radius,
-        QVector3D(1, -t, 0).normalized() * radius,
-        QVector3D(0, -1, t).normalized() * radius,
-        QVector3D(0, 1, t).normalized() * radius,
-        QVector3D(0, -1, -t).normalized() * radius,
-        QVector3D(0, 1, -t).normalized() * radius,
-        QVector3D(t, 0, -1).normalized() * radius,
-        QVector3D(t, 0, 1).normalized() * radius,
-        QVector3D(-t, 0, -1).normalized() * radius,
-        QVector3D(-t, 0, 1).normalized() * radius,
+    std::vector<Eigen::Vector3f> vertices = {
+        Eigen::Vector3f(-1, t, 0).normalized() * radius,
+        Eigen::Vector3f(1, t, 0).normalized() * radius,
+        Eigen::Vector3f(-1, -t, 0).normalized() * radius,
+        Eigen::Vector3f(1, -t, 0).normalized() * radius,
+        Eigen::Vector3f(0, -1, t).normalized() * radius,
+        Eigen::Vector3f(0, 1, t).normalized() * radius,
+        Eigen::Vector3f(0, -1, -t).normalized() * radius,
+        Eigen::Vector3f(0, 1, -t).normalized() * radius,
+        Eigen::Vector3f(t, 0, -1).normalized() * radius,
+        Eigen::Vector3f(t, 0, 1).normalized() * radius,
+        Eigen::Vector3f(-t, 0, -1).normalized() * radius,
+        Eigen::Vector3f(-t, 0, 1).normalized() * radius,
     };
 
     std::vector<uint32_t> indices = {
@@ -203,7 +204,7 @@ void NetworkObject::createNodeGeometry()
             if (it != midpointCache.end())
                 return it->second;
 
-            QVector3D mid = ((vertices[i0] + vertices[i1]) / 2.0f).normalized() * radius;
+            const Eigen::Vector3f mid = ((vertices[i0] + vertices[i1]) / 2.0f).normalized() * radius;
             uint32_t idx = static_cast<uint32_t>(vertices.size());
             vertices.push_back(mid);
             midpointCache[key] = idx;
@@ -229,7 +230,7 @@ void NetworkObject::createNodeGeometry()
     std::vector<VertexData> vd;
     vd.reserve(vertices.size());
     for (const auto& v : vertices) {
-        QVector3D n = v.normalized();
+        const Eigen::Vector3f n = v.normalized();
         vd.push_back({v.x(), v.y(), v.z(), n.x(), n.y(), n.z()});
     }
 
@@ -270,8 +271,7 @@ void NetworkObject::createEdgeGeometry()
         float x = radius * std::cos(angle);
         float z = radius * std::sin(angle);
 
-        QVector3D normal(x, 0, z);
-        normal.normalize();
+        const Eigen::Vector3f normal = Eigen::Vector3f(x, 0.0f, z).normalized();
 
         // Top side vertex
         vertices.push_back({x, halfHeight, z, normal.x(), normal.y(), normal.z()});
@@ -353,7 +353,7 @@ void NetworkObject::buildNodeInstances()
         iMaxDegree = 1;
 
     const VisualizationInfo& vizInfo = m_network.visualization_info();
-    const QString colormap = QString::fromStdString(vizInfo.colormap.empty() ? m_colormap : vizInfo.colormap);
+    const std::string& colormap = vizInfo.colormap.empty() ? m_colormap : vizInfo.colormap;
 
     std::vector<InstanceData> instances;
     instances.reserve(nodes.size());
@@ -364,31 +364,19 @@ void NetworkObject::buildNodeInstances()
             continue;
 
         const Vector3f& vert = nodes[i].position();
-        QVector3D pos(vert(0), vert(1), vert(2));
 
         // Scale: nodes with higher degree are larger
         // Range: 0.0006 to 0.005 (same as mne_viz_qt)
         float scaleFactor = (static_cast<float>(degree) / static_cast<float>(iMaxDegree)) * (0.005f - 0.0006f) + 0.0006f;
 
-        QMatrix4x4 m;
-        m.translate(pos);
-        m.scale(scaleFactor);
-
         InstanceData inst;
-        const float* mPtr = m.constData();
-        for (int j = 0; j < 16; ++j)
-            inst.model[j] = mPtr[j];
+        storeMatrix(modelMatrix(vert, Eigen::Quaternionf::Identity(), Eigen::Vector3f::Constant(scaleFactor)), inst.model);
 
         // Color: colormap-based or fixed
         if (vizInfo.coloring == VisualizationInfo::Coloring::colormap) {
             float normalized = static_cast<float>(degree) / static_cast<float>(iMaxDegree);
-            QRgb rgb = ColorMap::valueToColor(normalized, colormap);
-            QColor color(rgb);
-            float alpha = std::pow(normalized, 4.0f); // Same as mne_viz_qt
-            inst.color[0] = color.redF();
-            inst.color[1] = color.greenF();
-            inst.color[2] = color.blueF();
-            inst.color[3] = alpha;
+            storeColor(map_color(colormap, normalized), inst.color);
+            inst.color[3] = std::pow(normalized, 4.0f);
         } else {
             inst.color[0] = vizInfo.node_color[0] / 255.0f;
             inst.color[1] = vizInfo.node_color[1] / 255.0f;
@@ -426,7 +414,7 @@ void NetworkObject::buildEdgeInstances()
         dWeightRange = 1.0;
 
     const VisualizationInfo& vizInfo = m_network.visualization_info();
-    const QString colormap = QString::fromStdString(vizInfo.colormap.empty() ? m_colormap : vizInfo.colormap);
+    const std::string& colormap = vizInfo.colormap.empty() ? m_colormap : vizInfo.colormap;
 
     std::vector<InstanceData> instances;
     instances.reserve(m_network.edge_count(EdgeSet::thresholded));
@@ -438,46 +426,26 @@ void NetworkObject::buildEdgeInstances()
         const Vector3f& vStart = nodes[edge.source()].position();
         const Vector3f& vEnd = nodes[edge.target()].position();
 
-        QVector3D startPos(vStart(0), vStart(1), vStart(2));
-        QVector3D endPos(vEnd(0), vEnd(1), vEnd(2));
-
-        if (startPos == endPos)
+        if (vStart == vEnd)
             continue;
 
         double dWeight = std::fabs(edge.weight());
         if (dWeight == 0.0)
             continue;
 
-        QVector3D diff = endPos - startPos;
-        QVector3D midPoint = startPos + diff / 2.0f;
-        float length = diff.length();
-
-        // Build transform: translate to midpoint, rotate Y-axis to diff direction, scale
         float normalizedWeight = static_cast<float>(std::fabs((dWeight - dMinWeight) / dWeightRange));
 
         // Cylinder radius: proportional to weight, range 0.0001 to 0.001
         float edgeRadius = 0.0001f + normalizedWeight * 0.0009f;
 
-        QMatrix4x4 m;
-        m.translate(midPoint);
-        m.rotate(QQuaternion::rotationTo(QVector3D(0, 1, 0), diff.normalized()));
-        m.scale(edgeRadius, length, edgeRadius);
-
         InstanceData inst;
-        const float* mPtr = m.constData();
-        for (int j = 0; j < 16; ++j)
-            inst.model[j] = mPtr[j];
+        storeMatrix(segmentMatrix(vStart, vEnd, edgeRadius), inst.model);
 
         // Color
         if (vizInfo.coloring == VisualizationInfo::Coloring::colormap) {
             float normalized = (dMaxWeight != 0.0) ? static_cast<float>(std::fabs(dWeight / dMaxWeight)) : 0.0f;
-            QRgb rgb = ColorMap::valueToColor(normalized, colormap);
-            QColor color(rgb);
-            float alpha = std::pow(normalized, 1.5f); // Same as mne_viz_qt
-            inst.color[0] = color.redF();
-            inst.color[1] = color.greenF();
-            inst.color[2] = color.blueF();
-            inst.color[3] = alpha;
+            storeColor(map_color(colormap, normalized), inst.color);
+            inst.color[3] = std::pow(normalized, 1.5f);
         } else {
             inst.color[0] = vizInfo.edge_color[0] / 255.0f;
             inst.color[1] = vizInfo.edge_color[1] / 255.0f;
@@ -499,4 +467,4 @@ void NetworkObject::buildEdgeInstances()
 
 //=============================================================================================================
 
-} // namespace mne::viz::qt
+} // namespace mne::viz

@@ -18,7 +18,7 @@
 
 #include <electrodes.h>
 
-#include <mne/viz/backends/qt/3d/renderable/electrodeobject.h>
+#include <mne/viz/brain/electrodeobject.h>
 #include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
 #include <mne/viz/backends/qt/3d/scene/pickresult.h>
 #include <mne/ieeg/ieeg_implantation.h>

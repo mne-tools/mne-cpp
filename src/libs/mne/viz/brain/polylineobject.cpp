@@ -16,23 +16,19 @@
 
 #include "polylineobject.h"
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QMatrix4x4>
-#include <QQuaternion>
-#include <QVector3D>
+#include "instancing.h"
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <array>
 #include <cmath>
+#include <cstdint>
 #include <numbers>
 #include <vector>
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -45,8 +41,8 @@ PolylineObject::PolylineObject()
 : m_iIndexCount(0)
 , m_iInstanceCount(0)
 , m_fRadius(0.0015f)
-, m_startColor(QColor(60, 120, 255))
-, m_endColor(QColor(255, 80, 40))
+, m_startColor(Color{60, 120, 255, 255})
+, m_endColor(Color{255, 80, 40, 255})
 , m_bVisible(true)
 {
     createSegmentGeometry();
@@ -91,8 +87,7 @@ void PolylineObject::setRadius(float fRadius)
 
 //=============================================================================================================
 
-void PolylineObject::setGradient(const QColor& startColor,
-                                 const QColor& endColor)
+void PolylineObject::setGradient(const Color& startColor, const Color& endColor)
 {
     m_startColor = startColor;
     m_endColor = endColor;
@@ -114,25 +109,24 @@ void PolylineObject::createSegmentGeometry()
     const float fHalfHeight = 0.5f;
 
     std::vector<VertexData> vertices;
-    std::vector<quint32> indices;
+    std::vector<std::uint32_t> indices;
 
     for (int i = 0; i < iSegments; ++i) {
         const float fAngle = 2.0f * static_cast<float>(std::numbers::pi) * static_cast<float>(i) / static_cast<float>(iSegments);
         const float x = std::cos(fAngle);
         const float z = std::sin(fAngle);
 
-        QVector3D normal(x, 0.0f, z);
-        normal.normalize();
+        const Eigen::Vector3f normal = Eigen::Vector3f(x, 0.0f, z).normalized();
 
         vertices.push_back({x, fHalfHeight, z, normal.x(), normal.y(), normal.z()});
         vertices.push_back({x, -fHalfHeight, z, normal.x(), normal.y(), normal.z()});
     }
 
     for (int i = 0; i < iSegments; ++i) {
-        const quint32 uTop = static_cast<quint32>(i * 2);
-        const quint32 uBottom = uTop + 1;
-        const quint32 uNextTop = static_cast<quint32>(((i + 1) % iSegments) * 2);
-        const quint32 uNextBottom = uNextTop + 1;
+        const std::uint32_t uTop = static_cast<std::uint32_t>(i * 2);
+        const std::uint32_t uBottom = uTop + 1;
+        const std::uint32_t uNextTop = static_cast<std::uint32_t>(((i + 1) % iSegments) * 2);
+        const std::uint32_t uNextBottom = uNextTop + 1;
 
         indices.push_back(uTop);
         indices.push_back(uBottom);
@@ -169,11 +163,7 @@ void PolylineObject::buildInstances()
         const Eigen::Vector3f& vecStart = m_vecPoints.at(i);
         const Eigen::Vector3f& vecEnd = m_vecPoints.at(i + 1);
 
-        const QVector3D start(vecStart.x(), vecStart.y(), vecStart.z());
-        const QVector3D end(vecEnd.x(), vecEnd.y(), vecEnd.z());
-
-        const QVector3D direction = end - start;
-        const float fLength = direction.length();
+        const float fLength = (vecEnd - vecStart).norm();
 
         // Two consecutive fits can land on the same position when the subject
         // does not move. Such a segment has no direction to orient a cylinder
@@ -190,21 +180,19 @@ void PolylineObject::buildInstances()
             continue;
         }
 
-        QMatrix4x4 model;
-        model.translate((start + end) * 0.5f);
-        model.rotate(QQuaternion::rotationTo(QVector3D(0.0f, 1.0f, 0.0f),
-                                             direction / fLength));
-        model.scale(m_fRadius, fLength, m_fRadius);
-
         InstanceData instance{};
-        memcpy(instance.model, model.constData(), 16 * sizeof(float));
+        storeMatrix(segmentMatrix(vecStart, vecEnd, m_fRadius), instance.model);
 
         // Grade from the start colour to the end colour so the direction the
         // path was travelled in is visible without extra decoration.
         const float fRatio = (fLastStep > 0.0f) ? (static_cast<float>(i) / fLastStep) : 0.0f;
-        instance.color[0] = static_cast<float>(m_startColor.redF() + (m_endColor.redF() - m_startColor.redF()) * fRatio);
-        instance.color[1] = static_cast<float>(m_startColor.greenF() + (m_endColor.greenF() - m_startColor.greenF()) * fRatio);
-        instance.color[2] = static_cast<float>(m_startColor.blueF() + (m_endColor.blueF() - m_startColor.blueF()) * fRatio);
+        std::array<float, 4> start{};
+        std::array<float, 4> end{};
+        storeColor(m_startColor, start.data());
+        storeColor(m_endColor, end.data());
+        for (int k = 0; k < 3; ++k) {
+            instance.color[k] = start[k] + (end[k] - start[k]) * fRatio;
+        }
         instance.color[3] = 1.0f;
         instance.isSelected = 0.0f;
 
@@ -220,11 +208,11 @@ void PolylineObject::buildInstances()
 
 InstancedStreams PolylineObject::streams() const
 {
-    return {{m_vertexData.data(), quint32(m_vertexData.size()), m_geometryGeneration},
-            {m_indexData.data(), quint32(m_indexData.size()), m_geometryGeneration},
-            {m_instanceData.data(), quint32(m_iInstanceCount * sizeof(InstanceData)), m_instanceGeneration},
+    return {{m_vertexData.data(), std::uint32_t(m_vertexData.size()), m_geometryGeneration},
+            {m_indexData.data(), std::uint32_t(m_indexData.size()), m_geometryGeneration},
+            {m_instanceData.data(), std::uint32_t(m_iInstanceCount * sizeof(InstanceData)), m_instanceGeneration},
             m_iIndexCount,
             m_iInstanceCount};
 }
 
-} // namespace mne::viz::qt
+} // namespace mne::viz

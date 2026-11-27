@@ -13,7 +13,7 @@
  * active camera into a world-space ray and tests it against every
  * selectable scene primitive: per-triangle Moller-Trumbore against
  * @ref mne::viz::BrainSurface meshes, per-arrow segment / cylinder for
- * @ref mne::viz::qt::DipoleObject and ECoG electrodes, and per-sphere for
+ * @ref mne::viz::DipoleObject and ECoG electrodes, and per-sphere for
  * source-space points and digitizer fiducials.
  *
  * The closest hit is returned as a @ref mne::viz::qt::RayHit that names the
@@ -55,10 +55,13 @@ namespace mne::viz
 class BrainSurface;
 } // namespace mne::viz
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 class DipoleObject;
+} // namespace mne::viz
 
+namespace mne::viz::qt
+{
 //=============================================================================================================
 /**
  * @brief Result of a ray–mesh intersection test containing the hit point, triangle index, and distance.

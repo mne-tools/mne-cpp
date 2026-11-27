@@ -20,10 +20,10 @@
 
 #include <rhi/qrhi.h>
 #include "../../../../brain/brainsurface.h"
-#include "../renderable/dipoleobject.h"
-#include "../renderable/electrodeobject.h"
-#include "../renderable/networkobject.h"
-#include "../renderable/polylineobject.h"
+#include "../../../../brain/dipoleobject.h"
+#include "../../../../brain/electrodeobject.h"
+#include "../../../../brain/networkobject.h"
+#include "../../../../brain/polylineobject.h"
 #include "../renderable/videooverlay.h"
 #include "../renderable/sliceobject.h"
 

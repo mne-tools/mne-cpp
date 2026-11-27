@@ -17,7 +17,7 @@
 #include "raypicker.h"
 
 #include "../../../../brain/brainsurface.h"
-#include "../renderable/dipoleobject.h"
+#include "../../../../brain/dipoleobject.h"
 #include "../model/items/abstracttreeitem.h"
 #include "../model/items/digitizertreeitem.h"
 #include "../../qtconversions.h"
@@ -137,7 +137,7 @@ RayHit RayPicker::pick(const QVector3D& rayOrigin,
             continue;
 
         float dist = 0.0f;
-        int dipIdx = dipole->intersect(rayOrigin, rayDir, dist);
+        int dipIdx = dipole->intersect(toEigen(rayOrigin), toEigen(rayDir), dist);
         if (dipIdx != -1 && dist < closestDist) {
             closestDist = dist;
             result.hit = true;

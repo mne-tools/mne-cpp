@@ -22,8 +22,8 @@
  * slot per draw. All slots and uploads of a frame are prepared before its
  * render pass, which then only binds and draws.
  *
- * All scene objects (@ref mne::viz::BrainSurface, @ref mne::viz::qt::DipoleObject,
- * @ref mne::viz::qt::NetworkObject, @ref mne::viz::qt::VideoOverlay) are accepted through opaque
+ * All scene objects (@ref mne::viz::BrainSurface, @ref mne::viz::DipoleObject,
+ * @ref mne::viz::NetworkObject, @ref mne::viz::qt::VideoOverlay) are accepted through opaque
  * pointers so the renderer never pulls in the heavy headers of the
  * modalities it draws.
  */
@@ -70,12 +70,16 @@ namespace mne::viz
 class BrainSurface;
 } // namespace mne::viz
 
+namespace mne::viz
+{
+class PolylineObject;
+class NetworkObject;
+class ElectrodeObject;
+class DipoleObject;
+} // namespace mne::viz
+
 namespace mne::viz::qt
 {
-class DipoleObject;
-class ElectrodeObject;
-class NetworkObject;
-class PolylineObject;
 class VideoOverlay;
 class SliceObject;
 

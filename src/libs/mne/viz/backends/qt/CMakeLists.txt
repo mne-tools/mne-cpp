@@ -119,11 +119,7 @@ set(SOURCES
     3d/model/items/digitizersettreeitem.cpp
     3d/model/items/networktreeitem.cpp
     3d/renderable/sourceestimateoverlay.cpp
-    3d/renderable/dipoleobject.cpp
-    3d/renderable/electrodeobject.cpp
     3d/renderable/sliceobject.cpp
-    3d/renderable/networkobject.cpp
-    3d/renderable/polylineobject.cpp
     3d/scene/multimodalscene.cpp
     3d/scene/sensorfieldmapper.cpp
     3d/scene/rtsensorstreammanager.cpp
@@ -233,11 +229,7 @@ set(HEADERS
     3d/model/items/digitizersettreeitem.h
     3d/model/items/networktreeitem.h
     3d/renderable/sourceestimateoverlay.h
-    3d/renderable/dipoleobject.h
-    3d/renderable/electrodeobject.h
     3d/renderable/sliceobject.h
-    3d/renderable/networkobject.h
-    3d/renderable/polylineobject.h
     3d/renderable/videooverlay.h
     3d/scene/multimodalscene.h
     3d/scene/pickresult.h

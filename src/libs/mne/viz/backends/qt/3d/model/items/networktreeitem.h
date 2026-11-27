@@ -10,7 +10,7 @@
  * @brief    Tree item identifying a connectivity network rendered as instanced nodes and edges.
  *
  * Holds only the unique object key that maps the item back to its
- * @ref mne::Network payload inside @ref mne::viz::qt::NetworkObject. The
+ * @ref mne::Network payload inside @ref mne::viz::NetworkObject. The
  * actual graph (nodes as spheres, edges as cylinders colour-mapped
  * by weight) lives on the GPU as a pair of instanced meshes,
  * regenerated whenever the threshold or colormap changes.

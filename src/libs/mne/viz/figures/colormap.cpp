@@ -26,6 +26,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstdint>
@@ -465,4 +466,56 @@ Color mne::viz::map_color(std::string_view name, double value)
     const Colormap map = colormap_from_name(name).value_or(Colormap::Jet);
     // RedBlue spans [-1, 1]
     return map_color(map, map == Colormap::RedBlue ? 2.0 * value - 1.0 : value);
+}
+
+//=============================================================================================================
+
+Color mne::viz::color_from_hsl(double hue, double saturation, double lightness, double alpha)
+{
+    const double h = (hue - std::floor(hue)) * 6.0;
+    const double s = std::clamp(saturation, 0.0, 1.0);
+    const double l = std::clamp(lightness, 0.0, 1.0);
+    const double chroma = (1.0 - std::abs(2.0 * l - 1.0)) * s;
+    const double x = chroma * (1.0 - std::abs(std::fmod(h, 2.0) - 1.0));
+    const double m = l - chroma / 2.0;
+    double r = 0.0;
+    double g = 0.0;
+    double b = 0.0;
+    if (h < 1.0) {
+        r = chroma;
+        g = x;
+    } else if (h < 2.0) {
+        r = x;
+        g = chroma;
+    } else if (h < 3.0) {
+        g = chroma;
+        b = x;
+    } else if (h < 4.0) {
+        g = x;
+        b = chroma;
+    } else if (h < 5.0) {
+        r = x;
+        b = chroma;
+    } else {
+        r = chroma;
+        b = x;
+    }
+    auto byte = [](double v) {
+        return static_cast<std::uint8_t>(std::lround(std::clamp(v, 0.0, 1.0) * 255.0));
+    };
+    return {byte(r + m), byte(g + m), byte(b + m), byte(alpha)};
+}
+
+//=============================================================================================================
+
+Color mne::viz::darker(Color color, int factor)
+{
+    if (factor <= 100) {
+        return color;
+    }
+    // Hue and saturation stay, so scaling the value scales every channel alike
+    auto scale = [factor](std::uint8_t v) {
+        return static_cast<std::uint8_t>(std::lround(static_cast<double>(v) * 100.0 / factor));
+    };
+    return {scale(color.r), scale(color.g), scale(color.b), color.a};
 }

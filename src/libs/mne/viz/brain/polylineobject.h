@@ -15,26 +15,21 @@
  * This exists as its own renderable rather than reusing NetworkObject, which
  * can also express a chain but is built for connectivity graphs: it draws a
  * sphere at every point, it prunes segments by weight in @ref
- * mne::viz::qt::NetworkObject::setThreshold, and its node ids are qint16, which silently
+ * mne::viz::NetworkObject::setThreshold, and its node ids are qint16, which silently
  * wraps past 32767 points. None of that suits an ordered path, so a polyline
  * of N points here costs N-1 segment instances and nothing else.
  */
 
-#ifndef DISP3DLIB_POLYLINEOBJECT_H
-#define DISP3DLIB_POLYLINEOBJECT_H
+#ifndef VIZ_POLYLINEOBJECT_H
+#define VIZ_POLYLINEOBJECT_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
-#include "../../../../brain/rendertypes.h"
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QColor>
+#include "../viz_global.h"
+#include "../figures/style.h"
+#include "rendertypes.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -61,7 +56,7 @@
 // Deliberately at global scope, matching DipoleObject and NetworkObject. The
 // other renderables in this directory are not namespaced either.
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -76,7 +71,7 @@ namespace mne::viz::qt
  *
  * @snippet ex_disp3d_scene/main.cpp polyline_object_usage
  */
-class VIZQTSHARED_EXPORT PolylineObject
+class VIZSHARED_EXPORT PolylineObject
 {
 public:
     //=========================================================================================================
@@ -126,7 +121,7 @@ public:
      * @param[in] startColor    Colour of the first segment.
      * @param[in] endColor      Colour of the last segment.
      */
-    void setGradient(const QColor& startColor, const QColor& endColor);
+    void setGradient(const Color& startColor, const Color& endColor);
 
     //=========================================================================================================
     /**
@@ -226,17 +221,17 @@ private:
     int m_iIndexCount;    /**< Index count of the unit segment. */
     int m_iInstanceCount; /**< Number of segments. */
 
-    float m_fRadius;     /**< Segment radius in scene units. */
-    QColor m_startColor; /**< Colour of the first segment. */
-    QColor m_endColor;   /**< Colour of the last segment. */
+    float m_fRadius;    /**< Segment radius in scene units. */
+    Color m_startColor; /**< Colour of the first segment. */
+    Color m_endColor;   /**< Colour of the last segment. */
 
-    bool m_bVisible;                  /**< Whether the polyline is drawn. */
-    quint64 m_geometryGeneration = 0; /**< Bumped when the unit segment changes. */
-    quint64 m_instanceGeneration = 0; /**< Bumped when the segments change. */
+    bool m_bVisible;                        /**< Whether the polyline is drawn. */
+    std::uint64_t m_geometryGeneration = 0; /**< Bumped when the unit segment changes. */
+    std::uint64_t m_instanceGeneration = 0; /**< Bumped when the segments change. */
 
     RenderKey m_renderKey;
 };
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // DISP3DLIB_POLYLINEOBJECT_H
+#endif // VIZ_POLYLINEOBJECT_H

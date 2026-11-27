@@ -1152,7 +1152,7 @@ void BrainView::setMriSlicesVisible(bool visible)
 
 //=============================================================================================================
 
-void BrainView::setElectrodes(mne::viz::qt::ElectrodeObject* electrodes)
+void BrainView::setElectrodes(mne::viz::ElectrodeObject* electrodes)
 {
     m_pCore->setElectrodes(electrodes);
 }

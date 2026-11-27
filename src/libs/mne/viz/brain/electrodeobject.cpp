@@ -16,16 +16,10 @@
 
 #include "electrodeobject.h"
 
-#include <mne/viz/backends/qt/plots/helpers/colormap.h>
+#include "instancing.h"
+#include "../figures/colormap.h"
 #include <mne/ieeg/ieeg_surface_map.h>
 #include <mne/viz/views/ray_picking.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QMatrix4x4>
-#include <QQuaternion>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -49,7 +43,7 @@
 //=============================================================================================================
 
 using namespace mne::viz;
-using namespace mne::viz::qt;
+using namespace mne::viz;
 
 namespace
 {
@@ -63,7 +57,7 @@ struct MeshVertex
 void unitSphere(std::vector<std::byte>& vertices, std::vector<std::byte>& indices, int& indexCount)
 {
     const float t = (1.0f + std::sqrt(5.0f)) / 2.0f;
-    std::vector<QVector3D> v = {{-1, t, 0}, {1, t, 0}, {-1, -t, 0}, {1, -t, 0}, {0, -1, t}, {0, 1, t}, {0, -1, -t}, {0, 1, -t}, {t, 0, -1}, {t, 0, 1}, {-t, 0, -1}, {-t, 0, 1}};
+    std::vector<Eigen::Vector3f> v = {{-1.0f, t, 0.0f}, {1.0f, t, 0.0f}, {-1.0f, -t, 0.0f}, {1.0f, -t, 0.0f}, {0.0f, -1.0f, t}, {0.0f, 1.0f, t}, {0.0f, -1.0f, -t}, {0.0f, 1.0f, -t}, {t, 0.0f, -1.0f}, {t, 0.0f, 1.0f}, {-t, 0.0f, -1.0f}, {-t, 0.0f, 1.0f}};
     for (auto& p : v)
         p.normalize();
     std::vector<uint32_t> idx = {0, 11, 5, 0, 5, 1, 0, 1, 7, 0, 7, 10, 0, 10, 11, 1, 5, 9, 5, 11, 4, 11, 10, 2, 10, 7, 6, 7, 1, 8,
@@ -166,7 +160,7 @@ void ElectrodeObject::setImplantation(const mne::IeegImplantation& implantation)
         for (const int c : leads[l].contacts)
             m_leadOfContact[c] = l;
     }
-    m_contactColors.assign(contactCount, QColor());
+    m_contactColors.assign(contactCount, std::nullopt);
     m_contactValues.clear();
     m_selectedContact = -1;
     m_hoveredContact = -1;
@@ -207,12 +201,11 @@ void ElectrodeObject::setContactValues(const std::map<std::string, float>& value
     }
 
     const auto& contacts = m_implantation.contacts();
-    std::ranges::fill(m_contactColors, QColor());
-    const QString colormapName = QString::fromStdString(colormap);
+    std::ranges::fill(m_contactColors, std::nullopt);
     for (int c = 0; c < int(contacts.size()); ++c) {
         const auto it = values.find(contacts[c].name);
         if (it != values.end())
-            m_contactColors[c] = QColor::fromRgb(mne::viz::qt::ColorMap::valueToColor(normalized(it->second), colormapName));
+            m_contactColors[c] = map_color(colormap, normalized(it->second));
     }
     buildContactInstances();
 }
@@ -222,7 +215,7 @@ void ElectrodeObject::setContactValues(const std::map<std::string, float>& value
 void ElectrodeObject::clearContactValues()
 {
     m_contactValues.clear();
-    std::ranges::fill(m_contactColors, QColor());
+    std::ranges::fill(m_contactColors, std::nullopt);
     buildContactInstances();
 }
 
@@ -264,12 +257,11 @@ std::vector<uint32_t> ElectrodeObject::surfaceColors(const Eigen::MatrixX3f& ver
     const Eigen::VectorXd reach = weights * hasValue;
 
     std::vector<uint32_t> colors(static_cast<std::size_t>(vertices.rows()), packABGR(0, 0, 0, 0));
-    const QString colormapName = QString::fromStdString(m_colormap);
     for (int v = 0; v < std::ssize(colors); ++v) {
         if (reach(v) <= 0.0)
             continue;
-        const QRgb rgb = mne::viz::qt::ColorMap::valueToColor(normalized(static_cast<float>(weighted(v) / reach(v))), colormapName);
-        colors[v] = packABGR(qRed(rgb), qGreen(rgb), qBlue(rgb), static_cast<uint32_t>(255.0 * std::min(1.0, reach(v))));
+        const Color rgb = map_color(m_colormap, normalized(static_cast<float>(weighted(v) / reach(v))));
+        colors[v] = packABGR(rgb.r, rgb.g, rgb.b, static_cast<uint32_t>(255.0 * std::min(1.0, reach(v))));
     }
     return colors;
 }
@@ -308,10 +300,10 @@ std::string ElectrodeObject::selectedContact() const
 
 //=============================================================================================================
 
-QColor ElectrodeObject::leadColor(int index)
+Color ElectrodeObject::leadColor(int index)
 {
     const double hue = std::fmod(double(index) * 0.618033988749895, 1.0);
-    return QColor::fromHslF(float(hue), 0.72f, 0.62f);
+    return color_from_hsl(hue, 0.72, 0.62);
 }
 
 //=============================================================================================================
@@ -332,16 +324,10 @@ void ElectrodeObject::buildContactInstances()
     instances.reserve(size_t(contacts.size()));
     for (int c = 0; c < int(contacts.size()); ++c) {
         const Eigen::Vector3f& p = contacts[c].position;
-        QMatrix4x4 model;
-        model.translate(p.x(), p.y(), p.z());
-        model.scale(contactRadius(c));
-        const QColor color = (c < std::ssize(m_contactColors) && m_contactColors[c].isValid()) ? m_contactColors[c] : leadColor(std::max(0, leadOf(c)));
+        const Color color = (c < std::ssize(m_contactColors) && m_contactColors[c]) ? *m_contactColors[c] : leadColor(std::max(0, leadOf(c)));
         InstanceData d;
-        std::memcpy(d.model, model.constData(), sizeof(d.model));
-        d.color[0] = float(color.redF());
-        d.color[1] = float(color.greenF());
-        d.color[2] = float(color.blueF());
-        d.color[3] = float(color.alphaF());
+        storeMatrix(modelMatrix(p, Eigen::Quaternionf::Identity(), Eigen::Vector3f::Constant(contactRadius(c))), d.model);
+        storeColor(color, d.color);
         d.isSelected = (c == m_selectedContact || c == m_hoveredContact) ? 1.0f : 0.0f;
         instances.push_back(d);
     }
@@ -354,28 +340,19 @@ void ElectrodeObject::buildContactInstances()
 void ElectrodeObject::buildBodies()
 {
     std::vector<InstanceData> instances;
-    auto addCylinder = [&](const QVector3D& from, const QVector3D& to, float radius, const QColor& color) {
-        const QVector3D axis = to - from;
-        const float length = axis.length();
-        if (length < 1e-6f)
+    auto addCylinder = [&](const Eigen::Vector3f& from, const Eigen::Vector3f& to, float radius, const Color& color) {
+        if ((to - from).norm() < 1e-6f)
             return;
-        QMatrix4x4 model;
-        model.translate((from + to) * 0.5f);
-        model.rotate(QQuaternion::rotationTo(QVector3D(0.0f, 1.0f, 0.0f), axis / length));
-        model.scale(radius, length, radius);
         InstanceData d;
-        std::memcpy(d.model, model.constData(), sizeof(d.model));
-        d.color[0] = float(color.redF());
-        d.color[1] = float(color.greenF());
-        d.color[2] = float(color.blueF());
+        storeMatrix(segmentMatrix(from, to, radius), d.model);
+        storeColor(color, d.color);
         d.color[3] = 1.0f;
         d.isSelected = 0.0f;
         instances.push_back(d);
     };
     const auto& contacts = m_implantation.contacts();
-    auto pos = [&](int c) {
-        const Eigen::Vector3f& p = contacts[c].position;
-        return QVector3D(p.x(), p.y(), p.z());
+    auto pos = [&](int c) -> const Eigen::Vector3f& {
+        return contacts[c].position;
     };
 
     const auto& leads = m_implantation.leads();
@@ -385,18 +362,18 @@ void ElectrodeObject::buildBodies()
         if (order.size() < 2)
             continue;
         // The body is darker than the contacts so these stand out along it
-        const QColor body = leadColor(l).darker(150);
+        const Color body = darker(leadColor(l), 150);
         if (lead.type == mne::IeegLeadType::Depth) {
-            const QVector3D tip = pos(order.front());
-            const QVector3D tail = pos(order.back());
-            const QVector3D dir = (tail - tip).normalized();
+            const Eigen::Vector3f& tip = pos(order.front());
+            const Eigen::Vector3f& tail = pos(order.back());
+            const Eigen::Vector3f dir = (tail - tip).normalized();
             addCylinder(tip - dir * kShaftOvershoot, tail + dir * kShaftOvershoot, kShaftRadius, body);
             continue;
         }
         // Strips and grids: ties between neighbours along rows, and down columns for a grid of known shape
         const int cols = (lead.type == mne::IeegLeadType::Grid && lead.cols > 0) ? lead.cols : int(order.size());
         auto tie = [&](int i, int j) {
-            if ((pos(order[i]) - pos(order[j])).length() <= kMaxTieLength)
+            if ((pos(order[i]) - pos(order[j])).norm() <= kMaxTieLength)
                 addCylinder(pos(order[i]), pos(order[j]), kTieRadius, body);
         };
         for (int i = 0; i < int(order.size()); ++i) {
@@ -413,16 +390,16 @@ void ElectrodeObject::buildBodies()
 
 //=============================================================================================================
 
-int ElectrodeObject::intersect(const QVector3D& rayOrigin, const QVector3D& rayDir, float& dist) const
+int ElectrodeObject::intersect(const Eigen::Vector3f& rayOrigin, const Eigen::Vector3f& rayDir, float& dist) const
 {
     int best = -1;
     float bestT = std::numeric_limits<float>::max();
     const auto& contacts = m_implantation.contacts();
-    const viz::Ray ray{{rayOrigin.x(), rayOrigin.y(), rayOrigin.z()}, {rayDir.x(), rayDir.y(), rayDir.z()}};
+    const Ray ray{rayOrigin, rayDir};
     for (int c = 0; c < int(contacts.size()); ++c) {
         const float r = contactRadius(c);
         const Eigen::Vector3f& p = contacts[c].position;
-        const std::optional<viz::SphereCrossing> crossing = viz::intersect_ray_sphere(ray, p, r);
+        const std::optional<SphereCrossing> crossing = intersect_ray_sphere(ray, p, r);
         if (crossing && crossing->entry > 0.0f && crossing->entry < bestT) {
             bestT = crossing->entry;
             best = c;
@@ -459,9 +436,9 @@ std::string ElectrodeObject::contactLabel(int index) const
 
 InstancedStreams ElectrodeObject::contactStreams() const
 {
-    return {{m_sphereVertices.data(), quint32(m_sphereVertices.size()), 0},
-            {m_sphereIndices.data(), quint32(m_sphereIndices.size()), 0},
-            {m_contactInstances.data(), quint32(m_contactInstances.size()), m_contactGeneration},
+    return {{m_sphereVertices.data(), static_cast<std::uint32_t>(m_sphereVertices.size()), 0},
+            {m_sphereIndices.data(), static_cast<std::uint32_t>(m_sphereIndices.size()), 0},
+            {m_contactInstances.data(), static_cast<std::uint32_t>(m_contactInstances.size()), m_contactGeneration},
             m_sphereIndexCount,
             totalContactCount()};
 }
@@ -470,23 +447,23 @@ InstancedStreams ElectrodeObject::contactStreams() const
 
 InstancedStreams ElectrodeObject::bodyStreams() const
 {
-    return {{m_cylinderVertices.data(), quint32(m_cylinderVertices.size()), 0},
-            {m_cylinderIndices.data(), quint32(m_cylinderIndices.size()), 0},
-            {m_bodyInstances.data(), quint32(m_bodyInstances.size()), m_bodyGeneration},
+    return {{m_cylinderVertices.data(), static_cast<std::uint32_t>(m_cylinderVertices.size()), 0},
+            {m_cylinderIndices.data(), static_cast<std::uint32_t>(m_cylinderIndices.size()), 0},
+            {m_bodyInstances.data(), static_cast<std::uint32_t>(m_bodyInstances.size()), m_bodyGeneration},
             m_cylinderIndexCount,
             m_bodyCount};
 }
 
 //=============================================================================================================
 
-QVector3D ElectrodeObject::boundingBoxMin() const
+Eigen::Vector3f ElectrodeObject::boundingBoxMin() const
 {
     return m_bbMin;
 }
 
 //=============================================================================================================
 
-QVector3D ElectrodeObject::boundingBoxMax() const
+Eigen::Vector3f ElectrodeObject::boundingBoxMax() const
 {
     return m_bbMax;
 }
@@ -495,13 +472,13 @@ QVector3D ElectrodeObject::boundingBoxMax() const
 
 void ElectrodeObject::computeBoundingBox()
 {
-    m_bbMin = QVector3D(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
-    m_bbMax = QVector3D(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
+    m_bbMin = Eigen::Vector3f::Constant(std::numeric_limits<float>::max());
+    m_bbMax = Eigen::Vector3f::Constant(std::numeric_limits<float>::lowest());
     const auto& contacts = m_implantation.contacts();
     for (int c = 0; c < int(contacts.size()); ++c) {
         const float pad = contactRadius(c);
-        const QVector3D p(contacts[c].position.x(), contacts[c].position.y(), contacts[c].position.z());
-        m_bbMin = QVector3D(std::min(m_bbMin.x(), p.x() - pad), std::min(m_bbMin.y(), p.y() - pad), std::min(m_bbMin.z(), p.z() - pad));
-        m_bbMax = QVector3D(std::max(m_bbMax.x(), p.x() + pad), std::max(m_bbMax.y(), p.y() + pad), std::max(m_bbMax.z(), p.z() + pad));
+        const Eigen::Vector3f& p = contacts[c].position;
+        m_bbMin = m_bbMin.cwiseMin(p - Eigen::Vector3f::Constant(pad));
+        m_bbMax = m_bbMax.cwiseMax(p + Eigen::Vector3f::Constant(pad));
     }
 }

@@ -21,10 +21,10 @@
 
 #include "brainrenderer.h"
 #include "../../../../brain/brainsurface.h"
-#include "../renderable/dipoleobject.h"
-#include "../renderable/electrodeobject.h"
-#include "../renderable/networkobject.h"
-#include "../renderable/polylineobject.h"
+#include "../../../../brain/dipoleobject.h"
+#include "../../../../brain/electrodeobject.h"
+#include "../../../../brain/networkobject.h"
+#include "../../../../brain/polylineobject.h"
 #include "../renderable/videooverlay.h"
 #include "../renderable/sliceobject.h"
 #include "../core/surfacekeys.h"
@@ -573,7 +573,7 @@ void BrainViewCore::onRowsInserted(const QModelIndex& parent, int first, int las
             auto dipObject = std::make_shared<DipoleObject>();
             dipObject->load(dipItem->ecdSet());
             dipObject->setVisible(dipItem->isVisible());
-            dipObject->applyTransform(itemTransform(item));
+            dipObject->applyTransform(toEigen(itemTransform(item)));
 
             m_itemDipoleMap[item] = dipObject;
         }
@@ -687,7 +687,7 @@ void BrainViewCore::onDataChanged(const QModelIndex& topLeft, const QModelIndex&
             if (absItem && roles.contains(AbstractTreeItem::VisibleRole))
                 m_itemDipoleMap[item]->setVisible(absItem->isVisible());
             if (roles.contains(AbstractTreeItem::TransformRole))
-                m_itemDipoleMap[item]->applyTransform(itemTransform(item));
+                m_itemDipoleMap[item]->applyTransform(toEigen(itemTransform(item)));
         }
     }
     if (transformChanged) {
@@ -747,7 +747,8 @@ void BrainViewCore::updateSceneBounds()
     }
 
     for (auto it = m_itemDipoleMap.cbegin(); it != m_itemDipoleMap.cend(); ++it) {
-        QVector3D dMin, dMax;
+        Eigen::Vector3f dMin;
+        Eigen::Vector3f dMax;
         if (it->second->isVisible() && it->second->boundingBox(dMin, dMax)) {
             min = QVector3D(std::min(min.x(), dMin.x()), std::min(min.y(), dMin.y()), std::min(min.z(), dMin.z()));
             max = QVector3D(std::max(max.x(), dMax.x()), std::max(max.y(), dMax.y()), std::max(max.z(), dMax.z()));
@@ -2696,7 +2697,7 @@ void BrainViewCore::refreshSensorTransforms()
         }
     }
     for (auto it = m_itemDipoleMap.cbegin(); it != m_itemDipoleMap.cend(); ++it) {
-        it->second->applyTransform(itemTransform(it->first));
+        it->second->applyTransform(toEigen(itemTransform(it->first)));
     }
 
     if (m_fieldMapper.isLoaded()) {
@@ -2762,7 +2763,7 @@ void BrainViewCore::castRay(const QPoint& pos)
     int hitContact = -1;
     if (hasValidPane && m_electrodes && m_electrodes->isVisible()) {
         float contactDist = 0.0f;
-        hitContact = m_electrodes->intersect(rayOrigin, rayDir, contactDist);
+        hitContact = m_electrodes->intersect(toEigen(rayOrigin), toEigen(rayDir), contactDist);
         if (hitContact >= 0 && pickResult.hit && pickResult.distance < contactDist)
             hitContact = -1;
         if (hitContact >= 0) {
@@ -3499,7 +3500,7 @@ void BrainViewCore::setSlice(int slotIndex, mne::viz::qt::SliceObject* slice)
     requestUpdate();
 }
 
-void BrainViewCore::setElectrodes(mne::viz::qt::ElectrodeObject* electrodes)
+void BrainViewCore::setElectrodes(mne::viz::ElectrodeObject* electrodes)
 {
     if (m_electrodes)
         m_electrodes->setHoveredContact(-1);

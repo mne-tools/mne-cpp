@@ -22,23 +22,22 @@
  * instance data for tooltip / click selection.
  */
 
-#ifndef DIPOLEOBJECT_H
-#define DIPOLEOBJECT_H
+#ifndef VIZ_DIPOLEOBJECT_H
+#define VIZ_DIPOLEOBJECT_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
-#include "../../../../brain/rendertypes.h"
+#include "../viz_global.h"
+#include "rendertypes.h"
 #include <mne/inv/dipole_fit/inv_ecd_set.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
-#include <QMatrix4x4>
-#include <QVector3D>
+#include <Eigen/Core>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -47,7 +46,7 @@
 #include <memory>
 #include <vector>
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -59,7 +58,7 @@ namespace mne::viz::qt
  *
  * @snippet ex_disp3d_scene/main.cpp dipole_object_usage
  */
-class VIZQTSHARED_EXPORT DipoleObject
+class VIZSHARED_EXPORT DipoleObject
 {
 public:
     DipoleObject();
@@ -68,7 +67,7 @@ public:
     void load(const mne::InvEcdSet& ecdSet);
 
     // Place all loaded dipoles with this transform (replaces any previous one)
-    void applyTransform(const QMatrix4x4& trans);
+    void applyTransform(const Eigen::Matrix4f& trans);
 
     /** @return CPU streams of the arrow shape and of one instance per dipole. */
     InstancedStreams streams() const;
@@ -105,7 +104,7 @@ public:
      * @param[out] max   Maximum corner.
      * @return False if no dipoles are loaded.
      */
-    bool boundingBox(QVector3D& min, QVector3D& max) const;
+    bool boundingBox(Eigen::Vector3f& min, Eigen::Vector3f& max) const;
 
     void setSelected(int index, bool selected);
 
@@ -118,7 +117,7 @@ public:
      * @param[out] dist      Distance to intersection.
      * @return Index of intersected dipole, or -1 if none.
      */
-    int intersect(const QVector3D& rayOrigin, const QVector3D& rayDir, float& dist) const;
+    int intersect(const Eigen::Vector3f& rayOrigin, const Eigen::Vector3f& rayDir, float& dist) const;
 
 private:
     void createGeometry();
@@ -152,14 +151,12 @@ private:
     std::vector<std::byte> m_vertexData;
     std::vector<std::byte> m_indexData;
     std::vector<std::byte> m_instanceData;
-    std::vector<QMatrix4x4> m_loadedModels; /**< Instance model matrices as loaded, before applyTransform(). */
+    std::vector<Eigen::Matrix4f> m_loadedModels; /**< Instance model matrices as loaded, before applyTransform(). */
 
-    quint64 m_geometryGeneration = 0;
-    quint64 m_instanceGeneration = 0;
-
-    std::vector<QVector4D> m_originalColors;
+    std::uint64_t m_geometryGeneration = 0;
+    std::uint64_t m_instanceGeneration = 0;
 };
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // DIPOLEOBJECT_H
+#endif // VIZ_DIPOLEOBJECT_H

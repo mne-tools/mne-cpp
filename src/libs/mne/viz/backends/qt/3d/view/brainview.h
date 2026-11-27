@@ -84,15 +84,19 @@ namespace mne::viz
 class BrainSurface;
 } // namespace mne::viz
 
+namespace mne::viz
+{
+class PolylineObject;
+class NetworkObject;
+class ElectrodeObject;
+class DipoleObject;
+} // namespace mne::viz
+
 namespace mne::viz::qt
 {
 
 class BrainTreeModel;
 class BrainRenderer;
-class DipoleObject;
-class ElectrodeObject;
-class NetworkObject;
-class PolylineObject;
 class VideoOverlay;
 class SliceObject;
 
@@ -1095,7 +1099,7 @@ public slots:
      *
      * @param[in] electrodes  Non-owning pointer; it must outlive this view or be reset to nullptr.
      */
-    void setElectrodes(mne::viz::qt::ElectrodeObject* electrodes);
+    void setElectrodes(mne::viz::ElectrodeObject* electrodes);
 
     /**
      * Show one value per contact (e.g. high-gamma power) on the contacts and the cortex around

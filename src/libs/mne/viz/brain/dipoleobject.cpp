@@ -16,26 +16,24 @@
 
 #include "dipoleobject.h"
 
-#include "../../qtconversions.h"
-
+#include "instancing.h"
 #include <mne/viz/views/ray_picking.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QQuaternion>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <limits>
 #include <numbers>
 #include <optional>
 #include <random>
+#include <vector>
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -48,9 +46,9 @@ DipoleObject::~DipoleObject() = default;
 
 InstancedStreams DipoleObject::streams() const
 {
-    return {{m_vertexData.data(), quint32(m_vertexData.size()), m_geometryGeneration},
-            {m_indexData.data(), quint32(m_indexData.size()), m_geometryGeneration},
-            {m_instanceData.data(), quint32(m_instanceCount * sizeof(InstanceData)), m_instanceGeneration},
+    return {{m_vertexData.data(), static_cast<std::uint32_t>(m_vertexData.size()), m_geometryGeneration},
+            {m_indexData.data(), static_cast<std::uint32_t>(m_indexData.size()), m_geometryGeneration},
+            {m_instanceData.data(), static_cast<std::uint32_t>(m_instanceCount * sizeof(InstanceData)), m_instanceGeneration},
             m_indexCount,
             m_instanceCount};
 }
@@ -64,11 +62,11 @@ void DipoleObject::load(const mne::InvEcdSet& ecdSet)
     m_loadedModels.resize(m_instanceCount);
     InstanceData* data = reinterpret_cast<InstanceData*>(m_instanceData.data());
 
-    QVector3D from(0.0f, 1.0f, 0.0f); // Cone points up Y axis
+    const Eigen::Vector3f from = Eigen::Vector3f::UnitY(); // Cone points up Y axis
 
     float maxMag = 0.0f;
     for (int i = 0; i < ecdSet.size(); ++i) {
-        float mag = std::sqrt(std::pow(ecdSet[i].Q(0), 2) + std::pow(ecdSet[i].Q(1), 2) + std::pow(ecdSet[i].Q(2), 2));
+        const float mag = ecdSet[i].Q.norm();
         maxMag = std::max(maxMag, mag);
     }
 
@@ -78,34 +76,25 @@ void DipoleObject::load(const mne::InvEcdSet& ecdSet)
     for (int i = 0; i < ecdSet.size(); ++i) {
         const auto& dip = ecdSet[i];
 
-        QVector3D pos(dip.rd(0), dip.rd(1), dip.rd(2));
-        QVector3D Q(dip.Q(0), dip.Q(1), dip.Q(2));
-        float mag = Q.length();
+        const Eigen::Vector3f pos(dip.rd(0), dip.rd(1), dip.rd(2));
+        const Eigen::Vector3f Q(dip.Q(0), dip.Q(1), dip.Q(2));
+        const float mag = Q.norm();
 
-        QVector3D to = Q.normalized();
+        const Eigen::Vector3f to = Q.normalized();
         // Handle case where 'to' is parallel to 'from'
-        QQuaternion rot;
-        if (QVector3D::dotProduct(from, to) > 0.99f) {
-            rot = QQuaternion();
-        } else if (QVector3D::dotProduct(from, to) < -0.99f) {
-            rot = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, 180.0f);
-        } else {
-            rot = QQuaternion::rotationTo(from, to);
+        Eigen::Quaternionf rot = Eigen::Quaternionf::Identity();
+        if (from.dot(to) < -0.99f) {
+            rot = Eigen::Quaternionf(Eigen::AngleAxisf(std::numbers::pi_v<float>, Eigen::Vector3f::UnitX()));
+        } else if (from.dot(to) <= 0.99f) {
+            rot = rotationTo(from, to);
         }
 
         // Scale based on magnitude relative to max, with a minimum size of 20%
         float scaleFactor = (maxMag > 0.0f) ? (0.2f + 0.8f * (mag / maxMag)) : 1.0f;
 
-        QMatrix4x4 m;
-        m.translate(pos);
-        m.rotate(rot);
-        m.scale(scaleFactor);
+        const Eigen::Matrix4f m = modelMatrix(pos, rot, Eigen::Vector3f::Constant(scaleFactor));
         m_loadedModels[i] = m;
-
-        const float* mPtr = m.constData();
-        for (int j = 0; j < 16; ++j) {
-            data[i].model[j] = mPtr[j];
-        }
+        storeMatrix(m, data[i].model);
 
         // Random Color
         data[i].color[0] = colorDist(rng);
@@ -120,7 +109,7 @@ void DipoleObject::load(const mne::InvEcdSet& ecdSet)
     ++m_instanceGeneration;
 }
 
-void DipoleObject::applyTransform(const QMatrix4x4& trans)
+void DipoleObject::applyTransform(const Eigen::Matrix4f& trans)
 {
     if (m_instanceCount == 0)
         return;
@@ -128,26 +117,22 @@ void DipoleObject::applyTransform(const QMatrix4x4& trans)
     InstanceData* data = reinterpret_cast<InstanceData*>(m_instanceData.data());
 
     for (int i = 0; i < m_instanceCount; ++i) {
-        const QMatrix4x4 newModel = trans * m_loadedModels[i];
-        const float* newPtr = newModel.constData();
-        for (int j = 0; j < 16; ++j) {
-            data[i].model[j] = newPtr[j];
-        }
+        storeMatrix(trans * m_loadedModels[i], data[i].model);
     }
 
     ++m_instanceGeneration;
 }
 
-bool DipoleObject::boundingBox(QVector3D& min, QVector3D& max) const
+bool DipoleObject::boundingBox(Eigen::Vector3f& min, Eigen::Vector3f& max) const
 {
     if (m_instanceCount == 0)
         return false;
     const InstanceData* data = reinterpret_cast<const InstanceData*>(m_instanceData.data());
     for (int i = 0; i < m_instanceCount; ++i) {
         // Column-major model matrix: the translation is elements 12..14
-        const QVector3D pos(data[i].model[12], data[i].model[13], data[i].model[14]);
-        min = i == 0 ? pos : QVector3D(std::min(min.x(), pos.x()), std::min(min.y(), pos.y()), std::min(min.z(), pos.z()));
-        max = i == 0 ? pos : QVector3D(std::max(max.x(), pos.x()), std::max(max.y(), pos.y()), std::max(max.z(), pos.z()));
+        const Eigen::Vector3f pos(data[i].model[12], data[i].model[13], data[i].model[14]);
+        min = i == 0 ? pos : Eigen::Vector3f(min.cwiseMin(pos));
+        max = i == 0 ? pos : Eigen::Vector3f(max.cwiseMax(pos));
     }
     return true;
 }
@@ -178,14 +163,13 @@ void DipoleObject::createGeometry()
 
     // Rim vertices
     for (int i = 0; i < segments; ++i) {
-        float angle = 2.0f * std::numbers::pi * i / segments;
-        float x = radius * cos(angle);
-        float z = radius * sin(angle);
+        const float angle = 2.0f * std::numbers::pi_v<float> * static_cast<float>(i) / static_cast<float>(segments);
+        float x = radius * std::cos(angle);
+        float z = radius * std::sin(angle);
 
         // Side normal
         // Slope vector: (cos, -h/r, sin) -> normalized
-        QVector3D n(x, radius / height, z);
-        n.normalize();
+        const Eigen::Vector3f n = Eigen::Vector3f(x, radius / height, z).normalized();
 
         VertexData vSide = {x, 0, z, n.x(), n.y(), n.z()};
         vertices.push_back(vSide);
@@ -214,24 +198,23 @@ void DipoleObject::createGeometry()
     vertices.push_back(baseCenter); // 1
 
     for (int i = 0; i < segments; ++i) {
-        float angle = 2.0f * std::numbers::pi * i / segments;
-        float x = radius * cos(angle);
-        float z = radius * sin(angle);
+        const float angle = 2.0f * std::numbers::pi_v<float> * static_cast<float>(i) / static_cast<float>(segments);
+        float x = radius * std::cos(angle);
+        float z = radius * std::sin(angle);
 
-        QVector3D n(x, 0, z); // Approximate normal for side (flat shading effectively if we don't slant)
-        // Better normal: vector perpendicular to slope
-        QVector3D slope(x, -height, z);
-        QVector3D tangent(-sin(angle), 0, cos(angle));
-        QVector3D sideNormal = QVector3D::crossProduct(tangent, slope).normalized(); // Wait, slope is vector down side.
+        // Normal perpendicular to the slope down the side
+        const Eigen::Vector3f slope(x, -height, z);
+        const Eigen::Vector3f tangent(-std::sin(angle), 0.0f, std::cos(angle));
+        const Eigen::Vector3f sideNormal = tangent.cross(slope).normalized();
         // Actually simple: normal y component is radius/height ratio related.
 
         vertices.push_back({x, 0, z, sideNormal.x(), sideNormal.y(), sideNormal.z()}); // Side rim
     }
 
     for (int i = 0; i < segments; ++i) {
-        float angle = 2.0f * std::numbers::pi * i / segments;
-        float x = radius * cos(angle);
-        float z = radius * sin(angle);
+        const float angle = 2.0f * std::numbers::pi_v<float> * static_cast<float>(i) / static_cast<float>(segments);
+        float x = radius * std::cos(angle);
+        float z = radius * std::sin(angle);
         vertices.push_back({x, 0, z, 0, -1, 0}); // Base rim
     }
 
@@ -263,7 +246,7 @@ void DipoleObject::createGeometry()
     ++m_geometryGeneration;
 }
 
-int DipoleObject::intersect(const QVector3D& rayOrigin, const QVector3D& rayDir, float& dist) const
+int DipoleObject::intersect(const Eigen::Vector3f& rayOrigin, const Eigen::Vector3f& rayDir, float& dist) const
 {
     if (m_instanceCount == 0)
         return -1;
@@ -276,7 +259,7 @@ int DipoleObject::intersect(const QVector3D& rayOrigin, const QVector3D& rayDir,
     // Geometry radius ~ 0.005 (base) to 0.01 (height).
     // Let's use a slightly larger hit radius to make selection easier and more accurate.
     const float baseRadius = 0.02f;
-    const viz::Ray ray{toEigen(rayOrigin), toEigen(rayDir)};
+    const Ray ray{rayOrigin, rayDir};
 
     for (int i = 0; i < m_instanceCount; ++i) {
         // Translation (last column) and scale (length of the first column, roughly uniform)
@@ -285,7 +268,7 @@ int DipoleObject::intersect(const QVector3D& rayOrigin, const QVector3D& rayDir,
         const float radius = baseRadius * scale;
 
         // Spheres behind the ray origin do not count; from inside a sphere the exit point is hit
-        const std::optional<viz::SphereCrossing> crossing = viz::intersect_ray_sphere(ray, center, radius);
+        const std::optional<SphereCrossing> crossing = intersect_ray_sphere(ray, center, radius);
         if (!crossing || crossing->entry + crossing->exit < 0.0f)
             continue;
         const float t = crossing->entry >= 0.0f ? crossing->entry : crossing->exit;
@@ -318,4 +301,4 @@ void DipoleObject::setSelected(int index, bool selected)
     ++m_instanceGeneration;
 }
 
-} // namespace mne::viz::qt
+} // namespace mne::viz

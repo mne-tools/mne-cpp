@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Tree item wrapping a fitted @ref mne::InvEcdSet of equivalent current dipoles.
  *
- * Each dipole becomes one instance in the @ref mne::viz::qt::DipoleObject arrow
+ * Each dipole becomes one instance in the @ref mne::viz::DipoleObject arrow
  * mesh: position drives the instance translation, orientation the
  * rotation, goodness-of-fit the colour mapped through the active
  * dipole colormap. Toggling visibility on this item simply hides
