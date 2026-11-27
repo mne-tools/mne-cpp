@@ -34,7 +34,7 @@
 #include <mne/viz/backends/qt/plots/helpers/scenepainter.h>
 #include <mne/viz/backends/qt/viewers/triggerdetectionview.h>
 #include <mne/viz/backends/qt/viewers/averagingsettingsview.h>
-#include <mne/viz/backends/qt/viewers/settingspanel.h>
+#include <mne/viz/backends/qt/kit/settingspanel.h>
 #include <mne/viz/backends/qt/viewers/bidsview.h>
 #include <mne/viz/backends/qt/viewers/channelselectionview.h>
 #include <mne/viz/backends/qt/viewers/channeldataview.h>

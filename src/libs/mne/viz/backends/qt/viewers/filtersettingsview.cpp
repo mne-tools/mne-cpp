@@ -20,7 +20,7 @@
 #include "filtersettingsview.h"
 #include "../detail/scoped_flag.h"
 #include "filterdesignview.h"
-#include "settingspanel.h"
+#include "../kit/settingspanel.h"
 
 //=============================================================================================================
 // QT INCLUDES

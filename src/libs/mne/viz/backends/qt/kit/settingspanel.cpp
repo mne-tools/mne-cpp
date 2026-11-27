@@ -21,6 +21,8 @@
 //=============================================================================================================
 
 #include <QCheckBox>
+#include <QColor>
+#include <QColorDialog>
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QFileDialog>
@@ -84,6 +86,34 @@ SettingsPanel::SettingsPanel(std::shared_ptr<SettingsForm> form, QWidget* parent
 {
     setWindowTitle(toQString(m_form.title()));
     auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    build();
+
+    m_listener = m_form.add_listener([this](const std::string& key, const std::optional<SettingValue>& value) {
+        if (value) {
+            showValue(key);
+            updateConditions();
+        }
+    });
+    m_structureListener = m_form.add_structure_listener([this](const std::string& key) {
+        // A changed field is updated in place; added and removed fields need the rows built again
+        const SettingField* field = m_form.field(key);
+        const bool shown = field && !field->hidden;
+        if (shown != m_rows.contains(key)) {
+            rebuild();
+        } else {
+            updateField(key);
+        }
+    });
+}
+
+//=============================================================================================================
+
+void SettingsPanel::build()
+{
+    m_content = new QWidget(this);
+    layout()->addWidget(m_content);
+    auto* layout = new QVBoxLayout(m_content);
     for (const std::string& group : m_form.groups()) { // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks): Qt parents own the layouts
         const auto shown = [&group](const SettingField& field) {
             return field.group == group && !field.hidden;
@@ -93,12 +123,12 @@ SettingsPanel::SettingsPanel(std::shared_ptr<SettingsForm> form, QWidget* parent
         }
         QFormLayout* formLayout = nullptr;
         if (group.empty()) {
-            auto* holder = new QWidget(this);
+            auto* holder = new QWidget(m_content);
             layout->addWidget(holder);
             formLayout = new QFormLayout(holder);
             formLayout->setContentsMargins(0, 0, 0, 0);
         } else {
-            auto* box = new QGroupBox(toQString(group), this);
+            auto* box = new QGroupBox(toQString(group), m_content);
             formLayout = new QFormLayout(box);
             layout->addWidget(box);
             m_groups[group] = box;
@@ -110,17 +140,25 @@ SettingsPanel::SettingsPanel(std::shared_ptr<SettingsForm> form, QWidget* parent
         }
     }
     layout->addStretch(1);
-
-    m_listener = m_form.add_listener([this](const std::string& key, const std::optional<SettingValue>& value) {
-        if (value) {
-            showValue(key);
-            updateConditions();
-        }
-    });
-    m_structureListener = m_form.add_structure_listener([this](const std::string& key) {
-        updateField(key);
-    });
     updateConditions();
+}
+
+//=============================================================================================================
+
+void SettingsPanel::rebuild()
+{
+    // The old rows may be emitting the signal that changed the form, so they are deleted later
+    m_rows.clear();
+    m_groups.clear();
+    if (m_content) {
+        // Detached, so lookups by object name only find the new rows
+        m_content->hide();
+        layout()->removeWidget(m_content);
+        m_content->setParent(nullptr);
+        m_content->deleteLater();
+    }
+    build();
+    emit rebuilt();
 }
 
 //=============================================================================================================
@@ -139,7 +177,7 @@ void SettingsPanel::buildField(const SettingField& field, QFormLayout* layout)
     const std::string key = field.key;
     switch (field.kind) {
         case SettingField::Kind::Bool: {
-            auto* box = new QCheckBox(toQString(field.label), this);
+            auto* box = new QCheckBox(toQString(field.label), m_content);
             connect(box, &QCheckBox::toggled, this, [this, key](bool on) {
                 m_form.set_value(key, on);
             });
@@ -150,7 +188,7 @@ void SettingsPanel::buildField(const SettingField& field, QFormLayout* layout)
         case SettingField::Kind::Int:
         case SettingField::Kind::Double:
             if (field.style == SettingField::Style::Slider) {
-                auto* slider = new QSlider(Qt::Horizontal, this);
+                auto* slider = new QSlider(Qt::Horizontal, m_content);
                 connect(slider, &QSlider::valueChanged, this, [this, key](int position) {
                     if (const SettingField* f = m_form.field(key)) {
                         m_form.set_value(key, f->kind == SettingField::Kind::Int ? SettingValue(position) : SettingValue(position / sliderFactor(*f)));
@@ -158,7 +196,7 @@ void SettingsPanel::buildField(const SettingField& field, QFormLayout* layout)
                 });
                 row.editor = slider;
             } else if (field.kind == SettingField::Kind::Int) {
-                auto* spin = new QSpinBox(this);
+                auto* spin = new QSpinBox(m_content);
                 if (field.commit == SettingField::Commit::WhenFinished) {
                     connect(spin, &QSpinBox::editingFinished, this, [this, key, spin] {
                         m_form.set_value(key, spin->value());
@@ -170,7 +208,7 @@ void SettingsPanel::buildField(const SettingField& field, QFormLayout* layout)
                 }
                 row.editor = spin;
             } else {
-                auto* spin = new QDoubleSpinBox(this);
+                auto* spin = new QDoubleSpinBox(m_content);
                 if (field.commit == SettingField::Commit::WhenFinished) {
                     connect(spin, &QDoubleSpinBox::editingFinished, this, [this, key, spin] {
                         m_form.set_value(key, spin->value());
@@ -184,7 +222,7 @@ void SettingsPanel::buildField(const SettingField& field, QFormLayout* layout)
             }
             break;
         case SettingField::Kind::Choice: {
-            auto* combo = new QComboBox(this);
+            auto* combo = new QComboBox(m_content);
             connect(combo, &QComboBox::currentIndexChanged, this, [this, key, combo](int index) {
                 if (index >= 0) {
                     m_form.set_value(key, combo->itemData(index).toString().toStdString());
@@ -193,9 +231,8 @@ void SettingsPanel::buildField(const SettingField& field, QFormLayout* layout)
             row.editor = combo;
             break;
         }
-        case SettingField::Kind::Text:
-        case SettingField::Kind::Path: {
-            auto* edit = new QLineEdit(this);
+        case SettingField::Kind::Text: {
+            auto* edit = new QLineEdit(m_content);
             if (field.commit == SettingField::Commit::WhenFinished) {
                 connect(edit, &QLineEdit::editingFinished, this, [this, key, edit] {
                     m_form.set_value(key, edit->text().toStdString());
@@ -205,30 +242,46 @@ void SettingsPanel::buildField(const SettingField& field, QFormLayout* layout)
                     m_form.set_value(key, text.toStdString());
                 });
             }
-            if (field.kind == SettingField::Kind::Text) {
-                row.editor = edit;
-                break;
-            }
-            auto* container = new QWidget(this);
-            auto* line = new QHBoxLayout(container);
-            line->setContentsMargins(0, 0, 0, 0);
-            edit->setParent(container);
-            line->addWidget(edit);
-            auto* browse = new QToolButton(container);
-            browse->setText(QStringLiteral("..."));
-            line->addWidget(browse);
-            connect(browse, &QToolButton::clicked, this, [this, key, edit] {
+            row.editor = edit;
+            break;
+        }
+        case SettingField::Kind::Path:
+        case SettingField::Kind::Directory:
+            row.editor = buildChooser(field);
+            break;
+        case SettingField::Kind::Color: {
+            auto* button = new QToolButton(m_content);
+            button->setProperty("settingColor", true);
+            button->setMinimumWidth(48);
+            connect(button, &QToolButton::clicked, this, [this, key] {
+                const QColor current(toQString(m_form.get<std::string>(key)));
                 const SettingField* f = m_form.field(key);
-                const QString file = QFileDialog::getOpenFileName(this, f ? toQString(f->label) : QString(), edit->text(), f ? toQString(f->file_filter) : QString());
-                if (!file.isEmpty()) {
-                    m_form.set_value(key, file.toStdString());
+                const QColor chosen = QColorDialog::getColor(current, this, f ? toQString(f->label) : QString(), QColorDialog::ShowAlphaChannel);
+                if (chosen.isValid()) {
+                    const QColor::NameFormat format = chosen.alpha() == 255 ? QColor::HexRgb : QColor::HexArgb;
+                    QString name = chosen.name(format);
+                    if (format == QColor::HexArgb) {
+                        // Qt writes #aarrggbb, the form #rrggbbaa
+                        name = QLatin1Char('#') + name.mid(3) + name.mid(1, 2);
+                    }
+                    m_form.set_value(key, name.toStdString());
                 }
             });
-            row.editor = container;
+            row.editor = button;
+            break;
+        }
+        case SettingField::Kind::Info: {
+            auto* text = new QLabel(m_content);
+            text->setWordWrap(true);
+            text->setTextInteractionFlags(Qt::TextSelectableByMouse);
+            if (field.label.empty()) {
+                layout->addRow(text);
+            }
+            row.editor = text;
             break;
         }
         case SettingField::Kind::Action: {
-            auto* button = new QPushButton(toQString(field.label), this);
+            auto* button = new QPushButton(toQString(field.label), m_content);
             connect(button, &QPushButton::clicked, this, [this, key] {
                 m_form.trigger(key);
             });
@@ -237,27 +290,66 @@ void SettingsPanel::buildField(const SettingField& field, QFormLayout* layout)
             break;
         }
         case SettingField::Kind::Custom: {
-            auto* container = new QWidget(this);
+            auto* container = new QWidget(m_content);
             auto* inner = new QVBoxLayout(container);
             inner->setContentsMargins(0, 0, 0, 0);
             if (field.label.empty()) {
                 layout->addRow(container);
             } else {
-                row.label = new QLabel(toQString(field.label), this);
+                row.label = new QLabel(toQString(field.label), m_content);
                 layout->addRow(row.label, container);
             }
             row.editor = container;
             break;
         }
     }
-    if (!row.label && field.kind != SettingField::Kind::Bool && field.kind != SettingField::Kind::Action && field.kind != SettingField::Kind::Custom) {
-        row.label = new QLabel(toQString(field.label), this);
+    const bool ownRow = field.kind == SettingField::Kind::Bool || field.kind == SettingField::Kind::Action || field.kind == SettingField::Kind::Custom ||
+        (field.kind == SettingField::Kind::Info && field.label.empty());
+    if (!row.label && !ownRow) {
+        row.label = new QLabel(toQString(field.label), m_content);
         layout->addRow(row.label, row.editor);
     }
     row.editor->setObjectName(toQString(key));
     row.editor->setToolTip(toQString(field.tooltip));
     m_rows[key] = row;
     updateField(key);
+}
+
+//=============================================================================================================
+
+QWidget* SettingsPanel::buildChooser(const SettingField& field)
+{
+    const std::string key = field.key;
+    auto* container = new QWidget(m_content);
+    auto* line = new QHBoxLayout(container);
+    line->setContentsMargins(0, 0, 0, 0);
+    auto* edit = new QLineEdit(container);
+    line->addWidget(edit);
+    if (field.commit == SettingField::Commit::WhenFinished) {
+        connect(edit, &QLineEdit::editingFinished, this, [this, key, edit] {
+            m_form.set_value(key, edit->text().toStdString());
+        });
+    } else {
+        connect(edit, &QLineEdit::textEdited, this, [this, key](const QString& text) {
+            m_form.set_value(key, text.toStdString());
+        });
+    }
+    auto* browse = new QToolButton(container);
+    browse->setText(QStringLiteral("..."));
+    line->addWidget(browse);
+    connect(browse, &QToolButton::clicked, this, [this, key, edit] {
+        const SettingField* f = m_form.field(key);
+        if (!f) {
+            return;
+        }
+        const QString chosen = f->kind == SettingField::Kind::Directory
+            ? QFileDialog::getExistingDirectory(this, toQString(f->label), edit->text())
+            : QFileDialog::getOpenFileName(this, toQString(f->label), edit->text(), toQString(f->file_filter));
+        if (!chosen.isEmpty()) {
+            m_form.set_value(key, chosen.toStdString());
+        }
+    });
+    return container;
 }
 
 //=============================================================================================================
@@ -294,7 +386,24 @@ void SettingsPanel::updateField(const std::string& key)
         for (const SettingChoice& choice : field->choices) {
             combo->addItem(toQString(choice.label), toQString(choice.value));
         }
-    } else if (auto* button = qobject_cast<QAbstractButton*>(editor)) {
+    } else if (auto* text = qobject_cast<QLabel*>(editor)) {
+        // Info fields: the tone colours the text
+        QString color;
+        switch (field->tone) {
+            case SettingField::Tone::Positive:
+                color = QStringLiteral("#2e7d32");
+                break;
+            case SettingField::Tone::Warning:
+                color = QStringLiteral("#ef6c00");
+                break;
+            case SettingField::Tone::Negative:
+                color = QStringLiteral("#c62828");
+                break;
+            case SettingField::Tone::Normal:
+                break;
+        }
+        text->setStyleSheet(color.isEmpty() ? QString() : QStringLiteral("color: %1;").arg(color));
+    } else if (auto* button = qobject_cast<QAbstractButton*>(editor); button && !button->property("settingColor").toBool()) {
         button->setText(toQString(field->label));
     }
     showValue(key);
@@ -322,6 +431,12 @@ void SettingsPanel::showValue(const std::string& key)
         slider->setValue(static_cast<int>(std::lround(m_form.get<double>(key) * sliderFactor(*field))));
     } else if (auto* combo = qobject_cast<QComboBox*>(editor)) {
         combo->setCurrentIndex(combo->findData(toQString(m_form.get<std::string>(key))));
+    } else if (auto* text = qobject_cast<QLabel*>(editor)) {
+        text->setText(toQString(m_form.get<std::string>(key)));
+    } else if (auto* colorButton = qobject_cast<QToolButton*>(editor); colorButton && colorButton->property("settingColor").toBool()) {
+        const std::string color = m_form.get<std::string>(key);
+        colorButton->setStyleSheet(QStringLiteral("background-color: %1;").arg(toQString(color.substr(0, 7))));
+        colorButton->setToolTip(toQString(color));
     } else if (auto* edit = qobject_cast<QLineEdit*>(editor)) {
         edit->setText(toQString(m_form.get<std::string>(key)));
     } else if (auto* pathEdit = editor->findChild<QLineEdit*>()) {
@@ -396,10 +511,13 @@ void SettingsPanel::loadSettings(const QString& path)
             case SettingField::Kind::Choice:
             case SettingField::Kind::Text:
             case SettingField::Kind::Path:
+            case SettingField::Kind::Directory:
+            case SettingField::Kind::Color:
                 m_form.set_value(field.key, stored.toString().toStdString());
                 break;
             case SettingField::Kind::Action:
             case SettingField::Kind::Custom:
+            case SettingField::Kind::Info:
                 break;
         }
     }

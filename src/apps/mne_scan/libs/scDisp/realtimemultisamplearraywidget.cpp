@@ -25,9 +25,7 @@
 #include <mne/viz/backends/qt/viewers/helpers/channelinfomodel.h>
 #include <mne/viz/backends/qt/viewers/rtfiffrawview.h>
 #include <mne/viz/backends/qt/viewers/scalingview.h>
-#include <mne/viz/backends/qt/viewers/projectorsview.h>
 #include <mne/viz/backends/qt/viewers/filtersettingsview.h>
-#include <mne/viz/backends/qt/viewers/compensatorview.h>
 #include <mne/viz/backends/qt/viewers/spharasettingsview.h>
 #include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
 #include <mne/viz/backends/qt/viewers/triggerdetectionview.h>
@@ -182,26 +180,6 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
 
         //Init control widgets
         QList<QWidget*> lControlWidgets;
-
-        //        // Quick control projectors
-        //        ProjectorsView* pProjectorsView = new ProjectorsView(QString("MNESCAN/RTMSAW"));
-        //        pProjectorsView->setObjectName("group_tab_Noise_SSP");
-        //        lControlWidgets.append(pProjectorsView);
-
-        //        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
-        //                m_pChannelDataView.data(), &RtFiffRawView::updateProjection);
-
-        //        pProjectorsView->setProjectors(m_pFiffInfo->projs);
-
-        //        // Quick control compensators
-        //        CompensatorView* pCompensatorView = new CompensatorView(QString("MNESCAN/RTMSAW"));
-        //        pCompensatorView->setObjectName("group_tab_Noise_Comp");
-        //        lControlWidgets.append(pCompensatorView);
-
-        //        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
-        //                m_pChannelDataView.data(), &RtFiffRawView::updateCompensator);
-
-        //        pCompensatorView->setCompensators(m_pFiffInfo->comps);
 
         //        // Quick control filter
         //        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("MNESCAN/RTMSAW"));

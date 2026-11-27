@@ -22,10 +22,11 @@
 #include "FormFiles/noisereductionsetupwidget.h"
 #include <mne/base/string_utils.h>
 #include <mne/viz/backends/qt/viewers/scalingview.h>
-#include <mne/viz/backends/qt/viewers/projectorsview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/compensator_panel.h>
+#include <mne/viz/panels/projectors_panel.h>
 #include <mne/viz/backends/qt/viewers/filtersettingsview.h>
 #include <mne/viz/backends/qt/viewers/filterdesignview.h>
-#include <mne/viz/backends/qt/viewers/compensatorview.h>
 #include <mne/viz/backends/qt/viewers/spharasettingsview.h>
 #include <mne/dsp/rt/rt_filter.h>
 #include <mne/dsp/sphara.h>
@@ -37,6 +38,7 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <QPointer>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -224,27 +226,31 @@ void NoiseReduction::initPluginControlWidgets()
     if (m_pFiffInfo) {
         std::vector<std::unique_ptr<QWidget>> controlWidgets;
 
-        // Projectors
-        ProjectorsView* pProjectorsView = makeControlWidget<ProjectorsView>(controlWidgets, QString("MNESCAN/%1/").arg(this->getName()));
+        // Projectors and compensators: toolkit-free panels shown by the generic panel widget
+        auto projectors = std::make_shared<ProjectorsPanel>();
+        PanelWidget* pProjectorsWidget = makeControlWidget<PanelWidget>(controlWidgets, projectors, QString("MNESCAN/%1/").arg(this->getName()));
         connect(this, &NoiseReduction::guiModeChanged,
-                pProjectorsView, &ProjectorsView::setGuiMode);
-        pProjectorsView->setObjectName("group_tab_Settings_SSP");
+                pProjectorsWidget, &PanelWidget::setGuiMode);
+        pProjectorsWidget->setObjectName("group_tab_Settings_SSP");
+        const QPointer<NoiseReduction> plugin(this);
+        projectors->set_selection_callback([plugin](const std::vector<mne::FiffProj>& projs) {
+            if (plugin) {
+                plugin->updateProjection(projs);
+            }
+        });
+        projectors->set_projectors(m_pFiffInfo->projs);
 
-        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
-                this, &NoiseReduction::updateProjection);
-
-        pProjectorsView->setProjectors(m_pFiffInfo->projs);
-
-        // Compensators
-        CompensatorView* pCompensatorView = makeControlWidget<CompensatorView>(controlWidgets, QString("MNESCAN/%1/").arg(this->getName()));
+        auto compensators = std::make_shared<CompensatorPanel>();
+        PanelWidget* pCompensatorWidget = makeControlWidget<PanelWidget>(controlWidgets, compensators, QString("MNESCAN/%1/").arg(this->getName()));
         connect(this, &NoiseReduction::guiModeChanged,
-                pCompensatorView, &CompensatorView::setGuiMode);
-        pCompensatorView->setObjectName("group_tab_Settings_Comp");
-
-        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
-                this, &NoiseReduction::updateCompensator);
-
-        pCompensatorView->setCompensators(m_pFiffInfo->comps);
+                pCompensatorWidget, &PanelWidget::setGuiMode);
+        pCompensatorWidget->setObjectName("group_tab_Settings_Comp");
+        compensators->set_selection_callback([plugin](int to) {
+            if (plugin) {
+                plugin->updateCompensator(to);
+            }
+        });
+        compensators->set_compensators(m_pFiffInfo->comps);
 
         // Filter
         FilterSettingsView* pFilterSettingsView = makeControlWidget<FilterSettingsView>(controlWidgets, QString("MNESCAN/%1/").arg(this->getName()));

@@ -63,8 +63,6 @@ set(SOURCES
     viewers/channelselectionview.cpp
     viewers/spectrumsettingsview.cpp
     viewers/scalingview.cpp
-    viewers/projectorsview.cpp
-    viewers/compensatorview.cpp
     viewers/filtersettingsview.cpp
     viewers/spharasettingsview.cpp
     viewers/fiffrawviewsettings.cpp
@@ -84,7 +82,8 @@ set(SOURCES
     viewers/multiview.cpp
     viewers/hpisettingsview.cpp
     viewers/covariancesettingsview.cpp
-    viewers/settingspanel.cpp
+    kit/panelwidget.cpp
+    kit/settingspanel.cpp
     viewers/bidsview.cpp
     viewers/helpers/channeldatamodel.cpp
     viewers/helpers/channelrhiview.cpp
@@ -161,8 +160,6 @@ set(HEADERS
     viewers/channelselectionview.h
     viewers/spectrumsettingsview.h
     viewers/scalingview.h
-    viewers/projectorsview.h
-    viewers/compensatorview.h
     viewers/filtersettingsview.h
     viewers/spharasettingsview.h
     viewers/fiffrawviewsettings.h
@@ -182,7 +179,8 @@ set(HEADERS
     viewers/multiview.h
     viewers/hpisettingsview.h
     viewers/covariancesettingsview.h
-    viewers/settingspanel.h
+    kit/panelwidget.h
+    kit/settingspanel.h
     viewers/bidsview.h
     viewers/helpers/channeldatamodel.h
     viewers/helpers/channelrhiview.h

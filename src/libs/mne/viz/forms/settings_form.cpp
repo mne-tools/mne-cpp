@@ -21,6 +21,7 @@
 //=============================================================================================================
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <utility>
 
@@ -209,6 +210,77 @@ const SettingField& SettingsForm::add_custom(const std::string& key, const std::
 
 //=============================================================================================================
 
+const SettingField& SettingsForm::add_info(const std::string& key, const std::string& label, const std::string& text, const std::string& group)
+{
+    SettingField f;
+    f.key = key;
+    f.kind = SettingField::Kind::Info;
+    f.label = label;
+    f.default_value = text;
+    f.group = group;
+    f.persistent = false;
+    return add(std::move(f));
+}
+
+//=============================================================================================================
+
+const SettingField& SettingsForm::add_path(const std::string& key, const std::string& label, const std::string& value, const std::string& filter,
+                                           const std::string& group)
+{
+    SettingField f;
+    f.key = key;
+    f.kind = SettingField::Kind::Path;
+    f.label = label;
+    f.default_value = value;
+    f.file_filter = filter;
+    f.group = group;
+    return add(std::move(f));
+}
+
+//=============================================================================================================
+
+const SettingField& SettingsForm::add_directory(const std::string& key, const std::string& label, const std::string& value, const std::string& group)
+{
+    SettingField f;
+    f.key = key;
+    f.kind = SettingField::Kind::Directory;
+    f.label = label;
+    f.default_value = value;
+    f.group = group;
+    return add(std::move(f));
+}
+
+//=============================================================================================================
+
+const SettingField& SettingsForm::add_color(const std::string& key, const std::string& label, const std::string& value, const std::string& group)
+{
+    SettingField f;
+    f.key = key;
+    f.kind = SettingField::Kind::Color;
+    f.label = label;
+    f.default_value = value;
+    f.group = group;
+    return add(std::move(f));
+}
+
+//=============================================================================================================
+
+bool SettingsForm::remove(const std::string& key)
+{
+    const auto it = std::find_if(m_fields.begin(), m_fields.end(), [&key](const SettingField& f) {
+        return f.key == key;
+    });
+    if (it == m_fields.end()) {
+        return false;
+    }
+    m_fields.erase(it);
+    m_values.erase(key);
+    notify_structure(key);
+    return true;
+}
+
+//=============================================================================================================
+
 std::vector<std::string> SettingsForm::groups() const
 {
     std::vector<std::string> result;
@@ -260,10 +332,21 @@ std::optional<SettingValue> SettingsForm::valid_value(const SettingField& field,
         }
         case SettingField::Kind::Text:
         case SettingField::Kind::Path:
+        case SettingField::Kind::Info:
+        case SettingField::Kind::Directory:
             if (const std::string* text = std::get_if<std::string>(&value)) {
                 return *text;
             }
             return std::nullopt;
+        case SettingField::Kind::Color: {
+            // "#rrggbb" or "#rrggbbaa"
+            const std::string* text = std::get_if<std::string>(&value);
+            const bool valid = text && (text->size() == 7 || text->size() == 9) && text->front() == '#' &&
+                std::all_of(text->begin() + 1, text->end(), [](char c) {
+                                   return std::isxdigit(static_cast<unsigned char>(c)) != 0;
+                               });
+            return valid ? std::optional<SettingValue>(*text) : std::nullopt;
+        }
         case SettingField::Kind::Action:
         case SettingField::Kind::Custom:
             break;
@@ -380,6 +463,16 @@ void SettingsForm::set_label(const std::string& key, const std::string& label)
 {
     if (SettingField* f = find(key); f && f->label != label) {
         f->label = label;
+        notify_structure(key);
+    }
+}
+
+//=============================================================================================================
+
+void SettingsForm::set_tone(const std::string& key, SettingField::Tone tone)
+{
+    if (SettingField* f = find(key); f && f->tone != tone) {
+        f->tone = tone;
         notify_structure(key);
     }
 }

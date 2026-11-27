@@ -18,7 +18,7 @@
 
 #include "triggerdetectionview.h"
 #include "../detail/scoped_flag.h"
-#include "settingspanel.h"
+#include "../kit/settingspanel.h"
 #include <mne/fiff/fiff_info.h>
 
 //=============================================================================================================

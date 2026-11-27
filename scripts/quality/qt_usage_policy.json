@@ -15,7 +15,7 @@
       "QWindow hosts and scene viewports (phase 3)": "ChannelWindow (QWindow + QRhi swap chain) next to the ChannelRhiView QRhiWidget host, and SceneViewport replacing the QGraphicsView scenes, raised the disp ceilings once (tokens 4846 -> 4885, public header includes 82 -> 89); the QRhiWidget hosts go with phase 4.",
       "Qt input translation shared with the brain view": "toScenePointerEvent() and toSceneWheelEvent() (plots/helpers/sceneinput.h), which ChannelRhiRenderer and disp3D's BrainViewCore share instead of each translating Qt events, raised the disp ceilings once (tokens 4543 -> 4549); the brain view's camera, input, layout and overlay moving to mne_scene lowered disp3D from 1961 to 1807 tokens.",
       "QRhi backend of the GPU frame description": "RhiFrameRenderer (plots/helpers/rhiframerenderer.h) executes the Qt-free scene::GpuFrame of any view with QRhi: pipelines, buffers, textures and shader reflection checks in one place instead of in each renderer. ChannelRhiRenderer lost its own QRhi code to it, net raising the disp ceilings once (tokens 4529 -> 4546); the brain view moving onto it lowers disp3D.",
-      "Generic settings panel builder": "SettingsPanel (viewers/settingspanel.h) builds the Qt Widgets of any Qt-free scene::SettingsForm, so a new toolkit needs one builder instead of a hand-written view per panel; the builder raised the disp ceilings once (tokens 4546 -> 4601); the covariance, spectrum, averaging, filter, artifact and time-frequency settings views ported onto it lowered them again (tokens 4601 -> 4519). The SPHARA, minimum norm, connectivity and trigger detection settings views followed (viz/backends/qt tokens 5793 -> 5743).",
+      "Generic settings panel builder": "SettingsPanel (kit/settingspanel.h) builds the Qt Widgets of any Qt-free scene::SettingsForm, so a new toolkit needs one builder instead of a hand-written view per panel; the builder raised the disp ceilings once (tokens 4546 -> 4601); the covariance, spectrum, averaging, filter, artifact and time-frequency settings views ported onto it lowered them again (tokens 4601 -> 4519). The SPHARA, minimum norm, connectivity and trigger detection settings views followed (viz/backends/qt tokens 5793 -> 5743).",
       "Qt adapters of the Qt-free view models": "ChannelInfoModel, FrequencySpectrumModel and BidsViewModel became adapters of mne_viewmodels (ChannelTable, SpectrumTable, BidsTree), and RtFiffRawViewModel and EvokedSetModel hand their SSP, compensator, SPHARA, filtering and trigger detection to mne_dsp (RtRawDisplay, DisplayCorrection). The adapters convert between the view models and QVariant, QStandardItem and QModelIndex, which raised the 'other' category once (1315 -> 1329) while the total fell (tokens 4519 -> 4403).",
       "BrainWindow host and GPU overlay (phase 3)": "BrainWindow (QWindow + QRhi swap chain), the forwarding BrainView host and the overlay painted into the GPU pass instead of child QLabels raised the disp3D ceilings once (tokens 1633 -> 1961); the QRhiWidget host goes with phase 4.",
       "One Qt backend library": "mne_disp and mne_disp3D merged into mne_viz_qt (src/libs/mne/viz/backends/qt), the Qt backend of mne_viz; their ceilings add up (tokens 4403 + 1807 -> 6208, public header includes 87 + 73 -> 159), minus the two export headers that became one.",
@@ -23,7 +23,8 @@
       "Queued hand-over of Qt-free worker callbacks": "The real-time controllers and SourceEstimateManager hand the std::function callbacks of the workers that moved to viz/brain/realtime over to their own thread with QMetaObject::invokeMethod(..., Qt::QueuedConnection), as the queued signal connections did before; this raised the global category once (950 -> 954) while the move lowered tokens (5857 -> 5805) and public header includes (140 -> 135).",
       "Qt dispatcher of viz::Dispatcher": "qtdispatcher.h (queuedDispatcher) posts the tasks of Qt-free brain view models to a QObject's event loop, so SourceEstimateSession and SensorStreamSession could leave the backend; the public header raised public header includes once (135 -> 137) and objects_signals (620 -> 621).",
       "Mipmapped textures of the GPU frame description": "RhiFrameRenderer generating mipmaps for GpuTexture::mipmaps (the depth frame of the video decal) raised the viz/backends/qt ceilings once (tokens 5774 -> 5785, gui 1711 -> 1722); BrainViewCore moving onto BrainFrameBuilder and RhiFrameRenderer lowers them again.",
-      "Brain view on the GPU frame description": "BrainViewCore records its frames from viz::BrainFrameComposer through RhiFrameRenderer and owns the depth target over the QRhiWidget texture, raising the viz/backends/qt ceilings once (tokens 5785 -> 5793); the superseded BrainRenderer stays as deprecated public API, and its removal lowers them by its QRhi code."
+      "Brain view on the GPU frame description": "BrainViewCore records its frames from viz::BrainFrameComposer through RhiFrameRenderer and owns the depth target over the QRhiWidget texture, raising the viz/backends/qt ceilings once (tokens 5785 -> 5793); the superseded BrainRenderer stays as deprecated public API, and its removal lowers them by its QRhi code.",
+      "Generic panel host": "PanelWidget (kit/panelwidget.h) shows any toolkit-free viz::Panel, and SettingsPanel gained the colour button, colour dialog and toned read-only texts of the new Info and Color fields, raising the gui category once (1725 -> 1733); the compensator and projector views replaced by viz::CompensatorPanel and viz::ProjectorsPanel lowered the total (tokens 5743 -> 5722), and every further view ported to a panel lowers it again."
     }
   },
   "ceilings": {
@@ -163,7 +164,7 @@
       "modules": []
     },
     "viz/backends/qt": {
-      "tokens": 5743,
+      "tokens": 5722,
       "public_header_includes": 133,
       "modules": [
         "Core",
@@ -172,13 +173,13 @@
         "Widgets"
       ],
       "by_category": {
-        "containers": 19,
-        "files": 96,
-        "global": 940,
-        "gui": 1725,
-        "objects_signals": 616,
-        "other": 1532,
-        "strings": 801,
+        "containers": 17,
+        "files": 95,
+        "global": 933,
+        "gui": 1733,
+        "objects_signals": 611,
+        "other": 1522,
+        "strings": 797,
         "time": 14
       }
     },

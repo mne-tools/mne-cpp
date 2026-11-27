@@ -15,6 +15,9 @@
 //=============================================================================================================
 
 #include <mne/viz/forms/settings_form.h>
+#include <mne/viz/host/settings_store.h>
+#include <mne/viz/panels/compensator_panel.h>
+#include <mne/viz/panels/projectors_panel.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -168,6 +171,116 @@ void test_listeners()
     CHECK(heard.size() == 3);
 }
 
+void test_info_paths_colors_and_removal()
+{
+    SettingsForm form;
+    std::vector<std::string> structure;
+    form.add_structure_listener([&structure](const std::string& key) {
+        structure.push_back(key);
+    });
+    const SettingField& info = form.add_info("status", "Status", "idle");
+    CHECK(info.kind == SettingField::Kind::Info && !info.persistent && form.get<std::string>("status") == "idle");
+    form.set_tone("status", SettingField::Tone::Negative);
+    CHECK(form.field("status")->tone == SettingField::Tone::Negative);
+    CHECK(form.set_value("status", std::string("failed")) && form.get<std::string>("status") == "failed");
+
+    form.add_path("bem", "BEM", "/data/bem.fif", "FIFF files (*.fif)");
+    form.add_directory("subjects", "Subjects", "/data/subjects");
+    CHECK(form.field("bem")->file_filter == "FIFF files (*.fif)" && form.field("subjects")->kind == SettingField::Kind::Directory);
+
+    // Colours are "#rrggbb" or "#rrggbbaa"
+    form.add_color("color", "Colour", "#ff0000");
+    CHECK(form.get<std::string>("color") == "#ff0000");
+    CHECK(form.set_value("color", std::string("#00ff0080")));
+    CHECK(!form.set_value("color", std::string("red")) && !form.set_value("color", std::string("#12345g")));
+    CHECK(form.get<std::string>("color") == "#00ff0080");
+
+    // Removing a field drops its value and tells the hosts
+    CHECK(form.remove("bem") && !form.remove("bem"));
+    CHECK(!form.field("bem") && !form.value("bem"));
+    CHECK((structure == std::vector<std::string>{"status", "status", "bem", "subjects", "color", "bem"}));
+}
+
+void test_compensator_panel()
+{
+    std::vector<mne::FiffCtfComp> comps(3);
+    comps[0].kind = 1;
+    comps[1].kind = 2;
+    comps[2].kind = 3;
+    std::vector<int> chosen;
+    CompensatorPanel panel;
+    CHECK(panel.id() == "CompensatorView" && panel.title() == "Compensators" && panel.width() == 330);
+    panel.set_selection_callback([&chosen](int to) {
+        chosen.push_back(to);
+    });
+    panel.set_compensators(comps);
+    CHECK(panel.form().fields().size() == 3 && chosen.empty());
+
+    // At most one grade is on
+    panel.form().set_value(CompensatorPanel::field_key(2), true);
+    panel.form().set_value(CompensatorPanel::field_key(3), true);
+    CHECK(panel.selected() == 3 && !panel.form().get<bool>(CompensatorPanel::field_key(2)));
+    panel.form().set_value(CompensatorPanel::field_key(3), false);
+    CHECK((chosen == std::vector<int>{2, 3, 0}) && panel.selected() == 0);
+    panel.select(2);
+
+    // The chosen grade is remembered and chosen again with the next data
+    MemorySettingsStore store;
+    panel.save(store, "app");
+    CHECK(store.read_string("app/CompensatorView/active", {}) == "1:0,2:1,3:0");
+    CompensatorPanel restored;
+    restored.load(store, "app");
+    restored.set_selection_callback([&chosen](int to) {
+        chosen.push_back(to);
+    });
+    restored.set_compensators(comps);
+    CHECK(restored.selected() == 2 && chosen.back() == 2 && restored.form().get<bool>(CompensatorPanel::field_key(2)));
+
+    // New data replace the check boxes
+    restored.set_compensators({comps[0]});
+    CHECK(restored.form().fields().size() == 1 && restored.selected() == 0);
+}
+
+void test_projectors_panel()
+{
+    mne::FiffProj eeg;
+    eeg.active = true;
+    eeg.desc = "Average EEG = reference";
+    mne::FiffProj ecg;
+    ecg.active = false;
+    ecg.desc = "ECG\nline";
+    std::vector<std::vector<bool>> reported;
+    ProjectorsPanel panel;
+    panel.set_selection_callback([&reported](const std::vector<mne::FiffProj>& projs) {
+        reported.emplace_back();
+        for (const mne::FiffProj& proj : projs) {
+            reported.back().push_back(proj.active);
+        }
+    });
+    panel.set_projectors({eeg, ecg});
+    CHECK(panel.form().fields().size() == 3 && !panel.form().get<bool>(ProjectorsPanel::kAllKey));
+    CHECK((reported.back() == std::vector<bool>{true, false}));
+
+    panel.form().set_value(ProjectorsPanel::field_key(1), true);
+    CHECK(panel.form().get<bool>(ProjectorsPanel::kAllKey) && (reported.back() == std::vector<bool>{true, true}));
+    panel.form().set_value(ProjectorsPanel::kAllKey, false);
+    CHECK(!panel.form().get<bool>(ProjectorsPanel::field_key(0)) && (reported.back() == std::vector<bool>{false, false}));
+    panel.set_active(1, true);
+
+    // Remembered by description, which may contain the separators
+    MemorySettingsStore store;
+    panel.save(store, "app/");
+    ProjectorsPanel restored;
+    restored.load(store, "app");
+    restored.set_projectors({eeg, ecg});
+    CHECK(!restored.projectors()[0].active && restored.projectors()[1].active);
+
+    // Modes reach the panel
+    restored.set_gui_mode(Panel::GuiMode::Clinical);
+    restored.set_processing_mode(Panel::ProcessingMode::Offline);
+    CHECK(restored.gui_mode() == Panel::GuiMode::Clinical && restored.processing_mode() == Panel::ProcessingMode::Offline);
+}
+
 } // namespace
 
 //=============================================================================================================
@@ -181,6 +294,9 @@ int main()
         {"conditions", test_conditions},
         {"flags", test_flags},
         {"listeners", test_listeners},
+        {"info_paths_colors_and_removal", test_info_paths_colors_and_removal},
+        {"compensator_panel", test_compensator_panel},
+        {"projectors_panel", test_projectors_panel},
     };
     for (const auto& [name, test] : tests) {
         const int before = g_failures;

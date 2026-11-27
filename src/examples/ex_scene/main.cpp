@@ -24,6 +24,8 @@
 #include <mne/viz/figures/raster_renderer.h>
 #include <mne/viz/figures/sensor_layout.h>
 #include <mne/viz/forms/settings_form.h>
+#include <mne/viz/host/settings_store.h>
+#include <mne/viz/panels/compensator_panel.h>
 #include <mne/viz/figures/svg_renderer.h>
 #include <mne/viz/figures/text_metrics.h>
 
@@ -174,6 +176,24 @@ int main()
     //! [settings_form_usage]
     ok &= expect(form.get<int>("trials") == 1000 && heard == 1, "a value beyond the range is clamped and heard once");
     ok &= expect(!form.is_enabled("baseline_from"), "the baseline range waits for the baseline switch");
+
+    //! [panel_usage]
+    // A tool panel holds its state and rules once; every backend shows it with one generic host
+    // (viz::qt::PanelWidget for Qt) and stores it through a SettingsStore
+    std::vector<mne::FiffCtfComp> comps(2);
+    comps[0].kind = 1;
+    comps[1].kind = 3;
+    CompensatorPanel compensators;
+    int grade = -1;
+    compensators.set_selection_callback([&grade](int to) {
+        grade = to;
+    });
+    compensators.set_compensators(comps);
+    compensators.form().set_value(CompensatorPanel::field_key(3), true);
+    MemorySettingsStore settings;
+    compensators.save(settings, "ex_scene");
+    //! [panel_usage]
+    ok &= expect(grade == 3 && compensators.selected() == 3, "a click on a compensator's check box chooses its grade");
 
     std::error_code removeError;
     std::filesystem::remove_all(dir, removeError);

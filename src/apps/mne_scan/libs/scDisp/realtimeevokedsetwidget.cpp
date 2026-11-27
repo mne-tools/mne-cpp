@@ -27,8 +27,6 @@
 #include <mne/viz/backends/qt/viewers/butterflyview.h>
 #include <mne/viz/backends/qt/viewers/averagelayoutview.h>
 #include <mne/viz/backends/qt/viewers/scalingview.h>
-#include <mne/viz/backends/qt/viewers/projectorsview.h>
-#include <mne/viz/backends/qt/viewers/compensatorview.h>
 #include <mne/viz/backends/qt/viewers/modalityselectionview.h>
 #include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
 #include <mne/viz/backends/qt/viewers/averageselectionview.h>
@@ -238,32 +236,6 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
 
         //Init control widgets
         QList<QWidget*> lControlWidgets;
-
-        //        // Quick control projectors
-        //        ProjectorsView* pProjectorsView = new ProjectorsView(QString("MNESCAN/RTESW"));
-        //        pProjectorsView->setObjectName("group_tab_View_SSP");
-        //        lControlWidgets.append(pProjectorsView);
-
-        //        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
-        //                m_pEvokedSetModel.data(), &EvokedSetModel::updateProjection);
-
-        //        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
-        //                m_pButterflyView.data(), &ButterflyView::updateView);
-
-        //        pProjectorsView->setProjectors(m_pFiffInfo->projs);
-
-        //        // Quick control compensators
-        //        CompensatorView* pCompensatorView = new CompensatorView(QString("MNESCAN/RTESW"));
-        //        pCompensatorView->setObjectName("group_tab_View_Comp");
-        //        lControlWidgets.append(pCompensatorView);
-
-        //        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
-        //                m_pEvokedSetModel.data(), &EvokedSetModel::updateCompensator);
-
-        //        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
-        //                m_pButterflyView.data(), &ButterflyView::updateView);
-
-        //        pCompensatorView->setCompensators(m_pFiffInfo->comps);
 
         //        // Quick control filter settings
         //        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("MNESCAN/RTESW"));

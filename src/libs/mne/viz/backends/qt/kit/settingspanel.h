@@ -10,8 +10,8 @@
  * @brief    SettingsPanel builds Qt Widgets for any viz::SettingsForm.
  *
  * The one Qt builder of the toolkit-neutral settings description: check boxes, spin boxes, sliders, combo boxes,
- * line edits, file choosers and buttons in group boxes, kept in step with the form both ways, with the enabled and
- * visible conditions of the fields applied. Values persist in QSettings.
+ * line edits, file and directory choosers, colour buttons, read-only texts and buttons in group boxes, kept in step
+ * with the form both ways, with the enabled and visible conditions of the fields applied. Values persist in QSettings.
  */
 
 #ifndef DISP_SETTINGSPANEL_H
@@ -55,7 +55,8 @@ namespace mne::viz::qt
  *
  * The panel shares the form with its host, so it outlives the host's members when Qt deletes it as a child. Fields are laid out in the order of the form, one group box per group (fields
  * without a group come first, without a box); a group box hides while none of its fields shows, and hidden fields
- * get no widget. Custom fields get an empty container the host fills with its own widget (customWidget()).
+ * get no widget. Custom fields get an empty container the host fills with its own widget (customWidget()). Adding or
+ * removing fields rebuilds the widgets, emptying the containers of custom fields again; rebuilt() tells the host.
  *
  * @since 3.0.0
  */
@@ -113,6 +114,15 @@ public:
      */
     void saveSettings(const QString& path) const;
 
+signals:
+    //=========================================================================================================
+    /**
+     * Emitted after fields were added or removed and the widgets were built again.
+     *
+     * @since 3.0.0
+     */
+    void rebuilt();
+
 private:
     struct Row
     {
@@ -120,7 +130,10 @@ private:
         QLabel* label = nullptr;   /**< Label in front of the editor, if any. */
     };
 
+    void build();
+    void rebuild();
     void buildField(const viz::SettingField& field, QFormLayout* layout);
+    QWidget* buildChooser(const viz::SettingField& field);
     void showValue(const std::string& key);
     void updateField(const std::string& key);
     void updateConditions();
@@ -129,6 +142,7 @@ private:
     viz::SettingsForm& m_form;
     std::map<std::string, Row> m_rows;
     std::map<std::string, QGroupBox*> m_groups;
+    QWidget* m_content = nullptr; /**< Holds the rows; replaced on rebuild(). */
     int m_listener = 0;
     int m_structureListener = 0;
 };

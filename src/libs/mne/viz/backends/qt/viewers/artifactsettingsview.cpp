@@ -19,7 +19,7 @@
 
 #include "artifactsettingsview.h"
 #include "../detail/scoped_flag.h"
-#include "settingspanel.h"
+#include "../kit/settingspanel.h"
 
 #include <mne/fiff/fiff_ch_info.h>
 

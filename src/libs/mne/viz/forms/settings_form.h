@@ -69,14 +69,26 @@ struct SettingField
     /** What the field edits. */
     enum class Kind
     {
-        Bool,   /**< On or off (a check box). */
-        Int,    /**< A whole number in [minimum, maximum] (a spin box or slider). */
-        Double, /**< A number in [minimum, maximum] with decimals (a spin box or slider). */
-        Choice, /**< One of the choices (a combo box). */
-        Text,   /**< Free text (a line edit). */
-        Path,   /**< A file (a line edit with a browse button). */
-        Action, /**< No value: a button that triggers listeners. */
-        Custom  /**< No value: room for a toolkit-specific widget of the host. */
+        Bool,      /**< On or off (a check box). */
+        Int,       /**< A whole number in [minimum, maximum] (a spin box or slider). */
+        Double,    /**< A number in [minimum, maximum] with decimals (a spin box or slider). */
+        Choice,    /**< One of the choices (a combo box). */
+        Text,      /**< Free text (a line edit). */
+        Path,      /**< A file (a line edit with a browse button). */
+        Action,    /**< No value: a button that triggers listeners. */
+        Custom,    /**< No value: room for a toolkit-specific widget of the host. */
+        Info,      /**< Read-only text, e.g. a status or a measured value; not persisted. */
+        Directory, /**< A directory (a line edit with a browse button). */
+        Color      /**< A colour as "#rrggbb" or "#rrggbbaa" (a colour button). */
+    };
+
+    /** How an Info field is emphasised. */
+    enum class Tone
+    {
+        Normal,   /**< Plain text. */
+        Positive, /**< Success, e.g. "Forward solution ready". */
+        Warning,  /**< Needs attention. */
+        Negative  /**< Failure. */
     };
 
     /** How a number is edited. */
@@ -113,6 +125,7 @@ struct SettingField
     std::string visible_if;              /**< Key of a Bool field the field is shown with ("!key": without). */
     bool hidden = false;                 /**< Never shown, e.g. a mode flag of the host that conditions refer to. */
     bool persistent = true;              /**< Whether hosts store the value with the other settings. */
+    Tone tone = Tone::Normal;            /**< Emphasis of Info fields. */
 };
 
 /**
@@ -271,6 +284,80 @@ public:
 
     //=========================================================================================================
     /**
+     * Adds a read-only Info field, e.g. a status line; it is not persisted.
+     *
+     * @param[in] key     Field key.
+     * @param[in] label   Label in front of the text; empty for none.
+     * @param[in] text    Initial text.
+     * @param[in] group   Group title; empty for none.
+     *
+     * @return The stored field.
+     *
+     * @since 3.0.0
+     */
+    const SettingField& add_info(const std::string& key, const std::string& label, const std::string& text, const std::string& group = {});
+
+    //=========================================================================================================
+    /**
+     * Adds a Path field: a file chosen with a dialog or typed.
+     *
+     * @param[in] key      Field key.
+     * @param[in] label    Label in front of the editor.
+     * @param[in] value    Initial path.
+     * @param[in] filter   File dialog filter, e.g. "FIFF files (*.fif)".
+     * @param[in] group    Group title; empty for none.
+     *
+     * @return The stored field.
+     *
+     * @since 3.0.0
+     */
+    const SettingField& add_path(const std::string& key, const std::string& label, const std::string& value, const std::string& filter = {},
+                                 const std::string& group = {});
+
+    //=========================================================================================================
+    /**
+     * Adds a Directory field: a directory chosen with a dialog or typed.
+     *
+     * @param[in] key     Field key.
+     * @param[in] label   Label in front of the editor.
+     * @param[in] value   Initial directory.
+     * @param[in] group   Group title; empty for none.
+     *
+     * @return The stored field.
+     *
+     * @since 3.0.0
+     */
+    const SettingField& add_directory(const std::string& key, const std::string& label, const std::string& value, const std::string& group = {});
+
+    //=========================================================================================================
+    /**
+     * Adds a Color field.
+     *
+     * @param[in] key     Field key.
+     * @param[in] label   Label in front of the colour button.
+     * @param[in] value   Initial colour, "#rrggbb" or "#rrggbbaa".
+     * @param[in] group   Group title; empty for none.
+     *
+     * @return The stored field.
+     *
+     * @since 3.0.0
+     */
+    const SettingField& add_color(const std::string& key, const std::string& label, const std::string& value, const std::string& group = {});
+
+    //=========================================================================================================
+    /**
+     * Removes a field and its value.
+     *
+     * @param[in] key   Field key.
+     *
+     * @return Whether the field existed.
+     *
+     * @since 3.0.0
+     */
+    bool remove(const std::string& key);
+
+    //=========================================================================================================
+    /**
      * @param[in] key   Field key.
      *
      * @return The field, or nullptr.
@@ -311,6 +398,16 @@ public:
      * @param[in] label   New label.
      */
     void set_label(const std::string& key, const std::string& label);
+
+    /**
+     * Changes the emphasis of an Info field.
+     *
+     * @param[in] key    Field key.
+     * @param[in] tone   New emphasis.
+     *
+     * @since 3.0.0
+     */
+    void set_tone(const std::string& key, SettingField::Tone tone);
 
     //=========================================================================================================
     /**

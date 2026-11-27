@@ -405,6 +405,17 @@ aliases; replace the old spelling as below.
   `BrainFrameComposer::redraw_overlay()` draw an unchanged overlay again.
   `BrainRenderer` is no longer used by the view and is deprecated; it will be
   removed in a later release.
+- Tool panels become toolkit-free: `viz::Panel` (`viz/panels/panel.h`) holds
+  a tool's state, rules and `SettingsForm`, its GUI and processing modes and
+  its persistence through a `viz::SettingsStore`; each backend shows every
+  panel with one generic host (`viz::qt::PanelWidget` for Qt) instead of a
+  hand-written view per tool, so the tools look alike in every backend. The
+  generic Qt building blocks move to `viz/backends/qt/kit/` (`SettingsPanel`,
+  `PanelWidget`). `CompensatorView` and `ProjectorsView` are replaced by
+  `viz::CompensatorPanel` and `viz::ProjectorsPanel` (their settings are
+  stored under new keys). `SettingsForm` gains read-only Info fields with a
+  tone, Directory and Color fields, `add_path()` and `remove()`;
+  `SettingsPanel` rebuilds its rows when fields are added or removed.
 - `ChannelRhiRenderer` hosts a `viz::TraceViewClient`, the same trace view
   client the SDL example runs, instead of wiring its own view, animator,
   markers and frame builder; its host becomes the client's `viz::Surface`.

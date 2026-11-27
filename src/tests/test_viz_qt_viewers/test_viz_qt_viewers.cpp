@@ -9,7 +9,7 @@
  * @date     March, 2026
  * @brief    Tests for the disp viewer widget classes: construction, getter/setter round-trips,
  *           settings persistence, GuiMode/ProcessingMode switching, and clearView.
- *           Covers: ScalingView, CompensatorView, ProjectorsView, ModalitySelectionView,
+ *           Covers: ScalingView, PanelWidget (compensators, projectors), ModalitySelectionView,
  *           MinimumNormSettingsView, FilterSettingsView, FilterDesignView,
  *           SpectrumSettingsView, AveragingSettingsView, CovarianceSettingsView,
  *           ArtifactSettingsView, SettingsPanel, SpharaSettingsView, TfSettingsView, ConnectivitySettingsView,
@@ -22,8 +22,9 @@
 
 #include <mne/viz/backends/qt/viewers/abstractview.h>
 #include <mne/viz/backends/qt/viewers/scalingview.h>
-#include <mne/viz/backends/qt/viewers/compensatorview.h>
-#include <mne/viz/backends/qt/viewers/projectorsview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/compensator_panel.h>
+#include <mne/viz/panels/projectors_panel.h>
 #include <mne/viz/backends/qt/viewers/modalityselectionview.h>
 #include <mne/viz/backends/qt/viewers/minimumnormsettingsview.h>
 #include <mne/viz/backends/qt/viewers/filtersettingsview.h>
@@ -39,7 +40,7 @@
 #include <mne/viz/backends/qt/viewers/progressview.h>
 #include <mne/viz/backends/qt/viewers/quickcontrolview.h>
 #include <mne/viz/backends/qt/viewers/multiview.h>
-#include <mne/viz/backends/qt/viewers/settingspanel.h>
+#include <mne/viz/backends/qt/kit/settingspanel.h>
 
 #include <mne/fiff/fiff_ch_info.h>
 #include <mne/fiff/fiff_proj.h>
@@ -56,6 +57,7 @@
 #include <QStringList>
 #include <QMap>
 #include <QCheckBox>
+#include <QToolButton>
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QFormLayout>
@@ -109,16 +111,16 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies that CompensatorView accepts an empty and populated compensator list and
-     * returns consistent values.
+     * Verifies that PanelWidget shows the compensator panel's check boxes once the compensators arrive, that a
+     * click chooses one grade exclusively, and that the choice is restored from QSettings by a new widget.
      */
-    void compensatorView_setAndGet();
+    void panelWidget_compensators();
 
     //=========================================================================================================
     /**
-     * Verifies that ProjectorsView accepts projectors, returns them, and survives lifecycle calls.
+     * Verifies that PanelWidget shows one check box per projector and the "Enable all" box, which switches all.
      */
-    void projectorsView_setAndGet();
+    void panelWidget_projectors();
 
     //=========================================================================================================
     /**
@@ -174,6 +176,13 @@ private slots:
      * only persistent fields.
      */
     void settingsPanel_flagsGroupsAndPersistence();
+
+    //=========================================================================================================
+    /**
+     * Verifies the Info, Directory and Color widgets of SettingsPanel and that added and removed fields rebuild
+     * the rows.
+     */
+    void settingsPanel_infoColorDirectoryAndRebuild();
 
     //=========================================================================================================
     /**
@@ -326,57 +335,89 @@ void TestVizQtViewers::scalingView_constructAndGetSet()
 
 //=============================================================================================================
 
-void TestVizQtViewers::compensatorView_setAndGet()
+void TestVizQtViewers::panelWidget_compensators()
 {
-    CompensatorView view("test_viz_qt_viewers");
+    const QString path = QStringLiteral("test_viz_qt_viewers_compensators_%1").arg(QCoreApplication::applicationPid());
+    std::vector<FiffCtfComp> comps(2);
+    comps[0].kind = 1;
+    comps[1].kind = 3;
+    std::vector<int> chosen;
+    {
+        auto panel = std::make_shared<CompensatorPanel>();
+        panel->set_selection_callback([&chosen](int to) {
+            chosen.push_back(to);
+        });
+        PanelWidget widget(panel, path);
+        QCOMPARE(widget.windowTitle(), QStringLiteral("Compensators"));
+        QCOMPARE(widget.width(), 330);
+        QVERIFY(!widget.findChild<QCheckBox*>(QString::fromStdString(CompensatorPanel::field_key(1))));
 
-    // Empty list
-    view.setCompensators(std::vector<FiffCtfComp>());
-    QVERIFY(view.getCompensators().empty());
-    QCOMPARE(view.getLastTo(), 0);
+        // The check boxes appear with the data; checking one unchecks the other
+        panel->set_compensators(comps);
+        auto* first = widget.findChild<QCheckBox*>(QString::fromStdString(CompensatorPanel::field_key(1)));
+        auto* third = widget.findChild<QCheckBox*>(QString::fromStdString(CompensatorPanel::field_key(3)));
+        QVERIFY(first && third);
+        first->click();
+        third->click();
+        QVERIFY(!first->isChecked() && third->isChecked());
+        QCOMPARE(chosen, std::vector<int>({1, 3}));
+        third->click();
+        QCOMPARE(chosen.back(), 0);
+        third->click();
+        widget.setGuiMode(AbstractView::GuiMode::Clinical);
+        QCOMPARE(panel->gui_mode(), Panel::GuiMode::Clinical);
+    }
 
-    // Non-empty list
-    FiffCtfComp comp;
-    comp.ctfkind = 101;
-    comp.kind = FIFF_MNE_CTF_COMP_KIND;
-    view.setCompensators({comp});
-
-    view.setGuiMode(AbstractView::GuiMode::Research);
-    view.setProcessingMode(AbstractView::ProcessingMode::Offline);
-    view.saveSettings();
-    view.loadSettings();
-    view.clearView();
-
-    QApplication::processEvents();
+    // A new widget restores the chosen grade and reports it with the data
+    auto restored = std::make_shared<CompensatorPanel>();
+    PanelWidget widget(restored, path);
+    chosen.clear();
+    restored->set_selection_callback([&chosen](int to) {
+        chosen.push_back(to);
+    });
+    restored->set_compensators(comps);
+    QCOMPARE(restored->selected(), 3);
+    QCOMPARE(chosen, std::vector<int>({3}));
+    QSettings(QStringLiteral("MNECPP")).remove(path);
 }
 
 //=============================================================================================================
 
-void TestVizQtViewers::projectorsView_setAndGet()
+void TestVizQtViewers::panelWidget_projectors()
 {
-    ProjectorsView view("test_viz_qt_viewers");
+    auto panel = std::make_shared<ProjectorsPanel>();
+    std::vector<std::vector<bool>> reported;
+    panel->set_selection_callback([&reported](const std::vector<FiffProj>& projs) {
+        std::vector<bool> active;
+        active.reserve(projs.size());
+        for (const FiffProj& proj : projs) {
+            active.push_back(proj.active);
+        }
+        reported.push_back(active);
+    });
+    PanelWidget widget(panel);
 
-    // Empty list
-    view.setProjectors(std::vector<FiffProj>());
-    QVERIFY(view.getProjectors().empty());
+    FiffProj eeg;
+    eeg.kind = FIFFV_PROJ_ITEM_EEG_AVREF;
+    eeg.active = true;
+    eeg.desc = "Average EEG reference";
+    FiffProj ecg = eeg;
+    ecg.active = false;
+    ecg.desc = "ECG";
+    panel->set_projectors({eeg, ecg});
+    QCOMPARE(reported.back(), std::vector<bool>({true, false}));
 
-    // Non-empty list
-    FiffProj proj;
-    proj.kind = FIFFV_PROJ_ITEM_EEG_AVREF;
-    proj.active = false;
-    proj.desc = "Test projector";
-    view.setProjectors({proj});
-    QCOMPARE(view.getProjectors().size(), 1);
-    QVERIFY(!view.getProjectors().front().active);
-
-    view.redrawGUI();
-    view.setGuiMode(AbstractView::GuiMode::Clinical);
-    view.setProcessingMode(AbstractView::ProcessingMode::RealTime);
-    view.saveSettings();
-    view.loadSettings();
-    view.clearView();
-
-    QApplication::processEvents();
+    auto* box = widget.findChild<QCheckBox*>(QString::fromStdString(ProjectorsPanel::field_key(1)));
+    auto* all = widget.findChild<QCheckBox*>(QString::fromStdString(ProjectorsPanel::kAllKey));
+    QVERIFY(box && all);
+    QCOMPARE(box->text(), QStringLiteral("ECG"));
+    QVERIFY(!all->isChecked());
+    box->click();
+    QVERIFY(all->isChecked());
+    QCOMPARE(reported.back(), std::vector<bool>({true, true}));
+    all->click();
+    QCOMPARE(reported.back(), std::vector<bool>({false, false}));
+    QVERIFY(!box->isChecked());
 }
 
 //=============================================================================================================
@@ -672,6 +713,48 @@ void TestVizQtViewers::settingsPanel_buildsAndSyncsWidgets()
     QCOMPARE(form->get<int>("trials"), 20);
     QVERIFY(form->get<bool>("baseline"));
     QSettings(QStringLiteral("MNECPP")).remove(path);
+}
+
+//=============================================================================================================
+
+void TestVizQtViewers::settingsPanel_infoColorDirectoryAndRebuild()
+{
+    auto form = std::make_shared<SettingsForm>("Forward");
+    form->add_info("status", "Status", "idle");
+    form->add_directory("subjects", "Subjects", "/data");
+    form->add_color("color", "Colour", "#112233");
+    SettingsPanel panel(form);
+    QSignalSpy rebuilt(&panel, &SettingsPanel::rebuilt);
+
+    auto* status = qobject_cast<QLabel*>(panel.editor("status"));
+    QVERIFY(status);
+    QCOMPARE(status->text(), QStringLiteral("idle"));
+    form->set_value("status", std::string("failed"));
+    form->set_tone("status", SettingField::Tone::Negative);
+    QCOMPARE(status->text(), QStringLiteral("failed"));
+    QVERIFY(status->styleSheet().contains(QStringLiteral("color")));
+
+    auto* directory = panel.editor("subjects")->findChild<QLineEdit*>();
+    QVERIFY(directory);
+    QCOMPARE(directory->text(), QStringLiteral("/data"));
+    directory->setText(QStringLiteral("/other"));
+    emit directory->textEdited(directory->text());
+    QCOMPARE(form->get<std::string>("subjects"), std::string("/other"));
+
+    auto* color = qobject_cast<QToolButton*>(panel.editor("color"));
+    QVERIFY(color && color->styleSheet().contains(QStringLiteral("#112233")));
+    form->set_value("color", std::string("#445566"));
+    QVERIFY(color->styleSheet().contains(QStringLiteral("#445566")));
+
+    // Added and removed fields rebuild the rows
+    form->add_bool("extra", "Extra", true);
+    QCOMPARE(rebuilt.count(), 1);
+    QVERIFY(qobject_cast<QCheckBox*>(panel.editor("extra")));
+    QCOMPARE(panel.findChildren<QCheckBox*>(QStringLiteral("extra")).size(), 1);
+    form->remove("extra");
+    QCOMPARE(rebuilt.count(), 2);
+    QVERIFY(!panel.editor("extra"));
+    QCOMPARE(qobject_cast<QLabel*>(panel.editor("status"))->text(), QStringLiteral("failed"));
 }
 
 //=============================================================================================================

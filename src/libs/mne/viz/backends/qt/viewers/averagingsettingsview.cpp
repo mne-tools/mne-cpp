@@ -20,7 +20,7 @@
 #include "averagingsettingsview.h"
 #include "../detail/layout_reset.h"
 #include "../detail/scoped_flag.h"
-#include "settingspanel.h"
+#include "../kit/settingspanel.h"
 
 #include <mne/fiff/fiff_evoked_set.h>
 

@@ -1211,10 +1211,6 @@
       "modernize-use-nullptr": 2,
       "modernize-use-override": 8
     },
-    "src/libs/mne/viz/backends/qt/viewers/compensatorview.h": {
-      "modernize-use-nullptr": 1,
-      "modernize-use-override": 6
-    },
     "src/libs/mne/viz/backends/qt/viewers/connectivitysettingsview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
@@ -1351,10 +1347,6 @@
       "modernize-use-override": 1
     },
     "src/libs/mne/viz/backends/qt/viewers/progressview.h": {
-      "modernize-use-override": 6
-    },
-    "src/libs/mne/viz/backends/qt/viewers/projectorsview.h": {
-      "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
     "src/libs/mne/viz/backends/qt/viewers/projectsettingsview.h": {
