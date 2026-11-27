@@ -15,8 +15,9 @@
 //=============================================================================================================
 
 #include "dataloader.h"
+#include "../../qtconversions.h"
 
-#include "surfacekeys.h"
+#include "../../../../brain/surfacekeys.h"
 #include "../model/items/sensortreeitem.h"
 #include "../../../../brain/brainsurface.h"
 #include <mne/fiff/fiff_evoked_set.h>
@@ -85,7 +86,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const std::filesystem::path
             info.dev_head_t.to == FIFFV_COORD_HEAD &&
             !info.dev_head_t.trans.isIdentity()) {
             hasDevHead = true;
-            devHeadQTrans = mne::viz::qt::surface_keys::toQMatrix4x4(info.dev_head_t.trans);
+            devHeadQTrans = toQMatrix(info.dev_head_t.trans);
         }
 
         result.devHeadTrans = devHeadQTrans;

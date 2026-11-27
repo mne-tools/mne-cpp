@@ -27,7 +27,7 @@
 #include "../../../../brain/polylineobject.h"
 #include "../renderable/videooverlay.h"
 #include "../renderable/sliceobject.h"
-#include "../core/surfacekeys.h"
+#include "../../../../brain/surfacekeys.h"
 #include "../core/dataloader.h"
 #include "../input/raypicker.h"
 #include "../../qtconversions.h"
@@ -562,7 +562,7 @@ void BrainViewCore::onRowsInserted(const QModelIndex& parent, int first, int las
 
 
             // Legacy map support
-            const std::string keyPrefix = mne::viz::qt::surface_keys::sensorParentToKeyPrefix(parentText.toStdString());
+            const std::string keyPrefix = mne::viz::surface_keys::sensorParentToKeyPrefix(parentText.toStdString());
 
             const std::string key = std::format("{}{}_{}", keyPrefix, sensItem->text().toStdString(), reinterpret_cast<std::uintptr_t>(sensItem));
             m_surfaces[key] = brainSurf;
@@ -977,7 +977,7 @@ void BrainViewCore::syncBemShadersToBrainShaders()
 
 void BrainViewCore::setSensorVisible(const std::string& type, bool visible)
 {
-    const std::string object = mne::viz::qt::surface_keys::sensorTypeToObjectKey(type);
+    const std::string object = mne::viz::surface_keys::sensorTypeToObjectKey(type);
     if (object.empty())
         return;
 
@@ -2505,7 +2505,7 @@ std::map<int, QVector3D> BrainViewCore::cardinalFiducialsInMri() const
     QMatrix4x4 headToMri;
     headToMri.setToIdentity();
     if (haveTrans)
-        headToMri = mne::viz::qt::surface_keys::toQMatrix4x4(m_headToMriTrans.trans);
+        headToMri = toQMatrix(m_headToMriTrans.trans);
 
     for (const auto& dp : m_cardinalDigPoints) {
         const QVector3D posHead(dp.r[0], dp.r[1], dp.r[2]);
@@ -2680,7 +2680,7 @@ QMatrix4x4 BrainViewCore::itemTransform(const QStandardItem* item) const
     const int type = absItem->type();
     const bool inHead = type == AbstractTreeItem::itemTypeId(AbstractTreeItem::SensorItem) || type == AbstractTreeItem::itemTypeId(AbstractTreeItem::DigitizerItem) || type == AbstractTreeItem::itemTypeId(AbstractTreeItem::DipoleItem);
     if (inHead && m_applySensorTrans && !m_headToMriTrans.empty())
-        trans = mne::viz::qt::surface_keys::toQMatrix4x4(m_headToMriTrans.trans) * trans;
+        trans = toQMatrix(m_headToMriTrans.trans) * trans;
     return trans;
 }
 
@@ -2690,7 +2690,7 @@ void BrainViewCore::refreshSensorTransforms()
 {
     QMatrix4x4 qmat;
     if (m_applySensorTrans && !m_headToMriTrans.empty()) {
-        qmat = mne::viz::qt::surface_keys::toQMatrix4x4(m_headToMriTrans.trans);
+        qmat = toQMatrix(m_headToMriTrans.trans);
     }
 
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {

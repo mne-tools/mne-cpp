@@ -20,7 +20,7 @@
 #include <mne/viz/brain/rendertypes.h>
 #include <mne/viz/host/settings_store.h>
 #include <mne/viz/backends/qt/qtsettingsstore.h>
-#include <mne/viz/backends/qt/3d/core/surfacekeys.h>
+#include <mne/viz/brain/surfacekeys.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -425,32 +425,32 @@ void TestDisp3dViewState::testMultiViewPresetIsPerspective()
 void TestDisp3dViewState::testSurfaceKeyConstants()
 {
     // Verify key string constants are non-empty and match expected prefixes
-    QCOMPARE(mne::viz::qt::surface_keys::kLhPrefix, std::string_view("lh_"));
-    QCOMPARE(mne::viz::qt::surface_keys::kRhPrefix, std::string_view("rh_"));
-    QCOMPARE(mne::viz::qt::surface_keys::kBemHead, std::string_view("bem_head"));
-    QCOMPARE(mne::viz::qt::surface_keys::kBemPrefix, std::string_view("bem_"));
-    QCOMPARE(mne::viz::qt::surface_keys::kSensPrefix, std::string_view("sens_"));
-    QCOMPARE(mne::viz::qt::surface_keys::kDigPrefix, std::string_view("dig_"));
-    QCOMPARE(mne::viz::qt::surface_keys::kDigCardinal, std::string_view("dig_cardinal"));
-    QCOMPARE(mne::viz::qt::surface_keys::kDigHpi, std::string_view("dig_hpi"));
-    QCOMPARE(mne::viz::qt::surface_keys::kDigEeg, std::string_view("dig_eeg"));
-    QCOMPARE(mne::viz::qt::surface_keys::kDigExtra, std::string_view("dig_extra"));
+    QCOMPARE(mne::viz::surface_keys::kLhPrefix, std::string_view("lh_"));
+    QCOMPARE(mne::viz::surface_keys::kRhPrefix, std::string_view("rh_"));
+    QCOMPARE(mne::viz::surface_keys::kBemHead, std::string_view("bem_head"));
+    QCOMPARE(mne::viz::surface_keys::kBemPrefix, std::string_view("bem_"));
+    QCOMPARE(mne::viz::surface_keys::kSensPrefix, std::string_view("sens_"));
+    QCOMPARE(mne::viz::surface_keys::kDigPrefix, std::string_view("dig_"));
+    QCOMPARE(mne::viz::surface_keys::kDigCardinal, std::string_view("dig_cardinal"));
+    QCOMPARE(mne::viz::surface_keys::kDigHpi, std::string_view("dig_hpi"));
+    QCOMPARE(mne::viz::surface_keys::kDigEeg, std::string_view("dig_eeg"));
+    QCOMPARE(mne::viz::surface_keys::kDigExtra, std::string_view("dig_extra"));
 }
 
 //=============================================================================================================
 
 void TestDisp3dViewState::testSensorTypeToObjectKey()
 {
-    QCOMPARE(mne::viz::qt::surface_keys::sensorTypeToObjectKey("MEG"), std::string("sens_meg"));
-    QCOMPARE(mne::viz::qt::surface_keys::sensorTypeToObjectKey("MEG/Grad"), std::string("sens_meg_grad"));
-    QCOMPARE(mne::viz::qt::surface_keys::sensorTypeToObjectKey("MEG/Mag"), std::string("sens_meg_mag"));
-    QCOMPARE(mne::viz::qt::surface_keys::sensorTypeToObjectKey("EEG"), std::string("sens_eeg"));
-    QCOMPARE(mne::viz::qt::surface_keys::sensorTypeToObjectKey("Digitizer"), std::string("dig"));
-    QCOMPARE(mne::viz::qt::surface_keys::sensorTypeToObjectKey("Digitizer/Cardinal"), std::string("dig_cardinal"));
-    QCOMPARE(mne::viz::qt::surface_keys::sensorTypeToObjectKey("Digitizer/HPI"), std::string("dig_hpi"));
+    QCOMPARE(mne::viz::surface_keys::sensorTypeToObjectKey("MEG"), std::string("sens_meg"));
+    QCOMPARE(mne::viz::surface_keys::sensorTypeToObjectKey("MEG/Grad"), std::string("sens_meg_grad"));
+    QCOMPARE(mne::viz::surface_keys::sensorTypeToObjectKey("MEG/Mag"), std::string("sens_meg_mag"));
+    QCOMPARE(mne::viz::surface_keys::sensorTypeToObjectKey("EEG"), std::string("sens_eeg"));
+    QCOMPARE(mne::viz::surface_keys::sensorTypeToObjectKey("Digitizer"), std::string("dig"));
+    QCOMPARE(mne::viz::surface_keys::sensorTypeToObjectKey("Digitizer/Cardinal"), std::string("dig_cardinal"));
+    QCOMPARE(mne::viz::surface_keys::sensorTypeToObjectKey("Digitizer/HPI"), std::string("dig_hpi"));
 
     // Unknown type should return empty string
-    QVERIFY(mne::viz::qt::surface_keys::sensorTypeToObjectKey("Unknown").empty());
+    QVERIFY(mne::viz::surface_keys::sensorTypeToObjectKey("Unknown").empty());
 }
 
 //=============================================================================================================

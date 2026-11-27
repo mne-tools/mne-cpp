@@ -74,6 +74,7 @@ set(HEADERS
   brain/rendertypes.h
   brain/sensorfieldmapper.h
   brain/sourceestimateoverlay.h
+  brain/surfacekeys.h
   brain/viewstate.h
   figures/average_layout.h
   figures/average_tile.h

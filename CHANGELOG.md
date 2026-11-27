@@ -416,6 +416,9 @@ aliases; replace the old spelling as below.
   `SensorFieldMapper` (MEG/EEG field maps and contours on the helmet and head)
   moved to `viz/brain/` without Qt; `mne_viz` links `mne_fwd` for the field
   mapping.
+- The surface-key constants of the brain view moved to `viz/brain/surfacekeys.h`
+  (namespace `mne::viz::surface_keys`); its Qt matrix helper
+  `toQMatrix4x4` is gone, use `qt::toQMatrix` from `qtconversions.h`.
 - Views run in any backend through `viz/host/surface.h`: a backend implements
   `viz::Surface` (redraw requests, clock, pointer shape) and drives a
   `viz::SurfaceClient` (resize, pointer, wheel and key events, animation

@@ -211,7 +211,6 @@ set(HEADERS
     viewers/helpers/frequencyspectrumdelegate.h
     viewers/helpers/frequencyspectrummodel.h
     viewers/helpers/bidsviewmodel.h
-    3d/core/surfacekeys.h
     3d/core/dataloader.h
     3d/input/cameracontroller.h
     3d/input/raypicker.h

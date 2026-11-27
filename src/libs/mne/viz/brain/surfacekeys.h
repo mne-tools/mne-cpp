@@ -7,10 +7,10 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    String key constants for surfaces in the @c mne_viz_qt scene map.
+ * @brief    String key constants for surfaces in the scene map of the brain view.
  *
  * BrainView and the scene controllers store all renderable surfaces
- * in a single @c QMap<QString, std::shared_ptr<BrainSurface>>. The
+ * in a single @c std::map<std::string, std::shared_ptr<BrainSurface>>. The
  * keys in this namespace are the canonical identifiers used by every
  * controller to look up, replace or remove a surface without race
  * conditions caused by typo'd magic strings.
@@ -22,26 +22,14 @@
  * orientation gizmo).
  */
 
-#ifndef SURFACEKEYS_H
-#define SURFACEKEYS_H
+#ifndef VIZ_SURFACEKEYS_H
+#define VIZ_SURFACEKEYS_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QMatrix4x4>
-
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
+#include "../viz_global.h"
 
 //=============================================================================================================
 // STL INCLUDES
@@ -53,7 +41,7 @@
 
 //=============================================================================================================
 /**
- * @namespace mne::viz::qt::surface_keys
+ * @namespace mne::viz::surface_keys
  * @brief     Centralised string constants for surface map keys.
  *
  * Every surface stored in BrainView's `m_surfaces` map is identified by a
@@ -61,7 +49,7 @@
  * suffix.  Using these constants instead of raw string literals ensures
  * consistency and enables compile-time typo detection.
  */
-namespace mne::viz::qt::surface_keys
+namespace mne::viz::surface_keys
 {
 // ── Hemisphere prefixes ────────────────────────────────────────────
 inline constexpr std::string_view kLhPrefix = "lh_";
@@ -131,7 +119,7 @@ inline std::string sensorTypeToObjectKey(std::string_view uiType)
  * Map a parent-item display text (e.g. "MEG/Grad") to the surface-map key
  * prefix used when registering individual sensor surfaces.
  *
- * @param[in] parentText   Text from the parent QStandardItem.
+ * @param[in] parentText   Text of the parent tree item.
  * @return                 Key prefix string.
  */
 inline std::string sensorParentToKeyPrefix(std::string_view parentText)
@@ -149,25 +137,6 @@ inline std::string sensorParentToKeyPrefix(std::string_view parentText)
     return "sens_";
 }
 
-//=============================================================================================================
-/**
- * Convert an Eigen 4x4 matrix to a QMatrix4x4.
- *
- * This eliminates the duplicated nested for-loop that appears throughout
- * the codebase.
- *
- * @param[in] m   Eigen 4x4 float matrix.
- * @return        Equivalent QMatrix4x4.
- */
-inline QMatrix4x4 toQMatrix4x4(const Eigen::Matrix4f& m)
-{
-    QMatrix4x4 q;
-    for (int r = 0; r < 4; ++r)
-        for (int c = 0; c < 4; ++c)
-            q(r, c) = m(r, c);
-    return q;
-}
+} // namespace mne::viz::surface_keys
 
-} // namespace mne::viz::qt::surface_keys
-
-#endif // SURFACEKEYS_H
+#endif // VIZ_SURFACEKEYS_H

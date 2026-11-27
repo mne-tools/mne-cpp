@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include "rtsensorinterpolationmatworker.h"
+#include "../../qtconversions.h"
 
 #include <mne/base/log.h>
 
@@ -64,18 +65,6 @@ Eigen::Vector3f applyTransform(const Eigen::Vector3f& point,
     float r[3] = {point.x(), point.y(), point.z()};
     FiffCoordTrans::apply_trans(r, trans, FIFFV_MOVE);
     return Eigen::Vector3f(r[0], r[1], r[2]);
-}
-
-/**
- * Convert a 4×4 Eigen matrix to a QMatrix4x4.
- */
-QMatrix4x4 toQMatrix4x4(const Eigen::Matrix4f& m)
-{
-    QMatrix4x4 q;
-    for (int r = 0; r < 4; ++r)
-        for (int c = 0; c < 4; ++c)
-            q(r, c) = m(r, c);
-    return q;
 }
 
 } // anonymous namespace
@@ -198,12 +187,12 @@ void RtSensorInterpolationMatWorker::computeMapping()
         evoked.info.dev_head_t.to == FIFFV_COORD_HEAD &&
         !evoked.info.dev_head_t.trans.isIdentity()) {
         hasDevHead = true;
-        devHeadQt = toQMatrix4x4(evoked.info.dev_head_t.trans);
+        devHeadQt = toQMatrix(evoked.info.dev_head_t.trans);
     }
 
     QMatrix4x4 headToMri;
     if (applySensorTrans && !headToMriTrans.empty()) {
-        headToMri = toQMatrix4x4(headToMriTrans.trans);
+        headToMri = toQMatrix(headToMriTrans.trans);
     }
 
     // ── Classify channels ──────────────────────────────────────────────
