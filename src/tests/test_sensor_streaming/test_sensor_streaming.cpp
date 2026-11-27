@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/viz/backends/qt/3d/workers/rtsensordataworker.h>
+#include <mne/viz/brain/realtime/rtsensordataworker.h>
 #include <mne/viz/backends/qt/3d/workers/rtsensordatacontroller.h>
-#include <mne/viz/backends/qt/3d/workers/periodictask.h>
+#include <mne/viz/brain/realtime/periodictask.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -47,6 +47,21 @@ using namespace mne::viz::qt;
 /**
  * @brief Test class for real-time sensor data streaming.
  */
+
+namespace
+{
+
+// Records each callback invocation as a row of QVariants, as QSignalSpy does for signals
+template<typename Calls>
+auto recordInto(Calls& calls)
+{
+    return [&calls](const auto&... args) {
+        calls.append(QList<QVariant>{QVariant::fromValue(args)...});
+    };
+}
+
+} // namespace
+
 class TestSensorStreaming : public QObject
 {
     Q_OBJECT
@@ -127,7 +142,8 @@ void TestSensorStreaming::testWorkerAddData()
     RtSensorDataWorker worker;
     worker.setStreamSmoothedData(false);
     worker.setLoopState(false);
-    QSignalSpy spy(&worker, &RtSensorDataWorker::newRtRawSensorData);
+    QList<QList<QVariant>> spy;
+    worker.setNewRtRawSensorDataCallback(recordInto(spy));
     for (float v : {1.0f, 2.0f, 3.0f})
         worker.addData(Eigen::VectorXf::Constant(4, v));
     for (int i = 0; i < 4; ++i)
@@ -150,7 +166,8 @@ void TestSensorStreaming::testWorkerClear()
     worker.clear();
 
     // After clear, streaming should produce no output (no data in queue)
-    QSignalSpy spy(&worker, &RtSensorDataWorker::newRtSensorColors);
+    QList<QList<QVariant>> spy;
+    worker.setNewRtSensorColorsCallback(recordInto(spy));
     worker.streamData();
     QCOMPARE(spy.count(), 0);
 }
@@ -166,7 +183,8 @@ void TestSensorStreaming::testWorkerStreamDataNoMapping()
     worker.addData(data);
 
     // Without mapping matrix, streamData should not emit
-    QSignalSpy spy(&worker, &RtSensorDataWorker::newRtSensorColors);
+    QList<QList<QVariant>> spy;
+    worker.setNewRtSensorColorsCallback(recordInto(spy));
     worker.streamData();
     QCOMPARE(spy.count(), 0);
 }
@@ -186,7 +204,8 @@ void TestSensorStreaming::testWorkerStreamDataWithMapping()
     data << 1.0f, 0.5f, -0.5f, -1.0f, 0.0f;
     worker.addData(data);
 
-    QSignalSpy spy(&worker, &RtSensorDataWorker::newRtSensorColors);
+    QList<QList<QVariant>> spy;
+    worker.setNewRtSensorColorsCallback(recordInto(spy));
     worker.streamData();
 
     QCOMPARE(spy.count(), 1);
@@ -227,7 +246,8 @@ void TestSensorStreaming::testWorkerAveraging()
     worker.addData(d2);
     worker.addData(d3);
 
-    QSignalSpy spy(&worker, &RtSensorDataWorker::newRtSensorColors);
+    QList<QList<QVariant>> spy;
+    worker.setNewRtSensorColorsCallback(recordInto(spy));
 
     // First call: pops d1, starts accumulating (1/3) — no emission
     worker.streamData();
@@ -261,7 +281,8 @@ void TestSensorStreaming::testWorkerLooping()
     data << 1.0f, 2.0f, 3.0f;
     worker.addData(data);
 
-    QSignalSpy spy(&worker, &RtSensorDataWorker::newRtSensorColors);
+    QList<QList<QVariant>> spy;
+    worker.setNewRtSensorColorsCallback(recordInto(spy));
 
     // First call: takes from queue
     worker.streamData();
@@ -284,7 +305,8 @@ void TestSensorStreaming::testWorkerQueueCap()
     worker.setStreamSmoothedData(false);
     worker.setLoopState(false);
     worker.setSFreq(10.0);
-    QSignalSpy spy(&worker, &RtSensorDataWorker::newRtRawSensorData);
+    QList<QList<QVariant>> spy;
+    worker.setNewRtRawSensorDataCallback(recordInto(spy));
     for (int i = 0; i < 20; ++i)
         worker.addData(Eigen::VectorXf::Constant(3, i));
     for (int i = 0; i < 20; ++i)
@@ -309,7 +331,8 @@ void TestSensorStreaming::testWorkerMappingMatrixDimensionMismatch()
     wrongData.setRandom();
     worker.addData(wrongData);
 
-    QSignalSpy spy(&worker, &RtSensorDataWorker::newRtSensorColors);
+    QList<QList<QVariant>> spy;
+    worker.setNewRtSensorColorsCallback(recordInto(spy));
     worker.streamData();
 
     // Should not emit due to dimension mismatch
@@ -339,7 +362,8 @@ void TestSensorStreaming::testWorkerColorOutput()
     data << 1.0f, -1.0f;
     worker.addData(data);
 
-    QSignalSpy spy(&worker, &RtSensorDataWorker::newRtSensorColors);
+    QList<QList<QVariant>> spy;
+    worker.setNewRtSensorColorsCallback(recordInto(spy));
     worker.streamData();
 
     QCOMPARE(spy.count(), 1);
@@ -374,7 +398,8 @@ void TestSensorStreaming::testWorkerSymmetricNormalization()
     data << 2.0f;
     worker.addData(data);
 
-    QSignalSpy spy(&worker, &RtSensorDataWorker::newRtSensorColors);
+    QList<QList<QVariant>> spy;
+    worker.setNewRtSensorColorsCallback(recordInto(spy));
     worker.streamData();
 
     QCOMPARE(spy.count(), 1);
@@ -410,7 +435,8 @@ void TestSensorStreaming::testWorkerColormapChange()
 
     // Get colors with default colormap (MNE)
     worker.addData(data);
-    QSignalSpy spy1(&worker, &RtSensorDataWorker::newRtSensorColors);
+    QList<QList<QVariant>> spy1;
+    worker.setNewRtSensorColorsCallback(recordInto(spy1));
     worker.streamData();
     QCOMPARE(spy1.count(), 1);
     std::vector<uint32_t> colorsDefault = spy1.takeFirst().at(1).value<std::vector<uint32_t>>();
@@ -418,7 +444,8 @@ void TestSensorStreaming::testWorkerColormapChange()
     // Change colormap and get new colors
     worker.setColormapType("Hot");
     worker.addData(data);
-    QSignalSpy spy2(&worker, &RtSensorDataWorker::newRtSensorColors);
+    QList<QList<QVariant>> spy2;
+    worker.setNewRtSensorColorsCallback(recordInto(spy2));
     worker.streamData();
     QCOMPARE(spy2.count(), 1);
     std::vector<uint32_t> colorsHot = spy2.takeFirst().at(1).value<std::vector<uint32_t>>();
@@ -443,7 +470,8 @@ void TestSensorStreaming::testWorkerSFreq()
     worker.setStreamSmoothedData(false);
     worker.setLoopState(false);
     worker.setSFreq(0.5);
-    QSignalSpy spy(&worker, &RtSensorDataWorker::newRtRawSensorData);
+    QList<QList<QVariant>> spy;
+    worker.setNewRtRawSensorDataCallback(recordInto(spy));
     worker.addData(Eigen::VectorXf::Constant(3, 1.0f));
     worker.addData(Eigen::VectorXf::Constant(3, 2.0f));
     worker.streamData();

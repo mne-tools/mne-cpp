@@ -20,7 +20,7 @@
 
 #include "../../../../brain/sourceestimateoverlay.h"
 #include "../../../../brain/brainsurface.h"
-#include "../workers/stcloadingworker.h"
+#include "../../../../brain/realtime/stcloadingworker.h"
 #include "../workers/rtsourcedatacontroller.h"
 #include "../../../../brain/viewstate.h"
 
@@ -121,14 +121,17 @@ bool SourceEstimateManager::load(const std::filesystem::path& lhPath, const std:
     // Create overlay for results
     m_overlay = std::make_unique<SourceEstimateOverlay>();
 
-    // The worker stays on the GUI thread; process() runs on the loading thread, so its signals arrive queued
+    // process() runs on the loading thread; its progress and result are handled on this object's thread
     m_stcWorker = std::make_unique<StcLoadingWorker>(lhPath, rhPath, lhSurface, rhSurface);
 
     const std::uint64_t generation = m_loadGeneration;
-    connect(m_stcWorker.get(), &StcLoadingWorker::progress, this, &SourceEstimateManager::loadingProgress);
-    connect(m_stcWorker.get(), &StcLoadingWorker::finished, this, [this, generation](bool success) {
-        if (generation == m_loadGeneration)
-            onStcLoadingFinished(success);
+    m_stcWorker->setProgressCallback([this](int percent, const std::string& message) {
+        QMetaObject::invokeMethod(this, [this, percent, message] { emit loadingProgress(percent, message); }, Qt::QueuedConnection);
+    });
+    m_stcWorker->setFinishedCallback([this, generation](bool success) {
+        QMetaObject::invokeMethod(this, [this, generation, success] {
+            if (generation == m_loadGeneration)
+                onStcLoadingFinished(success); }, Qt::QueuedConnection);
     });
 
     m_isLoading = true;

@@ -34,15 +34,15 @@
 #include <mne/viz/backends/qt/3d/model/items/networktreeitem.h>
 #include <mne/viz/backends/qt/3d/model/items/dipoletreeitem.h>
 #include <mne/viz/backends/qt/3d/model/items/sourcespacetreeitem.h>
-#include <mne/viz/backends/qt/3d/workers/rtsourceinterpolationmatworker.h>
+#include <mne/viz/brain/realtime/rtsourceinterpolationmatworker.h>
 #include <mne/viz/backends/qt/3d/workers/rtsourcedatacontroller.h>
-#include <mne/viz/backends/qt/3d/workers/rtsensorinterpolationmatworker.h>
-#include <mne/viz/backends/qt/3d/workers/rtsourcedataworker.h>
-#include <mne/viz/backends/qt/3d/workers/rtsensordataworker.h>
+#include <mne/viz/brain/realtime/rtsensorinterpolationmatworker.h>
+#include <mne/viz/brain/realtime/rtsourcedataworker.h>
+#include <mne/viz/brain/realtime/rtsensordataworker.h>
 #include <mne/viz/backends/qt/3d/workers/rtsensordatacontroller.h>
 #include <mne/viz/backends/qt/3d/scene/sourceestimatemanager.h>
 #include <mne/viz/backends/qt/3d/scene/rtsensorstreammanager.h>
-#include <mne/viz/backends/qt/3d/workers/stcloadingworker.h>
+#include <mne/viz/brain/realtime/stcloadingworker.h>
 #include <mne/viz/brain/brainsurface.h>
 #include <mne/viz/backends/qt/3d/input/cameracontroller.h>
 #include <mne/viz/backends/qt/3d/input/raypicker.h>
@@ -114,6 +114,21 @@ using namespace mne;
  *        (construction and public-API calls that do not require an active GPU/render context).
  *
  */
+
+namespace
+{
+
+// Records each callback invocation as a row of QVariants, as QSignalSpy does for signals
+template<typename Calls>
+auto recordInto(Calls& calls)
+{
+    return [&calls](const auto&... args) {
+        calls.append(QList<QVariant>{QVariant::fromValue(args)...});
+    };
+}
+
+} // namespace
+
 class TestDisp3dBrainView : public QObject
 {
     Q_OBJECT
@@ -710,11 +725,11 @@ void TestDisp3dBrainView::rtSourceInterpolationMatWorker_basics()
 
     std::shared_ptr<Eigen::SparseMatrix<float>> lhMat;
     int nLh = 0;
-    QObject::connect(&worker, &RtSourceInterpolationMatWorker::newInterpolationMatrixLeftAvailable,
-                     [&](const std::shared_ptr<Eigen::SparseMatrix<float>>& mat) {
-                         lhMat = mat;
-                         ++nLh;
-                     });
+    worker.setNewInterpolationMatrixLeftAvailableCallback(
+        [&](const std::shared_ptr<Eigen::SparseMatrix<float>>& mat) {
+            lhMat = mat;
+            ++nLh;
+        });
 
     // Annotation mode: 6 vertices in labels 10 (vertices 0-2) and 20 (3-5), sources at vertices 0, 1 and 4.
     // Every vertex shows the mean of its label's sources.
@@ -839,13 +854,13 @@ void TestDisp3dBrainView::rtSensorInterpolationMatWorker_basics()
     std::string eegKey;
     std::shared_ptr<Eigen::MatrixXf> mapping;
     std::vector<int> pick;
-    QObject::connect(&worker, &RtSensorInterpolationMatWorker::newEegMappingAvailable,
-                     [&](const std::string& key, std::shared_ptr<Eigen::MatrixXf> mat, const std::vector<int>& picked) {
-                         ++eegCount;
-                         eegKey = key;
-                         mapping = std::move(mat);
-                         pick = picked;
-                     });
+    worker.setNewEegMappingAvailableCallback(
+        [&](const std::string& key, std::shared_ptr<Eigen::MatrixXf> mat, const std::vector<int>& picked) {
+            ++eegCount;
+            eegKey = key;
+            mapping = std::move(mat);
+            pick = picked;
+        });
 
     // Without evoked data nothing is computed
     worker.computeMapping();
@@ -1085,8 +1100,10 @@ void TestDisp3dBrainView::stcLoadingWorker_basics()
     QVERIFY(!worker.interpolationMatRh());
 
     // Neither file exists: two read errors, then failure
-    QSignalSpy errorSpy(&worker, &StcLoadingWorker::error);
-    QSignalSpy finishedSpy(&worker, &StcLoadingWorker::finished);
+    QList<QList<QVariant>> errorSpy;
+    worker.setErrorCallback(recordInto(errorSpy));
+    QList<QList<QVariant>> finishedSpy;
+    worker.setFinishedCallback(recordInto(finishedSpy));
     worker.process();
     QCOMPARE(errorSpy.size(), 3);
     QCOMPARE(finishedSpy.size(), 1);
@@ -1109,8 +1126,10 @@ void TestDisp3dBrainView::stcLoadingWorker_basics()
     tris << 0, 1, 2, 1, 3, 2;
     lhSurface.createFromData(rr, tris, toColor(QColor(Qt::gray)));
     StcLoadingWorker loader(lhPath.toStdU16String(), {}, &lhSurface, &rhSurface, 0.05);
-    QSignalSpy loadedSpy(&loader, &StcLoadingWorker::finished);
-    QSignalSpy progressSpy(&loader, &StcLoadingWorker::progress);
+    QList<QList<QVariant>> loadedSpy;
+    loader.setFinishedCallback(recordInto(loadedSpy));
+    QList<QList<QVariant>> progressSpy;
+    loader.setProgressCallback(recordInto(progressSpy));
     loader.process();
     QCOMPARE(loadedSpy.size(), 1);
     QVERIFY(loadedSpy.at(0).at(0).toBool());
@@ -1129,7 +1148,8 @@ void TestDisp3dBrainView::stcLoadingWorker_basics()
 
     // Cancelled before it starts: no matrix, failure
     StcLoadingWorker cancelled(lhPath.toStdU16String(), {}, &lhSurface, &rhSurface, 0.05);
-    QSignalSpy cancelledSpy(&cancelled, &StcLoadingWorker::finished);
+    QList<QList<QVariant>> cancelledSpy;
+    cancelled.setFinishedCallback(recordInto(cancelledSpy));
     cancelled.requestCancel();
     QVERIFY(cancelled.isCancelled());
     cancelled.process();

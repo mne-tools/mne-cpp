@@ -21,8 +21,8 @@
  * @ref mne::viz::Interpolation::interpolateSignal "interpolateSignal" multiplies the precomputed matrix by a
  * per-frame source / sensor vector to produce smoothed per-vertex
  * values; the matrix is built once per scene and reused on every
- * real-time frame in @ref mne::viz::qt::RtSourceDataWorker and
- * @ref mne::viz::qt::RtSensorDataWorker, keeping per-frame cost at one sparse mat-vec.
+ * real-time frame in @ref mne::viz::RtSourceDataWorker and
+ * @ref mne::viz::RtSensorDataWorker, keeping per-frame cost at one sparse mat-vec.
  */
 
 #ifndef VIZ_INTERPOLATION_H

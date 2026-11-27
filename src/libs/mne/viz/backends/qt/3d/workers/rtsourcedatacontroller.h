@@ -9,9 +9,9 @@
  * @date     March 2026
  * @brief    Real-time source-estimate streaming controller that owns the data worker and the per-hemisphere interpolation workers.
  *
- * RtSourceDataController bundles a @ref mne::viz::qt::RtSourceDataWorker (queue,
+ * RtSourceDataController bundles a @ref mne::viz::RtSourceDataWorker (queue,
  * averaging, sparse mat-vec per hemisphere, colormap packing) with
- * two @ref mne::viz::qt::RtSourceInterpolationMatWorker instances (one per
+ * two @ref mne::viz::RtSourceInterpolationMatWorker instances (one per
  * hemisphere) that recompute the sparse vertex-to-source weight
  * matrix when surfaces, source vertices or the interpolation
  * function change.
@@ -63,13 +63,15 @@ class ThreadPool;
 class FsLabel;
 }
 
+namespace mne::viz
+{
+class PeriodicTask;
+class RtSourceDataWorker;
+class RtSourceInterpolationMatWorker;
+} // namespace mne::viz
+
 namespace mne::viz::qt
 {
-
-class RtSourceDataWorker;
-class PeriodicTask;
-class RtSourceInterpolationMatWorker;
-
 //=============================================================================================================
 /**
  * RtSourceDataController orchestrates real-time source estimate streaming.
@@ -365,14 +367,14 @@ private slots:
     void onNewInterpolationMatrixRight(const std::shared_ptr<Eigen::SparseMatrix<float>>& interpMat);
 
 private:
-    mne::viz::qt::RtSourceDataWorker* m_pWorker = nullptr; /**< Data streaming worker. */
-    std::unique_ptr<PeriodicTask> m_pStreamTask;           /**< Streaming thread driving the cadence. */
-    bool m_bIsStreaming = false;                           /**< Whether streaming is active. */
-    int m_iTimeInterval = 17;                              /**< Streaming interval in ms (~60fps). */
+    std::unique_ptr<mne::viz::RtSourceDataWorker> m_pWorker; /**< Data streaming worker. */
+    std::unique_ptr<PeriodicTask> m_pStreamTask;             /**< Streaming thread driving the cadence. */
+    bool m_bIsStreaming = false;                             /**< Whether streaming is active. */
+    int m_iTimeInterval = 17;                                /**< Streaming interval in ms (~60fps). */
 
-    std::unique_ptr<mne::ThreadPool> m_pInterpPool;                          /**< Single thread running interpolation recomputations in order. */
-    std::atomic<bool> m_bShuttingDown{false};                                /**< Set in the destructor; queued recomputations are skipped. */
-    mne::viz::qt::RtSourceInterpolationMatWorker* m_pInterpWorker = nullptr; /**< Interpolation matrix worker. */
+    std::unique_ptr<mne::ThreadPool> m_pInterpPool;                            /**< Single thread running interpolation recomputations in order. */
+    std::atomic<bool> m_bShuttingDown{false};                                  /**< Set in the destructor; queued recomputations are skipped. */
+    std::unique_ptr<mne::viz::RtSourceInterpolationMatWorker> m_pInterpWorker; /**< Interpolation matrix worker. */
 };
 
 } // namespace mne::viz::qt

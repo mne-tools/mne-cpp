@@ -10,8 +10,8 @@
  * @brief    Real-time MEG / EEG sensor streaming controller that orchestrates the data and field-mapping workers.
  *
  * RtSensorDataController spins up a background @ref
- * mne::viz::qt::RtSensorDataWorker (queue, averaging, dense mat-vec mapping,
- * ABGR packing) and an optional @ref mne::viz::qt::RtSensorInterpolationMatWorker
+ * mne::viz::RtSensorDataWorker (queue, averaging, dense mat-vec mapping,
+ * ABGR packing) and an optional @ref mne::viz::RtSensorInterpolationMatWorker
  * (asynchronous recomputation of the dense mapping matrix when the
  * sensor configuration, projectors or target surface change) and
  * ties them together with a timer that paces the streaming.
@@ -62,13 +62,15 @@ namespace mne
 class ThreadPool;
 }
 
+namespace mne::viz
+{
+class PeriodicTask;
+class RtSensorDataWorker;
+class RtSensorInterpolationMatWorker;
+} // namespace mne::viz
+
 namespace mne::viz::qt
 {
-
-class RtSensorDataWorker;
-class PeriodicTask;
-class RtSensorInterpolationMatWorker;
-
 //=============================================================================================================
 /**
  * RtSensorDataController orchestrates real-time sensor data streaming.
@@ -339,14 +341,14 @@ private slots:
                          const std::vector<int>& pick);
 
 private:
-    mne::viz::qt::RtSensorDataWorker* m_pWorker = nullptr; /**< Data streaming worker. */
-    std::unique_ptr<PeriodicTask> m_pStreamTask;           /**< Streaming thread driving the cadence. */
-    bool m_bIsStreaming = false;                           /**< Whether streaming is active. */
-    int m_iTimeInterval = 17;                              /**< Streaming interval in ms (~60fps). */
+    std::unique_ptr<mne::viz::RtSensorDataWorker> m_pWorker; /**< Data streaming worker. */
+    std::unique_ptr<PeriodicTask> m_pStreamTask;             /**< Streaming thread driving the cadence. */
+    bool m_bIsStreaming = false;                             /**< Whether streaming is active. */
+    int m_iTimeInterval = 17;                                /**< Streaming interval in ms (~60fps). */
 
-    std::unique_ptr<mne::ThreadPool> m_pInterpPool;                          /**< Single thread running interpolation recomputations in order. */
-    std::atomic<bool> m_bShuttingDown{false};                                /**< Set in the destructor; queued recomputations are skipped. */
-    mne::viz::qt::RtSensorInterpolationMatWorker* m_pInterpWorker = nullptr; /**< Interpolation matrix worker. */
+    std::unique_ptr<mne::ThreadPool> m_pInterpPool;                            /**< Single thread running interpolation recomputations in order. */
+    std::atomic<bool> m_bShuttingDown{false};                                  /**< Set in the destructor; queued recomputations are skipped. */
+    std::unique_ptr<mne::viz::RtSensorInterpolationMatWorker> m_pInterpWorker; /**< Interpolation matrix worker. */
 };
 
 } // namespace mne::viz::qt

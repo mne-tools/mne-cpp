@@ -16,18 +16,19 @@
 
 #include "stcloadingworker.h"
 
-#include "../../../../brain/brainsurface.h"
-#include "../../../../brain/interpolation.h"
-#include "../../../../brain/geometryinfo.h"
+#include "../brainsurface.h"
+#include "../interpolation.h"
+#include "../geometryinfo.h"
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <utility>
 #include <format>
 #include <string>
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -38,10 +39,8 @@ StcLoadingWorker::StcLoadingWorker(const std::filesystem::path& lhPath,
                                    const std::filesystem::path& rhPath,
                                    BrainSurface* lhSurface,
                                    BrainSurface* rhSurface,
-                                   double cancelDist,
-                                   QObject* parent)
-: QObject(parent)
-, m_lhPath(lhPath)
+                                   double cancelDist)
+: m_lhPath(lhPath)
 , m_rhPath(rhPath)
 , m_lhSurface(lhSurface)
 , m_rhSurface(rhSurface)
@@ -65,7 +64,9 @@ std::shared_ptr<Eigen::SparseMatrix<float>> StcLoadingWorker::computeInterpolati
     int progressStart,
     int progressEnd)
 {
-    emit progress(progressStart, std::format("Computing {} geodesic interpolation...", hemiLabel));
+    if (m_progressCallback) {
+        m_progressCallback(progressStart, std::format("Computing {} geodesic interpolation...", hemiLabel));
+    }
 
     // Compute neighbors from the appropriate surface
     std::vector<Eigen::VectorXi> vecNeighbors;
@@ -84,7 +85,9 @@ std::shared_ptr<Eigen::SparseMatrix<float>> StcLoadingWorker::computeInterpolati
         if (m_cancelled.load(std::memory_order_relaxed))
             return;
         int pct = progressStart + (progressRange * current) / total;
-        emit progress(pct, std::format("{} geodesic interpolation {}/{}", hemiLabel, current, total));
+        if (m_progressCallback) {
+            m_progressCallback(pct, std::format("{} geodesic interpolation {}/{}", hemiLabel, current, total));
+        }
     };
 
     auto interpMat = mne::viz::GeometryInfo::scdcInterpolationMat(
@@ -99,7 +102,9 @@ std::shared_ptr<Eigen::SparseMatrix<float>> StcLoadingWorker::computeInterpolati
     if (m_cancelled.load(std::memory_order_relaxed))
         return std::shared_ptr<Eigen::SparseMatrix<float>>();
 
-    emit progress(progressEnd, std::format("{} interpolation matrix ready", hemiLabel));
+    if (m_progressCallback) {
+        m_progressCallback(progressEnd, std::format("{} interpolation matrix ready", hemiLabel));
+    }
     return interpMat;
 }
 
@@ -107,7 +112,9 @@ std::shared_ptr<Eigen::SparseMatrix<float>> StcLoadingWorker::computeInterpolati
 
 void StcLoadingWorker::process()
 {
-    emit progress(0, std::string("Loading STC files..."));
+    if (m_progressCallback) {
+        m_progressCallback(0, std::string("Loading STC files..."));
+    }
 
     // Load LH STC file
     if (!m_lhPath.empty()) {
@@ -115,11 +122,15 @@ void StcLoadingWorker::process()
             m_stcLh = std::move(*stc);
             m_hasLh = true;
         } else {
-            emit error(std::format("Failed to read LH STC file: {}", stc.error().what()));
+            if (m_errorCallback) {
+                m_errorCallback(std::format("Failed to read LH STC file: {}", stc.error().what()));
+            }
         }
     }
 
-    emit progress(5, std::string("Loading RH STC file..."));
+    if (m_progressCallback) {
+        m_progressCallback(5, std::string("Loading RH STC file..."));
+    }
 
     // Load RH STC file
     if (!m_rhPath.empty()) {
@@ -127,18 +138,26 @@ void StcLoadingWorker::process()
             m_stcRh = std::move(*stc);
             m_hasRh = true;
         } else {
-            emit error(std::format("Failed to read RH STC file: {}", stc.error().what()));
+            if (m_errorCallback) {
+                m_errorCallback(std::format("Failed to read RH STC file: {}", stc.error().what()));
+            }
         }
     }
 
     if (!m_hasLh && !m_hasRh) {
-        emit error(std::string("No STC data could be loaded."));
-        emit finished(false);
+        if (m_errorCallback) {
+            m_errorCallback(std::string("No STC data could be loaded."));
+        }
+        if (m_finishedCallback) {
+            m_finishedCallback(false);
+        }
         return;
     }
 
     if (m_cancelled.load(std::memory_order_relaxed)) {
-        emit finished(false);
+        if (m_finishedCallback) {
+            m_finishedCallback(false);
+        }
         return;
     }
 
@@ -151,7 +170,9 @@ void StcLoadingWorker::process()
             m_interpMatLh = computeInterpolationMatrix(matVertices, vecSourceVertices, m_cancelDist,
                                                        "LH", 10, 45);
             if (m_cancelled.load(std::memory_order_relaxed)) {
-                emit finished(false);
+                if (m_finishedCallback) {
+                    m_finishedCallback(false);
+                }
                 return;
             }
         }
@@ -166,15 +187,45 @@ void StcLoadingWorker::process()
             m_interpMatRh = computeInterpolationMatrix(matVertices, vecSourceVertices, m_cancelDist,
                                                        "RH", 50, 90);
             if (m_cancelled.load(std::memory_order_relaxed)) {
-                emit finished(false);
+                if (m_finishedCallback) {
+                    m_finishedCallback(false);
+                }
                 return;
             }
         }
     }
 
-    emit progress(95, std::string("Finalizing..."));
-    emit progress(100, std::string("Complete"));
-    emit finished(true);
+    if (m_progressCallback) {
+        m_progressCallback(95, std::string("Finalizing..."));
+    }
+    if (m_progressCallback) {
+        m_progressCallback(100, std::string("Complete"));
+    }
+    if (m_finishedCallback) {
+        m_finishedCallback(true);
+    }
 }
 
-} // namespace mne::viz::qt
+
+//=============================================================================================================
+
+void StcLoadingWorker::setProgressCallback(std::function<void(int, const std::string&)> callback)
+{
+    m_progressCallback = std::move(callback);
+}
+
+//=============================================================================================================
+
+void StcLoadingWorker::setFinishedCallback(std::function<void(bool)> callback)
+{
+    m_finishedCallback = std::move(callback);
+}
+
+//=============================================================================================================
+
+void StcLoadingWorker::setErrorCallback(std::function<void(const std::string&)> callback)
+{
+    m_errorCallback = std::move(callback);
+}
+
+} // namespace mne::viz

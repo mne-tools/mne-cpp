@@ -126,14 +126,8 @@ set(SOURCES
     3d/view/brainwindow.cpp
     3d/view/brainrenderer.cpp
     3d/view/multiviewlayout.cpp
-    3d/workers/periodictask.cpp
-    3d/workers/stcloadingworker.cpp
-    3d/workers/rtsourcedataworker.cpp
     3d/workers/rtsourcedatacontroller.cpp
-    3d/workers/rtsensordataworker.cpp
     3d/workers/rtsensordatacontroller.cpp
-    3d/workers/rtsensorinterpolationmatworker.cpp
-    3d/workers/rtsourceinterpolationmatworker.cpp
 )
 
 set(HEADERS
@@ -233,14 +227,8 @@ set(HEADERS
     3d/view/brainwindow.h
     3d/view/brainrenderer.h
     3d/view/multiviewlayout.h
-    3d/workers/periodictask.h
-    3d/workers/stcloadingworker.h
-    3d/workers/rtsourcedataworker.h
     3d/workers/rtsourcedatacontroller.h
-    3d/workers/rtsensordataworker.h
     3d/workers/rtsensordatacontroller.h
-    3d/workers/rtsensorinterpolationmatworker.h
-    3d/workers/rtsourceinterpolationmatworker.h
     qtconversions.h
     qtsettingsstore.h
 )

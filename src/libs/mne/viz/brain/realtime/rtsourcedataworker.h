@@ -18,20 +18,14 @@
  * mat-vec plus a tight colour-packing loop.
  */
 
-#ifndef BRAINVIEW_RTSOURCEDATAWORKER_H
-#define BRAINVIEW_RTSOURCEDATAWORKER_H
+#ifndef VIZ_RTSOURCEDATAWORKER_H
+#define VIZ_RTSOURCEDATAWORKER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QObject>
+#include "../../viz_global.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -44,6 +38,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <functional>
 #include <deque>
 #include <memory>
 #include <mutex>
@@ -54,7 +49,7 @@
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -67,18 +62,15 @@ namespace mne::viz::qt
  *
  * @brief Background worker for real-time source estimate streaming.
  */
-class VIZQTSHARED_EXPORT RtSourceDataWorker : public QObject
+class VIZSHARED_EXPORT RtSourceDataWorker
 {
-    Q_OBJECT
-
 public:
     //=========================================================================================================
     /**
      * Constructor.
      *
-     * @param[in] parent     Parent QObject.
      */
-    explicit RtSourceDataWorker(QObject* parent = nullptr);
+    RtSourceDataWorker();
 
     //=========================================================================================================
     /**
@@ -178,7 +170,7 @@ public:
     void setSurfaceColor(const std::vector<uint32_t>& baseColorsLh,
                          const std::vector<uint32_t>& baseColorsRh);
 
-public slots:
+public:
     //=========================================================================================================
     /**
      * Stream one frame of data. Called by the controller's timer.
@@ -186,26 +178,22 @@ public slots:
      */
     void streamData();
 
-signals:
+public:
     //=========================================================================================================
     /**
-     * Emitted when new interpolated color data is ready for rendering.
+     * Set the callback for newRtSmoothedData. Called when new interpolated color data is ready for rendering. It runs on the thread that produced the result.
      *
-     * @param[in] colorsLh   Per-vertex ABGR color array for the left hemisphere.
-     * @param[in] colorsRh   Per-vertex ABGR color array for the right hemisphere.
+     * @param[in] callback   Receives (colorsLh, colorsRh); empty to drop the results.
      */
-    void newRtSmoothedData(const std::vector<uint32_t>& colorsLh,
-                           const std::vector<uint32_t>& colorsRh);
+    void setNewRtSmoothedDataCallback(std::function<void(const std::vector<uint32_t>&, const std::vector<uint32_t>&)> callback);
 
     //=========================================================================================================
     /**
-     * Emitted when new raw (non-interpolated) data is available.
+     * Set the callback for newRtRawData. Called when new raw (non-interpolated) data is available. It runs on the thread that produced the result.
      *
-     * @param[in] dataLh     Source values for left hemisphere.
-     * @param[in] dataRh     Source values for right hemisphere.
+     * @param[in] callback   Receives (dataLh, dataRh); empty to drop the results.
      */
-    void newRtRawData(const Eigen::VectorXd& dataLh,
-                      const Eigen::VectorXd& dataRh);
+    void setNewRtRawDataCallback(std::function<void(const Eigen::VectorXd&, const Eigen::VectorXd&)> callback);
 
 private:
     //=========================================================================================================
@@ -247,15 +235,18 @@ private:
     bool m_bStreamSmoothedData = true; /**< Whether to stream smoothed colors (true) or raw data (false). */
     double m_dSFreq = 1000.0;          /**< Sampling frequency in Hz. */
 
-    QString m_sColormapType = QStringLiteral("Hot"); /**< Active colormap name (QString: mne::viz::qt::ColorMap takes one). */
-    double m_dThreshMin = 0.0;                       /**< Lower normalization threshold. */
-    double m_dThreshMid = 0.5;                       /**< Mid normalization threshold. */
-    double m_dThreshMax = 1.0;                       /**< Upper normalization threshold. */
+    std::string m_sColormapType = "Hot"; /**< Active colormap name. */
+    double m_dThreshMin = 0.0;           /**< Lower normalization threshold. */
+    double m_dThreshMid = 0.5;           /**< Mid normalization threshold. */
+    double m_dThreshMax = 1.0;           /**< Upper normalization threshold. */
 
     std::vector<uint32_t> m_baseColorsLh; /**< LH base surface colors (curvature/annotation). */
     std::vector<uint32_t> m_baseColorsRh; /**< RH base surface colors (curvature/annotation). */
+
+    std::function<void(const std::vector<uint32_t>&, const std::vector<uint32_t>&)> m_newRtSmoothedDataCallback; /**< Receives newRtSmoothedData. */
+    std::function<void(const Eigen::VectorXd&, const Eigen::VectorXd&)> m_newRtRawDataCallback;                  /**< Receives newRtRawData. */
 };
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // BRAINVIEW_RTSOURCEDATAWORKER_H
+#endif // VIZ_RTSOURCEDATAWORKER_H

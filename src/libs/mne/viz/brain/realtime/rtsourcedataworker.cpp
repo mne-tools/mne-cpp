@@ -18,8 +18,8 @@
 
 #include <mne/base/log.h>
 
-#include "../../../../brain/rendertypes.h"
-#include <mne/viz/backends/qt/plots/helpers/colormap.h>
+#include "../rendertypes.h"
+#include "../../figures/colormap.h"
 
 //=============================================================================================================
 // STL INCLUDES
@@ -31,14 +31,13 @@
 #include <utility>
 
 using namespace mne::viz;
-using namespace mne::viz::qt;
+using namespace mne::viz;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtSourceDataWorker::RtSourceDataWorker(QObject* parent)
-: QObject(parent)
+RtSourceDataWorker::RtSourceDataWorker()
 {
 }
 
@@ -104,7 +103,7 @@ void RtSourceDataWorker::setNumberAverages(int numAvr)
 void RtSourceDataWorker::setColormapType(const std::string& name)
 {
     std::scoped_lock locker(m_mutex);
-    m_sColormapType = QString::fromStdString(name);
+    m_sColormapType = name;
 }
 
 //=============================================================================================================
@@ -199,10 +198,10 @@ void RtSourceDataWorker::streamData()
     int nSourcesRh = 0;
 
     if (m_interpMatLh) {
-        nSourcesLh = m_interpMatLh->cols();
+        nSourcesLh = static_cast<int>(m_interpMatLh->cols());
     }
     if (m_interpMatRh) {
-        nSourcesRh = m_interpMatRh->cols();
+        nSourcesRh = static_cast<int>(m_interpMatRh->cols());
     }
 
     int nTotalExpected = nSourcesLh + nSourcesRh;
@@ -232,7 +231,9 @@ void RtSourceDataWorker::streamData()
         Eigen::VectorXd rawRh = dataRh.cast<double>();
 
         locker.unlock();
-        emit newRtRawData(rawLh, rawRh);
+        if (m_newRtRawDataCallback) {
+            m_newRtRawDataCallback(rawLh, rawRh);
+        }
         return;
     }
 
@@ -243,7 +244,9 @@ void RtSourceDataWorker::streamData()
     // Unlock before emitting (avoid deadlock if slot is direct connection)
     locker.unlock();
 
-    emit newRtSmoothedData(colorsLh, colorsRh);
+    if (m_newRtSmoothedDataCallback) {
+        m_newRtSmoothedDataCallback(colorsLh, colorsRh);
+    }
 }
 
 //=============================================================================================================
@@ -260,7 +263,7 @@ std::vector<uint32_t> RtSourceDataWorker::computeHemiColors(
     // Interpolate source data to all surface vertices
     Eigen::VectorXf interpolated = (*interpMat) * sourceData;
 
-    int nVertices = interpolated.size();
+    const int nVertices = static_cast<int>(interpolated.size());
     std::vector<uint32_t> colors(nVertices);
 
     bool hasBaseColors = (std::ssize(baseColors) == nVertices);
@@ -325,12 +328,22 @@ std::vector<uint32_t> RtSourceDataWorker::computeHemiColors(
 
 uint32_t RtSourceDataWorker::valueToColor(double value, uint8_t alpha) const
 {
-    QRgb rgb = mne::viz::qt::ColorMap::valueToColor(value, m_sColormapType);
-
-    uint32_t r = qRed(rgb);
-    uint32_t g = qGreen(rgb);
-    uint32_t b = qBlue(rgb);
+    const Color rgb = map_color(m_sColormapType, value);
 
     // Pack as ABGR (same format as BrainSurface uses)
-    return packABGR(r, g, b, static_cast<uint32_t>(alpha));
+    return packABGR(rgb.r, rgb.g, rgb.b, static_cast<uint32_t>(alpha));
+}
+
+//=============================================================================================================
+
+void RtSourceDataWorker::setNewRtSmoothedDataCallback(std::function<void(const std::vector<uint32_t>&, const std::vector<uint32_t>&)> callback)
+{
+    m_newRtSmoothedDataCallback = std::move(callback);
+}
+
+//=============================================================================================================
+
+void RtSourceDataWorker::setNewRtRawDataCallback(std::function<void(const Eigen::VectorXd&, const Eigen::VectorXd&)> callback)
+{
+    m_newRtRawDataCallback = std::move(callback);
 }

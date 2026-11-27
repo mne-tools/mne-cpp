@@ -12,7 +12,7 @@
  * Encapsulates the heavy-weight @ref mne::viz::GeometryInfo::scdc "GeometryInfo::scdc" (geodesic
  * distance Dijkstra) and @ref mne::viz::Interpolation::createInterpolationMat "Interpolation::createInterpolationMat"
  * (distance-based sparse weight build) calls. It supports two
- * @ref mne::viz::qt::RtSourceInterpolationMatWorker::VisualizationType "VisualizationType" modes: @c InterpolationBased uses the
+ * @ref mne::viz::RtSourceInterpolationMatWorker::VisualizationType "VisualizationType" modes: @c InterpolationBased uses the
  * smooth distance kernel, @c AnnotationBased uses a per-parcel
  * uniform colouring derived from the FreeSurfer annotation so the
  * cortex lights up parcel-by-parcel.
@@ -22,21 +22,15 @@
  * visible to the user.
  */
 
-#ifndef BRAINVIEW_RTSOURCEINTERPOLATIONMATWORKER_H
-#define BRAINVIEW_RTSOURCEINTERPOLATIONMATWORKER_H
+#ifndef VIZ_RTSOURCEINTERPOLATIONMATWORKER_H
+#define VIZ_RTSOURCEINTERPOLATIONMATWORKER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
+#include "../../viz_global.h"
 #include <mne/fs/fs_label.h> // complete: the exported class's implicit destructor destroys the label vectors
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QObject>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -49,6 +43,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <functional>
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -60,7 +55,7 @@
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -85,10 +80,8 @@ namespace mne::viz::qt
  *
  * @brief Background worker for computing source interpolation matrices.
  */
-class VIZQTSHARED_EXPORT RtSourceInterpolationMatWorker : public QObject
+class VIZSHARED_EXPORT RtSourceInterpolationMatWorker
 {
-    Q_OBJECT
-
 public:
     //=========================================================================================================
     /**
@@ -104,9 +97,8 @@ public:
     /**
      * Constructor.
      *
-     * @param[in] parent     Parent QObject.
      */
-    explicit RtSourceInterpolationMatWorker(QObject* parent = nullptr);
+    RtSourceInterpolationMatWorker();
 
     //=========================================================================================================
     /**
@@ -184,7 +176,7 @@ public:
                                 const std::vector<mne::FsLabel>& lLabels,
                                 const Eigen::VectorXi& vecVertNo);
 
-public slots:
+public:
     //=========================================================================================================
     /**
      * Compute the interpolation matrices for both hemispheres.
@@ -193,22 +185,22 @@ public slots:
      */
     void computeInterpolationMatrix();
 
-signals:
+public:
     //=========================================================================================================
     /**
-     * Emitted when a new left hemisphere interpolation matrix is available.
+     * Set the callback for newInterpolationMatrixLeftAvailable. Called when a new left hemisphere interpolation matrix is available. It runs on the thread that produced the result.
      *
-     * @param[in] interpMat    Sparse interpolation matrix (nVertices x nSources).
+     * @param[in] callback   Receives (interpMat); empty to drop the results.
      */
-    void newInterpolationMatrixLeftAvailable(std::shared_ptr<Eigen::SparseMatrix<float>> interpMat);
+    void setNewInterpolationMatrixLeftAvailableCallback(std::function<void(std::shared_ptr<Eigen::SparseMatrix<float>>)> callback);
 
     //=========================================================================================================
     /**
-     * Emitted when a new right hemisphere interpolation matrix is available.
+     * Set the callback for newInterpolationMatrixRightAvailable. Called when a new right hemisphere interpolation matrix is available. It runs on the thread that produced the result.
      *
-     * @param[in] interpMat    Sparse interpolation matrix (nVertices x nSources).
+     * @param[in] callback   Receives (interpMat); empty to drop the results.
      */
-    void newInterpolationMatrixRightAvailable(std::shared_ptr<Eigen::SparseMatrix<float>> interpMat);
+    void setNewInterpolationMatrixRightAvailableCallback(std::function<void(std::shared_ptr<Eigen::SparseMatrix<float>>)> callback);
 
 private:
     //=========================================================================================================
@@ -290,8 +282,11 @@ private:
     std::vector<int> m_vertNosRh;                               /**< RH source vertex numbers. */
     int m_nAnnotationVerticesRh = 0;                            /**< RH surface vertex count (size of the label-id vector). */
     bool m_bAnnotationRhInit = false;                           /**< Whether RH annotation data is set. */
+
+    std::function<void(std::shared_ptr<Eigen::SparseMatrix<float>>)> m_newInterpolationMatrixLeftAvailableCallback;  /**< Receives newInterpolationMatrixLeftAvailable. */
+    std::function<void(std::shared_ptr<Eigen::SparseMatrix<float>>)> m_newInterpolationMatrixRightAvailableCallback; /**< Receives newInterpolationMatrixRightAvailable. */
 };
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // BRAINVIEW_RTSOURCEINTERPOLATIONMATWORKER_H
+#endif // VIZ_RTSOURCEINTERPOLATIONMATWORKER_H

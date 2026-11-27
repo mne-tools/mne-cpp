@@ -12,27 +12,21 @@
  * Owns the inputs to the field-map kernel &mdash; evoked info, head
  * and helmet surface geometry, MRI / head coordinate transforms,
  * channel picks and SSP projectors. Whenever any of these change
- * via the (mutex-protected) setters, @ref mne::viz::qt::RtSensorInterpolationMatWorker::computeMapping "computeMapping" rebuilds
+ * via the (mutex-protected) setters, @ref mne::viz::RtSensorInterpolationMatWorker::computeMapping "computeMapping" rebuilds
  * the dense (n_vertices x n_channels) matrix and emits it back to
  * the data worker, so the streaming pipeline never stalls.
  */
 
-#ifndef BRAINVIEW_RTSENSORINTERPOLATIONMATWORKER_H
-#define BRAINVIEW_RTSENSORINTERPOLATIONMATWORKER_H
+#ifndef VIZ_RTSENSORINTERPOLATIONMATWORKER_H
+#define VIZ_RTSENSORINTERPOLATIONMATWORKER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
+#include "../../viz_global.h"
 #include <mne/fiff/fiff_evoked.h>
 #include <mne/fiff/fiff_coord_trans.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QObject>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -44,6 +38,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -53,7 +48,7 @@
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -74,18 +69,15 @@ namespace mne::viz::qt
  *
  * @brief Background worker for computing sensor field mapping matrices.
  */
-class VIZQTSHARED_EXPORT RtSensorInterpolationMatWorker : public QObject
+class VIZSHARED_EXPORT RtSensorInterpolationMatWorker
 {
-    Q_OBJECT
-
 public:
     //=========================================================================================================
     /**
      * Constructor.
      *
-     * @param[in] parent     Parent QObject.
      */
-    explicit RtSensorInterpolationMatWorker(QObject* parent = nullptr);
+    RtSensorInterpolationMatWorker();
 
     //=========================================================================================================
     /**
@@ -146,7 +138,7 @@ public:
      */
     void setBadChannels(const std::vector<std::string>& bads);
 
-public slots:
+public:
     //=========================================================================================================
     /**
      * Compute the sensor-to-surface mapping matrices.
@@ -156,30 +148,22 @@ public slots:
      */
     void computeMapping();
 
-signals:
+public:
     //=========================================================================================================
     /**
-     * Emitted when new MEG mapping data is available.
+     * Set the callback for newMegMappingAvailable. Called when new MEG mapping data is available. It runs on the thread that produced the result.
      *
-     * @param[in] surfaceKey    The surface the mapping targets.
-     * @param[in] mappingMat    Dense mapping matrix (nVerts x nChannels).
-     * @param[in] pick          Channel indices picked for this mapping.
+     * @param[in] callback   Receives (surfaceKey, mappingMat, pick); empty to drop the results.
      */
-    void newMegMappingAvailable(const std::string& surfaceKey,
-                                std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                                const std::vector<int>& pick);
+    void setNewMegMappingAvailableCallback(std::function<void(const std::string&, std::shared_ptr<Eigen::MatrixXf>, const std::vector<int>&)> callback);
 
     //=========================================================================================================
     /**
-     * Emitted when new EEG mapping data is available.
+     * Set the callback for newEegMappingAvailable. Called when new EEG mapping data is available. It runs on the thread that produced the result.
      *
-     * @param[in] surfaceKey    The surface the mapping targets.
-     * @param[in] mappingMat    Dense mapping matrix (nVerts x nChannels).
-     * @param[in] pick          Channel indices picked for this mapping.
+     * @param[in] callback   Receives (surfaceKey, mappingMat, pick); empty to drop the results.
      */
-    void newEegMappingAvailable(const std::string& surfaceKey,
-                                std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                                const std::vector<int>& pick);
+    void setNewEegMappingAvailableCallback(std::function<void(const std::string&, std::shared_ptr<Eigen::MatrixXf>, const std::vector<int>&)> callback);
 
 private:
     mutable std::mutex m_mutex; /**< Protects all data members. */
@@ -205,8 +189,11 @@ private:
     bool m_hasEegSurface = false;   /**< Whether EEG surface has been set. */
 
     std::vector<std::string> m_bads; /**< Current bad channel names. */
+
+    std::function<void(const std::string&, std::shared_ptr<Eigen::MatrixXf>, const std::vector<int>&)> m_newMegMappingAvailableCallback; /**< Receives newMegMappingAvailable. */
+    std::function<void(const std::string&, std::shared_ptr<Eigen::MatrixXf>, const std::vector<int>&)> m_newEegMappingAvailableCallback; /**< Receives newEegMappingAvailable. */
 };
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // BRAINVIEW_RTSENSORINTERPOLATIONMATWORKER_H
+#endif // VIZ_RTSENSORINTERPOLATIONMATWORKER_H

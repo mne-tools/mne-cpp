@@ -14,14 +14,14 @@
  * that live on the GUI thread receive its results through queued signals.
  */
 
-#ifndef DISP3D_PERIODICTASK_H
-#define DISP3D_PERIODICTASK_H
+#ifndef VIZ_PERIODICTASK_H
+#define VIZ_PERIODICTASK_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
+#include "../../viz_global.h"
 
 //=============================================================================================================
 // STL INCLUDES
@@ -35,7 +35,7 @@
 #include <stop_token>
 #include <thread>
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -44,7 +44,7 @@ namespace mne::viz::qt
  * start(). Ticks never overlap and do not queue up: a tick that overruns pushes the next one back.
  * stop() does not interrupt a tick that is already running.
  */
-class VIZQTSHARED_EXPORT PeriodicTask
+class VIZSHARED_EXPORT PeriodicTask
 {
 public:
     explicit PeriodicTask(std::function<void()> tick);
@@ -74,6 +74,6 @@ private:
     std::jthread m_thread;          /**< Declared last: joined before the members above are destroyed. */
 };
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // DISP3D_PERIODICTASK_H
+#endif // VIZ_PERIODICTASK_H

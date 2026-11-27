@@ -15,7 +15,7 @@
 //=============================================================================================================
 
 #include <mne/base/log.h>
-#include <mne/viz/backends/qt/3d/workers/rtsourcedataworker.h>
+#include <mne/viz/brain/realtime/rtsourcedataworker.h>
 #include <mne/viz/backends/qt/3d/workers/rtsourcedatacontroller.h>
 
 //=============================================================================================================
@@ -53,6 +53,21 @@ using namespace Eigen;
  *
  * @brief Unit tests for real-time source data streaming pipeline.
  */
+
+namespace
+{
+
+// Records each callback invocation as a row of QVariants, as QSignalSpy does for signals
+template<typename Calls>
+auto recordInto(Calls& calls)
+{
+    return [&calls](const auto&... args) {
+        calls.append(QList<QVariant>{QVariant::fromValue(args)...});
+    };
+}
+
+} // namespace
+
 class TestRtSourceStreaming : public QObject
 {
     Q_OBJECT
@@ -129,7 +144,8 @@ void TestRtSourceStreaming::testWorkerAddDataAndQueue()
     worker.addData(data3);
 
     // streamData without interpolation matrices should still work (emit nothing or handle gracefully)
-    QSignalSpy spy(&worker, &RtSourceDataWorker::newRtSmoothedData);
+    QList<QList<QVariant>> spy;
+    worker.setNewRtSmoothedDataCallback(recordInto(spy));
     worker.streamData();
 
     // Without interpolation matrices set, we don't expect color output
@@ -146,7 +162,8 @@ void TestRtSourceStreaming::testWorkerStreamWithoutInterpolation()
     int totalSources = m_iNumSourcesLh + m_iNumSourcesRh;
     worker.addData(VectorXd::Constant(totalSources, 0.3));
 
-    QSignalSpy spy(&worker, &RtSourceDataWorker::newRtSmoothedData);
+    QList<QList<QVariant>> spy;
+    worker.setNewRtSmoothedDataCallback(recordInto(spy));
     worker.streamData();
 
     // Without interpolation matrices, the signal should not be emitted
@@ -175,7 +192,8 @@ void TestRtSourceStreaming::testWorkerStreamWithIdentityInterpolation()
     worker.addData(data);
 
     // Stream
-    QSignalSpy spy(&worker, &RtSourceDataWorker::newRtSmoothedData);
+    QList<QList<QVariant>> spy;
+    worker.setNewRtSmoothedDataCallback(recordInto(spy));
     worker.streamData();
 
     // Should have emitted exactly one frame
@@ -222,7 +240,8 @@ void TestRtSourceStreaming::testWorkerThresholds()
     VectorXd dataLow = VectorXd::Constant(totalSources, 0.1);
     worker.addData(dataLow);
 
-    QSignalSpy spy(&worker, &RtSourceDataWorker::newRtSmoothedData);
+    QList<QList<QVariant>> spy;
+    worker.setNewRtSmoothedDataCallback(recordInto(spy));
     worker.streamData();
 
     QCOMPARE(spy.count(), 1);
@@ -240,7 +259,8 @@ void TestRtSourceStreaming::testWorkerThresholds()
     VectorXd dataHigh = VectorXd::Constant(totalSources, 0.98);
     worker.addData(dataHigh);
 
-    QSignalSpy spy2(&worker, &RtSourceDataWorker::newRtSmoothedData);
+    QList<QList<QVariant>> spy2;
+    worker.setNewRtSmoothedDataCallback(recordInto(spy2));
     worker.streamData();
 
     QCOMPARE(spy2.count(), 1);
@@ -272,7 +292,8 @@ void TestRtSourceStreaming::testWorkerColormapSwitch()
     // Get colors with "Hot" colormap
     worker.setColormapType("Hot");
     worker.addData(data);
-    QSignalSpy spyHot(&worker, &RtSourceDataWorker::newRtSmoothedData);
+    QList<QList<QVariant>> spyHot;
+    worker.setNewRtSmoothedDataCallback(recordInto(spyHot));
     worker.streamData();
     QCOMPARE(spyHot.count(), 1);
     std::vector<uint32_t> colorsHot = spyHot.takeFirst().at(0).value<std::vector<uint32_t>>();
@@ -280,7 +301,8 @@ void TestRtSourceStreaming::testWorkerColormapSwitch()
     // Get colors with "Jet" colormap
     worker.setColormapType("Jet");
     worker.addData(data);
-    QSignalSpy spyJet(&worker, &RtSourceDataWorker::newRtSmoothedData);
+    QList<QList<QVariant>> spyJet;
+    worker.setNewRtSmoothedDataCallback(recordInto(spyJet));
     worker.streamData();
     QCOMPARE(spyJet.count(), 1);
     std::vector<uint32_t> colorsJet = spyJet.takeFirst().at(0).value<std::vector<uint32_t>>();
@@ -313,7 +335,8 @@ void TestRtSourceStreaming::testWorkerLooping()
     VectorXd data = VectorXd::Constant(totalSources, 0.6);
     worker.addData(data);
 
-    QSignalSpy spy(&worker, &RtSourceDataWorker::newRtSmoothedData);
+    QList<QList<QVariant>> spy;
+    worker.setNewRtSmoothedDataCallback(recordInto(spy));
 
     // Stream multiple times — looping should allow replaying the same data
     for (int i = 0; i < 5; ++i) {

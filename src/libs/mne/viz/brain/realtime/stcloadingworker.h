@@ -21,21 +21,15 @@
  * served by @ref mne::viz::SourceEstimateOverlay without any further I/O.
  */
 
-#ifndef STCLOADINGWORKER_H
-#define STCLOADINGWORKER_H
+#ifndef VIZ_STCLOADINGWORKER_H
+#define VIZ_STCLOADINGWORKER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
+#include "../../viz_global.h"
 #include <mne/inv/inv_source_estimate.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QObject>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -47,6 +41,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <functional>
 #include <atomic>
 #include <filesystem>
 #include <memory>
@@ -61,7 +56,7 @@ namespace mne::viz
 class BrainSurface;
 } // namespace mne::viz
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 //=============================================================================================================
 /**
@@ -70,10 +65,8 @@ namespace mne::viz::qt
  *
  * @brief Background worker that loads source estimate (STC) files and emits loaded data for visualization.
  */
-class VIZQTSHARED_EXPORT StcLoadingWorker : public QObject
+class VIZSHARED_EXPORT StcLoadingWorker
 {
-    Q_OBJECT
-
 public:
     //=========================================================================================================
     /**
@@ -84,14 +77,12 @@ public:
      * @param[in] lhSurface      Pointer to left hemisphere surface.
      * @param[in] rhSurface      Pointer to right hemisphere surface.
      * @param[in] cancelDist     Cancel distance for interpolation.
-     * @param[in] parent         Parent object.
      */
     StcLoadingWorker(const std::filesystem::path& lhPath,
                      const std::filesystem::path& rhPath,
                      BrainSurface* lhSurface,
                      BrainSurface* rhSurface,
-                     double cancelDist = 0.05,
-                     QObject* parent = nullptr);
+                     double cancelDist = 0.05);
 
     //=========================================================================================================
     /**
@@ -181,7 +172,7 @@ public:
         return m_cancelled.load(std::memory_order_relaxed);
     }
 
-public slots:
+public:
     //=========================================================================================================
     /**
      * Perform the loading and computation work.
@@ -189,31 +180,30 @@ public slots:
      */
     void process();
 
-signals:
+public:
     //=========================================================================================================
     /**
-     * Emitted to report progress.
+     * Set the callback for progress. Called to report progress. It runs on the thread that produced the result.
      *
-     * @param[in] percent    Progress percentage (0-100).
-     * @param[in] message    Status message describing current operation.
+     * @param[in] callback   Receives (percent, message); empty to drop the results.
      */
-    void progress(int percent, const std::string& message);
+    void setProgressCallback(std::function<void(int, const std::string&)> callback);
 
     //=========================================================================================================
     /**
-     * Emitted when loading is complete.
+     * Set the callback for finished. Called when loading is complete. It runs on the thread that produced the result.
      *
-     * @param[in] success    True if loading succeeded.
+     * @param[in] callback   Receives (success); empty to drop the results.
      */
-    void finished(bool success);
+    void setFinishedCallback(std::function<void(bool)> callback);
 
     //=========================================================================================================
     /**
-     * Emitted when an error occurs.
+     * Set the callback for error. Called when an error occurs. It runs on the thread that produced the result.
      *
-     * @param[in] message    Error description.
+     * @param[in] callback   Receives (message); empty to drop the results.
      */
-    void error(const std::string& message);
+    void setErrorCallback(std::function<void(const std::string&)> callback);
 
 private:
     std::shared_ptr<Eigen::SparseMatrix<float>> computeInterpolationMatrix(
@@ -238,8 +228,12 @@ private:
     std::shared_ptr<Eigen::SparseMatrix<float>> m_interpMatLh; /**< LH interpolation matrix. */
     std::shared_ptr<Eigen::SparseMatrix<float>> m_interpMatRh; /**< RH interpolation matrix. */
     std::atomic<bool> m_cancelled{false};                      /**< Cancellation flag. */
+
+    std::function<void(int, const std::string&)> m_progressCallback; /**< Receives progress. */
+    std::function<void(bool)> m_finishedCallback;                    /**< Receives finished. */
+    std::function<void(const std::string&)> m_errorCallback;         /**< Receives error. */
 };
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // STCLOADINGWORKER_H
+#endif // VIZ_STCLOADINGWORKER_H

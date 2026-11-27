@@ -16,9 +16,9 @@
 
 #include "rtsensordatacontroller.h"
 
-#include "rtsensordataworker.h"
-#include "rtsensorinterpolationmatworker.h"
-#include "periodictask.h"
+#include "../../../../brain/realtime/rtsensordataworker.h"
+#include "../../../../brain/realtime/rtsensorinterpolationmatworker.h"
+#include "../../../../brain/realtime/periodictask.h"
 #include <mne/base/log.h>
 #include <mne/base/thread_pool.h>
 
@@ -39,29 +39,32 @@ RtSensorDataController::RtSensorDataController(QObject* parent)
 : QObject(parent)
 {
     // Create data worker
-    // The worker stays on the GUI thread; streamData() runs on the streaming thread, so its signals reach
-    // this controller queued.
-    m_pWorker = new mne::viz::qt::RtSensorDataWorker(this);
+    // streamData() runs on the streaming thread; its results are re-emitted on this controller's thread.
+    m_pWorker = std::make_unique<mne::viz::RtSensorDataWorker>();
 
     // Forward worker signals to controller signals
-    connect(m_pWorker, &mne::viz::qt::RtSensorDataWorker::newRtSensorColors,
-            this, &RtSensorDataController::newSensorColorsAvailable);
-    connect(m_pWorker, &mne::viz::qt::RtSensorDataWorker::newRtRawSensorData,
-            this, &RtSensorDataController::newRawSensorDataAvailable);
+    m_pWorker->setNewRtSensorColorsCallback([this](const std::string& surfaceKey, const std::vector<uint32_t>& colors) {
+        QMetaObject::invokeMethod(this, [this, surfaceKey, colors] { emit newSensorColorsAvailable(surfaceKey, colors); }, Qt::QueuedConnection);
+    });
+    m_pWorker->setNewRtRawSensorDataCallback([this](const Eigen::VectorXf& data) {
+        QMetaObject::invokeMethod(this, [this, data] { emit newRawSensorDataAvailable(data); }, Qt::QueuedConnection);
+    });
 
     // Streaming thread driving the cadence
-    m_pStreamTask = std::make_unique<PeriodicTask>([worker = m_pWorker] { worker->streamData(); });
+    m_pStreamTask = std::make_unique<PeriodicTask>([worker = m_pWorker.get()] { worker->streamData(); });
 
     // Create interpolation matrix worker
     // One pool thread runs the recomputations in request order.
-    m_pInterpWorker = new mne::viz::qt::RtSensorInterpolationMatWorker(this);
+    m_pInterpWorker = std::make_unique<mne::viz::RtSensorInterpolationMatWorker>();
     m_pInterpPool = std::make_unique<mne::ThreadPool>(1);
 
     // Forward interpolation results: auto-apply to data worker + re-emit for external listeners
-    connect(m_pInterpWorker, &mne::viz::qt::RtSensorInterpolationMatWorker::newMegMappingAvailable,
-            this, &RtSensorDataController::onNewMegMapping);
-    connect(m_pInterpWorker, &mne::viz::qt::RtSensorInterpolationMatWorker::newEegMappingAvailable,
-            this, &RtSensorDataController::onNewEegMapping);
+    m_pInterpWorker->setNewMegMappingAvailableCallback([this](const std::string& surfaceKey, const std::shared_ptr<Eigen::MatrixXf>& mappingMat, const std::vector<int>& pick) {
+        QMetaObject::invokeMethod(this, [this, surfaceKey, mappingMat, pick] { onNewMegMapping(surfaceKey, mappingMat, pick); }, Qt::QueuedConnection);
+    });
+    m_pInterpWorker->setNewEegMappingAvailableCallback([this](const std::string& surfaceKey, const std::shared_ptr<Eigen::MatrixXf>& mappingMat, const std::vector<int>& pick) {
+        QMetaObject::invokeMethod(this, [this, surfaceKey, mappingMat, pick] { onNewEegMapping(surfaceKey, mappingMat, pick); }, Qt::QueuedConnection);
+    });
 
     mne::Log::debug("RtSensorDataController: Initialized with {} ms interval", m_iTimeInterval);
 }
@@ -70,7 +73,7 @@ RtSensorDataController::RtSensorDataController(QObject* parent)
 
 RtSensorDataController::~RtSensorDataController()
 {
-    // Join the threads while the workers (children of this object) are still alive. Pending
+    // Join the threads while the workers are still alive. Pending
     // recomputations are skipped.
     m_bShuttingDown.store(true, std::memory_order_release);
     m_pStreamTask.reset();

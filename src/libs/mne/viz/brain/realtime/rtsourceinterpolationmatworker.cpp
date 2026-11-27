@@ -16,8 +16,8 @@
 
 #include "rtsourceinterpolationmatworker.h"
 
-#include "../../../../brain/interpolation.h"
-#include "../../../../brain/geometryinfo.h"
+#include "../interpolation.h"
+#include "../geometryinfo.h"
 #include <mne/base/log.h>
 #include <mne/fs/fs_label.h>
 
@@ -25,17 +25,17 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <utility>
 #include <algorithm>
 
 using namespace mne::viz;
-using namespace mne::viz::qt;
+using namespace mne::viz;
 
 //=============================================================================================================
 // MEMBER METHODS
 //=============================================================================================================
 
-RtSourceInterpolationMatWorker::RtSourceInterpolationMatWorker(QObject* parent)
-: QObject(parent)
+RtSourceInterpolationMatWorker::RtSourceInterpolationMatWorker()
 {
 }
 
@@ -247,7 +247,9 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
             auto mat = computeAnnotationOperator(labelsLh, mapLabelIdSrcLh, vertNosLh, nAnnotVertsLh);
             if (mat && mat->rows() > 0) {
                 mne::Log::debug("RtSourceInterpolationMatWorker: LH annotation matrix: {} x {}", mat->rows(), mat->cols());
-                emit newInterpolationMatrixLeftAvailable(mat);
+                if (m_newInterpolationMatrixLeftAvailableCallback) {
+                    m_newInterpolationMatrixLeftAvailableCallback(mat);
+                }
             }
         }
 
@@ -255,7 +257,9 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
             auto mat = computeAnnotationOperator(labelsRh, mapLabelIdSrcRh, vertNosRh, nAnnotVertsRh);
             if (mat && mat->rows() > 0) {
                 mne::Log::debug("RtSourceInterpolationMatWorker: RH annotation matrix: {} x {}", mat->rows(), mat->cols());
-                emit newInterpolationMatrixRightAvailable(mat);
+                if (m_newInterpolationMatrixRightAvailableCallback) {
+                    m_newInterpolationMatrixRightAvailableCallback(mat);
+                }
             }
         }
 
@@ -281,7 +285,9 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
 
         if (mat && mat->rows() > 0) {
             mne::Log::debug("RtSourceInterpolationMatWorker: LH matrix computed: {} x {}", mat->rows(), mat->cols());
-            emit newInterpolationMatrixLeftAvailable(mat);
+            if (m_newInterpolationMatrixLeftAvailableCallback) {
+                m_newInterpolationMatrixLeftAvailableCallback(mat);
+            }
         } else {
             mne::Log::warning("RtSourceInterpolationMatWorker: LH interpolation matrix computation failed.");
         }
@@ -295,7 +301,9 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
 
         if (mat && mat->rows() > 0) {
             mne::Log::debug("RtSourceInterpolationMatWorker: RH matrix computed: {} x {}", mat->rows(), mat->cols());
-            emit newInterpolationMatrixRightAvailable(mat);
+            if (m_newInterpolationMatrixRightAvailableCallback) {
+                m_newInterpolationMatrixRightAvailableCallback(mat);
+            }
         } else {
             mne::Log::warning("RtSourceInterpolationMatWorker: RH interpolation matrix computation failed.");
         }
@@ -341,4 +349,18 @@ std::shared_ptr<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::comp
     }
 
     return mat;
+}
+
+//=============================================================================================================
+
+void RtSourceInterpolationMatWorker::setNewInterpolationMatrixLeftAvailableCallback(std::function<void(std::shared_ptr<Eigen::SparseMatrix<float>>)> callback)
+{
+    m_newInterpolationMatrixLeftAvailableCallback = std::move(callback);
+}
+
+//=============================================================================================================
+
+void RtSourceInterpolationMatWorker::setNewInterpolationMatrixRightAvailableCallback(std::function<void(std::shared_ptr<Eigen::SparseMatrix<float>>)> callback)
+{
+    m_newInterpolationMatrixRightAvailableCallback = std::move(callback);
 }

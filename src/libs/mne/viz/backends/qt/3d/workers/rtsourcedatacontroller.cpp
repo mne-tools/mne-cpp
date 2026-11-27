@@ -16,9 +16,9 @@
 
 #include "rtsourcedatacontroller.h"
 
-#include "rtsourcedataworker.h"
-#include "rtsourceinterpolationmatworker.h"
-#include "periodictask.h"
+#include "../../../../brain/realtime/rtsourcedataworker.h"
+#include "../../../../brain/realtime/rtsourceinterpolationmatworker.h"
+#include "../../../../brain/realtime/periodictask.h"
 #include <mne/fs/fs_label.h>
 #include <mne/base/log.h>
 #include <mne/base/thread_pool.h>
@@ -41,29 +41,32 @@ RtSourceDataController::RtSourceDataController(QObject* parent)
 : QObject(parent)
 {
     // Create data worker
-    // The worker stays on the GUI thread; streamData() runs on the streaming thread, so its signals reach
-    // this controller queued.
-    m_pWorker = new mne::viz::qt::RtSourceDataWorker(this);
+    // streamData() runs on the streaming thread; its results are re-emitted on this controller's thread.
+    m_pWorker = std::make_unique<mne::viz::RtSourceDataWorker>();
 
     // Forward worker signals to controller signals
-    connect(m_pWorker, &mne::viz::qt::RtSourceDataWorker::newRtSmoothedData,
-            this, &RtSourceDataController::newSmoothedDataAvailable);
-    connect(m_pWorker, &mne::viz::qt::RtSourceDataWorker::newRtRawData,
-            this, &RtSourceDataController::newRawDataAvailable);
+    m_pWorker->setNewRtSmoothedDataCallback([this](const std::vector<uint32_t>& colorsLh, const std::vector<uint32_t>& colorsRh) {
+        QMetaObject::invokeMethod(this, [this, colorsLh, colorsRh] { emit newSmoothedDataAvailable(colorsLh, colorsRh); }, Qt::QueuedConnection);
+    });
+    m_pWorker->setNewRtRawDataCallback([this](const Eigen::VectorXd& dataLh, const Eigen::VectorXd& dataRh) {
+        QMetaObject::invokeMethod(this, [this, dataLh, dataRh] { emit newRawDataAvailable(dataLh, dataRh); }, Qt::QueuedConnection);
+    });
 
     // Streaming thread driving the cadence
-    m_pStreamTask = std::make_unique<PeriodicTask>([worker = m_pWorker] { worker->streamData(); });
+    m_pStreamTask = std::make_unique<PeriodicTask>([worker = m_pWorker.get()] { worker->streamData(); });
 
     // Create interpolation matrix worker
     // One pool thread runs the recomputations in request order.
-    m_pInterpWorker = new mne::viz::qt::RtSourceInterpolationMatWorker(this);
+    m_pInterpWorker = std::make_unique<mne::viz::RtSourceInterpolationMatWorker>();
     m_pInterpPool = std::make_unique<mne::ThreadPool>(1);
 
     // Forward interpolation results: auto-apply to data worker + re-emit
-    connect(m_pInterpWorker, &mne::viz::qt::RtSourceInterpolationMatWorker::newInterpolationMatrixLeftAvailable,
-            this, &RtSourceDataController::onNewInterpolationMatrixLeft);
-    connect(m_pInterpWorker, &mne::viz::qt::RtSourceInterpolationMatWorker::newInterpolationMatrixRightAvailable,
-            this, &RtSourceDataController::onNewInterpolationMatrixRight);
+    m_pInterpWorker->setNewInterpolationMatrixLeftAvailableCallback([this](const std::shared_ptr<Eigen::SparseMatrix<float>>& interpMat) {
+        QMetaObject::invokeMethod(this, [this, interpMat] { onNewInterpolationMatrixLeft(interpMat); }, Qt::QueuedConnection);
+    });
+    m_pInterpWorker->setNewInterpolationMatrixRightAvailableCallback([this](const std::shared_ptr<Eigen::SparseMatrix<float>>& interpMat) {
+        QMetaObject::invokeMethod(this, [this, interpMat] { onNewInterpolationMatrixRight(interpMat); }, Qt::QueuedConnection);
+    });
 
     mne::Log::debug("RtSourceDataController: Initialized with {} ms interval", m_iTimeInterval);
 }
@@ -72,7 +75,7 @@ RtSourceDataController::RtSourceDataController(QObject* parent)
 
 RtSourceDataController::~RtSourceDataController()
 {
-    // Join the threads while the workers (children of this object) are still alive. Pending
+    // Join the threads while the workers are still alive. Pending
     // recomputations are skipped.
     m_bShuttingDown.store(true, std::memory_order_release);
     m_pStreamTask.reset();

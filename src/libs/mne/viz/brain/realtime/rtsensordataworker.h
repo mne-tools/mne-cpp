@@ -20,20 +20,14 @@
  * swap the mapping matrix or change colormap mid-stream.
  */
 
-#ifndef BRAINVIEW_RTSENSORDATAWORKER_H
-#define BRAINVIEW_RTSENSORDATAWORKER_H
+#ifndef VIZ_RTSENSORDATAWORKER_H
+#define VIZ_RTSENSORDATAWORKER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QObject>
+#include "../../viz_global.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -45,6 +39,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <functional>
 #include <deque>
 #include <memory>
 #include <mutex>
@@ -55,7 +50,7 @@
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -71,18 +66,15 @@ namespace mne::viz::qt
  *
  * @brief Background worker for real-time sensor data streaming.
  */
-class VIZQTSHARED_EXPORT RtSensorDataWorker : public QObject
+class VIZSHARED_EXPORT RtSensorDataWorker
 {
-    Q_OBJECT
-
 public:
     //=========================================================================================================
     /**
      * Constructor.
      *
-     * @param[in] parent     Parent QObject.
      */
-    explicit RtSensorDataWorker(QObject* parent = nullptr);
+    RtSensorDataWorker();
 
     //=========================================================================================================
     /**
@@ -169,7 +161,7 @@ public:
      */
     void setStreamSmoothedData(bool bStreamSmoothedData);
 
-public slots:
+public:
     //=========================================================================================================
     /**
      * Stream one frame of data. Called by the controller's timer.
@@ -178,24 +170,22 @@ public slots:
      */
     void streamData();
 
-signals:
+public:
     //=========================================================================================================
     /**
-     * Emitted when new per-vertex color data is ready for rendering.
+     * Set the callback for newRtSensorColors. Called when new per-vertex color data is ready for rendering. It runs on the thread that produced the result.
      *
-     * @param[in] surfaceKey  FsSurface key identifying the target surface.
-     * @param[in] colors      Per-vertex ABGR color array.
+     * @param[in] callback   Receives (surfaceKey, colors); empty to drop the results.
      */
-    void newRtSensorColors(const std::string& surfaceKey,
-                           const std::vector<uint32_t>& colors);
+    void setNewRtSensorColorsCallback(std::function<void(const std::string&, const std::vector<uint32_t>&)> callback);
 
     //=========================================================================================================
     /**
-     * Emitted when raw (non-mapped) sensor data is available.
+     * Set the callback for newRtRawSensorData. Called when raw (non-mapped) sensor data is available. It runs on the thread that produced the result.
      *
-     * @param[in] data        Raw sensor measurement vector.
+     * @param[in] callback   Receives (data); empty to drop the results.
      */
-    void newRtRawSensorData(const Eigen::VectorXf& data);
+    void setNewRtRawSensorDataCallback(std::function<void(const Eigen::VectorXf&)> callback);
 
 private:
     //=========================================================================================================
@@ -224,12 +214,15 @@ private:
     bool m_bStreamSmoothedData = true; /**< Whether to stream smoothed colors (true) or raw data (false). */
     double m_dSFreq = 1000.0;          /**< Sampling frequency in Hz. */
 
-    QString m_sColormapType = QStringLiteral("MNE"); /**< Active colormap name (QString: mne::viz::qt::ColorMap takes one). */
-    double m_dThreshMin = 0.0;                       /**< Explicit min threshold (0 = auto). */
-    double m_dThreshMax = 0.0;                       /**< Explicit max threshold (0 = auto). */
-    bool m_bUseAutoNorm = true;                      /**< True = symmetric auto-norm (default). */
+    std::string m_sColormapType = "MNE"; /**< Active colormap name. */
+    double m_dThreshMin = 0.0;           /**< Explicit min threshold (0 = auto). */
+    double m_dThreshMax = 0.0;           /**< Explicit max threshold (0 = auto). */
+    bool m_bUseAutoNorm = true;          /**< True = symmetric auto-norm (default). */
+
+    std::function<void(const std::string&, const std::vector<uint32_t>&)> m_newRtSensorColorsCallback; /**< Receives newRtSensorColors. */
+    std::function<void(const Eigen::VectorXf&)> m_newRtRawSensorDataCallback;                          /**< Receives newRtRawSensorData. */
 };
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // BRAINVIEW_RTSENSORDATAWORKER_H
+#endif // VIZ_RTSENSORDATAWORKER_H

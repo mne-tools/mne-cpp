@@ -17,6 +17,12 @@ set(SOURCES
   brain/meshfactory.cpp
   brain/networkobject.cpp
   brain/polylineobject.cpp
+  brain/realtime/periodictask.cpp
+  brain/realtime/rtsensordataworker.cpp
+  brain/realtime/rtsensorinterpolationmatworker.cpp
+  brain/realtime/rtsourcedataworker.cpp
+  brain/realtime/rtsourceinterpolationmatworker.cpp
+  brain/realtime/stcloadingworker.cpp
   brain/sensorfieldmapper.cpp
   brain/sourceestimateoverlay.cpp
   brain/viewstate.cpp
@@ -73,6 +79,12 @@ set(HEADERS
   brain/meshfactory.h
   brain/networkobject.h
   brain/polylineobject.h
+  brain/realtime/periodictask.h
+  brain/realtime/rtsensordataworker.h
+  brain/realtime/rtsensorinterpolationmatworker.h
+  brain/realtime/rtsourcedataworker.h
+  brain/realtime/rtsourceinterpolationmatworker.h
+  brain/realtime/stcloadingworker.h
   brain/rendertypes.h
   brain/sensorfieldmapper.h
   brain/sourceestimateoverlay.h

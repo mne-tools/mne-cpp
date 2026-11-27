@@ -3,9 +3,9 @@
   "exempt_header_prefixes": {
     "viz/backends/qt/viewers/": "Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example.",
     "viz/backends/qt/3d/model/": "Scene-graph item owned and driven by BrainView; not constructed directly by library users.",
-    "viz/backends/qt/3d/workers/": "Background worker owned by a real-time view; its behaviour is exercised through the owning view.",
-    "viz/backends/qt/3d/core/": "Renderer internals behind the BrainView/MultimodalScene facade.",
-    "viz/backends/qt/3d/input/": "Interaction handler of an interactive view; evidenced by GUI tests."
+    "viz/backends/qt/3d/workers/": "Real-time controller owned by a view; its behaviour is exercised through the owning view.",
+    "viz/backends/qt/3d/input/": "Interaction handler of an interactive view; evidenced by GUI tests.",
+    "viz/brain/realtime/": "Background worker owned by a real-time controller of the brain view; its behaviour is exercised through the controller and its tests."
   },
   "exempt_name_suffixes": {
     "Private": "Implementation detail behind a public facade.",

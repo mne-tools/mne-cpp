@@ -424,6 +424,13 @@ aliases; replace the old spelling as below.
   `DataLoader::SensorPlacement` (name, position, coil orientation in head
   coordinates) instead of Qt tree items, which `BrainView` now builds, and
   `loadHelmetSurface` takes an `Eigen::Matrix4f`.
+- The real-time workers of the brain view (`RtSensorDataWorker`,
+  `RtSensorInterpolationMatWorker`, `RtSourceDataWorker`,
+  `RtSourceInterpolationMatWorker`, `StcLoadingWorker`) and `PeriodicTask`
+  moved to `viz/brain/realtime/` and are no longer `QObject`s: their results
+  go to `std::function` callbacks (`setNewRtSensorColorsCallback`, ...) on the
+  thread that produced them. The Qt controllers own them and re-emit the
+  results as signals on their own thread.
 - Views run in any backend through `viz/host/surface.h`: a backend implements
   `viz::Surface` (redraw requests, clock, pointer shape) and drives a
   `viz::SurfaceClient` (resize, pointer, wheel and key events, animation

@@ -24,7 +24,7 @@
 #include <utility>
 
 using namespace mne::viz;
-using namespace mne::viz::qt;
+using namespace mne::viz;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

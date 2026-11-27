@@ -18,26 +18,26 @@
 
 #include <mne/base/log.h>
 
-#include "../../../../brain/rendertypes.h"
-#include <mne/viz/backends/qt/plots/helpers/colormap.h>
+#include "../rendertypes.h"
+#include "../../figures/colormap.h"
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <utility>
 #include <algorithm>
 #include <cmath>
 #include <vector>
 
 using namespace mne::viz;
-using namespace mne::viz::qt;
+using namespace mne::viz;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtSensorDataWorker::RtSensorDataWorker(QObject* parent)
-: QObject(parent)
+RtSensorDataWorker::RtSensorDataWorker()
 {
 }
 
@@ -96,7 +96,7 @@ void RtSensorDataWorker::setNumberAverages(int numAvr)
 void RtSensorDataWorker::setColormapType(const std::string& name)
 {
     std::scoped_lock locker(m_mutex);
-    m_sColormapType = QString::fromStdString(name);
+    m_sColormapType = name;
 }
 
 //=============================================================================================================
@@ -184,7 +184,9 @@ void RtSensorDataWorker::streamData()
         // Raw mode: emit measurement vector without mapping
         Eigen::VectorXf rawData = vecCurrentData;
         locker.unlock();
-        emit newRtRawSensorData(rawData);
+        if (m_newRtRawSensorDataCallback) {
+            m_newRtRawSensorDataCallback(rawData);
+        }
         return;
     }
 
@@ -196,7 +198,9 @@ void RtSensorDataWorker::streamData()
     locker.unlock();
 
     if (!colors.empty()) {
-        emit newRtSensorColors(surfaceKey, colors);
+        if (m_newRtSensorColorsCallback) {
+            m_newRtSensorColorsCallback(surfaceKey, colors);
+        }
     }
 }
 
@@ -217,7 +221,7 @@ std::vector<uint32_t> RtSensorDataWorker::computeSurfaceColors(const Eigen::Vect
     // Map sensor data to surface vertices: mapped = M * meas
     Eigen::VectorXf mapped = (*m_mappingMat) * sensorData;
 
-    int nVertices = mapped.size();
+    const int nVertices = static_cast<int>(mapped.size());
 
     // Determine normalization range
     float normMin, normMax;
@@ -249,15 +253,25 @@ std::vector<uint32_t> RtSensorDataWorker::computeSurfaceColors(const Eigen::Vect
         double norm = static_cast<double>(mapped(i) - normMin) / static_cast<double>(range);
         norm = std::clamp(norm, 0.0, 1.0);
 
-        QRgb rgb = mne::viz::qt::ColorMap::valueToColor(norm, m_sColormapType);
-
-        uint32_t r = qRed(rgb);
-        uint32_t g = qGreen(rgb);
-        uint32_t b = qBlue(rgb);
+        const Color rgb = map_color(m_sColormapType, norm);
 
         // Pack as ABGR (same format as BrainSurface uses)
-        colors[i] = packABGR(r, g, b);
+        colors[i] = packABGR(rgb.r, rgb.g, rgb.b);
     }
 
     return colors;
+}
+
+//=============================================================================================================
+
+void RtSensorDataWorker::setNewRtSensorColorsCallback(std::function<void(const std::string&, const std::vector<uint32_t>&)> callback)
+{
+    m_newRtSensorColorsCallback = std::move(callback);
+}
+
+//=============================================================================================================
+
+void RtSensorDataWorker::setNewRtRawSensorDataCallback(std::function<void(const Eigen::VectorXf&)> callback)
+{
+    m_newRtRawSensorDataCallback = std::move(callback);
 }

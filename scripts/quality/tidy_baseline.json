@@ -1120,13 +1120,6 @@
     "src/libs/mne/viz/backends/qt/3d/workers/rtsensordatacontroller.cpp": {
       "performance-unnecessary-value-param": 3
     },
-    "src/libs/mne/viz/backends/qt/3d/workers/rtsensordataworker.cpp": {
-      "performance-unnecessary-copy-initialization": 1,
-      "performance-unnecessary-value-param": 1
-    },
-    "src/libs/mne/viz/backends/qt/3d/workers/stcloadingworker.h": {
-      "modernize-use-override": 1
-    },
     "src/libs/mne/viz/backends/qt/plots/graph.cpp": {
       "bugprone-integer-division": 6
     },
@@ -1403,6 +1396,13 @@
     "src/libs/mne/viz/backends/qt/viewers/triggerdetectionview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
+    },
+    "src/libs/mne/viz/brain/realtime/rtsensordataworker.cpp": {
+      "performance-unnecessary-copy-initialization": 1,
+      "performance-unnecessary-value-param": 1
+    },
+    "src/libs/mne/viz/brain/realtime/stcloadingworker.h": {
+      "modernize-use-override": 1
     },
     "src/libs/mne/viz/brain/sensorfieldmapper.cpp": {
       "bugprone-float-loop-counter": 2
