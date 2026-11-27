@@ -1648,14 +1648,14 @@ private:
     void updateSceneBounds();
 
     // ── Coordinate transforms ──────────────────────────────────────────
-    mne::FiffCoordTrans m_headToMriTrans;          /**< Head-to-MRI coordinate transform. */
-    mne::FiffDigPointSet m_cardinalDigPoints;      /**< Cardinal dig points from last sensor load. */
-    bool m_applySensorTrans = true;                /**< Whether to apply the transform to sensors/digitizers. */
-    std::filesystem::path m_megHelmetOverridePath; /**< Optional override path for MEG helmet surface. */
-    QMatrix4x4 m_devHeadTrans;                     /**< Device→Head transformation from last sensor load. */
-    bool m_hasDevHead = false;                     /**< Whether a valid Device→Head transform is available. */
-    bool m_dipolesVisible = true;                  /**< Whether dipoles are rendered. */
-    bool m_networkVisible = false;                 /**< Whether the connectivity network is rendered. */
+    mne::FiffCoordTrans m_headToMriTrans;                         /**< Head-to-MRI coordinate transform. */
+    mne::FiffDigPointSet m_cardinalDigPoints;                     /**< Cardinal dig points from last sensor load. */
+    bool m_applySensorTrans = true;                               /**< Whether to apply the transform to sensors/digitizers. */
+    std::filesystem::path m_megHelmetOverridePath;                /**< Optional override path for MEG helmet surface. */
+    Eigen::Matrix4f m_devHeadTrans = Eigen::Matrix4f::Identity(); /**< Device→Head transformation from last sensor load. */
+    bool m_hasDevHead = false;                                    /**< Whether a valid Device→Head transform is available. */
+    bool m_dipolesVisible = true;                                 /**< Whether dipoles are rendered. */
+    bool m_networkVisible = false;                                /**< Whether the connectivity network is rendered. */
 
     // ── Ray-pick hover state ───────────────────────────────────────────
     QStandardItem* m_hoveredItem = nullptr; /**< Model item currently under the cursor. */

@@ -9,6 +9,7 @@ project(mne_viz
 
 set(SOURCES
   brain/brainsurface.cpp
+  brain/dataloader.cpp
   brain/dipoleobject.cpp
   brain/electrodeobject.cpp
   brain/geometryinfo.cpp
@@ -63,6 +64,7 @@ set(SOURCES
 
 set(HEADERS
   brain/brainsurface.h
+  brain/dataloader.h
   brain/dipoleobject.h
   brain/electrodeobject.h
   brain/geometryinfo.h

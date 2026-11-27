@@ -419,6 +419,11 @@ aliases; replace the old spelling as below.
 - The surface-key constants of the brain view moved to `viz/brain/surfacekeys.h`
   (namespace `mne::viz::surface_keys`); its Qt matrix helper
   `toQMatrix4x4` is gone, use `qt::toQMatrix` from `qtconversions.h`.
+- `DataLoader` moved to `viz/brain/` without Qt: `loadSensors` returns the
+  MEG gradiometers, magnetometers and EEG electrodes as
+  `DataLoader::SensorPlacement` (name, position, coil orientation in head
+  coordinates) instead of Qt tree items, which `BrainView` now builds, and
+  `loadHelmetSurface` takes an `Eigen::Matrix4f`.
 - Views run in any backend through `viz/host/surface.h`: a backend implements
   `viz::Surface` (redraw requests, clock, pointer shape) and drives a
   `viz::SurfaceClient` (resize, pointer, wheel and key events, animation

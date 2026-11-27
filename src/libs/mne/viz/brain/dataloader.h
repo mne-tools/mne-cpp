@@ -7,13 +7,13 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Static helpers for loading FreeSurfer / MNE source-space and BEM data into the mne_viz_qt model tree.
+ * @brief    Static helpers for loading sensors, helmets, dipoles, source spaces and evoked data for the brain view.
  *
  * DataLoader is a thin facade over @c mne_fs and @c mne_mne readers
  * that turns raw files (FsSurface, FsAnnotation, MNESourceSpaces,
  * MNEBemSurface, FIFF digitizer / sensor blocks) into the in-memory
- * objects that @ref mne::viz::qt::BrainTreeModel and the @c renderable/ layer
- * expect. It exists so GUI code can populate the 3-D scene without
+ * objects that the brain view and its tree model expect (sensors as
+ * plain placements, helmets as @ref mne::viz::BrainSurface). It exists so GUI code can populate the 3-D scene without
  * knowing the FreeSurfer / MNE file-format conventions (subject
  * directory layout, hemisphere suffixes, surface-RAS vs head
  * coordinate frames, ...).
@@ -23,14 +23,14 @@
  * not touch the Qt RHI or any GUI state.
  */
 
-#ifndef DATALOADER_H
-#define DATALOADER_H
+#ifndef VIZ_DATALOADER_H
+#define VIZ_DATALOADER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
+#include "../viz_global.h"
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_evoked.h>
 #include <mne/fiff/fiff_coord_trans.h>
@@ -39,12 +39,10 @@
 #include <mne/inv/dipole_fit/inv_ecd_set.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
-#include <QStandardItem>
-#include <QVector3D>
-#include <QMatrix4x4>
+#include <Eigen/Core>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -64,9 +62,12 @@ namespace mne::viz
 class BrainSurface;
 } // namespace mne::viz
 
-namespace mne::viz::qt
+//=============================================================================================================
+// DEFINE NAMESPACE mne::viz
+//=============================================================================================================
+
+namespace mne::viz
 {
-class SensorTreeItem;
 
 //=============================================================================================================
 /**
@@ -76,8 +77,10 @@ class SensorTreeItem;
  * These static methods have zero coupling to the widget layer.  BrainView
  * calls them to obtain data and then wires the results into its own model /
  * surface map / member state.
+ *
+ * @snippet ex_disp3d_scene/main.cpp data_loader_usage
  */
-class VIZQTSHARED_EXPORT DataLoader
+class VIZSHARED_EXPORT DataLoader
 {
 public:
     DataLoader() = delete; // all-static class
@@ -89,21 +92,36 @@ public:
      *
      * Result of reading a FIF file for sensor information.
      */
+    /**
+     * @brief Name, position and coil orientation of one sensor.
+     */
+    struct SensorPlacement
+    {
+        std::string name;                                          ///< Channel name.
+        Eigen::Vector3f position = Eigen::Vector3f::Zero();        ///< Position in head coordinates when a device-to-head transform exists.
+        Eigen::Matrix4f orientation = Eigen::Matrix4f::Identity(); ///< Coil orientation (rotation only).
+    };
+
+    /**
+     * @brief Return value bundling loaded sensor geometry, labels, and channel-to-sensor mapping.
+     *
+     * Result of reading a FIF file for sensor information.
+     */
     struct SensorLoadResult
     {
         bool hasInfo = false;
         bool hasDigitizer = false;
 
-        mne::FiffInfo info;                                       ///< Channel / dig info
-        std::vector<std::unique_ptr<QStandardItem>> megGradItems; ///< Hand over with BrainTreeModel::addSensors()
-        std::vector<std::unique_ptr<QStandardItem>> megMagItems;
-        std::vector<std::unique_ptr<QStandardItem>> eegItems;
+        mne::FiffInfo info;                   ///< Channel / dig info
+        std::vector<SensorPlacement> megGrad; ///< MEG gradiometers.
+        std::vector<SensorPlacement> megMag;  ///< MEG magnetometers.
+        std::vector<SensorPlacement> eeg;     ///< EEG electrodes.
         mne::FiffDigPointSet digitizerPoints;
 
         std::shared_ptr<BrainSurface> helmetSurface; ///< May be null
 
-        QMatrix4x4 devHeadTrans; ///< Device→Head transform (identity if absent)
-        bool hasDevHead = false; ///< Whether a valid dev→head transform was found
+        Eigen::Matrix4f devHeadTrans = Eigen::Matrix4f::Identity(); ///< Device→Head transform (identity if absent)
+        bool hasDevHead = false;                                    ///< Whether a valid dev→head transform was found
     };
 
     // ── Static I/O methods ────────────────────────────────────────────
@@ -128,7 +146,7 @@ public:
      */
     static std::shared_ptr<BrainSurface> loadHelmetSurface(
         const std::filesystem::path& helmetFilePath,
-        const QMatrix4x4& devHeadTrans = QMatrix4x4(),
+        const Eigen::Matrix4f& devHeadTrans = Eigen::Matrix4f::Identity(),
         bool applyTrans = false);
 
     /**
@@ -176,6 +194,6 @@ public:
     static std::vector<std::string> probeEvokedSets(const std::filesystem::path& evokedPath);
 };
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // DATALOADER_H
+#endif // VIZ_DATALOADER_H

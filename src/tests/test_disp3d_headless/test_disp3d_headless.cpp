@@ -19,11 +19,16 @@
 #include <mne/viz/brain/interpolation.h>
 #include <mne/viz/brain/geometryinfo.h>
 #include <mne/viz/brain/meshfactory.h>
-#include <mne/viz/backends/qt/3d/core/dataloader.h>
+#include <mne/viz/brain/dataloader.h>
 #include <mne/viz/backends/qt/3d/workers/rtsourcedatacontroller.h>
 #include <mne/viz/backends/qt/3d/workers/rtsensordatacontroller.h>
 
 #include <mne/fiff/fiff.h>
+
+#include <Eigen/Geometry>
+
+#include <cmath>
+#include <cstddef>
 
 using namespace mne::viz;
 using namespace mne::viz::qt;
@@ -272,6 +277,20 @@ private slots:
         auto result = DataLoader::loadSensors(rawFile.toStdU16String());
         QVERIFY(result.hasInfo);
         QVERIFY(result.info.nchan > 0);
+
+        // Sensors are plain placements in head coordinates: every MEG/EEG channel, coils rotated by device-to-head
+        QCOMPARE(result.megGrad.size(), std::size_t(204));
+        QCOMPARE(result.megMag.size(), std::size_t(102));
+        QCOMPARE(result.eeg.size(), std::size_t(60));
+        QVERIFY(result.hasDevHead);
+        const auto& first = result.info.chs.front();
+        QCOMPARE(result.megGrad.front().name, first.ch_name);
+        const Eigen::Vector4f mapped = result.devHeadTrans * first.chpos.r0.homogeneous();
+        const Eigen::Vector3f expected = mapped.head<3>();
+        QVERIFY((result.megGrad.front().position - expected).norm() < 1e-6f);
+        const Eigen::Matrix3f rotation = result.megGrad.front().orientation.topLeftCorner<3, 3>();
+        QVERIFY(std::abs(rotation.determinant() - 1.0f) < 1e-4f);
+        QVERIFY(result.helmetSurface != nullptr);
     }
 
     void dataLoader_loadSensorsNonExistent()

@@ -105,7 +105,6 @@ set(SOURCES
     viewers/helpers/frequencyspectrumdelegate.cpp
     viewers/helpers/frequencyspectrummodel.cpp
     viewers/helpers/bidsviewmodel.cpp
-    3d/core/dataloader.cpp
     3d/input/cameracontroller.cpp
     3d/input/raypicker.cpp
     3d/model/braintreemodel.cpp
@@ -211,7 +210,6 @@ set(HEADERS
     viewers/helpers/frequencyspectrumdelegate.h
     viewers/helpers/frequencyspectrummodel.h
     viewers/helpers/bidsviewmodel.h
-    3d/core/dataloader.h
     3d/input/cameracontroller.h
     3d/input/raypicker.h
     3d/model/braintreemodel.h

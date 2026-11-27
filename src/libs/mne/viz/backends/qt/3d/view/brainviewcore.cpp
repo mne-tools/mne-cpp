@@ -28,7 +28,7 @@
 #include "../renderable/videooverlay.h"
 #include "../renderable/sliceobject.h"
 #include "../../../../brain/surfacekeys.h"
-#include "../core/dataloader.h"
+#include "../../../../brain/dataloader.h"
 #include "../input/raypicker.h"
 #include "../../qtconversions.h"
 #include "../../qtsettingsstore.h"
@@ -2470,12 +2470,25 @@ bool BrainViewCore::loadSensors(const std::filesystem::path& fifPath)
     m_devHeadTrans = r.devHeadTrans;
     m_hasDevHead = r.hasDevHead;
 
-    if (!r.megGradItems.empty())
-        m_model->addSensors("MEG/Grad", std::move(r.megGradItems));
-    if (!r.megMagItems.empty())
-        m_model->addSensors("MEG/Mag", std::move(r.megMagItems));
-    if (!r.eegItems.empty())
-        m_model->addSensors("EEG", std::move(r.eegItems));
+    // MEG coils carry their orientation (plates and barbells), EEG electrodes are small spheres
+    const auto toItems = [](const std::vector<DataLoader::SensorPlacement>& sensors, const QColor& color, float scale, bool oriented) {
+        std::vector<std::unique_ptr<QStandardItem>> items;
+        items.reserve(sensors.size());
+        for (const DataLoader::SensorPlacement& sensor : sensors) {
+            auto item = std::make_unique<SensorTreeItem>(QString::fromStdString(sensor.name), toQVector3D(sensor.position), color, scale);
+            if (oriented) {
+                item->setOrientation(toQMatrix(sensor.orientation));
+            }
+            items.push_back(std::move(item));
+        }
+        return items;
+    };
+    if (!r.megGrad.empty())
+        m_model->addSensors("MEG/Grad", toItems(r.megGrad, QColor(100, 100, 100), 0.01f, true));
+    if (!r.megMag.empty())
+        m_model->addSensors("MEG/Mag", toItems(r.megMag, QColor(100, 100, 100), 0.01f, true));
+    if (!r.eeg.empty())
+        m_model->addSensors("EEG", toItems(r.eeg, QColor(0, 200, 220), 0.002f, false));
 
     if (r.helmetSurface) {
         m_surfaces["sens_surface_meg"] = r.helmetSurface;
@@ -3277,7 +3290,7 @@ void BrainViewCore::clearCameraFocusOverride()
 
 void BrainViewCore::clearSensors()
 {
-    m_devHeadTrans = QMatrix4x4();
+    m_devHeadTrans = Eigen::Matrix4f::Identity();
     m_hasDevHead = false;
     removeSurfacesByPrefix({"sens_", "dig_"});
 }

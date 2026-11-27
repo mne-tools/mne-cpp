@@ -15,11 +15,8 @@
 //=============================================================================================================
 
 #include "dataloader.h"
-#include "../../qtconversions.h"
 
-#include "../../../../brain/surfacekeys.h"
-#include "../model/items/sensortreeitem.h"
-#include "../../../../brain/brainsurface.h"
+#include "brainsurface.h"
 #include <mne/fiff/fiff_evoked_set.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_stream.h>
@@ -34,6 +31,7 @@
 //=============================================================================================================
 
 #include <Eigen/Dense>
+#include <Eigen/Geometry>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -47,7 +45,23 @@
 
 using namespace mne;
 
-namespace mne::viz::qt
+namespace
+{
+
+// Moves a helmet into head coordinates; normals turn with the inverse transpose
+void transformHelmet(mne::MNEBemSurface& helmet, const Eigen::Matrix4f& devHead)
+{
+    const Eigen::Matrix3f normalMat = devHead.topLeftCorner<3, 3>().inverse().transpose();
+    for (int i = 0; i < helmet.rr.rows(); ++i) {
+        const Eigen::Vector4f p = devHead * Eigen::Vector3f(helmet.rr.row(i).transpose()).homogeneous();
+        helmet.rr.row(i) = (p.head<3>() / p.w()).transpose();
+        helmet.nn.row(i) = (normalMat * Eigen::Vector3f(helmet.nn.row(i).transpose())).normalized().transpose();
+    }
+}
+
+} // namespace
+
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -79,56 +93,43 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const std::filesystem::path
         result.info = info;
 
         // Prepare Device->Head transformation
-        QMatrix4x4 devHeadQTrans;
+        Eigen::Matrix4f devHead = Eigen::Matrix4f::Identity();
         bool hasDevHead = false;
         if (!info.dev_head_t.empty() &&
             info.dev_head_t.from == FIFFV_COORD_DEVICE &&
             info.dev_head_t.to == FIFFV_COORD_HEAD &&
             !info.dev_head_t.trans.isIdentity()) {
             hasDevHead = true;
-            devHeadQTrans = toQMatrix(info.dev_head_t.trans);
+            devHead = info.dev_head_t.trans;
         }
 
-        result.devHeadTrans = devHeadQTrans;
+        result.devHeadTrans = devHead;
         result.hasDevHead = hasDevHead;
 
         for (const auto& ch : info.chs) {
             if (ch.kind == FIFFV_MEG_CH) {
-                QVector3D pos(ch.chpos.r0(0), ch.chpos.r0(1), ch.chpos.r0(2));
-
+                DataLoader::SensorPlacement sensor;
+                sensor.name = ch.ch_name;
+                sensor.position = ch.chpos.r0;
+                sensor.orientation.topLeftCorner<3, 3>() = ch.coil_trans.topLeftCorner<3, 3>();
                 if (hasDevHead) {
-                    pos = devHeadQTrans.map(pos);
+                    const Eigen::Vector4f p = devHead * ch.chpos.r0.homogeneous();
+                    sensor.position = p.head<3>() / p.w();
+                    sensor.orientation.topLeftCorner<3, 3>() = devHead.topLeftCorner<3, 3>() * sensor.orientation.topLeftCorner<3, 3>();
                 }
-
-                auto item = std::make_unique<SensorTreeItem>(QString::fromStdString(ch.ch_name), pos, QColor(100, 100, 100), 0.01f);
-
-                // Store coil orientation
-                QMatrix4x4 orient;
-                for (int r = 0; r < 3; ++r)
-                    for (int c = 0; c < 3; ++c)
-                        orient(r, c) = ch.coil_trans(r, c);
-                if (hasDevHead) {
-                    QMatrix4x4 devHeadRot;
-                    for (int r = 0; r < 3; ++r)
-                        for (int c = 0; c < 3; ++c)
-                            devHeadRot(r, c) = devHeadQTrans(r, c);
-                    orient = devHeadRot * orient;
-                }
-                item->setOrientation(orient);
 
                 if (ch.unit == FIFF_UNIT_T_M) {
-                    result.megGradItems.push_back(std::move(item));
+                    result.megGrad.push_back(std::move(sensor));
                 } else {
-                    result.megMagItems.push_back(std::move(item));
+                    result.megMag.push_back(std::move(sensor));
                 }
             } else if (ch.kind == FIFFV_EEG_CH) {
-                QVector3D pos(ch.chpos.r0(0), ch.chpos.r0(1), ch.chpos.r0(2));
-                result.eegItems.push_back(std::make_unique<SensorTreeItem>(QString::fromStdString(ch.ch_name), pos, QColor(0, 200, 220), 0.002f));
+                result.eeg.push_back({ch.ch_name, ch.chpos.r0, Eigen::Matrix4f::Identity()});
             }
         }
 
         // ── MEG helmet surface ──────────────────────────────────────
-        if (!result.megGradItems.empty() || !result.megMagItems.empty()) {
+        if (!result.megGrad.empty() || !result.megMag.empty()) {
             auto pickHelmetFile = [&info]() -> std::filesystem::path {
                 int coilType = -1;
                 int nMeg = 0;
@@ -218,28 +219,11 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const std::filesystem::path
                     }
 
                     if (hasDevHead) {
-                        QMatrix3x3 normalMat = devHeadQTrans.normalMatrix();
-                        for (int i = 0; i < helmetSurf.rr.rows(); ++i) {
-                            QVector3D pos(helmetSurf.rr(i, 0), helmetSurf.rr(i, 1), helmetSurf.rr(i, 2));
-                            pos = devHeadQTrans.map(pos);
-                            helmetSurf.rr(i, 0) = pos.x();
-                            helmetSurf.rr(i, 1) = pos.y();
-                            helmetSurf.rr(i, 2) = pos.z();
-
-                            QVector3D nn(helmetSurf.nn(i, 0), helmetSurf.nn(i, 1), helmetSurf.nn(i, 2));
-                            const float* d = normalMat.constData();
-                            float nx = d[0] * nn.x() + d[3] * nn.y() + d[6] * nn.z();
-                            float ny = d[1] * nn.x() + d[4] * nn.y() + d[7] * nn.z();
-                            float nz = d[2] * nn.x() + d[5] * nn.y() + d[8] * nn.z();
-                            QVector3D n = QVector3D(nx, ny, nz).normalized();
-                            helmetSurf.nn(i, 0) = n.x();
-                            helmetSurf.nn(i, 1) = n.y();
-                            helmetSurf.nn(i, 2) = n.z();
-                        }
+                        transformHelmet(helmetSurf, devHead);
                     }
 
                     auto helmetSurface = std::make_shared<BrainSurface>();
-                    helmetSurface->fromBemSurface(helmetSurf, viz::Color{0, 0, 77, 200});
+                    helmetSurface->fromBemSurface(helmetSurf, Color{0, 0, 77, 200});
                     helmetSurface->setVisible(true);
                     result.helmetSurface = helmetSurface;
                 } else {
@@ -267,7 +251,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const std::filesystem::path
 
 std::shared_ptr<BrainSurface> DataLoader::loadHelmetSurface(
     const std::filesystem::path& helmetFilePath,
-    const QMatrix4x4& devHeadTrans,
+    const Eigen::Matrix4f& devHeadTrans,
     bool applyTrans)
 {
     std::error_code error;
@@ -289,28 +273,11 @@ std::shared_ptr<BrainSurface> DataLoader::loadHelmetSurface(
     }
 
     if (applyTrans) {
-        QMatrix3x3 normalMat = devHeadTrans.normalMatrix();
-        for (int i = 0; i < helmetSurf.rr.rows(); ++i) {
-            QVector3D pos(helmetSurf.rr(i, 0), helmetSurf.rr(i, 1), helmetSurf.rr(i, 2));
-            pos = devHeadTrans.map(pos);
-            helmetSurf.rr(i, 0) = pos.x();
-            helmetSurf.rr(i, 1) = pos.y();
-            helmetSurf.rr(i, 2) = pos.z();
-
-            QVector3D nn(helmetSurf.nn(i, 0), helmetSurf.nn(i, 1), helmetSurf.nn(i, 2));
-            const float* d = normalMat.constData();
-            float nx = d[0] * nn.x() + d[3] * nn.y() + d[6] * nn.z();
-            float ny = d[1] * nn.x() + d[4] * nn.y() + d[7] * nn.z();
-            float nz = d[2] * nn.x() + d[5] * nn.y() + d[8] * nn.z();
-            QVector3D n = QVector3D(nx, ny, nz).normalized();
-            helmetSurf.nn(i, 0) = n.x();
-            helmetSurf.nn(i, 1) = n.y();
-            helmetSurf.nn(i, 2) = n.z();
-        }
+        transformHelmet(helmetSurf, devHeadTrans);
     }
 
     auto surface = std::make_shared<BrainSurface>();
-    surface->fromBemSurface(helmetSurf, viz::Color{0, 0, 77, 200});
+    surface->fromBemSurface(helmetSurf, Color{0, 0, 77, 200});
     surface->setVisible(true);
 
     return surface;
@@ -397,4 +364,4 @@ std::vector<std::string> DataLoader::probeEvokedSets(const std::filesystem::path
     return result;
 }
 
-} // namespace mne::viz::qt
+} // namespace mne::viz

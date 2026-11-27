@@ -22,6 +22,8 @@
 #include <mne/viz/brain/geometryinfo.h>
 #include <mne/viz/brain/interpolation.h>
 #include <mne/viz/brain/brainsurface.h>
+#include <mne/viz/brain/dataloader.h>
+#include <mne/base/string_utils.h>
 #include <mne/viz/brain/meshfactory.h>
 #include <mne/viz/brain/rendertypes.h>
 #include <mne/viz/brain/viewstate.h>
@@ -57,6 +59,7 @@
 
 #include <cmath>
 #include <cstdlib>
+#include <filesystem>
 #include <format>
 #include <map>
 #include <memory>
@@ -331,6 +334,21 @@ int main(int argc, char* argv[])
     //! [view_state_usage]
     ok &= expect(restored.surfaceType == "inflated" && restored.brainShader == pane.brainShader && !restored.visibility.isObjectVisible("dipoles"),
                  "SubView: surface, shader and visibility round-trip through a settings store");
+
+    //! [data_loader_usage]
+    // The Neuromag helmet shipped with MNE-CPP, shifted 4 cm up as a device-to-head transform would
+    Eigen::Matrix4f devToHead = Eigen::Matrix4f::Identity();
+    devToHead(2, 3) = 0.04f;
+    const auto helmet = DataLoader::loadHelmetSurface(mne::resource_path("general/sensorSurfaces/306m.fif"), devToHead, true);
+    const DataLoader::SensorLoadResult noSensors = DataLoader::loadSensors("missing.fif"); // reports, never throws
+    //! [data_loader_usage]
+    Eigen::Vector3f helmetMin;
+    Eigen::Vector3f helmetMax;
+    if (helmet) {
+        helmet->boundingBox(helmetMin, helmetMax);
+    }
+    ok &= expect(helmet && helmet->vertexCount() > 0 && helmetMax.z() > 0.04f && !noSensors.hasInfo,
+                 "DataLoader: the helmet loads and moves with the transform; a missing file yields no sensors");
 
     //! [multi_view_layout_usage]
     MultiViewLayout layout;
