@@ -17,8 +17,8 @@
 //=============================================================================================================
 
 #include "triggerdetectionview.h"
-
-#include "ui_triggerdetectionview.h"
+#include "../detail/scoped_flag.h"
+#include "settingspanel.h"
 #include <mne/fiff/fiff_info.h>
 
 //=============================================================================================================
@@ -26,15 +26,24 @@
 //=============================================================================================================
 
 #include <QColorDialog>
+#include <QLabel>
+#include <QLayout>
 #include <QPalette>
+#include <QPushButton>
 #include <QSettings>
+#include <QVBoxLayout>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
+#include <cmath>
+#include <iterator>
 #include <memory>
+#include <string>
 #include <utility>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -45,6 +54,38 @@ using namespace mne::viz::qt;
 using namespace mne;
 
 //=============================================================================================================
+// DEFINE STATIC HELPERS
+//=============================================================================================================
+
+namespace
+{
+
+/** A field shown in real-time mode only. */
+SettingField realTimeField(const std::string& key, SettingField::Kind kind, const std::string& label)
+{
+    SettingField field;
+    field.key = key;
+    field.kind = kind;
+    field.label = label;
+    field.visible_if = "realTime";
+    return field;
+}
+
+/** Shows a color on a color button. */
+void showColor(QPushButton* button, const QColor& color)
+{
+    if (!button) {
+        return;
+    }
+    QPalette palette = button->palette();
+    palette.setColor(QPalette::Button, color);
+    button->setPalette(palette);
+    button->update();
+}
+
+} // namespace
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -52,10 +93,78 @@ TriggerDetectionView::TriggerDetectionView(const QString& sSettingsPath,
                                            QWidget* parent,
                                            Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pUi(std::make_unique<Ui::TriggerDetectionViewWidget>())
+, m_pForm(std::make_shared<viz::SettingsForm>("Trigger Detection Settings"))
 {
     m_sSettingsPath = sSettingsPath;
-    m_pUi->setupUi(this);
+
+    m_pForm->add_flag("realTime", true);
+
+    SettingField activate = realTimeField("activateTriggerDetection", SettingField::Kind::Bool, "Activate trigger detection");
+    activate.default_value = false;
+    m_pForm->add(activate);
+
+    m_pForm->add_choice("triggerChannel", "Trigger channel:", {}, {});
+
+    m_pForm->add(realTimeField("triggerColorType", SettingField::Kind::Choice, "Type color:"));
+    m_pForm->add(realTimeField("triggerColor", SettingField::Kind::Custom, {}));
+
+    m_pForm->add_double("detectionThresholdFirst", "Threshold:", 0.1, -1000.0, 1000.0, 0.1, 2);
+    SettingField exponent;
+    exponent.key = "detectionThresholdSecond";
+    exponent.kind = SettingField::Kind::Int;
+    exponent.default_value = -1;
+    exponent.minimum = -100;
+    exponent.maximum = 100;
+    exponent.decimals = 0;
+    exponent.prefix = "e^";
+    m_pForm->add(exponent);
+
+    m_pForm->add(realTimeField("numberDetectedTriggers", SettingField::Kind::Custom, "Detected trigger:"));
+    m_pForm->add(realTimeField("resetNumberTriggers", SettingField::Kind::Action, "Reset"));
+
+    SettingField detect;
+    detect.key = "detectTriggers";
+    detect.kind = SettingField::Kind::Action;
+    detect.label = "Detect Triggers";
+    detect.visible_if = "!realTime";
+    m_pForm->add(detect);
+
+    // The controls react once init() connected the view to measurement info
+    m_listener = m_pForm->add_listener([this](const std::string& key, const std::optional<viz::SettingValue>&) {
+        if (!m_bInitialized || m_bSilent) {
+            return;
+        }
+        if (key == "activateTriggerDetection" || key == "triggerChannel" || key.starts_with("detectionThreshold")) {
+            onTriggerInfoChanged();
+        } else if (key == "triggerColorType") {
+            onRealTimeTriggerColorTypeChanged(QString::fromStdString(m_pForm->get<std::string>("triggerColorType")));
+        } else if (key == "resetNumberTriggers") {
+            onResetTriggerNumbers();
+        } else if (key == "detectTriggers") {
+            onDetectTriggers();
+        }
+    });
+
+    auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    auto* pPanel = new SettingsPanel(m_pForm, this);
+    layout->addWidget(pPanel);
+
+    if (auto* pColor = pPanel->customWidget("triggerColor")) {
+        m_pTriggerColorButton = new QPushButton(QStringLiteral("Click to change"), pColor);
+        m_pTriggerColorButton->setObjectName(QStringLiteral("triggerColorButton"));
+        pColor->layout()->addWidget(m_pTriggerColorButton);
+        connect(m_pTriggerColorButton, &QPushButton::clicked, this, [this](bool state) {
+            if (m_bInitialized) {
+                onRealTimeTriggerColorChanged(state);
+            }
+        });
+    }
+    if (auto* pCount = pPanel->customWidget("numberDetectedTriggers")) {
+        m_pNumberDetectedTriggers = new QLabel(QStringLiteral("0"), pCount);
+        m_pNumberDetectedTriggers->setObjectName(QStringLiteral("numberDetectedTriggersLabel"));
+        pCount->layout()->addWidget(m_pNumberDetectedTriggers);
+    }
 
     this->setWindowTitle("Trigger Detection Settings");
     this->setMinimumWidth(330);
@@ -70,6 +179,7 @@ TriggerDetectionView::TriggerDetectionView(const QString& sSettingsPath,
 
 TriggerDetectionView::~TriggerDetectionView()
 {
+    m_pForm->remove_listener(m_listener);
     saveSettings();
 }
 
@@ -79,45 +189,22 @@ void TriggerDetectionView::init(const std::shared_ptr<FiffInfo>& pFiffInfo)
 {
     if (pFiffInfo) {
         m_pFiffInfo = pFiffInfo;
-        //Trigger detection
-        connect(m_pUi->m_checkBox_activateTriggerDetection, &QCheckBox::checkStateChanged,
-                this, &TriggerDetectionView::onTriggerInfoChanged, Qt::UniqueConnection);
 
-        m_pUi->m_comboBox_triggerChannels->clear();
-
+        std::vector<SettingChoice> channels;
         for (int i = 0; i < std::ssize(m_pFiffInfo->chs); i++) {
             if (m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
-                m_pUi->m_comboBox_triggerChannels->addItem(QString::fromStdString(m_pFiffInfo->chs[i].ch_name));
+                channels.push_back({m_pFiffInfo->chs[i].ch_name, m_pFiffInfo->chs[i].ch_name});
             }
         }
+        m_pForm->set_choices("triggerChannel", std::move(channels));
 
-        connect(m_pUi->m_comboBox_triggerChannels, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
-                this, &TriggerDetectionView::onTriggerInfoChanged, Qt::UniqueConnection);
+        m_bInitialized = true;
 
-        connect(m_pUi->m_comboBox_triggerColorType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
-                this, &TriggerDetectionView::onRealTimeTriggerColorTypeChanged, Qt::UniqueConnection);
-
-        connect(m_pUi->m_pushButton_triggerColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-                this, &TriggerDetectionView::onRealTimeTriggerColorChanged, Qt::UniqueConnection);
-
-        m_pUi->m_pushButton_triggerColor->setAutoFillBackground(true);
-        m_pUi->m_pushButton_triggerColor->setFlat(true);
-        QPalette palette = m_pUi->m_pushButton_triggerColor->palette();
-        palette.setColor(QPalette::Button, QColor(177, 0, 0));
-        m_pUi->m_pushButton_triggerColor->setPalette(palette);
-        m_pUi->m_pushButton_triggerColor->update();
-
-        connect(m_pUi->m_doubleSpinBox_detectionThresholdFirst, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this, &TriggerDetectionView::onTriggerInfoChanged, Qt::UniqueConnection);
-
-        connect(m_pUi->m_spinBox_detectionThresholdSecond, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                this, &TriggerDetectionView::onTriggerInfoChanged, Qt::UniqueConnection);
-
-        connect(m_pUi->m_pushButton_resetNumberTriggers, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-                this, &TriggerDetectionView::onResetTriggerNumbers, Qt::UniqueConnection);
-
-        connect(m_pUi->m_pushButton_DetectTriggers, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-                this, &TriggerDetectionView::onDetectTriggers, Qt::UniqueConnection);
+        if (m_pTriggerColorButton) {
+            m_pTriggerColorButton->setAutoFillBackground(true);
+            m_pTriggerColorButton->setFlat(true);
+        }
+        showColor(m_pTriggerColorButton, QColor(177, 0, 0));
 
         loadSettings();
     }
@@ -127,17 +214,23 @@ void TriggerDetectionView::init(const std::shared_ptr<FiffInfo>& pFiffInfo)
 
 void TriggerDetectionView::setNumberDetectedTriggersAndTypes(int numberDetections, const std::map<int, std::vector<std::pair<int, double>>>& mapDetectedTriggers)
 {
-    //if(m_bTriggerDetection) {
-    m_pUi->m_label_numberDetectedTriggers->setText(QString("%1").arg(numberDetections));
-    //}
+    if (m_pNumberDetectedTriggers) {
+        m_pNumberDetectedTriggers->setText(QString("%1").arg(numberDetections));
+    }
 
     //Set trigger types
+    std::vector<SettingChoice> types = m_pForm->field("triggerColorType")->choices;
+    const std::size_t count = types.size();
     for (const auto& [channel, triggers] : mapDetectedTriggers) {
         for (const auto& [sample, value] : triggers) {
-            if (m_pUi->m_comboBox_triggerColorType->findText(QString::number(value)) == -1) {
-                m_pUi->m_comboBox_triggerColorType->addItem(QString::number(value));
+            const std::string type = QString::number(value).toStdString();
+            if (std::ranges::none_of(types, [&type](const SettingChoice& choice) { return choice.value == type; })) {
+                types.push_back({type, type});
             }
         }
+    }
+    if (types.size() != count) {
+        m_pForm->set_choices("triggerColorType", std::move(types));
     }
 }
 
@@ -151,10 +244,15 @@ void TriggerDetectionView::saveSettings()
 
     QSettings settings("MNECPP");
 
-    settings.setValue(m_sSettingsPath + QString("/TriggerDetectionView/Activated"), m_pUi->m_checkBox_activateTriggerDetection->isChecked());
-    settings.setValue(m_sSettingsPath + QString("/TriggerDetectionView/ChannelIndex"), m_pUi->m_comboBox_triggerChannels->currentIndex());
-    settings.setValue(m_sSettingsPath + QString("/TriggerDetectionView/FirstThresholdValue"), m_pUi->m_doubleSpinBox_detectionThresholdFirst->value());
-    settings.setValue(m_sSettingsPath + QString("/TriggerDetectionView/SecondThresholdValue"), m_pUi->m_spinBox_detectionThresholdSecond->value());
+    const std::vector<SettingChoice>& channels = m_pForm->field("triggerChannel")->choices;
+    const std::string channel = m_pForm->get<std::string>("triggerChannel");
+    const auto current = std::ranges::find(channels, channel, &SettingChoice::value);
+    const int channelIndex = current == channels.end() ? -1 : static_cast<int>(std::distance(channels.begin(), current));
+
+    settings.setValue(m_sSettingsPath + QString("/TriggerDetectionView/Activated"), m_pForm->get<bool>("activateTriggerDetection"));
+    settings.setValue(m_sSettingsPath + QString("/TriggerDetectionView/ChannelIndex"), channelIndex);
+    settings.setValue(m_sSettingsPath + QString("/TriggerDetectionView/FirstThresholdValue"), m_pForm->get<double>("detectionThresholdFirst"));
+    settings.setValue(m_sSettingsPath + QString("/TriggerDetectionView/SecondThresholdValue"), m_pForm->get<int>("detectionThresholdSecond"));
 
     settings.beginGroup(m_sSettingsPath + QString("/TriggerDetectionView/Colors"));
     std::map<double, QColor>::const_iterator i = m_qMapTriggerColor.cbegin();
@@ -175,10 +273,17 @@ void TriggerDetectionView::loadSettings()
 
     QSettings settings("MNECPP");
 
-    m_pUi->m_checkBox_activateTriggerDetection->setChecked(settings.value(m_sSettingsPath + QString("/TriggerDetectionView/Activated"), false).toBool());
-    m_pUi->m_comboBox_triggerChannels->setCurrentIndex(settings.value(m_sSettingsPath + QString("/TriggerDetectionView/ChannelIndex"), 0).toInt());
-    m_pUi->m_doubleSpinBox_detectionThresholdFirst->setValue(settings.value(m_sSettingsPath + QString("/TriggerDetectionView/FirstThresholdValue"), 0.1).toDouble());
-    m_pUi->m_spinBox_detectionThresholdSecond->setValue(settings.value(m_sSettingsPath + QString("/TriggerDetectionView/SecondThresholdValue"), -1).toInt());
+    {
+        const detail::ScopedFlag silent(m_bSilent);
+        m_pForm->set_value("activateTriggerDetection", settings.value(m_sSettingsPath + QString("/TriggerDetectionView/Activated"), false).toBool());
+        const std::vector<SettingChoice>& channels = m_pForm->field("triggerChannel")->choices;
+        const int channelIndex = settings.value(m_sSettingsPath + QString("/TriggerDetectionView/ChannelIndex"), 0).toInt();
+        if (channelIndex >= 0 && channelIndex < std::ssize(channels)) {
+            m_pForm->set_value("triggerChannel", channels[static_cast<std::size_t>(channelIndex)].value);
+        }
+        m_pForm->set_value("detectionThresholdFirst", settings.value(m_sSettingsPath + QString("/TriggerDetectionView/FirstThresholdValue"), 0.1).toDouble());
+        m_pForm->set_value("detectionThresholdSecond", settings.value(m_sSettingsPath + QString("/TriggerDetectionView/SecondThresholdValue"), -1).toInt());
+    }
 
     settings.beginGroup(m_sSettingsPath + QString("/TriggerDetectionView/Colors"));
     for (const QString& key : settings.childKeys()) {
@@ -206,28 +311,7 @@ void TriggerDetectionView::updateGuiMode(GuiMode mode)
 
 void TriggerDetectionView::updateProcessingMode(ProcessingMode mode)
 {
-    switch (mode) {
-        case ProcessingMode::Offline:
-            m_pUi->label->hide();
-            m_pUi->label_9->hide();
-            m_pUi->m_pushButton_resetNumberTriggers->hide();
-            m_pUi->m_pushButton_triggerColor->hide();
-            m_pUi->m_checkBox_activateTriggerDetection->hide();
-            m_pUi->m_comboBox_triggerColorType->hide();
-            m_pUi->m_label_numberDetectedTriggers->hide();
-            m_pUi->m_pushButton_DetectTriggers->show();
-            break;
-        default: // default is realtime mode
-            m_pUi->label->show();
-            m_pUi->label_9->show();
-            m_pUi->m_pushButton_resetNumberTriggers->show();
-            m_pUi->m_pushButton_triggerColor->show();
-            m_pUi->m_checkBox_activateTriggerDetection->show();
-            m_pUi->m_comboBox_triggerColorType->show();
-            m_pUi->m_label_numberDetectedTriggers->show();
-            m_pUi->m_pushButton_DetectTriggers->hide();
-            break;
-    }
+    m_pForm->set_value("realTime", mode != ProcessingMode::Offline);
 }
 
 //=============================================================================================================
@@ -235,9 +319,9 @@ void TriggerDetectionView::updateProcessingMode(ProcessingMode mode)
 void TriggerDetectionView::onTriggerInfoChanged()
 {
     emit triggerInfoChanged(m_qMapTriggerColor,
-                            m_pUi->m_checkBox_activateTriggerDetection->isChecked(),
-                            m_pUi->m_comboBox_triggerChannels->currentText().toStdString(),
-                            m_pUi->m_doubleSpinBox_detectionThresholdFirst->value() * pow(10, m_pUi->m_spinBox_detectionThresholdSecond->value()));
+                            m_pForm->get<bool>("activateTriggerDetection"),
+                            getSelectedStimChannel(),
+                            m_pForm->get<double>("detectionThresholdFirst") * std::pow(10, m_pForm->get<int>("detectionThresholdSecond")));
 
     saveSettings();
 }
@@ -248,19 +332,16 @@ void TriggerDetectionView::onRealTimeTriggerColorChanged(bool state)
 {
     Q_UNUSED(state);
 
-    QColor color = QColorDialog::getColor(m_qMapTriggerColor[m_pUi->m_comboBox_triggerColorType->currentText().toDouble()], this, "Set trigger color");
+    const double type = QString::fromStdString(m_pForm->get<std::string>("triggerColorType")).toDouble();
+    const auto color = QColorDialog::getColor(m_qMapTriggerColor[type], this, "Set trigger color");
     // Cancelled: getColor() returns an invalid colour
     if (!color.isValid()) {
         return;
     }
 
-    //Change color of pushbutton
-    QPalette palette = m_pUi->m_pushButton_triggerColor->palette();
-    palette.setColor(QPalette::Button, color);
-    m_pUi->m_pushButton_triggerColor->setPalette(palette);
-    m_pUi->m_pushButton_triggerColor->update();
+    showColor(m_pTriggerColorButton, color);
 
-    m_qMapTriggerColor[m_pUi->m_comboBox_triggerColorType->currentText().toDouble()] = color;
+    m_qMapTriggerColor[type] = color;
 
     onTriggerInfoChanged();
 }
@@ -269,41 +350,42 @@ void TriggerDetectionView::onRealTimeTriggerColorChanged(bool state)
 
 void TriggerDetectionView::onRealTimeTriggerColorTypeChanged(const QString& value)
 {
-    //Change color of pushbutton
-    QPalette palette = m_pUi->m_pushButton_triggerColor->palette();
-    palette.setColor(QPalette::Button, m_qMapTriggerColor[value.toDouble()]);
-    m_pUi->m_pushButton_triggerColor->setPalette(palette);
-    m_pUi->m_pushButton_triggerColor->update();
+    showColor(m_pTriggerColorButton, m_qMapTriggerColor[value.toDouble()]);
 }
 
 //=============================================================================================================
 
 void TriggerDetectionView::onResetTriggerNumbers()
 {
-    m_pUi->m_label_numberDetectedTriggers->setText(QString("0"));
-    m_pUi->m_comboBox_triggerColorType->clear();
+    if (m_pNumberDetectedTriggers) {
+        m_pNumberDetectedTriggers->setText(QString("0"));
+    }
+    const bool hadTypes = !m_pForm->field("triggerColorType")->choices.empty();
+    m_pForm->set_choices("triggerColorType", {});
+    // The emptied type list selects no type, like the cleared combo box did
+    if (hadTypes && m_bInitialized) {
+        onRealTimeTriggerColorTypeChanged(QString());
+    }
 
     emit resetTriggerCounter();
-
-    //emit updateConnectedView();
 }
 
 //=============================================================================================================
 
 void TriggerDetectionView::onDetectTriggers()
 {
-    if (m_pUi->m_comboBox_triggerChannels->currentText() == "") {
+    if (getSelectedStimChannel().empty()) {
         return;
     }
-    emit detectTriggers(m_pUi->m_comboBox_triggerChannels->currentText().toStdString(),
-                        m_pUi->m_doubleSpinBox_detectionThresholdFirst->value() * pow(10, m_pUi->m_spinBox_detectionThresholdSecond->value()));
+    emit detectTriggers(getSelectedStimChannel(),
+                        m_pForm->get<double>("detectionThresholdFirst") * std::pow(10, m_pForm->get<int>("detectionThresholdSecond")));
 }
 
 //=============================================================================================================
 
 std::string TriggerDetectionView::getSelectedStimChannel()
 {
-    return m_pUi->m_comboBox_triggerChannels->currentText().toStdString();
+    return m_pForm->get<std::string>("triggerChannel");
 }
 
 //=============================================================================================================

@@ -27,21 +27,13 @@
 
 #include "../viz_qt_global.h"
 #include "abstractview.h"
+#include <mne/viz/forms/settings_form.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <memory>
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-namespace Ui
-{
-class SpharaSettingsViewWidget;
-}
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne::viz::qt
@@ -134,7 +126,18 @@ protected:
      */
     void onSpharaOptionsChanged();
 
-    std::unique_ptr<Ui::SpharaSettingsViewWidget> m_pUi;
+    //=========================================================================================================
+    /**
+     * Labels the basis-function fields and sets their maxima for the selected system: "Mag"/"Grad" for
+     * VectorView, "Inner layer"/"Outer layer" for BabyMEG and a single "EEG" field for EEG.
+     *
+     * @since 3.0.0
+     */
+    void updateSystemFields();
+
+    std::shared_ptr<viz::SettingsForm> m_pForm; /**< Activation, system and basis functions, built by a SettingsPanel. */
+    int m_listener = 0;                         /**< Id of the view's listener on the form. */
+    bool m_bSilent = false;                     /**< Whether form changes are applied without signals. */
 
 signals:
     //=========================================================================================================

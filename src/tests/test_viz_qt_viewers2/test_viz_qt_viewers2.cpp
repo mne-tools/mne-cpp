@@ -1354,13 +1354,13 @@ void TestVizQtViewers2::triggerDetectionView_settingsAndSignals()
 
     TriggerDetectionView view(QString{});
     view.show();
-    auto* pChannels = view.findChild<QComboBox*>(QStringLiteral("m_comboBox_triggerChannels"));
-    auto* pTypes = view.findChild<QComboBox*>(QStringLiteral("m_comboBox_triggerColorType"));
-    auto* pActive = view.findChild<QCheckBox*>(QStringLiteral("m_checkBox_activateTriggerDetection"));
-    auto* pFirst = view.findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_detectionThresholdFirst"));
-    auto* pSecond = view.findChild<QSpinBox*>(QStringLiteral("m_spinBox_detectionThresholdSecond"));
-    auto* pCount = view.findChild<QLabel*>(QStringLiteral("m_label_numberDetectedTriggers"));
-    auto* pDetect = view.findChild<QPushButton*>(QStringLiteral("m_pushButton_DetectTriggers"));
+    auto* pChannels = view.findChild<QComboBox*>(QStringLiteral("triggerChannel"));
+    auto* pTypes = view.findChild<QComboBox*>(QStringLiteral("triggerColorType"));
+    auto* pActive = view.findChild<QCheckBox*>(QStringLiteral("activateTriggerDetection"));
+    auto* pFirst = view.findChild<QDoubleSpinBox*>(QStringLiteral("detectionThresholdFirst"));
+    auto* pSecond = view.findChild<QSpinBox*>(QStringLiteral("detectionThresholdSecond"));
+    auto* pCount = view.findChild<QLabel*>(QStringLiteral("numberDetectedTriggersLabel"));
+    auto* pDetect = view.findChild<QPushButton*>(QStringLiteral("detectTriggers"));
     QVERIFY(pChannels);
     QVERIFY(pTypes);
     QVERIFY(pActive);
@@ -1394,7 +1394,7 @@ void TestVizQtViewers2::triggerDetectionView_settingsAndSignals()
     QCOMPARE(pTypes->count(), 2);
 
     // The color button shows the color of the selected type; picking a color stores it for that type
-    auto* pColor = view.findChild<QPushButton*>(QStringLiteral("m_pushButton_triggerColor"));
+    auto* pColor = view.findChild<QPushButton*>(QStringLiteral("triggerColorButton"));
     QVERIFY(pColor);
     pTypes->setCurrentIndex(1);
     answerNextModal([](QWidget* pModal) {
@@ -1423,7 +1423,7 @@ void TestVizQtViewers2::triggerDetectionView_settingsAndSignals()
     QCOMPARE(infoSpy.size(), infoCount);
 
     QSignalSpy resetSpy(&view, &TriggerDetectionView::resetTriggerCounter);
-    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_resetNumberTriggers")), Qt::LeftButton);
+    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("resetNumberTriggers")), Qt::LeftButton);
     QCOMPARE(resetSpy.count(), 1);
     QCOMPARE(pCount->text(), QStringLiteral("0"));
     QCOMPARE(pTypes->count(), 0);

@@ -27,6 +27,7 @@
 
 #include "../viz_qt_global.h"
 #include "abstractview.h"
+#include <mne/viz/forms/settings_form.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -42,10 +43,8 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui
-{
-class TriggerDetectionViewWidget;
-}
+class QLabel;
+class QPushButton;
 
 namespace mne
 {
@@ -189,7 +188,12 @@ protected:
      */
     void onDetectTriggers();
 
-    std::unique_ptr<Ui::TriggerDetectionViewWidget> m_pUi;
+    std::shared_ptr<viz::SettingsForm> m_pForm;   /**< Activation, channel, threshold and live controls, built by a SettingsPanel. */
+    int m_listener = 0;                           /**< Id of the view's listener on the form. */
+    bool m_bSilent = false;                       /**< Whether form changes are applied without signals. */
+    bool m_bInitialized = false;                  /**< Whether init() connected the view to measurement info. */
+    QPushButton* m_pTriggerColorButton = nullptr; /**< Shows and picks the color of the selected trigger type. */
+    QLabel* m_pNumberDetectedTriggers = nullptr;  /**< Number of detected triggers. */
 
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Connected fiff info. */
 

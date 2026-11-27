@@ -18,14 +18,23 @@
 //=============================================================================================================
 
 #include "connectivitysettingsview.h"
-
-#include "ui_connectivitysettingsview.h"
+#include "../detail/scoped_flag.h"
+#include "settingspanel.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSettings>
+#include <QVBoxLayout>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <initializer_list>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -35,6 +44,25 @@ using namespace mne::viz;
 using namespace mne::viz::qt;
 
 //=============================================================================================================
+// DEFINE STATIC HELPERS
+//=============================================================================================================
+
+namespace
+{
+
+/** Choices whose value is their label. */
+std::vector<SettingChoice> plainChoices(std::initializer_list<const char*> values)
+{
+    std::vector<SettingChoice> choices;
+    for (const char* value : values) {
+        choices.push_back({value, value});
+    }
+    return choices;
+}
+
+} // namespace
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -42,39 +70,56 @@ ConnectivitySettingsView::ConnectivitySettingsView(const QString& sSettingsPath,
                                                    QWidget* parent,
                                                    Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pUi(std::make_unique<Ui::ConnectivitySettingsViewWidget>())
+, m_pForm(std::make_shared<viz::SettingsForm>("Connectivity Settings"))
+, m_iNumberTrials(10)
 {
     m_sSettingsPath = sSettingsPath;
-    m_pUi->setupUi(this);
 
-    loadSettings();
+    // The keys are the QSettings keys of the fields
+    m_pForm->add_choice("connMethod", "Metric:", plainChoices({"COR", "COH", "IMAGCOH", "XCOR", "PLI", "DSWPLI", "USPLI", "WPLI", "PLV"}), "COR");
+    m_pForm->add_choice("connWindowType", "Window Type:", plainChoices({"Hanning", "Ones"}), "Hanning");
 
-    connect(m_pUi->m_comboBox_method, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
-            this, &ConnectivitySettingsView::onMetricChanged);
+    viz::SettingField trials;
+    trials.key = "connNrTrials";
+    trials.kind = viz::SettingField::Kind::Int;
+    trials.label = "Number of trials:";
+    trials.default_value = 10;
+    trials.minimum = 1;
+    trials.maximum = 1000;
+    trials.decimals = 0;
+    trials.commit = viz::SettingField::Commit::WhenFinished;
+    m_pForm->add(trials);
 
-    connect(m_pUi->m_comboBox_windowType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
-            this, &ConnectivitySettingsView::onWindowTypeChanged);
+    m_pForm->add_choice("connTriggerType", "Trigger type:", {}, {});
+    m_pForm->add_double("connFreqLow", "Lower frequency:", 7.0, 0.0, 10000.0, 1.0, 1);
+    m_pForm->add_double("connFreqHigh", "Upper frequency:", 13.0, 0.0, 10000.0, 1.0, 1);
 
-    //    connect(m_pUi->m_spinBox_numberTrials, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-    //            this, &ConnectivitySettingsView::onNumberTrialsChanged);
+    m_listener = m_pForm->add_listener([this](const std::string& key, const std::optional<viz::SettingValue>&) {
+        if (m_bSilent) {
+            return;
+        }
+        if (key == "connMethod") {
+            onMetricChanged(getConnectivityMetric());
+        } else if (key == "connWindowType") {
+            onWindowTypeChanged(getWindowType());
+        } else if (key == "connNrTrials") {
+            onNumberTrialsChanged();
+        } else if (key == "connTriggerType") {
+            onTriggerTypeChanged(getTriggerType());
+        } else if (key == "connFreqLow" || key == "connFreqHigh") {
+            onFrequencyBandChanged();
+        }
+    });
 
-    connect(m_pUi->m_spinBox_numberTrials, &QSpinBox::editingFinished,
-            this, &ConnectivitySettingsView::onNumberTrialsChanged);
+    auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    m_pPanel = new SettingsPanel(m_pForm, this);
+    layout->addWidget(m_pPanel);
 
-    connect(m_pUi->m_comboBox_triggerType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
-            this, &ConnectivitySettingsView::onTriggerTypeChanged);
-
-    //    connect(m_pUi->m_spinBox_freqLow, &QDoubleSpinBox::editingFinished,
-    //            this, &ConnectivitySettingsView::onFrequencyBandChanged);
-
-    //    connect(m_pUi->m_spinBox_freqHigh, &QDoubleSpinBox::editingFinished,
-    //            this, &ConnectivitySettingsView::onFrequencyBandChanged);
-
-    connect(m_pUi->m_spinBox_freqLow, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &ConnectivitySettingsView::onFrequencyBandChanged);
-
-    connect(m_pUi->m_spinBox_freqHigh, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &ConnectivitySettingsView::onFrequencyBandChanged);
+    {
+        const detail::ScopedFlag silent(m_bSilent);
+        loadSettings();
+    }
 
     this->setWindowTitle("Connectivity Settings");
     this->setMinimumWidth(330);
@@ -85,6 +130,7 @@ ConnectivitySettingsView::ConnectivitySettingsView(const QString& sSettingsPath,
 
 ConnectivitySettingsView::~ConnectivitySettingsView()
 {
+    m_pForm->remove_listener(m_listener);
     saveSettings();
 }
 
@@ -92,10 +138,16 @@ ConnectivitySettingsView::~ConnectivitySettingsView()
 
 void ConnectivitySettingsView::setTriggerTypes(const QStringList& lTriggerTypes)
 {
+    std::vector<viz::SettingChoice> choices = m_pForm->field("connTriggerType")->choices;
+    const std::size_t count = choices.size();
     for (const QString& sTriggerType : lTriggerTypes) {
-        if (m_pUi->m_comboBox_triggerType->findText(sTriggerType) == -1) {
-            m_pUi->m_comboBox_triggerType->addItem(sTriggerType);
+        const std::string type = sTriggerType.toStdString();
+        if (std::ranges::none_of(choices, [&type](const viz::SettingChoice& choice) { return choice.value == type; })) {
+            choices.push_back({type, type});
         }
+    }
+    if (choices.size() != count) {
+        m_pForm->set_choices("connTriggerType", std::move(choices));
     }
 }
 
@@ -103,57 +155,59 @@ void ConnectivitySettingsView::setTriggerTypes(const QStringList& lTriggerTypes)
 
 void ConnectivitySettingsView::setNumberTrials(int iNumberTrials)
 {
-    m_pUi->m_spinBox_numberTrials->setValue(iNumberTrials);
+    // Like setting the spin box: only finished user edits report the number
+    const detail::ScopedFlag silent(m_bSilent);
+    m_pForm->set_value("connNrTrials", iNumberTrials);
 }
 
 //=============================================================================================================
 
 void ConnectivitySettingsView::setFrequencyBand(double dFreqLow, double dFreqHigh)
 {
-    m_pUi->m_spinBox_freqLow->setValue(dFreqLow);
-    m_pUi->m_spinBox_freqHigh->setValue(dFreqHigh);
+    m_pForm->set_value("connFreqLow", dFreqLow);
+    m_pForm->set_value("connFreqHigh", dFreqHigh);
 }
 
 //=============================================================================================================
 
 QString ConnectivitySettingsView::getConnectivityMetric()
 {
-    return m_pUi->m_comboBox_method->currentText();
+    return QString::fromStdString(m_pForm->get<std::string>("connMethod"));
 }
 
 //=============================================================================================================
 
 QString ConnectivitySettingsView::getWindowType()
 {
-    return m_pUi->m_comboBox_windowType->currentText();
+    return QString::fromStdString(m_pForm->get<std::string>("connWindowType"));
 }
 
 //=============================================================================================================
 
 int ConnectivitySettingsView::getNumberTrials()
 {
-    return m_pUi->m_spinBox_numberTrials->value();
+    return m_pForm->get<int>("connNrTrials");
 }
 
 //=============================================================================================================
 
 QString ConnectivitySettingsView::getTriggerType()
 {
-    return m_pUi->m_comboBox_triggerType->currentText();
+    return QString::fromStdString(m_pForm->get<std::string>("connTriggerType"));
 }
 
 //=============================================================================================================
 
 double ConnectivitySettingsView::getLowerFreq()
 {
-    return m_pUi->m_spinBox_freqLow->value();
+    return m_pForm->get<double>("connFreqLow");
 }
 
 //=============================================================================================================
 
 double ConnectivitySettingsView::getUpperFreq()
 {
-    return m_pUi->m_spinBox_freqHigh->value();
+    return m_pForm->get<double>("connFreqHigh");
 }
 
 //=============================================================================================================
@@ -164,14 +218,7 @@ void ConnectivitySettingsView::saveSettings()
         return;
     }
 
-    QSettings settings("MNECPP");
-
-    settings.setValue(m_sSettingsPath + QString("/ConnectivitySettingsView/connMethod"), m_pUi->m_comboBox_method->currentText());
-    settings.setValue(m_sSettingsPath + QString("/ConnectivitySettingsView/connWindowType"), m_pUi->m_comboBox_windowType->currentText());
-    settings.setValue(m_sSettingsPath + QString("/ConnectivitySettingsView/connNrTrials"), m_pUi->m_spinBox_numberTrials->value());
-    settings.setValue(m_sSettingsPath + QString("/ConnectivitySettingsView/connTriggerType"), m_pUi->m_comboBox_triggerType->currentText());
-    settings.setValue(m_sSettingsPath + QString("/ConnectivitySettingsView/connFreqLow"), m_pUi->m_spinBox_freqLow->value());
-    settings.setValue(m_sSettingsPath + QString("/ConnectivitySettingsView/connFreqHigh"), m_pUi->m_spinBox_freqHigh->value());
+    m_pPanel->saveSettings(m_sSettingsPath + QString("/ConnectivitySettingsView"));
 }
 
 //=============================================================================================================
@@ -182,15 +229,8 @@ void ConnectivitySettingsView::loadSettings()
         return;
     }
 
-    QSettings settings("MNECPP");
-
-    m_pUi->m_comboBox_method->setCurrentText(settings.value(m_sSettingsPath + QString("/ConnectivitySettingsView/connMethod"), "COR").toString());
-    m_pUi->m_comboBox_windowType->setCurrentText(settings.value(m_sSettingsPath + QString("/ConnectivitySettingsView/connWindowType"), "Hanning").toString());
-    m_pUi->m_spinBox_numberTrials->setValue(settings.value(m_sSettingsPath + QString("/ConnectivitySettingsView/connNrTrials"), 10).toInt());
-    m_iNumberTrials = settings.value(m_sSettingsPath + QString("/ConnectivitySettingsView/connNrTrials"), 10).toInt();
-    m_pUi->m_comboBox_triggerType->setCurrentText(settings.value(m_sSettingsPath + QString("/ConnectivitySettingsView/connTriggerType"), "1").toString());
-    m_pUi->m_spinBox_freqLow->setValue(settings.value(m_sSettingsPath + QString("/ConnectivitySettingsView/connFreqLow"), 7.0).toDouble());
-    m_pUi->m_spinBox_freqHigh->setValue(settings.value(m_sSettingsPath + QString("/ConnectivitySettingsView/connFreqHigh"), 13.0).toDouble());
+    m_pPanel->loadSettings(m_sSettingsPath + QString("/ConnectivitySettingsView"));
+    m_iNumberTrials = getNumberTrials();
 }
 
 //=============================================================================================================
@@ -237,13 +277,13 @@ void ConnectivitySettingsView::onWindowTypeChanged(const QString& sWindowType)
 
 void ConnectivitySettingsView::onNumberTrialsChanged()
 {
-    if (m_iNumberTrials == m_pUi->m_spinBox_numberTrials->value()) {
+    if (m_iNumberTrials == getNumberTrials()) {
         return;
     }
 
-    m_iNumberTrials = m_pUi->m_spinBox_numberTrials->value();
+    m_iNumberTrials = getNumberTrials();
 
-    emit numberTrialsChanged(m_pUi->m_spinBox_numberTrials->value());
+    emit numberTrialsChanged(m_iNumberTrials);
     saveSettings();
 }
 
@@ -259,9 +299,8 @@ void ConnectivitySettingsView::onTriggerTypeChanged(const QString& sTriggerType)
 
 void ConnectivitySettingsView::onFrequencyBandChanged()
 {
-    //Q_UNUSED(value)
-    emit freqBandChanged(m_pUi->m_spinBox_freqLow->value(),
-                         m_pUi->m_spinBox_freqHigh->value());
+    emit freqBandChanged(static_cast<float>(getLowerFreq()),
+                         static_cast<float>(getUpperFreq()));
     saveSettings();
 }
 

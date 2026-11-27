@@ -18,9 +18,7 @@
 //=============================================================================================================
 
 #include "minimumnormsettingsview.h"
-
-#include "ui_minimumnormsettingsview.h"
-
+#include "settingspanel.h"
 #include <mne/base/string_utils.h>
 
 //=============================================================================================================
@@ -28,15 +26,18 @@
 //=============================================================================================================
 
 #include <QFileDialog>
-#include <QPushButton>
 #include <QSettings>
+#include <QVBoxLayout>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <filesystem>
+#include <string>
 #include <system_error>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -54,30 +55,71 @@ MinimumNormSettingsView::MinimumNormSettingsView(const QString& sSettingsPath,
                                                  QWidget* parent,
                                                  Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pUi(std::make_unique<Ui::MinimumNormSettingsViewWidget>())
+, m_pForm(std::make_shared<viz::SettingsForm>("InvMinimumNorm Settings"))
 {
     m_sSettingsPath = sSettingsPath;
     m_sMethod = sMethod;
-    m_pUi->setupUi(this);
 
-    connect(m_pUi->m_comboBox_method, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
-            this, &MinimumNormSettingsView::onMethodChanged);
+    m_pForm->add_flag("methodEditable", true);
+    m_pForm->add_flag("isCmne");
 
-    connect(m_pUi->m_comboBox_triggerType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
-            this, &MinimumNormSettingsView::onTriggerTypeChanged);
+    viz::SettingField method;
+    method.key = "method";
+    method.kind = viz::SettingField::Kind::Choice;
+    method.label = "Method:";
+    method.choices = {{"MNE", "MNE"}, {"dSPM", "dSPM"}, {"sLORETA", "sLORETA"}, {"CMNE", "CMNE"}};
+    method.default_value = std::string("MNE");
+    method.enabled_if = "methodEditable";
+    m_pForm->add(method);
 
-    connect(m_pUi->m_spinBox_timepoint, &QSpinBox::editingFinished,
-            this, &MinimumNormSettingsView::onTimePointValueChanged);
+    m_pForm->add_choice("triggerType", "Trigger type:", {}, {});
 
-    connect(m_pUi->m_pushButton_browseModelCheckpoint, &QPushButton::clicked,
-            this, &MinimumNormSettingsView::onBrowseModelCheckpointClicked);
+    viz::SettingField timePoint;
+    timePoint.key = "timePoint";
+    timePoint.kind = viz::SettingField::Kind::Int;
+    timePoint.label = "Time point (incl. pre stim):";
+    timePoint.default_value = 1;
+    timePoint.minimum = 1;
+    timePoint.maximum = 10000;
+    timePoint.decimals = 0;
+    timePoint.unit = "ms";
+    timePoint.commit = viz::SettingField::Commit::WhenFinished;
+    m_pForm->add(timePoint);
+
+    viz::SettingField checkpoint;
+    checkpoint.key = "modelCheckpoint";
+    checkpoint.kind = viz::SettingField::Kind::Path;
+    checkpoint.label = "Model checkpoint:";
+    checkpoint.tooltip = "Path to .onnx LSTM checkpoint";
+    checkpoint.default_value = std::string();
+    checkpoint.file_filter = "ONNX model (*.onnx);;All files (*)";
+    checkpoint.commit = viz::SettingField::Commit::WhenFinished;
+    checkpoint.visible_if = "isCmne";
+    checkpoint.persistent = false;
+    m_pForm->add(checkpoint);
+
+    m_listener = m_pForm->add_listener([this](const std::string& key, const std::optional<viz::SettingValue>&) {
+        if (key == "method") {
+            onMethodChanged(QString::fromStdString(m_pForm->get<std::string>("method")));
+        } else if (key == "triggerType") {
+            onTriggerTypeChanged(QString::fromStdString(m_pForm->get<std::string>("triggerType")));
+        } else if (key == "timePoint") {
+            onTimePointValueChanged();
+        } else if (key == "modelCheckpoint") {
+            setModelCheckpoint(mne::path_from_utf8(m_pForm->get<std::string>("modelCheckpoint")));
+        }
+    });
+
+    auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(new SettingsPanel(m_pForm, this));
 
     if (!m_sMethod.isEmpty()) {
-        m_pUi->m_comboBox_method->setCurrentIndex(m_pUi->m_comboBox_method->findText(m_sMethod));
-        m_pUi->m_comboBox_method->setEnabled(false);
+        m_pForm->set_value("method", m_sMethod.toStdString());
+        m_pForm->set_value("methodEditable", false);
     }
 
-    updateCmneWidgetVisibility(m_pUi->m_comboBox_method->currentText());
+    updateCmneWidgetVisibility(QString::fromStdString(m_pForm->get<std::string>("method")));
 
     this->setWindowTitle("InvMinimumNorm Settings");
     this->setMinimumWidth(330);
@@ -90,6 +132,7 @@ MinimumNormSettingsView::MinimumNormSettingsView(const QString& sSettingsPath,
 
 MinimumNormSettingsView::~MinimumNormSettingsView()
 {
+    m_pForm->remove_listener(m_listener);
     saveSettings();
 }
 
@@ -97,10 +140,16 @@ MinimumNormSettingsView::~MinimumNormSettingsView()
 
 void MinimumNormSettingsView::setTriggerTypes(const QStringList& lTriggerTypes)
 {
+    std::vector<viz::SettingChoice> choices = m_pForm->field("triggerType")->choices;
+    const std::size_t count = choices.size();
     for (const QString& sTriggerType : lTriggerTypes) {
-        if (m_pUi->m_comboBox_triggerType->findText(sTriggerType) == -1) {
-            m_pUi->m_comboBox_triggerType->addItem(sTriggerType);
+        const std::string type = sTriggerType.toStdString();
+        if (std::ranges::none_of(choices, [&type](const viz::SettingChoice& choice) { return choice.value == type; })) {
+            choices.push_back({type, type});
         }
+    }
+    if (choices.size() != count) {
+        m_pForm->set_choices("triggerType", std::move(choices));
     }
 }
 
@@ -174,7 +223,7 @@ void MinimumNormSettingsView::setModelCheckpoint(const std::filesystem::path& sP
         return;
     }
     m_sModelCheckpoint = sPath;
-    m_pUi->m_lineEdit_modelCheckpoint->setText(QString::fromStdString(mne::utf8_from_path(sPath)));
+    m_pForm->set_value("modelCheckpoint", mne::utf8_from_path(sPath));
     saveSettings();
     emit modelCheckpointChanged(sPath);
 }
@@ -190,10 +239,7 @@ std::filesystem::path MinimumNormSettingsView::getModelCheckpoint() const
 
 void MinimumNormSettingsView::updateCmneWidgetVisibility(const QString& method)
 {
-    const bool bIsCmne = (method == QLatin1String("CMNE"));
-    m_pUi->m_label_modelCheckpoint->setVisible(bIsCmne);
-    m_pUi->m_lineEdit_modelCheckpoint->setVisible(bIsCmne);
-    m_pUi->m_pushButton_browseModelCheckpoint->setVisible(bIsCmne);
+    m_pForm->set_value("isCmne", method == QLatin1String("CMNE"));
 }
 
 //=============================================================================================================
@@ -224,7 +270,7 @@ void MinimumNormSettingsView::onTriggerTypeChanged(const QString& sTriggerType)
 
 void MinimumNormSettingsView::onTimePointValueChanged()
 {
-    emit timePointChanged(m_pUi->m_spinBox_timepoint->value());
+    emit timePointChanged(m_pForm->get<int>("timePoint"));
 }
 
 //=============================================================================================================

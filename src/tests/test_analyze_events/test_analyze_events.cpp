@@ -98,11 +98,11 @@ void TestAnalyzeEvents::detectsTriggersLikePython()
             view = v;
     }
     QVERIFY(view);
-    auto* channel = view->findChild<QComboBox*>(QStringLiteral("m_comboBox_triggerChannels"));
+    auto* channel = view->findChild<QComboBox*>(QStringLiteral("triggerChannel"));
     QVERIFY(channel && channel->findText(QStringLiteral("STI 014")) >= 0);
     channel->setCurrentText(QStringLiteral("STI 014"));
-    view->findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_detectionThresholdFirst"))->setValue(1.0);
-    view->findChild<QSpinBox*>(QStringLiteral("m_spinBox_detectionThresholdSecond"))->setValue(0);
+    view->findChild<QDoubleSpinBox*>(QStringLiteral("detectionThresholdFirst"))->setValue(1.0);
+    view->findChild<QSpinBox*>(QStringLiteral("detectionThresholdSecond"))->setValue(0);
 
     // The detection runs on a worker; hold every pool worker so it starts only after the click has returned
     mne::ThreadPool& pool = mne::ThreadPool::global();
@@ -112,7 +112,7 @@ void TestAnalyzeEvents::detectsTriggersLikePython()
     held.reserve(pool.thread_count());
     for (std::size_t i = 0; i < pool.thread_count(); ++i)
         held.push_back(pool.submit([open] { open.wait(); }));
-    view->findChild<QPushButton*>(QStringLiteral("m_pushButton_DetectTriggers"))->click();
+    view->findChild<QPushButton*>(QStringLiteral("detectTriggers"))->click();
     QVERIFY(channel->count() > 1);
     channel->setCurrentIndex(channel->currentIndex() == 0 ? 1 : 0); // the user picks another channel meanwhile
     gate.set_value();

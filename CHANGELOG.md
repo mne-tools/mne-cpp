@@ -511,6 +511,15 @@ aliases; replace the old spelling as below.
   `TfSettingsView` are built from forms; their APIs, signals and `QSettings`
   keys are unchanged and three `.ui` files are gone. The Qt usage ceiling of
   `disp` drops to 4519 tokens.
+- `SpharaSettingsView`, `MinimumNormSettingsView`, `ConnectivitySettingsView`
+  and `TriggerDetectionView` are built from `viz::SettingsForm`s by
+  `SettingsPanel` as well; their APIs, signals, `QSettings` keys and
+  mode-dependent fields are unchanged and four more `.ui` files are gone. The
+  widgets are named after the form keys (e.g. `triggerChannel`,
+  `detectionThresholdFirst`). `FwdSettingsView` stays a `.ui` form: its
+  read-only information fields, directory chooser and colored status label
+  have no form counterpart. The Qt usage ceiling of `viz/backends/qt` drops
+  to 5743 tokens.
 - The display pre-processing of the raw and evoked viewers moved out of Qt
   into `mne_dsp`: `DisplayCorrection` (`dsp/display_correction.h`) builds and
   applies the SSP projector (bad channels zeroed) and the CTF compensator,

@@ -17,14 +17,21 @@
 //=============================================================================================================
 
 #include "spharasettingsview.h"
-
-#include "ui_spharasettingsview.h"
+#include "../detail/scoped_flag.h"
+#include "settingspanel.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSettings>
+#include <QVBoxLayout>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -41,24 +48,41 @@ SpharaSettingsView::SpharaSettingsView(const QString& sSettingsPath,
                                        QWidget* parent,
                                        Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pUi(std::make_unique<Ui::SpharaSettingsViewWidget>())
+, m_pForm(std::make_shared<viz::SettingsForm>("SPHARA Settings"))
 {
     m_sSettingsPath = sSettingsPath;
-    m_pUi->setupUi(this);
 
-    //Sphara activation changed
-    connect(m_pUi->m_checkBox_activateSphara, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &SpharaSettingsView::onSpharaButtonClicked);
+    m_pForm->add_bool("activateSphara", "Activate SPHARA", false);
+    m_pForm->add_choice("system", "System:", {{"BabyMEG", "BabyMEG"}, {"VectorView", "VectorView"}, {"EEG", "EEG"}}, "BabyMEG");
+    m_pForm->add_flag("hasSecond", true);
+    m_pForm->add_int("first", "Inner layer:", 270, 1, 270);
 
-    //Sphara options changed
-    connect(m_pUi->m_comboBox_spharaSystem, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
-            this, &SpharaSettingsView::onSpharaOptionsChanged);
+    viz::SettingField first = *m_pForm->field("first");
+    first.commit = viz::SettingField::Commit::WhenFinished;
+    m_pForm->add(first);
 
-    connect(m_pUi->m_spinBox_spharaFirst, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
-            this, &SpharaSettingsView::onSpharaOptionsChanged);
+    viz::SettingField second = first;
+    second.key = "second";
+    second.label = "Outer layer:";
+    second.default_value = 105;
+    second.maximum = 105;
+    second.visible_if = "hasSecond";
+    m_pForm->add(second);
 
-    connect(m_pUi->m_spinBox_spharaSecond, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
-            this, &SpharaSettingsView::onSpharaOptionsChanged);
+    m_listener = m_pForm->add_listener([this](const std::string& key, const std::optional<viz::SettingValue>&) {
+        if (m_bSilent) {
+            return;
+        }
+        if (key == "activateSphara") {
+            onSpharaButtonClicked(m_pForm->get<bool>("activateSphara"));
+        } else if (key == "system" || key == "first" || key == "second") {
+            onSpharaOptionsChanged();
+        }
+    });
+
+    auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(new SettingsPanel(m_pForm, this));
 
     this->setWindowTitle("SPHARA Settings");
     this->setMinimumWidth(330);
@@ -70,6 +94,7 @@ SpharaSettingsView::SpharaSettingsView(const QString& sSettingsPath,
 
 SpharaSettingsView::~SpharaSettingsView()
 {
+    m_pForm->remove_listener(m_listener);
     saveSettings();
 }
 
@@ -132,39 +157,41 @@ void SpharaSettingsView::onSpharaButtonClicked(bool state)
 
 void SpharaSettingsView::onSpharaOptionsChanged()
 {
-    m_pUi->m_label_spharaFirst->show();
-    m_pUi->m_spinBox_spharaFirst->show();
+    updateSystemFields();
 
-    m_pUi->m_label_spharaSecond->show();
-    m_pUi->m_spinBox_spharaSecond->show();
+    emit spharaOptionsChanged(QString::fromStdString(m_pForm->get<std::string>("system")),
+                              m_pForm->get<int>("first"),
+                              m_pForm->get<int>("second"));
+}
 
-    if (m_pUi->m_comboBox_spharaSystem->currentText() == "VectorView") {
-        m_pUi->m_label_spharaFirst->setText("Mag");
-        m_pUi->m_spinBox_spharaFirst->setMaximum(102);
+//=============================================================================================================
 
-        m_pUi->m_label_spharaSecond->setText("Grad");
-        m_pUi->m_spinBox_spharaSecond->setMaximum(102);
+void SpharaSettingsView::updateSystemFields()
+{
+    // Relabelling and clamping the fields must not report options of a half-switched system
+    const detail::ScopedFlag silent(m_bSilent);
+    const std::string system = m_pForm->get<std::string>("system");
+    m_pForm->set_value("hasSecond", true);
+
+    if (system == "VectorView") {
+        m_pForm->set_label("first", "Mag");
+        m_pForm->set_range("first", 1, 102);
+        m_pForm->set_label("second", "Grad");
+        m_pForm->set_range("second", 1, 102);
     }
 
-    if (m_pUi->m_comboBox_spharaSystem->currentText() == "BabyMEG") {
-        m_pUi->m_label_spharaFirst->setText("Inner layer");
-        m_pUi->m_spinBox_spharaFirst->setMaximum(270);
-
-        m_pUi->m_label_spharaSecond->setText("Outer layer");
-        m_pUi->m_spinBox_spharaSecond->setMaximum(105);
+    if (system == "BabyMEG") {
+        m_pForm->set_label("first", "Inner layer");
+        m_pForm->set_range("first", 1, 270);
+        m_pForm->set_label("second", "Outer layer");
+        m_pForm->set_range("second", 1, 105);
     }
 
-    if (m_pUi->m_comboBox_spharaSystem->currentText() == "EEG") {
-        m_pUi->m_label_spharaFirst->setText("EEG");
-        m_pUi->m_spinBox_spharaFirst->setMaximum(256);
-
-        m_pUi->m_label_spharaSecond->hide();
-        m_pUi->m_spinBox_spharaSecond->hide();
+    if (system == "EEG") {
+        m_pForm->set_label("first", "EEG");
+        m_pForm->set_range("first", 1, 256);
+        m_pForm->set_value("hasSecond", false);
     }
-
-    emit spharaOptionsChanged(m_pUi->m_comboBox_spharaSystem->currentText(),
-                              m_pUi->m_spinBox_spharaFirst->value(),
-                              m_pUi->m_spinBox_spharaSecond->value());
 }
 
 //=============================================================================================================

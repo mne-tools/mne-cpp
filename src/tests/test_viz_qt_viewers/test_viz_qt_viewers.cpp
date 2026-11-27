@@ -58,6 +58,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDoubleSpinBox>
+#include <QFormLayout>
 #include <QGroupBox>
 #include <QLabel>
 #include <QLineEdit>
@@ -225,6 +226,30 @@ private slots:
      * Verifies that TriggerDetectionView survives all lifecycle transitions.
      */
     void triggerDetectionView_lifecycle();
+
+    //=========================================================================================================
+    /**
+     * Verifies the form-built SpharaSettingsView: activation and option signals and the relabelled fields per system.
+     */
+    void spharaSettingsView_formPanel();
+
+    //=========================================================================================================
+    /**
+     * Verifies the form-built MinimumNormSettingsView: method, trigger type, time point and CMNE checkpoint.
+     */
+    void minimumNormSettingsView_formPanel();
+
+    //=========================================================================================================
+    /**
+     * Verifies the form-built ConnectivitySettingsView: its signals and the persisted values.
+     */
+    void connectivitySettingsView_formPanel();
+
+    //=========================================================================================================
+    /**
+     * Verifies the form-built TriggerDetectionView: its fields, custom widgets and that it reacts only after init().
+     */
+    void triggerDetectionView_formPanel();
 
     //=========================================================================================================
     /**
@@ -1048,6 +1073,255 @@ void TestVizQtViewers::triggerDetectionView_lifecycle()
     view.clearView();
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+namespace
+{
+
+/** The text of the label in front of a panel editor. */
+QString fieldLabel(QWidget* editor)
+{
+    auto* layout = editor ? qobject_cast<QFormLayout*>(editor->parentWidget()->layout()) : nullptr;
+    auto* label = layout ? qobject_cast<QLabel*>(layout->labelForField(editor)) : nullptr;
+    return label ? label->text() : QString();
+}
+
+} // namespace
+
+//=============================================================================================================
+
+void TestVizQtViewers::spharaSettingsView_formPanel()
+{
+    SpharaSettingsView view;
+    auto* panel = view.findChild<SettingsPanel*>();
+    QVERIFY(panel);
+    auto* activate = qobject_cast<QCheckBox*>(panel->editor("activateSphara"));
+    auto* system = qobject_cast<QComboBox*>(panel->editor("system"));
+    auto* first = qobject_cast<QSpinBox*>(panel->editor("first"));
+    auto* second = qobject_cast<QSpinBox*>(panel->editor("second"));
+    QVERIFY(activate && system && first && second);
+    QCOMPARE(view.windowTitle(), QStringLiteral("SPHARA Settings"));
+    QCOMPARE(system->count(), 3);
+    QCOMPARE(system->currentText(), QStringLiteral("BabyMEG"));
+    QCOMPARE(first->maximum(), 270);
+    QCOMPARE(first->value(), 270);
+    QCOMPARE(second->value(), 105);
+    QCOMPARE(fieldLabel(first), QStringLiteral("Inner layer:"));
+
+    QSignalSpy activation(&view, &SpharaSettingsView::spharaActivationChanged);
+    activate->setChecked(true);
+    QCOMPARE(activation.count(), 1);
+    QCOMPARE(activation.last().at(0).toBool(), true);
+
+    // VectorView: Mag and Grad, at most 102 each; one signal with the clamped values
+    QSignalSpy options(&view, &SpharaSettingsView::spharaOptionsChanged);
+    system->setCurrentIndex(system->findText(QStringLiteral("VectorView")));
+    QCOMPARE(options.count(), 1);
+    QCOMPARE(options.last().at(0).toString(), QStringLiteral("VectorView"));
+    QCOMPARE(options.last().at(1).toInt(), 102);
+    QCOMPARE(options.last().at(2).toInt(), 102);
+    QCOMPARE(fieldLabel(first), QStringLiteral("Mag"));
+    QCOMPARE(fieldLabel(second), QStringLiteral("Grad"));
+    QCOMPARE(first->maximum(), 102);
+    QCOMPARE(second->maximum(), 102);
+
+    // Spin boxes report when editing finishes
+    first->setValue(50);
+    QCOMPARE(options.count(), 1);
+    emit first->editingFinished();
+    QCOMPARE(options.count(), 2);
+    QCOMPARE(options.last().at(1).toInt(), 50);
+
+    // EEG: one field of at most 256, the second one hidden
+    system->setCurrentIndex(system->findText(QStringLiteral("EEG")));
+    QCOMPARE(options.count(), 3);
+    QCOMPARE(options.last().at(0).toString(), QStringLiteral("EEG"));
+    QCOMPARE(fieldLabel(first), QStringLiteral("EEG"));
+    QCOMPARE(first->maximum(), 256);
+    QVERIFY(second->isHidden());
+
+    system->setCurrentIndex(system->findText(QStringLiteral("BabyMEG")));
+    QCOMPARE(fieldLabel(first), QStringLiteral("Inner layer"));
+    QCOMPARE(fieldLabel(second), QStringLiteral("Outer layer"));
+    QCOMPARE(second->maximum(), 105);
+    QVERIFY(!second->isHidden());
+}
+
+//=============================================================================================================
+
+void TestVizQtViewers::minimumNormSettingsView_formPanel()
+{
+    {
+        MinimumNormSettingsView fixed(QString{}, QStringLiteral("dSPM"));
+        auto* method = qobject_cast<QComboBox*>(fixed.findChild<SettingsPanel*>()->editor("method"));
+        QVERIFY(method);
+        QCOMPARE(method->currentText(), QStringLiteral("dSPM"));
+        QVERIFY(!method->isEnabled());
+    }
+
+    MinimumNormSettingsView view;
+    auto* panel = view.findChild<SettingsPanel*>();
+    QVERIFY(panel);
+    auto* method = qobject_cast<QComboBox*>(panel->editor("method"));
+    auto* trigger = qobject_cast<QComboBox*>(panel->editor("triggerType"));
+    auto* timePoint = qobject_cast<QSpinBox*>(panel->editor("timePoint"));
+    QWidget* checkpoint = panel->editor("modelCheckpoint");
+    QVERIFY(method && trigger && timePoint && checkpoint);
+    QCOMPARE(view.windowTitle(), QStringLiteral("InvMinimumNorm Settings"));
+    QVERIFY(method->isEnabled());
+    QCOMPARE(method->count(), 4);
+    QCOMPARE(timePoint->maximum(), 10000);
+    QVERIFY(checkpoint->isHidden());
+
+    // The first trigger type is selected and reported; known types are not added twice
+    QSignalSpy triggerSpy(&view, &MinimumNormSettingsView::triggerTypeChanged);
+    view.setTriggerTypes(QStringList() << "1" << "2");
+    view.setTriggerTypes(QStringList() << "2" << "face");
+    QCOMPARE(trigger->count(), 3);
+    QCOMPARE(triggerSpy.count(), 1);
+    QCOMPARE(triggerSpy.last().at(0).toString(), QStringLiteral("1"));
+    trigger->setCurrentIndex(2);
+    QCOMPARE(triggerSpy.last().at(0).toString(), QStringLiteral("face"));
+
+    QSignalSpy timeSpy(&view, &MinimumNormSettingsView::timePointChanged);
+    timePoint->setValue(120);
+    QCOMPARE(timeSpy.count(), 0);
+    emit timePoint->editingFinished();
+    QCOMPARE(timeSpy.count(), 1);
+    QCOMPARE(timeSpy.last().at(0).toInt(), 120);
+
+    // CMNE shows the model checkpoint
+    QSignalSpy methodSpy(&view, &MinimumNormSettingsView::methodChanged);
+    method->setCurrentIndex(method->findText(QStringLiteral("CMNE")));
+    QCOMPARE(methodSpy.count(), 1);
+    QCOMPARE(methodSpy.last().at(0).toString(), QStringLiteral("CMNE"));
+    QVERIFY(!checkpoint->isHidden());
+
+    QSignalSpy checkpointSpy(&view, &MinimumNormSettingsView::modelCheckpointChanged);
+    view.setModelCheckpoint("model.onnx");
+    QCOMPARE(checkpointSpy.count(), 1);
+    QCOMPARE(view.getModelCheckpoint(), std::filesystem::path("model.onnx"));
+    auto* edit = checkpoint->findChild<QLineEdit*>();
+    QVERIFY(edit);
+    QCOMPARE(edit->text(), QStringLiteral("model.onnx"));
+    view.setModelCheckpoint("model.onnx");
+    QCOMPARE(checkpointSpy.count(), 1);
+}
+
+//=============================================================================================================
+
+void TestVizQtViewers::connectivitySettingsView_formPanel()
+{
+    const QString path = QStringLiteral("test_viz_qt_viewers_connectivity_form");
+    QSettings("MNECPP").remove(path);
+    {
+        ConnectivitySettingsView view(path);
+        auto* panel = view.findChild<SettingsPanel*>();
+        QVERIFY(panel);
+        auto* metric = qobject_cast<QComboBox*>(panel->editor("connMethod"));
+        auto* window = qobject_cast<QComboBox*>(panel->editor("connWindowType"));
+        auto* trials = qobject_cast<QSpinBox*>(panel->editor("connNrTrials"));
+        auto* trigger = qobject_cast<QComboBox*>(panel->editor("connTriggerType"));
+        auto* low = qobject_cast<QDoubleSpinBox*>(panel->editor("connFreqLow"));
+        auto* high = qobject_cast<QDoubleSpinBox*>(panel->editor("connFreqHigh"));
+        QVERIFY(metric && window && trials && trigger && low && high);
+        QCOMPARE(view.windowTitle(), QStringLiteral("Connectivity Settings"));
+        QCOMPARE(metric->count(), 9);
+        QCOMPARE(view.getConnectivityMetric(), QStringLiteral("COR"));
+        QCOMPARE(view.getWindowType(), QStringLiteral("Hanning"));
+        QCOMPARE(view.getNumberTrials(), 10);
+        QCOMPARE(view.getLowerFreq(), 7.0);
+        QCOMPARE(view.getUpperFreq(), 13.0);
+
+        QSignalSpy metricSpy(&view, &ConnectivitySettingsView::connectivityMetricChanged);
+        metric->setCurrentIndex(metric->findText(QStringLiteral("PLI")));
+        QCOMPARE(metricSpy.count(), 1);
+        QCOMPARE(metricSpy.last().at(0).toString(), QStringLiteral("PLI"));
+
+        QSignalSpy windowSpy(&view, &ConnectivitySettingsView::windowTypeChanged);
+        window->setCurrentIndex(1);
+        QCOMPARE(windowSpy.last().at(0).toString(), QStringLiteral("Ones"));
+
+        // Only a finished edit to another number of trials is reported; setNumberTrials() is silent
+        QSignalSpy trialsSpy(&view, &ConnectivitySettingsView::numberTrialsChanged);
+        view.setNumberTrials(20);
+        QCOMPARE(trials->value(), 20);
+        QCOMPARE(trialsSpy.count(), 0);
+        trials->setValue(30);
+        emit trials->editingFinished();
+        QCOMPARE(trialsSpy.count(), 1);
+        QCOMPARE(trialsSpy.last().at(0).toInt(), 30);
+
+        QSignalSpy triggerSpy(&view, &ConnectivitySettingsView::triggerTypeChanged);
+        view.setTriggerTypes(QStringList() << "1" << "2");
+        QCOMPARE(trigger->count(), 2);
+        QCOMPARE(triggerSpy.count(), 1);
+        trigger->setCurrentIndex(1);
+        QCOMPARE(triggerSpy.last().at(0).toString(), QStringLiteral("2"));
+
+        QSignalSpy bandSpy(&view, &ConnectivitySettingsView::freqBandChanged);
+        high->setValue(30.0);
+        QCOMPARE(bandSpy.count(), 1);
+        QCOMPARE(bandSpy.last().at(0).toFloat(), 7.0f);
+        QCOMPARE(bandSpy.last().at(1).toFloat(), 30.0f);
+        view.setFrequencyBand(8.0, 12.0);
+        QCOMPARE(low->value(), 8.0);
+        QCOMPARE(bandSpy.last().at(1).toFloat(), 12.0f);
+    }
+
+    // The values persist under the original keys and load without signals
+    QSettings settings("MNECPP");
+    QCOMPARE(settings.value(path + "/ConnectivitySettingsView/connMethod").toString(), QStringLiteral("PLI"));
+    QCOMPARE(settings.value(path + "/ConnectivitySettingsView/connNrTrials").toInt(), 30);
+    QCOMPARE(settings.value(path + "/ConnectivitySettingsView/connFreqHigh").toDouble(), 12.0);
+    {
+        ConnectivitySettingsView view(path);
+        QCOMPARE(view.getConnectivityMetric(), QStringLiteral("PLI"));
+        QCOMPARE(view.getWindowType(), QStringLiteral("Ones"));
+        QCOMPARE(view.getNumberTrials(), 30);
+        QCOMPARE(view.getLowerFreq(), 8.0);
+        QCOMPARE(view.getUpperFreq(), 12.0);
+        // The loaded number of trials is the reference for changes
+        QSignalSpy trialsSpy(&view, &ConnectivitySettingsView::numberTrialsChanged);
+        auto* trials = qobject_cast<QSpinBox*>(view.findChild<SettingsPanel*>()->editor("connNrTrials"));
+        emit trials->editingFinished();
+        QCOMPARE(trialsSpy.count(), 0);
+    }
+    settings.remove(path);
+}
+
+//=============================================================================================================
+
+void TestVizQtViewers::triggerDetectionView_formPanel()
+{
+    TriggerDetectionView view;
+    auto* panel = view.findChild<SettingsPanel*>();
+    QVERIFY(panel);
+    QCOMPARE(view.windowTitle(), QStringLiteral("Trigger Detection Settings"));
+    auto* first = qobject_cast<QDoubleSpinBox*>(panel->editor("detectionThresholdFirst"));
+    auto* second = qobject_cast<QSpinBox*>(panel->editor("detectionThresholdSecond"));
+    QVERIFY(first && second);
+    QCOMPARE(first->value(), 0.1);
+    QCOMPARE(second->value(), -1);
+    QCOMPARE(second->prefix(), QStringLiteral("e^"));
+    QVERIFY(qobject_cast<QCheckBox*>(panel->editor("activateTriggerDetection")));
+    QVERIFY(qobject_cast<QComboBox*>(panel->editor("triggerChannel")));
+    QVERIFY(qobject_cast<QPushButton*>(panel->editor("resetNumberTriggers")));
+    QVERIFY(panel->customWidget("triggerColor")->findChild<QPushButton*>(QStringLiteral("triggerColorButton")));
+    auto* count = panel->customWidget("numberDetectedTriggers")->findChild<QLabel*>(QStringLiteral("numberDetectedTriggersLabel"));
+    QVERIFY(count);
+    QCOMPARE(count->text(), QStringLiteral("0"));
+    QVERIFY(panel->editor("detectTriggers")->isHidden());
+
+    // Before init() the controls do not report
+    QSignalSpy infoSpy(&view, &TriggerDetectionView::triggerInfoChanged);
+    first->setValue(0.5);
+    QCOMPARE(infoSpy.count(), 0);
+    view.setNumberDetectedTriggersAndTypes(2, {{1, {{5, 3.0}}}});
+    QCOMPARE(count->text(), QStringLiteral("2"));
+    QCOMPARE(qobject_cast<QComboBox*>(panel->editor("triggerColorType"))->count(), 1);
 }
 
 //=============================================================================================================

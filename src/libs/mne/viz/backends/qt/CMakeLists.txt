@@ -243,12 +243,8 @@ set(UI
     viewers/formfiles/progressview.ui
     viewers/formfiles/channelselectionview.ui
     viewers/formfiles/scalingview.ui
-    viewers/formfiles/spharasettingsview.ui
     viewers/formfiles/fiffrawviewsettings.ui
-    viewers/formfiles/triggerdetectionview.ui
     viewers/formfiles/quickcontrolview.ui
-    viewers/formfiles/connectivitysettingsview.ui
-    viewers/formfiles/minimumnormsettingsview.ui
     viewers/formfiles/projectsettingsview.ui
     viewers/formfiles/control3dview.ui
     viewers/formfiles/hpisettingsview.ui

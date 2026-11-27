@@ -30,21 +30,13 @@
 
 #include "../viz_qt_global.h"
 #include "abstractview.h"
+#include <mne/viz/forms/settings_form.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <memory>
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-namespace Ui
-{
-class ConnectivitySettingsViewWidget;
-}
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne::viz::qt
@@ -56,6 +48,8 @@ namespace mne::viz::qt
 //=============================================================================================================
 // mne::viz::qt FORWARD DECLARATIONS
 //=============================================================================================================
+
+class SettingsPanel;
 
 //=============================================================================================================
 /**
@@ -234,7 +228,10 @@ protected:
      */
     void onFrequencyBandChanged();
 
-    std::unique_ptr<Ui::ConnectivitySettingsViewWidget> m_pUi;
+    std::shared_ptr<viz::SettingsForm> m_pForm; /**< Metric, window, trials, trigger type and band, built by m_pPanel. */
+    SettingsPanel* m_pPanel = nullptr;          /**< Qt Widgets of the form. */
+    int m_listener = 0;                         /**< Id of the view's listener on the form. */
+    bool m_bSilent = false;                     /**< Whether form changes are applied without signals. */
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
     int m_iNumberTrials;     /**< The number of trials are stored to check whether the number of trials actually changed. */

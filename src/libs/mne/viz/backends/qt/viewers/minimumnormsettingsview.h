@@ -28,6 +28,7 @@
 
 #include "../viz_qt_global.h"
 #include "abstractview.h"
+#include <mne/viz/forms/settings_form.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -35,15 +36,6 @@
 
 #include <filesystem>
 #include <memory>
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-namespace Ui
-{
-class MinimumNormSettingsViewWidget;
-}
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne::viz::qt
@@ -180,11 +172,13 @@ protected:
 
     //=========================================================================================================
     /**
-     * Slot called when the user clicks the "browse model checkpoint" button.
+     * Lets the user pick the model checkpoint in a file dialog and sets it. The browse button of the panel's
+     * checkpoint field opens the panel's own file dialog.
      */
     void onBrowseModelCheckpointClicked();
 
-    std::unique_ptr<Ui::MinimumNormSettingsViewWidget> m_pUi;
+    std::shared_ptr<viz::SettingsForm> m_pForm; /**< Method, trigger type, time point and checkpoint, built by a SettingsPanel. */
+    int m_listener = 0;                         /**< Id of the view's listener on the form. */
     QString m_sMethod;
     std::filesystem::path m_sModelCheckpoint; /**< Persisted model-checkpoint path for CMNE. */
 
