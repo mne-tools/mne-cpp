@@ -1,25 +1,25 @@
 ---
 id: sensor-field-mapper
-title: "mne::viz::qt::SensorFieldMapper"
+title: "mne::viz::SensorFieldMapper"
 sidebar_label: SensorFieldMapper
-sidebar_position: 104
+sidebar_position: 125
 ---
 
 # SensorFieldMapper
 
-**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/scene/sensorfieldmapper.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/scene/sensorfieldmapper.h)
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/sensorfieldmapper.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/sensorfieldmapper.h)
 
-`#include <mne/viz/backends/qt/sensorfieldmapper.h>`
+`#include <mne/viz/sensorfieldmapper.h>`
 
 ```cpp
-class mne::viz::qt::SensorFieldMapper
+class mne::viz::SensorFieldMapper
 ```
 
 Encapsulates sensor-to-surface field mapping for MEG and EEG sensors.
 
 This class owns the mapping state (evoked data, mapping matrices, channel picks, contour prefixes, surface key references) and provides methods to build mapping matrices and apply them to produce per-vertex field colours and iso-contour meshes.
 
-The class operates on surface and contour surfaces stored in the caller's surface map. It reads from / writes to those surfaces but does not own them, keeping ownership in the [`BrainView`](/docs/api/viz-qt/brain-view).
+The class operates on surface and contour surfaces stored in the caller's surface map. It reads from / writes to those surfaces but does not own them, keeping ownership in the [BrainView](/docs/api/viz-qt/brain-view).
 
 Sensor-to-surface field mapper that interpolates MEG/EEG measurements onto cortical meshes and generates iso-contour overlays.
 
@@ -317,6 +317,22 @@ Replicates MNE-Python's `fit_sphere_to_headshape` (linear least- squares sphere 
 - Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 347"
+// Contour spacing for a field map spanning +-120 fT with about 10 lines
+const float contourSpacing = SensorFieldMapper::contourStep(-120e-15f, 120e-15f, 10);
+std::map<std::string, std::shared_ptr<BrainSurface>> sceneSurfaces;
+sceneSurfaces.emplace("bem_inner_skull", std::make_shared<BrainSurface>());
+sceneSurfaces.emplace("bem_head", std::make_shared<BrainSurface>());
+const std::string headKey = SensorFieldMapper::findHeadSurfaceKey(sceneSurfaces); // where EEG maps are drawn
+ok &= expect(std::abs(contourSpacing - 50e-15f) < 1e-20f && headKey == "bem_head", "SensorFieldMapper: 50 fT contours, EEG map on bem_head");
+````
 
 ## Authors of this file
 

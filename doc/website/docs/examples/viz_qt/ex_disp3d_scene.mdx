@@ -89,7 +89,9 @@ The documented classes this example uses most:
 - [NetworkObject](../../api/viz/network-object.mdx)
 - [PolylineObject](../../api/viz/polyline-object.mdx)
 - [RenderKey](../../api/viz/render-key.mdx)
+- [SensorFieldMapper](../../api/viz/sensor-field-mapper.mdx)
 - [SettingsStore](../../api/viz/settings-store.mdx)
+- [SourceEstimateOverlay](../../api/viz/source-estimate-overlay.mdx)
 - [SubView](../../api/viz/sub-view.mdx)
 - [VertexData](../../api/viz/vertex-data.mdx)
 - [ViewVisibilityProfile](../../api/viz/view-visibility-profile.mdx)
@@ -101,10 +103,8 @@ The documented classes this example uses most:
 - [PickResult](../../api/viz-qt/pick-result.mdx)
 - [RtSensorStreamManager](../../api/viz-qt/rt-sensor-stream-manager.mdx)
 - [SceneLayer](../../api/viz-qt/scene-layer.mdx)
-- [SensorFieldMapper](../../api/viz-qt/sensor-field-mapper.mdx)
 - [SliceObject](../../api/viz-qt/slice-object.mdx)
 - [SourceEstimateManager](../../api/viz-qt/source-estimate-manager.mdx)
-- [SourceEstimateOverlay](../../api/viz-qt/source-estimate-overlay.mdx)
 - [VideoOverlay](../../api/viz-qt/video-overlay.mdx)
 
 ## Source
@@ -146,10 +146,10 @@ The documented classes this example uses most:
 #include <mne/viz/brain/networkobject.h>
 #include <mne/viz/brain/polylineobject.h>
 #include <mne/viz/backends/qt/3d/renderable/sliceobject.h>
-#include <mne/viz/backends/qt/3d/renderable/sourceestimateoverlay.h>
+#include <mne/viz/brain/sourceestimateoverlay.h>
 #include <mne/viz/backends/qt/3d/renderable/videooverlay.h>
 #include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
-#include <mne/viz/backends/qt/3d/scene/sensorfieldmapper.h>
+#include <mne/viz/brain/sensorfieldmapper.h>
 #include <mne/viz/backends/qt/3d/view/brainview.h>
 #include <mne/viz/backends/qt/3d/view/multiviewlayout.h>
 #include <mne/viz/backends/qt/qtconversions.h>

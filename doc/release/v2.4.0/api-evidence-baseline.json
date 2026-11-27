@@ -13169,29 +13169,6 @@
       "exempt_reason": null
     },
     {
-      "name": "SourceEstimateOverlay",
-      "header": "viz/backends/qt/3d/renderable/sourceestimateoverlay.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": "test_disp3d_brainview",
-      "test_resolves": true,
-      "example": "ex_disp3d_scene",
-      "example_state": "built",
-      "including_examples": [
-        "ex_disp3d_scene"
-      ],
-      "snippets": [
-        "ex_disp3d_scene/main.cpp#source_estimate_overlay_usage"
-      ],
-      "api_page": "doc/website/docs/api/viz-qt/source-estimate-overlay.mdx",
-      "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
-    },
-    {
       "name": "VideoOverlay",
       "header": "viz/backends/qt/3d/renderable/videooverlay.h",
       "library": "viz",
@@ -13301,29 +13278,6 @@
       "python_equiv": null,
       "example_eligible": false,
       "exempt_reason": "registry: Real-time sensor streaming state owned privately by BrainView; exercised through BrainView's streaming API (test_disp3d_brainview, test_sensor_streaming)."
-    },
-    {
-      "name": "SensorFieldMapper",
-      "header": "viz/backends/qt/3d/scene/sensorfieldmapper.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": "test_sensor_field_mapper",
-      "test_resolves": true,
-      "example": "ex_disp3d_scene",
-      "example_state": "built",
-      "including_examples": [
-        "ex_disp3d_scene"
-      ],
-      "snippets": [
-        "ex_disp3d_scene/main.cpp#sensor_field_mapper_usage"
-      ],
-      "api_page": "doc/website/docs/api/viz-qt/sensor-field-mapper.mdx",
-      "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
     },
     {
       "name": "SourceEstimateManager",
@@ -15499,6 +15453,52 @@
         "ex_disp3d_scene/main.cpp#render_streams_usage"
       ],
       "api_page": "doc/website/docs/api/viz/render-key.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "SensorFieldMapper",
+      "header": "viz/brain/sensorfieldmapper.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_sensor_field_mapper",
+      "test_resolves": true,
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#sensor_field_mapper_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/sensor-field-mapper.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "SourceEstimateOverlay",
+      "header": "viz/brain/sourceestimateoverlay.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_disp3d_brainview",
+      "test_resolves": true,
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#source_estimate_overlay_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/source-estimate-overlay.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null

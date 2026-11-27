@@ -721,7 +721,9 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz/network-object',
         'api/viz/polyline-object',
         'api/viz/settings-store',
-        'api/viz/memory-settings-store'
+        'api/viz/memory-settings-store',
+        'api/viz/sensor-field-mapper',
+        'api/viz/source-estimate-overlay'
       ],
     },
     {
@@ -826,10 +828,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz-qt/rt-sensor-data-controller',
         'api/viz-qt/rt-sensor-stream-manager',
         'api/viz-qt/rt-source-data-controller',
-        'api/viz-qt/sensor-field-mapper',
         'api/viz-qt/sensor-tree-item',
         'api/viz-qt/source-estimate-manager',
-        'api/viz-qt/source-estimate-overlay',
         'api/viz-qt/source-space-tree-item',
         'api/viz-qt/stc-loading-worker',
         'api/viz-qt/surface-tree-item',
