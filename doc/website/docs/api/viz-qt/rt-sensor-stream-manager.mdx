@@ -15,17 +15,15 @@ sidebar_position: 102
 class mne::viz::qt::RtSensorStreamManager
 ```
 
-Manages real-time sensor data streaming via [`RtSensorDataController`](/docs/api/viz-qt/rt-sensor-data-controller).
-
-[`BrainView`](/docs/api/viz-qt/brain-view) delegates all sensor streaming operations to this component, keeping its own code free of the [`RtSensorDataController`](/docs/api/viz-qt/rt-sensor-data-controller) lifecycle.
-
-Real-time sensor streaming lifecycle manager.
+Qt face of [`SensorStreamSession`](/docs/api/viz/sensor-stream-session) as a QObject: the same API, with the results as signals on this object's thread.
 
 ### Inheritance
 
 ```mermaid
 classDiagram
     QObject <|-- RtSensorStreamManager
+    SensorStreamSession <|-- RtSensorStreamManager
+    click SensorStreamSession href "../../viz/sensor-stream-session/"
 ```
 
 ---
@@ -46,106 +44,6 @@ Constructor.
 ### ~RtSensorStreamManager()
 
 Destructor.
-
----
-
-### startStreaming(modality, fieldMapper, surfaces)
-
-Start real-time sensor streaming for the given modality.
-
-Reads mapping matrices, pick vectors, evoked data, and colourmap from the provided `fieldMapper`. Validates that the target surface key exists in `surfaces`.
-
-**Parameters:**
-
-- **modality** : *const std::string &*
-  "MEG" or "EEG".
-
-- **fieldMapper** : *const [SensorFieldMapper](/docs/api/viz/sensor-field-mapper) &*
-  Sensor-field mapper with built mapping data.
-
-- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt; &gt; &*
-  [`FsSurface`](/docs/api/fs/fs-surface) map for target-surface validation.
-
-**Returns:**
-
-- *bool* — true if streaming was started successfully.
-
----
-
-### stopStreaming()
-
-Stop real-time sensor streaming.
-
----
-
-### isStreaming()
-
-**Returns:**
-
-- *bool* — true while real-time sensor streaming is active.
-
----
-
-### modality()
-
-**Returns:**
-
-- *std::string* — the active modality ("MEG" or "EEG"), or empty.
-
----
-
-### pushData(data)
-
-Push a single measurement vector into the streaming queue.
-
-**Parameters:**
-
-- **data** : *const Eigen::VectorXf &*
-  One sample of sensor values; ignored if no controller exists.
-
----
-
-### setInterval(msec)
-
-Set the streaming playback interval in milliseconds.
-
-**Parameters:**
-
-- **msec** : *int*
-  Interval between streamed samples in milliseconds.
-
----
-
-### setLooping(enabled)
-
-Enable or disable looping of the streaming queue.
-
-**Parameters:**
-
-- **enabled** : *bool*
-  True to replay the queue from the start when it ends.
-
----
-
-### setAverages(numAvr)
-
-Set the number of averages for smoothing.
-
-**Parameters:**
-
-- **numAvr** : *int*
-  Number of consecutive samples averaged per frame.
-
----
-
-### setColormap(name)
-
-Set the colormap used for colour mapping.
-
-**Parameters:**
-
-- **name** : *const std::string &*
-  `Colormap` name (e.g. "MNE", "Jet").
 
 ---
 

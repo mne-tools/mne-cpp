@@ -1,0 +1,345 @@
+---
+id: source-estimate-session
+title: "mne::viz::SourceEstimateSession"
+sidebar_label: SourceEstimateSession
+sidebar_position: 137
+---
+
+# SourceEstimateSession
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/sourceestimatesession.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/sourceestimatesession.h)
+
+`#include <mne/viz/sourceestimatesession.h>`
+
+```cpp
+class mne::viz::SourceEstimateSession
+```
+
+Manages source estimate data: async loading, time-point navigation, colormap/threshold control, and real-time streaming via [`RtSourceStream`](/docs/api/viz/rt-source-stream).
+
+[BrainView](/docs/api/viz-qt/brain-view) delegates all source-estimate operations to this component, keeping its own code free of STC lifecycle details.
+
+Source estimate lifecycle manager.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    SourceEstimateSession <|-- SourceEstimateManager
+    click SourceEstimateManager href "../../viz-qt/source-estimate-manager/"
+```
+
+---
+
+## Public Methods
+
+### SourceEstimateSession(dispatcher)
+
+Constructor.
+
+**Parameters:**
+
+- **dispatcher** : *Dispatcher*
+  Hands the results of the loading and streaming threads to the owner's thread.
+
+---
+
+### ~SourceEstimateSession()
+
+Destructor.
+
+---
+
+### SourceEstimateSession()
+
+---
+
+### operator=()
+
+---
+
+### load(lhPath, rhPath, surfaces, activeSurfaceType)
+
+Start async STC file loading on a background thread.
+
+**Parameters:**
+
+- **lhPath** : *const std::filesystem::path &*
+  Path to left-hemisphere STC file.
+
+- **rhPath** : *const std::filesystem::path &*
+  Path to right-hemisphere STC file.
+
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt; &gt; &*
+  [`FsSurface`](/docs/api/fs/fs-surface) map for finding lh/rh brain surfaces.
+
+- **activeSurfaceType** : *const std::string &*
+  Active surface type name (e.g. "pial").
+
+**Returns:**
+
+- *bool* — true if loading was started, false on error.
+
+---
+
+### cancelLoading()
+
+Cancel any in-progress STC loading / interpolation and wait for the thread to finish.
+
+---
+
+### isLoading()
+
+**Returns:**
+
+- *bool* — true while an async STC load is in progress.
+
+---
+
+### isLoaded()
+
+**Returns:**
+
+- *bool* — true if source estimate data has been loaded successfully.
+
+---
+
+### setTimePoint(index, surfaces, singleView, subViews)
+
+Set the current STC time-point and apply colours to matching surfaces.
+
+**Parameters:**
+
+- **index** : *int*
+  Time-point index.
+
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt; &gt; &*
+  [`FsSurface`](/docs/api/fs/fs-surface) map.
+
+- **singleView** : *const [SubView](/docs/api/viz/sub-view) &*
+  Single-view state (for active surface type).
+
+- **subViews** : *const std::vector&lt; [SubView](/docs/api/viz/sub-view) &gt; &*
+  Multi-view states.
+
+---
+
+### currentTimePoint()
+
+**Returns:**
+
+- *int* — current time-point index.
+
+---
+
+### tstep()
+
+**Returns:**
+
+- *float* — time step between STC samples (seconds), or 0.
+
+---
+
+### tmin()
+
+**Returns:**
+
+- *float* — start time of the STC data (seconds), or 0.
+
+---
+
+### numTimePoints()
+
+**Returns:**
+
+- *int* — number of time points, or 0.
+
+---
+
+### closestIndex(timeSec)
+
+**Parameters:**
+
+- **timeSec** : *float*
+  Time in seconds.
+
+**Returns:**
+
+- *int* — index closest to `timeSec`, or -1.
+
+---
+
+### setColormap(name)
+
+Set the colormap used for source estimate visualisation.
+
+**Parameters:**
+
+- **name** : *const std::string &*
+  `Colormap` name (e.g. "Hot", "Jet").
+
+---
+
+### setThresholds(min, mid, max)
+
+Set source estimate thresholds.
+
+**Parameters:**
+
+- **min** : *float*
+  Minimum threshold.
+
+- **mid** : *float*
+  Mid threshold.
+
+- **max** : *float*
+  Maximum threshold.
+
+---
+
+### startStreaming(surfaces, singleView, subViews)
+
+Start real-time playback.
+
+Feeds all STC time-points into the streaming queue and begins the interpolation pipeline.
+
+**Parameters:**
+
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt; &gt; &*
+  [`FsSurface`](/docs/api/fs/fs-surface) map (for colour application).
+
+- **singleView** : *const [SubView](/docs/api/viz/sub-view) &*
+  Single-view state.
+
+- **subViews** : *const std::vector&lt; [SubView](/docs/api/viz/sub-view) &gt; &*
+  Multi-view states.
+
+---
+
+### stopStreaming()
+
+Stop real-time streaming.
+
+---
+
+### isStreaming()
+
+**Returns:**
+
+- *bool* — true while real-time streaming is active.
+
+---
+
+### pushData(data)
+
+Push a single column of source data into the streaming queue.
+
+**Parameters:**
+
+- **data** : *const Eigen::VectorXd &*
+  Source amplitudes for one time point; ignored if no controller exists.
+
+---
+
+### setInterval(msec)
+
+Set the streaming playback interval in milliseconds.
+
+**Parameters:**
+
+- **msec** : *int*
+  Interval between streamed time points in milliseconds.
+
+---
+
+### setLooping(enabled)
+
+Enable or disable looping of the streaming queue.
+
+**Parameters:**
+
+- **enabled** : *bool*
+  True to replay the queue from the start when it ends.
+
+---
+
+### overlay()
+
+**Returns:**
+
+- *const [SourceEstimateOverlay](/docs/api/viz/source-estimate-overlay) ** — read-only pointer to the overlay (may be null).
+
+---
+
+### setLoadedCallback(callback)
+
+Set the callback for loaded.
+
+Called for loaded. It runs on the owner's thread.
+
+**Parameters:**
+
+- **callback** : *std::function&lt; void(int)&gt;*
+  Receives (numTimePoints); empty to drop the results.
+
+---
+
+### setThresholdsUpdatedCallback(callback)
+
+Set the callback for thresholdsUpdated.
+
+Called for thresholdsUpdated. It runs on the owner's thread.
+
+**Parameters:**
+
+- **callback** : *std::function&lt; void(float, float, float)&gt;*
+  Receives (min, mid, max); empty to drop the results.
+
+---
+
+### setTimePointChangedCallback(callback)
+
+Set the callback for timePointChanged.
+
+Called for timePointChanged. It runs on the owner's thread.
+
+**Parameters:**
+
+- **callback** : *std::function&lt; void(int, float)&gt;*
+  Receives (index, time); empty to drop the results.
+
+---
+
+### setLoadingProgressCallback(callback)
+
+Set the callback for loadingProgress.
+
+Called for loadingProgress. It runs on the owner's thread.
+
+**Parameters:**
+
+- **callback** : *std::function&lt; void(int, const std::string &)&gt;*
+  Receives (percent, message); empty to drop the results.
+
+---
+
+### setRealtimeColorsAvailableCallback(callback)
+
+Set the callback for realtimeColorsAvailable.
+
+Called when the real-time pipeline produces a new set of per-vertex colours. The host widget should apply these to its surfaces and repaint. It runs on the owner's thread.
+
+**Parameters:**
+
+- **callback** : *std::function&lt; void(const std::vector&lt; uint32_t &gt; &, const std::vector&lt; uint32_t &gt; &)&gt;*
+  Receives (colorsLh, colorsRh); empty to drop the results.
+
+---
+
+## Example
+
+No example of its own: Model of the brain view that loads .stc files on a thread and streams them; BrainView owns it through qt::SourceEstimateManager, exercised by test_disp3d_brainview.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
