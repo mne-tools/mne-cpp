@@ -37,7 +37,7 @@
 #include "multiviewlayout.h"
 #include "../../../../brain/viewstate.h"
 #include "../input/cameracontroller.h"
-#include "../scene/sensorfieldmapper.h"
+#include "../../../../brain/sensorfieldmapper.h"
 #include "../scene/sourceestimatemanager.h"
 #include "../scene/rtsensorstreammanager.h"
 #include <mne/fiff/fiff_coord_trans.h>

@@ -16,7 +16,7 @@
 
 #include "rtsensorstreammanager.h"
 
-#include "sensorfieldmapper.h"
+#include "../../../../brain/sensorfieldmapper.h"
 #include "../../../../brain/brainsurface.h"
 #include "../workers/rtsensordatacontroller.h"
 #include <mne/base/log.h>

@@ -15,12 +15,11 @@
 //=============================================================================================================
 
 #include "sensorfieldmapper.h"
-#include "../../qtconversions.h"
 
 #include <mne/base/log.h>
 
-#include "../../../../brain/brainsurface.h"
-#include "../../../../brain/rendertypes.h"
+#include "brainsurface.h"
+#include "rendertypes.h"
 #include <mne/base/string_utils.h>
 #include <mne/fwd/fwd_field_map.h>
 #include <mne/fiff/fiff_ch_info.h>
@@ -28,19 +27,13 @@
 #include <mne/fiff/fiff_coord_trans.h>
 #include <mne/fwd/fwd_coil_set.h>
 #include <mne/fs/fs_surface.h>
-#include <mne/viz/figures/colormap.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QVector3D>
-#include <QMatrix4x4>
+#include "../figures/colormap.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Geometry>
 #include <Eigen/LU>
 
 //=============================================================================================================
@@ -53,7 +46,7 @@
 
 using namespace mne;
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -231,23 +224,24 @@ bool SensorFieldMapper::buildMapping(
 
     // ── Build coordinate transforms ────────────────────────────────────
     bool hasDevHead = false;
-    QMatrix4x4 devHeadQt;
+    Eigen::Matrix4f devToHead = Eigen::Matrix4f::Identity();
     if (!m_evoked.info.dev_head_t.empty() &&
         m_evoked.info.dev_head_t.from == FIFFV_COORD_DEVICE &&
         m_evoked.info.dev_head_t.to == FIFFV_COORD_HEAD &&
         !m_evoked.info.dev_head_t.trans.isIdentity()) {
         hasDevHead = true;
-        for (int r = 0; r < 4; ++r)
-            for (int c = 0; c < 4; ++c)
-                devHeadQt(r, c) = m_evoked.info.dev_head_t.trans(r, c);
+        devToHead = m_evoked.info.dev_head_t.trans;
     }
 
-    QMatrix4x4 headToMri;
+    Eigen::Matrix4f headToMri = Eigen::Matrix4f::Identity();
     if (applySensorTrans && !headToMriTrans.empty()) {
-        for (int r = 0; r < 4; ++r)
-            for (int c = 0; c < 4; ++c)
-                headToMri(r, c) = headToMriTrans.trans(r, c);
+        headToMri = headToMriTrans.trans;
     }
+    // Maps a point like QMatrix4x4::map, with the projective divide
+    const auto map = [](const Eigen::Matrix4f& m, const Eigen::Vector3f& p) -> Eigen::Vector3f {
+        const Eigen::Vector4f q = m * p.homogeneous();
+        return q.head<3>() / q.w();
+    };
 
     // ── Classify channels ──────────────────────────────────────────────
     std::vector<FiffChInfo> megChs, eegChs;
@@ -267,22 +261,22 @@ bool SensorFieldMapper::buildMapping(
         if (isBad(ch.ch_name))
             continue;
 
-        QVector3D pos(ch.chpos.r0(0), ch.chpos.r0(1), ch.chpos.r0(2));
+        Eigen::Vector3f pos = ch.chpos.r0;
 
         if (ch.kind == FIFFV_MEG_CH) {
             if (hasDevHead)
-                pos = devHeadQt.map(pos);
+                pos = map(devToHead, pos);
             if (applySensorTrans && !headToMriTrans.empty())
-                pos = headToMri.map(pos);
+                pos = map(headToMri, pos);
             m_megPick(nMeg++) = k;
-            m_megPositions.push_back(Eigen::Vector3f(pos.x(), pos.y(), pos.z()));
+            m_megPositions.push_back(pos);
             megChs.push_back(ch);
             megChNames.push_back(ch.ch_name);
         } else if (ch.kind == FIFFV_EEG_CH) {
             if (applySensorTrans && !headToMriTrans.empty())
-                pos = headToMri.map(pos);
+                pos = map(headToMri, pos);
             m_eegPick(nEeg++) = k;
-            m_eegPositions.push_back(Eigen::Vector3f(pos.x(), pos.y(), pos.z()));
+            m_eegPositions.push_back(pos);
             eegChs.push_back(ch);
             eegChNames.push_back(ch.ch_name);
         }
@@ -675,38 +669,34 @@ void SensorFieldMapper::updateContourSurfaces(
     };
 
     auto addSegment = [](ContourBuf& buf,
-                         const QVector3D& p0, const QVector3D& p1,
-                         const QVector3D& normal,
+                         const Eigen::Vector3f& p0, const Eigen::Vector3f& p1,
+                         const Eigen::Vector3f& normal,
                          float halfW, float shift) {
-        QVector3D dir = p1 - p0;
-        const float len = dir.length();
+        Eigen::Vector3f dir = p1 - p0;
+        const float len = dir.norm();
         if (len < 1e-6f)
             return;
         dir /= len;
 
-        QVector3D binormal = QVector3D::crossProduct(normal, dir);
-        if (binormal.length() < 1e-6f)
-            binormal = QVector3D::crossProduct(QVector3D(0, 1, 0), dir);
-        if (binormal.length() < 1e-6f)
-            binormal = QVector3D::crossProduct(QVector3D(1, 0, 0), dir);
+        Eigen::Vector3f binormal = normal.cross(dir);
+        if (binormal.norm() < 1e-6f)
+            binormal = Eigen::Vector3f::UnitY().cross(dir);
+        if (binormal.norm() < 1e-6f)
+            binormal = Eigen::Vector3f::UnitX().cross(dir);
         binormal.normalize();
 
-        const QVector3D off = normal * shift;
-
-        auto toEig = [](const QVector3D& v) {
-            return Eigen::Vector3f(v.x(), v.y(), v.z());
-        };
+        const Eigen::Vector3f off = normal * shift;
 
         // Horizontal quad: width along binormal (visible from above)
         {
-            const QVector3D w = binormal * halfW;
+            const Eigen::Vector3f w = binormal * halfW;
             const int base = static_cast<int>(buf.verts.size());
-            Eigen::Vector3f n(normal.x(), normal.y(), normal.z());
+            const Eigen::Vector3f n = normal;
 
-            buf.verts.push_back(toEig(p0 - w + off));
-            buf.verts.push_back(toEig(p0 + w + off));
-            buf.verts.push_back(toEig(p1 - w + off));
-            buf.verts.push_back(toEig(p1 + w + off));
+            buf.verts.push_back(p0 - w + off);
+            buf.verts.push_back(p0 + w + off);
+            buf.verts.push_back(p1 - w + off);
+            buf.verts.push_back(p1 + w + off);
             buf.norms.push_back(n);
             buf.norms.push_back(n);
             buf.norms.push_back(n);
@@ -717,14 +707,14 @@ void SensorFieldMapper::updateContourSurfaces(
 
         // Vertical quad: height along normal (visible from the side)
         {
-            const QVector3D h = normal * halfW;
+            const Eigen::Vector3f h = normal * halfW;
             const int base = static_cast<int>(buf.verts.size());
-            Eigen::Vector3f n(binormal.x(), binormal.y(), binormal.z());
+            const Eigen::Vector3f n = binormal;
 
-            buf.verts.push_back(toEig(p0 - h + off));
-            buf.verts.push_back(toEig(p0 + h + off));
-            buf.verts.push_back(toEig(p1 - h + off));
-            buf.verts.push_back(toEig(p1 + h + off));
+            buf.verts.push_back(p0 - h + off);
+            buf.verts.push_back(p0 + h + off);
+            buf.verts.push_back(p1 - h + off);
+            buf.verts.push_back(p1 + h + off);
             buf.norms.push_back(n);
             buf.norms.push_back(n);
             buf.norms.push_back(n);
@@ -750,19 +740,16 @@ void SensorFieldMapper::updateContourSurfaces(
                 const int i0 = idx[t], i1 = idx[t + 1], i2 = idx[t + 2];
                 const float v0 = values[i0], v1 = values[i1], v2 = values[i2];
 
-                QVector3D p0(rr(i0, 0), rr(i0, 1), rr(i0, 2));
-                QVector3D p1(rr(i1, 0), rr(i1, 1), rr(i1, 2));
-                QVector3D p2(rr(i2, 0), rr(i2, 1), rr(i2, 2));
+                const Eigen::Vector3f p0 = rr.row(i0).transpose();
+                const Eigen::Vector3f p1 = rr.row(i1).transpose();
+                const Eigen::Vector3f p2 = rr.row(i2).transpose();
 
-                QVector3D n0(nn(i0, 0), nn(i0, 1), nn(i0, 2));
-                QVector3D n1(nn(i1, 0), nn(i1, 1), nn(i1, 2));
-                QVector3D n2(nn(i2, 0), nn(i2, 1), nn(i2, 2));
-                QVector3D triN = (n0 + n1 + n2).normalized();
-                if (triN.length() < 1e-6f)
-                    triN = QVector3D::crossProduct(p1 - p0, p2 - p0).normalized();
+                Eigen::Vector3f triN = (nn.row(i0) + nn.row(i1) + nn.row(i2)).transpose().normalized();
+                if (triN.norm() < 1e-6f)
+                    triN = (p1 - p0).cross(p2 - p0).normalized();
 
-                std::vector<QVector3D> hits;
-                auto checkEdge = [&](const QVector3D& a, const QVector3D& b,
+                std::vector<Eigen::Vector3f> hits;
+                auto checkEdge = [&](const Eigen::Vector3f& a, const Eigen::Vector3f& b,
                                      float va, float vb) {
                     if (va == vb)
                         return;
@@ -791,7 +778,7 @@ void SensorFieldMapper::updateContourSurfaces(
     // ── Upload contour meshes ──────────────────────────────────────────
     auto updateSurf = [&](const char* suffix,
                           const ContourBuf& buf,
-                          const QColor& color,
+                          const Color& color,
                           bool show) {
         const std::string key = prefix + suffix;
         if (!show || buf.verts.empty()) {
@@ -814,13 +801,13 @@ void SensorFieldMapper::updateContourSurfaces(
         if (!csurf) {
             csurf = std::make_shared<BrainSurface>();
         }
-        csurf->createFromData(rr, nn, tris, toColor(color));
+        csurf->createFromData(rr, nn, tris, color);
         csurf->setVisible(true);
     };
 
-    updateSurf("_neg", negBuf, QColor(0, 0, 255, 200), visible && !negBuf.verts.empty());
-    updateSurf("_zero", zeroBuf, QColor(0, 0, 0, 220), visible && !zeroBuf.verts.empty());
-    updateSurf("_pos", posBuf, QColor(255, 0, 0, 200), visible && !posBuf.verts.empty());
+    updateSurf("_neg", negBuf, Color{0, 0, 255, 200}, visible && !negBuf.verts.empty());
+    updateSurf("_zero", zeroBuf, Color{0, 0, 0, 220}, visible && !zeroBuf.verts.empty());
+    updateSurf("_pos", posBuf, Color{255, 0, 0, 200}, visible && !posBuf.verts.empty());
 }
 
-} // namespace mne::viz::qt
+} // namespace mne::viz

@@ -13,7 +13,7 @@
  * arriving on a worker thread) and the rendering side (per-vertex
  * colour updates on the target head / helmet surface). It owns the
  * @ref mne::viz::qt::RtSensorDataController plus the dense MEG / EEG mapping
- * matrix produced by @ref mne::viz::qt::SensorFieldMapper and forwards new
+ * matrix produced by @ref mne::viz::SensorFieldMapper and forwards new
  * colour buffers to the bound @ref mne::viz::BrainSurface on every frame.
  */
 
@@ -56,11 +56,14 @@ namespace mne::viz
 class BrainSurface;
 } // namespace mne::viz
 
+namespace mne::viz
+{
+class SensorFieldMapper;
+} // namespace mne::viz
+
 namespace mne::viz::qt
 {
 class RtSensorDataController;
-class SensorFieldMapper;
-
 //=============================================================================================================
 /**
  * Manages real-time sensor data streaming via RtSensorDataController.

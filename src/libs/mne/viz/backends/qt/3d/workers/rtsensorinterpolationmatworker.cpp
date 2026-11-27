@@ -18,7 +18,7 @@
 
 #include <mne/base/log.h>
 
-#include "../scene/sensorfieldmapper.h"
+#include "../../../../brain/sensorfieldmapper.h"
 #include <mne/base/string_utils.h>
 #include <mne/fwd/fwd_field_map.h>
 #include <mne/fiff/fiff_ch_info.h>

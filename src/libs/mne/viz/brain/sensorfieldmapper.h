@@ -23,15 +23,15 @@
  * MNE-Suite field-map look.
  */
 
-#ifndef SENSORFIELDMAPPER_H
-#define SENSORFIELDMAPPER_H
+#ifndef VIZ_SENSORFIELDMAPPER_H
+#define VIZ_SENSORFIELDMAPPER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
-#include "../../../../brain/viewstate.h"
+#include "../viz_global.h"
+#include "viewstate.h"
 #include <mne/fiff/fiff_evoked.h>
 #include <mne/fiff/fiff_coord_trans.h>
 
@@ -55,7 +55,7 @@ namespace mne::viz
 class BrainSurface;
 } // namespace mne::viz
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 //=============================================================================================================
 /**
@@ -74,7 +74,7 @@ namespace mne::viz::qt
  *
  * @snippet ex_disp3d_scene/main.cpp sensor_field_mapper_usage
  */
-class VIZQTSHARED_EXPORT SensorFieldMapper
+class VIZSHARED_EXPORT SensorFieldMapper
 {
 public:
     //=========================================================================================================
@@ -369,6 +369,6 @@ private:
     float m_eegVmax = 0.0f; /**< Colour-map normalisation: max |mapped| at peak-GFP time for EEG. */
 };
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // SENSORFIELDMAPPER_H
+#endif // VIZ_SENSORFIELDMAPPER_H

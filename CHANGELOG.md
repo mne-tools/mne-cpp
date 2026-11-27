@@ -412,6 +412,10 @@ aliases; replace the old spelling as below.
   `ViewVisibilityProfile`, moved to `viz/brain/viewstate.h` and loads and
   saves through it; `perspectivePresetRotation`/`multiViewPresetOffset`
   return `Eigen::Quaternionf` and `mneAnalyzeColor` a `viz::Color`.
+- `SourceEstimateOverlay` (source estimates coloured onto the cortex) and
+  `SensorFieldMapper` (MEG/EEG field maps and contours on the helmet and head)
+  moved to `viz/brain/` without Qt; `mne_viz` links `mne_fwd` for the field
+  mapping.
 - Views run in any backend through `viz/host/surface.h`: a backend implements
   `viz::Surface` (redraw requests, clock, pointer shape) and drives a
   `viz::SurfaceClient` (resize, pointer, wheel and key events, animation

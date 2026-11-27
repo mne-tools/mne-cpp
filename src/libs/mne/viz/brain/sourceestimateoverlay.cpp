@@ -18,11 +18,11 @@
 
 #include <mne/base/log.h>
 
-#include "../../../../brain/brainsurface.h"
-#include "../../../../brain/rendertypes.h"
-#include "../../../../brain/interpolation.h"
-#include "../../../../brain/geometryinfo.h"
-#include <mne/viz/backends/qt/plots/helpers/colormap.h>
+#include "brainsurface.h"
+#include "rendertypes.h"
+#include "interpolation.h"
+#include "geometryinfo.h"
+#include "../figures/colormap.h"
 
 //=============================================================================================================
 // STL INCLUDES
@@ -33,7 +33,7 @@
 #include <vector>
 #include <utility>
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 
 //=============================================================================================================
@@ -76,9 +76,9 @@ bool SourceEstimateOverlay::loadStc(const std::filesystem::path& path, int hemi)
     if (m_hasLh || m_hasRh) {
         double minVal, maxVal;
         getDataRange(minVal, maxVal);
-        m_threshMin = minVal;
-        m_threshMax = maxVal;
-        m_threshMid = (minVal + maxVal) / 2.0;
+        m_threshMin = static_cast<float>(minVal);
+        m_threshMax = static_cast<float>(maxVal);
+        m_threshMid = static_cast<float>((minVal + maxVal) / 2.0);
         mne::Log::debug("SourceEstimateOverlay: Auto thresholds set to {} {} {}", m_threshMin, m_threshMid, m_threshMax);
     }
 
@@ -202,7 +202,6 @@ void SourceEstimateOverlay::setColormap(const std::string& name)
     if (m_colormap == name)
         return;
     m_colormap = name;
-    m_colormapQt = QString::fromStdString(name);
     invalidateColorCache();
 }
 
@@ -223,9 +222,9 @@ void SourceEstimateOverlay::setThresholds(float min, float mid, float max)
 int SourceEstimateOverlay::numTimePoints() const
 {
     if (m_hasLh)
-        return m_stcLh.data.cols();
+        return static_cast<int>(m_stcLh.data.cols());
     if (m_hasRh)
-        return m_stcRh.data.cols();
+        return static_cast<int>(m_stcRh.data.cols());
     return 0;
 }
 
@@ -290,14 +289,10 @@ void SourceEstimateOverlay::getDataRange(double& minVal, double& maxVal) const
 
 uint32_t SourceEstimateOverlay::valueToColor(double value, uint8_t alpha) const
 {
-    QRgb rgb = mne::viz::qt::ColorMap::valueToColor(value, m_colormapQt);
-
-    uint32_t r = qRed(rgb);
-    uint32_t g = qGreen(rgb);
-    uint32_t b = qBlue(rgb);
+    const Color rgb = map_color(m_colormap, value);
 
     // Pack as ABGR (same format as BrainSurface uses)
-    return packABGR(r, g, b, static_cast<uint32_t>(alpha));
+    return packABGR(rgb.r, rgb.g, rgb.b, static_cast<uint32_t>(alpha));
 }
 
 //=============================================================================================================
@@ -402,9 +397,9 @@ void SourceEstimateOverlay::updateThresholdsFromData()
     if (m_hasLh || m_hasRh) {
         double minVal, maxVal;
         getDataRange(minVal, maxVal);
-        m_threshMin = minVal;
-        m_threshMax = maxVal;
-        m_threshMid = (minVal + maxVal) / 2.0;
+        m_threshMin = static_cast<float>(minVal);
+        m_threshMax = static_cast<float>(maxVal);
+        m_threshMid = static_cast<float>((minVal + maxVal) / 2.0);
         invalidateColorCache();
         mne::Log::debug("SourceEstimateOverlay: Auto thresholds set to {} {} {}", m_threshMin, m_threshMid, m_threshMax);
     }
@@ -414,8 +409,8 @@ void SourceEstimateOverlay::updateThresholdsFromData()
 
 Eigen::VectorXd SourceEstimateOverlay::sourceDataColumn(int timeIndex) const
 {
-    int nLh = m_hasLh ? m_stcLh.data.rows() : 0;
-    int nRh = m_hasRh ? m_stcRh.data.rows() : 0;
+    const int nLh = m_hasLh ? static_cast<int>(m_stcLh.data.rows()) : 0;
+    const int nRh = m_hasRh ? static_cast<int>(m_stcRh.data.rows()) : 0;
 
     if (nLh == 0 && nRh == 0) {
         return Eigen::VectorXd();
@@ -436,4 +431,4 @@ Eigen::VectorXd SourceEstimateOverlay::sourceDataColumn(int timeIndex) const
     return result;
 }
 
-} // namespace mne::viz::qt
+} // namespace mne::viz

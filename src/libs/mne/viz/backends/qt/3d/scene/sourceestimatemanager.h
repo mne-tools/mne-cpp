@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Owns the source-time-course overlay together with its loader, real-time controller and target cortical surfaces.
  *
- * SourceEstimateManager couples @ref mne::viz::qt::SourceEstimateOverlay (the
+ * SourceEstimateManager couples @ref mne::viz::SourceEstimateOverlay (the
  * static colour-mapped renderable), @ref mne::viz::qt::StcLoadingWorker (background
  * loader for @c .stc files) and @ref mne::viz::qt::RtSourceDataController (the
  * real-time pipeline) into a single object that the GUI talks to.
@@ -65,9 +65,13 @@ namespace mne::viz
 struct SubView;
 } // namespace mne::viz
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 class SourceEstimateOverlay;
+} // namespace mne::viz
+
+namespace mne::viz::qt
+{
 class StcLoadingWorker;
 class RtSourceDataController;
 //=============================================================================================================

@@ -11,7 +11,7 @@
  *
  * On every timer tick the worker pops the next packet (or averages
  * the queue), multiplies it by the dense (n_vertices x n_channels)
- * mapping matrix produced by @ref mne::viz::qt::SensorFieldMapper, applies
+ * mapping matrix produced by @ref mne::viz::SensorFieldMapper, applies
  * symmetric normalisation around zero, maps through the active
  * MEG / EEG colormap and packs the result as ABGR uint32 ready for
  * direct upload into the target @ref mne::viz::BrainSurface colour slot.

@@ -118,10 +118,8 @@ set(SOURCES
     3d/model/items/digitizertreeitem.cpp
     3d/model/items/digitizersettreeitem.cpp
     3d/model/items/networktreeitem.cpp
-    3d/renderable/sourceestimateoverlay.cpp
     3d/renderable/sliceobject.cpp
     3d/scene/multimodalscene.cpp
-    3d/scene/sensorfieldmapper.cpp
     3d/scene/rtsensorstreammanager.cpp
     3d/scene/sourceestimatemanager.cpp
     3d/view/brainview.cpp
@@ -227,12 +225,10 @@ set(HEADERS
     3d/model/items/digitizertreeitem.h
     3d/model/items/digitizersettreeitem.h
     3d/model/items/networktreeitem.h
-    3d/renderable/sourceestimateoverlay.h
     3d/renderable/sliceobject.h
     3d/renderable/videooverlay.h
     3d/scene/multimodalscene.h
     3d/scene/pickresult.h
-    3d/scene/sensorfieldmapper.h
     3d/scene/rtsensorstreammanager.h
     3d/scene/sourceestimatemanager.h
     3d/view/brainview.h

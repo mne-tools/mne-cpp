@@ -16,6 +16,8 @@ set(SOURCES
   brain/meshfactory.cpp
   brain/networkobject.cpp
   brain/polylineobject.cpp
+  brain/sensorfieldmapper.cpp
+  brain/sourceestimateoverlay.cpp
   brain/viewstate.cpp
   figures/average_layout.cpp
   figures/average_tile.cpp
@@ -70,6 +72,8 @@ set(HEADERS
   brain/networkobject.h
   brain/polylineobject.h
   brain/rendertypes.h
+  brain/sensorfieldmapper.h
+  brain/sourceestimateoverlay.h
   brain/viewstate.h
   figures/average_layout.h
   figures/average_tile.h
@@ -138,6 +142,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   mne_fiff
   mne_fs
   mne_mne
+  mne_fwd
   mne_inv
   mne_connectivity
   mne_ieeg

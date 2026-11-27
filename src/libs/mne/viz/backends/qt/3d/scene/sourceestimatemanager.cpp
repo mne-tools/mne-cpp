@@ -18,7 +18,7 @@
 
 #include <mne/base/log.h>
 
-#include "../renderable/sourceestimateoverlay.h"
+#include "../../../../brain/sourceestimateoverlay.h"
 #include "../../../../brain/brainsurface.h"
 #include "../workers/stcloadingworker.h"
 #include "../workers/rtsourcedatacontroller.h"

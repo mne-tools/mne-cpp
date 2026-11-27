@@ -10,7 +10,7 @@
  * @brief    Data-free tests for SensorFieldMapper utilities and state.
  */
 
-#include <mne/viz/backends/qt/3d/scene/sensorfieldmapper.h>
+#include <mne/viz/brain/sensorfieldmapper.h>
 
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_dig_point.h>

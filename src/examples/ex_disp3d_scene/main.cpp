@@ -32,10 +32,10 @@
 #include <mne/viz/brain/networkobject.h>
 #include <mne/viz/brain/polylineobject.h>
 #include <mne/viz/backends/qt/3d/renderable/sliceobject.h>
-#include <mne/viz/backends/qt/3d/renderable/sourceestimateoverlay.h>
+#include <mne/viz/brain/sourceestimateoverlay.h>
 #include <mne/viz/backends/qt/3d/renderable/videooverlay.h>
 #include <mne/viz/backends/qt/3d/scene/multimodalscene.h>
-#include <mne/viz/backends/qt/3d/scene/sensorfieldmapper.h>
+#include <mne/viz/brain/sensorfieldmapper.h>
 #include <mne/viz/backends/qt/3d/view/brainview.h>
 #include <mne/viz/backends/qt/3d/view/multiviewlayout.h>
 #include <mne/viz/backends/qt/qtconversions.h>

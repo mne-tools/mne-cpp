@@ -18,7 +18,7 @@
  *
  * On completion the controller signals the GUI to attach the data
  * to the cortical surfaces, after which scrubbing and playback are
- * served by @ref mne::viz::qt::SourceEstimateOverlay without any further I/O.
+ * served by @ref mne::viz::SourceEstimateOverlay without any further I/O.
  */
 
 #ifndef STCLOADINGWORKER_H

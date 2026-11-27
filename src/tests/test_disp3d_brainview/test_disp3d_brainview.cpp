@@ -50,10 +50,10 @@
 #include <mne/viz/brain/electrodeobject.h>
 #include <mne/ieeg/ieeg_implantation.h>
 #include <mne/viz/brain/networkobject.h>
-#include <mne/viz/backends/qt/3d/renderable/sourceestimateoverlay.h>
+#include <mne/viz/brain/sourceestimateoverlay.h>
 #include <mne/viz/backends/qt/3d/renderable/sliceobject.h>
 #include <mne/viz/backends/qt/3d/renderable/videooverlay.h>
-#include <mne/viz/backends/qt/3d/scene/sensorfieldmapper.h>
+#include <mne/viz/brain/sensorfieldmapper.h>
 #include <mne/fiff/fiff_evoked.h>
 #include <mne/fwd/fwd_coil_set.h>
 #include <mne/fwd/fwd_field_map.h>

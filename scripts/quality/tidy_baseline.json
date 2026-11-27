@@ -1111,9 +1111,6 @@
     "src/libs/mne/viz/backends/qt/3d/model/items/sourcespacetreeitem.h": {
       "modernize-use-override": 1
     },
-    "src/libs/mne/viz/backends/qt/3d/scene/sensorfieldmapper.cpp": {
-      "bugprone-float-loop-counter": 2
-    },
     "src/libs/mne/viz/backends/qt/3d/view/brainview.cpp": {
       "performance-unnecessary-copy-initialization": 1
     },
@@ -1406,6 +1403,9 @@
     "src/libs/mne/viz/backends/qt/viewers/triggerdetectionview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
+    },
+    "src/libs/mne/viz/brain/sensorfieldmapper.cpp": {
+      "bugprone-float-loop-counter": 2
     },
     "src/tests/test_api_registry/test_api_registry.cpp": {
       "performance-implicit-conversion-in-loop": 3

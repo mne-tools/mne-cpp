@@ -12200,8 +12200,8 @@
     },
     {
       "name": "SensorFieldMapper",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/3d/scene/sensorfieldmapper.h",
+      "module": "viz",
+      "header": "viz/brain/sensorfieldmapper.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -12214,7 +12214,7 @@
       "example_mode": "run",
       "status": "documented",
       "documented": true,
-      "sidebar_position": 104,
+      "sidebar_position": 125,
       "guide": null,
       "python_equiv": null,
       "python_url": null
@@ -12258,8 +12258,8 @@
     },
     {
       "name": "SourceEstimateOverlay",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/3d/renderable/sourceestimateoverlay.h",
+      "module": "viz",
+      "header": "viz/brain/sourceestimateoverlay.h",
       "origin": "custom",
       "mne_c_tool": null,
       "mne_python": null,
@@ -12272,7 +12272,7 @@
       "example_mode": "run",
       "status": "documented",
       "documented": true,
-      "sidebar_position": 107,
+      "sidebar_position": 126,
       "guide": null,
       "python_equiv": null,
       "python_url": null

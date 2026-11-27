@@ -159,8 +159,8 @@
       "modules": []
     },
     "viz/backends/qt": {
-      "tokens": 5922,
-      "public_header_includes": 145,
+      "tokens": 5883,
+      "public_header_includes": 144,
       "modules": [
         "Core",
         "Gui",
@@ -170,11 +170,11 @@
       "by_category": {
         "containers": 19,
         "files": 98,
-        "global": 953,
-        "gui": 1783,
+        "global": 950,
+        "gui": 1751,
         "objects_signals": 667,
-        "other": 1567,
-        "strings": 821,
+        "other": 1566,
+        "strings": 818,
         "time": 14
       }
     },

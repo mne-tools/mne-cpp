@@ -24,21 +24,15 @@
  * geometry change.
  */
 
-#ifndef SOURCEESTIMATEOVERLAY_H
-#define SOURCEESTIMATEOVERLAY_H
+#ifndef VIZ_SOURCEESTIMATEOVERLAY_H
+#define VIZ_SOURCEESTIMATEOVERLAY_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
+#include "../viz_global.h"
 #include <mne/inv/inv_source_estimate.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QString>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -67,7 +61,7 @@ namespace mne::viz
 class BrainSurface;
 } // namespace mne::viz
 
-namespace mne::viz::qt
+namespace mne::viz
 {
 //=============================================================================================================
 /**
@@ -78,7 +72,7 @@ namespace mne::viz::qt
  *
  * @snippet ex_disp3d_scene/main.cpp source_estimate_overlay_usage
  */
-class VIZQTSHARED_EXPORT SourceEstimateOverlay
+class VIZSHARED_EXPORT SourceEstimateOverlay
 {
 public:
     //=========================================================================================================
@@ -294,11 +288,10 @@ private:
     bool m_hasLh = false;           /**< Flag indicating LH data loaded. */
     bool m_hasRh = false;           /**< Flag indicating RH data loaded. */
 
-    std::string m_colormap = "Hot";               /**< Current colormap name. */
-    QString m_colormapQt = QStringLiteral("Hot"); /**< Same name as QString, for mne::viz::qt::ColorMap. */
-    float m_threshMin = 0.0f;                     /**< Minimum threshold. */
-    float m_threshMid = 0.5f;                     /**< Mid threshold. */
-    float m_threshMax = 1.0f;                     /**< Maximum threshold. */
+    std::string m_colormap = "Hot"; /**< Current colormap name. */
+    float m_threshMin = 0.0f;       /**< Minimum threshold. */
+    float m_threshMid = 0.5f;       /**< Mid threshold. */
+    float m_threshMax = 1.0f;       /**< Maximum threshold. */
 
     std::shared_ptr<Eigen::SparseMatrix<float>> m_interpolationMatLh; /**< LH interpolation matrix. */
     std::shared_ptr<Eigen::SparseMatrix<float>> m_interpolationMatRh; /**< RH interpolation matrix. */
@@ -319,6 +312,6 @@ private:
     }
 };
 
-} // namespace mne::viz::qt
+} // namespace mne::viz
 
-#endif // SOURCEESTIMATEOVERLAY_H
+#endif // VIZ_SOURCEESTIMATEOVERLAY_H
