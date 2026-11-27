@@ -35,6 +35,10 @@
     {
       "pattern": "src/apps/mne_analyze/plugins/sampleplugin/*",
       "reason": "Template for plugin authors; its add_subdirectory() is commented out in mne_analyze/plugins/CMakeLists.txt."
+    },
+    {
+      "pattern": "src/libs/mne/viz/backends/sdl/*",
+      "reason": "Built only with BUILD_VIZ_SDL=ON, which needs SDL3; the coverage build has no SDL3. The Qt-free CI job builds the SDL backend and runs ex_scene_sdl with the dummy video driver."
     }
   ]
 }
