@@ -1,0 +1,274 @@
+---
+id: font-face
+title: "mne::viz::FontFace"
+sidebar_label: FontFace
+sidebar_position: 156
+---
+
+# FontFace
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/figures/font_face.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/figures/font_face.h)
+
+`#include <mne/viz/font_face.h>`
+
+```cpp
+class mne::viz::FontFace
+```
+
+One face of a TrueType (.ttf) or TrueType collection (.ttc) font.
+
+Fonts with CFF outlines (.otf without a glyf table) are rejected. Of a variable font the default instance is read. Glyph coordinates are in font units with y growing upwards; `units_per_em()` of them make the font size.
+
+```cpp title="src/examples/ex_scene/main.cpp"
+// One face: glyphs, advances and pair kerning in font units
+const std::shared_ptr<const FontFace> face = FontLibrary::sans();
+const std::uint32_t t = face->glyph_index(U'T');
+const double kerning = face->kerning(t, face->glyph_index(U'o')) * 13.0 / face->units_per_em(); // pixels at 13 px
+```
+
+---
+
+## Public Methods
+
+### family()
+
+**Returns:**
+
+- *const std::string &* — The family name, e.g. "Source Sans 3", preferring the typographic family.
+
+---
+
+### style()
+
+**Returns:**
+
+- *const std::string &* — The style name, e.g. "Semibold Italic", preferring the typographic subfamily.
+
+---
+
+### weight()
+
+**Returns:**
+
+- *int* — The weight from 1 to 1000, 400 regular and 700 bold.
+
+---
+
+### italic()
+
+**Returns:**
+
+- *bool* — Whether the face is italic or oblique.
+
+---
+
+### units_per_em()
+
+**Returns:**
+
+- *int* — [`Font`](/docs/api/viz/font) units per em.
+
+---
+
+### ascender()
+
+**Returns:**
+
+- *int* — Distance from the baseline to the top of the line, in font units, positive.
+
+---
+
+### descender()
+
+**Returns:**
+
+- *int* — Distance from the baseline to the bottom of the line, in font units, negative.
+
+---
+
+### line_gap()
+
+**Returns:**
+
+- *int* — Extra space between lines, in font units.
+
+---
+
+### glyph_count()
+
+**Returns:**
+
+- *int* — The number of glyphs.
+
+---
+
+### glyph_index(code_point)
+
+**Parameters:**
+
+- **code_point** : *char32_t*
+  Unicode code point.
+
+**Returns:**
+
+- *std::uint32_t* — Its glyph, or 0 (the missing-glyph box) if the face does not cover it.
+
+---
+
+### advance(glyph)
+
+**Parameters:**
+
+- **glyph** : *std::uint32_t*
+  Glyph index.
+
+**Returns:**
+
+- *int* — Its horizontal advance in font units.
+
+---
+
+### kerning(left, right)
+
+[`Pair`](/docs/api/inv/pair) kerning from the kern feature of GPOS, else from the kern table.
+
+**Parameters:**
+
+- **left** : *std::uint32_t*
+  Glyph before.
+
+- **right** : *std::uint32_t*
+  Glyph after.
+
+**Returns:**
+
+- *int* — The adjustment of the advance of `left` in font units, negative to tighten.
+
+---
+
+### outline(glyph)
+
+**Parameters:**
+
+- **glyph** : *std::uint32_t*
+  Glyph index.
+
+**Returns:**
+
+- *std::vector&lt; Contour &gt;* — The contours of the glyph, composites resolved; empty for blank or damaged glyphs.
+
+---
+
+### flattened_outline(glyph, pixels_per_em)
+
+The outline flattened to polygons fine enough to be drawn at `pixels_per_em`, cached per glyph and size.
+
+**Parameters:**
+
+- **glyph** : *std::uint32_t*
+  Glyph index.
+
+- **pixels_per_em** : *double*
+  Size it is drawn at, in device pixels.
+
+**Returns:**
+
+- *std::shared_ptr&lt; const std::vector&lt; Polygon &gt; &gt;* — Closed polygons in font units, y up, with their original orientation (fill with non-zero winding).
+
+---
+
+## Static Methods
+
+### load(path, face_index)
+
+Reads a face from a font file.
+
+**Parameters:**
+
+- **path** : *const std::filesystem::path &*
+  .ttf or .ttc file.
+
+- **face_index** : *int*
+  Face of a collection; 0 for a single font.
+
+**Returns:**
+
+- *[Expected](/docs/api/base/expected)&lt; std::shared_ptr&lt; const FontFace &gt; &gt;* — The face, or why it cannot be read.
+
+---
+
+### from_bytes(bytes, face_index)
+
+Reads a face from a copy of font data in memory.
+
+**Parameters:**
+
+- **bytes** : *std::vector&lt; std::uint8_t &gt;*
+  Contents of a .ttf or .ttc file.
+
+- **face_index** : *int*
+  Face of a collection; 0 for a single font.
+
+**Returns:**
+
+- *[Expected](/docs/api/base/expected)&lt; std::shared_ptr&lt; const FontFace &gt; &gt;* — The face, or why it cannot be read.
+
+---
+
+### from_static_bytes(bytes, face_index)
+
+Reads a face from font data that stays valid and unchanged while the face exists, without copying it.
+
+**Parameters:**
+
+- **bytes** : *std::span&lt; const std::uint8_t &gt;*
+  Contents of a .ttf or .ttc file, e.g. a font compiled into the program.
+
+- **face_index** : *int*
+  Face of a collection; 0 for a single font.
+
+**Returns:**
+
+- *[Expected](/docs/api/base/expected)&lt; std::shared_ptr&lt; const FontFace &gt; &gt;* — The face, or why it cannot be read.
+
+---
+
+### face_count(bytes)
+
+**Parameters:**
+
+- **bytes** : *std::span&lt; const std::uint8_t &gt;*
+  Contents of a font file.
+
+**Returns:**
+
+- *int* — The number of faces: the count of a collection, 1 for a single font, 0 for anything else.
+
+---
+
+## Example
+
+- Start here: [ex_scene](../../examples/viz/ex_scene.mdx) — Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+- Full source: [`src/examples/ex_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_scene/main.cpp)
+- Build target: `ex_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_scene](../../examples/viz/ex_scene.mdx)
+
+Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+
+````cpp title="src/examples/ex_scene/main.cpp, line 213"
+// One face: glyphs, advances and pair kerning in font units
+const std::shared_ptr<const FontFace> face = FontLibrary::sans();
+const std::uint32_t t = face->glyph_index(U'T');
+const double kerning = face->kerning(t, face->glyph_index(U'o')) * 13.0 / face->units_per_em(); // pixels at 13 px
+// Installed fonts, found without a font service; FontLibrary falls back to them
+const std::shared_ptr<const FontFace> installed = SystemFonts::shared()->face(Font{});
+ok &= expect(typesetPng && face->family() == "Source Sans 3" && kerning < 0.0, "text is typeset in the bundled font, kerned");
+std::println("        installed UI font: {}", installed ? installed->family() : std::string("none"));
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

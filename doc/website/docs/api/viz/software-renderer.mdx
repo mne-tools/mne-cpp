@@ -74,6 +74,17 @@ Renders a frame.
 
 ---
 
+### set_fonts(fonts)
+
+Sets the fonts figure textures draw their text with; by default they use the bitmap font of `to_raster()`.
+
+**Parameters:**
+
+- **fonts** : *std::shared_ptr&lt; const [FontSource](/docs/api/viz/font-source) &gt;*
+  Fonts, e.g. `FontLibrary::shared()`; nullptr restores the bitmap font.
+
+---
+
 ## Example
 
 No example of its own: CPU backend of the GPU frame description; exercised with golden images by test_viz_gpu_frame and test_viz_trace_view.

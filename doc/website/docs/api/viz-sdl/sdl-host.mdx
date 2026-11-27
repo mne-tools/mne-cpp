@@ -23,6 +23,8 @@ if (!host.is_open()) {
     std::fprintf(stderr, "Cannot open the window: %s\n", host.error().c_str());
     return 1;
 }
+// The layouts measure the text with the fonts the host draws it with
+const FontTextMetrics metrics(options.fonts);
 ```
 
 ### Inheritance

@@ -6,9 +6,9 @@
     "commit": "0800c9a1bf606c2df8c44e35fbb42ea13029b549"
   },
   "summary": {
-    "directories": 301,
+    "directories": 302,
     "registration": {
-      "unconditional": 288,
+      "unconditional": 289,
       "conditional": 10,
       "unregistered": 3
     },
@@ -73,6 +73,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_fonts",
           "test_viz_form_view",
           "test_viz_gpu_frame",
           "test_viz_qt_brain_window",
@@ -199,6 +200,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_fonts",
           "test_viz_form_view",
           "test_viz_gpu_frame",
           "test_viz_qt_brain_window",
@@ -325,6 +327,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_fonts",
           "test_viz_form_view",
           "test_viz_gpu_frame",
           "test_viz_qt_brain_window",
@@ -451,6 +454,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_fonts",
           "test_viz_form_view",
           "test_viz_gpu_frame",
           "test_viz_qt_brain_window",
@@ -577,6 +581,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_fonts",
           "test_viz_form_view",
           "test_viz_gpu_frame",
           "test_viz_qt_brain_window",
@@ -703,6 +708,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_fonts",
           "test_viz_form_view",
           "test_viz_gpu_frame",
           "test_viz_qt_brain_window",
@@ -10602,6 +10608,47 @@
         "PixelSize",
         "Ray",
         "SphereCrossing"
+      ]
+    },
+    {
+      "name": "test_viz_fonts",
+      "cmake": "src/tests/test_viz_fonts/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_fonts"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 120,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "FontFace",
+        "FontLibrary",
+        "FontSource",
+        "FontTextMetrics",
+        "GlyphRun",
+        "PlacedGlyph",
+        "SystemFontInfo",
+        "SystemFonts"
       ]
     },
     {

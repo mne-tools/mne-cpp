@@ -52,6 +52,8 @@ const Expected<void> png = to_raster(chart).save_png(dir / "plot.png");
 classDiagram
     TextMetrics <|-- ApproximateTextMetrics
     click ApproximateTextMetrics href "../../viz/approximate-text-metrics/"
+    TextMetrics <|-- FontTextMetrics
+    click FontTextMetrics href "../../viz/font-text-metrics/"
     TextMetrics <|-- QtTextMetrics
     click QtTextMetrics href "../../viz-qt/qt-text-metrics/"
 ```
@@ -137,6 +139,28 @@ classDiagram
 - Start here: [ex_scene](../../examples/viz/ex_scene.mdx) — Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
 - Full source: [`src/examples/ex_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_scene/main.cpp)
 - Build target: `ex_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_scene_sdl](../../examples/viz/ex_scene_sdl.mdx)
+
+Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 99"
+ *
+ * @return The number of frames drawn.
+ */
+int run_panel(sdl::SdlHost& host, const std::string& which, const TextMetrics& metrics)
+{
+    std::unique_ptr<Panel> panel;
+    if (which == "compensator") {
+        auto compensator = std::make_unique<CompensatorPanel>();
+        std::vector<mne::FiffCtfComp> comps(3);
+        for (int i = 0; i < 3; ++i) {
+            comps[static_cast<std::size_t>(i)].kind = i + 1;
+        }
+        compensator->set_compensators(comps);
+````
 
 ## Authors of this file
 

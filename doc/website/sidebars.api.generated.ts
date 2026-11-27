@@ -752,7 +752,15 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz/projectors-panel',
         'api/viz/forward-panel',
         'api/viz/form-view',
-        'api/viz/theme'
+        'api/viz/theme',
+        'api/viz/font-face',
+        'api/viz/font-library',
+        'api/viz/font-source',
+        'api/viz/font-text-metrics',
+        'api/viz/system-fonts',
+        'api/viz/system-font-info',
+        'api/viz/placed-glyph',
+        'api/viz/glyph-run'
       ],
     },
     {

@@ -160,7 +160,7 @@ Stores the panel in `store`, under the keys `load()` reads.
 
 Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
 
-````cpp title="src/examples/ex_scene/main.cpp, line 183"
+````cpp title="src/examples/ex_scene/main.cpp, line 187"
 std::vector<mne::FiffCtfComp> comps(2);
 comps[0].kind = 1;
 comps[1].kind = 3;
@@ -180,7 +180,7 @@ ok &= expect(grade == 3 && compensators.selected() == 3, "a click on a compensat
 
 Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
 
-````cpp title="src/examples/ex_scene_sdl/main.cpp, line 105"
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 107"
     auto compensator = std::make_unique<CompensatorPanel>();
     std::vector<mne::FiffCtfComp> comps(3);
     for (int i = 0; i < 3; ++i) {

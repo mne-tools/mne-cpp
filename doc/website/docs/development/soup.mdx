@@ -26,6 +26,7 @@ Every third-party component that MNE-CPP builds, ships, loads at run time or is 
 | Python and MNE-Python | user-installed, separate process | `PSF-2.0 AND BSD-3-Clause` | separate process (pybridge), optional, not shipped | no |
 | curl | the operating system's curl program | `curl` | separate process, not shipped | no |
 | Lato and Roboto fonts | Lato 1.104, Roboto 2.137 | `OFL-1.1 AND Apache-2.0` | resource compiled into the applications | no |
+| Source Sans 3 and Source Code Pro fonts | Source Sans 3 3.052, Source Code Pro 2.042 | `OFL-1.1` | unmodified font files in resources/fonts, compiled into mne_viz as data | no |
 | Operating system, C++ standard library and threads | macOS 26+, Windows 10+, Ubuntu 24.04+; libc++, libstdc++ or the MSVC STL | `LicenseRef-platform` | system | yes |
 | Build toolchain | pinned versions in the table below | `LicenseRef-build-tools` | build tool, not shipped | yes |
 
@@ -115,6 +116,13 @@ Every third-party component that MNE-CPP builds, ships, loads at run time or is 
 - **Purpose:** User interface typefaces.
 - **If it fails:** Appearance only.
 - **Mitigation:** None needed.
+
+### Source Sans 3 and Source Code Pro fonts
+
+- **Used by:** mne_viz (software renderer, FormView), the SDL backend, mne_render
+- **Purpose:** Typefaces of the toolkit-free user interface and of figures rendered without Qt, identical on every platform.
+- **If it fails:** Appearance only: a damaged font file shows wrong or missing glyphs.
+- **Mitigation:** Files are bounds-checked when parsed (test_viz_fonts parses garbled data); missing glyphs fall back to system fonts; golden images of rendered text.
 
 ### Operating system, C++ standard library and threads
 

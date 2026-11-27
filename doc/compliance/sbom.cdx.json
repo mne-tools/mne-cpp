@@ -185,6 +185,27 @@
           "url": "https://fonts.google.com"
         }
       ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "source-fonts",
+      "name": "Source Sans 3 and Source Code Pro fonts",
+      "version": "Source Sans 3 3.052, Source Code Pro 2.042",
+      "supplier": {
+        "name": "Adobe"
+      },
+      "licenses": [
+        {
+          "expression": "OFL-1.1"
+        }
+      ],
+      "description": "Typefaces of the toolkit-free user interface and of figures rendered without Qt, identical on every platform.",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/adobe-fonts"
+        }
+      ]
     }
   ],
   "dependencies": [
@@ -196,7 +217,8 @@
         "zlib",
         "onnxruntime",
         "dlpack",
-        "fonts"
+        "fonts",
+        "source-fonts"
       ]
     }
   ]

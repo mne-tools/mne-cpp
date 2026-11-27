@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 544,
-    "exported_free_functions": 253,
-    "registered_classes": 711,
+    "exported_classes": 549,
+    "exported_free_functions": 258,
+    "registered_classes": 719,
     "exported_not_registered": 2,
     "registered_function_modules": 15,
-    "registered_header_only": 154,
+    "registered_header_only": 157,
     "registered_stale": 0,
-    "registered_with_test": 399,
+    "registered_with_test": 407,
     "registered_test_unresolved": 0,
-    "registered_with_example": 472,
+    "registered_with_example": 477,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 102,
     "registered_without_api_page": 0,
-    "with_snippet": 516,
-    "public_api_units": 713,
-    "example_eligible": 472,
-    "example_exempt": 241,
-    "eligible_backed_by_registry_example": 470,
-    "eligible_used_by_some_example": 401,
+    "with_snippet": 524,
+    "public_api_units": 721,
+    "example_eligible": 477,
+    "example_exempt": 244,
+    "eligible_backed_by_registry_example": 475,
+    "eligible_used_by_some_example": 403,
     "examples_on_disk": 82,
     "examples_built": 82
   },
@@ -225,13 +225,13 @@
       "with_snippet": 12
     },
     "viz": {
-      "public": 242,
-      "registered": 242,
-      "with_test": 173,
-      "eligible": 61,
-      "eligible_with_registry_example": 61,
-      "eligible_used_by_example": 49,
-      "with_snippet": 74
+      "public": 250,
+      "registered": 250,
+      "with_test": 181,
+      "eligible": 66,
+      "eligible_with_registry_example": 66,
+      "eligible_used_by_example": 51,
+      "with_snippet": 82
     }
   },
   "exported_free_functions": [
@@ -1246,6 +1246,16 @@
       "library": "report"
     },
     {
+      "name": "themeStyleSheet",
+      "header": "viz/backends/qt/kit/qttheme.h",
+      "library": "viz"
+    },
+    {
+      "name": "applyTheme",
+      "header": "viz/backends/qt/kit/qttheme.h",
+      "library": "viz"
+    },
+    {
       "name": "sceneTimestampMs",
       "header": "viz/backends/qt/plots/helpers/sceneinput.h",
       "library": "viz"
@@ -1368,6 +1378,21 @@
     {
       "name": "darker",
       "header": "viz/figures/colormap.h",
+      "library": "viz"
+    },
+    {
+      "name": "decode_utf8",
+      "header": "viz/figures/font_face.h",
+      "library": "viz"
+    },
+    {
+      "name": "shape_text",
+      "header": "viz/figures/font_source.h",
+      "library": "viz"
+    },
+    {
+      "name": "font_pixel_size",
+      "header": "viz/figures/font_source.h",
       "library": "viz"
     },
     {
@@ -16050,6 +16075,137 @@
       "exempt_reason": null
     },
     {
+      "name": "FontFace",
+      "header": "viz/figures/font_face.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_fonts",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#font_face_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/font-face.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "FontLibrary",
+      "header": "viz/figures/font_library.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_fonts",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene"
+      ],
+      "snippets": [
+        "ex_scene/main.cpp#font_library_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/font-library.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "FontSource",
+      "header": "viz/figures/font_source.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_fonts",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#font_library_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/font-source.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "GlyphRun",
+      "header": "viz/figures/font_source.h",
+      "library": "viz",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_fonts",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#font_library_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/glyph-run.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Plain result of shape_text(): the positioned glyphs and the extent of a string."
+    },
+    {
+      "name": "PlacedGlyph",
+      "header": "viz/figures/font_source.h",
+      "library": "viz",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_fonts",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#font_library_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/placed-glyph.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Plain record of one positioned glyph in a GlyphRun, produced by shape_text()."
+    },
+    {
+      "name": "FontTextMetrics",
+      "header": "viz/figures/font_text_metrics.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_fonts",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene",
+        "ex_scene_sdl"
+      ],
+      "snippets": [
+        "ex_scene/main.cpp#font_library_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/font-text-metrics.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "Point",
       "header": "viz/figures/geometry.h",
       "library": "viz",
@@ -16333,6 +16489,48 @@
         "ex_scene/main.cpp#scene_usage"
       ],
       "api_page": "doc/website/docs/api/viz/svg-options.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "SystemFontInfo",
+      "header": "viz/figures/system_fonts.h",
+      "library": "viz",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_fonts",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#system_fonts_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/system-font-info.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Plain record of an installed face returned by SystemFonts, whose example shows it."
+    },
+    {
+      "name": "SystemFonts",
+      "header": "viz/figures/system_fonts.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_fonts",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#system_fonts_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/system-fonts.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null

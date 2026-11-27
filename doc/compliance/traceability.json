@@ -392,8 +392,8 @@
       "missing_tests": []
     },
     "viz": {
-      "classes": 139,
-      "tested": 130,
+      "classes": 147,
+      "tested": 138,
       "untested": [
         "ElectrodeObject",
         "GeometryInfo",

@@ -55,7 +55,7 @@ No example of its own: RGBA value type taken by pens, brushes and plots; shown i
 
 Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
 
-````cpp title="src/examples/ex_scene/main.cpp, line 86"
+````cpp title="src/examples/ex_scene/main.cpp, line 90"
 // Qt:   QPainter p(&widget); p.setPen(...); p.drawRect(...); p.drawText(...);
 Canvas canvas(200, 120, Color::white());
 canvas.set_antialiasing(true);
@@ -86,7 +86,7 @@ ok &= expect(static_cast<int>(marker->vertexCount()) == MeshFactory::sphereVerte
 
 Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
 
-````cpp title="src/examples/ex_scene_sdl/main.cpp, line 183"
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 188"
     TraceBuffer::ChannelSpec spec;
     spec.name = "EEG " + std::to_string(ch + 1);
     spec.type_label = "EEG";

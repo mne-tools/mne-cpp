@@ -20,7 +20,8 @@
       "Qt dispatcher of viz::Dispatcher": "qtdispatcher.h (queuedDispatcher) posts the tasks of Qt-free brain view models to a QObject's event loop, so SourceEstimateSession and SensorStreamSession could leave the backend; the public header raised public header includes once (135 -> 137) and objects_signals (620 -> 621).",
       "Mipmapped textures of the GPU frame description": "RhiFrameRenderer generating mipmaps for GpuTexture::mipmaps (the depth frame of the video decal) raised the viz/backends/qt ceilings once (tokens 5774 -> 5785, gui 1711 -> 1722); BrainViewCore moving onto BrainFrameBuilder and RhiFrameRenderer lowers them again.",
       "Brain view on the GPU frame description": "BrainViewCore records its frames from viz::BrainFrameComposer through RhiFrameRenderer and owns the depth target over the QRhiWidget texture, raising the viz/backends/qt ceilings once (tokens 5785 -> 5793); the superseded BrainRenderer stays as deprecated public API, and its removal lowers them by its QRhi code.",
-      "Generic panel host": "PanelWidget (kit/panelwidget.h) shows any toolkit-free viz::Panel, and SettingsPanel gained the colour button, colour dialog and toned read-only texts of the new Info and Color fields, raising the gui category once (1725 -> 1733); the compensator and projector views replaced by viz::CompensatorPanel and viz::ProjectorsPanel lowered the total (tokens 5743 -> 5722), the forward settings view replaced by viz::ForwardPanel further (5722 -> 5686), and every further view ported to a panel lowers it again."
+      "Generic panel host": "PanelWidget (kit/panelwidget.h) shows any toolkit-free viz::Panel, and SettingsPanel gained the colour button, colour dialog and toned read-only texts of the new Info and Color fields, raising the gui category once (1725 -> 1733); the compensator and projector views replaced by viz::CompensatorPanel and viz::ProjectorsPanel lowered the total (tokens 5743 -> 5722), the forward settings view replaced by viz::ForwardPanel further (5722 -> 5686), and every further view ported to a panel lowers it again.",
+      "One look for every backend": "qttheme.h (themeStyleSheet(), applyTheme()) gives Qt panels the viz::Theme of the toolkit-free FormView and registers the bundled Source Sans 3 / Source Code Pro with QFontDatabase, and SettingsPanel lays rows out like FormView (labels left, editors right) with toned status chips, raising the viz/backends/qt ceilings once (tokens 5686 -> 5720, public header includes 133 -> 134)."
     }
   },
   "summary": {
@@ -55,7 +56,7 @@
       "viz",
       "viz/backends/sdl"
     ],
-    "tokens": 5686,
+    "tokens": 5720,
     "gui_outside_design": []
   },
   "libraries": {
@@ -272,24 +273,24 @@
       "by_category": {},
       "public_header_includes": 0,
       "q_object": 0,
-      "files": 153,
+      "files": 165,
       "modules": []
     },
     "viz/backends/qt": {
-      "tokens": 5686,
+      "tokens": 5720,
       "by_category": {
         "containers": 17,
         "files": 90,
-        "global": 930,
-        "gui": 1731,
+        "global": 935,
+        "gui": 1741,
         "objects_signals": 604,
-        "other": 1515,
-        "strings": 785,
+        "other": 1530,
+        "strings": 789,
         "time": 14
       },
-      "public_header_includes": 133,
+      "public_header_includes": 134,
       "q_object": 69,
-      "files": 194,
+      "files": 196,
       "modules": [
         "Core",
         "Gui",

@@ -54,6 +54,25 @@ const Expected<void> png = to_raster(chart).save_png(dir / "plot.png");
 - Full source: [`src/examples/ex_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_scene/main.cpp)
 - Build target: `ex_scene` (runs under CTest)
 
+## Used in examples
+
+### [ex_scene](../../examples/viz/ex_scene.mdx)
+
+Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+
+````cpp title="src/examples/ex_scene/main.cpp, line 205"
+const std::shared_ptr<const FontLibrary> fonts = FontLibrary::shared();
+const FontTextMetrics fontMetrics(fonts);
+const DisplayList typeset = plot.render(480, 320, fontMetrics, Font{"", 0.0, 13.0});
+RasterOptions fontOptions;
+fontOptions.fonts = fonts.get();
+const Expected<void> typesetPng = to_raster(typeset, fontOptions).save_png(dir / "plot_fonts.png");
+// One face: glyphs, advances and pair kerning in font units
+const std::shared_ptr<const FontFace> face = FontLibrary::sans();
+const std::uint32_t t = face->glyph_index(U'T');
+const double kerning = face->kerning(t, face->glyph_index(U'o')) * 13.0 / face->units_per_em(); // pixels at 13 px
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

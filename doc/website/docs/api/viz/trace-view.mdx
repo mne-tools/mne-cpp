@@ -714,7 +714,7 @@ No example of its own: Interaction state of the raw-data trace view; driven by v
 
 Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
 
-````cpp title="src/examples/ex_scene_sdl/main.cpp, line 198"
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 203"
 TraceViewClient client;
 client.style().background = Color{250, 250, 250};
 TraceView& view = client.view();
@@ -724,6 +724,7 @@ view.set_visible_channel_count(16);
 view.set_samples_per_pixel(5.0);
 view.set_scalebars_visible(true);
 client.set_source(&buffer);
+client.set_text_metrics(&metrics);
 ````
 
 ## Authors of this file
