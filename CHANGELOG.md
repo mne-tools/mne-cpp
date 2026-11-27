@@ -263,7 +263,7 @@ aliases; replace the old spelling as below.
   `TFplot`, `Plot`, `ButterflyView` and the channel tiles of
   `AverageLayoutView`) draw their `mne_viz` model through a QPainter backend
   (`viz/backends/qt/plots/helpers/scenepainter.h`: `paintScene()`, `QtTextMetrics`). On
-  screen they draw the same pixels as before; `test_scene_render` compares
+  screen they draw the same pixels as before; `test_viz_render` compares
   every model's SVG and PNG output with golden files. `ButterflyView` saves
   SVG screenshots as vector graphics instead of an embedded bitmap. Removed
   with the move: `Graph::drawLabels()`, the protected data members of `Plot`
@@ -328,7 +328,7 @@ aliases; replace the old spelling as below.
   back through callbacks. `draw_overlays()` draws the crosshair, scalebars,
   ruler and annotation selection into a `Canvas`. `viz::qt::ChannelRhiRenderer`
   delegates to it and paints the overlays with `paintScene()`; its API and
-  signals are unchanged. `test_scene_trace_view` tests it without Qt, with
+  signals are unchanged. `test_viz_trace_view` tests it without Qt, with
   golden SVG files of the overlays. The Qt usage ceiling of `disp` drops
   accordingly (tokens 4885 to 4680).
 - The rest of the trace view's logic moved to `mne_viz` as well:
@@ -365,7 +365,7 @@ aliases; replace the old spelling as below.
   opacity. `TraceFrameBuilder` (`viz/gpu/trace_frame.h`) describes the frames
   of the trace view: traces, the marker overlay with the per-second bands
   and the crosshair, scalebar, ruler and selection overlay.
-  `test_scene_gpu_frame` tests the software backend; `test_scene_trace_view`
+  `test_viz_gpu_frame` tests the software backend; `test_viz_trace_view`
   renders a trace view headless against a golden PNG.
 - `viz::qt::RhiFrameRenderer` (`viz/backends/qt/plots/helpers/rhiframerenderer.h`) is the
   QRhi backend of the GPU frame description: one QRhi buffer, texture and
@@ -382,8 +382,8 @@ aliases; replace the old spelling as below.
   instanced dipole and electrode glyphs, and a screen overlay, pane by pane;
   mesh streams are uploaded only when their generation changes. The software
   backend gains C++ counterparts of these disp3D shaders, so the brain view
-  renders headless (`test_scene_brain_view` compares a golden PNG), and
-  `test_disp3d_brain_window` checks the frames against the reflection of the
+  renders headless (`test_viz_brain_view` compares a golden PNG), and
+  `test_viz_qt_brain_window` checks the frames against the reflection of the
   `.qsb` shaders.
 - `viz::BrainFrameBuilder` also draws MRI slices, the video disk and video
   decals on surfaces (flat or following a depth frame) from `viz::Image`
@@ -393,7 +393,7 @@ aliases; replace the old spelling as below.
 - `viz::BrainFrameComposer` (`viz/brain/brainframecomposer.h`) turns the
   brain view's scene (surfaces, glyphs, MRI slices, video overlay, pointer)
   and its panes into `GpuFrame`s with the drawing order and shaders of the
-  view, so every backend renders the same frames; `test_scene_brain_view`
+  view, so every backend renders the same frames; `test_viz_brain_view`
   renders a two-pane scene headless against a golden PNG.
   `BrainFrameBuilder::draw_video_billboard()` takes the key of the texture
   the disks of all panes share.
@@ -405,6 +405,9 @@ aliases; replace the old spelling as below.
   `BrainFrameComposer::redraw_overlay()` draw an unchanged overlay again.
   `BrainRenderer` is no longer used by the view and is deprecated; it will be
   removed in a later release.
+- The tests of `mne_viz` are named `test_viz_*` and those of `mne_viz_qt`
+  `test_viz_qt_*` (formerly `test_scene_*`, `test_viewmodels`, `test_disp_*`
+  and `test_disp3d_*`).
 - New tool `mne_render` renders raw data traces (PNG through the trace view's
   GPU frames, or SVG) or a FreeSurfer surface with a source estimate (PNG)
   headless, without Qt, a window system or a GPU, on the software backend of
@@ -538,7 +541,7 @@ aliases; replace the old spelling as below.
   writes into it. `reconcile_conditions()` and `pre_stimulus_samples()`
   (`viz/models/evoked_conditions.h`) do the per-condition colour and visibility
   bookkeeping and the onset search of `viz::qt::EvokedSetModel`.
-  `test_scene_trace_buffer` tests them without Qt. The Qt usage ceiling of
+  `test_viz_trace_buffer` tests them without Qt. The Qt usage ceiling of
   `disp` drops to 4529 tokens.
 - The camera, input handling, pane layout and head-up display of the 3-D brain
   view moved to `mne_viz` (which now links Eigen): `OrbitCamera`
@@ -562,7 +565,7 @@ aliases; replace the old spelling as below.
   events, converts the matrices for its QRhi uniforms and paints the overlay
   with `paintScene()`; the APIs and signals of `BrainViewCore`, `BrainView`
   and `BrainWindow` are unchanged, and `CameraController`, `RayPicker` and
-  `viz::qt::MultiViewLayout` remain as Qt-typed adapters. `test_scene_brain_view`
+  `viz::qt::MultiViewLayout` remain as Qt-typed adapters. `test_viz_brain_view`
   tests it without Qt, with a golden SVG of the overlay. The Qt usage ceiling
   of `disp3D` drops to 1807 tokens.
 - `mne::write_mat_file()` (`math/mat_file.h`) writes matrices to a MATLAB

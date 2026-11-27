@@ -132,50 +132,50 @@
         "src/tests/test_mne_source_space_ops_python/data/sample-vol25-src.fif": "9e31c11f1e9547e7386e3253283a558bef399359b1fd406baae0552b2e1a7f82"
       }
     },
-    "test_scene_brain_view": {
+    "test_viz_brain_view": {
       "generators": [],
       "fixtures": {
-        "src/tests/test_scene_brain_view/data/brain_frame.png": "933cf7a674ed1927350e2839aaf471a2f01166a0fe7c11d043a6d4e06acfac54",
-        "src/tests/test_scene_brain_view/data/brain_frame_textured.png": "ba0cf3a9b8f0454fe16fe3e306576db1ced25f78ced305e861b06b1b0fba6d6e",
-        "src/tests/test_scene_brain_view/data/brain_scene.png": "986f81553a800b141ace4ff5f07d0df55186627fdac71b05d1f9c8042be0ed93",
-        "src/tests/test_scene_brain_view/data/brain_view_overlay.svg": "026f3d6e401752ae57e9d14519d4d9b753f0a8bef62a77680c710fe6b8d46b06"
+        "src/tests/test_viz_brain_view/data/brain_frame.png": "933cf7a674ed1927350e2839aaf471a2f01166a0fe7c11d043a6d4e06acfac54",
+        "src/tests/test_viz_brain_view/data/brain_frame_textured.png": "ba0cf3a9b8f0454fe16fe3e306576db1ced25f78ced305e861b06b1b0fba6d6e",
+        "src/tests/test_viz_brain_view/data/brain_scene.png": "986f81553a800b141ace4ff5f07d0df55186627fdac71b05d1f9c8042be0ed93",
+        "src/tests/test_viz_brain_view/data/brain_view_overlay.svg": "026f3d6e401752ae57e9d14519d4d9b753f0a8bef62a77680c710fe6b8d46b06"
       }
     },
-    "test_scene_render": {
+    "test_viz_render": {
       "generators": [],
       "fixtures": {
-        "src/tests/test_scene_render/data/average_layout.png": "1a3cbbffdbd390dbe29df937dba8940a390811b5d9a9b5e6237cbca2adc2cbc0",
-        "src/tests/test_scene_render/data/average_layout.svg": "b2bce0e2d6fd76551c22a9e63a7bb12c672b01f198b7b4f2b9965e1eaa5dee26",
-        "src/tests/test_scene_render/data/average_tile.png": "e3dc6dfc107a6aec4530973521fb78c48009c9da64a85396bfa0de7a05088c4d",
-        "src/tests/test_scene_render/data/average_tile.svg": "0a68d54b228906de959e36854ec94c11965f694860f734281153e9f8129db4c0",
-        "src/tests/test_scene_render/data/bar_chart.png": "0a9f311764cfb5bcbae122c0d0a7d1301adcaf0cd5f1a31bfacb8f0d6aa6db16",
-        "src/tests/test_scene_render/data/bar_chart.svg": "863411ee0639bcde18a7375c69875b09ac5585b62e925530fb8203a0d5312b0e",
-        "src/tests/test_scene_render/data/butterfly_plot.png": "dcba6c6c878f4560d5e853724a0df4b3160918bce183eb12210affd5a1f3474e",
-        "src/tests/test_scene_render/data/butterfly_plot.svg": "fc42e41ebe9f6b5368fdf4fd0008de54783a886fbb5f84a4b2df6497408a1a0a",
-        "src/tests/test_scene_render/data/filter_response_plot.png": "821b0f20ab5463238b9830ab52af643466a2a5310e519e1e31b48233552bcbac",
-        "src/tests/test_scene_render/data/filter_response_plot.svg": "41cd1410ba9fb0d7aa2d88b189cf4d54024996c14e426036b27e7ee414ee1f7c",
-        "src/tests/test_scene_render/data/image_plot.png": "e3d6c2fa92684e47d3e8d613c6280d8fbe5b0d02a1548d601606e6b120c5baf3",
-        "src/tests/test_scene_render/data/image_plot.svg": "a3850c1399187015e71e5a61692fd1d3097eec3160a738a3334752624053413a",
-        "src/tests/test_scene_render/data/line_chart.png": "d008d8a0026b5854c619dd46f3dc28c942153abdc70cff2e2aa9fd540c14fc0e",
-        "src/tests/test_scene_render/data/line_chart.svg": "64666ad026e6946cb74bee9deb81a59a585b9a385a0b8ae581806efdeb6e76ef",
-        "src/tests/test_scene_render/data/sample.png": "967dba01d3666923715e336766c74da20f50723b878c3b98966525e20375a4c6",
-        "src/tests/test_scene_render/data/sample.svg": "65c2237c92e95888bfc92b20bf3acc2f8a8e24123fd2a98ef27662671e0265ae",
-        "src/tests/test_scene_render/data/sensor_layout.png": "fc09054d0743b037c1d078fb006eb8b335fed3d6fba418971c36326eaec9786e",
-        "src/tests/test_scene_render/data/sensor_layout.svg": "d51aebfab510b4b32580ea5dc29b88765b4cda5e8e7396399d7cefa6214142d3",
-        "src/tests/test_scene_render/data/spline_plot.png": "28f35b3158abab418c3ea05f20d9b72736053a4cfefff370cb5df481988dbed0",
-        "src/tests/test_scene_render/data/spline_plot.svg": "bc3de7f9b179cc724b3a6a7b4588db7cae69be849b572b2c550d0a0251df03fe",
-        "src/tests/test_scene_render/data/vector_plot.png": "2541122b219b9b8b270ababab4d880f84c473551ceeb5c6a25eb6910110ede8b",
-        "src/tests/test_scene_render/data/vector_plot.svg": "f4d3fc30fcb7a12d0868364ae0e27bb0187220085c7f1cacd75d38227423a20b"
+        "src/tests/test_viz_render/data/average_layout.png": "1a3cbbffdbd390dbe29df937dba8940a390811b5d9a9b5e6237cbca2adc2cbc0",
+        "src/tests/test_viz_render/data/average_layout.svg": "b2bce0e2d6fd76551c22a9e63a7bb12c672b01f198b7b4f2b9965e1eaa5dee26",
+        "src/tests/test_viz_render/data/average_tile.png": "e3dc6dfc107a6aec4530973521fb78c48009c9da64a85396bfa0de7a05088c4d",
+        "src/tests/test_viz_render/data/average_tile.svg": "0a68d54b228906de959e36854ec94c11965f694860f734281153e9f8129db4c0",
+        "src/tests/test_viz_render/data/bar_chart.png": "0a9f311764cfb5bcbae122c0d0a7d1301adcaf0cd5f1a31bfacb8f0d6aa6db16",
+        "src/tests/test_viz_render/data/bar_chart.svg": "863411ee0639bcde18a7375c69875b09ac5585b62e925530fb8203a0d5312b0e",
+        "src/tests/test_viz_render/data/butterfly_plot.png": "dcba6c6c878f4560d5e853724a0df4b3160918bce183eb12210affd5a1f3474e",
+        "src/tests/test_viz_render/data/butterfly_plot.svg": "fc42e41ebe9f6b5368fdf4fd0008de54783a886fbb5f84a4b2df6497408a1a0a",
+        "src/tests/test_viz_render/data/filter_response_plot.png": "821b0f20ab5463238b9830ab52af643466a2a5310e519e1e31b48233552bcbac",
+        "src/tests/test_viz_render/data/filter_response_plot.svg": "41cd1410ba9fb0d7aa2d88b189cf4d54024996c14e426036b27e7ee414ee1f7c",
+        "src/tests/test_viz_render/data/image_plot.png": "e3d6c2fa92684e47d3e8d613c6280d8fbe5b0d02a1548d601606e6b120c5baf3",
+        "src/tests/test_viz_render/data/image_plot.svg": "a3850c1399187015e71e5a61692fd1d3097eec3160a738a3334752624053413a",
+        "src/tests/test_viz_render/data/line_chart.png": "d008d8a0026b5854c619dd46f3dc28c942153abdc70cff2e2aa9fd540c14fc0e",
+        "src/tests/test_viz_render/data/line_chart.svg": "64666ad026e6946cb74bee9deb81a59a585b9a385a0b8ae581806efdeb6e76ef",
+        "src/tests/test_viz_render/data/sample.png": "967dba01d3666923715e336766c74da20f50723b878c3b98966525e20375a4c6",
+        "src/tests/test_viz_render/data/sample.svg": "65c2237c92e95888bfc92b20bf3acc2f8a8e24123fd2a98ef27662671e0265ae",
+        "src/tests/test_viz_render/data/sensor_layout.png": "fc09054d0743b037c1d078fb006eb8b335fed3d6fba418971c36326eaec9786e",
+        "src/tests/test_viz_render/data/sensor_layout.svg": "d51aebfab510b4b32580ea5dc29b88765b4cda5e8e7396399d7cefa6214142d3",
+        "src/tests/test_viz_render/data/spline_plot.png": "28f35b3158abab418c3ea05f20d9b72736053a4cfefff370cb5df481988dbed0",
+        "src/tests/test_viz_render/data/spline_plot.svg": "bc3de7f9b179cc724b3a6a7b4588db7cae69be849b572b2c550d0a0251df03fe",
+        "src/tests/test_viz_render/data/vector_plot.png": "2541122b219b9b8b270ababab4d880f84c473551ceeb5c6a25eb6910110ede8b",
+        "src/tests/test_viz_render/data/vector_plot.svg": "f4d3fc30fcb7a12d0868364ae0e27bb0187220085c7f1cacd75d38227423a20b"
       }
     },
-    "test_scene_trace_view": {
+    "test_viz_trace_view": {
       "generators": [],
       "fixtures": {
-        "src/tests/test_scene_trace_view/data/trace_figure.svg": "1f5ad574fa69d776cbe69cca4af154af3436170491192f8340b6459111b01ec3",
-        "src/tests/test_scene_trace_view/data/trace_frame.png": "ae4c3f255705a77444e9c432b2bff99120849ca01c0728532de36341863ee3b8",
-        "src/tests/test_scene_trace_view/data/trace_markers.svg": "8be2f1768ce82b725726a2d2420d75d31ddbf7abd2e0ea7877ece696adcae723",
-        "src/tests/test_scene_trace_view/data/trace_view_overlays.svg": "0d06988f7b3a675b0d2f4790943062f7219b1c1e62574ef7f6c6ef86f7f2afd5",
-        "src/tests/test_scene_trace_view/data/trace_view_selection.svg": "83cbd091c34813ac658699769e265b33247f6782d9a1c3239bae28cea3a4ba92"
+        "src/tests/test_viz_trace_view/data/trace_figure.svg": "1f5ad574fa69d776cbe69cca4af154af3436170491192f8340b6459111b01ec3",
+        "src/tests/test_viz_trace_view/data/trace_frame.png": "ae4c3f255705a77444e9c432b2bff99120849ca01c0728532de36341863ee3b8",
+        "src/tests/test_viz_trace_view/data/trace_markers.svg": "8be2f1768ce82b725726a2d2420d75d31ddbf7abd2e0ea7877ece696adcae723",
+        "src/tests/test_viz_trace_view/data/trace_view_overlays.svg": "0d06988f7b3a675b0d2f4790943062f7219b1c1e62574ef7f6c6ef86f7f2afd5",
+        "src/tests/test_viz_trace_view/data/trace_view_selection.svg": "83cbd091c34813ac658699769e265b33247f6782d9a1c3239bae28cea3a4ba92"
       }
     },
     "test_source_estimate_io": {

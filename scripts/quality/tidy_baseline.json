@@ -1428,17 +1428,17 @@
     "src/tests/test_decoding_ssd/test_decoding_ssd.cpp": {
       "bugprone-random-generator-seed": 1
     },
-    "src/tests/test_disp3d_viewstate/test_disp3d_viewstate.cpp": {
+    "src/tests/test_viz_qt_viewstate/test_viz_qt_viewstate.cpp": {
       "bugprone-float-loop-counter": 1
     },
-    "src/tests/test_disp_plots/test_disp_plots.cpp": {
+    "src/tests/test_viz_qt_plots/test_viz_qt_plots.cpp": {
       "bugprone-float-loop-counter": 4,
       "clang-analyzer-cplusplus.NewDeleteLeaks": 2
     },
-    "src/tests/test_disp_viewers2/test_disp_viewers2.cpp": {
+    "src/tests/test_viz_qt_viewers2/test_viz_qt_viewers2.cpp": {
       "performance-unnecessary-copy-initialization": 1
     },
-    "src/tests/test_disp_viewers3/test_disp_viewers3.cpp": {
+    "src/tests/test_viz_qt_viewers3/test_viz_qt_viewers3.cpp": {
       "clang-analyzer-cplusplus.NewDeleteLeaks": 10
     },
     "src/tests/test_dsp_bad_channel_detect/test_dsp_bad_channel_detect.cpp": {

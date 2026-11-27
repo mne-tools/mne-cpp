@@ -226,8 +226,8 @@ the plot models: `LineChart`, `BarChart`, `SplinePlot`, `ImagePlot`, `VectorPlot
 `AverageTile` (`figures/`). The widgets of `mne_viz_qt` (`LinePlot`, `Bar`, `Spline`, `ImageSc`, `TFplot`,
 `Plot`, `ButterflyView` and the channel tiles of `AverageLayoutView`) keep such a model and paint it through the
 QPainter backend in `viz/backends/qt/plots/helpers/scenepainter.h`, so a figure looks the same on screen, in an
-SVG file and in a PNG written by a tool without Qt. `test_scene_render` compares each plot's SVG and PNG output
-with golden files in `src/tests/test_scene_render/data`; run it with `MNE_UPDATE_GOLDEN=1` to rewrite them after
+SVG file and in a PNG written by a tool without Qt. `test_viz_render` compares each plot's SVG and PNG output
+with golden files in `src/tests/test_viz_render/data`; run it with `MNE_UPDATE_GOLDEN=1` to rewrite them after
 an intended change.
 
 The interactive views keep their state in `mne_viz` as well (`views/`), driven by toolkit-neutral input events
@@ -236,7 +236,7 @@ matrices and view presets), `BrainViewInteraction` (orbit, pan, zoom and pane sp
 `views/ray_picking.h` and the head-up display `BrainViewOverlay`. Their frames are described as `GpuFrame`s
 (`gpu/`), which the built-in `SoftwareRenderer` draws headless and `mne_viz_qt` draws with QRhi. Settings panels
 are described as `SettingsForm`s (`forms/`) and the table, spectrum and BIDS browser data as view models
-(`models/`). `test_scene_trace_view` and `test_scene_brain_view` test them without Qt.
+(`models/`). `test_viz_trace_view` and `test_viz_brain_view` test them without Qt.
 
 A backend depends on `mne_viz` only, never on another backend, and `mne_viz` never includes from `backends/`;
 `scripts/quality/audit_dependencies.py` enforces both through the layering in `dependency_policy.json`.
