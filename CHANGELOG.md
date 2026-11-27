@@ -385,6 +385,11 @@ aliases; replace the old spelling as below.
   renders headless (`test_scene_brain_view` compares a golden PNG), and
   `test_disp3d_brain_window` checks the frames against the reflection of the
   `.qsb` shaders.
+- `viz::BrainFrameBuilder` also draws MRI slices, the video disk and video
+  decals on surfaces (flat or following a depth frame) from `viz::Image`
+  textures that are uploaded only when their revision changes; textures can
+  request mipmaps (`GpuTexture::mipmaps`), which `RhiFrameRenderer` generates.
+  The software backend renders slices, the video disk and flat decals.
 - New tool `mne_render` renders raw data traces (PNG through the trace view's
   GPU frames, or SVG) or a FreeSurfer surface with a source estimate (PNG)
   headless, without Qt, a window system or a GPU, on the software backend of

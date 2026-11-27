@@ -20,7 +20,10 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <array>
+#include <cstddef>
+#include <cstring>
 #include <utility>
 
 //=============================================================================================================
@@ -68,6 +71,20 @@ GpuPipeline instanced_pipeline(const char* shader)
     return pipeline;
 }
 
+GpuPipeline textured_quad_pipeline(const char* shader)
+{
+    GpuPipeline pipeline;
+    pipeline.shader = shader;
+    pipeline.bindings = {{5 * sizeof(float), false}};
+    pipeline.attributes = {{0, 0, GpuVertexFormat::Float3, 0}, {1, 0, GpuVertexFormat::Float2, 3 * sizeof(float)}};
+    pipeline.topology = GpuTopology::TriangleStrip;
+    pipeline.blend = GpuBlend::Alpha;
+    return pipeline;
+}
+
+// Bytes of the uniform block video_decal declares: everything but depth_params
+constexpr std::size_t kVideoDecalBlockSize = offsetof(BrainVideoDecalUniforms, depth_params);
+
 } // namespace
 
 //=============================================================================================================
@@ -102,6 +119,21 @@ BrainFrameBuilder::BrainFrameBuilder()
     dipole.depth_write = false;
     m_pipelines[index(BrainShader::Dipole)] = m_resources.create_pipeline(std::move(dipole));
     m_pipelines[index(BrainShader::Electrode)] = m_resources.create_pipeline(instanced_pipeline("electrode"));
+
+    // MRI slices blend behind opaque geometry; the video disk lies on top of everything
+    GpuPipeline slice = textured_quad_pipeline("slice");
+    slice.depth_test = true;
+    m_slicePipeline = m_resources.create_pipeline(std::move(slice));
+    m_videoBillboardPipeline = m_resources.create_pipeline(textured_quad_pipeline("video_overlay"));
+
+    // The decal lies on its surface; the relief-following decal moves vertices inwards, so it is not depth tested
+    GpuPipeline decal = surface_pipeline("video_decal");
+    decal.blend = GpuBlend::Alpha;
+    decal.depth_write = false;
+    m_videoDecalPipeline = m_resources.create_pipeline(decal);
+    decal.shader = "video_decal_depth";
+    decal.depth_test = false;
+    m_videoDecalDepthPipeline = m_resources.create_pipeline(std::move(decal));
 
     GpuPipeline overlay;
     overlay.shader = "screen_overlay";
@@ -149,12 +181,8 @@ GpuHandle BrainFrameBuilder::stream_buffer(Mesh& mesh, int slot, GpuBufferUsage 
 
 //=============================================================================================================
 
-bool BrainFrameBuilder::draw_surface(std::uint64_t key, const BrainSurfaceStreams& streams, BrainShader shader, const BrainSurfaceUniforms& uniforms,
-                                     const GpuRect& viewport)
+bool BrainFrameBuilder::surface_buffers(std::uint64_t key, const BrainSurfaceStreams& streams, GpuDraw& draw)
 {
-    if (shader == BrainShader::Dipole || shader == BrainShader::Electrode || streams.index_count == 0 || m_frame.passes.empty()) {
-        return false;
-    }
     Mesh& mesh = m_meshes[key];
     mesh.last_frame = m_frameIndex;
     const GpuHandle geometry = stream_buffer(mesh, 0, GpuBufferUsage::Vertex, streams.geometry);
@@ -164,11 +192,146 @@ bool BrainFrameBuilder::draw_surface(std::uint64_t key, const BrainSurfaceStream
     if (geometry == 0 || colors == 0 || annotations == 0 || indices == 0) {
         return false;
     }
-
-    GpuDraw draw;
     draw.vertex_buffers = {geometry, colors, annotations};
     draw.index_buffer = indices;
     draw.count = streams.index_count;
+    return true;
+}
+
+//=============================================================================================================
+
+GpuHandle BrainFrameBuilder::texture(std::uint64_t key, const BrainTextureView& view, bool mipmaps)
+{
+    if (!view.image || view.image->width <= 0 || view.image->height <= 0) {
+        return 0;
+    }
+    Texture& texture = m_textures[key];
+    texture.last_frame = m_frameIndex;
+    if (texture.handle == 0) {
+        GpuTexture created;
+        created.content = *view.image;
+        created.mipmaps = mipmaps;
+        texture.handle = m_resources.create_texture(std::move(created));
+        texture.revision = view.revision;
+    } else if (texture.revision != view.revision) {
+        m_resources.set_texture(texture.handle, *view.image);
+        texture.revision = view.revision;
+    }
+    return texture.handle;
+}
+
+//=============================================================================================================
+
+GpuHandle BrainFrameBuilder::quad_buffer(std::uint64_t key, std::span<const float, 20> quad)
+{
+    Mesh& mesh = m_meshes[key];
+    mesh.last_frame = m_frameIndex;
+    if (mesh.buffers[0] == 0) {
+        mesh.buffers[0] = m_resources.create_buffer(GpuBufferUsage::Vertex);
+    }
+    const GpuBuffer* current = m_resources.buffer(mesh.buffers[0]);
+    const std::span<const std::byte> bytes = std::as_bytes(quad);
+    if (!current || current->data.size() != bytes.size() || !std::equal(bytes.begin(), bytes.end(), current->data.begin())) {
+        m_resources.set_buffer_data(mesh.buffers[0], bytes);
+    }
+    return mesh.buffers[0];
+}
+
+//=============================================================================================================
+
+bool BrainFrameBuilder::draw_slice(std::uint64_t key, const BrainTextureView& image, std::span<const float, 20> quad, const BrainSliceUniforms& uniforms,
+                                   const GpuRect& viewport)
+{
+    if (m_frame.passes.empty()) {
+        return false;
+    }
+    const GpuHandle tex = texture(key, image, false);
+    if (tex == 0) {
+        return false;
+    }
+    GpuDraw draw;
+    draw.pipeline = m_slicePipeline;
+    draw.vertex_buffers = {quad_buffer(key, quad)};
+    draw.count = 4;
+    draw.set_uniforms(0, uniforms);
+    draw.textures = {{1, tex}};
+    draw.viewport = viewport;
+    draw.scissor = viewport;
+    m_frame.passes.back().draws.push_back(std::move(draw));
+    return true;
+}
+
+//=============================================================================================================
+
+bool BrainFrameBuilder::draw_video_billboard(std::uint64_t key, const BrainTextureView& frame, std::span<const float, 20> quad,
+                                             const BrainVideoBillboardUniforms& uniforms, const GpuRect& viewport)
+{
+    if (m_frame.passes.empty()) {
+        return false;
+    }
+    const GpuHandle tex = texture(key, frame, false);
+    if (tex == 0) {
+        return false;
+    }
+    GpuDraw draw;
+    draw.pipeline = m_videoBillboardPipeline;
+    draw.vertex_buffers = {quad_buffer(key, quad)};
+    draw.count = 4;
+    draw.set_uniforms(0, uniforms);
+    draw.textures = {{1, tex}};
+    draw.viewport = viewport;
+    draw.scissor = viewport;
+    m_frame.passes.back().draws.push_back(std::move(draw));
+    return true;
+}
+
+//=============================================================================================================
+
+bool BrainFrameBuilder::draw_video_decal(std::uint64_t key, const BrainSurfaceStreams& streams, std::uint64_t textureKey, const BrainTextureView& frame,
+                                         const BrainTextureView& depth, const BrainVideoDecalUniforms& uniforms, const GpuRect& viewport)
+{
+    if (streams.index_count == 0 || m_frame.passes.empty()) {
+        return false;
+    }
+    const GpuHandle video = texture(textureKey, frame, false);
+    if (video == 0) {
+        return false;
+    }
+    GpuDraw draw;
+    if (!surface_buffers(key, streams, draw)) {
+        return false;
+    }
+    // The depth texture of a key sits at its complement; the vertex shader reads a blurred mip level of it
+    const GpuHandle relief = texture(~textureKey, depth, true);
+    GpuUniformBlock block;
+    block.binding = 0;
+    const std::size_t size = relief != 0 ? sizeof(BrainVideoDecalUniforms) : kVideoDecalBlockSize;
+    block.data.resize(size);
+    std::memcpy(block.data.data(), &uniforms, size);
+    draw.uniforms.push_back(std::move(block));
+    draw.textures = {{1, video}};
+    if (relief != 0) {
+        draw.textures.push_back({2, relief});
+    }
+    draw.pipeline = relief != 0 ? m_videoDecalDepthPipeline : m_videoDecalPipeline;
+    draw.viewport = viewport;
+    draw.scissor = viewport;
+    m_frame.passes.back().draws.push_back(std::move(draw));
+    return true;
+}
+
+//=============================================================================================================
+
+bool BrainFrameBuilder::draw_surface(std::uint64_t key, const BrainSurfaceStreams& streams, BrainShader shader, const BrainSurfaceUniforms& uniforms,
+                                     const GpuRect& viewport)
+{
+    if (shader == BrainShader::Dipole || shader == BrainShader::Electrode || streams.index_count == 0 || m_frame.passes.empty()) {
+        return false;
+    }
+    GpuDraw draw;
+    if (!surface_buffers(key, streams, draw)) {
+        return false;
+    }
     draw.set_uniforms(0, uniforms);
     draw.viewport = viewport;
     draw.scissor = viewport;
@@ -250,6 +413,14 @@ GpuFrame BrainFrameBuilder::finish()
             ++it;
         }
     }
+    for (auto it = m_textures.begin(); it != m_textures.end();) {
+        if (m_frameIndex - it->second.last_frame > kUnusedFrames) {
+            m_resources.release(it->second.handle);
+            it = m_textures.erase(it);
+        } else {
+            ++it;
+        }
+    }
     return std::exchange(m_frame, GpuFrame{});
 }
 
@@ -257,12 +428,16 @@ GpuFrame BrainFrameBuilder::finish()
 
 void BrainFrameBuilder::release(std::uint64_t key)
 {
-    const auto found = m_meshes.find(key);
-    if (found == m_meshes.end()) {
-        return;
+    if (const auto found = m_meshes.find(key); found != m_meshes.end()) {
+        for (const GpuHandle buffer : found->second.buffers) {
+            m_resources.release(buffer);
+        }
+        m_meshes.erase(found);
     }
-    for (const GpuHandle buffer : found->second.buffers) {
-        m_resources.release(buffer);
+    for (const std::uint64_t textureKey : {key, ~key}) {
+        if (const auto found = m_textures.find(textureKey); found != m_textures.end()) {
+            m_resources.release(found->second.handle);
+            m_textures.erase(found);
+        }
     }
-    m_meshes.erase(found);
 }

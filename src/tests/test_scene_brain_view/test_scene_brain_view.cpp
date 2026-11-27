@@ -776,6 +776,109 @@ void test_brain_frame()
     CHECK(builder.mesh_count() == 2 && !builder.resources().buffer(geometry));
 }
 
+void test_brain_frame_textured()
+{
+    const int width = 200;
+    const int height = 150;
+    const Sphere brain(0.05f, 3);
+
+    OrbitCamera camera;
+    camera.set_scene_size(0.15f);
+    const CameraMatrices view = camera.single_view(Eigen::Quaternionf(Eigen::AngleAxisf(0.6f, Eigen::Vector3f::UnitY())), 1.f,
+                                                   static_cast<float>(width) / static_cast<float>(height));
+    const Eigen::Matrix4f pvm = view.pvm();
+    BrainSurfaceUniforms surface;
+    copy_matrix(pvm, surface.mvp);
+    std::copy(view.eye.data(), view.eye.data() + 3, surface.camera_pos);
+    const Eigen::Vector3f light = view.eye.normalized();
+    std::copy(light.data(), light.data() + 3, surface.light_dir);
+
+    // An axial MRI slice through the centre: a bright ring on a dark ground whose dark voxels are discarded
+    Image mri = Image::transparent(32, 32);
+    for (int y = 0; y < 32; ++y) {
+        for (int x = 0; x < 32; ++x) {
+            const float r = Eigen::Vector2f(static_cast<float>(x) - 15.5f, static_cast<float>(y) - 15.5f).norm();
+            const auto level = static_cast<std::uint8_t>(r > 9.f && r < 14.f ? 230 : 10);
+            mri.set_pixel(x, y, Color{level, level, level, 255});
+        }
+    }
+    const std::array<float, 20> sliceQuad = {-0.09f, -0.09f, 0.f, 0.f, 1.f, 0.09f, -0.09f, 0.f, 1.f, 1.f,
+                                             -0.09f, 0.09f, 0.f, 0.f, 0.f, 0.09f, 0.09f, 0.f, 1.f, 0.f};
+    BrainSliceUniforms slice;
+    copy_matrix(pvm, slice.mvp);
+    slice.opacity = 1.f;
+
+    // A video frame: red left half, green right half
+    Image video = Image::transparent(16, 16);
+    for (int y = 0; y < 16; ++y) {
+        for (int x = 0; x < 16; ++x) {
+            video.set_pixel(x, y, x < 8 ? Color{230, 40, 40, 255} : Color{40, 200, 60, 255});
+        }
+    }
+    // As a decal on the brain facing the camera, and as a disk in the lower left corner facing the camera
+    BrainVideoDecalUniforms decal;
+    copy_matrix(pvm, decal.mvp);
+    const Eigen::Vector3f normal = view.eye.normalized();
+    const Eigen::Vector3f focus = normal * 0.05f;
+    const Eigen::Vector3f axisV = (Eigen::Vector3f::UnitY() - Eigen::Vector3f::UnitY().dot(normal) * normal).normalized();
+    const Eigen::Vector3f axisU = axisV.cross(normal).normalized();
+    std::copy(focus.data(), focus.data() + 3, decal.focus_and_size);
+    decal.focus_and_size[3] = 0.05f;
+    std::copy(axisU.data(), axisU.data() + 3, decal.axis_u_and_opacity);
+    std::copy(axisV.data(), axisV.data() + 3, decal.axis_v_and_offset);
+    decal.axis_v_and_offset[3] = 0.00045f;
+    std::copy(normal.data(), normal.data() + 3, decal.axis_n_and_depth);
+    decal.axis_n_and_depth[3] = 0.0225f;
+    std::copy(view.eye.data(), view.eye.data() + 3, decal.camera_pos_and_aspect);
+
+    const Eigen::Vector3f centre = Eigen::Vector3f(-0.07f, -0.05f, 0.f);
+    const Eigen::Vector3f right = axisU * 0.02f;
+    const Eigen::Vector3f up = axisV * 0.02f;
+    std::array<float, 20> disk{};
+    const std::array<std::pair<Eigen::Vector3f, Eigen::Vector2f>, 4> corners = {
+        std::pair{centre - right - up, Eigen::Vector2f(0.f, 1.f)}, std::pair{centre + right - up, Eigen::Vector2f(1.f, 1.f)},
+        std::pair{centre - right + up, Eigen::Vector2f(0.f, 0.f)}, std::pair{centre + right + up, Eigen::Vector2f(1.f, 0.f)}};
+    for (std::size_t c = 0; c < corners.size(); ++c) {
+        std::copy(corners[c].first.data(), corners[c].first.data() + 3, disk.begin() + static_cast<std::ptrdiff_t>(5 * c));
+        std::copy(corners[c].second.data(), corners[c].second.data() + 2, disk.begin() + static_cast<std::ptrdiff_t>(5 * c + 3));
+    }
+    BrainVideoBillboardUniforms billboard;
+    copy_matrix(pvm, billboard.mvp);
+
+    BrainFrameBuilder builder;
+    GpuFrameTarget target;
+    target.pixel_width = width;
+    target.pixel_height = height;
+    const GpuRect pane{0, 0, width, height};
+    builder.begin(target, Color{20, 20, 30});
+    CHECK(builder.draw_surface(1, brain.streams(), BrainShader::Standard, surface, pane));
+    CHECK(builder.draw_slice(2, BrainTextureView{&mri, 1}, sliceQuad, slice, pane));
+    CHECK(builder.draw_video_decal(1, brain.streams(), 3, BrainTextureView{&video, 1}, BrainTextureView{}, decal, pane));
+    CHECK(builder.draw_video_billboard(4, BrainTextureView{&video, 1}, disk, billboard, pane));
+    CHECK(!builder.draw_slice(5, BrainTextureView{}, sliceQuad, slice, pane));
+    const GpuFrame frame = builder.finish();
+    CHECK(frame.passes[0].draws.size() == 4);
+    // Without a depth frame the decal declares the uniform block of video_decal, without the depth parameters
+    const GpuDraw& decalDraw = frame.passes[0].draws[2];
+    CHECK(builder.resources().pipeline(decalDraw.pipeline)->shader == "video_decal" && decalDraw.uniforms[0].data.size() == 160 &&
+          decalDraw.textures.size() == 1);
+    SoftwareRenderer renderer;
+    CHECK(scene_golden::matches_png(renderer.render(frame, builder.resources()), GOLDEN_DIR "/brain_frame_textured.png"));
+
+    // A depth frame selects the relief shader with a mipmapped depth texture; an unchanged revision is not uploaded again
+    const GpuHandle videoTexture = decalDraw.textures[0].texture;
+    const std::uint64_t revision = builder.resources().texture(videoTexture)->revision;
+    builder.begin(target);
+    CHECK(builder.draw_video_decal(1, brain.streams(), 3, BrainTextureView{&video, 1}, BrainTextureView{&mri, 1}, decal, pane));
+    const GpuFrame relief = builder.finish();
+    const GpuDraw& reliefDraw = relief.passes[0].draws[0];
+    CHECK(builder.resources().pipeline(reliefDraw.pipeline)->shader == "video_decal_depth" && reliefDraw.uniforms[0].data.size() == 176);
+    CHECK(reliefDraw.textures.size() == 2 && builder.resources().texture(reliefDraw.textures[1].texture)->mipmaps);
+    CHECK(builder.resources().texture(videoTexture)->revision == revision);
+    builder.release(3);
+    CHECK(!builder.resources().texture(videoTexture));
+}
+
 } // namespace
 
 //=============================================================================================================
@@ -796,6 +899,7 @@ int main()
         {"interaction_multi_view", test_interaction_multi_view},
         {"overlay", test_overlay},
         {"brain_frame", test_brain_frame},
+        {"brain_frame_textured", test_brain_frame_textured},
     };
     for (const auto& [name, test] : tests) {
         const int before = g_failures;

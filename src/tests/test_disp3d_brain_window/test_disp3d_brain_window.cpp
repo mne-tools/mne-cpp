@@ -38,6 +38,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <array>
 #include <cstdint>
 #include <memory>
 #include <span>
@@ -514,6 +515,14 @@ void TestDisp3dBrainWindow::frames_matchTheirShaders()
     }
     QVERIFY(builder.draw_instanced(2, glyphs, viz::BrainShader::Dipole, viz::BrainInstanceUniforms{}, pane));
     QVERIFY(builder.draw_instanced(2, glyphs, viz::BrainShader::Electrode, viz::BrainInstanceUniforms{}, pane));
+    // Textured draws: an MRI slice, the video disk and the video decal, flat and following a depth frame
+    viz::Image pixels = viz::Image::transparent(4, 4);
+    const std::array<float, 20> quad = {0.f, 0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, 1.f, 1.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 1.f, 0.f};
+    QVERIFY(builder.draw_slice(3, viz::BrainTextureView{&pixels, 1}, quad, viz::BrainSliceUniforms{}, pane));
+    QVERIFY(builder.draw_video_billboard(4, viz::BrainTextureView{&pixels, 1}, quad, viz::BrainVideoBillboardUniforms{}, pane));
+    QVERIFY(builder.draw_video_decal(1, surface, 5, viz::BrainTextureView{&pixels, 1}, viz::BrainTextureView{}, viz::BrainVideoDecalUniforms{}, pane));
+    QVERIFY(builder.draw_video_decal(1, surface, 6, viz::BrainTextureView{&pixels, 1}, viz::BrainTextureView{&pixels, 1}, viz::BrainVideoDecalUniforms{},
+                                     pane));
     builder.draw_overlay(viz::Canvas(64, 48).display_list());
     const viz::GpuFrame frame = builder.finish();
 

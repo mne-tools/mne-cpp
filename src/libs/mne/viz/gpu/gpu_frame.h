@@ -186,6 +186,7 @@ struct GpuTexture
     std::variant<Image, DisplayList> content; /**< Pixels (not premultiplied) or a figure. */
     double scale = 1.0;                       /**< Texture pixels per figure pixel of a figure. */
     bool linear_filter = true;                /**< Linear rather than nearest sampling. */
+    bool mipmaps = false;                     /**< Whether the backend keeps mipmaps, for shaders that sample a coarser level. */
     std::uint64_t revision = 0;               /**< Changes with the contents; backends upload again on change. */
 
     /** @return The width in pixels. */

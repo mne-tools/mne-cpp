@@ -384,6 +384,115 @@ SoftwareShader screen_overlay_shader()
     return shader;
 }
 
+/** slice.vert / .frag of mne_viz_qt: an MRI slice, intensity windowed, dark voxels discarded. */
+SoftwareShader slice_shader()
+{
+    SoftwareShader shader;
+    shader.varying_count = 2;
+    shader.vertex = [](const SoftwareAttributes& in, const SoftwareBindings& bindings, SoftwareVaryings& out) {
+        const auto u = bindings.uniforms<BrainSliceUniforms>(0);
+        out[0] = in[1].x();
+        out[1] = in[1].y();
+        const Vec4 world = Eigen::Map<const Eigen::Matrix4f>(u.slice_to_world) * Vec4(in[0].x(), in[0].y(), in[0].z(), 1.f);
+        return Vec4(Eigen::Map<const Eigen::Matrix4f>(u.mvp) * world);
+    };
+    shader.fragment = [](const SoftwareVaryings& in, const SoftwareFragment&, const SoftwareBindings& bindings) -> std::optional<Vec4> {
+        const auto u = bindings.uniforms<BrainSliceUniforms>(0);
+        const float intensity = bindings.sample(1, Eigen::Vector2f(in[0], in[1])).x();
+        const float lo = u.window_center - u.window_width * 0.5f;
+        const float hi = u.window_center + u.window_width * 0.5f;
+        const float mapped = std::clamp((intensity - lo) / std::max(hi - lo, 0.001f), 0.f, 1.f);
+        if (mapped < 0.05f) {
+            return std::nullopt;
+        }
+        const float alpha = u.opacity * smoothstep(0.05f, 0.8f, mapped) * 0.7f;
+        return Vec4(mapped, mapped, mapped, alpha);
+    };
+    return shader;
+}
+
+/** video_overlay.vert / .frag of mne_viz_qt: a video frame on a round disk with a rim. */
+SoftwareShader video_overlay_shader()
+{
+    SoftwareShader shader;
+    shader.varying_count = 2;
+    shader.vertex = [](const SoftwareAttributes& in, const SoftwareBindings& bindings, SoftwareVaryings& out) {
+        const auto u = bindings.uniforms<BrainVideoBillboardUniforms>(0);
+        out[0] = in[1].x();
+        out[1] = in[1].y();
+        return Vec4(Eigen::Map<const Eigen::Matrix4f>(u.mvp) * Vec4(in[0].x(), in[0].y(), in[0].z(), 1.f));
+    };
+    shader.fragment = [](const SoftwareVaryings& in, const SoftwareFragment&, const SoftwareBindings& bindings) -> std::optional<Vec4> {
+        const auto u = bindings.uniforms<BrainVideoBillboardUniforms>(0);
+        const float r = Eigen::Vector2f(in[0] * 2.f - 1.f, in[1] * 2.f - 1.f).norm();
+        if (r > 1.f) {
+            return std::nullopt;
+        }
+        const Vec3 video = bindings.sample(1, Eigen::Vector2f(in[0], in[1])).head<3>();
+        const Vec3 border(u.border_color[0], u.border_color[1], u.border_color[2]);
+        const Vec3 color = mix3(video, border, smoothstep(0.92f, 1.f, r) * u.border_color[3]);
+        return Vec4(color.x(), color.y(), color.z(), u.opacity * (1.f - smoothstep(0.97f, 1.f, r)));
+    };
+    return shader;
+}
+
+/** video_decal.vert / .frag of mne_viz_qt: a video frame projected onto a surface, with soft rounded edges. */
+SoftwareShader video_decal_shader()
+{
+    SoftwareShader shader;
+    shader.varying_count = 3;
+    shader.vertex = [](const SoftwareAttributes& in, const SoftwareBindings& bindings, SoftwareVaryings& out) {
+        const auto u = bindings.uniforms<BrainVideoDecalUniforms>(0);
+        const Vec3 position = in[0].head<3>();
+        const Vec3 normal = in[1].head<3>().normalized();
+        set_varying3(out, 0, position);
+        const Vec3 lifted = position + normal * u.axis_v_and_offset[3];
+        return Vec4(Eigen::Map<const Eigen::Matrix4f>(u.mvp) * Vec4(lifted.x(), lifted.y(), lifted.z(), 1.f));
+    };
+    shader.fragment = [](const SoftwareVaryings& in, const SoftwareFragment&, const SoftwareBindings& bindings) -> std::optional<Vec4> {
+        const auto u = bindings.uniforms<BrainVideoDecalUniforms>(0);
+        const Vec3 d = varying3(in, 0) - Vec3(u.focus_and_size[0], u.focus_and_size[1], u.focus_and_size[2]);
+        const float side = std::max(u.focus_and_size[3], 0.0001f);
+        const float aspect = std::max(u.camera_pos_and_aspect[3], 0.0001f);
+        if (std::abs(d.dot(Vec3(u.axis_n_and_depth[0], u.axis_n_and_depth[1], u.axis_n_and_depth[2]))) > u.axis_n_and_depth[3]) {
+            return std::nullopt;
+        }
+        const Eigen::Vector2f local(d.dot(Vec3(u.axis_u_and_opacity[0], u.axis_u_and_opacity[1], u.axis_u_and_opacity[2])) / side,
+                                    d.dot(Vec3(u.axis_v_and_offset[0], u.axis_v_and_offset[1], u.axis_v_and_offset[2])) / (side / aspect));
+        // Signed distance to a rounded rectangle of half size 0.5
+        constexpr float kCornerRadius = 0.105f;
+        constexpr float kFeather = 0.115f;
+        const Eigen::Vector2f q = local.cwiseAbs() - Eigen::Vector2f::Constant(0.5f - kCornerRadius);
+        const float sdf = q.cwiseMax(0.f).norm() + std::min(std::max(q.x(), q.y()), 0.f) - kCornerRadius;
+        if (sdf > kFeather) {
+            return std::nullopt;
+        }
+        const float edgeBand = smoothstep(-kFeather, kFeather, sdf);
+        Eigen::Vector2f uv = Eigen::Vector2f::Constant(0.055f) + (local + Eigen::Vector2f::Constant(0.5f)) * (0.945f - 0.055f);
+        uv.y() = 1.f - uv.y();
+        // Soft 3x3 sample, wider towards the edge
+        const Eigen::Vector2f radius = Eigen::Vector2f(0.0016f, 0.0024f) * (1.f + 4.5f * edgeBand);
+        Vec3 video = bindings.sample(1, uv).head<3>() * 0.34f;
+        for (int dy = -1; dy <= 1; ++dy) {
+            for (int dx = -1; dx <= 1; ++dx) {
+                if (dx == 0 && dy == 0) {
+                    continue;
+                }
+                const float weight = (dx == 0 || dy == 0) ? 0.11f : 0.055f;
+                video += bindings.sample(1, uv + Eigen::Vector2f(static_cast<float>(dx) * radius.x(), static_cast<float>(dy) * radius.y())).head<3>() * weight;
+            }
+        }
+        video = video.cwiseMax(0.f).array().pow(0.92f).matrix();
+        const float lensFalloff = smoothstep(0.58f, 0.08f, local.norm());
+        const float alpha = u.axis_u_and_opacity[3] * (1.f - edgeBand) * (0.62f + (0.96f - 0.62f) * lensFalloff);
+        const float rim = (1.f - smoothstep(0.f, 0.030f, std::abs(sdf))) * 0.18f;
+        Vec3 color = mix3(video, Vec3(u.border_color[0], u.border_color[1], u.border_color[2]), rim);
+        color = mix3(color, Vec3::Constant(color.dot(Vec3(0.299f, 0.587f, 0.114f))), edgeBand * 0.10f);
+        return Vec4(color.x(), color.y(), color.z(), alpha);
+    };
+    return shader;
+}
+
 } // namespace
 
 //=============================================================================================================
@@ -401,4 +510,7 @@ void mne::viz::detail::register_builtin_software_shaders(SoftwareRenderer& rende
     renderer.set_shader("dipole", instanced_shader(dipole_fragment));
     renderer.set_shader("electrode", instanced_shader(electrode_fragment));
     renderer.set_shader("screen_overlay", screen_overlay_shader());
+    renderer.set_shader("slice", slice_shader());
+    renderer.set_shader("video_overlay", video_overlay_shader());
+    renderer.set_shader("video_decal", video_decal_shader());
 }

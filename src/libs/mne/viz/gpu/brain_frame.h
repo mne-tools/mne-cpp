@@ -89,6 +89,71 @@ struct BrainInstanceUniforms
 static_assert(sizeof(BrainInstanceUniforms) == 96, "BrainInstanceUniforms must match the uniform block of dipole.vert");
 
 /**
+ * @brief The uniform block of the MRI slice shader (binding 0 of slice.vert/.frag).
+ *
+ * @since 3.0.0
+ */
+struct BrainSliceUniforms
+{
+    float mvp[16] = {1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f};            /**< Offset 0: projection * view, column-major. */
+    float slice_to_world[16] = {1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f}; /**< Offset 64: slice quad to world. */
+    float opacity = 1.f;                                                                                         /**< Offset 128: opacity. */
+    float window_center = 0.5f;                                                                                  /**< Offset 132: intensity window centre, 0 to 1. */
+    float window_width = 1.f;                                                                                    /**< Offset 136: intensity window width, 0 to 1. */
+    float padding = 0.f;                                                                                         /**< Offset 140. */
+};
+
+static_assert(sizeof(BrainSliceUniforms) == 144, "BrainSliceUniforms must match the uniform block of slice.vert");
+
+/**
+ * @brief The uniform block of the camera-facing video disk (binding 0 of video_overlay.vert/.frag).
+ *
+ * @since 3.0.0
+ */
+struct BrainVideoBillboardUniforms
+{
+    float mvp[16] = {1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f}; /**< Offset 0: projection * view, column-major. */
+    float border_color[4] = {0.f, 0.85f, 1.f, 1.f};                                                   /**< Offset 64: colour of the rim. */
+    float opacity = 1.f;                                                                              /**< Offset 80: opacity. */
+    float padding[3] = {0.f, 0.f, 0.f};                                                               /**< Offset 84. */
+};
+
+static_assert(sizeof(BrainVideoBillboardUniforms) == 96, "BrainVideoBillboardUniforms must match the uniform block of video_overlay.vert");
+
+/**
+ * @brief The uniform block of the video decal on a surface (binding 0 of video_decal and video_decal_depth).
+ *
+ * The depth shader reads depth_params after the block of video_decal; the builder passes the bytes each shader
+ * declares.
+ *
+ * @since 3.0.0
+ */
+struct BrainVideoDecalUniforms
+{
+    float mvp[16] = {1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f}; /**< Offset 0: projection * view, column-major. */
+    float focus_and_size[4] = {0.f, 0.f, 0.f, 0.f};                                                   /**< Offset 64: decal centre, side length. */
+    float axis_u_and_opacity[4] = {1.f, 0.f, 0.f, 1.f};                                               /**< Offset 80: decal U axis, opacity. */
+    float axis_v_and_offset[4] = {0.f, 1.f, 0.f, 0.f};                                                /**< Offset 96: decal V axis, offset along the normal. */
+    float axis_n_and_depth[4] = {0.f, 0.f, 1.f, 0.f};                                                 /**< Offset 112: decal normal, half the depth it reaches. */
+    float camera_pos_and_aspect[4] = {0.f, 0.f, 0.f, 1.f};                                            /**< Offset 128: camera position, frame width / height. */
+    float border_color[4] = {0.f, 0.85f, 1.f, 1.f};                                                   /**< Offset 144: colour of the rim. */
+    float depth_params[4] = {0.f, 0.f, 0.f, 0.f};                                                     /**< Offset 160: displacement scale, steps, 1 to displace. */
+};
+
+static_assert(sizeof(BrainVideoDecalUniforms) == 176, "BrainVideoDecalUniforms must match the uniform block of video_decal_depth.vert");
+
+/**
+ * @brief Pixels of a texture and a revision its owner changes with them.
+ *
+ * @since 3.0.0
+ */
+struct BrainTextureView
+{
+    const Image* image = nullptr; /**< RGBA pixels, not premultiplied; nullptr for none. */
+    std::uint64_t revision = 0;   /**< Changes with the pixels; equal revisions are not uploaded again. */
+};
+
+/**
  * @brief Bytes of a mesh stream and a generation its owner changes with them.
  *
  * @since 3.0.0
@@ -190,6 +255,54 @@ public:
 
     //=========================================================================================================
     /**
+     * Draws an MRI slice: a textured quad whose dark voxels are discarded, blended behind opaque geometry.
+     *
+     * @param[in] key        Identity of the slice; also identifies its texture.
+     * @param[in] image      Slice image; the shader reads the red channel as intensity.
+     * @param[in] quad       Four corners, each position (3 floats) and texture coordinates (2 floats), as a strip.
+     * @param[in] uniforms   Shader parameters.
+     * @param[in] viewport   Pane in target pixels.
+     *
+     * @return Whether anything was drawn: false without an image.
+     */
+    bool draw_slice(std::uint64_t key, const BrainTextureView& image, std::span<const float, 20> quad, const BrainSliceUniforms& uniforms,
+                    const GpuRect& viewport);
+
+    //=========================================================================================================
+    /**
+     * Draws a video frame as a round disk facing the camera, over everything drawn before.
+     *
+     * @param[in] key        Identity of the disk; also identifies its texture. Panes that each face their own
+     *                       camera need keys of their own, since a key holds one quad per frame.
+     * @param[in] frame      Video frame.
+     * @param[in] quad       Four corners, each position (3 floats) and texture coordinates (2 floats), as a strip.
+     * @param[in] uniforms   Shader parameters.
+     * @param[in] viewport   Pane in target pixels.
+     *
+     * @return Whether anything was drawn: false without a frame.
+     */
+    bool draw_video_billboard(std::uint64_t key, const BrainTextureView& frame, std::span<const float, 20> quad,
+                              const BrainVideoBillboardUniforms& uniforms, const GpuRect& viewport);
+
+    //=========================================================================================================
+    /**
+     * Projects a video frame onto a surface as a decal; with a depth frame the decal follows its relief.
+     *
+     * @param[in] key        Identity of the surface mesh, as for draw_surface().
+     * @param[in] streams    Vertex and index streams of the surface.
+     * @param[in] textureKey Identity of the video textures.
+     * @param[in] frame      Video frame.
+     * @param[in] depth      Depth frame, or none for a flat decal.
+     * @param[in] uniforms   Shader parameters.
+     * @param[in] viewport   Pane in target pixels.
+     *
+     * @return Whether anything was drawn: false without streams or frame.
+     */
+    bool draw_video_decal(std::uint64_t key, const BrainSurfaceStreams& streams, std::uint64_t textureKey, const BrainTextureView& frame,
+                          const BrainTextureView& depth, const BrainVideoDecalUniforms& uniforms, const GpuRect& viewport);
+
+    //=========================================================================================================
+    /**
      * Blends a screen-sized overlay over everything drawn so far, e.g. labels and pane separators.
      *
      * @param[in] overlay   RGBA pixels (not premultiplied) of the target size, or a figure of the logical size.
@@ -207,9 +320,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Drops the buffers of a mesh.
+     * Drops the buffers of a mesh and the textures of that key.
      *
-     * @param[in] key   Identity of the mesh.
+     * @param[in] key   Identity of the mesh or textured draw.
      */
     void release(std::uint64_t key);
 
@@ -234,13 +347,28 @@ private:
         std::uint64_t last_frame = 0;
     };
 
+    struct Texture
+    {
+        GpuHandle handle = 0;
+        std::uint64_t revision = 0;
+        std::uint64_t last_frame = 0;
+    };
+
     GpuHandle stream_buffer(Mesh& mesh, int slot, GpuBufferUsage usage, const GpuStreamView& stream);
+    GpuHandle texture(std::uint64_t key, const BrainTextureView& view, bool mipmaps);
+    bool surface_buffers(std::uint64_t key, const BrainSurfaceStreams& streams, GpuDraw& draw);
+    GpuHandle quad_buffer(std::uint64_t key, std::span<const float, 20> quad);
 
     GpuResources m_resources;
     std::unordered_map<std::uint64_t, Mesh> m_meshes;
+    std::unordered_map<std::uint64_t, Texture> m_textures; /**< By key; a key's second texture (decal depth) at ~key. */
     GpuHandle m_pipelines[7] = {0, 0, 0, 0, 0, 0, 0};
     GpuHandle m_backFacePipelines[2] = {0, 0}; /**< Holographic, XRay. */
     GpuHandle m_overlayPipeline = 0;
+    GpuHandle m_slicePipeline = 0;
+    GpuHandle m_videoBillboardPipeline = 0;
+    GpuHandle m_videoDecalPipeline = 0;
+    GpuHandle m_videoDecalDepthPipeline = 0;
     GpuHandle m_quad = 0;
     GpuHandle m_overlayTexture = 0;
     GpuFrame m_frame;

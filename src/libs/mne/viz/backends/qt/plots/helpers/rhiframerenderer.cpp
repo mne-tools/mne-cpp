@@ -167,6 +167,7 @@ struct RhiFrameRenderer::Impl
         std::uint64_t revision = 0;
         QSize size;
         std::uint64_t serial = 0; /**< Changes whenever the QRhi texture is created again. */
+        bool mipmaps = false;     /**< Whether the texture has mipmaps. */
         QImage image;             /**< What was uploaded last. */
     };
 
@@ -195,6 +196,7 @@ struct RhiFrameRenderer::Impl
     std::uint64_t uniformsSerial = 0;
     std::unique_ptr<QRhiSampler> linearSampler;
     std::unique_ptr<QRhiSampler> nearestSampler;
+    std::unique_ptr<QRhiSampler> mipmapSampler;
     std::map<std::string, std::pair<QShader, QShader>> shaders;
 
     void release()
@@ -206,6 +208,7 @@ struct RhiFrameRenderer::Impl
         uniforms.reset();
         linearSampler.reset();
         nearestSampler.reset();
+        mipmapSampler.reset();
         rhi = nullptr;
     }
 
@@ -283,16 +286,21 @@ QRhiTexture* RhiFrameRenderer::Impl::texture(GpuHandle handle, const GpuResource
         painter.setRenderHint(QPainter::Antialiasing, false);
         paintScene(painter, std::get<DisplayList>(source->content), font);
     }
-    if (!cached.texture || cached.size != size) {
-        cached.texture.reset(rhi->newTexture(QRhiTexture::RGBA8, size));
+    if (!cached.texture || cached.size != size || cached.mipmaps != source->mipmaps) {
+        const QRhiTexture::Flags flags = source->mipmaps ? QRhiTexture::Flags(QRhiTexture::MipMapped | QRhiTexture::UsedWithGenerateMips) : QRhiTexture::Flags();
+        cached.texture.reset(rhi->newTexture(QRhiTexture::RGBA8, size, 1, flags));
         if (!cached.texture->create()) {
             cached.texture.reset();
             return nullptr;
         }
         cached.size = size;
+        cached.mipmaps = source->mipmaps;
         cached.serial = ++serial;
     }
     batch->uploadTexture(cached.texture.get(), QRhiTextureUploadEntry(0, 0, QRhiTextureSubresourceUploadDescription(image)));
+    if (source->mipmaps) {
+        batch->generateMips(cached.texture.get());
+    }
     cached.revision = source->revision;
     cached.image = std::move(image);
     return cached.texture.get();
@@ -340,7 +348,9 @@ QRhiShaderResourceBindings* RhiFrameRenderer::Impl::shaderBindings(const GpuDraw
         }
         key += "|t" + std::to_string(binding.binding) + ":" + std::to_string(textures[binding.texture].serial);
         list.push_back(QRhiShaderResourceBinding::sampledTexture(binding.binding, kAllStages, tex,
-                                                                 source->linear_filter ? linearSampler.get() : nearestSampler.get()));
+                                                                 source->mipmaps             ? mipmapSampler.get()
+                                                                     : source->linear_filter ? linearSampler.get()
+                                                                                             : nearestSampler.get()));
     }
     Bindings& entry = bindings[key];
     entry.used = true;
@@ -487,6 +497,9 @@ void RhiFrameRenderer::render(QRhi* rhi, QRhiRenderTarget* target, QRhiCommandBu
         d.nearestSampler.reset(rhi->newSampler(QRhiSampler::Nearest, QRhiSampler::Nearest, QRhiSampler::None, QRhiSampler::ClampToEdge,
                                                QRhiSampler::ClampToEdge));
         d.nearestSampler->create();
+        d.mipmapSampler.reset(rhi->newSampler(QRhiSampler::Linear, QRhiSampler::Linear, QRhiSampler::Linear, QRhiSampler::ClampToEdge,
+                                              QRhiSampler::ClampToEdge));
+        d.mipmapSampler->create();
     }
     QRhiResourceUpdateBatch* batch = rhi->nextResourceUpdateBatch();
 
