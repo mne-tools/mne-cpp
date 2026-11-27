@@ -6,9 +6,9 @@
     "commit": "0800c9a1bf606c2df8c44e35fbb42ea13029b549"
   },
   "summary": {
-    "directories": 300,
+    "directories": 301,
     "registration": {
-      "unconditional": 287,
+      "unconditional": 288,
       "conditional": 10,
       "unregistered": 3
     },
@@ -73,6 +73,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_form_view",
           "test_viz_gpu_frame",
           "test_viz_qt_brain_window",
           "test_viz_qt_brainsurface",
@@ -198,6 +199,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_form_view",
           "test_viz_gpu_frame",
           "test_viz_qt_brain_window",
           "test_viz_qt_brainsurface",
@@ -323,6 +325,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_form_view",
           "test_viz_gpu_frame",
           "test_viz_qt_brain_window",
           "test_viz_qt_brainsurface",
@@ -448,6 +451,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_form_view",
           "test_viz_gpu_frame",
           "test_viz_qt_brain_window",
           "test_viz_qt_brainsurface",
@@ -573,6 +577,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_form_view",
           "test_viz_gpu_frame",
           "test_viz_qt_brain_window",
           "test_viz_qt_brainsurface",
@@ -698,6 +703,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_form_view",
           "test_viz_gpu_frame",
           "test_viz_qt_brain_window",
           "test_viz_qt_brainsurface",
@@ -10599,6 +10605,41 @@
       ]
     },
     {
+      "name": "test_viz_form_view",
+      "cmake": "src/tests/test_viz_form_view/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_form_view"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "FormView",
+        "Theme"
+      ]
+    },
+    {
       "name": "test_viz_gpu_frame",
       "cmake": "src/tests/test_viz_gpu_frame/CMakeLists.txt",
       "registration": {
@@ -11215,6 +11256,7 @@
       },
       "registry_classes": [
         "CompensatorPanel",
+        "ForwardPanel",
         "Panel",
         "ProjectorsPanel",
         "SettingChoice",

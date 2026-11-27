@@ -749,7 +749,10 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz/brain-video-layer',
         'api/viz/panel',
         'api/viz/compensator-panel',
-        'api/viz/projectors-panel'
+        'api/viz/projectors-panel',
+        'api/viz/forward-panel',
+        'api/viz/form-view',
+        'api/viz/theme'
       ],
     },
     {
@@ -790,7 +793,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz-qt/filter-settings-view',
         'api/viz-qt/frequency-spectrum-delegate',
         'api/viz-qt/frequency-spectrum-model',
-        'api/viz-qt/fwd-settings-view',
         'api/viz-qt/graph',
         'api/viz-qt/hpi-settings-view',
         'api/viz-qt/image-sc',

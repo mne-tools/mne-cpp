@@ -176,6 +176,27 @@ compensators.save(settings, "ex_scene");
 ok &= expect(grade == 3 && compensators.selected() == 3, "a click on a compensator's check box chooses its grade");
 ````
 
+### [ex_scene_sdl](../../examples/viz/ex_scene_sdl.mdx)
+
+Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 105"
+    auto compensator = std::make_unique<CompensatorPanel>();
+    std::vector<mne::FiffCtfComp> comps(3);
+    for (int i = 0; i < 3; ++i) {
+        comps[static_cast<std::size_t>(i)].kind = i + 1;
+    }
+    compensator->set_compensators(comps);
+    compensator->set_selection_callback([](int to) {
+        std::printf("Compensation grade %d\n", to);
+    });
+    panel = std::move(compensator);
+} else {
+    auto projectors = std::make_unique<ProjectorsPanel>();
+    std::vector<mne::FiffProj> projs(4);
+    const char* descriptions[] = {"Average EEG reference", "PCA-v1 (planar)", "PCA-v2 (axial)", "ECG-planar-999--0.200-0.400-PCA-01"};
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

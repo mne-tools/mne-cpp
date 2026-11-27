@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 542,
+    "exported_classes": 544,
     "exported_free_functions": 253,
-    "registered_classes": 709,
+    "registered_classes": 711,
     "exported_not_registered": 2,
     "registered_function_modules": 15,
     "registered_header_only": 154,
     "registered_stale": 0,
-    "registered_with_test": 396,
+    "registered_with_test": 399,
     "registered_test_unresolved": 0,
-    "registered_with_example": 471,
+    "registered_with_example": 472,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 102,
     "registered_without_api_page": 0,
-    "with_snippet": 515,
-    "public_api_units": 711,
-    "example_eligible": 471,
-    "example_exempt": 240,
-    "eligible_backed_by_registry_example": 469,
-    "eligible_used_by_some_example": 400,
+    "with_snippet": 516,
+    "public_api_units": 713,
+    "example_eligible": 472,
+    "example_exempt": 241,
+    "eligible_backed_by_registry_example": 470,
+    "eligible_used_by_some_example": 401,
     "examples_on_disk": 82,
     "examples_built": 82
   },
@@ -225,13 +225,13 @@
       "with_snippet": 12
     },
     "viz": {
-      "public": 240,
-      "registered": 240,
-      "with_test": 170,
-      "eligible": 60,
-      "eligible_with_registry_example": 60,
-      "eligible_used_by_example": 48,
-      "with_snippet": 73
+      "public": 242,
+      "registered": 242,
+      "with_test": 173,
+      "eligible": 61,
+      "eligible_with_registry_example": 61,
+      "eligible_used_by_example": 49,
+      "with_snippet": 74
     }
   },
   "exported_free_functions": [
@@ -14168,25 +14168,6 @@
       "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
     },
     {
-      "name": "FwdSettingsView",
-      "header": "viz/backends/qt/viewers/fwdsettingsview.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
-      "api_page": "doc/website/docs/api/viz-qt/fwd-settings-view.mdx",
-      "python_equiv": null,
-      "example_eligible": false,
-      "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
-    },
-    {
       "name": "AverageLayoutWidget",
       "header": "viz/backends/qt/viewers/helpers/averagelayoutwidget.h",
       "library": "viz",
@@ -16405,6 +16386,25 @@
       "exempt_reason": null
     },
     {
+      "name": "Theme",
+      "header": "viz/figures/theme.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_form_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/viz/theme.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Plain style values (colours, sizes, spacing) handed to FormView, whose example shows them in use."
+    },
+    {
       "name": "VectorPlot",
       "header": "viz/figures/vector_plot.h",
       "library": "viz",
@@ -17245,7 +17245,8 @@
       "example": "ex_scene",
       "example_state": "built",
       "including_examples": [
-        "ex_scene"
+        "ex_scene",
+        "ex_scene_sdl"
       ],
       "snippets": [
         "ex_scene/main.cpp#panel_usage"
@@ -17254,6 +17255,48 @@
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
+    },
+    {
+      "name": "FormView",
+      "header": "viz/panels/form_view.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_form_view",
+      "test_resolves": true,
+      "example": "ex_scene_sdl",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
+      "snippets": [
+        "ex_scene_sdl/main.cpp#form_view_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/form-view.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "ForwardPanel",
+      "header": "viz/panels/forward_panel.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_settings_form",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/viz/forward-panel.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Tool panel of the MNE Scan forward plugin, shown by the backends' panel hosts; works like CompensatorPanel, whose example shows the pattern."
     },
     {
       "name": "Panel",
@@ -17288,7 +17331,9 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
       "snippets": [],
       "api_page": "doc/website/docs/api/viz/projectors-panel.mdx",
       "python_equiv": null,

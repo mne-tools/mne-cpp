@@ -40,6 +40,8 @@ compensators.save(settings, "ex_scene");
 classDiagram
     Panel <|-- CompensatorPanel
     click CompensatorPanel href "../../viz/compensator-panel/"
+    Panel <|-- ForwardPanel
+    click ForwardPanel href "../../viz/forward-panel/"
     Panel <|-- ProjectorsPanel
     click ProjectorsPanel href "../../viz/projectors-panel/"
 ```
@@ -193,6 +195,29 @@ Stores the panel in `store`, under the keys `load()` reads.
 - Start here: [ex_scene](../../examples/viz/ex_scene.mdx) — Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
 - Full source: [`src/examples/ex_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_scene/main.cpp)
 - Build target: `ex_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_scene_sdl](../../examples/viz/ex_scene_sdl.mdx)
+
+Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 103"
+std::unique_ptr<Panel> panel;
+if (which == "compensator") {
+    auto compensator = std::make_unique<CompensatorPanel>();
+    std::vector<mne::FiffCtfComp> comps(3);
+    for (int i = 0; i < 3; ++i) {
+        comps[static_cast<std::size_t>(i)].kind = i + 1;
+    }
+    compensator->set_compensators(comps);
+    compensator->set_selection_callback([](int to) {
+        std::printf("Compensation grade %d\n", to);
+    });
+    panel = std::move(compensator);
+} else {
+    auto projectors = std::make_unique<ProjectorsPanel>();
+````
 
 ## Authors of this file
 

@@ -1,0 +1,66 @@
+---
+id: theme
+title: "mne::viz::Theme"
+sidebar_label: Theme
+sidebar_position: 155
+---
+
+# Theme
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/figures/theme.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/figures/theme.h)
+
+`#include <mne/viz/theme.h>`
+
+```cpp
+struct mne::viz::Theme
+```
+
+The look of toolkit-free views such as [`FormView`](/docs/api/viz/form-view): one calm palette, font sizes and metrics.
+
+All lengths are in logical units. Backends draw the same [`Theme`](/docs/api/viz/theme), so a panel looks alike in every window.
+
+---
+
+## Public Methods
+
+### font(pixel_size, bold)
+
+**Parameters:**
+
+- **pixel_size** : *double*
+  Pixel size of the font.
+
+- **bold** : *bool*
+  Whether the font is bold.
+
+**Returns:**
+
+- *[Font](/docs/api/viz/font)* — A font of the theme's family.
+
+---
+
+## Static Methods
+
+### light()
+
+**Returns:**
+
+- *[Theme](/docs/api/viz/theme)* — The default light theme.
+
+---
+
+### dark()
+
+**Returns:**
+
+- *[Theme](/docs/api/viz/theme)* — A dark variant of the light theme with the same metrics.
+
+---
+
+## Example
+
+No example of its own: Plain style values (colours, sizes, spacing) handed to FormView, whose example shows them in use.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

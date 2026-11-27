@@ -392,8 +392,8 @@
       "missing_tests": []
     },
     "viz": {
-      "classes": 136,
-      "tested": 127,
+      "classes": 139,
+      "tested": 130,
       "untested": [
         "ElectrodeObject",
         "GeometryInfo",
@@ -408,7 +408,7 @@
       "missing_tests": []
     },
     "viz_qt": {
-      "classes": 103,
+      "classes": 102,
       "tested": 43,
       "untested": [
         "AbstractTreeItem",
@@ -440,7 +440,6 @@
         "FilterSettingsView",
         "FrequencySpectrumDelegate",
         "FrequencySpectrumModel",
-        "FwdSettingsView",
         "Graph",
         "HpiSettingsView",
         "ImageSc",
