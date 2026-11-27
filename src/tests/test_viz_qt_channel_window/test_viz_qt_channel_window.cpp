@@ -190,6 +190,7 @@ private slots:
     void initTestCase();
     void renderer_rendersOffscreenFrame();
     void renderer_drawsHudOverlay();
+    void renderer_animatesWithoutFrames();
     void frames_matchTheirShaders();
     void window_rendersWithNullBackend();
     void window_forwardsInput();
@@ -312,6 +313,33 @@ void TestVizQtChannelWindow::renderer_drawsHudOverlay()
     QVERIFY(!renderer.hudVisible());
 
     renderer.releaseResources();
+}
+
+//=============================================================================================================
+
+void TestVizQtChannelWindow::renderer_animatesWithoutFrames()
+{
+    // A hidden host renders no frames; the animations still reach their targets and report each step
+    TestHost host;
+    ChannelRhiRenderer renderer(&host);
+    renderer.setModel(&m_model);
+    renderer.setSfreq(1000.f);
+    renderer.setFirstFileSample(100);
+    renderer.setLastFileSample(2099);
+    renderer.setSamplesPerPixel(1.f);
+    renderer.setScrollSample(100.f);
+    QSignalSpy scrolled(&renderer, &ChannelRhiRenderer::scrollSampleChanged);
+    QSignalSpy zoomed(&renderer, &ChannelRhiRenderer::samplesPerPixelChanged);
+    const int requests = host.frameRequests;
+
+    renderer.scrollTo(600.f, 80);
+    QTRY_COMPARE_WITH_TIMEOUT(renderer.scrollSample(), 600.f, 2000);
+    QVERIFY(scrolled.count() > 1);
+    QVERIFY(host.frameRequests > requests + 1);
+
+    renderer.zoomTo(2.f, 80);
+    QTRY_COMPARE_WITH_TIMEOUT(renderer.samplesPerPixel(), 2.f, 2000);
+    QVERIFY(zoomed.count() > 1);
 }
 
 //=============================================================================================================

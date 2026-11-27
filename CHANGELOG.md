@@ -405,6 +405,10 @@ aliases; replace the old spelling as below.
   `BrainFrameComposer::redraw_overlay()` draw an unchanged overlay again.
   `BrainRenderer` is no longer used by the view and is deprecated; it will be
   removed in a later release.
+- `ChannelRhiRenderer` hosts a `viz::TraceViewClient`, the same trace view
+  client the SDL example runs, instead of wiring its own view, animator,
+  markers and frame builder; its host becomes the client's `viz::Surface`.
+  Its API is unchanged.
 - The tests of `mne_viz` are named `test_viz_*` and those of `mne_viz_qt`
   `test_viz_qt_*` (formerly `test_scene_*`, `test_viewmodels`, `test_disp_*`
   and `test_disp3d_*`).

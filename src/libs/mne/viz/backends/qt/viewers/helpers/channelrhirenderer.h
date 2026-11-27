@@ -30,6 +30,7 @@
 #include "channeldatamodel.h"
 #include "../../plots/helpers/rhiframerenderer.h"
 #include <mne/viz/gpu/trace_frame.h>
+#include <mne/viz/host/trace_view_client.h>
 #include <mne/viz/views/trace_geometry.h>
 #include <mne/viz/views/trace_markers.h>
 #include <mne/viz/views/trace_view.h>
@@ -70,6 +71,8 @@ class QWheelEvent;
 
 namespace mne::viz::qt
 {
+
+class QtTextMetrics;
 
 //=============================================================================================================
 /**
@@ -376,7 +379,7 @@ public:
      */
     bool epochMarkersVisible() const
     {
-        return m_markers.epoch_markers_visible();
+        return m_client.markers().epoch_markers_visible();
     }
 
     //=========================================================================================================
@@ -449,7 +452,7 @@ public:
      */
     bool eventsVisible() const
     {
-        return m_markers.events_visible();
+        return m_client.markers().events_visible();
     }
 
     //=========================================================================================================
@@ -468,7 +471,7 @@ public:
      */
     bool annotationsVisible() const
     {
-        return m_markers.annotations_visible();
+        return m_client.markers().annotations_visible();
     }
 
     // ── Scroll / zoom ─────────────────────────────────────────────────
@@ -481,7 +484,7 @@ public:
      */
     float scrollSample() const
     {
-        return static_cast<float>(m_view.scroll_sample());
+        return static_cast<float>(m_client.view().scroll_sample());
     }
 
     //=========================================================================================================
@@ -492,7 +495,7 @@ public:
      */
     float samplesPerPixel() const
     {
-        return static_cast<float>(m_view.samples_per_pixel());
+        return static_cast<float>(m_client.view().samples_per_pixel());
     }
 
     //=========================================================================================================
@@ -613,7 +616,7 @@ public:
      */
     int firstVisibleChannel() const
     {
-        return m_view.first_visible_channel();
+        return m_client.view().first_visible_channel();
     }
 
     //=========================================================================================================
@@ -632,7 +635,7 @@ public:
      */
     int visibleChannelCount() const
     {
-        return m_view.visible_channel_count();
+        return m_client.view().visible_channel_count();
     }
 
     //=========================================================================================================
@@ -651,7 +654,7 @@ public:
      */
     bool isFrozen() const
     {
-        return m_view.frozen();
+        return m_client.view().frozen();
     }
 
     //=========================================================================================================
@@ -705,7 +708,7 @@ public:
      */
     int lastFileSample() const
     {
-        return m_view.last_file_sample();
+        return m_client.view().last_file_sample();
     }
 
     //=========================================================================================================
@@ -724,7 +727,7 @@ public:
      */
     bool wheelScrollsChannels() const
     {
-        return m_view.wheel_scrolls_channels();
+        return m_client.view().wheel_scrolls_channels();
     }
 
     //=========================================================================================================
@@ -743,7 +746,7 @@ public:
      */
     float scrollSpeedFactor() const
     {
-        return static_cast<float>(m_view.scroll_speed_factor());
+        return static_cast<float>(m_client.view().scroll_speed_factor());
     }
 
     //=========================================================================================================
@@ -781,7 +784,7 @@ public:
      */
     bool crosshairEnabled() const
     {
-        return m_view.crosshair_enabled();
+        return m_client.view().crosshair_enabled();
     }
 
     //=========================================================================================================
@@ -800,7 +803,7 @@ public:
      */
     bool clockTimeFormat() const
     {
-        return m_view.clock_time_format();
+        return m_client.view().clock_time_format();
     }
 
     //=========================================================================================================
@@ -829,7 +832,7 @@ public:
      */
     bool scalebarsVisible() const
     {
-        return m_view.scalebars_visible();
+        return m_client.view().scalebars_visible();
     }
 
     //=========================================================================================================
@@ -848,7 +851,7 @@ public:
      */
     bool butterflyMode() const
     {
-        return m_view.butterfly_mode();
+        return m_client.view().butterfly_mode();
     }
 
 signals:
@@ -939,6 +942,7 @@ private:
     void requestUpdate();
 
     class TraceSourceAdapter;
+    class HostSurface;
 
     void connectView();
     viz::TraceView& view() const; // the TraceView, sized like the host
@@ -946,20 +950,20 @@ private:
     void tickAnimations();
     void startAnimationTimer();
     viz::TraceStyle traceStyle() const;
+    void updateTextMetrics();
 
     ChannelRhiHost* m_pHost = nullptr;
 
-    viz::TraceFrameBuilder m_frameBuilder; // the frames as viz::GpuFrame: vertices, textures, pipelines
-    RhiFrameRenderer m_frameRenderer;      // executes the frames with QRhi
-
     // ── Shared browser state ───────────────────────────────────────────
     QPointer<ChannelDataModel> m_model;
-    std::unique_ptr<TraceSourceAdapter> m_traceSource; // the model's channels for m_view
-    mutable viz::TraceView m_view;                     // viewport, input and overlays; sized by view()
-    viz::TraceMarkers m_markers;                       // events and epoch markers
-    viz::ViewAnimator m_animator;                      // scroll and zoom animations of m_view
-    int m_animationTimerId = 0;                        // ticks m_animator while the host renders no frames
-    QColor m_bgColor{250, 250, 250};                   // light default
+    std::unique_ptr<TraceSourceAdapter> m_traceSource; // the model's channels for the view
+    std::unique_ptr<HostSurface> m_surface;            // the host as the client's viz::Surface
+    mutable viz::TraceViewClient m_client;             // view, markers, animations and frames; sized by view()
+    std::unique_ptr<QtTextMetrics> m_metrics;          // metrics of m_metricsFont for the client
+    QFont m_metricsFont;
+    RhiFrameRenderer m_frameRenderer; // executes the frames with QRhi
+    int m_animationTimerId = 0;       // ticks the animations while the host renders no frames
+    QColor m_bgColor{250, 250, 250};  // light default
 
     bool m_gridVisible = true;
     bool m_hideBadChannels = false;

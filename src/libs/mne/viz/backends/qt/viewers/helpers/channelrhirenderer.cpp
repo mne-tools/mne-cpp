@@ -115,6 +115,48 @@ private:
 };
 
 //=============================================================================================================
+// HOST SURFACE
+//=============================================================================================================
+
+/**
+ * The renderer's host as the viz::Surface of its TraceViewClient: frame requests, cursor and clock.
+ */
+class ChannelRhiRenderer::HostSurface : public viz::Surface
+{
+public:
+    explicit HostSurface(ChannelRhiRenderer& renderer)
+    : m_renderer(renderer)
+    {
+    }
+
+    void request_update() override
+    {
+        // Animations advance on every frame and, for hosts that render no frames (e.g. hidden ones), on a timer
+        if (m_renderer.m_client.animator().running())
+            m_renderer.startAnimationTimer();
+        m_renderer.requestUpdate();
+    }
+
+    void set_cursor(viz::CursorShape shape) override
+    {
+        if (!m_renderer.m_pHost)
+            return;
+        if (shape == viz::CursorShape::SizeHorizontal)
+            m_renderer.m_pHost->setCursorShape(Qt::SizeHorCursor);
+        else
+            m_renderer.m_pHost->unsetCursorShape();
+    }
+
+    std::int64_t now_ms() const override
+    {
+        return sceneTimestampMs();
+    }
+
+private:
+    ChannelRhiRenderer& m_renderer;
+};
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -122,9 +164,12 @@ ChannelRhiRenderer::ChannelRhiRenderer(ChannelRhiHost* host, QObject* parent)
 : QObject(parent)
 , m_pHost(host)
 , m_traceSource(std::make_unique<TraceSourceAdapter>(*this))
+, m_surface(std::make_unique<HostSurface>(*this))
 {
-    m_view.set_source(m_traceSource.get());
+    // The host may still be under construction, so the client gets it only after its setup
+    m_client.set_source(m_traceSource.get());
     connectView();
+    m_client.attach(m_surface.get());
     m_frameRenderer.addShaderPrefix(":/disp/shaders/viewers/helpers/shaders/");
 
     // Repaint when the app regains focus
@@ -141,32 +186,16 @@ ChannelRhiRenderer::ChannelRhiRenderer(ChannelRhiHost* host, QObject* parent)
 
 void ChannelRhiRenderer::connectView()
 {
+    // The client invalidates its caches, starts animations, sets the cursor and requests frames itself
     viz::TraceView::Effects effects;
     effects.scroll_changed = [this](double) {
         emit scrollSampleChanged(scrollSample());
-        requestUpdate();
     };
     effects.zoom_changed = [this](double) {
-        m_frameBuilder.geometry().invalidate(); // zoom change → decimation changes
-        m_frameBuilder.invalidate_overlay();
         emit samplesPerPixelChanged(samplesPerPixel());
-        requestUpdate();
     };
     effects.channel_offset_changed = [this](int firstChannel) {
-        m_frameBuilder.geometry().invalidate();
         emit channelOffsetChanged(firstChannel);
-        requestUpdate();
-    };
-    effects.animate_scroll = [this](const viz::TraceView::ScrollAnimation& animation) {
-        m_animator.start_scroll(animation, sceneTimestampMs());
-        startAnimationTimer();
-    };
-    effects.animate_zoom = [this](const viz::TraceView::ZoomAnimation& animation) {
-        m_animator.start_zoom(animation, sceneTimestampMs());
-        startAnimationTimer();
-    };
-    effects.stop_animations = [this] {
-        m_animator.stop_scroll();
     };
     effects.sample_clicked = [this](int sample) {
         emit sampleClicked(sample);
@@ -177,47 +206,33 @@ void ChannelRhiRenderer::connectView()
     effects.annotation_boundary_moved = [this](int index, bool isStart, int sample) {
         emit annotationBoundaryMoved(index, isStart, sample);
     };
-    effects.annotations_changed = [this] {
-        m_frameBuilder.invalidate_overlay();
-        requestUpdate();
-    };
     effects.channel_double_clicked = [this](int logicalChannel) {
         const int ch = actualChannelAt(logicalChannel);
         if (m_model && ch >= 0) {
             m_model->setChannelBad(ch, !m_model->channelInfo(ch).bad);
         }
     };
-    effects.cursor_changed = [this](viz::CursorShape shape) {
-        if (!m_pHost)
-            return;
-        if (shape == viz::CursorShape::SizeHorizontal)
-            m_pHost->setCursorShape(Qt::SizeHorCursor);
-        else
-            m_pHost->unsetCursorShape();
-    };
     effects.cursor_data_changed = [this](const viz::TraceView::CursorData& data) {
         emit cursorDataChanged(data.time_sec, data.amplitude, QString::fromStdString(data.channel_name),
                                QString::fromStdString(data.unit_label));
     };
-    effects.redraw = [this] {
-        requestUpdate();
-    };
-    m_view.set_effects(std::move(effects));
+    m_client.set_effects(std::move(effects));
 }
 
 //=============================================================================================================
 
 mne::viz::TraceView& ChannelRhiRenderer::view() const
 {
-    m_view.set_view_size(viewWidth(), viewHeight());
-    return m_view;
+    m_client.view().set_view_size(viewWidth(), viewHeight());
+    return m_client.view();
 }
 
 //=============================================================================================================
 
 void ChannelRhiRenderer::tickAnimations()
 {
-    if ((!m_animator.running() || !m_animator.tick(sceneTimestampMs(), view())) && m_animationTimerId != 0) {
+    view();
+    if ((!m_client.animator().running() || !m_client.tick(sceneTimestampMs())) && m_animationTimerId != 0) {
         killTimer(m_animationTimerId);
         m_animationTimerId = 0;
     }
@@ -227,7 +242,6 @@ void ChannelRhiRenderer::tickAnimations()
 
 void ChannelRhiRenderer::startAnimationTimer()
 {
-    // Animations advance on every frame and, for hosts that render no frames (e.g. hidden ones), on this timer
     if (m_animationTimerId == 0)
         m_animationTimerId = startTimer(std::chrono::milliseconds(16), Qt::PreciseTimer);
 }
@@ -264,8 +278,8 @@ ChannelRhiRenderer::~ChannelRhiRenderer() = default;
 void ChannelRhiRenderer::setHost(ChannelRhiHost* host)
 {
     m_pHost = host;
-    m_frameBuilder.geometry().invalidate();
-    m_frameBuilder.invalidate_overlay();
+    m_client.builder().geometry().invalidate();
+    m_client.builder().invalidate_overlay();
 }
 
 //=============================================================================================================
@@ -311,15 +325,15 @@ void ChannelRhiRenderer::setModel(ChannelDataModel* model)
     m_model = model;
     if (m_model) {
         connect(m_model, &ChannelDataModel::dataChanged, this, [this] {
-            m_frameBuilder.geometry().invalidate();
+            m_client.builder().geometry().invalidate();
             requestUpdate();
         });
         connect(m_model, &ChannelDataModel::metaChanged, this, [this] {
-            m_frameBuilder.geometry().invalidate();
+            m_client.builder().geometry().invalidate();
             requestUpdate();
         });
     }
-    m_frameBuilder.geometry().invalidate();
+    m_client.builder().geometry().invalidate();
     requestUpdate();
 }
 
@@ -363,7 +377,7 @@ void ChannelRhiRenderer::zoomTo(float targetSpp, int durationMs)
 void ChannelRhiRenderer::setBackgroundColor(const QColor& color)
 {
     m_bgColor = color;
-    m_frameBuilder.invalidate_overlay();
+    m_client.builder().invalidate_overlay();
     requestUpdate();
 }
 
@@ -371,14 +385,14 @@ void ChannelRhiRenderer::setBackgroundColor(const QColor& color)
 
 void ChannelRhiRenderer::setPrefetchFactor(float factor)
 {
-    m_frameBuilder.geometry().set_prefetch_factor(factor);
+    m_client.builder().geometry().set_prefetch_factor(factor);
 }
 
 //=============================================================================================================
 
 int ChannelRhiRenderer::visibleFirstSample() const
 {
-    return m_view.visible_first_sample();
+    return m_client.view().visible_first_sample();
 }
 
 //=============================================================================================================
@@ -392,16 +406,16 @@ int ChannelRhiRenderer::visibleSampleCount() const
 
 void ChannelRhiRenderer::setFirstVisibleChannel(int ch)
 {
-    m_view.set_first_visible_channel(ch);
+    m_client.view().set_first_visible_channel(ch);
 }
 
 //=============================================================================================================
 
 void ChannelRhiRenderer::setVisibleChannelCount(int count)
 {
-    if (!m_view.set_visible_channel_count(count))
+    if (!m_client.view().set_visible_channel_count(count))
         return;
-    m_frameBuilder.geometry().invalidate();
+    m_client.builder().geometry().invalidate();
     requestUpdate();
 }
 
@@ -409,7 +423,7 @@ void ChannelRhiRenderer::setVisibleChannelCount(int count)
 
 void ChannelRhiRenderer::setFrozen(bool frozen)
 {
-    m_view.set_frozen(frozen);
+    m_client.view().set_frozen(frozen);
 }
 
 //=============================================================================================================
@@ -419,7 +433,7 @@ void ChannelRhiRenderer::setGridVisible(bool visible)
     if (visible == m_gridVisible)
         return;
     m_gridVisible = visible;
-    m_frameBuilder.invalidate_overlay();
+    m_client.builder().invalidate_overlay();
     requestUpdate();
 }
 
@@ -427,8 +441,8 @@ void ChannelRhiRenderer::setGridVisible(bool visible)
 
 void ChannelRhiRenderer::setSfreq(float sfreq)
 {
-    m_view.set_sfreq(sfreq);
-    m_frameBuilder.invalidate_overlay();
+    m_client.view().set_sfreq(sfreq);
+    m_client.builder().invalidate_overlay();
     requestUpdate();
 }
 
@@ -436,9 +450,9 @@ void ChannelRhiRenderer::setSfreq(float sfreq)
 
 void ChannelRhiRenderer::setFirstFileSample(int first)
 {
-    if (!m_view.set_first_file_sample(first))
+    if (!m_client.view().set_first_file_sample(first))
         return;
-    m_frameBuilder.invalidate_overlay();
+    m_client.builder().invalidate_overlay();
     requestUpdate();
 }
 
@@ -446,7 +460,7 @@ void ChannelRhiRenderer::setFirstFileSample(int first)
 
 void ChannelRhiRenderer::setLastFileSample(int last)
 {
-    m_view.set_last_file_sample(last);
+    m_client.view().set_last_file_sample(last);
 }
 
 //=============================================================================================================
@@ -458,8 +472,8 @@ void ChannelRhiRenderer::setHideBadChannels(bool hide)
 
     m_hideBadChannels = hide;
     // Re-clamp the channel window to the new channel count
-    m_view.set_first_visible_channel(m_view.first_visible_channel());
-    m_frameBuilder.geometry().invalidate();
+    m_client.view().set_first_visible_channel(m_client.view().first_visible_channel());
+    m_client.builder().geometry().invalidate();
     requestUpdate();
 }
 
@@ -467,21 +481,21 @@ void ChannelRhiRenderer::setHideBadChannels(bool hide)
 
 void ChannelRhiRenderer::setWheelScrollsChannels(bool channelsMode)
 {
-    m_view.set_wheel_scrolls_channels(channelsMode);
+    m_client.view().set_wheel_scrolls_channels(channelsMode);
 }
 
 //=============================================================================================================
 
 void ChannelRhiRenderer::setScrollSpeedFactor(float factor)
 {
-    m_view.set_scroll_speed_factor(factor);
+    m_client.view().set_scroll_speed_factor(factor);
 }
 
 //=============================================================================================================
 
 void ChannelRhiRenderer::setCrosshairEnabled(bool enabled)
 {
-    if (!m_view.set_crosshair_enabled(enabled))
+    if (!m_client.view().set_crosshair_enabled(enabled))
         return;
     if (m_pHost)
         m_pHost->setMouseTracking(enabled);
@@ -492,7 +506,7 @@ void ChannelRhiRenderer::setCrosshairEnabled(bool enabled)
 
 void ChannelRhiRenderer::setClockTimeFormat(bool useClock)
 {
-    m_view.set_clock_time_format(useClock);
+    m_client.view().set_clock_time_format(useClock);
     requestUpdate();
 }
 
@@ -500,7 +514,7 @@ void ChannelRhiRenderer::setClockTimeFormat(bool useClock)
 
 void ChannelRhiRenderer::setScalebarsVisible(bool visible)
 {
-    if (!m_view.set_scalebars_visible(visible))
+    if (!m_client.view().set_scalebars_visible(visible))
         return;
     requestUpdate();
 }
@@ -509,10 +523,10 @@ void ChannelRhiRenderer::setScalebarsVisible(bool visible)
 
 void ChannelRhiRenderer::setButterflyMode(bool enabled)
 {
-    if (!m_view.set_butterfly_mode(enabled))
+    if (!m_client.view().set_butterfly_mode(enabled))
         return;
-    m_frameBuilder.geometry().invalidate();
-    m_frameBuilder.invalidate_overlay();
+    m_client.builder().geometry().invalidate();
+    m_client.builder().invalidate_overlay();
     requestUpdate();
 }
 
@@ -522,8 +536,8 @@ void ChannelRhiRenderer::setChannelIndices(const std::vector<int>& indices)
 {
     m_filteredChannels = indices;
     // Clamp the channel window to the new range
-    m_view.set_first_visible_channel(m_view.first_visible_channel());
-    m_frameBuilder.geometry().invalidate();
+    m_client.view().set_first_visible_channel(m_client.view().first_visible_channel());
+    m_client.builder().geometry().invalidate();
     requestUpdate();
 }
 
@@ -565,8 +579,8 @@ void ChannelRhiRenderer::setEvents(const std::vector<EventMarker>& events)
     sceneEvents.reserve(events.size());
     for (const EventMarker& event : events)
         sceneEvents.push_back({event.sample, event.type, toSceneColor(event.color), event.label});
-    m_markers.set_events(std::move(sceneEvents));
-    m_frameBuilder.invalidate_overlay();
+    m_client.markers().set_events(std::move(sceneEvents));
+    m_client.builder().invalidate_overlay();
     requestUpdate();
 }
 
@@ -574,8 +588,8 @@ void ChannelRhiRenderer::setEvents(const std::vector<EventMarker>& events)
 
 void ChannelRhiRenderer::setEpochMarkers(const std::vector<int>& triggerSamples)
 {
-    m_markers.set_epoch_markers(triggerSamples);
-    m_frameBuilder.invalidate_overlay();
+    m_client.markers().set_epoch_markers(triggerSamples);
+    m_client.builder().invalidate_overlay();
     requestUpdate();
 }
 
@@ -583,9 +597,9 @@ void ChannelRhiRenderer::setEpochMarkers(const std::vector<int>& triggerSamples)
 
 void ChannelRhiRenderer::setEpochMarkersVisible(bool visible)
 {
-    if (!m_markers.set_epoch_markers_visible(visible))
+    if (!m_client.markers().set_epoch_markers_visible(visible))
         return;
-    m_frameBuilder.invalidate_overlay();
+    m_client.builder().invalidate_overlay();
     requestUpdate();
 }
 
@@ -606,7 +620,7 @@ void ChannelRhiRenderer::setZScoreMode(bool enabled)
     if (m_bZScoreMode == enabled)
         return;
     m_bZScoreMode = enabled;
-    m_frameBuilder.geometry().invalidate(); // VBO data changes (z-score normalization)
+    m_client.builder().geometry().invalidate(); // VBO data changes (z-score normalization)
     requestUpdate();
 }
 
@@ -619,8 +633,8 @@ void ChannelRhiRenderer::setAnnotations(const std::vector<AnnotationSpan>& annot
     for (const AnnotationSpan& annotation : annotations) {
         spans.push_back({annotation.startSample, annotation.endSample, toSceneColor(annotation.color), annotation.label});
     }
-    m_view.set_annotations(std::move(spans));
-    m_frameBuilder.invalidate_overlay();
+    m_client.view().set_annotations(std::move(spans));
+    m_client.builder().invalidate_overlay();
     requestUpdate();
 }
 
@@ -628,16 +642,16 @@ void ChannelRhiRenderer::setAnnotations(const std::vector<AnnotationSpan>& annot
 
 void ChannelRhiRenderer::setAnnotationSelectionEnabled(bool enabled)
 {
-    m_view.set_annotation_selection_enabled(enabled);
+    m_client.view().set_annotation_selection_enabled(enabled);
 }
 
 //=============================================================================================================
 
 void ChannelRhiRenderer::setEventsVisible(bool visible)
 {
-    if (!m_markers.set_events_visible(visible))
+    if (!m_client.markers().set_events_visible(visible))
         return;
-    m_frameBuilder.invalidate_overlay();
+    m_client.builder().invalidate_overlay();
     requestUpdate();
 }
 
@@ -645,9 +659,9 @@ void ChannelRhiRenderer::setEventsVisible(bool visible)
 
 void ChannelRhiRenderer::setAnnotationsVisible(bool visible)
 {
-    if (!m_markers.set_annotations_visible(visible))
+    if (!m_client.markers().set_annotations_visible(visible))
         return;
-    m_frameBuilder.invalidate_overlay();
+    m_client.builder().invalidate_overlay();
     requestUpdate();
 }
 
@@ -655,8 +669,8 @@ void ChannelRhiRenderer::setAnnotationsVisible(bool visible)
 
 void ChannelRhiRenderer::initializeResources()
 {
-    m_frameBuilder.geometry().invalidate();
-    m_frameBuilder.invalidate_overlay();
+    m_client.builder().geometry().invalidate();
+    m_client.builder().invalidate_overlay();
 }
 
 //=============================================================================================================
@@ -671,7 +685,7 @@ void ChannelRhiRenderer::releaseResources()
 
 bool ChannelRhiRenderer::hudVisible() const
 {
-    return m_view.overlays_visible();
+    return m_client.view().overlays_visible();
 }
 
 //=============================================================================================================
@@ -687,25 +701,37 @@ void ChannelRhiRenderer::paintHud(QPainter& painter) const
 //=============================================================================================================
 //=============================================================================================================
 
+void ChannelRhiRenderer::updateTextMetrics()
+{
+    const auto font = hostFont();
+    if (!m_metrics || font != m_metricsFont) {
+        m_metricsFont = font;
+        m_metrics = std::make_unique<QtTextMetrics>(font);
+        m_client.set_text_metrics(m_metrics.get());
+        m_frameRenderer.setFont(font);
+    }
+}
+
+//=============================================================================================================
+
 void ChannelRhiRenderer::renderFrame(QRhi* rhi, QRhiRenderTarget* target, QRhiCommandBuffer* cb)
 {
     tickAnimations();
     const int logicalW = viewWidth();
     const qreal dpr = (logicalW > 0) ? (static_cast<qreal>(target->pixelSize().width()) / static_cast<qreal>(logicalW))
                                      : (m_pHost ? m_pHost->surfaceDevicePixelRatio() : 1.0);
-    const QFont font = hostFont();
-    const QtTextMetrics metrics(font);
-    m_frameRenderer.setFont(font);
-    const viz::GpuFrame frame = m_frameBuilder.build(view(), *m_traceSource, traceStyle(), m_markers, metrics,
-                                                     RhiFrameRenderer::frameTarget(rhi, target, dpr));
-    m_frameRenderer.render(rhi, target, cb, frame, m_frameBuilder.resources());
+    updateTextMetrics();
+    view();
+    m_client.style() = traceStyle();
+    const viz::GpuFrame frame = m_client.frame(RhiFrameRenderer::frameTarget(rhi, target, dpr));
+    m_frameRenderer.render(rhi, target, cb, frame, m_client.resources());
 }
 
 //=============================================================================================================
 
 QImage ChannelRhiRenderer::hudImage() const
 {
-    return m_frameRenderer.textureImage(m_frameBuilder.hud_texture());
+    return m_frameRenderer.textureImage(m_client.builder().hud_texture());
 }
 
 //=============================================================================================================
@@ -721,7 +747,7 @@ QImage ChannelRhiRenderer::renderToImage(const QSize& size) const
     const QFont font = QGuiApplication::font();
     const QtTextMetrics metrics(font);
     viz::Canvas canvas(pw, ph);
-    viz::draw_trace_figure(canvas, metrics, viz::Font{}, view(), *m_traceSource, m_markers, traceStyle());
+    viz::draw_trace_figure(canvas, metrics, viz::Font{}, view(), *m_traceSource, m_client.markers(), traceStyle());
 
     QImage img(pw, ph, QImage::Format_RGB32);
     img.fill(m_bgColor.rgb());
@@ -737,8 +763,8 @@ QImage ChannelRhiRenderer::renderToImage(const QSize& size) const
 
 void ChannelRhiRenderer::handleResize()
 {
-    m_frameBuilder.geometry().invalidate();
-    m_frameBuilder.invalidate_overlay();
+    m_client.builder().geometry().invalidate();
+    m_client.builder().invalidate_overlay();
     emit viewResized(viewWidth(), viewHeight());
     requestUpdate();
 }
