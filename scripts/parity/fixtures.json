@@ -136,6 +136,7 @@
       "generators": [],
       "fixtures": {
         "src/tests/test_scene_brain_view/data/brain_frame.png": "933cf7a674ed1927350e2839aaf471a2f01166a0fe7c11d043a6d4e06acfac54",
+        "src/tests/test_scene_brain_view/data/brain_frame_textured.png": "ba0cf3a9b8f0454fe16fe3e306576db1ced25f78ced305e861b06b1b0fba6d6e",
         "src/tests/test_scene_brain_view/data/brain_view_overlay.svg": "026f3d6e401752ae57e9d14519d4d9b753f0a8bef62a77680c710fe6b8d46b06"
       }
     },
