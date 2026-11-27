@@ -397,6 +397,14 @@ aliases; replace the old spelling as below.
   renders a two-pane scene headless against a golden PNG.
   `BrainFrameBuilder::draw_video_billboard()` takes the key of the texture
   the disks of all panes share.
+- The 3-D brain view (`BrainViewCore`, hence `BrainView` and `BrainWindow`)
+  renders through `viz::BrainFrameComposer` and `RhiFrameRenderer`: one
+  frame description for the QRhi and the software backend, slice and video
+  pixels are converted only when they change, and the overlay is uploaded
+  only when its labels change. `BrainFrameBuilder::redraw_overlay()` and
+  `BrainFrameComposer::redraw_overlay()` draw an unchanged overlay again.
+  `BrainRenderer` is no longer used by the view and is deprecated; it will be
+  removed in a later release.
 - New tool `mne_render` renders raw data traces (PNG through the trace view's
   GPU frames, or SVG) or a FreeSurfer surface with a source estimate (PNG)
   headless, without Qt, a window system or a GPU, on the software backend of

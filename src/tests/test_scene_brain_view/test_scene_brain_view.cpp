@@ -952,7 +952,10 @@ void test_brain_frame_composer()
     Canvas separator(width, height);
     separator.set_pen(Color::white());
     separator.draw_line(Point{width / 2.0, 0}, Point{width / 2.0, static_cast<double>(height)});
-    const GpuFrame frame = composer.finish(separator.display_list());
+    composer.draw_overlay(separator.display_list());
+    const GpuFrame frame = composer.finish();
+    const GpuHandle overlayTexture = frame.passes[0].draws.back().textures.at(0).texture;
+    const std::uint64_t overlayRevision = composer.resources().texture(overlayTexture)->revision;
     CHECK(drawn.size() == 2 && drawn[0] == std::vector<std::string>({"lh_pial", "rh_pial"}) && drawn[1] == std::vector<std::string>({"lh_pial"}));
 
     // Pane 1: hemispheres, slice, the head (back and front faces), the decal after it, the pointer (back and front)
@@ -972,7 +975,12 @@ void test_brain_frame_composer()
     head.reset();
     composer.begin(target);
     composer.draw(scene, panes);
+    // The unchanged overlay is drawn again without a new revision
+    CHECK(composer.redraw_overlay());
     const GpuFrame disk = composer.finish();
+    const GpuDraw& overlay = disk.passes[0].draws.back();
+    CHECK(overlay.textures.size() == 1 && overlay.textures[0].texture == overlayTexture);
+    CHECK(composer.resources().texture(overlayTexture)->revision == overlayRevision);
     // The head is gone, each pane's disk adds a quad
     CHECK(composer.mesh_count() == meshes - 1 + 2);
     int disks = 0;

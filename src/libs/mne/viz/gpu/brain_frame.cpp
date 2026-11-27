@@ -391,12 +391,23 @@ void BrainFrameBuilder::draw_overlay(std::variant<Image, DisplayList> overlay, d
     } else {
         m_resources.set_texture(m_overlayTexture, std::move(overlay), scale);
     }
+    redraw_overlay();
+}
+
+//=============================================================================================================
+
+bool BrainFrameBuilder::redraw_overlay()
+{
+    if (m_frame.passes.empty() || m_overlayTexture == 0) {
+        return false;
+    }
     GpuDraw draw;
     draw.pipeline = m_overlayPipeline;
     draw.vertex_buffers = {m_quad};
     draw.count = 4;
     draw.textures = {{0, m_overlayTexture}};
     m_frame.passes.back().draws.push_back(std::move(draw));
+    return true;
 }
 
 //=============================================================================================================

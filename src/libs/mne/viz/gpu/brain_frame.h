@@ -313,6 +313,15 @@ public:
 
     //=========================================================================================================
     /**
+     * Blends the overlay of the last draw_overlay() again; its content is unchanged, so backends do not upload it
+     * again.
+     *
+     * @return Whether there was an overlay to draw.
+     */
+    bool redraw_overlay();
+
+    //=========================================================================================================
+    /**
      * Ends the frame and drops the buffers of meshes undrawn for kUnusedFrames frames.
      *
      * @return The frame, referring to resources().

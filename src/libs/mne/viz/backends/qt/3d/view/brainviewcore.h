@@ -16,9 +16,9 @@
  * pane selection and splitters), takes the camera matrices from
  * @ref mne::viz::OrbitCamera, paints the 2-D overlay (FPS, per-pane info,
  * pane names, hovered region, pane separators) of
- * @ref mne::viz::BrainViewOverlay with paintScene() into a QImage and
- * records a frame through @ref mne::viz::qt::BrainRenderer into a QRhi render
- * target.
+ * @ref mne::viz::BrainViewOverlay, describes each frame with
+ * @ref mne::viz::BrainFrameComposer and records it through
+ * @ref mne::viz::qt::RhiFrameRenderer into a QRhi render target.
  *
  * A host surface implements @ref mne::viz::qt::BrainViewHost and forwards its
  * events and frames: @ref mne::viz::qt::BrainView (a QRhiWidget) and
@@ -106,7 +106,6 @@ namespace mne::viz::qt
 {
 
 class BrainTreeModel;
-class BrainRenderer;
 class VideoOverlay;
 class SliceObject;
 
@@ -1581,14 +1580,16 @@ private:
     QSize hostSize() const;
     void setHostCursor(viz::CursorShape shape);
     QImage grabSceneFrame();
-    void renderFrame(QRhi* rhi, int sampleCount, QRhiCommandBuffer* cb);
+    void renderFrame(QRhi* rhi, QRhiRenderTarget* target, QRhiCommandBuffer* cb);
+    void composeScene(QSize outputSize);
     void loadMultiViewSettings();
     void saveMultiViewSettings() const;
     void updateInflatedSurfaceTransforms();
 
     // ── Rendering ───────────────────────────────────────────────────────
-    std::unique_ptr<BrainRenderer> m_renderer; /**< GPU renderer for all surfaces/dipoles. */
-    BrainTreeModel* m_model = nullptr;         /**< Data model driving the scene graph (not owned). */
+    struct FrameState;
+    std::unique_ptr<FrameState> m_frame; /**< Frame composer, QRhi backend and render target, while a QRhi exists. */
+    BrainTreeModel* m_model = nullptr;   /**< Data model driving the scene graph (not owned). */
 
     std::map<const QStandardItem*, std::shared_ptr<BrainSurface>> m_itemSurfaceMap; /**< Model-item → renderable surface. */
     std::map<const QStandardItem*, std::shared_ptr<DipoleObject>> m_itemDipoleMap;  /**< Model-item → dipole renderable. */
@@ -1676,8 +1677,7 @@ private:
     // ── Host and 2-D overlay ───────────────────────────────────────────
     BrainViewHost* m_host = nullptr;  /**< Surface showing the view (not owned). */
     viz::BrainViewOverlay m_overlay;  /**< Labels and pane separators, in logical surface coordinates. */
-    mutable QImage m_overlayCache;    /**< Last painted overlay. */
-    bool m_overlayDirty = true;       /**< Overlay must be repainted. */
+    bool m_overlayDirty = true;       /**< Overlay must be laid out and uploaded again. */
     bool m_inRender = false;          /**< True while a frame is recorded. */
     bool m_overlaySuppressed = false; /**< Screenshot frames leave the overlay out. */
 };

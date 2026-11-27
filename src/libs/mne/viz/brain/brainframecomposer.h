@@ -163,14 +163,28 @@ public:
 
     //=========================================================================================================
     /**
-     * Ends the frame, blending a screen overlay (labels, pane separators) over all panes.
+     * Blends a screen overlay (labels, pane separators) over all panes.
      *
-     * @param[in] overlay   RGBA pixels of the target size or a figure of the logical size, or none.
+     * @param[in] overlay   RGBA pixels of the target size, or a figure of the logical size.
      * @param[in] scale     Texture pixels per figure pixel of a figure.
+     */
+    void draw_overlay(std::variant<Image, DisplayList> overlay, double scale = 1.0);
+
+    //=========================================================================================================
+    /**
+     * Blends the overlay of the last draw_overlay() again, without uploading it again.
+     *
+     * @return Whether there was an overlay to draw.
+     */
+    bool redraw_overlay();
+
+    //=========================================================================================================
+    /**
+     * Ends the frame.
      *
      * @return The frame, referring to resources().
      */
-    GpuFrame finish(std::optional<std::variant<Image, DisplayList>> overlay = std::nullopt, double scale = 1.0);
+    GpuFrame finish();
 
     /** @return Buffers, textures and pipelines of the frames. */
     const GpuResources& resources() const

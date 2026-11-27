@@ -252,11 +252,22 @@ std::vector<std::vector<std::string>> BrainFrameComposer::draw(const BrainScene&
 
 //=============================================================================================================
 
-GpuFrame BrainFrameComposer::finish(std::optional<std::variant<Image, DisplayList>> overlay, double scale)
+void BrainFrameComposer::draw_overlay(std::variant<Image, DisplayList> overlay, double scale)
 {
-    if (overlay) {
-        m_builder.draw_overlay(std::move(*overlay), scale);
-    }
+    m_builder.draw_overlay(std::move(overlay), scale);
+}
+
+//=============================================================================================================
+
+bool BrainFrameComposer::redraw_overlay()
+{
+    return m_builder.redraw_overlay();
+}
+
+//=============================================================================================================
+
+GpuFrame BrainFrameComposer::finish()
+{
     return m_builder.finish();
 }
 

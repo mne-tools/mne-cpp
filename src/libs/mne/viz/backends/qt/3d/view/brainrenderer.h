@@ -87,6 +87,9 @@ class SliceObject;
 /**
  * BrainRenderer handles the low-level RHI rendering logic, managing pipelines, shaders, and draw calls for brain surfaces.
  *
+ * Deprecated since 3.0.0: the brain view describes its frames with @ref mne::viz::BrainFrameComposer and records
+ * them with @ref mne::viz::qt::RhiFrameRenderer. BrainRenderer will be removed in a later release.
+ *
  * @brief Qt RHI-based 3-D renderer managing scene objects, lighting, camera, and render pipeline for brain visualization.
  */
 class VIZQTSHARED_EXPORT BrainRenderer

@@ -19,7 +19,8 @@
 #include <mne/base/log.h>
 #include <mne/base/string_utils.h>
 
-#include "brainrenderer.h"
+#include "../../../../brain/brainframecomposer.h"
+#include <mne/viz/backends/qt/plots/helpers/rhiframerenderer.h>
 #include "../../../../brain/brainsurface.h"
 #include "../../../../brain/dipoleobject.h"
 #include "../../../../brain/electrodeobject.h"
@@ -82,6 +83,7 @@
 #include <chrono>
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 #include <ctime>
 #include <filesystem>
 #include <format>
@@ -183,6 +185,81 @@ void BrainViewHost::endOffscreenCapture()
 // organisation and application names that each host (mne_align,
 // mne_inspect, ex_disp_3D, ...) sets on QCoreApplication in its main(),
 // so persisted view state is naturally scoped per-application.
+
+//=============================================================================================================
+// BrainViewCore::FrameState
+//=============================================================================================================
+
+/**
+ * What exists of a frame while a QRhi does: the composer describing it, the QRhi backend recording it, the depth
+ * target over a host colour texture, and the pixels of slices and video converted for the composer.
+ */
+struct BrainViewCore::FrameState
+{
+    /** Pixels converted from a QImage, kept until the source changes. */
+    struct ImageCache
+    {
+        std::uint64_t source = 0;   /**< Cache key or generation of the source. */
+        viz::Image image;           /**< RGBA pixels. */
+        std::uint64_t revision = 0; /**< Revision for the composer; 0 before the first conversion. */
+    };
+
+    FrameState()
+    {
+        renderer.addShaderPrefix(":/");
+        renderer.setFont(overlayBaseFont());
+    }
+
+    /** @return A depth-buffered render target over @p color, rebuilt when the texture or its size changes. */
+    QRhiRenderTarget* textureTarget(QRhi* rhi, QRhiTexture* color)
+    {
+        if (!target || targetColor != color || targetSize != color->pixelSize()) {
+            target.reset();
+            targetPass.reset();
+            depthStencil.reset(rhi->newRenderBuffer(QRhiRenderBuffer::DepthStencil, color->pixelSize(), color->sampleCount()));
+            depthStencil->create();
+            QRhiTextureRenderTargetDescription description{QRhiColorAttachment(color)};
+            description.setDepthStencilBuffer(depthStencil.get());
+            target.reset(rhi->newTextureRenderTarget(description));
+            targetPass.reset(target->newCompatibleRenderPassDescriptor());
+            target->setRenderPassDescriptor(targetPass.get());
+            target->create();
+            targetColor = color;
+            targetSize = color->pixelSize();
+        }
+        return target.get();
+    }
+
+    /** @return The pixels of @p image, converted when @p source differs from the cached one. */
+    viz::BrainTextureView cachedImage(ImageCache& cache, const QImage& image, std::uint64_t source)
+    {
+        if (cache.revision == 0 || cache.source != source) {
+            const QImage rgba = image.convertToFormat(QImage::Format_RGBA8888);
+            cache.image = viz::Image::transparent(rgba.width(), rgba.height());
+            const std::size_t rowBytes = static_cast<std::size_t>(rgba.width()) * 4;
+            for (int y = 0; y < rgba.height(); ++y) {
+                std::memcpy(cache.image.rgba.data() + static_cast<std::size_t>(y) * rowBytes, rgba.constScanLine(y), rowBytes);
+            }
+            cache.source = source;
+            cache.revision = ++imageRevision;
+        }
+        return {&cache.image, cache.revision};
+    }
+
+    viz::BrainFrameComposer composer;
+    RhiFrameRenderer renderer;
+    std::unique_ptr<QRhiRenderBuffer> depthStencil;
+    std::unique_ptr<QRhiRenderPassDescriptor> targetPass;
+    std::unique_ptr<QRhiTextureRenderTarget> target; /**< Declared last, so it is destroyed first. */
+    QRhiTexture* targetColor = nullptr;
+    QSize targetSize;
+    std::array<ImageCache, kMaxSliceSlots> sliceImages;
+    ImageCache videoFrame;
+    ImageCache videoDepth;
+    std::uint64_t imageRevision = 0;
+    QSize overlaySize;
+    qreal overlayRatio = 0.0;
+};
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -1229,11 +1306,11 @@ bool BrainViewCore::savePng(const std::filesystem::path& path, int width, int he
     const auto waitStart = std::chrono::steady_clock::now();
     while (std::chrono::steady_clock::now() - waitStart < std::chrono::seconds(5)) {
         QCoreApplication::processEvents(QEventLoop::AllEvents, 16);
-        if (m_renderer && !m_surfaces.empty())
+        if (m_frame && !m_surfaces.empty())
             break;
     }
 
-    if (!m_renderer) {
+    if (!m_frame) {
         m_host->endOffscreenCapture();
         return false;
     }
@@ -1563,12 +1640,9 @@ void BrainViewCore::handleResize()
 
 void BrainViewCore::initialize(QRhi* rhi, QRhiTexture* colorTexture)
 {
-    m_renderer = std::make_unique<BrainRenderer>();
-
-    // Create dual render targets (clearing + preserving) sharing the
-    // host's color texture.
+    m_frame = std::make_unique<FrameState>();
     if (rhi && colorTexture) {
-        m_renderer->ensureRenderTargets(rhi, colorTexture, colorTexture->pixelSize());
+        m_frame->textureTarget(rhi, colorTexture);
     }
     markOverlayDirty();
 }
@@ -1577,30 +1651,28 @@ void BrainViewCore::initialize(QRhi* rhi, QRhiTexture* colorTexture)
 
 void BrainViewCore::releaseResources()
 {
-    // The renderer owns every GPU resource of the scene, so dropping it frees them all
-    m_renderer.reset();
+    // The QRhi backend and the render target own every GPU resource of the scene, so dropping them frees them all
+    m_frame.reset();
 }
 
 //=============================================================================================================
 
 bool BrainViewCore::hasRenderer() const
 {
-    return m_renderer != nullptr;
+    return m_frame != nullptr;
 }
 
 //=============================================================================================================
 
-void BrainViewCore::render(QRhi* rhi, QRhiTexture* colorTexture, int sampleCount, QRhiCommandBuffer* cb)
+void BrainViewCore::render(QRhi* rhi, QRhiTexture* colorTexture, int /*sampleCount*/, QRhiCommandBuffer* cb)
 {
     if (!rhi || !colorTexture || !cb) {
         return;
     }
-    if (!m_renderer) {
-        m_renderer = std::make_unique<BrainRenderer>();
+    if (!m_frame) {
+        m_frame = std::make_unique<FrameState>();
     }
-    m_renderer->setExternalRenderTarget(nullptr);
-    m_renderer->ensureRenderTargets(rhi, colorTexture, colorTexture->pixelSize());
-    renderFrame(rhi, sampleCount, cb);
+    renderFrame(rhi, m_frame->textureTarget(rhi, colorTexture), cb);
 }
 
 //=============================================================================================================
@@ -1610,53 +1682,52 @@ void BrainViewCore::render(QRhi* rhi, QRhiRenderTarget* renderTarget, QRhiComman
     if (!rhi || !renderTarget || !cb) {
         return;
     }
-    if (!m_renderer) {
-        m_renderer = std::make_unique<BrainRenderer>();
+    if (!m_frame) {
+        m_frame = std::make_unique<FrameState>();
     }
-    m_renderer->setExternalRenderTarget(renderTarget);
-    renderFrame(rhi, renderTarget->sampleCount(), cb);
+    renderFrame(rhi, renderTarget, cb);
 }
 
 //=============================================================================================================
 
-void BrainViewCore::renderFrame(QRhi* rhi, int sampleCount, QRhiCommandBuffer* cb)
+void BrainViewCore::renderFrame(QRhi* rhi, QRhiRenderTarget* target, QRhiCommandBuffer* cb)
 {
     m_inRender = true;
-    const QImage noOverlay;
-    const auto overlayFor = [this, &noOverlay](const QSize& pixelSize) -> const QImage& {
-        if (m_overlaySuppressed) {
-            return noOverlay;
-        }
-        const qreal dpr = m_host ? m_host->devicePixelRatio() : 1.0;
-        if (m_overlayDirty || m_overlayCache.size() != pixelSize || m_overlayCache.devicePixelRatio() != dpr) {
-            m_overlayCache = overlayImage(pixelSize, dpr);
-            m_overlayDirty = false;
-        }
-        return m_overlayCache;
-    };
+    const qreal dpr = m_host ? m_host->devicePixelRatio() : 1.0;
+    const QSize outputSize = target->pixelSize();
+    viz::BrainFrameComposer& composer = m_frame->composer;
+    composer.begin(RhiFrameRenderer::frameTarget(rhi, target, dpr), viz::Color::black());
 
-    // Check if there is anything to render
-    bool hasSurfaces = !m_surfaces.empty();
-    bool hasDipoles = !m_itemDipoleMap.empty() || m_dipoles; // Check managed dipoles too
-
-    // If absolutely nothing is loaded, render black background
-    if (!hasSurfaces && !hasDipoles && !m_electrodes) {
-        // No surface loaded: render a black background (and the overlay) instead of leaving the target uninitialized
-        m_renderer->initialize(rhi, m_renderer->rtClear()->renderPassDescriptor(), sampleCount);
-        QRhiResourceUpdateBatch* updates = rhi->nextResourceUpdateBatch();
-        m_renderer->prepareScreenOverlay(rhi, updates, overlayFor(m_renderer->rtClear()->pixelSize()));
-        m_renderer->beginFrame(cb, updates);
-        m_renderer->issueScreenOverlayDraw(cb);
-        m_renderer->endPass(cb);
-        m_inRender = false;
-        return;
+    // Without anything loaded the frame shows the overlay on black
+    if (!m_surfaces.empty() || !m_itemDipoleMap.empty() || m_dipoles || m_electrodes) {
+        composeScene(outputSize);
     }
 
+    // The overlay is laid out after the panes updated their info labels, and uploaded only when it changed
+    if (!m_overlaySuppressed) {
+        const bool resized = m_frame->overlaySize != outputSize || m_frame->overlayRatio != dpr;
+        if (m_overlayDirty || resized || !composer.redraw_overlay()) {
+            const QtTextMetrics metrics(overlayBaseFont());
+            composer.draw_overlay(m_overlay.draw(qCeil(outputSize.width() / dpr), qCeil(outputSize.height() / dpr), metrics), dpr);
+            m_frame->overlaySize = outputSize;
+            m_frame->overlayRatio = dpr;
+            m_overlayDirty = false;
+        }
+    }
+
+    const viz::GpuFrame frame = composer.finish();
+    m_frame->renderer.render(rhi, target, cb, frame, composer.resources());
+    m_inRender = false;
+}
+
+//=============================================================================================================
+
+void BrainViewCore::composeScene(QSize outputSize)
+{
     // Ensure active surface pointer is valid if possible, otherwise just use first available for stats
     if (!m_activeSurface && !m_surfaces.empty()) {
         m_activeSurface = m_surfaces.begin()->second;
     }
-
 
     m_frameCount++;
     const std::chrono::duration<float> fpsElapsed = std::chrono::steady_clock::now() - m_fpsStart;
@@ -1702,316 +1773,92 @@ void BrainViewCore::renderFrame(QRhi* rhi, int sampleCount, QRhiCommandBuffer* c
         m_fpsStart = std::chrono::steady_clock::now();
     }
 
-    // Initialize renderer
-    m_renderer->initialize(rhi, m_renderer->rtClear()->renderPassDescriptor(), sampleCount);
-
-    // Determine viewport configuration
-    QSize outputSize = m_renderer->rtClear()->pixelSize();
-
-    // Build list of enabled viewports
-    const auto enabledViewports = enabledViewportIndices();
-    int numEnabled = static_cast<int>(enabledViewports.size());
-
-    // ── Prepare phase ──────────────────────────────────────────────────
-    // Every upload and uniform of the frame goes into one batch that
-    // beginFrame() commits: QRhi forbids resource updates inside a pass.
-    // The prepare calls upload only the streams that changed, and only for
-    // objects that are drawn. Overlay modes and highlights are per-draw
-    // uniforms, so panes with different overlays share the same buffers.
-    m_renderer->newFrame();
-    QRhiResourceUpdateBatch* updates = rhi->nextResourceUpdateBatch();
-    if (m_videoOverlay && m_videoOverlay->isEnabled()) {
-        m_renderer->prepareVideoOverlay(rhi, updates, m_videoOverlay.get());
+    // What every pane draws
+    viz::BrainScene scene;
+    scene.surfaces = &m_surfaces;
+    scene.meg_field_key = m_fieldMapper.megSurfaceKey();
+    scene.eeg_field_key = m_fieldMapper.eegSurfaceKey();
+    for (const auto& [item, dipoles] : m_itemDipoleMap) {
+        scene.dipoles.push_back(dipoles.get());
     }
+    if (m_dipoles) {
+        scene.dipoles.push_back(m_dipoles.get());
+    }
+    scene.electrodes = m_electrodes;
+    scene.network = m_network.get();
+    scene.head_path = m_headPath.get();
+    if (m_hasIntersection && m_debugPointerSurface) {
+        scene.pointer = m_debugPointerSurface.get();
+        scene.pointer_position = toEigen(m_lastIntersectionPoint);
+    }
+    scene.lighting = m_lightingEnabled;
+
+    // Slice and video pixels are converted only when they change
     for (int i = 0; i < kMaxSliceSlots; ++i) {
-        m_renderer->prepareSlice(rhi, updates, (m_slices[i] && m_sliceVisible[i]) ? m_slices[i] : nullptr, i);
-    }
-
-    BrainSurface* videoOverlayTargetSurface = nullptr;
-    const bool hasVideoOverlay = m_videoOverlay && m_videoOverlay->isEnabled() && m_videoOverlay->hasFrame();
-    if (hasVideoOverlay) {
-        // Target is always the head surface (BEM head or TissueSkin).
-        if (const auto head = m_surfaces.find("bem_head"); head != m_surfaces.end()) {
-            videoOverlayTargetSurface = head->second.get();
-        } else {
-            for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-                if (it->second && it->second->tissueType() == BrainSurface::TissueSkin) {
-                    videoOverlayTargetSurface = it->second.get();
-                    break;
-                }
-            }
+        if (m_slices[i] && m_sliceVisible[i] && !m_slices[i]->image().isNull()) {
+            const QImage& image = m_slices[i]->image();
+            viz::BrainSliceLayer slice;
+            slice.image = m_frame->cachedImage(m_frame->sliceImages[static_cast<std::size_t>(i)], image, static_cast<std::uint64_t>(image.cacheKey()));
+            std::vector<float> quad;
+            m_slices[i]->generateQuadVertices(quad);
+            std::copy_n(quad.begin(), std::min(quad.size(), slice.quad.size()), slice.quad.begin());
+            slice.opacity = m_slices[i]->opacity();
+            slice.window_center = m_slices[i]->windowCenter();
+            slice.window_width = m_slices[i]->windowWidth();
+            scene.slices.push_back(slice);
         }
     }
+    if (m_videoOverlay && m_videoOverlay->isEnabled() && m_videoOverlay->hasFrame()) {
+        viz::BrainVideoLayer video;
+        video.frame = m_frame->cachedImage(m_frame->videoFrame, m_videoOverlay->frame(), m_videoOverlay->frameGeneration());
+        if (m_videoOverlay->isDepthEnabled() && m_videoOverlay->hasDepthFrame()) {
+            video.depth = m_frame->cachedImage(m_frame->videoDepth, m_videoOverlay->depthFrame(), m_videoOverlay->depthFrameGeneration());
+        }
+        video.focus = toEigen(m_videoOverlay->focusPosition());
+        video.size = m_videoOverlay->sizeMeters();
+        video.up_hint = toEigen(m_videoOverlay->upHint());
+        video.opacity = m_videoOverlay->opacity();
+        video.depth_scale = m_videoOverlay->depthScale();
+        video.depth_steps = m_videoOverlay->depthSteps();
+        scene.video = video;
+    }
 
-    struct DrawItem
-    {
-        BrainSurface* surface;
-        mne::viz::ShaderMode mode;
-        float overlayMode;
-        float distSq;      // for transparent back-to-front sort
-        int uniformOffset; // filled by prepareSurfaceDraw
-    };
-
-    // What each pane draws, with the uniform slots prepared for it
-    struct PaneDraws
-    {
-        QRhiViewport viewport;
-        QRhiScissor scissor;
-        std::vector<DrawItem> opaqueDraws;
-        std::vector<DrawItem> transparentDraws;
-        int sliceOffsets[kMaxSliceSlots] = {-1, -1, -1};
-        int videoOverlayOffset = -1;
-        int electrodeOffset = -1;
-        std::vector<std::pair<DipoleObject*, int>> dipoleDraws;
-        int networkOffset = -1;
-        int headPathOffset = -1;
-        int pointerOffset = -1;
-    };
-    std::vector<PaneDraws> panes(static_cast<size_t>(numEnabled));
-
+    // The panes, leaving the separator lines to the right and below each pane free
+    const auto enabledViewports = enabledViewportIndices();
+    const int numEnabled = static_cast<int>(enabledViewports.size());
+    m_camera.set_scene_center(toEigen(m_cameraFocusOverride ? m_cameraFocusCenter : m_sceneCenter));
+    m_camera.set_scene_size(m_cameraFocusOverride ? m_cameraFocusSize : m_sceneSize);
+    std::vector<viz::BrainScenePane> panes;
+    panes.reserve(static_cast<std::size_t>(numEnabled));
     for (int slot = 0; slot < numEnabled; ++slot) {
-        PaneDraws& pane = panes[static_cast<size_t>(slot)];
-        int vp = (m_viewMode == MultiView) ? enabledViewports[slot] : 0;
+        const int vp = (m_viewMode == MultiView) ? enabledViewports[slot] : 0;
         const SubView& sv = (m_viewMode == MultiView) ? m_subViews[vp] : m_singleView;
-
-        // The scene leaves the separator lines to the right and below a pane free
         const viz::PaneLayout& layout = m_interaction.layout();
-        const viz::PixelRect renderPixels = (m_viewMode == MultiView)
+        const viz::PixelRect pixels = (m_viewMode == MultiView)
             ? layout.inset_for_separator(layout.slot_rect(slot, numEnabled, toPixelSize(outputSize)), slot, numEnabled)
             : viz::PixelRect{0, 0, outputSize.width(), outputSize.height()};
-        const QRect renderRect = toQRect(renderPixels);
+        const viz::GpuRect viewport{pixels.x, pixels.y, std::max(1, pixels.width), std::max(1, pixels.height)};
+        const float aspectRatio = static_cast<float>(viewport.width) / static_cast<float>(viewport.height);
+        const viz::CameraMatrices camera = (m_viewMode == MultiView) ? m_camera.pane_view(sv, aspectRatio)
+                                                                     : m_camera.single_view(m_singleView.rotation, m_singleView.zoom, aspectRatio);
+        panes.push_back({viewport, camera, &sv});
+    }
+    const std::vector<std::vector<std::string>> drawn = m_frame->composer.draw(scene, panes);
 
-        const int viewX = renderRect.x();
-        const int viewY = outputSize.height() - (renderRect.y() + renderRect.height());
-        const int viewW = std::max(1, renderRect.width());
-        const int viewH = std::max(1, renderRect.height());
-
-        pane.viewport = QRhiViewport(viewX, viewY, viewW, viewH);
-        pane.scissor = QRhiScissor(viewX, viewY, viewW, viewH);
-        const float aspectRatio = float(viewW) / float(viewH);
-
-        // Calculate camera for this viewport
-        m_camera.set_scene_center(toEigen(m_cameraFocusOverride ? m_cameraFocusCenter : m_sceneCenter));
-        m_camera.set_scene_size(m_cameraFocusOverride ? m_cameraFocusSize : m_sceneSize);
-        const viz::CameraMatrices cam = (m_viewMode == MultiView)
-            ? m_camera.pane_view(sv, aspectRatio)
-            : m_camera.single_view(m_singleView.rotation, m_singleView.zoom, aspectRatio);
-        const Eigen::Matrix4f pvm = cam.pvm();
-
-        BrainRenderer::SceneData sceneData;
-        sceneData.mvp = rhi->clipSpaceCorrMatrix() * toQMatrix(pvm);
-
-        sceneData.cameraPos = toQVector3D(cam.eye);
-        sceneData.lightDir = sceneData.cameraPos.normalized();
-        sceneData.lightingEnabled = m_lightingEnabled;
-
-        // Per-draw overlayMode uniform — the shader selects the vertex colour
-        // channel (curvature / annotation) so no per-pane vertex buffer
-        // re-uploads are needed.
-        sceneData.overlayMode = static_cast<float>(sv.overlayMode);
-
-        // Pass 1: Opaque Surfaces (Brain surfaces)
-        // Use viewport-specific shader from subview
-        mne::viz::ShaderMode currentShader = sv.brainShader;
-        const std::string overlayName = visualizationModeName(sv.overlayMode);
-
-        // Collect matched brain surface keys for this pane's info panel
-        mne::StringList drawnKeys;
-
-        for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-            if (!sv.matchesSurfaceType(it->first))
-                continue;
-            if (!sv.shouldRenderSurface(it->first))
-                continue;
-            drawnKeys.push_back(it->first);
-            BrainSurface* surf = it->second.get();
-            pane.opaqueDraws.push_back({surf, currentShader, sceneData.overlayMode, 0.0f,
-                                        m_renderer->prepareSurfaceDraw(updates, sceneData, surf)});
-        }
-
-        // Info panel; relayout only on change
-        std::string info = std::format("Shader: {}\nSurface: {}\nOverlay: {}\nDrawn: {}", shaderModeName(currentShader),
-                                       sv.surfaceType, overlayName, drawnKeys.empty() ? std::string("none") : mne::join(drawnKeys, ", "));
+    // Per-pane info labels; relayout only on change
+    for (int slot = 0; slot < numEnabled; ++slot) {
+        const int vp = (m_viewMode == MultiView) ? enabledViewports[slot] : 0;
+        const SubView& sv = *panes[static_cast<std::size_t>(slot)].view;
+        const std::vector<std::string>& keys = drawn[static_cast<std::size_t>(slot)];
+        std::string info = std::format("Shader: {}\nSurface: {}\nOverlay: {}\nDrawn: {}", shaderModeName(sv.brainShader), sv.surfaceType,
+                                       visualizationModeName(sv.overlayMode), keys.empty() ? std::string("none") : mne::join(keys, ", "));
         const bool infoChanged = (m_viewMode == MultiView)
             ? m_overlay.set_text(viz::BrainViewOverlay::Item::ViewportInfoLabel, std::move(info), vp)
             : m_overlay.set_text(viz::BrainViewOverlay::Item::SingleViewInfoLabel, std::move(info));
         if (infoChanged) {
             updateOverlayLayout();
         }
-
-        // Single pass over m_surfaces categorises non-brain items into opaque
-        // and transparent draw lists.
-
-        // Determine per-viewport field-map visibility
-        const bool megFieldVisible = sv.visibility.megFieldMap;
-        const bool eegFieldVisible = sv.visibility.eegFieldMap;
-        const mne::viz::ShaderMode currentBemShader = sv.bemShader;
-        const std::string& megFieldKey = m_fieldMapper.megSurfaceKey();
-        const std::string& eegFieldKey = m_fieldMapper.eegSurfaceKey();
-
-        // Brain surfaces were added above; the other opaque items follow them
-        std::vector<DrawItem> opaqueDraws;
-        std::vector<DrawItem> transparentDraws;
-
-        for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-            const std::string& key = it->first;
-            BrainSurface* surf = it->second.get();
-
-            if (SubView::isBrainSurfaceKey(key)) {
-                // Brain surfaces already rendered above
-                continue;
-            } else if (key.starts_with("srcsp_") || key.starts_with("dig_")) {
-                if (!sv.shouldRenderSurface(key))
-                    continue;
-                if (!surf->isVisible())
-                    continue;
-                if (key.starts_with("dig_live_t_") || key.starts_with("dig_ray_") || key.starts_with("dig_probe_")) {
-                    Eigen::Vector3f bminEigen, bmaxEigen;
-                    surf->boundingBox(bminEigen, bmaxEigen);
-                    QVector3D bmin = toQVector3D(bminEigen), bmax = toQVector3D(bmaxEigen);
-                    QVector3D ctr = (bmin + bmax) * 0.5f;
-                    float dist = (sceneData.cameraPos - ctr).lengthSquared();
-                    transparentDraws.push_back({surf, mne::viz::Holographic,
-                                                static_cast<float>(mne::viz::ModeScientific),
-                                                dist, -1});
-                } else {
-                    opaqueDraws.push_back({surf, currentShader,
-                                           static_cast<float>(mne::viz::ModeScientific),
-                                           0.0f, -1});
-                }
-            } else {
-                bool isSensor = key.starts_with("sens_");
-                bool isBem = key.starts_with("bem_");
-                if (!isSensor && !isBem)
-                    continue;
-                if (!sv.shouldRenderSurface(key))
-                    continue;
-                if (!surf->isVisible())
-                    continue;
-
-                Eigen::Vector3f bminEigen, bmaxEigen;
-                surf->boundingBox(bminEigen, bmaxEigen);
-                QVector3D bmin = toQVector3D(bminEigen), bmax = toQVector3D(bmaxEigen);
-                QVector3D center = (bmin + bmax) * 0.5f;
-                float dist = (sceneData.cameraPos - center).lengthSquared();
-
-                auto mode = isBem ? currentBemShader : mne::viz::Holographic;
-                float itemOverlay = static_cast<float>(mne::viz::ModeScientific);
-                if (key == megFieldKey && !megFieldVisible)
-                    itemOverlay = static_cast<float>(mne::viz::ModeSurface);
-                else if (key == eegFieldKey && !eegFieldVisible)
-                    itemOverlay = static_cast<float>(mne::viz::ModeSurface);
-
-                transparentDraws.push_back({surf, mode, itemOverlay, dist, -1});
-            }
-        }
-
-        // Sort transparent items back-to-front for correct alpha blending
-        std::sort(transparentDraws.begin(), transparentDraws.end(),
-                  [](const DrawItem& a, const DrawItem& b) { return a.distSq > b.distSq; });
-
-        BrainRenderer::SceneData itemData = sceneData;
-        for (auto& item : opaqueDraws) {
-            itemData.overlayMode = item.overlayMode;
-            item.uniformOffset = m_renderer->prepareSurfaceDraw(updates, itemData, item.surface);
-        }
-        pane.opaqueDraws.insert(pane.opaqueDraws.end(), opaqueDraws.begin(), opaqueDraws.end());
-        for (auto& item : transparentDraws) {
-            itemData.overlayMode = item.overlayMode;
-            item.uniformOffset = m_renderer->prepareSurfaceDraw(updates, itemData, item.surface);
-        }
-        pane.transparentDraws = transparentDraws;
-        pane.electrodeOffset = m_renderer->prepareElectrodeDraw(updates, sceneData, m_electrodes);
-
-        if (sv.visibility.mriSlices) {
-            for (int i = 0; i < kMaxSliceSlots; ++i) {
-                if (m_slices[i] && m_sliceVisible[i]) {
-                    pane.sliceOffsets[i] = m_renderer->prepareSliceDraw(updates, sceneData, i);
-                }
-            }
-        }
-
-        if (hasVideoOverlay) {
-            pane.videoOverlayOffset = m_renderer->prepareVideoOverlayDraw(updates, sceneData, m_videoOverlay.get(), videoOverlayTargetSurface);
-        }
-
-        // The head movement path is not connectivity data, so it is not tied to the network
-        // visibility flag.
-        if (sv.visibility.dipoles) {
-            for (auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
-                const int offset = m_renderer->prepareDipoleDraw(updates, sceneData, it->second.get());
-                if (offset >= 0)
-                    pane.dipoleDraws.push_back({it->second.get(), offset});
-            }
-            const int offset = m_renderer->prepareDipoleDraw(updates, sceneData, m_dipoles.get());
-            if (offset >= 0)
-                pane.dipoleDraws.push_back({m_dipoles.get(), offset});
-        }
-        if (sv.visibility.network) {
-            pane.networkOffset = m_renderer->prepareNetworkDraw(updates, sceneData, m_network.get());
-        }
-        pane.headPathOffset = m_renderer->preparePolylineDraw(updates, sceneData, m_headPath.get());
-
-        // Intersection Pointer
-        if (m_hasIntersection && m_debugPointerSurface) {
-            BrainRenderer::SceneData debugSceneData = sceneData;
-            debugSceneData.overlayMode = 0.0f; // pass-through for holographic shell
-
-            debugSceneData.mvp = rhi->clipSpaceCorrMatrix() * toQMatrix(pvm * viz::translation_matrix(toEigen(m_lastIntersectionPoint)));
-
-            pane.pointerOffset = m_renderer->prepareSurfaceDraw(updates, debugSceneData, m_debugPointerSurface.get());
-        }
-    } // End of viewport loop
-
-    // The 2-D overlay is painted after the panes updated their info labels
-    m_renderer->prepareScreenOverlay(rhi, updates, overlayFor(outputSize));
-
-    // ── Draw phase: bind and draw only ──────────────────────────────────
-    m_renderer->beginFrame(cb, updates);
-
-    for (const PaneDraws& pane : panes) {
-        cb->setViewport(pane.viewport);
-        cb->setScissor(pane.scissor);
-
-        for (const auto& item : pane.opaqueDraws)
-            m_renderer->issueSurfaceDraw(cb, item.surface, item.mode, item.uniformOffset);
-        m_renderer->issueElectrodeDraw(cb, m_electrodes, pane.electrodeOffset);
-
-        // Issue MRI slice draws after opaque surfaces but before the holographic
-        // brain.  Background voxels are discarded in the shader; remaining anatomy
-        // alpha-blends into the framebuffer.  The subsequent holographic additive
-        // pass (SrcAlpha + One) adds its glow on top without being dimmed.
-        // depthTest=true, depthWrite=false keeps slices behind opaque geometry.
-        for (int i = 0; i < kMaxSliceSlots; ++i) {
-            m_renderer->issueSliceDraw(cb, i, pane.sliceOffsets[i]);
-        }
-
-        // The video overlay goes right after its target surface, or last
-        bool videoOverlayDrawn = false;
-        for (const auto& item : pane.transparentDraws) {
-            m_renderer->issueSurfaceDraw(cb, item.surface, item.mode, item.uniformOffset);
-            if (item.surface == videoOverlayTargetSurface && !videoOverlayDrawn) {
-                m_renderer->issueVideoOverlayDraw(cb, m_videoOverlay.get(), videoOverlayTargetSurface, pane.videoOverlayOffset);
-                videoOverlayDrawn = true;
-            }
-        }
-        if (!videoOverlayDrawn) {
-            m_renderer->issueVideoOverlayDraw(cb, m_videoOverlay.get(), videoOverlayTargetSurface, pane.videoOverlayOffset);
-        }
-
-        for (const auto& [dipoles, offset] : pane.dipoleDraws)
-            m_renderer->issueDipoleDraw(cb, dipoles, offset);
-        m_renderer->issueNetworkDraw(cb, m_network.get(), pane.networkOffset);
-        m_renderer->issuePolylineDraw(cb, m_headPath.get(), pane.headPathOffset);
-
-        m_renderer->issueSurfaceDraw(cb, m_debugPointerSurface.get(), mne::viz::Holographic, pane.pointerOffset);
     }
-
-    // Labels and pane separators on top of every pane
-    m_renderer->issueScreenOverlayDraw(cb);
-
-    m_renderer->endPass(cb);
-    m_inRender = false;
 }
 
 //=============================================================================================================
