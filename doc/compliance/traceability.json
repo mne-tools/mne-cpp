@@ -392,21 +392,23 @@
       "missing_tests": []
     },
     "viz": {
-      "classes": 121,
-      "tested": 114,
+      "classes": 124,
+      "tested": 115,
       "untested": [
         "ElectrodeObject",
         "GeometryInfo",
         "Interpolation",
+        "PickResult",
         "RtSensorInterpolationMatWorker",
         "RtSourceDataWorker",
         "RtSourceInterpolationMatWorker",
+        "SceneLayer",
         "VertexData"
       ],
       "missing_tests": []
     },
     "viz_qt": {
-      "classes": 106,
+      "classes": 104,
       "tested": 42,
       "untested": [
         "AbstractTreeItem",
@@ -452,7 +454,6 @@
         "MultiViewWindow",
         "MultimodalScene",
         "OverviewBarWidget",
-        "PickResult",
         "Plot",
         "ProgressView",
         "ProjectSettingsView",
@@ -460,7 +461,6 @@
         "QuickControlView",
         "ScaleControl",
         "ScalingView",
-        "SceneLayer",
         "SelectionItem",
         "SensorTreeItem",
         "SpectrumSettingsView",

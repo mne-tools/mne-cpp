@@ -1,0 +1,79 @@
+---
+id: scene-layer
+title: "mne::viz::SceneLayer"
+sidebar_label: SceneLayer
+sidebar_position: 139
+---
+
+# SceneLayer
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/scenestate.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/scenestate.h)
+
+`#include <mne/viz/scenestate.h>`
+
+```cpp
+struct mne::viz::SceneLayer
+```
+
+Opaque, type-erased handle to a layer payload.
+
+The payload is owned by the caller (e.g. the plugin that loaded the data) and supplied as a `std::shared_ptr<void>` so the scene neither owns nor inspects it. The scene only needs the `mne::viz::SceneLayer::kind` "kind", the `id`, and the generic visibility / opacity flags to drive draw order; the renderer downcasts the payload by `mne::viz::SceneLayer::kind` "kind".
+
+This indirection keeps `3d/scene/` free of QRhi includes and means new renderables (sEEG, ECoG, future fNIRS optodes, …) plug in without touching this header.
+
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+MultimodalScene scene;
+scene.registerBoundsFn(SceneLayerKind::Electrode, [](const SceneLayer& layer, Vector3f& bbMin, Vector3f& bbMax) {
+    const auto* object = static_cast<const ElectrodeObject*>(layer.payload.get());
+    const Eigen::MatrixX3f positions = object->implantation().positions();
+    bbMin = positions.colwise().minCoeff().transpose();
+    bbMax = positions.colwise().maxCoeff().transpose();
+    return true;
+});
+SceneLayer layer;
+layer.id = "seeg_LH";
+layer.kind = SceneLayerKind::Electrode;
+auto payload = std::make_shared<ElectrodeObject>();
+payload->setImplantation(electrodes.implantation());
+layer.payload = payload;
+scene.addLayer(layer);
+scene.setOverlayThresholds(2.0f, 4.0f, 8.0f);
+Vector3f bbMin;
+Vector3f bbMax;
+scene.worldBounds(bbMin, bbMax); // union over visible layers with a bounds function
+```
+
+---
+
+## Example
+
+- Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 185"
+MultimodalScene scene;
+scene.registerBoundsFn(SceneLayerKind::Electrode, [](const SceneLayer& layer, Vector3f& bbMin, Vector3f& bbMax) {
+    const auto* object = static_cast<const ElectrodeObject*>(layer.payload.get());
+    const Eigen::MatrixX3f positions = object->implantation().positions();
+    bbMin = positions.colwise().minCoeff().transpose();
+    bbMax = positions.colwise().maxCoeff().transpose();
+    return true;
+});
+SceneLayer layer;
+layer.id = "seeg_LH";
+layer.kind = SceneLayerKind::Electrode;
+auto payload = std::make_shared<ElectrodeObject>();
+payload->setImplantation(electrodes.implantation());
+layer.payload = payload;
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

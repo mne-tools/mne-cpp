@@ -734,7 +734,10 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz/rt-sensor-stream',
         'api/viz/rt-source-stream',
         'api/viz/sensor-stream-session',
-        'api/viz/source-estimate-session'
+        'api/viz/source-estimate-session',
+        'api/viz/pick-result',
+        'api/viz/scene-layer',
+        'api/viz/scene-state'
       ],
     },
     {
@@ -810,8 +813,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz-qt/multimodal-scene',
         'api/viz-qt/slice-object',
         'api/viz-qt/video-overlay',
-        'api/viz-qt/pick-result',
-        'api/viz-qt/scene-layer',
         'api/viz-qt/channel-display-info',
         'api/viz-qt/time-ruler-event-mark',
         'api/viz-qt/time-ruler-reference-mark',

@@ -190,7 +190,7 @@ Number of vertices in a subdivided icosahedron (for picking calculations).
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 249"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 247"
 // A 5 mm marker sphere above the patch and a 2 cm rod along x, both ready for the renderer
 const auto marker = MeshFactory::createSphere(Eigen::Vector3f(0.01f, 0.01f, 0.05f), 0.005f, Color{255, 0, 0, 255}, 1);
 const auto rod = MeshFactory::createCylinder(Eigen::Vector3f::Zero(), Eigen::Vector3f(0.02f, 0.0f, 0.0f), 0.001f, Color{0, 0, 255, 255});
