@@ -47,20 +47,21 @@ namespace mne::viz
  */
 enum class Colormap
 {
-    Jet,           /**< Blue, cyan, yellow, red (MATLAB's jet). */
-    Hot,           /**< Black, red, yellow, white. */
-    HotNegative1,  /**< Hot, starting later. */
-    HotNegative2,  /**< Hot, starting even later. */
-    Bone,          /**< Grey-blue. */
-    RedBlue,       /**< Blue at -1, white at 0, red at 1. */
-    Cool,          /**< Cyan to magenta. */
-    Viridis,       /**< Perceptually uniform, purple to yellow. */
-    ViridisNegated /**< Viridis reversed. */
+    Jet,            /**< Blue, cyan, yellow, red (MATLAB's jet). */
+    Hot,            /**< Black, red, yellow, white. */
+    HotNegative1,   /**< Hot, starting later. */
+    HotNegative2,   /**< Hot, starting even later. */
+    Bone,           /**< Grey-blue. */
+    RedBlue,        /**< Blue at -1, white at 0, red at 1. */
+    Cool,           /**< Cyan to magenta. */
+    Viridis,        /**< Perceptually uniform, purple to yellow. */
+    ViridisNegated, /**< Viridis reversed. */
+    Mne             /**< MNE's diverging field map: cyan, blue, grey at 0.5, red, yellow (since 3.0.0). */
 };
 
 /**
- * @param[in] name   "Jet", "Hot", "HotNegative1", "HotNegative2", "Bone", "RedBlue", "Cool", "Viridis" or
- *                   "ViridisNegated".
+ * @param[in] name   "Jet", "Hot", "HotNegative1", "HotNegative2", "Bone", "RedBlue", "Cool", "Viridis",
+ *                   "ViridisNegated" or "MNE".
  *
  * @return The colour map of that name, or none.
  *

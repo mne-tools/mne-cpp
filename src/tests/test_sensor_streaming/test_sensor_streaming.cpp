@@ -18,6 +18,8 @@
 #include <mne/viz/backends/qt/3d/workers/rtsensordatacontroller.h>
 #include <mne/viz/brain/realtime/periodictask.h>
 #include <mne/viz/brain/realtime/rtsensorstream.h>
+#include <mne/viz/brain/rendertypes.h>
+#include <mne/viz/brain/viewstate.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -81,6 +83,7 @@ private slots:
     void testWorkerColorOutput();
     void testWorkerSymmetricNormalization();
     void testWorkerColormapChange();
+    void testWorkerMneColormapIsDiverging();
     void testWorkerSFreq();
 
     // ── Controller tests ───────────────────────────────────────────────
@@ -730,6 +733,25 @@ void TestSensorStreaming::testStreamCallbacksWithoutEventLoop()
     stream.setStreamingState(false);
     QVERIFY(delivered.load() > 0);
     QCOMPARE(vertexCount.load(), std::size_t(20));
+}
+
+//=============================================================================================================
+
+void TestSensorStreaming::testWorkerMneColormapIsDiverging()
+{
+    // The default "MNE" map is the diverging map of the static field map: zero field is grey, not Jet's green
+    RtSensorDataWorker worker;
+    auto mapping = std::make_shared<Eigen::MatrixXf>(3, 1);
+    *mapping << 1.0f, 0.0f, -1.0f;
+    worker.setMappingMatrix("head", mapping);
+    worker.addData(Eigen::VectorXf::Constant(1, 1.0f));
+    QList<QList<QVariant>> spy;
+    worker.setNewRtSensorColorsCallback(recordInto(spy));
+    worker.streamData();
+    QCOMPARE(spy.count(), 1);
+    const std::vector<uint32_t> colors = spy.takeFirst().at(1).value<std::vector<uint32_t>>();
+    const Color zero = mneAnalyzeColor(0.5);
+    QCOMPARE(colors.at(1), packABGR(zero.r, zero.g, zero.b));
 }
 
 //=============================================================================================================

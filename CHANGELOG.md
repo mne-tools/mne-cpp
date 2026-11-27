@@ -405,6 +405,10 @@ aliases; replace the old spelling as below.
   (Eigen positions and transforms, `viz::Color`); `viz/brain/instancing.h`
   builds their model matrices, and `viz::color_from_hsl` and `viz::darker`
   join the colour maps in `viz/figures/colormap.h`.
+- Real-time sensor streaming draws its default "MNE" colour map as MNE's
+  diverging field map, as the static field map does, instead of Jet: the map
+  is now `viz::Colormap::Mne` ("MNE" in `viz::map_color`), and
+  `mneAnalyzeColor` uses it.
 - Views persist their state through `viz::SettingsStore`
   (`viz/host/settings_store.h`): typed reads of key/value pairs from any
   storage, with `MemorySettingsStore` in memory and `qt::QtSettingsStore` on a

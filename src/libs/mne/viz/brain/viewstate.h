@@ -331,7 +331,7 @@ VIZSHARED_EXPORT std::string visualizationModeName(VisualizationMode mode);
  * Input v is normalised to [0,1] where 0.5 corresponds to zero field.
  *
  * @param[in] v   Normalised value in [0,1].
- * @return        Packed QRgb colour.
+ * @return        The colour; the same as viz::map_color(Colormap::Mne, v).
  */
 VIZSHARED_EXPORT Color mneAnalyzeColor(double v);
 

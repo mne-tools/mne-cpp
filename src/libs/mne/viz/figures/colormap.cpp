@@ -395,6 +395,29 @@ Color viridis(double x, bool negated)
     return {kViridis[row][0], kViridis[row][1], kViridis[row][2]};
 }
 
+// MNE's diverging field map (mne_analyze): x in [0, 1] runs over the stops of [-1, 1]
+Color mneDiverging(double x)
+{
+    constexpr int kStops = 7;
+    constexpr std::array<double, kStops> pos = {-1.0, -0.90, -0.30, 0.0, 0.30, 0.90, 1.0};
+    constexpr std::array<double, kStops> rr = {0.0, 0.0, 0.5, 0.5, 0.5, 1.0, 1.0};
+    constexpr std::array<double, kStops> gg = {1.0, 0.0, 0.5, 0.5, 0.5, 0.0, 1.0};
+    constexpr std::array<double, kStops> bb = {1.0, 1.0, 0.5, 0.5, 0.5, 0.0, 0.0};
+    const double v = std::clamp(2.0 * x - 1.0, -1.0, 1.0);
+    std::size_t seg = kStops - 2;
+    for (std::size_t i = 0; i + 1 < kStops; ++i) {
+        if (v >= pos[i] && v <= pos[i + 1]) {
+            seg = i;
+            break;
+        }
+    }
+    const double t = std::clamp((v - pos[seg]) / (pos[seg + 1] - pos[seg]), 0.0, 1.0);
+    const auto channel = [seg, t](const std::array<double, kStops>& c) {
+        return static_cast<std::uint8_t>(std::clamp(static_cast<int>(std::round((c[seg] + t * (c[seg + 1] - c[seg])) * 255.0)), 0, 255));
+    };
+    return {channel(rr), channel(gg), channel(bb), 255};
+}
+
 } // namespace
 
 //=============================================================================================================
@@ -430,6 +453,9 @@ std::optional<Colormap> mne::viz::colormap_from_name(std::string_view name)
     if (name == "ViridisNegated") {
         return Colormap::ViridisNegated;
     }
+    if (name == "MNE") {
+        return Colormap::Mne;
+    }
     return std::nullopt;
 }
 
@@ -454,6 +480,8 @@ Color mne::viz::map_color(Colormap map, double value)
             return viridis(value, false);
         case Colormap::ViridisNegated:
             return viridis(value, true);
+        case Colormap::Mne:
+            return mneDiverging(value);
         default:
             return jet(value);
     }

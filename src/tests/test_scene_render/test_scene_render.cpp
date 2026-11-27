@@ -568,6 +568,10 @@ void TestSceneRender::colormapsMatchTheirDefinition()
     QCOMPARE(map_color(Colormap::Viridis, 0.0), (Color{68, 1, 84}));
     QCOMPARE(map_color(Colormap::ViridisNegated, 0.0), (Color{253, 231, 37}));
     QCOMPARE(map_color(Colormap::Viridis, 1.5), Color::transparent());
+    // MNE's diverging field map: cyan, blue, grey around zero, red, yellow
+    QCOMPARE(map_color("MNE", 0.5), (Color{128, 128, 128}));
+    QCOMPARE(map_color("MNE", 0.0), (Color{0, 255, 255}));
+    QCOMPARE(map_color("MNE", 1.0), (Color{255, 255, 0}));
     // By name: RedBlue takes [0, 1] like the others, unknown names are Jet
     QCOMPARE(map_color("RedBlue", 0.5), (Color{255, 255, 255}));
     QCOMPARE(map_color("Unknown", 0.5), map_color(Colormap::Jet, 0.5));

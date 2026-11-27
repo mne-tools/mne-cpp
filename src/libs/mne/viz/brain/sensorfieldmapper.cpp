@@ -581,7 +581,7 @@ void SensorFieldMapper::apply(
             double norm = (mapped(i) / maxAbs) * 0.5 + 0.5;
             norm = std::clamp(norm, 0.0, 1.0);
 
-            const Color rgb = (m_colormap == "MNE") ? mneAnalyzeColor(norm) : map_color(m_colormap, norm);
+            const Color rgb = map_color(m_colormap, norm);
             colors[i] = packABGR(rgb.r, rgb.g, rgb.b);
         }
         surface->applySourceEstimateColors(colors);

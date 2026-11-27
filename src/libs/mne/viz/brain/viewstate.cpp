@@ -17,6 +17,7 @@
 #include "viewstate.h"
 
 #include "brainsurface.h"
+#include "../figures/colormap.h"
 #include "../host/settings_store.h"
 
 //=============================================================================================================
@@ -408,35 +409,7 @@ std::string visualizationModeName(VisualizationMode mode)
 
 Color mneAnalyzeColor(double v)
 {
-    double x = 2.0 * v - 1.0;
-    x = std::clamp(x, -1.0, 1.0);
-
-    static constexpr int N = 7;
-    static const double pos[N] = {-1.0, -0.90, -0.30, 0.0, 0.30, 0.90, 1.0};
-    static const double rr[N] = {0.0, 0.0, 0.5, 0.5, 0.5, 1.0, 1.0};
-    static const double gg[N] = {1.0, 0.0, 0.5, 0.5, 0.5, 0.0, 1.0};
-    static const double bb[N] = {1.0, 1.0, 0.5, 0.5, 0.5, 0.0, 0.0};
-
-    int seg = 0;
-    for (int i = 0; i < N - 1; ++i) {
-        if (x >= pos[i] && x <= pos[i + 1]) {
-            seg = i;
-            break;
-        }
-    }
-    if (x > pos[N - 1])
-        seg = N - 2;
-
-    double t = (pos[seg + 1] != pos[seg])
-        ? (x - pos[seg]) / (pos[seg + 1] - pos[seg])
-        : 0.0;
-    t = std::clamp(t, 0.0, 1.0);
-
-    int r = static_cast<int>(std::round((rr[seg] + t * (rr[seg + 1] - rr[seg])) * 255.0));
-    int g = static_cast<int>(std::round((gg[seg] + t * (gg[seg + 1] - gg[seg])) * 255.0));
-    int b = static_cast<int>(std::round((bb[seg] + t * (bb[seg + 1] - bb[seg])) * 255.0));
-
-    return {static_cast<std::uint8_t>(std::clamp(r, 0, 255)), static_cast<std::uint8_t>(std::clamp(g, 0, 255)), static_cast<std::uint8_t>(std::clamp(b, 0, 255)), 255};
+    return map_color(Colormap::Mne, v);
 }
 
 //=============================================================================================================
