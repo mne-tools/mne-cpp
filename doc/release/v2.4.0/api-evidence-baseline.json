@@ -12,16 +12,16 @@
     "registered_stale": 0,
     "registered_with_test": 378,
     "registered_test_unresolved": 0,
-    "registered_with_example": 467,
+    "registered_with_example": 468,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 102,
     "registered_without_api_page": 0,
-    "with_snippet": 511,
+    "with_snippet": 512,
     "public_api_units": 695,
-    "example_eligible": 467,
-    "example_exempt": 228,
-    "eligible_backed_by_registry_example": 465,
-    "eligible_used_by_some_example": 399,
+    "example_eligible": 468,
+    "example_exempt": 227,
+    "eligible_backed_by_registry_example": 466,
+    "eligible_used_by_some_example": 400,
     "examples_on_disk": 82,
     "examples_built": 82
   },
@@ -228,10 +228,10 @@
       "public": 224,
       "registered": 224,
       "with_test": 152,
-      "eligible": 56,
-      "eligible_with_registry_example": 56,
-      "eligible_used_by_example": 47,
-      "with_snippet": 69
+      "eligible": 57,
+      "eligible_with_registry_example": 57,
+      "eligible_used_by_example": 48,
+      "with_snippet": 70
     }
   },
   "exported_free_functions": [
@@ -12836,25 +12836,6 @@
       "exempt_reason": null
     },
     {
-      "name": "DataLoader",
-      "header": "viz/backends/qt/3d/core/dataloader.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": "test_disp3d_headless",
-      "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
-      "api_page": "doc/website/docs/api/viz-qt/data-loader.mdx",
-      "python_equiv": null,
-      "example_eligible": false,
-      "exempt_reason": "header prefix 'viz/backends/qt/3d/core/': Renderer internals behind the BrainView/MultimodalScene facade."
-    },
-    {
       "name": "CameraController",
       "header": "viz/backends/qt/3d/input/cameracontroller.h",
       "library": "viz",
@@ -15215,6 +15196,29 @@
         "ex_disp3d_scene/main.cpp#brain_surface_usage"
       ],
       "api_page": "doc/website/docs/api/viz/vertex-data.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "DataLoader",
+      "header": "viz/brain/dataloader.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_disp3d_headless",
+      "test_resolves": true,
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#data_loader_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/data-loader.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null

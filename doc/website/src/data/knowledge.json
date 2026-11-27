@@ -617,7 +617,8 @@
         "inv",
         "viz_qt",
         "viz",
-        "ieeg"
+        "ieeg",
+        "base"
       ],
       "tasks": [
         "visualization"

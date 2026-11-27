@@ -392,8 +392,8 @@
       "missing_tests": []
     },
     "viz": {
-      "classes": 110,
-      "tested": 106,
+      "classes": 111,
+      "tested": 107,
       "untested": [
         "ElectrodeObject",
         "GeometryInfo",
@@ -403,8 +403,8 @@
       "missing_tests": []
     },
     "viz_qt": {
-      "classes": 113,
-      "tested": 46,
+      "classes": 112,
+      "tested": 45,
       "untested": [
         "AbstractTreeItem",
         "AbstractView",

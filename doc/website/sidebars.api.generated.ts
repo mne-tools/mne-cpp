@@ -723,7 +723,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz/settings-store',
         'api/viz/memory-settings-store',
         'api/viz/sensor-field-mapper',
-        'api/viz/source-estimate-overlay'
+        'api/viz/source-estimate-overlay',
+        'api/viz/data-loader'
       ],
     },
     {
@@ -816,7 +817,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz-qt/brain-view',
         'api/viz-qt/camera-controller',
         'api/viz-qt/camera-result',
-        'api/viz-qt/data-loader',
         'api/viz-qt/digitizer-set-tree-item',
         'api/viz-qt/digitizer-tree-item',
         'api/viz-qt/dipole-tree-item',

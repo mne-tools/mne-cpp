@@ -1,23 +1,31 @@
 ---
 id: data-loader
-title: "mne::viz::qt::DataLoader"
+title: "mne::viz::DataLoader"
 sidebar_label: DataLoader
-sidebar_position: 88
+sidebar_position: 127
 ---
 
 # DataLoader
 
-**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/core/dataloader.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/core/dataloader.h)
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/dataloader.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/dataloader.h)
 
-`#include <mne/viz/backends/qt/dataloader.h>`
+`#include <mne/viz/dataloader.h>`
 
 ```cpp
-class mne::viz::qt::DataLoader
+class mne::viz::DataLoader
 ```
 
 Pure I/O helpers that load MNE data files and return results.
 
-These static methods have zero coupling to the widget layer. [`BrainView`](/docs/api/viz-qt/brain-view) calls them to obtain data and then wires the results into its own model / surface map / member state.
+These static methods have zero coupling to the widget layer. [BrainView](/docs/api/viz-qt/brain-view) calls them to obtain data and then wires the results into its own model / surface map / member state.
+
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+// The Neuromag helmet shipped with MNE-CPP, shifted 4 cm up as a device-to-head transform would
+Eigen::Matrix4f devToHead = Eigen::Matrix4f::Identity();
+devToHead(2, 3) = 0.04f;
+const auto helmet = DataLoader::loadHelmetSurface(mne::resource_path("general/sensorSurfaces/306m.fif"), devToHead, true);
+const DataLoader::SensorLoadResult noSensors = DataLoader::loadSensors("missing.fif"); // reports, never throws
+```
 
 ---
 
@@ -56,7 +64,7 @@ Load a standalone MEG helmet surface from a BEM FIF file.
 - **helmetFilePath** : *const std::filesystem::path &*
   Path to the helmet BEM FIF file.
 
-- **devHeadTrans** : *const QMatrix4x4 &*
+- **devHeadTrans** : *const Eigen::Matrix4f &*
   Device-to-Head transformation matrix (identity if none).
 
 - **applyTrans** : *bool*
@@ -150,6 +158,33 @@ Probe a FIF file for the available evoked data sets.
 - *std::vector&lt; std::string &gt;* — List of human-readable labels for each set.
 
 ---
+
+## Example
+
+- Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 339"
+// The Neuromag helmet shipped with MNE-CPP, shifted 4 cm up as a device-to-head transform would
+Eigen::Matrix4f devToHead = Eigen::Matrix4f::Identity();
+devToHead(2, 3) = 0.04f;
+const auto helmet = DataLoader::loadHelmetSurface(mne::resource_path("general/sensorSurfaces/306m.fif"), devToHead, true);
+const DataLoader::SensorLoadResult noSensors = DataLoader::loadSensors("missing.fif"); // reports, never throws
+Eigen::Vector3f helmetMin;
+Eigen::Vector3f helmetMax;
+if (helmet) {
+    helmet->boundingBox(helmetMin, helmetMax);
+}
+ok &= expect(helmet && helmet->vertexCount() > 0 && helmetMax.z() > 0.04f && !noSensors.hasInfo,
+             "DataLoader: the helmet loads and moves with the transform; a missing file yields no sensors");
+````
 
 ## Authors of this file
 

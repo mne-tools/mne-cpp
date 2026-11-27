@@ -369,9 +369,9 @@
     "G3_api_documentation": {
       "public_api_units": 695,
       "exported_not_registered": 2,
-      "example_eligible": 467,
+      "example_eligible": 468,
       "eligible_backed_percent": 99.57,
-      "snippets": 511,
+      "snippets": 512,
       "registered_test_percent": 54.55
     },
     "G4_screenshots": {
