@@ -203,6 +203,16 @@ labels and pane separators.
 
 ---
 
+### redraw_overlay()
+
+Blends the overlay of the last `draw_overlay()` again; its content is unchanged, so backends do not upload it again.
+
+**Returns:**
+
+- *bool* — Whether there was an overlay to draw.
+
+---
+
 ### finish()
 
 Ends the frame and drops the buffers of meshes undrawn for kUnusedFrames frames.

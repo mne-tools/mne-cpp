@@ -55,17 +55,33 @@ Draws the scene into the panes.
 
 ---
 
-### finish(overlay, scale)
+### draw_overlay(overlay, scale)
 
-Ends the frame, blending a screen overlay (labels, pane separators) over all panes.
+Blends a screen overlay (labels, pane separators) over all panes.
 
 **Parameters:**
 
-- **overlay** : *std::optional&lt; std::variant&lt; [Image](/docs/api/viz/image), [DisplayList](/docs/api/viz/display-list) &gt; &gt;*
-  RGBA pixels of the target size or a figure of the logical size, or none.
+- **overlay** : *std::variant&lt; [Image](/docs/api/viz/image), [DisplayList](/docs/api/viz/display-list) &gt;*
+  RGBA pixels of the target size, or a figure of the logical size.
 
 - **scale** : *double*
   Texture pixels per figure pixel of a figure.
+
+---
+
+### redraw_overlay()
+
+Blends the overlay of the last `draw_overlay()` again, without uploading it again.
+
+**Returns:**
+
+- *bool* — Whether there was an overlay to draw.
+
+---
+
+### finish()
+
+Ends the frame.
 
 **Returns:**
 

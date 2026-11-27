@@ -17,6 +17,8 @@ class mne::viz::qt::BrainRenderer
 
 [`BrainRenderer`](/docs/api/viz-qt/brain-renderer) handles the low-level RHI rendering logic, managing pipelines, shaders, and draw calls for brain surfaces.
 
+Deprecated since 3.0.0: the brain view describes its frames with [`BrainFrameComposer`](/docs/api/viz/brain-frame-composer) and records them with [`RhiFrameRenderer`](/docs/api/viz-qt/rhi-frame-renderer). [`BrainRenderer`](/docs/api/viz-qt/brain-renderer) will be removed in a later release.
+
 Qt RHI-based 3-D renderer managing scene objects, lighting, camera, and render pipeline for brain visualization.
 
 ---
