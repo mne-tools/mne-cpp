@@ -114,6 +114,7 @@ void SettingsPanel::build()
     m_content = new QWidget(this);
     layout()->addWidget(m_content);
     auto* layout = new QVBoxLayout(m_content);
+    layout->setSpacing(16);
     for (const std::string& group : m_form.groups()) { // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks): Qt parents own the layouts
         const auto shown = [&group](const SettingField& field) {
             return field.group == group && !field.hidden;
@@ -130,9 +131,15 @@ void SettingsPanel::build()
         } else {
             auto* box = new QGroupBox(toQString(group), m_content);
             formLayout = new QFormLayout(box);
+            formLayout->setContentsMargins(16, 12, 16, 12);
             layout->addWidget(box);
             m_groups[group] = box;
         }
+        // Labels on the left, editors aligned on the right, as in viz::FormView
+        formLayout->setLabelAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        formLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+        formLayout->setRowWrapPolicy(QFormLayout::DontWrapRows);
+        formLayout->setVerticalSpacing(10);
         for (const SettingField& field : m_form.fields()) {
             if (shown(field)) {
                 buildField(field, formLayout);
@@ -285,8 +292,16 @@ void SettingsPanel::buildField(const SettingField& field, QFormLayout* layout)
             connect(button, &QPushButton::clicked, this, [this, key] {
                 m_form.trigger(key);
             });
-            layout->addRow(button);
+            // As wide as its text, on the right
+            auto* line = new QWidget(m_content);
+            auto* lineLayout = new QHBoxLayout(line);
+            lineLayout->setContentsMargins(0, 0, 0, 0);
+            lineLayout->addStretch(1);
+            button->setParent(line);
+            lineLayout->addWidget(button);
+            layout->addRow(line);
             row.editor = button;
+            row.container = line;
             break;
         }
         case SettingField::Kind::Custom: {
@@ -307,7 +322,21 @@ void SettingsPanel::buildField(const SettingField& field, QFormLayout* layout)
         (field.kind == SettingField::Kind::Info && field.label.empty());
     if (!row.label && !ownRow) {
         row.label = new QLabel(toQString(field.label), m_content);
-        layout->addRow(row.label, row.editor);
+        // Editors keep the theme's width and sit on the right; read-only texts align right
+        auto* line = new QWidget(m_content);
+        auto* lineLayout = new QHBoxLayout(line);
+        lineLayout->setContentsMargins(0, 0, 0, 0);
+        lineLayout->addStretch(1);
+        row.editor->setParent(line);
+        if (auto* text = qobject_cast<QLabel*>(row.editor)) {
+            text->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+            lineLayout->addWidget(text);
+        } else {
+            row.editor->setFixedWidth(static_cast<int>(m_theme.editor_width));
+            lineLayout->addWidget(row.editor);
+        }
+        layout->addRow(row.label, line);
+        row.container = line;
     }
     row.editor->setObjectName(toQString(key));
     row.editor->setToolTip(toQString(field.tooltip));
@@ -387,22 +416,29 @@ void SettingsPanel::updateField(const std::string& key)
             combo->addItem(toQString(choice.label), toQString(choice.value));
         }
     } else if (auto* text = qobject_cast<QLabel*>(editor)) {
-        // Info fields: the tone colours the text
-        QString color;
+        // Info fields with a tone are status chips in the tone's colour, as in viz::FormView
+        std::optional<Color> color;
         switch (field->tone) {
             case SettingField::Tone::Positive:
-                color = QStringLiteral("#2e7d32");
+                color = m_theme.positive;
                 break;
             case SettingField::Tone::Warning:
-                color = QStringLiteral("#ef6c00");
+                color = m_theme.warning;
                 break;
             case SettingField::Tone::Negative:
-                color = QStringLiteral("#c62828");
+                color = m_theme.negative;
                 break;
             case SettingField::Tone::Normal:
                 break;
         }
-        text->setStyleSheet(color.isEmpty() ? QString() : QStringLiteral("color: %1;").arg(color));
+        text->setStyleSheet(!color ? QString()
+                                   : QStringLiteral("color: rgb(%1, %2, %3); background: rgba(%1, %2, %3, 26); border-radius: %4px; padding: 2px 8px; "
+                                                    "font-weight: 600; font-family: \"%5\";")
+                                         .arg(color->r)
+                                         .arg(color->g)
+                                         .arg(color->b)
+                                         .arg(static_cast<int>(m_theme.small_font_size))
+                                         .arg(QString::fromStdString(m_theme.font_family)));
     } else if (auto* button = qobject_cast<QAbstractButton*>(editor); button && !button->property("settingColor").toBool()) {
         button->setText(toQString(field->label));
     }
@@ -454,6 +490,9 @@ void SettingsPanel::updateConditions()
         const bool visible = m_form.is_visible(key);
         row.editor->setEnabled(enabled);
         row.editor->setVisible(visible);
+        if (row.container) {
+            row.container->setVisible(visible);
+        }
         if (row.label) {
             row.label->setEnabled(enabled);
             row.label->setVisible(visible);
@@ -465,6 +504,16 @@ void SettingsPanel::updateConditions()
             return field.group == group && m_rows.contains(field.key) && m_form.is_visible(field.key);
         });
         box->setVisible(any);
+    }
+}
+
+//=============================================================================================================
+
+void SettingsPanel::setTheme(const viz::Theme& theme)
+{
+    m_theme = theme;
+    for (const auto& [key, row] : m_rows) {
+        updateField(key);
     }
 }
 

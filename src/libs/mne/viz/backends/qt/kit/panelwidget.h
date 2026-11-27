@@ -33,6 +33,7 @@
 namespace mne::viz
 {
 class Panel;
+struct Theme;
 } // namespace mne::viz
 
 //=============================================================================================================
@@ -81,6 +82,16 @@ public:
     {
         return m_formPanel;
     }
+
+    //=========================================================================================================
+    /**
+     * Gives the panel a theme; PanelWidget starts with viz::Theme::light().
+     *
+     * @param[in] theme   Colours, fonts and metrics.
+     *
+     * @since 3.0.0
+     */
+    void setTheme(const viz::Theme& theme);
 
     void saveSettings() override;
     void loadSettings() override;

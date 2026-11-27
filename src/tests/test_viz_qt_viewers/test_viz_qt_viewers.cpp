@@ -24,6 +24,8 @@
 #include <mne/viz/backends/qt/viewers/scalingview.h>
 #include <mne/viz/backends/qt/kit/panelwidget.h>
 #include <mne/viz/panels/compensator_panel.h>
+#include <mne/viz/panels/forward_panel.h>
+#include <mne/viz/figures/theme.h>
 #include <mne/viz/panels/projectors_panel.h>
 #include <mne/viz/backends/qt/viewers/modalityselectionview.h>
 #include <mne/viz/backends/qt/viewers/minimumnormsettingsview.h>
@@ -57,6 +59,7 @@
 #include <QStringList>
 #include <QMap>
 #include <QCheckBox>
+#include <QFontInfo>
 #include <QToolButton>
 #include <QComboBox>
 #include <QDoubleSpinBox>
@@ -121,6 +124,13 @@ private slots:
      * Verifies that PanelWidget shows one check box per projector and the "Enable all" box, which switches all.
      */
     void panelWidget_projectors();
+
+    //=========================================================================================================
+    /**
+     * Verifies that PanelWidget gives its panel the look of viz::FormView: theme style sheet, font and status
+     * chips in the tone colours.
+     */
+    void panelWidget_theme();
 
     //=========================================================================================================
     /**
@@ -418,6 +428,33 @@ void TestVizQtViewers::panelWidget_projectors()
     all->click();
     QCOMPARE(reported.back(), std::vector<bool>({false, false}));
     QVERIFY(!box->isChecked());
+}
+
+//=============================================================================================================
+
+void TestVizQtViewers::panelWidget_theme()
+{
+    auto panel = std::make_shared<ForwardPanel>();
+    PanelWidget widget(panel);
+    const viz::Theme theme = viz::Theme::light();
+    QVERIFY(widget.styleSheet().contains(QColor(theme.accent.r, theme.accent.g, theme.accent.b).name()));
+    QCOMPARE(widget.font().pixelSize(), static_cast<int>(theme.font_size));
+    // The bundled typeface reaches the children, status chips included
+    QCOMPARE(QFontInfo(widget.findChild<QCheckBox*>()->font()).family(), QString::fromStdString(theme.font_family));
+    panel->set_status(static_cast<int>(ForwardPanel::Status::Finished));
+    auto* status = qobject_cast<QLabel*>(widget.formPanel()->editor("status"));
+    QVERIFY(status && status->styleSheet().contains(QStringLiteral("rgb(%1, %2, %3)").arg(theme.positive.r).arg(theme.positive.g).arg(theme.positive.b)));
+    QCOMPARE(QFontInfo(status->font()).family(), QString::fromStdString(theme.font_family));
+
+    // A dark theme recolours the chips
+    widget.setTheme(viz::Theme::dark());
+    const viz::Theme dark = viz::Theme::dark();
+    QVERIFY(status->styleSheet().contains(QStringLiteral("rgb(%1, %2, %3)").arg(dark.positive.r).arg(dark.positive.g).arg(dark.positive.b)));
+    if (const QByteArray shot = qgetenv("MNE_PANEL_SHOT"); !shot.isEmpty()) {
+        widget.setTheme(theme);
+        widget.resize(360, 640);
+        widget.grab().save(QString::fromLocal8Bit(shot));
+    }
 }
 
 //=============================================================================================================
@@ -783,8 +820,11 @@ void TestVizQtViewers::settingsPanel_flagsGroupsAndPersistence()
     panel.show();
     // Flags get no widget; a group box shows while one of its fields does
     QVERIFY(!panel.editor("offline"));
-    auto* box = panel.editor("compute")->parentWidget();
-    QVERIFY(qobject_cast<QGroupBox*>(box));
+    QWidget* box = panel.editor("compute")->parentWidget();
+    while (box && !qobject_cast<QGroupBox*>(box)) {
+        box = box->parentWidget();
+    }
+    QVERIFY(box);
     QVERIFY(box->isHidden());
     form->set_value("offline", true);
     QVERIFY(!box->isHidden() && !panel.editor("compute")->isHidden());
@@ -1166,8 +1206,13 @@ namespace
 /** The text of the label in front of a panel editor. */
 QString fieldLabel(QWidget* editor)
 {
-    auto* layout = editor ? qobject_cast<QFormLayout*>(editor->parentWidget()->layout()) : nullptr;
-    auto* label = layout ? qobject_cast<QLabel*>(layout->labelForField(editor)) : nullptr;
+    // The editor sits in a line widget that is the field of the form layout
+    QWidget* field = editor;
+    while (field && field->parentWidget() && !qobject_cast<QFormLayout*>(field->parentWidget()->layout())) {
+        field = field->parentWidget();
+    }
+    auto* layout = field && field->parentWidget() ? qobject_cast<QFormLayout*>(field->parentWidget()->layout()) : nullptr;
+    auto* label = layout ? qobject_cast<QLabel*>(layout->labelForField(field)) : nullptr;
     return label ? label->text() : QString();
 }
 

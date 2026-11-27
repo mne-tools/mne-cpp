@@ -15,6 +15,8 @@
 //=============================================================================================================
 
 #include "../common/scene_golden.h"
+#include <mne/viz/figures/font_library.h>
+#include <mne/viz/figures/font_text_metrics.h>
 #include <mne/viz/forms/settings_form.h>
 #include <mne/viz/gpu/software_renderer.h>
 #include <mne/viz/host/surface.h>
@@ -27,6 +29,7 @@
 
 #include <cstdint>
 #include <cstdio>
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
@@ -325,7 +328,11 @@ void test_panel_and_golden()
     SettingsForm form("Preprocessing");
     build_form(form);
     form.add_custom("plot", "Response");
+    // The bundled typefaces, identical on every machine, measured as drawn
+    const auto fonts = std::make_shared<FontLibrary>();
+    const FontTextMetrics metrics(fonts);
     FormView view(form);
+    view.set_text_metrics(&metrics);
     GpuFrameTarget target;
     target.pixel_width = 420;
     target.pixel_height = 560;
@@ -334,6 +341,7 @@ void test_panel_and_golden()
     // Focus a field so the golden shows a caret
     click(view, "name");
     SoftwareRenderer renderer;
+    renderer.set_fonts(fonts);
     CHECK(scene_golden::matches_png(renderer.render(view.frame(target), view.resources()), GOLDEN_DIR "/form_view.png"));
 
     // The dark theme clears to its background

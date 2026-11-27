@@ -82,6 +82,7 @@ set(SOURCES
     viewers/hpisettingsview.cpp
     viewers/covariancesettingsview.cpp
     kit/panelwidget.cpp
+    kit/qttheme.cpp
     kit/settingspanel.cpp
     viewers/bidsview.cpp
     viewers/helpers/channeldatamodel.cpp
@@ -178,6 +179,7 @@ set(HEADERS
     viewers/hpisettingsview.h
     viewers/covariancesettingsview.h
     kit/panelwidget.h
+    kit/qttheme.h
     kit/settingspanel.h
     viewers/bidsview.h
     viewers/helpers/channeldatamodel.h

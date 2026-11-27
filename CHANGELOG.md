@@ -433,6 +433,12 @@ aliases; replace the old spelling as below.
   glyphs, `viz::SystemFonts`) and `viz::FontTextMetrics`. The software
   renderer, `SdlHost` and `mne_render --fonts` use them; `RasterOptions` and
   `SoftwareRenderer` keep the bitmap font unless fonts are set.
+- A clinical look for panels: `viz::Theme` gets calm neutrals with one blue
+  accent, hairline borders, check boxes, status chips and Source Sans 3;
+  `FormView` draws it, and the Qt kit applies the same theme
+  (`viz::qt::applyTheme()`, `PanelWidget::setTheme()`, the bundled fonts
+  registered with Qt), with labels left and editors right-aligned in
+  `SettingsPanel`.
 - `ChannelRhiRenderer` hosts a `viz::TraceViewClient`, the same trace view
   client the SDL example runs, instead of wiring its own view, animator,
   markers and frame builder; its host becomes the client's `viz::Surface`.

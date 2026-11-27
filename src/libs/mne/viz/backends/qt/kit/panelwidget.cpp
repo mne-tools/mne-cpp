@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include "panelwidget.h"
+#include "qttheme.h"
 #include "settingspanel.h"
 #include "../qtsettingsstore.h"
 #include <mne/viz/panels/panel.h>
@@ -57,6 +58,8 @@ PanelWidget::PanelWidget(std::shared_ptr<Panel> panel, const QString& settingsPa
     layout->setContentsMargins(0, 0, 0, 0);
     m_formPanel = new SettingsPanel(m_panel->shared_form(), this);
     layout->addWidget(m_formPanel);
+    // The look of viz::FormView, so a panel looks alike in every backend
+    setTheme(viz::Theme::light());
 }
 
 //=============================================================================================================
@@ -64,6 +67,14 @@ PanelWidget::PanelWidget(std::shared_ptr<Panel> panel, const QString& settingsPa
 PanelWidget::~PanelWidget()
 {
     saveSettings();
+}
+
+//=============================================================================================================
+
+void PanelWidget::setTheme(const viz::Theme& theme)
+{
+    applyTheme(this, theme);
+    m_formPanel->setTheme(theme);
 }
 
 //=============================================================================================================

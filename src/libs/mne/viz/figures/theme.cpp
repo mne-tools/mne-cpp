@@ -36,17 +36,19 @@ Theme Theme::light()
 Theme Theme::dark()
 {
     Theme theme;
-    theme.background = Color{24, 26, 30};
-    theme.surface = Color{34, 37, 43};
-    theme.field = Color{44, 48, 55};
-    theme.text = Color{231, 233, 236};
-    theme.muted_text = Color{150, 156, 166};
-    theme.accent = Color{92, 142, 245};
-    theme.accent_text = Color{255, 255, 255};
-    theme.border = Color{58, 63, 71};
-    theme.positive = Color{86, 196, 128};
-    theme.warning = Color{232, 172, 72};
-    theme.negative = Color{240, 112, 102};
+    theme.background = Color{21, 24, 29};
+    theme.surface = Color{30, 34, 40};
+    theme.field = Color{24, 27, 33};
+    theme.field_border = Color{66, 72, 82};
+    theme.text = Color{230, 233, 237};
+    theme.muted_text = Color{148, 156, 168};
+    theme.accent = Color{88, 150, 255};
+    theme.accent_text = Color{12, 18, 28};
+    theme.border = Color{48, 53, 61};
+    theme.separator = Color{40, 45, 52};
+    theme.positive = Color{92, 196, 136};
+    theme.warning = Color{232, 168, 76};
+    theme.negative = Color{240, 113, 103};
     return theme;
 }
 
@@ -58,5 +60,15 @@ Font Theme::font(double pixel_size, bool bold) const
     result.family = font_family;
     result.pixel_size = pixel_size;
     result.bold = bold;
+    return result;
+}
+
+//=============================================================================================================
+
+Font Theme::mono_font(double pixel_size) const
+{
+    Font result;
+    result.family = mono_font_family.empty() ? std::string("monospace") : mono_font_family;
+    result.pixel_size = pixel_size;
     return result;
 }

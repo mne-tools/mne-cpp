@@ -106,6 +106,10 @@ std::optional<Color> parse_color(const std::string& text)
     return color;
 }
 
+constexpr double kCheckBoxSize = 18.0;
+constexpr double kControlRadius = 4.0;
+constexpr double kRowInset = 16.0;
+
 std::string upper(std::string text)
 {
     for (char& c : text) {
@@ -276,8 +280,8 @@ void FormView::layout() const
 
     const Theme& t = m_theme;
     const double width = std::max(m_width - 2.0 * t.padding, 1.0);
-    const double inset = 0.75 * t.padding;
-    const double editorHeight = t.row_height - 12.0;
+    const double inset = kRowInset;
+    const double editorHeight = t.control_height;
     double y = t.padding;
 
     if (!m_form.title().empty()) {
@@ -308,7 +312,7 @@ void FormView::layout() const
             Row header;
             header.type = Row::Type::Group;
             header.key = group;
-            header.rect = Rect{t.padding + inset, y, width - inset, std::round(t.small_font_size * 2.0)};
+            header.rect = Rect{t.padding + 2.0, y, width - 2.0, std::round(t.small_font_size * 2.3)};
             m_rows.push_back(header);
             y += header.rect.height;
         }
@@ -327,25 +331,30 @@ void FormView::layout() const
             const double top = y + (t.row_height - editorHeight) / 2.0;
             switch (f->kind) {
                 case SettingField::Kind::Bool: {
-                    const double h = std::round(editorHeight * 0.85);
-                    r.editor = Rect{right - std::round(h * 1.75), y + (t.row_height - h) / 2.0, std::round(h * 1.75), h};
+                    const double h = kCheckBoxSize;
+                    r.editor = Rect{right - h, y + std::round((t.row_height - h) / 2.0), h, h};
                     break;
                 }
                 case SettingField::Kind::Int:
                 case SettingField::Kind::Double:
                 case SettingField::Kind::Choice:
                     r.editor = Rect{right - editorWidth, top, editorWidth, editorHeight};
-                    r.decrement = Rect{r.editor.x, top, editorHeight + 4.0, editorHeight};
-                    r.increment = Rect{r.editor.right() - editorHeight - 4.0, top, editorHeight + 4.0, editorHeight};
+                    r.decrement = Rect{r.editor.x, top, editorHeight, editorHeight};
+                    r.increment = Rect{r.editor.right() - editorHeight, top, editorHeight, editorHeight};
                     break;
                 case SettingField::Kind::Text:
                 case SettingField::Kind::Path:
                 case SettingField::Kind::Directory:
-                case SettingField::Kind::Action:
                     r.editor = Rect{right - editorWidth, top, editorWidth, editorHeight};
                     break;
+                case SettingField::Kind::Action: {
+                    // As wide as its text, like a native button
+                    const double w = std::clamp(m_metrics->advance(t.font(t.font_size, true), f->label) + 4.0 * t.spacing, 96.0, inner);
+                    r.editor = Rect{right - w, top, w, editorHeight};
+                    break;
+                }
                 case SettingField::Kind::Color:
-                    r.editor = Rect{right - 2.0 * editorHeight, top, 2.0 * editorHeight, editorHeight};
+                    r.editor = Rect{right - 36.0, y + std::round((t.row_height - 20.0) / 2.0), 36.0, 20.0};
                     break;
                 case SettingField::Kind::Info: {
                     const double labelWidth = f->label.empty() ? 0.0 : m_metrics->advance(t.font(t.font_size), f->label) + 2.0 * t.spacing;
@@ -505,6 +514,9 @@ void FormView::step(const SettingField& field, int steps)
     } else if (field.kind == SettingField::Kind::Choice && !field.choices.empty()) {
         const std::string current = m_form.get<std::string>(field.key);
         const auto count = static_cast<int>(field.choices.size());
+        if (count <= 0) {
+            return;
+        }
         int index = 0;
         for (int i = 0; i < count; ++i) {
             if (field.choices[static_cast<std::size_t>(i)].value == current) {
@@ -653,7 +665,7 @@ std::string FormView::value_text(const SettingField& field) const
             return field.prefix + buffer.data() + field.unit;
         }
         case SettingField::Kind::Choice: {
-            const std::string current = m_form.get<std::string>(field.key);
+            std::string current = m_form.get<std::string>(field.key);
             for (const SettingChoice& choice : field.choices) {
                 if (choice.value == current) {
                     return choice.label;
@@ -711,7 +723,7 @@ void FormView::draw_row(Canvas& canvas, const Row& r) const
         case Row::Type::Group:
             canvas.set_font(t.font(t.small_font_size, true));
             canvas.set_pen(t.muted_text);
-            canvas.draw_text(r.rect, Align::Left | Align::VCenter, elided(upper(r.key), canvas.font(), r.rect.width));
+            canvas.draw_text(r.rect, Align::Left | Align::VCenter, elided(r.key, canvas.font(), r.rect.width));
             return;
         case Row::Type::Card:
             canvas.set_pen(Pen{t.border, 1.0});
@@ -726,9 +738,9 @@ void FormView::draw_row(Canvas& canvas, const Row& r) const
     if (!f) {
         return;
     }
-    const double inset = 0.75 * t.padding;
+    const double inset = kRowInset;
     if (!r.last) {
-        canvas.set_pen(Pen{t.border, 1.0});
+        canvas.set_pen(Pen{t.separator, 1.0});
         canvas.draw_line({r.rect.x + inset, r.rect.bottom() - 0.5}, {r.rect.right() - inset, r.rect.bottom() - 0.5});
     }
 
@@ -754,44 +766,52 @@ void FormView::draw_editor(Canvas& canvas, const Row& r, const SettingField& f) 
 {
     const Theme& t = m_theme;
     const Rect& e = r.editor;
-    const double radius = t.corner_radius / 2.0;
     const Font font = t.font(t.font_size);
     canvas.set_font(font);
 
     switch (f.kind) {
         case SettingField::Kind::Bool: {
+            // A check box, as clinical applications use: square, quiet when off, a white tick on the accent when on
             const bool on = m_form.get<bool>(f.key);
-            const double knob = e.height / 2.0 - 2.0;
-            canvas.set_pen(Pen::none());
-            canvas.set_brush(Brush::solid(on ? t.accent : t.border));
-            canvas.draw_rounded_rect(e, e.height / 2.0, e.height / 2.0);
-            canvas.set_brush(Brush::solid(t.surface));
-            canvas.draw_ellipse({on ? e.right() - e.height / 2.0 : e.x + e.height / 2.0, e.y + e.height / 2.0}, knob, knob);
+            if (on) {
+                canvas.set_pen(Pen::none());
+                canvas.set_brush(Brush::solid(t.accent));
+                canvas.draw_rounded_rect(e, kControlRadius, kControlRadius);
+                canvas.set_pen(line_pen(t.accent_text, 2.0));
+                const std::array<Point, 3> tick = {Point{e.x + 0.25 * e.width, e.y + 0.52 * e.height}, Point{e.x + 0.43 * e.width, e.y + 0.70 * e.height},
+                                                   Point{e.x + 0.76 * e.width, e.y + 0.32 * e.height}};
+                canvas.draw_polyline(tick);
+            } else {
+                canvas.set_pen(Pen{t.field_border, 1.5});
+                canvas.set_brush(Brush::solid(t.field));
+                canvas.draw_rounded_rect(e.adjusted(0.75, 0.75, -0.75, -0.75), kControlRadius, kControlRadius);
+            }
             return;
         }
         case SettingField::Kind::Int:
         case SettingField::Kind::Double:
         case SettingField::Kind::Choice: {
-            canvas.set_pen(Pen{t.border, 1.0});
+            canvas.set_pen(Pen{t.field_border, 1.0});
             canvas.set_brush(Brush::solid(t.field));
-            canvas.draw_rounded_rect(e.adjusted(0.5, 0.5, -0.5, -0.5), radius, radius);
-            canvas.draw_line({r.decrement.right(), e.y + 4.0}, {r.decrement.right(), e.bottom() - 4.0});
-            canvas.draw_line({r.increment.x, e.y + 4.0}, {r.increment.x, e.bottom() - 4.0});
+            canvas.draw_rounded_rect(e.adjusted(0.5, 0.5, -0.5, -0.5), kControlRadius, kControlRadius);
+            canvas.set_pen(Pen{t.separator, 1.0});
+            canvas.draw_line({r.decrement.right() - 0.5, e.y + 1.0}, {r.decrement.right() - 0.5, e.bottom() - 1.0});
+            canvas.draw_line({r.increment.x + 0.5, e.y + 1.0}, {r.increment.x + 0.5, e.bottom() - 1.0});
 
             const Point minus = r.decrement.center();
             const Point plus = r.increment.center();
             const double arm = 4.0;
             if (f.kind == SettingField::Kind::Choice) {
-                canvas.set_pen(line_pen(t.muted_text, 1.6));
+                canvas.set_pen(line_pen(t.muted_text, 1.5));
                 const std::array<Point, 3> previous = {Point{minus.x + 2.0, minus.y - arm}, Point{minus.x - 2.0, minus.y}, Point{minus.x + 2.0, minus.y + arm}};
                 const std::array<Point, 3> next = {Point{plus.x - 2.0, plus.y - arm}, Point{plus.x + 2.0, plus.y}, Point{plus.x - 2.0, plus.y + arm}};
                 canvas.draw_polyline(previous);
                 canvas.draw_polyline(next);
             } else {
                 const double value = m_form.get<double>(f.key);
-                canvas.set_pen(line_pen(value <= f.minimum ? t.border : t.text, 1.6));
+                canvas.set_pen(line_pen(value <= f.minimum ? t.field_border : t.muted_text, 1.5));
                 canvas.draw_line({minus.x - arm, minus.y}, {minus.x + arm, minus.y});
-                canvas.set_pen(line_pen(value >= f.maximum ? t.border : t.text, 1.6));
+                canvas.set_pen(line_pen(value >= f.maximum ? t.field_border : t.muted_text, 1.5));
                 canvas.draw_line({plus.x - arm, plus.y}, {plus.x + arm, plus.y});
                 canvas.draw_line({plus.x, plus.y - arm}, {plus.x, plus.y + arm});
             }
@@ -804,10 +824,18 @@ void FormView::draw_editor(Canvas& canvas, const Row& r, const SettingField& f) 
         case SettingField::Kind::Path:
         case SettingField::Kind::Directory: {
             const bool focused = m_focus == f.key;
-            canvas.set_pen(Pen{focused ? t.accent : t.border, focused ? 1.5 : 1.0});
-            canvas.set_brush(Brush::solid(focused ? t.surface : t.field));
-            canvas.draw_rounded_rect(e.adjusted(0.5, 0.5, -0.5, -0.5), radius, radius);
-            const Rect box = e.adjusted(t.spacing, 0.0, -t.spacing, 0.0);
+            if (focused) {
+                // A soft focus ring around the accent outline
+                Color ring = t.accent;
+                ring.a = 48;
+                canvas.set_pen(Pen{ring, 3.0});
+                canvas.set_brush(Brush{});
+                canvas.draw_rounded_rect(e.adjusted(-1.5, -1.5, 1.5, 1.5), kControlRadius + 1.5, kControlRadius + 1.5);
+            }
+            canvas.set_pen(Pen{focused ? t.accent : t.field_border, 1.0});
+            canvas.set_brush(Brush::solid(t.field));
+            canvas.draw_rounded_rect(e.adjusted(0.5, 0.5, -0.5, -0.5), kControlRadius, kControlRadius);
+            const Rect box = e.adjusted(10.0, 0.0, -10.0, 0.0);
             std::string text = focused ? m_editText : value_text(f);
             if (focused) {
                 // The end of the text stays in view while typing
@@ -817,37 +845,65 @@ void FormView::draw_editor(Canvas& canvas, const Row& r, const SettingField& f) 
                         text.erase(0, 1);
                     }
                 }
-                const double caret = box.x + m_metrics->advance(font, text) + 1.0;
+                const double caret = std::round(box.x + m_metrics->advance(font, text)) + 1.5;
                 canvas.set_pen(line_pen(t.accent, 1.5));
-                canvas.draw_line({caret, e.y + 5.0}, {caret, e.bottom() - 5.0});
+                canvas.draw_line({caret, e.y + 7.0}, {caret, e.bottom() - 7.0});
             } else {
                 text = elided(text, font, box.width);
             }
-            canvas.set_pen(t.text);
+            canvas.set_pen(f.kind == SettingField::Kind::Text || focused ? t.text : t.muted_text);
             canvas.draw_text(box, Align::Left | Align::VCenter, text);
             return;
         }
-        case SettingField::Kind::Action:
+        case SettingField::Kind::Action: {
             canvas.set_pen(Pen::none());
             canvas.set_brush(Brush::solid(t.accent));
-            canvas.draw_rounded_rect(e, radius, radius);
+            canvas.draw_rounded_rect(e, kControlRadius, kControlRadius);
+            const Font bold = t.font(t.font_size, true);
+            canvas.set_font(bold);
             canvas.set_pen(t.accent_text);
-            canvas.draw_text(e, Align::Center, elided(f.label, font, e.width - t.spacing));
-            return;
-        case SettingField::Kind::Color: {
-            const std::string text = m_form.get<std::string>(f.key);
-            canvas.set_pen(Pen{t.border, 1.0});
-            canvas.set_brush(Brush::solid(parse_color(text).value_or(Color::transparent())));
-            canvas.draw_rounded_rect(e.adjusted(0.5, 0.5, -0.5, -0.5), radius, radius);
-            canvas.set_pen(t.muted_text);
-            canvas.draw_text(Rect{e.x - 6.0 * e.height, e.y, 6.0 * e.height - t.spacing, e.height}, Align::Right | Align::VCenter, upper(text));
+            canvas.draw_text(e, Align::Center, elided(f.label, bold, e.width - t.spacing));
             return;
         }
-        case SettingField::Kind::Info:
-            canvas.set_pen(tone_color(t, f.tone));
-            canvas.draw_text(e, (f.label.empty() ? Align::Left : Align::Right) | Align::VCenter,
-                             elided(m_form.get<std::string>(f.key), font, e.width));
+        case SettingField::Kind::Color: {
+            const std::string text = m_form.get<std::string>(f.key);
+            canvas.set_pen(Pen{t.field_border, 1.0});
+            canvas.set_brush(Brush::solid(parse_color(text).value_or(Color::transparent())));
+            canvas.draw_rounded_rect(e.adjusted(0.5, 0.5, -0.5, -0.5), kControlRadius, kControlRadius);
+            const Font mono = t.mono_font(t.small_font_size);
+            canvas.set_font(mono);
+            canvas.set_pen(t.muted_text);
+            canvas.draw_text(Rect{e.x - 120.0, r.rect.y, 120.0 - t.spacing, r.rect.height}, Align::Right | Align::VCenter, upper(text));
             return;
+        }
+        case SettingField::Kind::Info: {
+            const std::string text = m_form.get<std::string>(f.key);
+            if (f.tone == SettingField::Tone::Normal) {
+                canvas.set_pen(t.muted_text);
+                canvas.draw_text(e, (f.label.empty() ? Align::Left : Align::Right) | Align::VCenter, elided(text, font, e.width));
+                return;
+            }
+            // A status chip: tinted pill with a dot in the tone's colour
+            const Color color = tone_color(t, f.tone);
+            const Font chipFont = t.font(t.small_font_size, true);
+            const double dot = 6.0;
+            const double textWidth = std::min(m_metrics->advance(chipFont, text), e.width - 3.0 * t.spacing - dot);
+            const double chipWidth = textWidth + 3.0 * t.spacing + dot;
+            const double chipHeight = std::round(t.small_font_size * 1.9);
+            const Rect chip{f.label.empty() ? e.x : e.right() - chipWidth, std::round(e.center().y - chipHeight / 2.0), chipWidth, chipHeight};
+            Color tint = color;
+            tint.a = 26;
+            canvas.set_pen(Pen::none());
+            canvas.set_brush(Brush::solid(tint));
+            canvas.draw_rounded_rect(chip, chipHeight / 2.0, chipHeight / 2.0);
+            canvas.set_brush(Brush::solid(color));
+            canvas.draw_ellipse({chip.x + t.spacing + dot / 2.0, chip.center().y}, dot / 2.0, dot / 2.0);
+            canvas.set_font(chipFont);
+            canvas.set_pen(color);
+            canvas.draw_text(Rect{chip.x + 1.5 * t.spacing + dot, chip.y, textWidth + 1.0, chip.height}, Align::Left | Align::VCenter,
+                             elided(text, chipFont, textWidth + 1.0));
+            return;
+        }
         case SettingField::Kind::Custom:
             return;
     }

@@ -22,6 +22,7 @@
 //=============================================================================================================
 
 #include "../viz_qt_global.h"
+#include <mne/viz/figures/theme.h>
 #include <mne/viz/forms/settings_form.h>
 
 //=============================================================================================================
@@ -100,6 +101,16 @@ public:
 
     //=========================================================================================================
     /**
+     * Sets the colours of status texts; the rest of the look comes from applyTheme() on a parent.
+     *
+     * @param[in] theme   Theme of the panels.
+     *
+     * @since 3.0.0
+     */
+    void setTheme(const viz::Theme& theme);
+
+    //=========================================================================================================
+    /**
      * Reads the values stored under @p path; missing ones and fields that are not persistent keep their current value.
      *
      * @param[in] path   QSettings group of the panel, e.g. "MNESCAN/Averaging"; empty does nothing.
@@ -126,8 +137,9 @@ signals:
 private:
     struct Row
     {
-        QWidget* editor = nullptr; /**< Editor, button or container. */
-        QLabel* label = nullptr;   /**< Label in front of the editor, if any. */
+        QWidget* editor = nullptr;    /**< Editor, button or container. */
+        QLabel* label = nullptr;      /**< Label in front of the editor, if any. */
+        QWidget* container = nullptr; /**< Line that holds the editor on the right, if any. */
     };
 
     void build();
@@ -142,7 +154,8 @@ private:
     viz::SettingsForm& m_form;
     std::map<std::string, Row> m_rows;
     std::map<std::string, QGroupBox*> m_groups;
-    QWidget* m_content = nullptr; /**< Holds the rows; replaced on rebuild(). */
+    viz::Theme m_theme = viz::Theme::light(); /**< Colours of status texts. */
+    QWidget* m_content = nullptr;             /**< Holds the rows; replaced on rebuild(). */
     int m_listener = 0;
     int m_structureListener = 0;
 };

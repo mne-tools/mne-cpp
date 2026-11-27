@@ -150,7 +150,7 @@
     "test_viz_form_view": {
       "generators": [],
       "fixtures": {
-        "src/tests/test_viz_form_view/data/form_view.png": "d0f447c34d331f6dfd4ef6d7bb184d816ff5b4e4eece782d3be1e4c0417e0471"
+        "src/tests/test_viz_form_view/data/form_view.png": "e9dfe6718513034db77ebaa73699fa77baccc541fa01671873d672223c28d62a"
       }
     },
     "test_viz_render": {
