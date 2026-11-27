@@ -67,11 +67,11 @@ Cast a ray against all surfaces in the scene.
 - **subView** : *const [SubView](/docs/api/viz-qt/sub-view) &*
   Active [`SubView`](/docs/api/viz-qt/sub-view) (for visibility / surface type filtering).
 
-- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz-qt/brain-surface) &gt; &gt; &*
-  Map of surface key → [`BrainSurface`](/docs/api/viz-qt/brain-surface).
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt; &gt; &*
+  Map of surface key → [`BrainSurface`](/docs/api/viz/brain-surface).
 
-- **itemSurfaceMap** : *const std::map&lt; const QStandardItem *, std::shared_ptr&lt; [BrainSurface](/docs/api/viz-qt/brain-surface) &gt; &gt; &*
-  Map of tree item → [`BrainSurface`](/docs/api/viz-qt/brain-surface) (for reverse lookup).
+- **itemSurfaceMap** : *const std::map&lt; const QStandardItem *, std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt; &gt; &*
+  Map of tree item → [`BrainSurface`](/docs/api/viz/brain-surface) (for reverse lookup).
 
 - **itemDipoleMap** : *const std::map&lt; const QStandardItem *, std::shared_ptr&lt; [DipoleObject](/docs/api/viz-qt/dipole-object) &gt; &gt; &*
   Map of tree item → [`DipoleObject`](/docs/api/viz-qt/dipole-object).
@@ -93,10 +93,10 @@ This examines the surface key, annotation data, and item type to produce a human
 - **result** : *const [RayHit](/docs/api/viz-qt/ray-hit) &*
   [`RayHit`](/docs/api/viz-qt/ray-hit) from `pick()`.
 
-- **itemSurfaceMap** : *const std::map&lt; const QStandardItem *, std::shared_ptr&lt; [BrainSurface](/docs/api/viz-qt/brain-surface) &gt; &gt; &*
+- **itemSurfaceMap** : *const std::map&lt; const QStandardItem *, std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt; &gt; &*
   Map for reverse item → surface lookup.
 
-- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz-qt/brain-surface) &gt; &gt; &*
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt; &gt; &*
   [`FsSurface`](/docs/api/fs/fs-surface) map for key-based lookup.
 
 **Returns:**

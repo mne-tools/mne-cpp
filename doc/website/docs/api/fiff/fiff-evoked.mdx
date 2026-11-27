@@ -275,7 +275,7 @@ Merges evoked data with a predefined weighting strategy (weights="nave" or "equa
 
 Read an evoked data set from FIFF and print its measurement info and coordinate transforms.
 
-````cpp title="src/examples/ex_read_evoked/main.cpp, line 57"
+````cpp title="src/examples/ex_read_evoked/main.cpp, line 58"
 /** Writes a butterfly plot of the channels of @p evoked of @p kind measured in @p unit, scaled by @p scale. */
 void saveButterfly(const FiffEvoked& evoked, int kind, int unit, double scale, const QString& name, const QString& yLabel, const QColor& color)
 {
@@ -296,7 +296,7 @@ void saveButterfly(const FiffEvoked& evoked, int kind, int unit, double scale, c
 
 Average a raw recording and localize dipole pairs with Powell RAP-MUSIC on a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 373"
+````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 374"
 FiffEvoked evoked = data.average(raw.info, tmin * raw.info.sfreq, floor(tmax * raw.info.sfreq + 0.5), vecSel);
 ````
 
@@ -304,7 +304,7 @@ FiffEvoked evoked = data.average(raw.info, tmin * raw.info.sfreq, floor(tmax * r
 
 Average a raw recording and localize dipole pairs with RAP-MUSIC on a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_rap_music_raw/main.cpp, line 368"
+````cpp title="src/examples/ex_clustered_inverse_rap_music_raw/main.cpp, line 369"
 FiffEvoked evoked = data.average(raw.info, tmin * raw.info.sfreq, floor(tmax * raw.info.sfreq + 0.5), vecSel);
 ````
 

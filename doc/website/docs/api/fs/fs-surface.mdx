@@ -413,7 +413,7 @@ const auto reread = MNEMorphMap::read(mapFile.toStdU16String(), "small", "large"
 
 Cluster the forward solution by cortical parcellation and compute an MNE, dSPM or sLORETA estimate of an evoked response.
 
-````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 85"
+````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 86"
 QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM"); //"MNE" | "dSPM" | "sLORETA"
 QCommandLineOption invFileOption("invOut", "Path to inverse <file>, which is to be written.", "file", "");
 QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
@@ -428,7 +428,7 @@ QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subj
 
 Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 89"
+````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 90"
 QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 QCommandLineOption surfOption("surfType", "FsSurface type <type>.", "type", "inflated");
 QCommandLineOption annotOption("annotType", "FsAnnotation type <type>.", "type", "aparc.a2009s");

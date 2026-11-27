@@ -61,7 +61,7 @@ Start async STC file loading on a background thread.
 - **rhPath** : *const std::filesystem::path &*
   Path to right-hemisphere STC file.
 
-- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz-qt/brain-surface) &gt; &gt; &*
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt; &gt; &*
   [`FsSurface`](/docs/api/fs/fs-surface) map for finding lh/rh brain surfaces.
 
 - **activeSurfaceType** : *const std::string &*
@@ -104,7 +104,7 @@ Set the current STC time-point and apply colours to matching surfaces.
 - **index** : *int*
   Time-point index.
 
-- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz-qt/brain-surface) &gt; &gt; &*
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt; &gt; &*
   [`FsSurface`](/docs/api/fs/fs-surface) map.
 
 - **singleView** : *const [SubView](/docs/api/viz-qt/sub-view) &*
@@ -196,7 +196,7 @@ Feeds all STC time-points into the streaming queue and begins the interpolation 
 
 **Parameters:**
 
-- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz-qt/brain-surface) &gt; &gt; &*
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt; &gt; &*
   [`FsSurface`](/docs/api/fs/fs-surface) map (for colour application).
 
 - **singleView** : *const [SubView](/docs/api/viz-qt/sub-view) &*

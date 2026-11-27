@@ -169,7 +169,7 @@ Takes the writer of an output stream (control path).
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 210"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 211"
 const AcqStream stream = device->stream();
 const auto info = stream.info();
 // Electrode check before recording; amplifiers without an impedance mode return NotSupported.
@@ -190,7 +190,7 @@ auto reader = stream.reader(AcqReader::ReadMode::Lossless);
 
 Live multi-channel, multi-rate scope of a streaming source with a closed-loop stimulator on the same clock.
 
-````cpp title="src/examples/ex_acq_scope/main.cpp, line 831"
+````cpp title="src/examples/ex_acq_scope/main.cpp, line 832"
     const AcqStream stream = device->stream(i);
     const auto streamInfo = stream.info();
     if (streamInfo->direction != AcqDirection::Input || isComplex(streamInfo->format) || streamInfo->sfreq <= 0.0) {

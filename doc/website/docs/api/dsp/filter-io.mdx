@@ -73,7 +73,7 @@ Writes the coefficients with all the digits they need to be read back exactly.
 
 FIR filter design, application and storage with the dsp library.
 
-````cpp title="src/examples/ex_dsp_filter/main.cpp, line 187"
+````cpp title="src/examples/ex_dsp_filter/main.cpp, line 188"
 QTemporaryDir dir;
 const std::filesystem::path path = dir.filePath("lp40.txt").toStdString();
 const bool written = FilterIO::write_filter(path, lowPass).has_value();

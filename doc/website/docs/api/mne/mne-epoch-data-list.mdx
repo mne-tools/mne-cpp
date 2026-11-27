@@ -304,7 +304,7 @@ ok &= expect(evoked.nave == 6 && near(evoked.data.topRows(306).norm(), 6.0801191
 
 Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
-````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 113"
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 114"
 std::shared_ptr<TFplot> m_pTfPlot;
 Eigen::MatrixXd m_matEvoked;
 Eigen::MatrixXd m_matEvokedSource;
@@ -315,7 +315,7 @@ mne::MNEEpochDataList epochs;
 
 Average stimulus-locked epochs of a raw FIFF recording into an evoked response, with event selection and EOG rejection.
 
-````cpp title="src/examples/ex_averaging/main.cpp, line 153"
+````cpp title="src/examples/ex_averaging/main.cpp, line 154"
 FiffEvoked evoked = MNEEpochDataList::computeAverage(raw,
                                                      events,
                                                      fTMin,

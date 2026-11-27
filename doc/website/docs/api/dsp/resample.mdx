@@ -94,7 +94,7 @@ The ratio is reduced to its lowest terms p/q via GCD, then a polyphase Hamming-w
 
 Spectral and filtering tools of the dsp library on signals with known content.
 
-````cpp title="src/examples/ex_dsp_spectral/main.cpp, line 187"
+````cpp title="src/examples/ex_dsp_spectral/main.cpp, line 188"
 const RowVectorXd downsampled = Resample::resample(signal, 100.0, kSFreq); // 200 Hz -> 100 Hz
 // 55 Hz is above the new Nyquist (50 Hz) and must be removed; the 20 Hz sine stays
 RowVectorXd expected20(downsampled.size());

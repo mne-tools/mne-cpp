@@ -71,7 +71,7 @@ Sets the message, cut to fit.
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 249"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 250"
 std::array<AcqControlEvent, 32> controlEvents;
 const auto reportAlerts = [&] {
     for (std::size_t i = 0, n = device->pollControlEvents(controlEvents); i < n; ++i) {

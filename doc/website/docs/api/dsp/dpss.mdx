@@ -66,7 +66,7 @@ Compute DPSS tapers for a given window length and half-bandwidth.
 
 Spectral and filtering tools of the dsp library on signals with known content.
 
-````cpp title="src/examples/ex_dsp_spectral/main.cpp, line 132"
+````cpp title="src/examples/ex_dsp_spectral/main.cpp, line 133"
 const DpssResult dpss = Dpss::compute(64, 2.5, 4); // N = 64 samples, NW = 2.5, 4 tapers
 // scipy.signal.windows.dpss(64, 2.5, 4, return_ratios=True)
 const double dpssErr = maxError(dpss.vecEigenvalues, {0.9999972774351693, 0.9998465484588153, 0.9962668597877571, 0.9524259615013084});

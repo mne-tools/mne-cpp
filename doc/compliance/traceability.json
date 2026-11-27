@@ -392,17 +392,18 @@
       "missing_tests": []
     },
     "viz": {
-      "classes": 94,
-      "tested": 92,
+      "classes": 100,
+      "tested": 97,
       "untested": [
         "GeometryInfo",
-        "Interpolation"
+        "Interpolation",
+        "VertexData"
       ],
       "missing_tests": []
     },
     "viz_qt": {
-      "classes": 126,
-      "tested": 57,
+      "classes": 120,
+      "tested": 52,
       "untested": [
         "AbstractTreeItem",
         "AbstractView",
@@ -471,8 +472,7 @@
         "TimeRulerEventMark",
         "TimeRulerReferenceMark",
         "TimeRulerWidget",
-        "TriggerDetectionView",
-        "VertexData"
+        "TriggerDetectionView"
       ],
       "missing_tests": []
     },

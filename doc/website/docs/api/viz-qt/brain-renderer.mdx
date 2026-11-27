@@ -171,7 +171,7 @@ Upload the surface's streams if they changed and write the uniforms of one surfa
 - **data** : *const SceneData &*
   Scene uniforms (MVP, light, etc).
 
-- **surface** : *[BrainSurface](/docs/api/viz-qt/brain-surface) **
+- **surface** : *[BrainSurface](/docs/api/viz/brain-surface) **
   Pointer to surface.
 
 **Returns:**
@@ -191,7 +191,7 @@ Call inside a pass.
 - **cb** : *QRhiCommandBuffer **
   [`Command`](/docs/api/viz/command) buffer.
 
-- **surface** : *[BrainSurface](/docs/api/viz-qt/brain-surface) **
+- **surface** : *[BrainSurface](/docs/api/viz/brain-surface) **
   Pointer to surface to draw.
 
 - **mode** : *ShaderMode*
@@ -398,7 +398,7 @@ Call after `prepareVideoOverlay()`.
 - **overlay** : *[VideoOverlay](/docs/api/viz-qt/video-overlay) **
   Pointer to [`VideoOverlay`](/docs/api/viz-qt/video-overlay); ignored when null/disabled.
 
-- **surface** : *[BrainSurface](/docs/api/viz-qt/brain-surface) **
+- **surface** : *[BrainSurface](/docs/api/viz/brain-surface) **
   Target surface mesh (typically scalp/head), or nullptr for the quad.
 
 **Returns:**
@@ -421,7 +421,7 @@ Call inside a pass.
 - **overlay** : *[VideoOverlay](/docs/api/viz-qt/video-overlay) **
   Pointer to [`VideoOverlay`](/docs/api/viz-qt/video-overlay).
 
-- **surface** : *[BrainSurface](/docs/api/viz-qt/brain-surface) **
+- **surface** : *[BrainSurface](/docs/api/viz/brain-surface) **
   Same target surface as in `prepareVideoOverlayDraw()`.
 
 - **uniformOffset** : *int*

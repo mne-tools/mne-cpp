@@ -275,7 +275,7 @@ void runCard(AcqWriter& input, AcqReader& dac, const SignalGenerator& gen, Close
 
 Live multi-channel, multi-rate scope of a streaming source with a closed-loop stimulator on the same clock.
 
-````cpp title="src/examples/ex_acq_scope/main.cpp, line 247"
+````cpp title="src/examples/ex_acq_scope/main.cpp, line 248"
 /** Reads everything @p reader has now into trace @p index; used for the device's further streams. */
 void drainInto(AcqReader& reader, std::size_t index, std::vector<float>& block, Shared& shared)
 {
@@ -296,7 +296,7 @@ void drainInto(AcqReader& reader, std::size_t index, std::vector<float>& block, 
 
 Pick an acquisition device or its simulator, watch it, record it to FIFF and play the recording back.
 
-````cpp title="src/examples/ex_acq_devices/main.cpp, line 475"
+````cpp title="src/examples/ex_acq_devices/main.cpp, line 476"
 auto reader = device->stream().reader(AcqReader::ReadMode::Lossless);
 if (!reader) {
     return fail(reader.error().text());

@@ -194,7 +194,7 @@ Starts recording `stream` into a BIDS dataset; `stop()` writes the sidecars (cha
 
 Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 
-````cpp title="src/examples/ex_acq_record/main.cpp, line 82"
+````cpp title="src/examples/ex_acq_record/main.cpp, line 83"
 AcqRecorderOptions options;
 options.device = device->description(); // device and URI go into the file's measurement info
 const std::string path = QDir(directory).filePath("oddball_raw.fif").toStdString();
@@ -215,7 +215,7 @@ if (const AcqError error = recorder->stop(); !error.ok()) {
 
 Pick an acquisition device or its simulator, watch it, record it to FIFF and play the recording back.
 
-````cpp title="src/examples/ex_acq_devices/main.cpp, line 487"
+````cpp title="src/examples/ex_acq_devices/main.cpp, line 488"
     m_path = m_folder / name;
     AcqRecorderOptions options;
     options.device = device->description();

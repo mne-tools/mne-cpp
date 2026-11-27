@@ -1,0 +1,206 @@
+---
+id: mesh-factory
+title: "mne::viz::MeshFactory"
+sidebar_label: MeshFactory
+sidebar_position: 118
+---
+
+# MeshFactory
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/meshfactory.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/meshfactory.h)
+
+`#include <mne/viz/meshfactory.h>`
+
+```cpp
+class mne::viz::MeshFactory
+```
+
+Static factory for procedural mesh primitives.
+
+All methods return fully constructed [`BrainSurface`](/docs/api/viz/brain-surface) objects ready for rendering. This eliminates duplicated icosahedron / plate / barbell code that was spread across [BrainView](/docs/api/viz-qt/brain-view)::onRowsInserted.
+
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+// A 5 mm marker sphere above the patch and a 2 cm rod along x, both ready for the renderer
+const auto marker = MeshFactory::createSphere(Eigen::Vector3f(0.01f, 0.01f, 0.05f), 0.005f, Color{255, 0, 0, 255}, 1);
+const auto rod = MeshFactory::createCylinder(Eigen::Vector3f::Zero(), Eigen::Vector3f(0.02f, 0.0f, 0.0f), 0.001f, Color{0, 0, 255, 255});
+Eigen::Vector3f markerMin;
+Eigen::Vector3f markerMax;
+marker->boundingBox(markerMin, markerMax);
+```
+
+---
+
+## Public Methods
+
+### MeshFactory()
+
+---
+
+## Static Methods
+
+### createSphere(center, radius, color, subdivisions)
+
+Create a subdivided icosahedron sphere.
+
+**Parameters:**
+
+- **center** : *const Eigen::Vector3f &*
+  World-space center of the sphere.
+
+- **radius** : *float*
+  Radius in meters.
+
+- **color** : *const [Color](/docs/api/viz/color) &*
+  [`FsSurface`](/docs/api/fs/fs-surface) color.
+
+- **subdivisions** : *int*
+  Number of subdivision passes (0 = 20 tris, 1 = 80 tris).
+
+**Returns:**
+
+- *std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt;* — Shared pointer to the created [`BrainSurface`](/docs/api/viz/brain-surface).
+
+---
+
+### createPlate(center, orientation, color, size)
+
+Create a thin oriented rectangular plate (used for MEG magnetometers).
+
+**Parameters:**
+
+- **center** : *const Eigen::Vector3f &*
+  World-space center.
+
+- **orientation** : *const Eigen::Matrix4f &*
+  3×3 rotation embedded in a 4×4 matrix (coil_trans).
+
+- **color** : *const [Color](/docs/api/viz/color) &*
+  [`FsSurface`](/docs/api/fs/fs-surface) color.
+
+- **size** : *float*
+  Side length in meters (plate is size × size × thin).
+
+**Returns:**
+
+- *std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt;* — Shared pointer to the created [`BrainSurface`](/docs/api/viz/brain-surface).
+
+---
+
+### createBarbell(center, orientation, color, size)
+
+Create a barbell shape (two spheres connected by a thin rod), used for MEG gradiometers.
+
+**Parameters:**
+
+- **center** : *const Eigen::Vector3f &*
+  World-space center.
+
+- **orientation** : *const Eigen::Matrix4f &*
+  3×3 rotation embedded in a 4×4 matrix (coil_trans).
+
+- **color** : *const [Color](/docs/api/viz/color) &*
+  [`FsSurface`](/docs/api/fs/fs-surface) color.
+
+- **size** : *float*
+  Overall size scale in meters.
+
+**Returns:**
+
+- *std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt;* — Shared pointer to the created [`BrainSurface`](/docs/api/viz/brain-surface).
+
+---
+
+### createBatchedSpheres(positions, radius, color, subdivisions)
+
+Create a batched mesh of identical spheres at multiple positions (used for source space points, digitizer points, etc.).
+
+All spheres are merged into a single [`BrainSurface`](/docs/api/viz/brain-surface) for efficient rendering.
+
+**Parameters:**
+
+- **positions** : *const std::vector&lt; Eigen::Vector3f &gt; &*
+  World-space positions for each sphere.
+
+- **radius** : *float*
+  [`Sphere`](/docs/api/math/sphere) radius in meters.
+
+- **color** : *const [Color](/docs/api/viz/color) &*
+  [`Sphere`](/docs/api/math/sphere) color.
+
+- **subdivisions** : *int*
+  Number of subdivision passes per sphere.
+
+**Returns:**
+
+- *std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt;* — Shared pointer to the batched [`BrainSurface`](/docs/api/viz/brain-surface).
+
+---
+
+### createCylinder(from, to, radius, color, sides)
+
+Create a cylinder between two world-space endpoints.
+
+**Parameters:**
+
+- **from** : *const Eigen::Vector3f &*
+  Start point (metres).
+
+- **to** : *const Eigen::Vector3f &*
+  End point (metres).
+
+- **radius** : *float*
+  Cylinder radius (metres).
+
+- **color** : *const [Color](/docs/api/viz/color) &*
+  [`Surface`](/docs/api/viz/surface) color.
+
+- **sides** : *int*
+  Number of sides around the circumference (min 3).
+
+**Returns:**
+
+- *std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt;* — Shared pointer to the created [`BrainSurface`](/docs/api/viz/brain-surface).
+
+---
+
+### sphereVertexCount(subdivisions)
+
+Number of vertices in a subdivided icosahedron (for picking calculations).
+
+**Parameters:**
+
+- **subdivisions** : *int*
+  Number of subdivision passes.
+
+**Returns:**
+
+- *int* — Number of vertices.
+
+---
+
+## Example
+
+- Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 244"
+// A 5 mm marker sphere above the patch and a 2 cm rod along x, both ready for the renderer
+const auto marker = MeshFactory::createSphere(Eigen::Vector3f(0.01f, 0.01f, 0.05f), 0.005f, Color{255, 0, 0, 255}, 1);
+const auto rod = MeshFactory::createCylinder(Eigen::Vector3f::Zero(), Eigen::Vector3f(0.02f, 0.0f, 0.0f), 0.001f, Color{0, 0, 255, 255});
+Eigen::Vector3f markerMin;
+Eigen::Vector3f markerMax;
+marker->boundingBox(markerMin, markerMax);
+ok &= expect(static_cast<int>(marker->vertexCount()) == MeshFactory::sphereVertexCount(1) && rod->indexCount() > 0 && std::abs(markerMax.z() - 0.055f) < 1e-4f,
+             "MeshFactory: the marker sphere spans 5 mm around its centre, the rod has triangles");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

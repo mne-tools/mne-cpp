@@ -175,7 +175,7 @@ Needs the caller's surface map to locate the helmet and/or head surface. Also ne
 
 **Parameters:**
 
-- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz-qt/brain-surface) &gt; &gt; &*
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt; &gt; &*
   All surfaces keyed by name.
 
 - **headToMriTrans** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
@@ -198,7 +198,7 @@ Paints per-vertex colours onto the target surfaces and optionally generates iso-
 
 **Parameters:**
 
-- **surfaces** : *std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz-qt/brain-surface) &gt; &gt; &*
+- **surfaces** : *std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt; &gt; &*
   [`FsSurface`](/docs/api/fs/fs-surface) map (contour surfaces may be added).
 
 - **singleView** : *const [SubView](/docs/api/viz-qt/sub-view) &*
@@ -247,7 +247,7 @@ Looks for "bem_head" first, then any BEM surface whose tissue type is `BrainSurf
 
 **Parameters:**
 
-- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz-qt/brain-surface) &gt; &gt; &*
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt; &gt; &*
   [`Surface`](/docs/api/viz/surface) map keyed by surface name.
 
 **Returns:**
@@ -262,7 +262,7 @@ Find the MEG helmet surface key ("sens_surface_meg") if present.
 
 **Parameters:**
 
-- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz-qt/brain-surface) &gt; &gt; &*
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/viz/brain-surface) &gt; &gt; &*
   [`Surface`](/docs/api/viz/surface) map keyed by surface name.
 
 **Returns:**

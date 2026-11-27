@@ -261,7 +261,7 @@ Applies the current filter to the input data using multiplication in frequency d
 
 FIR filter design, application and storage with the dsp library.
 
-````cpp title="src/examples/ex_dsp_filter/main.cpp, line 111"
+````cpp title="src/examples/ex_dsp_filter/main.cpp, line 112"
 // Frequencies are normalised to Nyquist (500 Hz): 40 Hz cut-off, 10 Hz transition
 const int typeLpf = FilterKernel::filter_type_index("LPF");
 const int cosine = FilterKernel::design_method_index("Cosine");
@@ -281,7 +281,7 @@ for (const FilterKernel* kernel : {&lowPass, &lowPassPm}) {
 
 Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
 
-````cpp title="src/examples/ex_disp_plots/main.cpp, line 230"
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 231"
 // Band pass 1-40 Hz at 250 Hz, 256 taps; frequencies are normed to the Nyquist frequency of 125 Hz
 const FilterKernel bandPass("BPF_1_40", FilterKernel::filter_type_index("BPF"), 256, 20.5 / 125.0, 39.0 / 125.0,
                             5.0 / 125.0, 250.0, FilterKernel::design_method_index("Cosine"));

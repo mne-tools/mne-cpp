@@ -282,7 +282,7 @@ MNEBem t_Bem(parser.value(bemFileInOption).toStdU16String());
 
 Compute a clustered MNE, dSPM or sLORETA estimate of the sample evoked response and show it on the cortex with Disp3D.
 
-````cpp title="src/examples/ex_disp_3D/main.cpp, line 245"
+````cpp title="src/examples/ex_disp_3D/main.cpp, line 246"
 //Read and show BEM
 MNEBem t_Bem((QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif").toStdU16String());
 for (std::size_t i = 0; i < t_Bem.size(); ++i) {

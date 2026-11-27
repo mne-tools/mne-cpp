@@ -50,7 +50,7 @@ std::printf("%s: %d channels, samples %d to %d, device %s '%s' (%s)\n", path.c_s
 
 Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 
-````cpp title="src/examples/ex_acq_record/main.cpp, line 106"
+````cpp title="src/examples/ex_acq_record/main.cpp, line 107"
 FiffRawData raw(QString::fromStdString(path).toStdString());
 const FiffDeviceInfo& recorded = raw.info.device_info; // backend, device and source id of the recording
 std::printf("%s: %d channels, samples %d to %d, device %s '%s' (%s)\n", path.c_str(), raw.info.nchan,

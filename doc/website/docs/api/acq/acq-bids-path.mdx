@@ -58,7 +58,7 @@ std::printf("BIDS: %s\n", bidsRecorder->files().front().c_str());
 
 Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 
-````cpp title="src/examples/ex_acq_record/main.cpp, line 140"
+````cpp title="src/examples/ex_acq_record/main.cpp, line 141"
 AcqBidsPath bids;
 bids.root = QDir(directory).filePath("bids").toStdString();
 bids.subject = "01";

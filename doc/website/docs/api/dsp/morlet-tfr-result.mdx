@@ -37,7 +37,7 @@ const MorletTfrResult morlet = MorletTfr::compute(signal, kSFreq, morletFreqs, 7
 
 Spectral and filtering tools of the dsp library on signals with known content.
 
-````cpp title="src/examples/ex_dsp_spectral/main.cpp, line 159"
+````cpp title="src/examples/ex_dsp_spectral/main.cpp, line 160"
 RowVectorXd morletFreqs(3);
 morletFreqs << 20.0, 35.0, 55.0;
 const MorletTfrResult morlet = MorletTfr::compute(signal, kSFreq, morletFreqs, 7.0);

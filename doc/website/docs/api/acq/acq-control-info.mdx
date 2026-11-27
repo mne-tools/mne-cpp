@@ -48,7 +48,7 @@ const auto reportAlerts = [&] {
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 244"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 245"
 // What the device lets a program set, run and watch while it is open, and what it reports
 for (const AcqControlInfo& control : device->controls()) {
     const char* kind = control.kind == AcqControlKind::Command ? "command" : (control.kind == AcqControlKind::Status ? "status" : "setting");

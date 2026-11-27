@@ -76,7 +76,7 @@ Constructs a [`CosineFilter`](/docs/api/dsp/cosine-filter) object.
 
 FIR filter design, application and storage with the dsp library.
 
-````cpp title="src/examples/ex_dsp_filter/main.cpp, line 127"
+````cpp title="src/examples/ex_dsp_filter/main.cpp, line 128"
 // CosineFilter works in absolute Hz: low-pass edge 40 Hz with a 10 Hz slope, FFT length 1024
 CosineFilter cosineLp(1024, 40.0f, 10.0f, 0.0f, 0.0f, kSFreq, CosineFilter::LPF);
 const RowVectorXcd& response = cosineLp.m_vecFftCoeff; // one-sided response, bin k at k * 1000 / 1024 Hz

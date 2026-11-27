@@ -396,7 +396,7 @@ Divides every edge weight and the threshold by the largest magnitude, so that we
 
 Connectivity metrics on synthetic data with a known coupling.
 
-````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 116"
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 117"
 /**
  * Band-averaged weight of the edge start -> end, or -1 if the network has no such edge.
  */
@@ -415,7 +415,7 @@ double edgeWeight(const Network& network, int start, int end)
 
 Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
-````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 94"
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 95"
 ConnectivitySettings m_settings;
 std::vector<Network> m_rawNetworkData; /**< Results as computed. */
 std::vector<Network> m_networkData;    /**< Results averaged over the selected band and normalized. */
@@ -426,7 +426,7 @@ std::map<std::string, Eigen::Vector4i> mColor;
 
 Compare connectivity metrics side by side on the same averaged sensor- or source-level data.
 
-````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 333"
+````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 334"
 std::vector<Network> lNetworks = compute_connectivity(conSettings);
 ````
 

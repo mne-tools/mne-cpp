@@ -49,7 +49,7 @@
       "viz",
       "viz/backends/sdl"
     ],
-    "tokens": 6208,
+    "tokens": 6105,
     "gui_outside_design": []
   },
   "libraries": {
@@ -266,24 +266,24 @@
       "by_category": {},
       "public_header_includes": 0,
       "q_object": 0,
-      "files": 90,
+      "files": 95,
       "modules": []
     },
     "viz/backends/qt": {
-      "tokens": 6208,
+      "tokens": 6105,
       "by_category": {
         "containers": 19,
         "files": 103,
-        "global": 1009,
-        "gui": 1987,
+        "global": 992,
+        "gui": 1901,
         "objects_signals": 657,
         "other": 1573,
         "strings": 846,
         "time": 14
       },
-      "public_header_includes": 159,
+      "public_header_includes": 158,
       "q_object": 76,
-      "files": 230,
+      "files": 225,
       "modules": [
         "Core",
         "Gui",

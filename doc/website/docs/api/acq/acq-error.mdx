@@ -112,7 +112,7 @@ Creates an error with context (control path, allocates).
 
 Pick an acquisition device or its simulator, watch it, record it to FIFF and play the recording back.
 
-````cpp title="src/examples/ex_acq_devices/main.cpp, line 503"
+````cpp title="src/examples/ex_acq_devices/main.cpp, line 504"
 m_view->setFileBounds(0, static_cast<int>(m_width) - 1);
 m_view->setData(m_sweep, 0);
 m_view->scrollToSample(0, false);
@@ -133,7 +133,7 @@ setMode(mode);
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 322"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 323"
 // Native samples to volts in one pass, whatever the device's format and layout.
 const AcqBlockView& samples = **view;
 const std::size_t n = samples.sampleCount();
@@ -154,7 +154,7 @@ for (std::size_t e = 0; e < samples.events().size(); ++e) {
 
 Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 
-````cpp title="src/examples/ex_acq_record/main.cpp, line 93"
+````cpp title="src/examples/ex_acq_record/main.cpp, line 94"
 device->close();
 if (const AcqError error = recorder->stop(); !error.ok()) {
     std::fprintf(stderr, "%s\n", error.text().c_str());

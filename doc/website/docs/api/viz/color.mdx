@@ -67,6 +67,21 @@ canvas.draw_text(Rect{0, 80, 200, 30}, Align::Center, "Hello scene");
 const DisplayList figure = canvas.take();
 ````
 
+### [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 244"
+// A 5 mm marker sphere above the patch and a 2 cm rod along x, both ready for the renderer
+const auto marker = MeshFactory::createSphere(Eigen::Vector3f(0.01f, 0.01f, 0.05f), 0.005f, Color{255, 0, 0, 255}, 1);
+const auto rod = MeshFactory::createCylinder(Eigen::Vector3f::Zero(), Eigen::Vector3f(0.02f, 0.0f, 0.0f), 0.001f, Color{0, 0, 255, 255});
+Eigen::Vector3f markerMin;
+Eigen::Vector3f markerMax;
+marker->boundingBox(markerMin, markerMax);
+ok &= expect(static_cast<int>(marker->vertexCount()) == MeshFactory::sphereVertexCount(1) && rod->indexCount() > 0 && std::abs(markerMax.z() - 0.055f) < 1e-4f,
+             "MeshFactory: the marker sphere spans 5 mm around its centre, the rod has triangles");
+````
+
 ### [ex_scene_sdl](../../examples/viz/ex_scene_sdl.mdx)
 
 Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.

@@ -44,7 +44,7 @@ const std::vector<TriggerFlank> steps = detect_trigger_flanks_grad(stim, 0, 0, 0
 
 FIR filter design, application and storage with the dsp library.
 
-````cpp title="src/examples/ex_dsp_filter/main.cpp, line 177"
+````cpp title="src/examples/ex_dsp_filter/main.cpp, line 178"
 MatrixXd stim = MatrixXd::Zero(1, 3000); // a stim channel with code 5 at 0.5 s and code 3 at 2 s, 100 ms each
 stim.block(0, 500, 1, 100).setConstant(5.0);
 stim.block(0, 2000, 1, 100).setConstant(3.0);

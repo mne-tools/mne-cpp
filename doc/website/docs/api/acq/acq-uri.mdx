@@ -99,7 +99,7 @@ From [ex_acq_oddball](../../examples/acq/ex_acq_oddball.mdx).
 
 Pick an acquisition device or its simulator, watch it, record it to FIFF and play the recording back.
 
-````cpp title="src/examples/ex_acq_devices/main.cpp, line 301"
+````cpp title="src/examples/ex_acq_devices/main.cpp, line 302"
     auto parsed = AcqUri::parse(uri);
     if (!parsed) {
         return fail(parsed.error().text());
@@ -118,7 +118,7 @@ Pick an acquisition device or its simulator, watch it, record it to FIFF and pla
 
 Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 
-````cpp title="src/examples/ex_acq_record/main.cpp, line 114"
+````cpp title="src/examples/ex_acq_record/main.cpp, line 115"
 // fiff:// replays a raw file as a source in its native format, with the trigger channel's changes as events.
 registerFiffScheme();                                                                // keeps a static link from dropping the backend
 auto replay = AcqDevice::open(AcqUri{"fiff", path, {{"realtime", "0"}}}.toString()); // as fast as possible

@@ -1,21 +1,21 @@
 ---
 id: brain-surface
-title: "mne::viz::qt::BrainSurface"
+title: "mne::viz::BrainSurface"
 sidebar_label: BrainSurface
-sidebar_position: 83
+sidebar_position: 117
 ---
 
 # BrainSurface
 
-**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/renderable/brainsurface.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/renderable/brainsurface.h)
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/brainsurface.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/brainsurface.h)
 
-`#include <mne/viz/backends/qt/brainsurface.h>`
+`#include <mne/viz/brainsurface.h>`
 
 ```cpp
-class mne::viz::qt::BrainSurface
+class mne::viz::BrainSurface
 ```
 
-[`BrainSurface`](/docs/api/viz-qt/brain-surface) manages the geometry and visual properties of a single brain mesh.
+[`BrainSurface`](/docs/api/viz/brain-surface) manages the geometry and visual properties of a single brain mesh.
 
 Renderable cortical surface mesh with per-vertex color, curvature data, and GPU buffer management.
 
@@ -26,11 +26,11 @@ patchVertices << 0.0f, 0.0f, 0.0f, 0.02f, 0.0f, 0.0f, 0.02f, 0.02f, 0.0f, 0.0f, 
 MatrixX3i patchTriangles(2, 3);
 patchTriangles << 0, 1, 2, 0, 2, 3;
 BrainSurface patch;
-patch.createFromData(patchVertices, patchTriangles, Qt::gray);
+patch.createFromData(patchVertices, patchTriangles, toColor(QColor(Qt::gray)));
 patch.setHemi(0);
 float hitDistance = 0.0f;
 int hitVertex = -1;
-const bool picked = patch.intersects(QVector3D(0.019f, 0.019f, 0.05f), QVector3D(0.0f, 0.0f, -1.0f), hitDistance, hitVertex);
+const bool picked = patch.intersects(Eigen::Vector3f(0.019f, 0.019f, 0.05f), Eigen::Vector3f(0.0f, 0.0f, -1.0f), hitDistance, hitVertex);
 const VertexData& corner = patch.vertexDataRef().at(2); // interleaved position, normal and packed ABGR colour
 ```
 
@@ -133,7 +133,7 @@ Load geometry from a MNE BEM surface.
 - **surf** : *const [MNEBemSurface](/docs/api/mne/mne-bem-surface) &*
   Input BEM surface.
 
-- **color** : *const QColor &*
+- **color** : *const [Color](/docs/api/viz/color) &*
   Base color for the surface.
 
 ---
@@ -152,7 +152,7 @@ Vertex normals are the sums of the adjacent face normals.
 - **triangles** : *const Eigen::MatrixX3i &*
   Mx3 matrix of triangle indices.
 
-- **color** : *const QColor &*
+- **color** : *const [Color](/docs/api/viz/color) &*
   [`FsSurface`](/docs/api/fs/fs-surface) color.
 
 ---
@@ -172,7 +172,7 @@ Create surface from raw vertex, normal and triangle data.
 - **triangles** : *const Eigen::MatrixX3i &*
   Mx3 matrix of triangle indices.
 
-- **color** : *const QColor &*
+- **color** : *const [Color](/docs/api/viz/color) &*
   [`FsSurface`](/docs/api/fs/fs-surface) color.
 
 ---
@@ -248,7 +248,7 @@ Clear source estimate overlay colors and restore curvature-based coloring.
 
 **Returns:**
 
-- *[GpuStream](/docs/api/viz-qt/gpu-stream)* — Geometry stream ([`VertexData`](/docs/api/viz-qt/vertex-data) per vertex).
+- *[GpuStream](/docs/api/viz/gpu-stream)* — Geometry stream ([`VertexData`](/docs/api/viz/vertex-data) per vertex).
 
 ---
 
@@ -256,7 +256,7 @@ Clear source estimate overlay colors and restore curvature-based coloring.
 
 **Returns:**
 
-- *[GpuStream](/docs/api/viz-qt/gpu-stream)* — Colour stream (packed ABGR per vertex; alpha carries the curvature grey on cortex).
+- *[GpuStream](/docs/api/viz/gpu-stream)* — Colour stream (packed ABGR per vertex; alpha carries the curvature grey on cortex).
 
 ---
 
@@ -264,7 +264,7 @@ Clear source estimate overlay colors and restore curvature-based coloring.
 
 **Returns:**
 
-- *[GpuStream](/docs/api/viz-qt/gpu-stream)* — Annotation colour stream (packed ABGR per vertex, 0 where unlabelled).
+- *[GpuStream](/docs/api/viz/gpu-stream)* — Annotation colour stream (packed ABGR per vertex, 0 where unlabelled).
 
 ---
 
@@ -272,7 +272,7 @@ Clear source estimate overlay colors and restore curvature-based coloring.
 
 **Returns:**
 
-- *[GpuStream](/docs/api/viz-qt/gpu-stream)* — Triangle index stream (three uint32 per triangle).
+- *[GpuStream](/docs/api/viz/gpu-stream)* — Triangle index stream (three uint32 per triangle).
 
 ---
 
@@ -280,7 +280,7 @@ Clear source estimate overlay colors and restore curvature-based coloring.
 
 **Returns:**
 
-- *const [RenderKey](/docs/api/viz-qt/render-key) &* — Identity of this surface in the renderer's GPU cache.
+- *const [RenderKey](/docs/api/viz/render-key) &* — Identity of this surface in the renderer's GPU cache.
 
 ---
 
@@ -326,7 +326,7 @@ Get the triangle index buffer.
 
 **Returns:**
 
-- *const std::vector&lt; [VertexData](/docs/api/viz-qt/vertex-data) &gt; &* — Current vertex geometry, valid while this surface lives.
+- *const std::vector&lt; [VertexData](/docs/api/viz/vertex-data) &gt; &* — Current vertex geometry, valid while this surface lives.
 
 ---
 
@@ -372,10 +372,10 @@ Get bounding box of the surface.
 
 **Parameters:**
 
-- **min** : *QVector3D &*
+- **min** : *Eigen::Vector3f &*
   Minimum coordinates.
 
-- **max** : *QVector3D &*
+- **max** : *Eigen::Vector3f &*
   Maximum coordinates.
 
 ---
@@ -386,10 +386,10 @@ Test ray intersection with this surface.
 
 **Parameters:**
 
-- **rayOrigin** : *const QVector3D &*
-  [`Ray`](/docs/api/viz/ray) origin in world/local space (object is assumed at 0,0,0 usually unless transformed externally). Note: The [`BrainSurface`](/docs/api/viz-qt/brain-surface) vertices are typically already transformed (e.g. by View3D model matrix logic? No, [`BrainView`](/docs/api/viz-qt/brain-view) applies matrix in shader. The vertices here are raw. So ray must be transformed to local space OR vertices transformed to world.
+- **rayOrigin** : *const Eigen::Vector3f &*
+  [`Ray`](/docs/api/viz/ray) origin in world/local space (object is assumed at 0,0,0 usually unless transformed externally). Note: The [`BrainSurface`](/docs/api/viz/brain-surface) vertices are typically already transformed (e.g. by View3D model matrix logic? No, BrainView applies matrix in shader. The vertices here are raw. So ray must be transformed to local space OR vertices transformed to world.
 
-- **rayDir** : *const QVector3D &*
+- **rayDir** : *const Eigen::Vector3f &*
   [`Ray`](/docs/api/viz/ray) direction (normalized).
 
 - **dist** : *float &*
@@ -451,7 +451,7 @@ Apply a generic 4x4 transformation matrix to all vertices and normals.
 
 **Parameters:**
 
-- **m** : *const QMatrix4x4 &*
+- **m** : *const Eigen::Matrix4f &*
   Transformation matrix.
 
 ---
@@ -464,7 +464,7 @@ Note: This prevents transformation accumulation.
 
 **Parameters:**
 
-- **m** : *const QMatrix4x4 &*
+- **m** : *const Eigen::Matrix4f &*
   Transformation matrix.
 
 ---
@@ -508,7 +508,7 @@ Set the colour of a surface without curvature (BEM, sensors, digitizers, source 
 
 **Parameters:**
 
-- **color** : *const QColor &*
+- **color** : *const [Color](/docs/api/viz/color) &*
   New colour; its alpha is the opacity of the holographic shader.
 
 ---
@@ -558,6 +558,27 @@ a single sphere in a batched mesh). Pass start=-1 to clear the vertex range high
 - Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 229"
+patchVertices << 0.0f, 0.0f, 0.0f, 0.02f, 0.0f, 0.0f, 0.02f, 0.02f, 0.0f, 0.0f, 0.02f, 0.0f;
+MatrixX3i patchTriangles(2, 3);
+patchTriangles << 0, 1, 2, 0, 2, 3;
+BrainSurface patch;
+patch.createFromData(patchVertices, patchTriangles, toColor(QColor(Qt::gray)));
+patch.setHemi(0);
+float hitDistance = 0.0f;
+int hitVertex = -1;
+const bool picked = patch.intersects(Eigen::Vector3f(0.019f, 0.019f, 0.05f), Eigen::Vector3f(0.0f, 0.0f, -1.0f), hitDistance, hitVertex);
+const VertexData& corner = patch.vertexDataRef().at(2); // interleaved position, normal and packed ABGR colour
+ok &= expect(picked && std::abs(hitDistance - 0.05f) < 1e-6f && hitVertex == 2 && corner.pos == Eigen::Vector3f(0.02f, 0.02f, 0.0f) && std::abs(std::abs(corner.norm.z()) - 1.0f) < 1e-6f,
+             "BrainSurface: a downward ray hits the patch 5 cm below, nearest vertex 2");
+````
 
 ## Authors of this file
 

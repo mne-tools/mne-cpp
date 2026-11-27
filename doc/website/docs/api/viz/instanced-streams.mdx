@@ -1,0 +1,52 @@
+---
+id: instanced-streams
+title: "mne::viz::InstancedStreams"
+sidebar_label: InstancedStreams
+sidebar_position: 115
+---
+
+# InstancedStreams
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/rendertypes.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/rendertypes.h)
+
+`#include <mne/viz/rendertypes.h>`
+
+```cpp
+struct mne::viz::InstancedStreams
+```
+
+CPU streams of an instanced mesh: one shape (vertices, indices) drawn once per instance.
+
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+// What a renderer uploads: CPU streams with generations, cached under the renderable's key
+const GpuStream patchGeometry = patch.geometryStream();
+const InstancedStreams glyphStreams = dipoleGlyphs.streams();
+const RenderKey& patchKey = patch.renderKey();
+```
+
+---
+
+## Example
+
+- Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 288"
+// What a renderer uploads: CPU streams with generations, cached under the renderable's key
+const GpuStream patchGeometry = patch.geometryStream();
+const InstancedStreams glyphStreams = dipoleGlyphs.streams();
+const RenderKey& patchKey = patch.renderKey();
+ok &= expect(patchGeometry.bytes == 4 * sizeof(VertexData) && glyphStreams.instanceCount == 2 && patchKey.id() != nullptr,
+             "Render streams: four patch vertices, two dipole instances, a live render key");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

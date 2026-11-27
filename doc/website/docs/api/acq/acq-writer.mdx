@@ -363,7 +363,7 @@ void runCard(AcqWriter& input, AcqReader& dac, const SignalGenerator& gen, Close
 
 Live multi-channel, multi-rate scope of a streaming source with a closed-loop stimulator on the same clock.
 
-````cpp title="src/examples/ex_acq_scope/main.cpp, line 270"
+````cpp title="src/examples/ex_acq_scope/main.cpp, line 271"
 /** Acquisition thread: reads the source, schedules pulses, plays the output ring, fills the histories. */
 void acquire(AcqReader& input, std::vector<AcqReader>& others, AcqWriter& stimulator, AcqReader& dac, Shared& shared)
 {
