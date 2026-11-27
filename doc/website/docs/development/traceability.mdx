@@ -8,7 +8,7 @@ sidebar_label: Traceability
 
 # Class-to-test traceability
 
-392 of 707 public classes name the test that covers them in [`doc/api_registry.json`](https://github.com/mne-tools/mne-cpp/blob/staging/doc/api_registry.json). CI checks that every named test exists and that no library's count falls below its floor in `scripts/compliance/traceability_policy.json`. Libraries in the acquisition, processing and file path are marked safety-relevant and come first.
+396 of 709 public classes name the test that covers them in [`doc/api_registry.json`](https://github.com/mne-tools/mne-cpp/blob/staging/doc/api_registry.json). CI checks that every named test exists and that no library's count falls below its floor in `scripts/compliance/traceability_policy.json`. Libraries in the acquisition, processing and file path are marked safety-relevant and come first.
 
 | Library | Safety-relevant | Classes | With a test | Share |
 |---|---|---:|---:|---:|
@@ -34,8 +34,8 @@ sidebar_label: Traceability
 | mri | no | 8 | 0 | 0 % |
 | pybridge | no | 4 | 4 | 100 % |
 | report | no | 1 | 1 | 100 % |
-| viz | no | 133 | 124 | 93 % |
-| viz_qt | no | 104 | 42 | 40 % |
+| viz | no | 136 | 127 | 93 % |
+| viz_qt | no | 103 | 43 | 42 % |
 | viz_sdl | no | 1 | 0 | 0 % |
 
 ## Classes without a named test
@@ -55,5 +55,5 @@ sidebar_label: Traceability
 - **mna**: `MnaFileRef`, `MnaGraph`, `MnaGraphExecutor`, `MnaIO`, `MnaNode`, `MnaOpRegistry`, `MnaOpSchema`, `MnaOpSchemaAttr`, `MnaOpSchemaPort`, `MnaParamBinding`, `MnaParamTree`, `MnaPort`, `MnaProject`, `MnaProvenance`, `MnaRecording`, `MnaRegistryLoader`, `MnaScript`, `MnaSession`, `MnaSubject`, `MnaVerification`, `MnaVerificationCheck`, `MnaVerificationResult`
 - **mri**: `MriCorFifIO`, `MriCorIO`, `MriMghIO`, `MriNiftiIO`, `MriSlice`, `MriSliceImage`, `MriSlicer`, `MriVolData`
 - **viz**: `ElectrodeObject`, `GeometryInfo`, `Interpolation`, `PickResult`, `RtSensorInterpolationMatWorker`, `RtSourceDataWorker`, `RtSourceInterpolationMatWorker`, `SceneLayer`, `VertexData`
-- **viz_qt**: `AbstractTreeItem`, `AbstractView`, `ApplyToView`, `ArtifactSettingsView`, `AverageLayoutView`, `AverageSelectionView`, `AveragingSettingsView`, `Bar`, `BidsView`, `BidsViewModel`, `ButterflyView`, `ChannelDataModel`, `ChannelDisplayInfo`, `ChannelInfoModel`, `ChannelLabelPanel`, `ChannelSelectionView`, `ColorMap`, `CompensatorView`, `ConnectivitySettingsView`, `Control3DView`, `CoregSettingsView`, `CovarianceSettingsView`, `DipoleFitView`, `DraggableFramelessWidget`, `EvokedSetModel`, `FiffRawViewSettings`, `FilterDesignView`, `FilterSettingsView`, `FrequencySpectrumDelegate`, `FrequencySpectrumModel`, `FwdSettingsView`, `Graph`, `HpiSettingsView`, `ImageSc`, `LinePlot`, `LiveMarker`, `MNEOperator`, `MinimumNormSettingsView`, `ModalitySelectionView`, `MultiView`, `MultiViewWindow`, `MultimodalScene`, `OverviewBarWidget`, `Plot`, `ProgressView`, `ProjectSettingsView`, `ProjectorsView`, `QuickControlView`, `ScaleControl`, `ScalingView`, `SelectionItem`, `SensorTreeItem`, `SpectrumSettingsView`, `SpectrumView`, `SpharaSettingsView`, `Spline`, `TFplot`, `TfSettingsView`, `TimeRulerEventMark`, `TimeRulerReferenceMark`, `TimeRulerWidget`, `TriggerDetectionView`
+- **viz_qt**: `AbstractTreeItem`, `AbstractView`, `ApplyToView`, `ArtifactSettingsView`, `AverageLayoutView`, `AverageSelectionView`, `AveragingSettingsView`, `Bar`, `BidsView`, `BidsViewModel`, `ButterflyView`, `ChannelDataModel`, `ChannelDisplayInfo`, `ChannelInfoModel`, `ChannelLabelPanel`, `ChannelSelectionView`, `ColorMap`, `ConnectivitySettingsView`, `Control3DView`, `CoregSettingsView`, `CovarianceSettingsView`, `DipoleFitView`, `DraggableFramelessWidget`, `EvokedSetModel`, `FiffRawViewSettings`, `FilterDesignView`, `FilterSettingsView`, `FrequencySpectrumDelegate`, `FrequencySpectrumModel`, `FwdSettingsView`, `Graph`, `HpiSettingsView`, `ImageSc`, `LinePlot`, `LiveMarker`, `MNEOperator`, `MinimumNormSettingsView`, `ModalitySelectionView`, `MultiView`, `MultiViewWindow`, `MultimodalScene`, `OverviewBarWidget`, `Plot`, `ProgressView`, `ProjectSettingsView`, `QuickControlView`, `ScaleControl`, `ScalingView`, `SelectionItem`, `SensorTreeItem`, `SpectrumSettingsView`, `SpectrumView`, `SpharaSettingsView`, `Spline`, `TFplot`, `TfSettingsView`, `TimeRulerEventMark`, `TimeRulerReferenceMark`, `TimeRulerWidget`, `TriggerDetectionView`
 - **viz_sdl**: `SdlHost`

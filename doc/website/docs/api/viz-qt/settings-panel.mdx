@@ -7,7 +7,7 @@ sidebar_position: 125
 
 # SettingsPanel
 
-**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/viewers/settingspanel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/viewers/settingspanel.h)
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/kit/settingspanel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/kit/settingspanel.h)
 
 `#include <mne/viz/backends/qt/settingspanel.h>`
 
@@ -17,7 +17,7 @@ class mne::viz::qt::SettingsPanel
 
 Qt Widgets for a [`SettingsForm`](/docs/api/viz/settings-form).
 
-The panel shares the form with its host, so it outlives the host's members when Qt deletes it as a child. Fields are laid out in the order of the form, one group box per group (fields without a group come first, without a box); a group box hides while none of its fields shows, and hidden fields get no widget. Custom fields get an empty container the host fills with its own widget (`customWidget()`).
+The panel shares the form with its host, so it outlives the host's members when Qt deletes it as a child. Fields are laid out in the order of the form, one group box per group (fields without a group come first, without a box); a group box hides while none of its fields shows, and hidden fields get no widget. Custom fields get an empty container the host fills with its own widget (`customWidget()`). Adding or removing fields rebuilds the widgets, emptying the containers of custom fields again; `rebuilt()` tells the host.
 
 ### Inheritance
 

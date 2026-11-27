@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 540,
+    "exported_classes": 542,
     "exported_free_functions": 253,
-    "registered_classes": 707,
+    "registered_classes": 709,
     "exported_not_registered": 2,
     "registered_function_modules": 15,
     "registered_header_only": 154,
     "registered_stale": 0,
-    "registered_with_test": 392,
+    "registered_with_test": 396,
     "registered_test_unresolved": 0,
-    "registered_with_example": 469,
+    "registered_with_example": 471,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 102,
     "registered_without_api_page": 0,
-    "with_snippet": 513,
-    "public_api_units": 709,
-    "example_eligible": 469,
+    "with_snippet": 515,
+    "public_api_units": 711,
+    "example_eligible": 471,
     "example_exempt": 240,
-    "eligible_backed_by_registry_example": 467,
-    "eligible_used_by_some_example": 399,
+    "eligible_backed_by_registry_example": 469,
+    "eligible_used_by_some_example": 400,
     "examples_on_disk": 82,
     "examples_built": 82
   },
@@ -225,13 +225,13 @@
       "with_snippet": 12
     },
     "viz": {
-      "public": 238,
-      "registered": 238,
-      "with_test": 166,
-      "eligible": 58,
-      "eligible_with_registry_example": 58,
-      "eligible_used_by_example": 47,
-      "with_snippet": 71
+      "public": 240,
+      "registered": 240,
+      "with_test": 170,
+      "eligible": 60,
+      "eligible_with_registry_example": 60,
+      "eligible_used_by_example": 48,
+      "with_snippet": 73
     }
   },
   "exported_free_functions": [
@@ -13434,6 +13434,44 @@
       "exempt_reason": "header prefix 'viz/backends/qt/3d/workers/': Real-time controller owned by a view; its behaviour is exercised through the owning view."
     },
     {
+      "name": "PanelWidget",
+      "header": "viz/backends/qt/kit/panelwidget.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_qt_viewers",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/viz-qt/panel-widget.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Qt host of the toolkit-free viz::Panel classes, created by the MNE Scan plugins; exercised by test_viz_qt_viewers."
+    },
+    {
+      "name": "SettingsPanel",
+      "header": "viz/backends/qt/kit/settingspanel.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_qt_viewers",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/viz-qt/settings-panel.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Qt Widgets builder of viz::SettingsForm used inside the settings views; exercised by test_viz_qt_viewers."
+    },
+    {
       "name": "Bar",
       "header": "viz/backends/qt/plots/bar.h",
       "library": "viz",
@@ -13970,25 +14008,6 @@
       "including_examples": [],
       "snippets": [],
       "api_page": "doc/website/docs/api/viz-qt/channel-selection-view.mdx",
-      "python_equiv": null,
-      "example_eligible": false,
-      "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
-    },
-    {
-      "name": "CompensatorView",
-      "header": "viz/backends/qt/viewers/compensatorview.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
-      "api_page": "doc/website/docs/api/viz-qt/compensator-view.mdx",
       "python_equiv": null,
       "example_eligible": false,
       "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
@@ -14759,25 +14778,6 @@
       "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
     },
     {
-      "name": "ProjectorsView",
-      "header": "viz/backends/qt/viewers/projectorsview.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
-      "api_page": "doc/website/docs/api/viz-qt/projectors-view.mdx",
-      "python_equiv": null,
-      "example_eligible": false,
-      "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
-    },
-    {
       "name": "ProjectSettingsView",
       "header": "viz/backends/qt/viewers/projectsettingsview.h",
       "library": "viz",
@@ -14849,25 +14849,6 @@
       "including_examples": [],
       "snippets": [],
       "api_page": "doc/website/docs/api/viz-qt/scaling-view.mdx",
-      "python_equiv": null,
-      "example_eligible": false,
-      "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
-    },
-    {
-      "name": "SettingsPanel",
-      "header": "viz/backends/qt/viewers/settingspanel.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": "test_viz_qt_viewers",
-      "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
-      "api_page": "doc/website/docs/api/viz-qt/settings-panel.mdx",
       "python_equiv": null,
       "example_eligible": false,
       "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
@@ -17077,7 +17058,8 @@
       "example": "ex_disp3d_scene",
       "example_state": "built",
       "including_examples": [
-        "ex_disp3d_scene"
+        "ex_disp3d_scene",
+        "ex_scene"
       ],
       "snippets": [
         "ex_disp3d_scene/main.cpp#view_state_usage",
@@ -17101,7 +17083,8 @@
       "example": "ex_disp3d_scene",
       "example_state": "built",
       "including_examples": [
-        "ex_disp3d_scene"
+        "ex_disp3d_scene",
+        "ex_scene"
       ],
       "snippets": [
         "ex_disp3d_scene/main.cpp#view_state_usage",
@@ -17248,6 +17231,69 @@
       "python_equiv": null,
       "example_eligible": false,
       "exempt_reason": "registry: View model of the spectrum viewer; adapted by viz::qt::FrequencySpectrumModel and exercised by test_viz_viewmodels, it has no standalone use without a view."
+    },
+    {
+      "name": "CompensatorPanel",
+      "header": "viz/panels/compensator_panel.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_settings_form",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene"
+      ],
+      "snippets": [
+        "ex_scene/main.cpp#panel_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/compensator-panel.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "Panel",
+      "header": "viz/panels/panel.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_settings_form",
+      "test_resolves": true,
+      "example": "ex_scene",
+      "example_state": "built",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene/main.cpp#panel_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/panel.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "ProjectorsPanel",
+      "header": "viz/panels/projectors_panel.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_settings_form",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/viz/projectors-panel.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Tool panel shown by the backends' panel hosts in MNE Scan; works like CompensatorPanel, whose example shows the pattern."
     },
     {
       "name": "BrainViewInteraction",

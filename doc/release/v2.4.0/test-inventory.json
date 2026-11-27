@@ -10997,6 +10997,7 @@
         "windows-2025-vs2026-qt-min": "absent"
       },
       "registry_classes": [
+        "PanelWidget",
         "SettingsPanel"
       ]
     },
@@ -11213,6 +11214,9 @@
         "windows-2025-vs2026-qt-min": "absent"
       },
       "registry_classes": [
+        "CompensatorPanel",
+        "Panel",
+        "ProjectorsPanel",
         "SettingChoice",
         "SettingField",
         "SettingsForm"

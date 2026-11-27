@@ -746,7 +746,10 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz/brain-scene',
         'api/viz/brain-scene-pane',
         'api/viz/brain-slice-layer',
-        'api/viz/brain-video-layer'
+        'api/viz/brain-video-layer',
+        'api/viz/panel',
+        'api/viz/compensator-panel',
+        'api/viz/projectors-panel'
       ],
     },
     {
@@ -773,7 +776,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz-qt/channel-rhi-view',
         'api/viz-qt/channel-selection-view',
         'api/viz-qt/color-map',
-        'api/viz-qt/compensator-view',
+        'api/viz-qt/panel-widget',
         'api/viz-qt/connectivity-settings-view',
         'api/viz-qt/control3-d-view',
         'api/viz-qt/coreg-settings-view',
@@ -803,7 +806,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz-qt/plot',
         'api/viz-qt/progress-view',
         'api/viz-qt/project-settings-view',
-        'api/viz-qt/projectors-view',
         'api/viz-qt/quick-control-view',
         'api/viz-qt/rt-fiff-raw-view',
         'api/viz-qt/rt-fiff-raw-view-delegate',

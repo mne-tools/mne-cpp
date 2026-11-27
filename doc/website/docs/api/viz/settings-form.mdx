@@ -291,6 +291,122 @@ Adds a Custom field the host fills with its own widget.
 
 ---
 
+### add_info(key, label, text, group)
+
+Adds a read-only Info field, e.g.
+
+a status line; it is not persisted.
+
+**Parameters:**
+
+- **key** : *const std::string &*
+  Field key.
+
+- **label** : *const std::string &*
+  Label in front of the text; empty for none.
+
+- **text** : *const std::string &*
+  Initial text.
+
+- **group** : *const std::string &*
+  Group title; empty for none.
+
+**Returns:**
+
+- *const [SettingField](/docs/api/viz/setting-field) &* — The stored field.
+
+---
+
+### add_path(key, label, value, filter, group)
+
+Adds a Path field: a file chosen with a dialog or typed.
+
+**Parameters:**
+
+- **key** : *const std::string &*
+  Field key.
+
+- **label** : *const std::string &*
+  Label in front of the editor.
+
+- **value** : *const std::string &*
+  Initial path.
+
+- **filter** : *const std::string &*
+  File dialog filter, e.g. "FIFF files (*.fif)".
+
+- **group** : *const std::string &*
+  Group title; empty for none.
+
+**Returns:**
+
+- *const [SettingField](/docs/api/viz/setting-field) &* — The stored field.
+
+---
+
+### add_directory(key, label, value, group)
+
+Adds a Directory field: a directory chosen with a dialog or typed.
+
+**Parameters:**
+
+- **key** : *const std::string &*
+  Field key.
+
+- **label** : *const std::string &*
+  Label in front of the editor.
+
+- **value** : *const std::string &*
+  Initial directory.
+
+- **group** : *const std::string &*
+  Group title; empty for none.
+
+**Returns:**
+
+- *const [SettingField](/docs/api/viz/setting-field) &* — The stored field.
+
+---
+
+### add_color(key, label, value, group)
+
+Adds a [`Color`](/docs/api/viz/color) field.
+
+**Parameters:**
+
+- **key** : *const std::string &*
+  Field key.
+
+- **label** : *const std::string &*
+  Label in front of the colour button.
+
+- **value** : *const std::string &*
+  Initial colour, "#rrggbb" or "#rrggbbaa".
+
+- **group** : *const std::string &*
+  Group title; empty for none.
+
+**Returns:**
+
+- *const [SettingField](/docs/api/viz/setting-field) &* — The stored field.
+
+---
+
+### remove(key)
+
+Removes a field and its value.
+
+**Parameters:**
+
+- **key** : *const std::string &*
+  Field key.
+
+**Returns:**
+
+- *bool* — Whether the field existed.
+
+---
+
 ### field(key)
 
 **Parameters:**
@@ -362,6 +478,20 @@ Changes the label of a field.
 
 - **label** : *const std::string &*
   New label.
+
+---
+
+### set_tone(key, tone)
+
+Changes the emphasis of an Info field.
+
+**Parameters:**
+
+- **key** : *const std::string &*
+  Field key.
+
+- **tone** : *[SettingField](/docs/api/viz/setting-field)::Tone*
+  New emphasis.
 
 ---
 
@@ -529,7 +659,7 @@ Removes a listener.
 
 Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
 
-````cpp title="src/examples/ex_scene/main.cpp, line 155"
+````cpp title="src/examples/ex_scene/main.cpp, line 157"
 // A settings panel described once; any toolkit builds its widgets from it (viz::qt::SettingsPanel for Qt)
 SettingsForm form("Averaging");
 form.add_int("trials", "Number of trials", 10, 1, 1000, 1, {}, "General");

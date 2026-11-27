@@ -100,6 +100,19 @@ ok &= expect(restored.surfaceType == "inflated" && restored.brainShader == pane.
              "SubView: surface, shader and visibility round-trip through a settings store");
 ````
 
+### [ex_scene](../../examples/viz/ex_scene.mdx)
+
+Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
+
+````cpp title="src/examples/ex_scene/main.cpp, line 190"
+});
+compensators.set_compensators(comps);
+compensators.form().set_value(CompensatorPanel::field_key(3), true);
+MemorySettingsStore settings;
+compensators.save(settings, "ex_scene");
+ok &= expect(grade == 3 && compensators.selected() == 3, "a click on a compensator's check box chooses its grade");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

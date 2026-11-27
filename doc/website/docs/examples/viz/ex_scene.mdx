@@ -36,9 +36,9 @@ The documented classes this example uses most:
 | [`Font`](../../api/viz/font.mdx) | Visualization |
 | [`AverageLayout`](../../api/viz/average-layout.mdx) | Visualization |
 | [`Canvas`](../../api/viz/canvas.mdx) | Visualization |
+| [`CompensatorPanel`](../../api/viz/compensator-panel.mdx) | Visualization |
 | [`SettingField`](../../api/viz/setting-field.mdx) | Visualization |
 | [`ApproximateTextMetrics`](../../api/viz/approximate-text-metrics.mdx) | Visualization |
-| [`AverageTile`](../../api/viz/average-tile.mdx) | Visualization |
 
 ## Used in the API reference
 
@@ -50,11 +50,14 @@ The documented classes this example uses most:
 - [ButterflyPlot](../../api/viz/butterfly-plot.mdx)
 - [Canvas](../../api/viz/canvas.mdx)
 - [Color](../../api/viz/color.mdx)
+- [CompensatorPanel](../../api/viz/compensator-panel.mdx)
 - [DisplayList](../../api/viz/display-list.mdx)
 - [FilterResponsePlot](../../api/viz/filter-response-plot.mdx)
 - [Font](../../api/viz/font.mdx)
 - [ImagePlot](../../api/viz/image-plot.mdx)
 - [LineChart](../../api/viz/line-chart.mdx)
+- [MemorySettingsStore](../../api/viz/memory-settings-store.mdx)
+- [Panel](../../api/viz/panel.mdx)
 - [Pen](../../api/viz/pen.mdx)
 - [RasterOptions](../../api/viz/raster-options.mdx)
 - [Rect](../../api/viz/rect.mdx)
@@ -97,6 +100,8 @@ The documented classes this example uses most:
 #include <mne/viz/figures/raster_renderer.h>
 #include <mne/viz/figures/sensor_layout.h>
 #include <mne/viz/forms/settings_form.h>
+#include <mne/viz/host/settings_store.h>
+#include <mne/viz/panels/compensator_panel.h>
 #include <mne/viz/figures/svg_renderer.h>
 #include <mne/viz/figures/text_metrics.h>
 
@@ -247,6 +252,24 @@ int main()
     //! [settings_form_usage]
     ok &= expect(form.get<int>("trials") == 1000 && heard == 1, "a value beyond the range is clamped and heard once");
     ok &= expect(!form.is_enabled("baseline_from"), "the baseline range waits for the baseline switch");
+
+    //! [panel_usage]
+    // A tool panel holds its state and rules once; every backend shows it with one generic host
+    // (viz::qt::PanelWidget for Qt) and stores it through a SettingsStore
+    std::vector<mne::FiffCtfComp> comps(2);
+    comps[0].kind = 1;
+    comps[1].kind = 3;
+    CompensatorPanel compensators;
+    int grade = -1;
+    compensators.set_selection_callback([&grade](int to) {
+        grade = to;
+    });
+    compensators.set_compensators(comps);
+    compensators.form().set_value(CompensatorPanel::field_key(3), true);
+    MemorySettingsStore settings;
+    compensators.save(settings, "ex_scene");
+    //! [panel_usage]
+    ok &= expect(grade == 3 && compensators.selected() == 3, "a click on a compensator's check box chooses its grade");
 
     std::error_code removeError;
     std::filesystem::remove_all(dir, removeError);

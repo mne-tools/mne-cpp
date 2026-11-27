@@ -392,8 +392,8 @@
       "missing_tests": []
     },
     "viz": {
-      "classes": 133,
-      "tested": 124,
+      "classes": 136,
+      "tested": 127,
       "untested": [
         "ElectrodeObject",
         "GeometryInfo",
@@ -408,8 +408,8 @@
       "missing_tests": []
     },
     "viz_qt": {
-      "classes": 104,
-      "tested": 42,
+      "classes": 103,
+      "tested": 43,
       "untested": [
         "AbstractTreeItem",
         "AbstractView",
@@ -428,7 +428,6 @@
         "ChannelLabelPanel",
         "ChannelSelectionView",
         "ColorMap",
-        "CompensatorView",
         "ConnectivitySettingsView",
         "Control3DView",
         "CoregSettingsView",
@@ -457,7 +456,6 @@
         "Plot",
         "ProgressView",
         "ProjectSettingsView",
-        "ProjectorsView",
         "QuickControlView",
         "ScaleControl",
         "ScalingView",

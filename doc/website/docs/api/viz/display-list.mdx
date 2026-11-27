@@ -60,7 +60,7 @@ const Expected<void> png = to_raster(chart).save_png(dir / "plot.png");
 
 Scene library: draw a figure on a Canvas, plot a line chart, and write both as SVG and PNG without Qt.
 
-````cpp title="src/examples/ex_scene/main.cpp, line 89"
+````cpp title="src/examples/ex_scene/main.cpp, line 91"
 canvas.draw_rounded_rect({20, 20, 80, 50}, 6, 6);
 canvas.set_pen(Color::black());
 canvas.draw_text(Rect{0, 80, 200, 30}, Align::Center, "Hello scene");
