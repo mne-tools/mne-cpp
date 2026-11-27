@@ -206,7 +206,7 @@ ok &= expect(implantation.leads().size() == 1 && lead.name == "LA" && lead.type 
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 143"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 145"
 ElectrodeObject electrodes; // a view of the implantation, drawn by BrainView::setElectrodes()
 electrodes.setImplantation(IeegImplantation(shaft));
 electrodes.selectContact("LH3");

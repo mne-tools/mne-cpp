@@ -708,7 +708,9 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz/surface',
         'api/viz/surface-client',
         'api/viz/trace-view-client',
+        'api/viz/sub-view',
         'api/viz/vertex-data',
+        'api/viz/view-visibility-profile',
         'api/viz/gpu-stream',
         'api/viz/instanced-streams',
         'api/viz/render-key',
@@ -717,7 +719,9 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz/electrode-object',
         'api/viz/dipole-object',
         'api/viz/network-object',
-        'api/viz/polyline-object'
+        'api/viz/polyline-object',
+        'api/viz/settings-store',
+        'api/viz/memory-settings-store'
       ],
     },
     {
@@ -828,9 +832,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz-qt/source-estimate-overlay',
         'api/viz-qt/source-space-tree-item',
         'api/viz-qt/stc-loading-worker',
-        'api/viz-qt/sub-view',
         'api/viz-qt/surface-tree-item',
-        'api/viz-qt/view-visibility-profile',
         'api/viz-qt/qt-text-metrics',
         'api/viz-qt/scene-viewport',
         'api/viz-qt/sensor-layout-widget',
@@ -842,7 +844,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz-qt/settings-panel',
         'api/viz-qt/brain-view-core',
         'api/viz-qt/brain-view-host',
-        'api/viz-qt/brain-window'
+        'api/viz-qt/brain-window',
+        'api/viz-qt/qt-settings-store'
       ],
     },
     {

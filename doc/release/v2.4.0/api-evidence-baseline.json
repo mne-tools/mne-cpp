@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 531,
+    "exported_classes": 534,
     "exported_free_functions": 253,
-    "registered_classes": 690,
+    "registered_classes": 693,
     "exported_not_registered": 2,
     "registered_function_modules": 15,
     "registered_header_only": 146,
     "registered_stale": 0,
-    "registered_with_test": 375,
+    "registered_with_test": 378,
     "registered_test_unresolved": 0,
-    "registered_with_example": 463,
+    "registered_with_example": 467,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 102,
     "registered_without_api_page": 0,
-    "with_snippet": 507,
-    "public_api_units": 692,
-    "example_eligible": 463,
-    "example_exempt": 229,
-    "eligible_backed_by_registry_example": 461,
-    "eligible_used_by_some_example": 395,
+    "with_snippet": 511,
+    "public_api_units": 695,
+    "example_eligible": 467,
+    "example_exempt": 228,
+    "eligible_backed_by_registry_example": 465,
+    "eligible_used_by_some_example": 399,
     "examples_on_disk": 82,
     "examples_built": 82
   },
@@ -225,13 +225,13 @@
       "with_snippet": 12
     },
     "viz": {
-      "public": 221,
-      "registered": 221,
-      "with_test": 149,
-      "eligible": 52,
-      "eligible_with_registry_example": 52,
-      "eligible_used_by_example": 43,
-      "with_snippet": 65
+      "public": 224,
+      "registered": 224,
+      "with_test": 152,
+      "eligible": 56,
+      "eligible_with_registry_example": 56,
+      "eligible_used_by_example": 47,
+      "with_snippet": 69
     }
   },
   "exported_free_functions": [
@@ -1246,56 +1246,6 @@
       "library": "report"
     },
     {
-      "name": "perspectivePresetRotation",
-      "header": "viz/backends/qt/3d/core/viewstate.h",
-      "library": "viz"
-    },
-    {
-      "name": "multiViewPresetName",
-      "header": "viz/backends/qt/3d/core/viewstate.h",
-      "library": "viz"
-    },
-    {
-      "name": "multiViewPresetOffset",
-      "header": "viz/backends/qt/3d/core/viewstate.h",
-      "library": "viz"
-    },
-    {
-      "name": "multiViewPresetIsPerspective",
-      "header": "viz/backends/qt/3d/core/viewstate.h",
-      "library": "viz"
-    },
-    {
-      "name": "normalizedVisualizationTarget",
-      "header": "viz/backends/qt/3d/core/viewstate.h",
-      "library": "viz"
-    },
-    {
-      "name": "shaderModeFromName",
-      "header": "viz/backends/qt/3d/core/viewstate.h",
-      "library": "viz"
-    },
-    {
-      "name": "shaderModeName",
-      "header": "viz/backends/qt/3d/core/viewstate.h",
-      "library": "viz"
-    },
-    {
-      "name": "visualizationModeFromName",
-      "header": "viz/backends/qt/3d/core/viewstate.h",
-      "library": "viz"
-    },
-    {
-      "name": "visualizationModeName",
-      "header": "viz/backends/qt/3d/core/viewstate.h",
-      "library": "viz"
-    },
-    {
-      "name": "mneAnalyzeColor",
-      "header": "viz/backends/qt/3d/core/viewstate.h",
-      "library": "viz"
-    },
-    {
       "name": "sceneTimestampMs",
       "header": "viz/backends/qt/plots/helpers/sceneinput.h",
       "library": "viz"
@@ -1343,6 +1293,56 @@
     {
       "name": "getScalingValue",
       "header": "viz/backends/qt/viewers/scalingview.h",
+      "library": "viz"
+    },
+    {
+      "name": "perspectivePresetRotation",
+      "header": "viz/brain/viewstate.h",
+      "library": "viz"
+    },
+    {
+      "name": "multiViewPresetName",
+      "header": "viz/brain/viewstate.h",
+      "library": "viz"
+    },
+    {
+      "name": "multiViewPresetOffset",
+      "header": "viz/brain/viewstate.h",
+      "library": "viz"
+    },
+    {
+      "name": "multiViewPresetIsPerspective",
+      "header": "viz/brain/viewstate.h",
+      "library": "viz"
+    },
+    {
+      "name": "normalizedVisualizationTarget",
+      "header": "viz/brain/viewstate.h",
+      "library": "viz"
+    },
+    {
+      "name": "shaderModeFromName",
+      "header": "viz/brain/viewstate.h",
+      "library": "viz"
+    },
+    {
+      "name": "shaderModeName",
+      "header": "viz/brain/viewstate.h",
+      "library": "viz"
+    },
+    {
+      "name": "visualizationModeFromName",
+      "header": "viz/brain/viewstate.h",
+      "library": "viz"
+    },
+    {
+      "name": "visualizationModeName",
+      "header": "viz/brain/viewstate.h",
+      "library": "viz"
+    },
+    {
+      "name": "mneAnalyzeColor",
+      "header": "viz/brain/viewstate.h",
       "library": "viz"
     },
     {
@@ -12855,44 +12855,6 @@
       "exempt_reason": "header prefix 'viz/backends/qt/3d/core/': Renderer internals behind the BrainView/MultimodalScene facade."
     },
     {
-      "name": "SubView",
-      "header": "viz/backends/qt/3d/core/viewstate.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": "test_disp3d_viewstate",
-      "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
-      "api_page": "doc/website/docs/api/viz-qt/sub-view.mdx",
-      "python_equiv": null,
-      "example_eligible": false,
-      "exempt_reason": "header prefix 'viz/backends/qt/3d/core/': Renderer internals behind the BrainView/MultimodalScene facade."
-    },
-    {
-      "name": "ViewVisibilityProfile",
-      "header": "viz/backends/qt/3d/core/viewstate.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": "test_disp3d_viewstate",
-      "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
-      "api_page": "doc/website/docs/api/viz-qt/view-visibility-profile.mdx",
-      "python_equiv": null,
-      "example_eligible": false,
-      "exempt_reason": "header prefix 'viz/backends/qt/3d/core/': Renderer internals behind the BrainView/MultimodalScene facade."
-    },
-    {
       "name": "CameraController",
       "header": "viz/backends/qt/3d/input/cameracontroller.h",
       "library": "viz",
@@ -14025,6 +13987,25 @@
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
+    },
+    {
+      "name": "QtSettingsStore",
+      "header": "viz/backends/qt/qtsettingsstore.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_disp3d_viewstate",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/viz-qt/qt-settings-store.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Adapter of viz::SettingsStore onto QSettings that BrainView persists through; the example shows the store interface with MemorySettingsStore."
     },
     {
       "name": "AbstractView",
@@ -15523,6 +15504,54 @@
       "exempt_reason": null
     },
     {
+      "name": "SubView",
+      "header": "viz/brain/viewstate.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_disp3d_viewstate",
+      "test_resolves": true,
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#view_state_usage",
+        "ex_disp3d_scene/main.cpp#view_state_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/sub-view.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "ViewVisibilityProfile",
+      "header": "viz/brain/viewstate.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_disp3d_viewstate",
+      "test_resolves": true,
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#view_state_usage",
+        "ex_disp3d_scene/main.cpp#view_state_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/view-visibility-profile.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "AverageLayout",
       "header": "viz/figures/average_layout.h",
       "library": "viz",
@@ -16764,6 +16793,54 @@
       "python_equiv": null,
       "example_eligible": false,
       "exempt_reason": "registry: Plain uniform-block value type of the trace overlay shader, written by TraceFrameBuilder."
+    },
+    {
+      "name": "MemorySettingsStore",
+      "header": "viz/host/settings_store.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_disp3d_viewstate",
+      "test_resolves": true,
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#view_state_usage",
+        "ex_disp3d_scene/main.cpp#view_state_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/memory-settings-store.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "SettingsStore",
+      "header": "viz/host/settings_store.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_disp3d_viewstate",
+      "test_resolves": true,
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#view_state_usage",
+        "ex_disp3d_scene/main.cpp#view_state_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/settings-store.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
     },
     {
       "name": "Surface",

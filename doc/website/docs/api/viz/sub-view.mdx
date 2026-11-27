@@ -1,18 +1,18 @@
 ---
 id: sub-view
-title: "mne::viz::qt::SubView"
+title: "mne::viz::SubView"
 sidebar_label: SubView
 sidebar_position: 110
 ---
 
 # SubView
 
-**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/3d/core/viewstate.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/3d/core/viewstate.h)
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/viewstate.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/viewstate.h)
 
-`#include <mne/viz/backends/qt/viewstate.h>`
+`#include <mne/viz/viewstate.h>`
 
 ```cpp
-struct mne::viz::qt::SubView
+struct mne::viz::SubView
 ```
 
 Viewport subdivision holding its own camera, projection, and scissor rectangle.
@@ -20,6 +20,17 @@ Viewport subdivision holding its own camera, projection, and scissor rectangle.
 Encapsulates all per-view state for a single viewport (single view or one pane in multi-view).
 
 The class stores shader, surface type, overlay mode, visibility flags, and, through its toolkit-neutral [`PaneCamera`](/docs/api/viz/pane-camera) base, the zoom, pan, camera rotation and view preset — everything that can differ between two viewports showing the same scene.
+
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+// A pane's camera, shaders and layer visibility survive a restart through any SettingsStore
+MemorySettingsStore viewSettings; // QtSettingsStore puts the same keys into a QSettings
+SubView pane = SubView::defaultForIndex(2);
+pane.surfaceType = "inflated";
+pane.visibility.setObjectVisible("dipoles", false);
+pane.save(viewSettings, "multi2_");
+SubView restored;
+restored.load(viewSettings, "multi2_");
+```
 
 ### Inheritance
 
@@ -80,14 +91,14 @@ Non-brain surfaces are never touched.
 
 ### load(settings, prefix, fallbackRotation)
 
-Load this [`SubView`](/docs/api/viz-qt/sub-view)'s state from QSettings under the given prefix.
+Load this [`SubView`](/docs/api/viz/sub-view)'s state from QSettings under the given prefix.
 
 **Parameters:**
 
-- **settings** : *const QSettings &*
+- **settings** : *const [SettingsStore](/docs/api/viz/settings-store) &*
   Settings store to read from.
 
-- **prefix** : *const QString &*
+- **prefix** : *const std::string &*
   `Key` prefix (e.g. "multi0_").
 
 - **fallbackRotation** : *const Eigen::Quaternionf &*
@@ -97,14 +108,14 @@ Load this [`SubView`](/docs/api/viz-qt/sub-view)'s state from QSettings under th
 
 ### save(settings, prefix)
 
-Save this [`SubView`](/docs/api/viz-qt/sub-view)'s state to QSettings under the given prefix.
+Save this [`SubView`](/docs/api/viz/sub-view)'s state to QSettings under the given prefix.
 
 **Parameters:**
 
-- **settings** : *QSettings &*
+- **settings** : *[SettingsStore](/docs/api/viz/settings-store) &*
   Settings store to write to.
 
-- **prefix** : *const QString &*
+- **prefix** : *const std::string &*
   `Key` prefix (e.g. "multi0_").
 
 ---
@@ -128,7 +139,7 @@ True when `key` identifies a brain-tissue surface (lh_/rh_) as opposed to BEM, s
 
 ### defaultForIndex(index)
 
-Return default [`SubView`](/docs/api/viz-qt/sub-view) configuration for viewport `index`.
+Return default [`SubView`](/docs/api/viz/sub-view) configuration for viewport `index`.
 
 The preset cycles through the 7 camera orientations (Top, Perspective, Front, Left, Bottom, Back, Right) and the shader cycles through Anatomical → Standard → Holographic.
 
@@ -139,9 +150,34 @@ The preset cycles through the 7 camera orientations (Top, Perspective, Front, Le
 
 **Returns:**
 
-- *[SubView](/docs/api/viz-qt/sub-view)* — Enabled [`SubView`](/docs/api/viz-qt/sub-view) with preset index % 7 and the cycled brain shader.
+- *[SubView](/docs/api/viz/sub-view)* — Enabled [`SubView`](/docs/api/viz/sub-view) with preset index % 7 and the cycled brain shader.
 
 ---
+
+## Example
+
+- Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 323"
+// A pane's camera, shaders and layer visibility survive a restart through any SettingsStore
+MemorySettingsStore viewSettings; // QtSettingsStore puts the same keys into a QSettings
+SubView pane = SubView::defaultForIndex(2);
+pane.surfaceType = "inflated";
+pane.visibility.setObjectVisible("dipoles", false);
+pane.save(viewSettings, "multi2_");
+SubView restored;
+restored.load(viewSettings, "multi2_");
+ok &= expect(restored.surfaceType == "inflated" && restored.brainShader == pane.brainShader && !restored.visibility.isObjectVisible("dipoles"),
+             "SubView: surface, shader and visibility round-trip through a settings store");
+````
 
 ## Authors of this file
 

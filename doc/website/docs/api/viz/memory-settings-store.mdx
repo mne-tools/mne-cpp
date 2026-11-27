@@ -1,0 +1,105 @@
+---
+id: memory-settings-store
+title: "mne::viz::MemorySettingsStore"
+sidebar_label: MemorySettingsStore
+sidebar_position: 124
+---
+
+# MemorySettingsStore
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/host/settings_store.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/host/settings_store.h)
+
+`#include <mne/viz/settings_store.h>`
+
+```cpp
+class mne::viz::MemorySettingsStore
+```
+
+[`SettingsStore`](/docs/api/viz/settings-store) that keeps the values in memory.
+
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+// A pane's camera, shaders and layer visibility survive a restart through any SettingsStore
+MemorySettingsStore viewSettings; // QtSettingsStore puts the same keys into a QSettings
+SubView pane = SubView::defaultForIndex(2);
+pane.surfaceType = "inflated";
+pane.visibility.setObjectVisible("dipoles", false);
+pane.save(viewSettings, "multi2_");
+SubView restored;
+restored.load(viewSettings, "multi2_");
+```
+
+### Inheritance
+
+```mermaid
+classDiagram
+    SettingsStore <|-- MemorySettingsStore
+    click SettingsStore href "../../viz/settings-store/"
+```
+
+---
+
+## Public Methods
+
+### value(key)
+
+**Parameters:**
+
+- **key** : *const std::string &*
+  `Key`.
+
+**Returns:**
+
+- *std::optional&lt; SettingValue &gt;* — The stored value, or nothing when `key` is absent.
+
+---
+
+### set_value(key, value)
+
+Store `value` under `key`, replacing any previous value.
+
+**Parameters:**
+
+- **key** : *const std::string &*
+  `Key`.
+
+- **value** : *const SettingValue &*
+  Value.
+
+---
+
+### values()
+
+**Returns:**
+
+- *const std::map&lt; std::string, SettingValue &gt; &* — All stored values by key.
+
+---
+
+## Example
+
+- Start here: [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
+
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/viz_qt/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 323"
+// A pane's camera, shaders and layer visibility survive a restart through any SettingsStore
+MemorySettingsStore viewSettings; // QtSettingsStore puts the same keys into a QSettings
+SubView pane = SubView::defaultForIndex(2);
+pane.surfaceType = "inflated";
+pane.visibility.setObjectVisible("dipoles", false);
+pane.save(viewSettings, "multi2_");
+SubView restored;
+restored.load(viewSettings, "multi2_");
+ok &= expect(restored.surfaceType == "inflated" && restored.brainShader == pane.brainShader && !restored.visibility.isObjectVisible("dipoles"),
+             "SubView: surface, shader and visibility round-trip through a settings store");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

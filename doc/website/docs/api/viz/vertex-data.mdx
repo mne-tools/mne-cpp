@@ -46,7 +46,7 @@ const VertexData& corner = patch.vertexDataRef().at(2); // interleaved position,
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 235"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 237"
 float hitDistance = 0.0f;
 int hitVertex = -1;
 const bool picked = patch.intersects(Eigen::Vector3f(0.019f, 0.019f, 0.05f), Eigen::Vector3f(0.0f, 0.0f, -1.0f), hitDistance, hitVertex);
