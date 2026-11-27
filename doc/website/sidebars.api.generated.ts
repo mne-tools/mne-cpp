@@ -730,7 +730,9 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz/rt-sensor-interpolation-mat-worker',
         'api/viz/rt-source-data-worker',
         'api/viz/rt-source-interpolation-mat-worker',
-        'api/viz/stc-loading-worker'
+        'api/viz/stc-loading-worker',
+        'api/viz/rt-sensor-stream',
+        'api/viz/rt-source-stream'
       ],
     },
     {

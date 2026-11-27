@@ -9462,7 +9462,8 @@
         "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
-        "RtSourceDataController"
+        "RtSourceDataController",
+        "RtSourceStream"
       ]
     },
     {
@@ -10024,7 +10025,8 @@
       "registry_classes": [
         "PeriodicTask",
         "RtSensorDataController",
-        "RtSensorDataWorker"
+        "RtSensorDataWorker",
+        "RtSensorStream"
       ]
     },
     {
