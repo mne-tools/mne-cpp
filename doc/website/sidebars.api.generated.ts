@@ -741,7 +741,12 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz/brain-slice-uniforms',
         'api/viz/brain-video-billboard-uniforms',
         'api/viz/brain-video-decal-uniforms',
-        'api/viz/brain-texture-view'
+        'api/viz/brain-texture-view',
+        'api/viz/brain-frame-composer',
+        'api/viz/brain-scene',
+        'api/viz/brain-scene-pane',
+        'api/viz/brain-slice-layer',
+        'api/viz/brain-video-layer'
       ],
     },
     {

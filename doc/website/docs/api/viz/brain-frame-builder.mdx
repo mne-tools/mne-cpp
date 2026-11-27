@@ -124,14 +124,17 @@ Draws an MRI slice: a textured quad whose dark voxels are discarded, blended beh
 
 ---
 
-### draw_video_billboard(key, frame, quad, uniforms, viewport)
+### draw_video_billboard(key, textureKey, frame, quad, uniforms, viewport)
 
 Draws a video frame as a round disk facing the camera, over everything drawn before.
 
 **Parameters:**
 
 - **key** : *std::uint64_t*
-  Identity of the disk; also identifies its texture. Panes that each face their own camera need keys of their own, since a key holds one quad per frame.
+  Identity of the disk. Panes that each face their own camera need keys of their own, since a key holds one quad per frame.
+
+- **textureKey** : *std::uint64_t*
+  Identity of the video texture, which the disks of all panes share.
 
 - **frame** : *const [BrainTextureView](/docs/api/viz/brain-texture-view) &*
   Video frame.

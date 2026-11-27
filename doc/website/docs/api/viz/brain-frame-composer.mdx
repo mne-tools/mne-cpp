@@ -1,0 +1,98 @@
+---
+id: brain-frame-composer
+title: "mne::viz::BrainFrameComposer"
+sidebar_label: BrainFrameComposer
+sidebar_position: 145
+---
+
+# BrainFrameComposer
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/brain/brainframecomposer.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/brain/brainframecomposer.h)
+
+`#include <mne/viz/brainframecomposer.h>`
+
+```cpp
+class mne::viz::BrainFrameComposer
+```
+
+Describes the frames of the brain view as [`GpuFrame`](/docs/api/viz/gpu-frame): what each pane draws in which order with which shader.
+
+Brain surfaces of the pane's surface type are drawn first, then the other opaque surfaces (source spaces, digitizers), electrodes and MRI slices, the translucent surfaces (BEM, sensors, digitizer markers) back to front with the video decal after its head surface, then dipoles, the network, the head path and the pointer marker. The GPU copies of surfaces and glyphs are dropped once their owners are destroyed.
+
+---
+
+## Public Methods
+
+### begin(target, clear)
+
+Starts a frame.
+
+**Parameters:**
+
+- **target** : *const [GpuFrameTarget](/docs/api/viz/gpu-frame-target) &*
+  Size, pixel ratio and clip-space correction of the target.
+
+- **clear** : *[Color](/docs/api/viz/color)*
+  Colour the frame clears to.
+
+---
+
+### draw(scene, panes)
+
+Draws the scene into the panes.
+
+**Parameters:**
+
+- **scene** : *const [BrainScene](/docs/api/viz/brain-scene) &*
+  What to draw.
+
+- **panes** : *std::span&lt; const [BrainScenePane](/docs/api/viz/brain-scene-pane) &gt;*
+  Panes in drawing order.
+
+**Returns:**
+
+- *std::vector&lt; std::vector&lt; std::string &gt; &gt;* — For each pane, the keys of the brain surfaces of its surface type it shows.
+
+---
+
+### finish(overlay, scale)
+
+Ends the frame, blending a screen overlay (labels, pane separators) over all panes.
+
+**Parameters:**
+
+- **overlay** : *std::optional&lt; std::variant&lt; [Image](/docs/api/viz/image), [DisplayList](/docs/api/viz/display-list) &gt; &gt;*
+  RGBA pixels of the target size or a figure of the logical size, or none.
+
+- **scale** : *double*
+  Texture pixels per figure pixel of a figure.
+
+**Returns:**
+
+- *[GpuFrame](/docs/api/viz/gpu-frame)* — The frame, referring to `resources()`.
+
+---
+
+### resources()
+
+**Returns:**
+
+- *const [GpuResources](/docs/api/viz/gpu-resources) &* — Buffers, textures and pipelines of the frames.
+
+---
+
+### mesh_count()
+
+**Returns:**
+
+- *int* — The number of meshes with buffers.
+
+---
+
+## Example
+
+No example of its own: Driven by the brain view hosts each frame; test_scene_brain_view shows a complete scene composed and rendered headless.
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
