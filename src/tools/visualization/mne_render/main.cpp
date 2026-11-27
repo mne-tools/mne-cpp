@@ -32,6 +32,8 @@
 #include <mne/viz/figures/colormap.h>
 #include <mne/viz/gpu/software_renderer.h>
 #include <mne/viz/figures/svg_renderer.h>
+#include <mne/viz/figures/font_library.h>
+#include <mne/viz/figures/font_text_metrics.h>
 #include <mne/viz/figures/text_metrics.h>
 #include <mne/viz/views/trace_buffer.h>
 #include <mne/viz/gpu/trace_frame.h>
@@ -217,7 +219,11 @@ int render_raw(const CommandLineParser& parser, const std::string& outFile, int 
     TraceStyle style;
     style.background = Color::white();
     const TraceMarkers markers;
-    const ApproximateTextMetrics metrics;
+    // PNG text in the bundled fonts on request; the default bitmap font keeps images identical across versions
+    const bool fonts = parser.is_set("fonts") && !is_svg(outFile);
+    const ApproximateTextMetrics approximateMetrics;
+    const FontTextMetrics fontMetrics(FontLibrary::shared());
+    const TextMetrics& metrics = fonts ? static_cast<const TextMetrics&>(fontMetrics) : approximateMetrics;
 
     if (is_svg(outFile)) {
         Canvas canvas(width, height, style.background);
@@ -237,6 +243,9 @@ int render_raw(const CommandLineParser& parser, const std::string& outFile, int 
         target.device_pixel_ratio = scale;
         const GpuFrame frame = builder.build(view, buffer, style, markers, metrics, target);
         SoftwareRenderer renderer;
+        if (fonts) {
+            renderer.set_fonts(FontLibrary::shared());
+        }
         const Expected<void> written = to_rgb(renderer.render(frame, builder.resources())).save_png(path_from_utf8(outFile));
         if (!written) {
             Log::critical("{}", written.error().what());
@@ -440,6 +449,7 @@ int main(int argc, char* argv[])
     parser.add_option({{"first-channel"}, "Raw data: first channel row.", "n", "0"});
     parser.add_option({{"autoscale"}, "Raw data: scale every channel type to its signals instead of the raw browser's defaults.", {}, {}});
     parser.add_option({{"scalebars"}, "Raw data: draw scalebars.", {}, {}});
+    parser.add_option({{"fonts"}, "Raw data: draw the text of a PNG anti-aliased in the bundled fonts instead of the bitmap font.", {}, {}});
     parser.add_option({{"stc"}, "Surface: source estimate (.stc) of the hemisphere.", "file", {}});
     parser.add_option({{"time"}, "Surface: time of the source estimate in seconds (default: the first sample).", "sec", {}});
     parser.add_option({{"smooth"}, "Surface: smoothing steps that spread the source values over the surface.", "n", "10"});

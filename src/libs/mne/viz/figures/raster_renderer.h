@@ -11,7 +11,7 @@
  *
  * The software backend of the scene library: tools render figures into PNG files with it, and tests compare
  * its pixels with golden images. Shapes are anti-aliased; text uses RasterImage's built-in bitmap font, so it
- * is legible but not typeset.
+ * is legible but not typeset, unless RasterOptions::fonts supplies real fonts.
  */
 
 #ifndef VIZ_RASTER_RENDERER_H
@@ -32,6 +32,8 @@
 namespace mne::viz
 {
 
+class FontSource;
+
 /**
  * Options of to_raster().
  *
@@ -43,6 +45,7 @@ struct RasterOptions
 {
     Color background = Color::white(); /**< Fill of a figure without background. */
     double scale = 1.0;                /**< Image pixels per figure pixel, e.g. 2 for a high-resolution image. */
+    const FontSource* fonts = nullptr; /**< Fonts that draw text anti-aliased (e.g. FontLibrary), outliving the call; nullptr for the bitmap font. */
 };
 
 /**

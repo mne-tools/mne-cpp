@@ -27,6 +27,7 @@
 //=============================================================================================================
 
 #include <mne/viz/backends/sdl/sdl_host.h>
+#include <mne/viz/figures/font_text_metrics.h>
 #include <mne/viz/host/trace_view_client.h>
 #include <mne/viz/panels/compensator_panel.h>
 #include <mne/viz/panels/form_view.h>
@@ -94,10 +95,11 @@ Eigen::MatrixXd synthetic_block(int first, int samples)
  *
  * @param[in] host      The window.
  * @param[in] which     "projectors" or "compensator".
+ * @param[in] metrics   Metrics of the fonts the host draws with.
  *
  * @return The number of frames drawn.
  */
-int run_panel(sdl::SdlHost& host, const std::string& which)
+int run_panel(sdl::SdlHost& host, const std::string& which, const TextMetrics& metrics)
 {
     //! [form_view_usage]
     std::unique_ptr<Panel> panel;
@@ -131,6 +133,7 @@ int run_panel(sdl::SdlHost& host, const std::string& which)
         panel = std::move(projectors);
     }
     FormView view(*panel);
+    view.set_text_metrics(&metrics);
     return host.run(view);
     //! [form_view_usage]
 }
@@ -168,10 +171,12 @@ int main(int argc, char* argv[])
         std::fprintf(stderr, "Cannot open the window: %s\n", host.error().c_str());
         return 1;
     }
+    // The layouts measure the text with the fonts the host draws it with
+    const FontTextMetrics metrics(options.fonts);
     //! [sdl_host_usage]
 
     if (!panel.empty()) {
-        const int frames = run_panel(host, panel);
+        const int frames = run_panel(host, panel, metrics);
         std::printf("Rendered %d frames of the %s panel with the SDL3 backend of mne_viz\n", frames, panel.c_str());
         return 0;
     }
@@ -204,6 +209,7 @@ int main(int argc, char* argv[])
     view.set_samples_per_pixel(5.0);
     view.set_scalebars_visible(true);
     client.set_source(&buffer);
+    client.set_text_metrics(&metrics);
     //! [trace_view_client_usage]
 
     // The view follows the end of the recording until the user scrolls

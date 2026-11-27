@@ -20,6 +20,7 @@
 
 #include "raster_renderer.h"
 #include "detail/text_layout.h"
+#include "font_source.h"
 
 //=============================================================================================================
 // STL INCLUDES
@@ -270,6 +271,7 @@ class Renderer
 public:
     Renderer(const DisplayList& list, const RasterOptions& options)
     : m_scale(options.scale > 0.0 ? options.scale : 1.0)
+    , m_fonts(options.fonts)
     , m_image(static_cast<int>(std::ceil(list.width * m_scale)), static_cast<int>(std::ceil(list.height * m_scale)),
               rgb(list.background.value_or(options.background)))
     {
@@ -528,6 +530,12 @@ private:
 
     void draw(const TextShape& text)
     {
+        if (m_fonts) {
+            if (const GlyphRun run = shape_text(*m_fonts, text.font, text.text, font_pixel_size(text.font)); run.face) {
+                drawGlyphs(text, run);
+                return;
+            }
+        }
         const int pixelSize = static_cast<int>(std::lround(text.font.pixel_size > 0.0       ? text.font.pixel_size
                                                                : text.font.point_size > 0.0 ? text.font.point_size * 96.0 / 72.0
                                                                                             : 13.0));
@@ -554,6 +562,44 @@ private:
             const int coverage = glyphs.pixel(static_cast<int>(sx), static_cast<int>(sy)).r;
             return Color{color.r, color.g, color.b, static_cast<std::uint8_t>(coverage * color.a / 255)};
         });
+    }
+
+    // Glyph outlines filled together with the non-zero rule, so overlapping glyphs and contours blend once
+    void drawGlyphs(const TextShape& text, const GlyphRun& run)
+    {
+        const Point origin = detail::text_origin(text, run.advance, run.ascent, run.descent);
+        const double deviceScale = std::sqrt(std::abs(m_device.m11 * m_device.m22 - m_device.m12 * m_device.m21));
+        // Without rotation the baseline starts on a whole device pixel, which keeps horizontal stems crisp
+        Point snap;
+        if (m_device.m12 == 0.0 && m_device.m21 == 0.0) {
+            const Point start = m_device.map(origin);
+            snap = {std::round(start.x) - start.x, std::round(start.y) - start.y};
+        }
+        std::vector<std::vector<PointF>> contours;
+        for (const PlacedGlyph& placed : run.glyphs) {
+            const double unit = run.pixel_size / placed.face->units_per_em();
+            const auto polygons = placed.face->flattened_outline(placed.glyph, run.pixel_size * deviceScale);
+            for (const FontFace::Polygon& outline : *polygons) {
+                Polygon polygon;
+                polygon.reserve(outline.size());
+                for (const Point& p : outline) {
+                    polygon.push_back(m_device.map({origin.x + placed.x + p.x * unit, origin.y - p.y * unit}) + snap);
+                }
+                for (const Polygon& clip : m_clips) {
+                    polygon = clipConvex(std::move(polygon), clip);
+                }
+                if (polygon.size() < 3) {
+                    continue;
+                }
+                std::vector<PointF> contour;
+                contour.reserve(polygon.size());
+                for (const Point& p : polygon) {
+                    contour.push_back({p.x, p.y});
+                }
+                contours.push_back(std::move(contour));
+            }
+        }
+        m_image.fill_polygons(contours, rgb(text.color), alpha(text.color.a));
     }
 
     void draw(const ImageShape& shape)
@@ -586,6 +632,7 @@ private:
     }
 
     double m_scale;
+    const FontSource* m_fonts = nullptr;
     RasterImage m_image;
     Transform m_device;
     double m_opacity = 1.0;

@@ -16,6 +16,7 @@
 
 #include "software_renderer.h"
 #include "detail/software_shaders.h"
+#include "../figures/font_source.h"
 #include "../figures/raster_renderer.h"
 
 //=============================================================================================================
@@ -268,11 +269,21 @@ const Image* SoftwareRenderer::texture_image(GpuHandle handle, const GpuTexture&
         if (const Image* image = std::get_if<Image>(&texture.content)) {
             cached.image = *image;
         } else {
-            cached.image = to_rgba_image(std::get<DisplayList>(texture.content), texture.scale);
+            cached.image = to_rgba_image(std::get<DisplayList>(texture.content), texture.scale, m_fonts.get());
         }
         cached.revision = texture.revision;
     }
     return &cached.image;
+}
+
+//=============================================================================================================
+
+void SoftwareRenderer::set_fonts(std::shared_ptr<const FontSource> fonts)
+{
+    if (fonts != m_fonts) {
+        m_fonts = std::move(fonts);
+        m_textures.clear();
+    }
 }
 
 //=============================================================================================================
@@ -572,10 +583,11 @@ void SoftwareRenderer::draw(Target& target, const GpuDraw& draw, const GpuResour
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-Image mne::viz::to_rgba_image(const DisplayList& list, double scale)
+Image mne::viz::to_rgba_image(const DisplayList& list, double scale, const FontSource* fonts)
 {
     RasterOptions options;
     options.scale = scale;
+    options.fonts = fonts;
     options.background = Color::black();
     const RasterImage onBlack = to_raster(list, options);
     options.background = Color::white();

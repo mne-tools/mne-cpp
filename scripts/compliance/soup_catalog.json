@@ -264,6 +264,25 @@
       "safety_relevant": false
     },
     {
+      "id": "source-fonts",
+      "name": "Source Sans 3 and Source Code Pro fonts",
+      "supplier": "Adobe",
+      "license": "OFL-1.1",
+      "url": "https://github.com/adobe-fonts",
+      "purl": "",
+      "version": {
+        "literal": "Source Sans 3 3.052, Source Code Pro 2.042"
+      },
+      "linkage": "unmodified font files in resources/fonts, compiled into mne_viz as data",
+      "shipped": true,
+      "cmake_targets": [],
+      "used_by": "mne_viz (software renderer, FormView), the SDL backend, mne_render",
+      "purpose": "Typefaces of the toolkit-free user interface and of figures rendered without Qt, identical on every platform.",
+      "risk": "Appearance only: a damaged font file shows wrong or missing glyphs.",
+      "mitigation": "Files are bounds-checked when parsed (test_viz_fonts parses garbled data); missing glyphs fall back to system fonts; golden images of rendered text.",
+      "safety_relevant": false
+    },
+    {
       "id": "platform",
       "name": "Operating system, C++ standard library and threads",
       "supplier": "Apple, Microsoft, the Linux distribution, LLVM, GNU",

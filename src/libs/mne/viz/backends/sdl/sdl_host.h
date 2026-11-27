@@ -22,6 +22,7 @@
 //=============================================================================================================
 
 #include "viz_sdl_global.h"
+#include <mne/viz/figures/font_library.h>
 #include <mne/viz/gpu/software_renderer.h>
 #include <mne/viz/host/surface.h>
 
@@ -32,6 +33,7 @@
 #include <array>
 #include <cstdint>
 #include <functional>
+#include <memory>
 #include <string>
 
 //=============================================================================================================
@@ -67,10 +69,11 @@ public:
      */
     struct Options
     {
-        std::string title = "MNE-CPP"; /**< Window title. */
-        int width = 1000;              /**< Initial width in logical units. */
-        int height = 640;              /**< Initial height in logical units. */
-        int frame_limit = -1;          /**< Frames to draw before run() returns; -1 runs until the window closes. */
+        std::string title = "MNE-CPP";                                   /**< Window title. */
+        int width = 1000;                                                /**< Initial width in logical units. */
+        int height = 640;                                                /**< Initial height in logical units. */
+        int frame_limit = -1;                                            /**< Frames to draw before run() returns; -1 runs until the window closes. */
+        std::shared_ptr<const FontSource> fonts = FontLibrary::shared(); /**< Fonts of the text; nullptr for the bitmap font. */
     };
 
     //=========================================================================================================

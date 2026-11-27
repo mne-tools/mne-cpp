@@ -20,6 +20,8 @@
 #include <mne/viz/figures/average_layout.h>
 #include <mne/viz/figures/canvas.h>
 #include <mne/viz/figures/filter_response_plot.h>
+#include <mne/viz/figures/font_library.h>
+#include <mne/viz/figures/font_text_metrics.h>
 #include <mne/viz/figures/line_chart.h>
 #include <mne/viz/figures/raster_renderer.h>
 #include <mne/viz/figures/sensor_layout.h>
@@ -34,9 +36,11 @@
 //=============================================================================================================
 
 #include <array>
+#include <cstdint>
 #include <cmath>
 #include <cstdlib>
 #include <filesystem>
+#include <memory>
 #include <format>
 #include <print>
 #include <optional>
@@ -194,6 +198,29 @@ int main()
     compensators.save(settings, "ex_scene");
     //! [panel_usage]
     ok &= expect(grade == 3 && compensators.selected() == 3, "a click on a compensator's check box chooses its grade");
+
+    //! [font_library_usage]
+    // Text in the bundled Source Sans 3, laid out with the metrics of what is drawn; without RasterOptions::fonts
+    // the bitmap font draws, as above
+    const std::shared_ptr<const FontLibrary> fonts = FontLibrary::shared();
+    const FontTextMetrics fontMetrics(fonts);
+    const DisplayList typeset = plot.render(480, 320, fontMetrics, Font{"", 0.0, 13.0});
+    RasterOptions fontOptions;
+    fontOptions.fonts = fonts.get();
+    const Expected<void> typesetPng = to_raster(typeset, fontOptions).save_png(dir / "plot_fonts.png");
+    //! [font_library_usage]
+    //! [font_face_usage]
+    // One face: glyphs, advances and pair kerning in font units
+    const std::shared_ptr<const FontFace> face = FontLibrary::sans();
+    const std::uint32_t t = face->glyph_index(U'T');
+    const double kerning = face->kerning(t, face->glyph_index(U'o')) * 13.0 / face->units_per_em(); // pixels at 13 px
+    //! [font_face_usage]
+    //! [system_fonts_usage]
+    // Installed fonts, found without a font service; FontLibrary falls back to them
+    const std::shared_ptr<const FontFace> installed = SystemFonts::shared()->face(Font{});
+    //! [system_fonts_usage]
+    ok &= expect(typesetPng && face->family() == "Source Sans 3" && kerning < 0.0, "text is typeset in the bundled font, kerned");
+    std::println("        installed UI font: {}", installed ? installed->family() : std::string("none"));
 
     std::error_code removeError;
     std::filesystem::remove_all(dir, removeError);

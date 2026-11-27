@@ -38,6 +38,7 @@
 #include <cstdint>
 #include <functional>
 #include <map>
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
@@ -48,6 +49,8 @@
 
 namespace mne::viz
 {
+
+class FontSource;
 
 /**
  * @brief The uniform blocks and textures of a draw as a software shader reads them.
@@ -188,6 +191,16 @@ public:
      */
     Image render(const GpuFrame& frame, const GpuResources& resources);
 
+    //=========================================================================================================
+    /**
+     * Sets the fonts figure textures draw their text with; by default they use the bitmap font of to_raster().
+     *
+     * @param[in] fonts   Fonts, e.g. FontLibrary::shared(); nullptr restores the bitmap font.
+     *
+     * @since 3.0.0
+     */
+    void set_fonts(std::shared_ptr<const FontSource> fonts);
+
 private:
     struct CachedTexture
     {
@@ -202,6 +215,7 @@ private:
 
     std::map<std::string, SoftwareShader> m_shaders;
     std::map<GpuHandle, CachedTexture> m_textures;
+    std::shared_ptr<const FontSource> m_fonts;
 };
 
 //=============================================================================================================
@@ -213,12 +227,13 @@ private:
  *
  * @param[in] list    Figure; its background, if any, is drawn too.
  * @param[in] scale   Image pixels per figure pixel.
+ * @param[in] fonts   Fonts of the text (RasterOptions::fonts); nullptr for the bitmap font.
  *
  * @return The RGBA image, not premultiplied.
  *
  * @since 3.0.0
  */
-VIZSHARED_EXPORT Image to_rgba_image(const DisplayList& list, double scale = 1.0);
+VIZSHARED_EXPORT Image to_rgba_image(const DisplayList& list, double scale = 1.0, const FontSource* fonts = nullptr);
 
 } // namespace mne::viz
 

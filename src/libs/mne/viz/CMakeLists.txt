@@ -39,12 +39,17 @@ set(SOURCES
   figures/canvas.cpp
   figures/colormap.cpp
   figures/filter_response_plot.cpp
+  figures/font_face.cpp
+  figures/font_library.cpp
+  figures/font_source.cpp
+  figures/font_text_metrics.cpp
   figures/image_plot.cpp
   figures/line_chart.cpp
   figures/raster_renderer.cpp
   figures/sensor_layout.cpp
   figures/spline_plot.cpp
   figures/svg_renderer.cpp
+  figures/system_fonts.cpp
   figures/text_metrics.cpp
   figures/ticks.cpp
   figures/vector_plot.cpp
@@ -117,6 +122,10 @@ set(HEADERS
   figures/colormap.h
   figures/display_list.h
   figures/filter_response_plot.h
+  figures/font_face.h
+  figures/font_library.h
+  figures/font_source.h
+  figures/font_text_metrics.h
   figures/geometry.h
   figures/image_plot.h
   figures/line_chart.h
@@ -125,6 +134,7 @@ set(HEADERS
   figures/spline_plot.h
   figures/style.h
   figures/svg_renderer.h
+  figures/system_fonts.h
   figures/text_metrics.h
   figures/ticks.h
   figures/vector_plot.h
@@ -165,11 +175,27 @@ set(HEADERS
 )
 
 set(PRIVATE_HEADERS
+  figures/detail/bundled_fonts.h
+  figures/detail/font_names.h
   figures/detail/text_layout.h
   gpu/detail/software_shaders.h
 )
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${PRIVATE_HEADERS})
+
+# Source Sans 3 and Source Code Pro (SIL OFL 1.1, unmodified) compiled in, so text renders alike everywhere
+foreach(_font SourceSans3-Regular SourceSans3-Semibold SourceCodePro-Regular)
+  string(REPLACE "-" "" _symbol "k${_font}")
+  set(_input ${CMAKE_CURRENT_LIST_DIR}/../../../../resources/fonts/${_font}.ttf)
+  set(_output ${CMAKE_CURRENT_BINARY_DIR}/bundled_fonts/${_font}.cpp)
+  add_custom_command(OUTPUT ${_output}
+    COMMAND ${CMAKE_COMMAND} -DINPUT=${_input} -DOUTPUT=${_output} -DSYMBOL=${_symbol} -DNAMESPACE=mne::viz::detail
+            -P ${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/MneEmbedFile.cmake
+    DEPENDS ${_input} ${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/MneEmbedFile.cmake
+    COMMENT "Embedding ${_font}.ttf"
+    VERBATIM)
+  target_sources(${PROJECT_NAME} PRIVATE ${_output})
+endforeach()
 include(${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/MneWarnings.cmake)
 mne_warn_on_narrowing(${PROJECT_NAME})
 

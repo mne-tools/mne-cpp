@@ -184,6 +184,7 @@ SDL_SystemCursor system_cursor_of(CursorShape shape)
 SdlHost::SdlHost(Options options)
 : m_options(std::move(options))
 {
+    m_software.set_fonts(m_options.fonts);
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         m_error = SDL_GetError();
         return;

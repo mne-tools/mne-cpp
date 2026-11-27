@@ -414,6 +414,9 @@ aliases; replace the old spelling as below.
   `PanelWidget`). `CompensatorView` and `ProjectorsView` are replaced by
   `viz::CompensatorPanel` and `viz::ProjectorsPanel` (their settings are
   stored under new keys), and `FwdSettingsView` by `viz::ForwardPanel`.
+  `SettingsForm` gains read-only Info fields with a tone, Directory and Color
+  fields, `add_path()` and `remove()`; `SettingsPanel` rebuilds its rows when
+  fields are added or removed.
 - `viz::FormView` (`viz/panels/form_view.h`) lays out, draws and edits any
   `SettingsForm` without a toolkit (check boxes, steppers, choice cyclers,
   text fields, buttons, toned status texts, scrolling), styled by
@@ -421,9 +424,15 @@ aliases; replace the old spelling as below.
   a `SurfaceClient` shows every panel through it: `ex_scene_sdl --panel`
   shows the projector or compensator panel in an SDL window, and `SdlHost`
   now passes typed text to its client. `test_viz_form_view` drives the view
-  with synthetic input and compares a golden PNG. `SettingsForm` gains read-only Info fields with a
-  tone, Directory and Color fields, `add_path()` and `remove()`;
-  `SettingsPanel` rebuilds its rows when fields are added or removed.
+  with synthetic input and compares a golden PNG.
+- Text without Qt is drawn with real typefaces: mne_viz bundles the
+  unmodified Source Sans 3 (Regular, Semibold) and Source Code Pro (SIL OFL
+  1.1, `resources/fonts`) and renders them with its own TrueType reader
+  (`viz::FontFace`: outlines, cmap, GPOS and `kern` kerning, collections),
+  `viz::FontLibrary` (bundled faces, installed fonts as fallback for missing
+  glyphs, `viz::SystemFonts`) and `viz::FontTextMetrics`. The software
+  renderer, `SdlHost` and `mne_render --fonts` use them; `RasterOptions` and
+  `SoftwareRenderer` keep the bitmap font unless fonts are set.
 - `ChannelRhiRenderer` hosts a `viz::TraceViewClient`, the same trace view
   client the SDL example runs, instead of wiring its own view, animator,
   markers and frame builder; its host becomes the client's `viz::Surface`.
