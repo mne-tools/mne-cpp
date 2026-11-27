@@ -519,7 +519,7 @@ void TestDisp3dBrainWindow::frames_matchTheirShaders()
     viz::Image pixels = viz::Image::transparent(4, 4);
     const std::array<float, 20> quad = {0.f, 0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, 1.f, 1.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 1.f, 0.f};
     QVERIFY(builder.draw_slice(3, viz::BrainTextureView{&pixels, 1}, quad, viz::BrainSliceUniforms{}, pane));
-    QVERIFY(builder.draw_video_billboard(4, viz::BrainTextureView{&pixels, 1}, quad, viz::BrainVideoBillboardUniforms{}, pane));
+    QVERIFY(builder.draw_video_billboard(4, 4, viz::BrainTextureView{&pixels, 1}, quad, viz::BrainVideoBillboardUniforms{}, pane));
     QVERIFY(builder.draw_video_decal(1, surface, 5, viz::BrainTextureView{&pixels, 1}, viz::BrainTextureView{}, viz::BrainVideoDecalUniforms{}, pane));
     QVERIFY(builder.draw_video_decal(1, surface, 6, viz::BrainTextureView{&pixels, 1}, viz::BrainTextureView{&pixels, 1}, viz::BrainVideoDecalUniforms{},
                                      pane));

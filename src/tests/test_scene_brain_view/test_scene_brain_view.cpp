@@ -17,6 +17,9 @@
 
 #include "../common/scene_golden.h"
 #include <mne/viz/gpu/brain_frame.h>
+#include <mne/viz/brain/brainframecomposer.h>
+#include <mne/viz/brain/brainsurface.h>
+#include <mne/viz/brain/meshfactory.h>
 #include <mne/viz/views/brain_view_interaction.h>
 #include <mne/viz/views/brain_view_overlay.h>
 #include <mne/viz/views/camera.h>
@@ -48,6 +51,8 @@
 #include <fstream>
 #include <functional>
 #include <iterator>
+#include <map>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -854,7 +859,7 @@ void test_brain_frame_textured()
     CHECK(builder.draw_surface(1, brain.streams(), BrainShader::Standard, surface, pane));
     CHECK(builder.draw_slice(2, BrainTextureView{&mri, 1}, sliceQuad, slice, pane));
     CHECK(builder.draw_video_decal(1, brain.streams(), 3, BrainTextureView{&video, 1}, BrainTextureView{}, decal, pane));
-    CHECK(builder.draw_video_billboard(4, BrainTextureView{&video, 1}, disk, billboard, pane));
+    CHECK(builder.draw_video_billboard(4, 4, BrainTextureView{&video, 1}, disk, billboard, pane));
     CHECK(!builder.draw_slice(5, BrainTextureView{}, sliceQuad, slice, pane));
     const GpuFrame frame = builder.finish();
     CHECK(frame.passes[0].draws.size() == 4);
@@ -879,6 +884,104 @@ void test_brain_frame_textured()
     CHECK(!builder.resources().texture(videoTexture));
 }
 
+void test_brain_frame_composer()
+{
+    const int width = 240;
+    const int height = 120;
+
+    // Pial and white hemispheres, a translucent head carrying the video and a pointer marker
+    std::map<std::string, std::shared_ptr<BrainSurface>> surfaces;
+    surfaces["lh_pial"] = MeshFactory::createSphere(Eigen::Vector3f(-0.025f, 0.f, 0.f), 0.03f, Color{200, 190, 180}, 3);
+    surfaces["rh_pial"] = MeshFactory::createSphere(Eigen::Vector3f(0.025f, 0.f, 0.f), 0.03f, Color{200, 190, 180}, 3);
+    surfaces["lh_white"] = MeshFactory::createSphere(Eigen::Vector3f(-0.025f, 0.f, 0.f), 0.02f, Color{255, 255, 255}, 2);
+    std::shared_ptr<BrainSurface> head = MeshFactory::createSphere(Eigen::Vector3f::Zero(), 0.07f, Color{230, 190, 160}, 3);
+    head->setTissueType(BrainSurface::TissueSkin);
+    surfaces["bem_head"] = head;
+    const std::shared_ptr<BrainSurface> pointer = MeshFactory::createSphere(Eigen::Vector3f::Zero(), 0.006f, Color{255, 200, 0}, 2);
+
+    Image video = Image::transparent(16, 16);
+    for (int y = 0; y < 16; ++y) {
+        for (int x = 0; x < 16; ++x) {
+            video.set_pixel(x, y, x < 8 ? Color{230, 40, 40, 255} : Color{40, 200, 60, 255});
+        }
+    }
+    Image mri = Image::transparent(8, 8);
+    for (int y = 0; y < 8; ++y) {
+        for (int x = 0; x < 8; ++x) {
+            const auto level = static_cast<std::uint8_t>((x + y) % 2 ? 220 : 120);
+            mri.set_pixel(x, y, Color{level, level, level, 255});
+        }
+    }
+
+    BrainScene scene;
+    scene.surfaces = &surfaces;
+    scene.pointer = pointer.get();
+    scene.pointer_position = Eigen::Vector3f(0.f, 0.f, 0.07f);
+    BrainSliceLayer slice;
+    slice.image = BrainTextureView{&mri, 1};
+    slice.quad = {-0.08f, -0.08f, 0.f, 0.f, 1.f, 0.08f, -0.08f, 0.f, 1.f, 1.f, -0.08f, 0.08f, 0.f, 0.f, 0.f, 0.08f, 0.08f, 0.f, 1.f, 0.f};
+    scene.slices.push_back(slice);
+    BrainVideoLayer layer;
+    layer.frame = BrainTextureView{&video, 1};
+    layer.focus = Eigen::Vector3f(0.f, 0.f, 0.07f);
+    layer.size = 0.06f;
+    layer.up_hint = Eigen::Vector3f::UnitY();
+    scene.video = layer;
+
+    // Two panes: the pial surfaces in front with the head as a holographic shell, and from the side without slices
+    SubView front;
+    front.bemShader = Holographic;
+    front.visibility.bemHead = true;
+    SubView side = front;
+    side.visibility.mriSlices = false;
+    side.visibility.rh = false;
+    OrbitCamera camera;
+    camera.set_scene_size(0.16f);
+    const float aspect = static_cast<float>(width) / 2.f / static_cast<float>(height);
+    const std::array<BrainScenePane, 2> panes = {
+        BrainScenePane{GpuRect{0, 0, width / 2, height}, camera.single_view(Eigen::Quaternionf::Identity(), 1.f, aspect), &front},
+        BrainScenePane{GpuRect{width / 2, 0, width / 2, height},
+                       camera.single_view(Eigen::Quaternionf(Eigen::AngleAxisf(0.9f, Eigen::Vector3f::UnitY())), 1.f, aspect), &side}};
+
+    BrainFrameComposer composer;
+    GpuFrameTarget target;
+    target.pixel_width = width;
+    target.pixel_height = height;
+    composer.begin(target, Color{20, 20, 30});
+    const std::vector<std::vector<std::string>> drawn = composer.draw(scene, panes);
+    Canvas separator(width, height);
+    separator.set_pen(Color::white());
+    separator.draw_line(Point{width / 2.0, 0}, Point{width / 2.0, static_cast<double>(height)});
+    const GpuFrame frame = composer.finish(separator.display_list());
+    CHECK(drawn.size() == 2 && drawn[0] == std::vector<std::string>({"lh_pial", "rh_pial"}) && drawn[1] == std::vector<std::string>({"lh_pial"}));
+
+    // Pane 1: hemispheres, slice, the head (back and front faces), the decal after it, the pointer (back and front)
+    std::vector<std::string> shaders;
+    for (const GpuDraw& draw : frame.passes[0].draws) {
+        if (draw.viewport && draw.viewport->x == 0) {
+            shaders.push_back(composer.resources().pipeline(draw.pipeline)->shader);
+        }
+    }
+    CHECK(shaders == std::vector<std::string>({"standard", "standard", "slice", "holographic", "holographic", "video_decal", "holographic", "holographic"}));
+    SoftwareRenderer renderer;
+    CHECK(scene_golden::matches_png(renderer.render(frame, composer.resources()), GOLDEN_DIR "/brain_scene.png"));
+
+    // Without a head the video becomes a disk facing each camera; destroyed surfaces lose their buffers
+    const int meshes = composer.mesh_count();
+    surfaces.erase("bem_head");
+    head.reset();
+    composer.begin(target);
+    composer.draw(scene, panes);
+    const GpuFrame disk = composer.finish();
+    // The head is gone, each pane's disk adds a quad
+    CHECK(composer.mesh_count() == meshes - 1 + 2);
+    int disks = 0;
+    for (const GpuDraw& draw : disk.passes[0].draws) {
+        disks += composer.resources().pipeline(draw.pipeline)->shader == "video_overlay" ? 1 : 0;
+    }
+    CHECK(disks == 2);
+}
+
 } // namespace
 
 //=============================================================================================================
@@ -900,6 +1003,7 @@ int main()
         {"overlay", test_overlay},
         {"brain_frame", test_brain_frame},
         {"brain_frame_textured", test_brain_frame_textured},
+        {"brain_frame_composer", test_brain_frame_composer},
     };
     for (const auto& [name, test] : tests) {
         const int before = g_failures;

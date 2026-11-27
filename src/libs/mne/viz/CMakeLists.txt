@@ -8,6 +8,7 @@ project(mne_viz
 )
 
 set(SOURCES
+  brain/brainframecomposer.cpp
   brain/brainsurface.cpp
   brain/dataloader.cpp
   brain/dipoleobject.cpp
@@ -74,6 +75,7 @@ set(SOURCES
 )
 
 set(HEADERS
+  brain/brainframecomposer.h
   brain/brainsurface.h
   brain/dataloader.h
   brain/dipoleobject.h

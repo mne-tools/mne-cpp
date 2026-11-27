@@ -263,13 +263,13 @@ bool BrainFrameBuilder::draw_slice(std::uint64_t key, const BrainTextureView& im
 
 //=============================================================================================================
 
-bool BrainFrameBuilder::draw_video_billboard(std::uint64_t key, const BrainTextureView& frame, std::span<const float, 20> quad,
+bool BrainFrameBuilder::draw_video_billboard(std::uint64_t key, std::uint64_t textureKey, const BrainTextureView& frame, std::span<const float, 20> quad,
                                              const BrainVideoBillboardUniforms& uniforms, const GpuRect& viewport)
 {
     if (m_frame.passes.empty()) {
         return false;
     }
-    const GpuHandle tex = texture(key, frame, false);
+    const GpuHandle tex = texture(textureKey, frame, false);
     if (tex == 0) {
         return false;
     }

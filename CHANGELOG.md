@@ -390,6 +390,13 @@ aliases; replace the old spelling as below.
   textures that are uploaded only when their revision changes; textures can
   request mipmaps (`GpuTexture::mipmaps`), which `RhiFrameRenderer` generates.
   The software backend renders slices, the video disk and flat decals.
+- `viz::BrainFrameComposer` (`viz/brain/brainframecomposer.h`) turns the
+  brain view's scene (surfaces, glyphs, MRI slices, video overlay, pointer)
+  and its panes into `GpuFrame`s with the drawing order and shaders of the
+  view, so every backend renders the same frames; `test_scene_brain_view`
+  renders a two-pane scene headless against a golden PNG.
+  `BrainFrameBuilder::draw_video_billboard()` takes the key of the texture
+  the disks of all panes share.
 - New tool `mne_render` renders raw data traces (PNG through the trace view's
   GPU frames, or SVG) or a FreeSurfer surface with a source estimate (PNG)
   headless, without Qt, a window system or a GPU, on the software backend of

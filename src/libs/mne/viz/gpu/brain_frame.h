@@ -272,8 +272,9 @@ public:
     /**
      * Draws a video frame as a round disk facing the camera, over everything drawn before.
      *
-     * @param[in] key        Identity of the disk; also identifies its texture. Panes that each face their own
-     *                       camera need keys of their own, since a key holds one quad per frame.
+     * @param[in] key        Identity of the disk. Panes that each face their own camera need keys of their own,
+     *                       since a key holds one quad per frame.
+     * @param[in] textureKey Identity of the video texture, which the disks of all panes share.
      * @param[in] frame      Video frame.
      * @param[in] quad       Four corners, each position (3 floats) and texture coordinates (2 floats), as a strip.
      * @param[in] uniforms   Shader parameters.
@@ -281,7 +282,7 @@ public:
      *
      * @return Whether anything was drawn: false without a frame.
      */
-    bool draw_video_billboard(std::uint64_t key, const BrainTextureView& frame, std::span<const float, 20> quad,
+    bool draw_video_billboard(std::uint64_t key, std::uint64_t textureKey, const BrainTextureView& frame, std::span<const float, 20> quad,
                               const BrainVideoBillboardUniforms& uniforms, const GpuRect& viewport);
 
     //=========================================================================================================
