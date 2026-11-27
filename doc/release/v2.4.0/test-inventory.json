@@ -57,9 +57,6 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
-          "test_disp3d_brain_window",
-          "test_disp_channel_window",
-          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_dsp_rt_raw_display",
@@ -75,13 +72,25 @@
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
-          "test_scene_brain_view",
-          "test_scene_gpu_frame",
-          "test_scene_render",
-          "test_scene_settings_form",
-          "test_scene_trace_buffer",
-          "test_scene_trace_view",
-          "test_viewmodels"
+          "test_viz_brain_view",
+          "test_viz_gpu_frame",
+          "test_viz_qt_brain_window",
+          "test_viz_qt_brainsurface",
+          "test_viz_qt_brainview",
+          "test_viz_qt_channel_window",
+          "test_viz_qt_colormap",
+          "test_viz_qt_headless",
+          "test_viz_qt_plots",
+          "test_viz_qt_svg_writer",
+          "test_viz_qt_viewers",
+          "test_viz_qt_viewers2",
+          "test_viz_qt_viewers3",
+          "test_viz_qt_viewstate",
+          "test_viz_render",
+          "test_viz_settings_form",
+          "test_viz_trace_buffer",
+          "test_viz_trace_view",
+          "test_viz_viewmodels"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -118,6 +127,15 @@
           "ex_sts_statistics",
           "ex_utils",
           "test_com_rt_client",
+          "test_disp3d_brainsurface",
+          "test_disp3d_brainview",
+          "test_disp3d_headless",
+          "test_disp3d_viewstate",
+          "test_disp_colormap",
+          "test_disp_plots",
+          "test_disp_viewers",
+          "test_disp_viewers2",
+          "test_disp_viewers3",
           "test_python_runner",
           "test_rtprocessing_averaging",
           "test_rtprocessing_extended",
@@ -164,9 +182,6 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
-          "test_disp3d_brain_window",
-          "test_disp_channel_window",
-          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_dsp_rt_raw_display",
@@ -182,13 +197,25 @@
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
-          "test_scene_brain_view",
-          "test_scene_gpu_frame",
-          "test_scene_render",
-          "test_scene_settings_form",
-          "test_scene_trace_buffer",
-          "test_scene_trace_view",
-          "test_viewmodels"
+          "test_viz_brain_view",
+          "test_viz_gpu_frame",
+          "test_viz_qt_brain_window",
+          "test_viz_qt_brainsurface",
+          "test_viz_qt_brainview",
+          "test_viz_qt_channel_window",
+          "test_viz_qt_colormap",
+          "test_viz_qt_headless",
+          "test_viz_qt_plots",
+          "test_viz_qt_svg_writer",
+          "test_viz_qt_viewers",
+          "test_viz_qt_viewers2",
+          "test_viz_qt_viewers3",
+          "test_viz_qt_viewstate",
+          "test_viz_render",
+          "test_viz_settings_form",
+          "test_viz_trace_buffer",
+          "test_viz_trace_view",
+          "test_viz_viewmodels"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -225,6 +252,15 @@
           "ex_sts_statistics",
           "ex_utils",
           "test_com_rt_client",
+          "test_disp3d_brainsurface",
+          "test_disp3d_brainview",
+          "test_disp3d_headless",
+          "test_disp3d_viewstate",
+          "test_disp_colormap",
+          "test_disp_plots",
+          "test_disp_viewers",
+          "test_disp_viewers2",
+          "test_disp_viewers3",
           "test_python_runner",
           "test_rtprocessing_averaging",
           "test_rtprocessing_extended",
@@ -271,9 +307,6 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
-          "test_disp3d_brain_window",
-          "test_disp_channel_window",
-          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_dsp_rt_raw_display",
@@ -289,13 +322,25 @@
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
-          "test_scene_brain_view",
-          "test_scene_gpu_frame",
-          "test_scene_render",
-          "test_scene_settings_form",
-          "test_scene_trace_buffer",
-          "test_scene_trace_view",
-          "test_viewmodels"
+          "test_viz_brain_view",
+          "test_viz_gpu_frame",
+          "test_viz_qt_brain_window",
+          "test_viz_qt_brainsurface",
+          "test_viz_qt_brainview",
+          "test_viz_qt_channel_window",
+          "test_viz_qt_colormap",
+          "test_viz_qt_headless",
+          "test_viz_qt_plots",
+          "test_viz_qt_svg_writer",
+          "test_viz_qt_viewers",
+          "test_viz_qt_viewers2",
+          "test_viz_qt_viewers3",
+          "test_viz_qt_viewstate",
+          "test_viz_render",
+          "test_viz_settings_form",
+          "test_viz_trace_buffer",
+          "test_viz_trace_view",
+          "test_viz_viewmodels"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -332,6 +377,15 @@
           "ex_sts_statistics",
           "ex_utils",
           "test_com_rt_client",
+          "test_disp3d_brainsurface",
+          "test_disp3d_brainview",
+          "test_disp3d_headless",
+          "test_disp3d_viewstate",
+          "test_disp_colormap",
+          "test_disp_plots",
+          "test_disp_viewers",
+          "test_disp_viewers2",
+          "test_disp_viewers3",
           "test_python_runner",
           "test_rtprocessing_averaging",
           "test_rtprocessing_extended",
@@ -378,9 +432,6 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
-          "test_disp3d_brain_window",
-          "test_disp_channel_window",
-          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_dsp_rt_raw_display",
@@ -396,13 +447,25 @@
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
-          "test_scene_brain_view",
-          "test_scene_gpu_frame",
-          "test_scene_render",
-          "test_scene_settings_form",
-          "test_scene_trace_buffer",
-          "test_scene_trace_view",
-          "test_viewmodels"
+          "test_viz_brain_view",
+          "test_viz_gpu_frame",
+          "test_viz_qt_brain_window",
+          "test_viz_qt_brainsurface",
+          "test_viz_qt_brainview",
+          "test_viz_qt_channel_window",
+          "test_viz_qt_colormap",
+          "test_viz_qt_headless",
+          "test_viz_qt_plots",
+          "test_viz_qt_svg_writer",
+          "test_viz_qt_viewers",
+          "test_viz_qt_viewers2",
+          "test_viz_qt_viewers3",
+          "test_viz_qt_viewstate",
+          "test_viz_render",
+          "test_viz_settings_form",
+          "test_viz_trace_buffer",
+          "test_viz_trace_view",
+          "test_viz_viewmodels"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -439,6 +502,15 @@
           "ex_sts_statistics",
           "ex_utils",
           "test_com_rt_client",
+          "test_disp3d_brainsurface",
+          "test_disp3d_brainview",
+          "test_disp3d_headless",
+          "test_disp3d_viewstate",
+          "test_disp_colormap",
+          "test_disp_plots",
+          "test_disp_viewers",
+          "test_disp_viewers2",
+          "test_disp_viewers3",
           "test_python_runner",
           "test_rtprocessing_averaging",
           "test_rtprocessing_extended",
@@ -485,9 +557,6 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
-          "test_disp3d_brain_window",
-          "test_disp_channel_window",
-          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_dsp_rt_raw_display",
@@ -503,13 +572,25 @@
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
-          "test_scene_brain_view",
-          "test_scene_gpu_frame",
-          "test_scene_render",
-          "test_scene_settings_form",
-          "test_scene_trace_buffer",
-          "test_scene_trace_view",
-          "test_viewmodels"
+          "test_viz_brain_view",
+          "test_viz_gpu_frame",
+          "test_viz_qt_brain_window",
+          "test_viz_qt_brainsurface",
+          "test_viz_qt_brainview",
+          "test_viz_qt_channel_window",
+          "test_viz_qt_colormap",
+          "test_viz_qt_headless",
+          "test_viz_qt_plots",
+          "test_viz_qt_svg_writer",
+          "test_viz_qt_viewers",
+          "test_viz_qt_viewers2",
+          "test_viz_qt_viewers3",
+          "test_viz_qt_viewstate",
+          "test_viz_render",
+          "test_viz_settings_form",
+          "test_viz_trace_buffer",
+          "test_viz_trace_view",
+          "test_viz_viewmodels"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -546,6 +627,15 @@
           "ex_sts_statistics",
           "ex_utils",
           "test_com_rt_client",
+          "test_disp3d_brainsurface",
+          "test_disp3d_brainview",
+          "test_disp3d_headless",
+          "test_disp3d_viewstate",
+          "test_disp_colormap",
+          "test_disp_plots",
+          "test_disp_viewers",
+          "test_disp_viewers2",
+          "test_disp_viewers3",
           "test_python_runner",
           "test_rtprocessing_averaging",
           "test_rtprocessing_extended",
@@ -592,9 +682,6 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
-          "test_disp3d_brain_window",
-          "test_disp_channel_window",
-          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_dsp_rt_raw_display",
@@ -610,13 +697,25 @@
           "test_rt_server_fiff_replay",
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
-          "test_scene_brain_view",
-          "test_scene_gpu_frame",
-          "test_scene_render",
-          "test_scene_settings_form",
-          "test_scene_trace_buffer",
-          "test_scene_trace_view",
-          "test_viewmodels"
+          "test_viz_brain_view",
+          "test_viz_gpu_frame",
+          "test_viz_qt_brain_window",
+          "test_viz_qt_brainsurface",
+          "test_viz_qt_brainview",
+          "test_viz_qt_channel_window",
+          "test_viz_qt_colormap",
+          "test_viz_qt_headless",
+          "test_viz_qt_plots",
+          "test_viz_qt_svg_writer",
+          "test_viz_qt_viewers",
+          "test_viz_qt_viewers2",
+          "test_viz_qt_viewers3",
+          "test_viz_qt_viewstate",
+          "test_viz_render",
+          "test_viz_settings_form",
+          "test_viz_trace_buffer",
+          "test_viz_trace_view",
+          "test_viz_viewmodels"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -653,6 +752,15 @@
           "ex_sts_statistics",
           "ex_utils",
           "test_com_rt_client",
+          "test_disp3d_brainsurface",
+          "test_disp3d_brainview",
+          "test_disp3d_headless",
+          "test_disp3d_viewstate",
+          "test_disp_colormap",
+          "test_disp_plots",
+          "test_disp_viewers",
+          "test_disp_viewers2",
+          "test_disp_viewers3",
           "test_python_runner",
           "test_rtprocessing_averaging",
           "test_rtprocessing_extended",
@@ -2637,474 +2745,6 @@
         "test-data"
       ],
       "gui": false,
-      "qskip_sites": 0,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "run",
-        "macos-26-qt-min": "run",
-        "ubuntu-24.04": "run",
-        "ubuntu-24.04-qt-min": "run",
-        "windows-2025-vs2026": "run",
-        "windows-2025-vs2026-qt-min": "run"
-      },
-      "registry_classes": []
-    },
-    {
-      "name": "test_disp3d_brain_window",
-      "cmake": "src/tests/test_disp3d_brain_window/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_disp3d_brain_window"
-      ],
-      "labels": [
-        "gui",
-        "unit"
-      ],
-      "timeout": 60,
-      "requirements": [
-        "test-data"
-      ],
-      "gui": true,
-      "qskip_sites": 1,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "absent",
-        "macos-26-qt-min": "absent",
-        "ubuntu-24.04": "absent",
-        "ubuntu-24.04-qt-min": "absent",
-        "windows-2025-vs2026": "absent",
-        "windows-2025-vs2026-qt-min": "absent"
-      },
-      "registry_classes": [
-        "BrainViewCore",
-        "BrainViewHost",
-        "BrainWindow"
-      ]
-    },
-    {
-      "name": "test_disp3d_brainsurface",
-      "cmake": "src/tests/test_disp3d_brainsurface/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_disp3d_brainsurface"
-      ],
-      "labels": [
-        "unit"
-      ],
-      "timeout": 60,
-      "requirements": [],
-      "gui": false,
-      "qskip_sites": 0,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "run",
-        "macos-26-qt-min": "run",
-        "ubuntu-24.04": "run",
-        "ubuntu-24.04-qt-min": "run",
-        "windows-2025-vs2026": "run",
-        "windows-2025-vs2026-qt-min": "run"
-      },
-      "registry_classes": [
-        "BrainSurface",
-        "GpuStream"
-      ]
-    },
-    {
-      "name": "test_disp3d_brainview",
-      "cmake": "src/tests/test_disp3d_brainview/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_disp3d_brainview"
-      ],
-      "labels": [
-        "gui",
-        "unit"
-      ],
-      "timeout": 60,
-      "requirements": [
-        "test-data"
-      ],
-      "gui": true,
-      "qskip_sites": 0,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "run",
-        "macos-26-qt-min": "run",
-        "ubuntu-24.04": "run",
-        "ubuntu-24.04-qt-min": "run",
-        "windows-2025-vs2026": "run",
-        "windows-2025-vs2026-qt-min": "run"
-      },
-      "registry_classes": [
-        "BemTreeItem",
-        "BrainRenderer",
-        "BrainTreeModel",
-        "BrainView",
-        "CameraController",
-        "CameraResult",
-        "DigitizerSetTreeItem",
-        "DigitizerTreeItem",
-        "DipoleObject",
-        "DipoleTreeItem",
-        "InstancedStreams",
-        "MultiViewLayout",
-        "NetworkObject",
-        "NetworkTreeItem",
-        "PolylineObject",
-        "RayHit",
-        "RayPicker",
-        "RenderKey",
-        "RtSensorStreamManager",
-        "SensorStreamSession",
-        "SliceObject",
-        "SourceEstimateManager",
-        "SourceEstimateOverlay",
-        "SourceEstimateSession",
-        "SourceSpaceTreeItem",
-        "StcLoadingWorker",
-        "SurfaceTreeItem",
-        "VideoOverlay"
-      ]
-    },
-    {
-      "name": "test_disp3d_headless",
-      "cmake": "src/tests/test_disp3d_headless/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_disp3d_headless"
-      ],
-      "labels": [
-        "integration",
-        "requires-data"
-      ],
-      "timeout": 60,
-      "requirements": [
-        "test-data"
-      ],
-      "gui": false,
-      "qskip_sites": 5,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "run",
-        "macos-26-qt-min": "run",
-        "ubuntu-24.04": "run",
-        "ubuntu-24.04-qt-min": "run",
-        "windows-2025-vs2026": "run",
-        "windows-2025-vs2026-qt-min": "run"
-      },
-      "registry_classes": [
-        "DataLoader",
-        "MeshFactory"
-      ]
-    },
-    {
-      "name": "test_disp3d_viewstate",
-      "cmake": "src/tests/test_disp3d_viewstate/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_disp3d_viewstate"
-      ],
-      "labels": [
-        "unit"
-      ],
-      "timeout": 60,
-      "requirements": [],
-      "gui": false,
-      "qskip_sites": 0,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "run",
-        "macos-26-qt-min": "run",
-        "ubuntu-24.04": "run",
-        "ubuntu-24.04-qt-min": "run",
-        "windows-2025-vs2026": "run",
-        "windows-2025-vs2026-qt-min": "run"
-      },
-      "registry_classes": [
-        "MemorySettingsStore",
-        "QtSettingsStore",
-        "SettingsStore",
-        "SubView",
-        "ViewVisibilityProfile"
-      ]
-    },
-    {
-      "name": "test_disp_channel_window",
-      "cmake": "src/tests/test_disp_channel_window/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_disp_channel_window"
-      ],
-      "labels": [
-        "gui",
-        "unit"
-      ],
-      "timeout": 60,
-      "requirements": [],
-      "gui": false,
-      "qskip_sites": 0,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "absent",
-        "macos-26-qt-min": "absent",
-        "ubuntu-24.04": "absent",
-        "ubuntu-24.04-qt-min": "absent",
-        "windows-2025-vs2026": "absent",
-        "windows-2025-vs2026-qt-min": "absent"
-      },
-      "registry_classes": [
-        "ChannelRhiHost",
-        "ChannelRhiRenderer",
-        "ChannelWindow",
-        "RhiFrameRenderer"
-      ]
-    },
-    {
-      "name": "test_disp_colormap",
-      "cmake": "src/tests/test_disp_colormap/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_disp_colormap"
-      ],
-      "labels": [
-        "unit"
-      ],
-      "timeout": 60,
-      "requirements": [],
-      "gui": false,
-      "qskip_sites": 0,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "run",
-        "macos-26-qt-min": "run",
-        "ubuntu-24.04": "run",
-        "ubuntu-24.04-qt-min": "run",
-        "windows-2025-vs2026": "run",
-        "windows-2025-vs2026-qt-min": "run"
-      },
-      "registry_classes": []
-    },
-    {
-      "name": "test_disp_plots",
-      "cmake": "src/tests/test_disp_plots/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_disp_plots"
-      ],
-      "labels": [
-        "gui",
-        "unit"
-      ],
-      "timeout": 60,
-      "requirements": [],
-      "gui": true,
-      "qskip_sites": 0,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "run",
-        "macos-26-qt-min": "run",
-        "ubuntu-24.04": "run",
-        "ubuntu-24.04-qt-min": "run",
-        "windows-2025-vs2026": "run",
-        "windows-2025-vs2026-qt-min": "run"
-      },
-      "registry_classes": [
-        "FigureExporter",
-        "QtTextMetrics"
-      ]
-    },
-    {
-      "name": "test_disp_svg_writer",
-      "cmake": "src/tests/test_disp_svg_writer/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_disp_svg_writer"
-      ],
-      "labels": [
-        "gui",
-        "unit"
-      ],
-      "timeout": 60,
-      "requirements": [],
-      "gui": true,
-      "qskip_sites": 0,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "absent",
-        "macos-26-qt-min": "absent",
-        "ubuntu-24.04": "absent",
-        "ubuntu-24.04-qt-min": "absent",
-        "windows-2025-vs2026": "absent",
-        "windows-2025-vs2026-qt-min": "absent"
-      },
-      "registry_classes": [
-        "SvgWriter"
-      ]
-    },
-    {
-      "name": "test_disp_viewers",
-      "cmake": "src/tests/test_disp_viewers/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_disp_viewers"
-      ],
-      "labels": [
-        "gui",
-        "unit"
-      ],
-      "timeout": 60,
-      "requirements": [],
-      "gui": true,
-      "qskip_sites": 0,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "run",
-        "macos-26-qt-min": "run",
-        "ubuntu-24.04": "run",
-        "ubuntu-24.04-qt-min": "run",
-        "windows-2025-vs2026": "run",
-        "windows-2025-vs2026-qt-min": "run"
-      },
-      "registry_classes": [
-        "SettingsPanel"
-      ]
-    },
-    {
-      "name": "test_disp_viewers2",
-      "cmake": "src/tests/test_disp_viewers2/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_disp_viewers2"
-      ],
-      "labels": [
-        "gui",
-        "unit"
-      ],
-      "timeout": 60,
-      "requirements": [
-        "test-data"
-      ],
-      "gui": true,
-      "qskip_sites": 2,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "run",
-        "macos-26-qt-min": "run",
-        "ubuntu-24.04": "run",
-        "ubuntu-24.04-qt-min": "run",
-        "windows-2025-vs2026": "run",
-        "windows-2025-vs2026-qt-min": "run"
-      },
-      "registry_classes": [
-        "AverageLayoutWidget",
-        "ChannelDataView",
-        "ChannelRhiView",
-        "FilterPlot",
-        "RtFiffRawView",
-        "RtFiffRawViewDelegate",
-        "RtFiffRawViewModel",
-        "SceneViewport",
-        "SensorLayoutWidget"
-      ]
-    },
-    {
-      "name": "test_disp_viewers3",
-      "cmake": "src/tests/test_disp_viewers3/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_disp_viewers3"
-      ],
-      "labels": [
-        "gui",
-        "unit"
-      ],
-      "timeout": 60,
-      "requirements": [],
-      "gui": true,
       "qskip_sites": 0,
       "spawns_processes": false,
       "ci_excluded_on": [],
@@ -9572,302 +9212,6 @@
       "registry_classes": []
     },
     {
-      "name": "test_scene_brain_view",
-      "cmake": "src/tests/test_scene_brain_view/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_scene_brain_view"
-      ],
-      "labels": [
-        "unit"
-      ],
-      "timeout": 60,
-      "requirements": [],
-      "gui": false,
-      "qskip_sites": 0,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "absent",
-        "macos-26-qt-min": "absent",
-        "ubuntu-24.04": "absent",
-        "ubuntu-24.04-qt-min": "absent",
-        "windows-2025-vs2026": "absent",
-        "windows-2025-vs2026-qt-min": "absent"
-      },
-      "registry_classes": [
-        "BrainFrameBuilder",
-        "BrainFrameComposer",
-        "BrainInstanceUniforms",
-        "BrainInstancedStreams",
-        "BrainScene",
-        "BrainScenePane",
-        "BrainSliceLayer",
-        "BrainSliceUniforms",
-        "BrainSurfaceStreams",
-        "BrainSurfaceUniforms",
-        "BrainTextureView",
-        "BrainVideoBillboardUniforms",
-        "BrainVideoDecalUniforms",
-        "BrainVideoLayer",
-        "BrainViewInteraction",
-        "BrainViewOverlay",
-        "CameraMatrices",
-        "GpuStreamView",
-        "KeyEvent",
-        "OrbitCamera",
-        "PaneCamera",
-        "PaneLayout",
-        "PixelRect",
-        "PixelSize",
-        "Ray",
-        "SphereCrossing"
-      ]
-    },
-    {
-      "name": "test_scene_gpu_frame",
-      "cmake": "src/tests/test_scene_gpu_frame/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_scene_gpu_frame"
-      ],
-      "labels": [
-        "unit"
-      ],
-      "timeout": 60,
-      "requirements": [],
-      "gui": false,
-      "qskip_sites": 0,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "absent",
-        "macos-26-qt-min": "absent",
-        "ubuntu-24.04": "absent",
-        "ubuntu-24.04-qt-min": "absent",
-        "windows-2025-vs2026": "absent",
-        "windows-2025-vs2026-qt-min": "absent"
-      },
-      "registry_classes": [
-        "GpuBuffer",
-        "GpuDraw",
-        "GpuFrame",
-        "GpuFrameTarget",
-        "GpuPass",
-        "GpuPipeline",
-        "GpuRect",
-        "GpuResources",
-        "GpuTexture",
-        "GpuTextureBinding",
-        "GpuUniformBlock",
-        "GpuVertexAttribute",
-        "GpuVertexBinding",
-        "SoftwareBindings",
-        "SoftwareFragment",
-        "SoftwareRenderer",
-        "SoftwareShader"
-      ]
-    },
-    {
-      "name": "test_scene_render",
-      "cmake": "src/tests/test_scene_render/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_scene_render"
-      ],
-      "labels": [
-        "unit"
-      ],
-      "timeout": 60,
-      "requirements": [],
-      "gui": false,
-      "qskip_sites": 0,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "absent",
-        "macos-26-qt-min": "absent",
-        "ubuntu-24.04": "absent",
-        "ubuntu-24.04-qt-min": "absent",
-        "windows-2025-vs2026": "absent",
-        "windows-2025-vs2026-qt-min": "absent"
-      },
-      "registry_classes": [
-        "ApproximateTextMetrics",
-        "AverageLayout",
-        "AverageTile",
-        "BarChart",
-        "Brush",
-        "ButterflyPlot",
-        "Canvas",
-        "Clip",
-        "Color",
-        "Command",
-        "DisplayList",
-        "EllipseShape",
-        "FilterResponsePlot",
-        "Font",
-        "GradientStop",
-        "Image",
-        "ImagePlot",
-        "ImageShape",
-        "LineChart",
-        "LineShape",
-        "PathShape",
-        "Pen",
-        "Point",
-        "RasterOptions",
-        "Rect",
-        "RectShape",
-        "SensorLayout",
-        "SplinePlot",
-        "SvgOptions",
-        "TextMetrics",
-        "TextShape",
-        "Transform",
-        "VectorPlot"
-      ]
-    },
-    {
-      "name": "test_scene_settings_form",
-      "cmake": "src/tests/test_scene_settings_form/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_scene_settings_form"
-      ],
-      "labels": [
-        "unit"
-      ],
-      "timeout": 60,
-      "requirements": [],
-      "gui": false,
-      "qskip_sites": 0,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "absent",
-        "macos-26-qt-min": "absent",
-        "ubuntu-24.04": "absent",
-        "ubuntu-24.04-qt-min": "absent",
-        "windows-2025-vs2026": "absent",
-        "windows-2025-vs2026-qt-min": "absent"
-      },
-      "registry_classes": [
-        "SettingChoice",
-        "SettingField",
-        "SettingsForm"
-      ]
-    },
-    {
-      "name": "test_scene_trace_buffer",
-      "cmake": "src/tests/test_scene_trace_buffer/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_scene_trace_buffer"
-      ],
-      "labels": [
-        "unit"
-      ],
-      "timeout": 60,
-      "requirements": [],
-      "gui": false,
-      "qskip_sites": 0,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "absent",
-        "macos-26-qt-min": "absent",
-        "ubuntu-24.04": "absent",
-        "ubuntu-24.04-qt-min": "absent",
-        "windows-2025-vs2026": "absent",
-        "windows-2025-vs2026-qt-min": "absent"
-      },
-      "registry_classes": [
-        "SweepBuffer",
-        "TraceBuffer"
-      ]
-    },
-    {
-      "name": "test_scene_trace_view",
-      "cmake": "src/tests/test_scene_trace_view/CMakeLists.txt",
-      "registration": {
-        "state": "unconditional",
-        "via": "src/tests/CMakeLists.txt",
-        "conditions": [],
-        "early_return_guard": null,
-        "unregistered_reason": null
-      },
-      "add_test_names": [
-        "test_scene_trace_view"
-      ],
-      "labels": [
-        "unit"
-      ],
-      "timeout": 60,
-      "requirements": [],
-      "gui": false,
-      "qskip_sites": 0,
-      "spawns_processes": false,
-      "ci_excluded_on": [],
-      "ci": {
-        "macos-26": "absent",
-        "macos-26-qt-min": "absent",
-        "ubuntu-24.04": "absent",
-        "ubuntu-24.04-qt-min": "absent",
-        "windows-2025-vs2026": "absent",
-        "windows-2025-vs2026-qt-min": "absent"
-      },
-      "registry_classes": [
-        "PointerEvent",
-        "Surface",
-        "SurfaceClient",
-        "SurfaceSize",
-        "TraceDraw",
-        "TraceFrameBuilder",
-        "TraceGeometry",
-        "TraceMarkers",
-        "TraceOverlayUniforms",
-        "TraceSource",
-        "TraceStyle",
-        "TraceUniforms",
-        "TraceVertices",
-        "TraceView",
-        "TraceViewClient",
-        "ViewAnimator",
-        "WheelEvent"
-      ]
-    },
-    {
       "name": "test_scmeas_measurements",
       "cmake": "src/tests/test_scmeas_measurements/CMakeLists.txt",
       "registration": {
@@ -11196,8 +10540,8 @@
       ]
     },
     {
-      "name": "test_viewmodels",
-      "cmake": "src/tests/test_viewmodels/CMakeLists.txt",
+      "name": "test_viz_brain_view",
+      "cmake": "src/tests/test_viz_brain_view/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
         "via": "src/tests/CMakeLists.txt",
@@ -11206,7 +10550,771 @@
         "unregistered_reason": null
       },
       "add_test_names": [
-        "test_viewmodels"
+        "test_viz_brain_view"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "BrainFrameBuilder",
+        "BrainFrameComposer",
+        "BrainInstanceUniforms",
+        "BrainInstancedStreams",
+        "BrainScene",
+        "BrainScenePane",
+        "BrainSliceLayer",
+        "BrainSliceUniforms",
+        "BrainSurfaceStreams",
+        "BrainSurfaceUniforms",
+        "BrainTextureView",
+        "BrainVideoBillboardUniforms",
+        "BrainVideoDecalUniforms",
+        "BrainVideoLayer",
+        "BrainViewInteraction",
+        "BrainViewOverlay",
+        "CameraMatrices",
+        "GpuStreamView",
+        "KeyEvent",
+        "OrbitCamera",
+        "PaneCamera",
+        "PaneLayout",
+        "PixelRect",
+        "PixelSize",
+        "Ray",
+        "SphereCrossing"
+      ]
+    },
+    {
+      "name": "test_viz_gpu_frame",
+      "cmake": "src/tests/test_viz_gpu_frame/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_gpu_frame"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "GpuBuffer",
+        "GpuDraw",
+        "GpuFrame",
+        "GpuFrameTarget",
+        "GpuPass",
+        "GpuPipeline",
+        "GpuRect",
+        "GpuResources",
+        "GpuTexture",
+        "GpuTextureBinding",
+        "GpuUniformBlock",
+        "GpuVertexAttribute",
+        "GpuVertexBinding",
+        "SoftwareBindings",
+        "SoftwareFragment",
+        "SoftwareRenderer",
+        "SoftwareShader"
+      ]
+    },
+    {
+      "name": "test_viz_qt_brain_window",
+      "cmake": "src/tests/test_viz_qt_brain_window/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_qt_brain_window"
+      ],
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": true,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "BrainViewCore",
+        "BrainViewHost",
+        "BrainWindow"
+      ]
+    },
+    {
+      "name": "test_viz_qt_brainsurface",
+      "cmake": "src/tests/test_viz_qt_brainsurface/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_qt_brainsurface"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "BrainSurface",
+        "GpuStream"
+      ]
+    },
+    {
+      "name": "test_viz_qt_brainview",
+      "cmake": "src/tests/test_viz_qt_brainview/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_qt_brainview"
+      ],
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "BemTreeItem",
+        "BrainRenderer",
+        "BrainTreeModel",
+        "BrainView",
+        "CameraController",
+        "CameraResult",
+        "DigitizerSetTreeItem",
+        "DigitizerTreeItem",
+        "DipoleObject",
+        "DipoleTreeItem",
+        "InstancedStreams",
+        "MultiViewLayout",
+        "NetworkObject",
+        "NetworkTreeItem",
+        "PolylineObject",
+        "RayHit",
+        "RayPicker",
+        "RenderKey",
+        "RtSensorStreamManager",
+        "SensorStreamSession",
+        "SliceObject",
+        "SourceEstimateManager",
+        "SourceEstimateOverlay",
+        "SourceEstimateSession",
+        "SourceSpaceTreeItem",
+        "StcLoadingWorker",
+        "SurfaceTreeItem",
+        "VideoOverlay"
+      ]
+    },
+    {
+      "name": "test_viz_qt_channel_window",
+      "cmake": "src/tests/test_viz_qt_channel_window/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_qt_channel_window"
+      ],
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "ChannelRhiHost",
+        "ChannelRhiRenderer",
+        "ChannelWindow",
+        "RhiFrameRenderer"
+      ]
+    },
+    {
+      "name": "test_viz_qt_colormap",
+      "cmake": "src/tests/test_viz_qt_colormap/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_qt_colormap"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_viz_qt_headless",
+      "cmake": "src/tests/test_viz_qt_headless/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_qt_headless"
+      ],
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 5,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "DataLoader",
+        "MeshFactory"
+      ]
+    },
+    {
+      "name": "test_viz_qt_plots",
+      "cmake": "src/tests/test_viz_qt_plots/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_qt_plots"
+      ],
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "FigureExporter",
+        "QtTextMetrics"
+      ]
+    },
+    {
+      "name": "test_viz_qt_svg_writer",
+      "cmake": "src/tests/test_viz_qt_svg_writer/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_qt_svg_writer"
+      ],
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "SvgWriter"
+      ]
+    },
+    {
+      "name": "test_viz_qt_viewers",
+      "cmake": "src/tests/test_viz_qt_viewers/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_qt_viewers"
+      ],
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "SettingsPanel"
+      ]
+    },
+    {
+      "name": "test_viz_qt_viewers2",
+      "cmake": "src/tests/test_viz_qt_viewers2/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_qt_viewers2"
+      ],
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": true,
+      "qskip_sites": 2,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "AverageLayoutWidget",
+        "ChannelDataView",
+        "ChannelRhiView",
+        "FilterPlot",
+        "RtFiffRawView",
+        "RtFiffRawViewDelegate",
+        "RtFiffRawViewModel",
+        "SceneViewport",
+        "SensorLayoutWidget"
+      ]
+    },
+    {
+      "name": "test_viz_qt_viewers3",
+      "cmake": "src/tests/test_viz_qt_viewers3/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_qt_viewers3"
+      ],
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_viz_qt_viewstate",
+      "cmake": "src/tests/test_viz_qt_viewstate/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_qt_viewstate"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "MemorySettingsStore",
+        "QtSettingsStore",
+        "SettingsStore",
+        "SubView",
+        "ViewVisibilityProfile"
+      ]
+    },
+    {
+      "name": "test_viz_render",
+      "cmake": "src/tests/test_viz_render/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_render"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "ApproximateTextMetrics",
+        "AverageLayout",
+        "AverageTile",
+        "BarChart",
+        "Brush",
+        "ButterflyPlot",
+        "Canvas",
+        "Clip",
+        "Color",
+        "Command",
+        "DisplayList",
+        "EllipseShape",
+        "FilterResponsePlot",
+        "Font",
+        "GradientStop",
+        "Image",
+        "ImagePlot",
+        "ImageShape",
+        "LineChart",
+        "LineShape",
+        "PathShape",
+        "Pen",
+        "Point",
+        "RasterOptions",
+        "Rect",
+        "RectShape",
+        "SensorLayout",
+        "SplinePlot",
+        "SvgOptions",
+        "TextMetrics",
+        "TextShape",
+        "Transform",
+        "VectorPlot"
+      ]
+    },
+    {
+      "name": "test_viz_settings_form",
+      "cmake": "src/tests/test_viz_settings_form/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_settings_form"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "SettingChoice",
+        "SettingField",
+        "SettingsForm"
+      ]
+    },
+    {
+      "name": "test_viz_trace_buffer",
+      "cmake": "src/tests/test_viz_trace_buffer/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_trace_buffer"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "SweepBuffer",
+        "TraceBuffer"
+      ]
+    },
+    {
+      "name": "test_viz_trace_view",
+      "cmake": "src/tests/test_viz_trace_view/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_trace_view"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "PointerEvent",
+        "Surface",
+        "SurfaceClient",
+        "SurfaceSize",
+        "TraceDraw",
+        "TraceFrameBuilder",
+        "TraceGeometry",
+        "TraceMarkers",
+        "TraceOverlayUniforms",
+        "TraceSource",
+        "TraceStyle",
+        "TraceUniforms",
+        "TraceVertices",
+        "TraceView",
+        "TraceViewClient",
+        "ViewAnimator",
+        "WheelEvent"
+      ]
+    },
+    {
+      "name": "test_viz_viewmodels",
+      "cmake": "src/tests/test_viz_viewmodels/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_viewmodels"
       ],
       "labels": [
         "unit"

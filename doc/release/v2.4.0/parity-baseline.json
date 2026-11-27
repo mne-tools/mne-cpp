@@ -1089,7 +1089,7 @@
       "python": "mne.viz.plot_filter",
       "claimed": "implemented",
       "equivalence": null,
-      "test": "test_scene_render",
+      "test": "test_viz_render",
       "evidence": "tested"
     },
     {
