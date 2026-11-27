@@ -21,16 +21,16 @@
  * @c newSensorColorsAvailable to its surface-colour slot.
  */
 
-#ifndef BRAINVIEW_RTSENSORDATACONTROLLER_H
-#define BRAINVIEW_RTSENSORDATACONTROLLER_H
+#ifndef VIZ_QT_RTSENSORDATACONTROLLER_H
+#define VIZ_QT_RTSENSORDATACONTROLLER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "../../viz_qt_global.h"
-#include <mne/fiff/fiff_evoked.h>
-#include <mne/fiff/fiff_coord_trans.h>
+
+#include <mne/viz/brain/realtime/rtsensorstream.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -39,74 +39,27 @@
 #include <QObject>
 
 //=============================================================================================================
-// EIGEN INCLUDES
+// DEFINE NAMESPACE mne::viz::qt
 //=============================================================================================================
-
-#include <Eigen/Core>
-
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <atomic>
-#include <memory>
-#include <string>
-#include <vector>
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-namespace mne
-{
-class ThreadPool;
-}
-
-namespace mne::viz
-{
-class PeriodicTask;
-class RtSensorDataWorker;
-class RtSensorInterpolationMatWorker;
-} // namespace mne::viz
 
 namespace mne::viz::qt
 {
+
 //=============================================================================================================
 /**
- * RtSensorDataController orchestrates real-time sensor data streaming.
- * It manages a background data worker thread, a background interpolation
- * matrix worker thread, and a timer that drives the data flow.
+ * @brief Qt face of @ref mne::viz::RtSensorStream as a QObject: the same API, with the results as signals on this object's thread.
  *
- * Unlike the source-estimate controller (which uses sparse interpolation matrices
- * split by hemisphere), this controller uses a single dense mapping matrix
- * produced by mne::FwdFieldMap::computeMeg/EegMapping() that maps sensor measurements
- * directly to surface vertex values.
- *
- * The controller can either accept a precomputed mapping matrix via
- * setMappingMatrix(), or compute one on-the-fly in a background thread
- * by providing evoked data, surface geometry, and transforms via the
- * setInterpolationInfo() / setEvoked() / setTransform() methods.
- * When parameters change, recomputeMapping() triggers an asynchronous
- * recomputation; the new matrix is automatically forwarded to the data worker.
- *
- * Usage:
- *   1. Create controller
- *   2. Either set mapping matrix via setMappingMatrix(), or configure
- *      interpolation parameters and call recomputeMapping()
- *   3. Connect newSensorColorsAvailable() to your rendering update slot
- *   4. Call addData() to push sensor measurement vectors
- *   5. Call setStreamingState(true) to start streaming
- *
- * @brief Controller for real-time sensor data streaming.
+ * The streaming and interpolation threads of the stream hand their results over to this object's thread, so
+ * slots connected to the signals may touch the GUI.
  */
-class VIZQTSHARED_EXPORT RtSensorDataController : public QObject
+class VIZQTSHARED_EXPORT RtSensorDataController : public QObject, public viz::RtSensorStream
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-     * Constructor. Creates the worker and background thread.
+     * Constructor.
      *
      * @param[in] parent     Parent QObject.
      */
@@ -114,180 +67,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Destructor. Stops the worker thread and cleans up.
+     * Destructor. Stops the threads of the stream before the signals go away.
      */
     ~RtSensorDataController() override;
-
-    //=========================================================================================================
-    /**
-     * Add a sensor measurement vector to the streaming queue.
-     * The vector should contain one value per picked sensor channel
-     * (matching the mapping matrix column count).
-     *
-     * @param[in] data       Sensor measurement vector (nChannels x 1).
-     */
-    void addData(const Eigen::VectorXf& data);
-
-    //=========================================================================================================
-    /**
-     * Set the dense mapping matrix (sensor → surface vertices).
-     * Size: (nVertices × nChannels).
-     *
-     * @param[in] surfaceKey Key of the surface the matrix maps onto; colours are emitted for it.
-     * @param[in] mat        Dense mapping matrix.
-     */
-    void setMappingMatrix(const std::string& surfaceKey, std::shared_ptr<Eigen::MatrixXf> mat);
-
-    //=========================================================================================================
-    /**
-     * Start or stop the streaming.
-     *
-     * @param[in] state      True to start, false to stop.
-     */
-    void setStreamingState(bool state);
-
-    //=========================================================================================================
-    /**
-     * Check if streaming is active.
-     *
-     * @return True if streaming is running.
-     */
-    bool isStreaming() const;
-
-    //=========================================================================================================
-    /**
-     * Set the streaming interval (time between frames).
-     *
-     * @param[in] msec       Interval in milliseconds (default: 17ms ≈ 60fps).
-     */
-    void setTimeInterval(int msec);
-
-    //=========================================================================================================
-    /**
-     * Set the number of samples to average before emitting.
-     *
-     * @param[in] numAvr     Number of averages (1 = no averaging).
-     */
-    void setNumberAverages(int numAvr);
-
-    //=========================================================================================================
-    /**
-     * Set the colormap type.
-     *
-     * @param[in] name       Colormap name ("MNE", "Hot", "Jet", "Viridis", "Cool", "RedBlue").
-     */
-    void setColormapType(const std::string& name);
-
-    //=========================================================================================================
-    /**
-     * Set explicit normalization thresholds for sensor data.
-     * Pass min == 0 and max == 0 to re-enable symmetric auto-normalization.
-     *
-     * @param[in] min        Lower threshold.
-     * @param[in] max        Upper threshold.
-     */
-    void setThresholds(double min, double max);
-
-    //=========================================================================================================
-    /**
-     * Enable or disable looping (replay data when queue is exhausted).
-     *
-     * @param[in] enabled    True to enable looping.
-     */
-    void setLoopState(bool enabled);
-
-    //=========================================================================================================
-    /**
-     * Set the sampling frequency of the incoming data.
-     *
-     * @param[in] sFreq     Sampling frequency in Hz.
-     */
-    void setSFreq(double sFreq);
-
-    //=========================================================================================================
-    /**
-     * Clear all queued data and reset the worker state.
-     */
-    void clearData();
-
-    //=========================================================================================================
-    /**
-     * Toggle between emitting per-vertex color data (smoothed) and raw
-     * sensor values.
-     *
-     * @param[in] bStreamSmoothedData    True for smoothed colors (default), false for raw.
-     */
-    void setStreamSmoothedData(bool bStreamSmoothedData);
-
-    //=========================================================================================================
-    // ── On-the-fly interpolation matrix computation ─────────────────────
-    //=========================================================================================================
-
-    /**
-     * Set the evoked data that contains channel info and sensor definitions.
-     * This configures the interpolation worker for on-the-fly recomputation.
-     *
-     * @param[in] evoked    The evoked dataset.
-     */
-    void setEvoked(const mne::FiffEvoked& evoked);
-
-    //=========================================================================================================
-    /**
-     * Set the head-to-MRI coordinate transform for the interpolation worker.
-     *
-     * @param[in] trans              The transform.
-     * @param[in] applySensorTrans   Whether to apply the transform.
-     */
-    void setTransform(const mne::FiffCoordTrans& trans, bool applySensorTrans);
-
-    //=========================================================================================================
-    /**
-     * Set whether the MEG field should be mapped onto the head (BEM) surface
-     * rather than the helmet surface.
-     *
-     * @param[in] onHead    True to map onto head.
-     */
-    void setMegFieldMapOnHead(bool onHead);
-
-    //=========================================================================================================
-    /**
-     * Set the MEG target surface geometry for on-the-fly mapping.
-     *
-     * @param[in] surfaceKey    The key identifying the surface.
-     * @param[in] vertices      Vertex positions (nVerts x 3).
-     * @param[in] normals       Vertex normals (nVerts x 3).
-     * @param[in] triangles     Triangle indices (nTris x 3).
-     */
-    void setMegSurface(const std::string& surfaceKey,
-                       const Eigen::MatrixX3f& vertices,
-                       const Eigen::MatrixX3f& normals,
-                       const Eigen::MatrixX3i& triangles);
-
-    //=========================================================================================================
-    /**
-     * Set the EEG target surface geometry for on-the-fly mapping.
-     *
-     * @param[in] surfaceKey    The key identifying the surface.
-     * @param[in] vertices      Vertex positions (nVerts x 3).
-     */
-    void setEegSurface(const std::string& surfaceKey,
-                       const Eigen::MatrixX3f& vertices);
-
-    //=========================================================================================================
-    /**
-     * Set bad channels for the interpolation worker.
-     *
-     * @param[in] bads    List of bad channel names.
-     */
-    void setBadChannels(const std::vector<std::string>& bads);
-
-    //=========================================================================================================
-    /**
-     * Trigger an asynchronous recomputation of the mapping matrix.
-     * The new matrix will be automatically forwarded to the data worker
-     * when ready.
-     */
-    void recomputeMapping();
 
 signals:
     //=========================================================================================================
@@ -331,26 +113,8 @@ signals:
     void newEegMappingAvailable(const std::string& surfaceKey,
                                 std::shared_ptr<Eigen::MatrixXf> mappingMat,
                                 const std::vector<int>& pick);
-
-private slots:
-    void onNewMegMapping(const std::string& surfaceKey,
-                         std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                         const std::vector<int>& pick);
-    void onNewEegMapping(const std::string& surfaceKey,
-                         std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                         const std::vector<int>& pick);
-
-private:
-    std::unique_ptr<mne::viz::RtSensorDataWorker> m_pWorker; /**< Data streaming worker. */
-    std::unique_ptr<PeriodicTask> m_pStreamTask;             /**< Streaming thread driving the cadence. */
-    bool m_bIsStreaming = false;                             /**< Whether streaming is active. */
-    int m_iTimeInterval = 17;                                /**< Streaming interval in ms (~60fps). */
-
-    std::unique_ptr<mne::ThreadPool> m_pInterpPool;                            /**< Single thread running interpolation recomputations in order. */
-    std::atomic<bool> m_bShuttingDown{false};                                  /**< Set in the destructor; queued recomputations are skipped. */
-    std::unique_ptr<mne::viz::RtSensorInterpolationMatWorker> m_pInterpWorker; /**< Interpolation matrix worker. */
 };
 
 } // namespace mne::viz::qt
 
-#endif // BRAINVIEW_RTSENSORDATACONTROLLER_H
+#endif // VIZ_QT_RTSENSORDATACONTROLLER_H

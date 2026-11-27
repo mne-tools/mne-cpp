@@ -431,6 +431,11 @@ aliases; replace the old spelling as below.
   go to `std::function` callbacks (`setNewRtSensorColorsCallback`, ...) on the
   thread that produced them. The Qt controllers own them and re-emit the
   results as signals on their own thread.
+- The real-time controllers have Qt-free cores, `viz::RtSensorStream` and
+  `viz::RtSourceStream` (`viz/brain/realtime/`): they own the workers and
+  threads and report results to callbacks. `qt::RtSensorDataController` and
+  `qt::RtSourceDataController` derive from them, keep their API, and emit the
+  results as signals on their own thread.
 - Views run in any backend through `viz/host/surface.h`: a backend implements
   `viz::Surface` (redraw requests, clock, pointer shape) and drives a
   `viz::SurfaceClient` (resize, pointer, wheel and key events, animation

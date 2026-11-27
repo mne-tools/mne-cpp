@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Thread / timer plumbing tying the sensor data worker and field-mapping worker into one streaming pipeline.
+ * @brief    RtSensorDataController hands the results of viz::RtSensorStream over to its thread as Qt signals.
  */
 
 //=============================================================================================================
@@ -16,20 +16,11 @@
 
 #include "rtsensordatacontroller.h"
 
-#include "../../../../brain/realtime/rtsensordataworker.h"
-#include "../../../../brain/realtime/rtsensorinterpolationmatworker.h"
-#include "../../../../brain/realtime/periodictask.h"
-#include <mne/base/log.h>
-#include <mne/base/thread_pool.h>
-
 //=============================================================================================================
-// STL INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <vector>
-
-namespace mne::viz::qt
-{
+using namespace mne::viz::qt;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -38,271 +29,24 @@ namespace mne::viz::qt
 RtSensorDataController::RtSensorDataController(QObject* parent)
 : QObject(parent)
 {
-    // Create data worker
-    // streamData() runs on the streaming thread; its results are re-emitted on this controller's thread.
-    m_pWorker = std::make_unique<mne::viz::RtSensorDataWorker>();
-
-    // Forward worker signals to controller signals
-    m_pWorker->setNewRtSensorColorsCallback([this](const std::string& surfaceKey, const std::vector<uint32_t>& colors) {
+    // The callbacks run on the streaming and interpolation threads; the signals are emitted on this object's thread
+    setNewSensorColorsAvailableCallback([this](const std::string& surfaceKey, const std::vector<uint32_t>& colors) {
         QMetaObject::invokeMethod(this, [this, surfaceKey, colors] { emit newSensorColorsAvailable(surfaceKey, colors); }, Qt::QueuedConnection);
     });
-    m_pWorker->setNewRtRawSensorDataCallback([this](const Eigen::VectorXf& data) {
+    setNewRawSensorDataAvailableCallback([this](const Eigen::VectorXf& data) {
         QMetaObject::invokeMethod(this, [this, data] { emit newRawSensorDataAvailable(data); }, Qt::QueuedConnection);
     });
-
-    // Streaming thread driving the cadence
-    m_pStreamTask = std::make_unique<PeriodicTask>([worker = m_pWorker.get()] { worker->streamData(); });
-
-    // Create interpolation matrix worker
-    // One pool thread runs the recomputations in request order.
-    m_pInterpWorker = std::make_unique<mne::viz::RtSensorInterpolationMatWorker>();
-    m_pInterpPool = std::make_unique<mne::ThreadPool>(1);
-
-    // Forward interpolation results: auto-apply to data worker + re-emit for external listeners
-    m_pInterpWorker->setNewMegMappingAvailableCallback([this](const std::string& surfaceKey, const std::shared_ptr<Eigen::MatrixXf>& mappingMat, const std::vector<int>& pick) {
-        QMetaObject::invokeMethod(this, [this, surfaceKey, mappingMat, pick] { onNewMegMapping(surfaceKey, mappingMat, pick); }, Qt::QueuedConnection);
+    setNewMegMappingAvailableCallback([this](const std::string& surfaceKey, const std::shared_ptr<Eigen::MatrixXf>& mappingMat, const std::vector<int>& pick) {
+        QMetaObject::invokeMethod(this, [this, surfaceKey, mappingMat, pick] { emit newMegMappingAvailable(surfaceKey, mappingMat, pick); }, Qt::QueuedConnection);
     });
-    m_pInterpWorker->setNewEegMappingAvailableCallback([this](const std::string& surfaceKey, const std::shared_ptr<Eigen::MatrixXf>& mappingMat, const std::vector<int>& pick) {
-        QMetaObject::invokeMethod(this, [this, surfaceKey, mappingMat, pick] { onNewEegMapping(surfaceKey, mappingMat, pick); }, Qt::QueuedConnection);
+    setNewEegMappingAvailableCallback([this](const std::string& surfaceKey, const std::shared_ptr<Eigen::MatrixXf>& mappingMat, const std::vector<int>& pick) {
+        QMetaObject::invokeMethod(this, [this, surfaceKey, mappingMat, pick] { emit newEegMappingAvailable(surfaceKey, mappingMat, pick); }, Qt::QueuedConnection);
     });
-
-    mne::Log::debug("RtSensorDataController: Initialized with {} ms interval", m_iTimeInterval);
 }
 
 //=============================================================================================================
 
 RtSensorDataController::~RtSensorDataController()
 {
-    // Join the threads while the workers are still alive. Pending
-    // recomputations are skipped.
-    m_bShuttingDown.store(true, std::memory_order_release);
-    m_pStreamTask.reset();
-    m_pInterpPool.reset();
+    // The stream base joins its threads next; results they still hand over are dropped with this object
 }
-
-//=============================================================================================================
-
-void RtSensorDataController::addData(const Eigen::VectorXf& data)
-{
-    if (m_pWorker) {
-        // Direct call is thread-safe because RtSensorDataWorker uses a mutex
-        m_pWorker->addData(data);
-    }
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::setMappingMatrix(const std::string& surfaceKey, std::shared_ptr<Eigen::MatrixXf> mat)
-{
-    if (m_pWorker) {
-        m_pWorker->setMappingMatrix(surfaceKey, mat);
-    }
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::setStreamingState(bool state)
-{
-    m_bIsStreaming = state;
-
-    if (state) {
-        m_pStreamTask->start(std::chrono::milliseconds(m_iTimeInterval));
-        mne::Log::debug("RtSensorDataController: Streaming started at {} ms interval", m_iTimeInterval);
-    } else {
-        m_pStreamTask->stop();
-        mne::Log::debug("RtSensorDataController: Streaming stopped");
-    }
-}
-
-//=============================================================================================================
-
-bool RtSensorDataController::isStreaming() const
-{
-    return m_bIsStreaming;
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::setTimeInterval(int msec)
-{
-    m_iTimeInterval = qMax(1, msec);
-
-    if (m_bIsStreaming) {
-        m_pStreamTask->setInterval(std::chrono::milliseconds(m_iTimeInterval));
-    }
-
-    mne::Log::debug("RtSensorDataController: Time interval set to {} ms", m_iTimeInterval);
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::setNumberAverages(int numAvr)
-{
-    if (m_pWorker) {
-        m_pWorker->setNumberAverages(numAvr);
-    }
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::setColormapType(const std::string& name)
-{
-    if (m_pWorker) {
-        m_pWorker->setColormapType(name);
-    }
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::setThresholds(double min, double max)
-{
-    if (m_pWorker) {
-        m_pWorker->setThresholds(min, max);
-    }
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::setLoopState(bool enabled)
-{
-    if (m_pWorker) {
-        m_pWorker->setLoopState(enabled);
-    }
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::setSFreq(double sFreq)
-{
-    if (m_pWorker) {
-        m_pWorker->setSFreq(sFreq);
-    }
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::clearData()
-{
-    if (m_pWorker) {
-        m_pWorker->clear();
-    }
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::setStreamSmoothedData(bool bStreamSmoothedData)
-{
-    if (m_pWorker) {
-        m_pWorker->setStreamSmoothedData(bStreamSmoothedData);
-    }
-}
-
-//=============================================================================================================
-// ── On-the-fly interpolation matrix computation ────────────────────────
-//=============================================================================================================
-
-void RtSensorDataController::setEvoked(const mne::FiffEvoked& evoked)
-{
-    if (m_pInterpWorker) {
-        m_pInterpWorker->setEvoked(evoked);
-    }
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::setTransform(const mne::FiffCoordTrans& trans,
-                                          bool applySensorTrans)
-{
-    if (m_pInterpWorker) {
-        m_pInterpWorker->setTransform(trans, applySensorTrans);
-    }
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::setMegFieldMapOnHead(bool onHead)
-{
-    if (m_pInterpWorker) {
-        m_pInterpWorker->setMegFieldMapOnHead(onHead);
-    }
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::setMegSurface(const std::string& surfaceKey,
-                                           const Eigen::MatrixX3f& vertices,
-                                           const Eigen::MatrixX3f& normals,
-                                           const Eigen::MatrixX3i& triangles)
-{
-    if (m_pInterpWorker) {
-        m_pInterpWorker->setMegSurface(surfaceKey, vertices, normals, triangles);
-    }
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::setEegSurface(const std::string& surfaceKey,
-                                           const Eigen::MatrixX3f& vertices)
-{
-    if (m_pInterpWorker) {
-        m_pInterpWorker->setEegSurface(surfaceKey, vertices);
-    }
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::setBadChannels(const std::vector<std::string>& bads)
-{
-    if (m_pInterpWorker) {
-        m_pInterpWorker->setBadChannels(bads);
-    }
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::recomputeMapping()
-{
-    if (m_pInterpWorker) {
-        m_pInterpPool->submit([this] {
-            if (!m_bShuttingDown.load(std::memory_order_acquire)) {
-                m_pInterpWorker->computeMapping();
-            }
-        });
-    }
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::onNewMegMapping(const std::string& surfaceKey,
-                                             std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                                             const std::vector<int>& pick)
-{
-    // Auto-forward the new matrix to the data worker
-    if (m_pWorker && mappingMat) {
-        m_pWorker->setMappingMatrix(surfaceKey, mappingMat);
-    }
-
-    // Re-emit for external listeners (e.g. BrainView)
-    emit newMegMappingAvailable(surfaceKey, mappingMat, pick);
-
-    mne::Log::debug("RtSensorDataController: New MEG mapping received and forwarded ({}x{})", mappingMat->rows(), mappingMat->cols());
-}
-
-//=============================================================================================================
-
-void RtSensorDataController::onNewEegMapping(const std::string& surfaceKey,
-                                             std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                                             const std::vector<int>& pick)
-{
-    // Auto-forward the new matrix to the data worker
-    if (m_pWorker && mappingMat) {
-        m_pWorker->setMappingMatrix(surfaceKey, mappingMat);
-    }
-
-    // Re-emit for external listeners (e.g. BrainView)
-    emit newEegMappingAvailable(surfaceKey, mappingMat, pick);
-
-    mne::Log::debug("RtSensorDataController: New EEG mapping received and forwarded ({}x{})", mappingMat->rows(), mappingMat->cols());
-}
-
-} // namespace mne::viz::qt

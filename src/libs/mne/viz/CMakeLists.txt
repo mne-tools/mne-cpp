@@ -19,6 +19,8 @@ set(SOURCES
   brain/polylineobject.cpp
   brain/realtime/periodictask.cpp
   brain/realtime/rtsensordataworker.cpp
+  brain/realtime/rtsensorstream.cpp
+  brain/realtime/rtsourcestream.cpp
   brain/realtime/rtsensorinterpolationmatworker.cpp
   brain/realtime/rtsourcedataworker.cpp
   brain/realtime/rtsourceinterpolationmatworker.cpp
@@ -81,6 +83,8 @@ set(HEADERS
   brain/polylineobject.h
   brain/realtime/periodictask.h
   brain/realtime/rtsensordataworker.h
+  brain/realtime/rtsensorstream.h
+  brain/realtime/rtsourcestream.h
   brain/realtime/rtsensorinterpolationmatworker.h
   brain/realtime/rtsourcedataworker.h
   brain/realtime/rtsourceinterpolationmatworker.h

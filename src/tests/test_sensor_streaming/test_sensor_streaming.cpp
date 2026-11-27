@@ -17,6 +17,7 @@
 #include <mne/viz/brain/realtime/rtsensordataworker.h>
 #include <mne/viz/backends/qt/3d/workers/rtsensordatacontroller.h>
 #include <mne/viz/brain/realtime/periodictask.h>
+#include <mne/viz/brain/realtime/rtsensorstream.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -99,6 +100,7 @@ private slots:
 
     void testPeriodicTaskTicksOnlyWhileRunning();
     void testPeriodicTaskDestroyDuringTick();
+    void testStreamCallbacksWithoutEventLoop();
 };
 
 //=============================================================================================================
@@ -703,6 +705,31 @@ void TestSensorStreaming::testPeriodicTaskDestroyDuringTick()
     }
     // The destructor joins: the running tick completed before it returned.
     QVERIFY(tickFinished.load());
+}
+
+//=============================================================================================================
+
+void TestSensorStreaming::testStreamCallbacksWithoutEventLoop()
+{
+    // The Qt-free stream delivers colours on its streaming thread; no event loop is involved
+    RtSensorStream stream;
+    std::atomic<int> delivered{0};
+    std::atomic<std::size_t> vertexCount{0};
+    stream.setNewSensorColorsAvailableCallback([&](const std::string& key, const std::vector<uint32_t>& colors) {
+        if (key == "head") {
+            vertexCount = colors.size();
+            ++delivered;
+        }
+    });
+    stream.setMappingMatrix("head", createTestMapping(20, 5));
+    stream.addData(Eigen::VectorXf::Constant(5, 1.0f));
+    stream.setTimeInterval(5);
+    stream.setStreamingState(true);
+    for (int i = 0; i < 400 && delivered.load() == 0; ++i)
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    stream.setStreamingState(false);
+    QVERIFY(delivered.load() > 0);
+    QCOMPARE(vertexCount.load(), std::size_t(20));
 }
 
 //=============================================================================================================

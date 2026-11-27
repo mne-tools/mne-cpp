@@ -14753,6 +14753,40 @@
       "python_url": null,
       "example_exempt": true,
       "example_exempt_reason": "Adapter of viz::SettingsStore onto QSettings that BrainView persists through; the example shows the store interface with MemorySettingsStore."
+    },
+    {
+      "name": "RtSensorStream",
+      "module": "viz",
+      "header": "viz/brain/realtime/rtsensorstream.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_sensor_streaming",
+      "example": null,
+      "status": "documented",
+      "documented": true,
+      "sidebar_position": 134,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
+    },
+    {
+      "name": "RtSourceStream",
+      "module": "viz",
+      "header": "viz/brain/realtime/rtsourcestream.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_rt_source_streaming",
+      "example": null,
+      "status": "documented",
+      "documented": true,
+      "sidebar_position": 135,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
     }
   ],
   "parity": {
