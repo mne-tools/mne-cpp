@@ -48,6 +48,8 @@ set(SOURCES
   figures/text_metrics.cpp
   figures/ticks.cpp
   figures/vector_plot.cpp
+  figures/theme.cpp
+  panels/form_view.cpp
   forms/settings_form.cpp
   panels/compensator_panel.cpp
   panels/forward_panel.cpp
@@ -126,6 +128,8 @@ set(HEADERS
   figures/text_metrics.h
   figures/ticks.h
   figures/vector_plot.h
+  figures/theme.h
+  panels/form_view.h
   forms/settings_form.h
   panels/compensator_panel.h
   panels/forward_panel.h

@@ -141,6 +141,12 @@
         "src/tests/test_viz_brain_view/data/brain_view_overlay.svg": "026f3d6e401752ae57e9d14519d4d9b753f0a8bef62a77680c710fe6b8d46b06"
       }
     },
+    "test_viz_form_view": {
+      "generators": [],
+      "fixtures": {
+        "src/tests/test_viz_form_view/data/form_view.png": "d0f447c34d331f6dfd4ef6d7bb184d816ff5b4e4eece782d3be1e4c0417e0471"
+      }
+    },
     "test_viz_render": {
       "generators": [],
       "fixtures": {

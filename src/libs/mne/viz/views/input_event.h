@@ -193,7 +193,7 @@ enum class Key
 struct KeyEvent
 {
     Key key = Key::Unknown;              /**< The key. */
-    char32_t character = 0;              /**< For Key::Character the character of the key, letters in upper case. */
+    char32_t character = 0;              /**< For Key::Character the character: typed text in its case, or a key's letter in upper case. */
     Modifier modifiers = Modifier::None; /**< Modifiers held. */
     std::int64_t timestamp_ms = 0;       /**< Monotonic time in milliseconds. */
 

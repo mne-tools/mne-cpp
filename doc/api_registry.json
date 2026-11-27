@@ -14586,6 +14586,46 @@
       "python_url": null
     },
     {
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "status": "documented",
+      "documented": true,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null,
+      "name": "FormView",
+      "module": "viz",
+      "header": "viz/panels/form_view.h",
+      "test": "test_viz_form_view",
+      "example": "ex_scene_sdl",
+      "example_mode": "run",
+      "example_snippet": [
+        "ex_scene_sdl/main.cpp#form_view_usage"
+      ],
+      "sidebar_position": 154
+    },
+    {
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "status": "documented",
+      "documented": true,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null,
+      "name": "Theme",
+      "module": "viz",
+      "header": "viz/figures/theme.h",
+      "test": "test_viz_form_view",
+      "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Plain style values (colours, sizes, spacing) handed to FormView, whose example shows them in use.",
+      "sidebar_position": 155
+    },
+    {
       "name": "ProjectorsPanel",
       "module": "viz",
       "header": "viz/panels/projectors_panel.h",

@@ -23,6 +23,7 @@
 //=============================================================================================================
 
 #include <utility>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -142,6 +143,24 @@ KeyEvent key_of(const SDL_KeyboardEvent& event, std::int64_t now)
     return key;
 }
 
+// Decodes UTF-8 text, e.g. of SDL_EVENT_TEXT_INPUT, into code points
+std::vector<char32_t> code_points_of(const char* text)
+{
+    std::vector<char32_t> result;
+    for (const auto* p = reinterpret_cast<const unsigned char*>(text); p && *p;) {
+        const unsigned char lead = *p++;
+        const int continuation = lead >= 0xF0 ? 3 : lead >= 0xE0 ? 2
+            : lead >= 0xC0                                       ? 1
+                                                                 : 0;
+        char32_t c = continuation == 0 ? lead : lead & (0x3F >> continuation);
+        for (int i = 0; i < continuation && (*p & 0xC0) == 0x80; ++i) {
+            c = (c << 6) | (*p++ & 0x3F);
+        }
+        result.push_back(c);
+    }
+    return result;
+}
+
 SDL_SystemCursor system_cursor_of(CursorShape shape)
 {
     switch (shape) {
@@ -209,6 +228,8 @@ int SdlHost::run(SurfaceClient& client, const std::function<void(std::int64_t)>&
     }
 
     client.attach(this);
+    // Typed text arrives as SDL_EVENT_TEXT_INPUT, in its case and with shifted and composed characters
+    SDL_StartTextInput(m_window);
     m_size = SurfaceSize{};
     m_updateRequested = true;
 
@@ -244,6 +265,7 @@ int SdlHost::run(SurfaceClient& client, const std::function<void(std::int64_t)>&
         ++frames;
     }
 
+    SDL_StopTextInput(m_window);
     client.attach(nullptr);
     return frames;
 }
@@ -325,12 +347,30 @@ bool SdlHost::dispatch(SurfaceClient& client)
             }
             case SDL_EVENT_KEY_DOWN: {
                 const KeyEvent key = key_of(event.key, now);
+                // Printable keys without shortcut modifiers come again as text input
+                const bool shortcut = has_flag(key.modifiers, Modifier::Ctrl) || has_flag(key.modifiers, Modifier::Alt) ||
+                    has_flag(key.modifiers, Modifier::Meta);
+                if (key.key == Key::Character && !shortcut && SDL_TextInputActive(m_window)) {
+                    break;
+                }
                 const bool used = (m_keyHandler && m_keyHandler(key)) || client.handle_key(key);
                 if (!used && key.key == Key::Escape) {
                     return false;
                 }
                 break;
             }
+            case SDL_EVENT_TEXT_INPUT:
+                for (const char32_t c : code_points_of(event.text.text)) {
+                    KeyEvent key;
+                    key.key = Key::Character;
+                    key.character = c;
+                    key.modifiers = modifiers_of(SDL_GetModState());
+                    key.timestamp_ms = now;
+                    if (!(m_keyHandler && m_keyHandler(key))) {
+                        client.handle_key(key);
+                    }
+                }
+                break;
             case SDL_EVENT_WINDOW_EXPOSED:
                 m_updateRequested = true;
                 break;

@@ -413,7 +413,15 @@ aliases; replace the old spelling as below.
   generic Qt building blocks move to `viz/backends/qt/kit/` (`SettingsPanel`,
   `PanelWidget`). `CompensatorView` and `ProjectorsView` are replaced by
   `viz::CompensatorPanel` and `viz::ProjectorsPanel` (their settings are
-  stored under new keys), and `FwdSettingsView` by `viz::ForwardPanel`. `SettingsForm` gains read-only Info fields with a
+  stored under new keys), and `FwdSettingsView` by `viz::ForwardPanel`.
+- `viz::FormView` (`viz/panels/form_view.h`) lays out, draws and edits any
+  `SettingsForm` without a toolkit (check boxes, steppers, choice cyclers,
+  text fields, buttons, toned status texts, scrolling), styled by
+  `viz::Theme` (`viz/figures/theme.h`, light and dark). Any backend that hosts
+  a `SurfaceClient` shows every panel through it: `ex_scene_sdl --panel`
+  shows the projector or compensator panel in an SDL window, and `SdlHost`
+  now passes typed text to its client. `test_viz_form_view` drives the view
+  with synthetic input and compares a golden PNG. `SettingsForm` gains read-only Info fields with a
   tone, Directory and Color fields, `add_path()` and `remove()`;
   `SettingsPanel` rebuilds its rows when fields are added or removed.
 - `ChannelRhiRenderer` hosts a `viz::TraceViewClient`, the same trace view

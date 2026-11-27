@@ -25,4 +25,6 @@ endif()
 if(BUILD_TESTS)
     mne_add_test(${PROJECT_NAME} COMMAND $<TARGET_FILE:${PROJECT_NAME}> --frames 5 ENVIRONMENT SDL_VIDEODRIVER=dummy
                  LABELS example unit TIMEOUT 120)
+    mne_add_test(${PROJECT_NAME}_panel COMMAND $<TARGET_FILE:${PROJECT_NAME}> --panel projectors --frames 5
+                 ENVIRONMENT SDL_VIDEODRIVER=dummy LABELS example unit TIMEOUT 120)
 endif()

@@ -34,6 +34,7 @@
 #include "figures/style.h"
 #include "figures/svg_renderer.h"
 #include "figures/text_metrics.h"
+#include "figures/theme.h"
 #include "figures/ticks.h"
 #include "figures/vector_plot.h"
 #include "forms/settings_form.h"
