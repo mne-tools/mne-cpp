@@ -61,12 +61,9 @@ set(SOURCES
     viewers/filtersettingsview.cpp
     viewers/fiffrawviewsettings.cpp
     viewers/averageselectionview.cpp
-    viewers/triggerdetectionview.cpp
     viewers/quickcontrolview.cpp
-    viewers/averagingsettingsview.cpp
     viewers/projectsettingsview.cpp
     viewers/control3dview.cpp
-    viewers/artifactsettingsview.cpp
     viewers/channeldataview.cpp
     viewers/rtfiffrawview.cpp
     viewers/multiviewwindow.cpp
@@ -146,12 +143,9 @@ set(HEADERS
     viewers/filtersettingsview.h
     viewers/fiffrawviewsettings.h
     viewers/averageselectionview.h
-    viewers/triggerdetectionview.h
     viewers/quickcontrolview.h
-    viewers/averagingsettingsview.h
     viewers/projectsettingsview.h
     viewers/control3dview.h
-    viewers/artifactsettingsview.h
     viewers/channeldataview.h
     viewers/rtfiffrawview.h
     viewers/multiviewwindow.h

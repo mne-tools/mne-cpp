@@ -1165,20 +1165,11 @@
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/viz/backends/qt/viewers/artifactsettingsview.h": {
-      "modernize-use-override": 6
-    },
     "src/libs/mne/viz/backends/qt/viewers/averageselectionview.cpp": {
       "modernize-use-nullptr": 1
     },
     "src/libs/mne/viz/backends/qt/viewers/averageselectionview.h": {
       "modernize-use-nullptr": 1,
-      "modernize-use-override": 6
-    },
-    "src/libs/mne/viz/backends/qt/viewers/averagingsettingsview.cpp": {
-      "modernize-use-nullptr": 1
-    },
-    "src/libs/mne/viz/backends/qt/viewers/averagingsettingsview.h": {
       "modernize-use-override": 6
     },
     "src/libs/mne/viz/backends/qt/viewers/bidsview.h": {
@@ -1322,10 +1313,6 @@
     "src/libs/mne/viz/backends/qt/viewers/scalingview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
-    },
-    "src/libs/mne/viz/backends/qt/viewers/triggerdetectionview.h": {
-      "modernize-use-nullptr": 1,
-      "modernize-use-override": 6
     },
     "src/libs/mne/viz/brain/realtime/rtsensordataworker.cpp": {
       "performance-unnecessary-copy-initialization": 1,

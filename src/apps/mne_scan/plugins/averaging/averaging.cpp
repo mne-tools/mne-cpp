@@ -20,8 +20,10 @@
 #include "averaging.h"
 
 #include "FormFiles/averagingsetupwidget.h"
-#include <mne/viz/backends/qt/viewers/averagingsettingsview.h>
-#include <mne/viz/backends/qt/viewers/artifactsettingsview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/artifact_panel.h>
+#include <mne/viz/panels/averaging_panel.h>
+#include <mne/fiff/fiff_evoked_set.h>
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimemultisamplearray.h>
 
@@ -202,52 +204,67 @@ void Averaging::initPluginControlWidgets()
         std::vector<std::unique_ptr<QWidget>> controlWidgets;
 
         //Add control widgets to output data (will be used by QuickControlView by the measurements display)
-        AveragingSettingsView* pAveragingSettingsView = makeControlWidget<AveragingSettingsView>(controlWidgets, QString("MNESCAN/%1").arg(this->getName()));
+        auto averaging = std::make_shared<AveragingPanel>();
+        AveragingPanel::Callbacks callbacks;
+        callbacks.num_averages_changed = [this](int value) {
+            onChangeNumAverages(value);
+        };
+        callbacks.baseline_from_changed = [this](int value) {
+            onChangeBaselineFrom(value);
+        };
+        callbacks.baseline_to_changed = [this](int value) {
+            onChangeBaselineTo(value);
+        };
+        callbacks.post_stim_changed = [this](int value) {
+            onChangePostStim(value);
+        };
+        callbacks.pre_stim_changed = [this](int value) {
+            onChangePreStim(value);
+        };
+        callbacks.stim_channel_changed = [this](const std::string& channel) {
+            onChangeStimChannel(channel);
+        };
+        callbacks.baseline_active_changed = [this](bool active) {
+            onChangeBaselineActive(active);
+        };
+        callbacks.reset = [this] {
+            onResetAverage(false);
+        };
+        averaging->set_callbacks(std::move(callbacks));
+        PanelWidget* pAveragingSettingsView = makeControlWidget<PanelWidget>(controlWidgets, averaging, QString("MNESCAN/%1").arg(this->getName()));
         connect(this, &Averaging::guiModeChanged,
-                pAveragingSettingsView, &AveragingSettingsView::setGuiMode);
+                pAveragingSettingsView, &PanelWidget::setGuiMode);
         pAveragingSettingsView->setObjectName("group_tab_Settings_Averaging");
-
-        connect(pAveragingSettingsView, &AveragingSettingsView::changeNumAverages,
-                this, &Averaging::onChangeNumAverages);
-        connect(pAveragingSettingsView, &AveragingSettingsView::changeBaselineFrom,
-                this, &Averaging::onChangeBaselineFrom);
-        connect(pAveragingSettingsView, &AveragingSettingsView::changeBaselineTo,
-                this, &Averaging::onChangeBaselineTo);
-        connect(pAveragingSettingsView, &AveragingSettingsView::changePostStim,
-                this, &Averaging::onChangePostStim);
-        connect(pAveragingSettingsView, &AveragingSettingsView::changePreStim,
-                this, &Averaging::onChangePreStim);
-        connect(pAveragingSettingsView, &AveragingSettingsView::changeStimChannel,
-                this, &Averaging::onChangeStimChannel);
-        connect(pAveragingSettingsView, &AveragingSettingsView::changeBaselineActive,
-                this, &Averaging::onChangeBaselineActive);
-        connect(pAveragingSettingsView, &AveragingSettingsView::resetAverage,
-                this, &Averaging::onResetAverage);
         connect(this, &Averaging::stimChannelsChanged,
-                pAveragingSettingsView, &AveragingSettingsView::setStimChannels);
+                pAveragingSettingsView, [averaging](const std::map<std::string, int>& channels) {
+                    averaging->set_stim_channels(channels);
+                });
         connect(this, &Averaging::evokedSetChanged,
-                pAveragingSettingsView, &AveragingSettingsView::setDetectedEpochs);
+                pAveragingSettingsView, [averaging](const FiffEvokedSet& evokedSet) {
+                    averaging->set_detected_epochs(evokedSet);
+                });
 
         emit stimChannelsChanged(m_mapStimChsIndexNames);
 
-
-        ArtifactSettingsView* pArtifactSettingsView = makeControlWidget<ArtifactSettingsView>(controlWidgets, QString("MNESCAN/%1").arg(this->getName()));
+        auto artifact = std::make_shared<ArtifactPanel>();
+        artifact->set_thresholds_callback([this](const std::map<std::string, double>& thresholds) {
+            onChangeArtifactThreshold(thresholds);
+        });
+        PanelWidget* pArtifactSettingsView = makeControlWidget<PanelWidget>(controlWidgets, artifact, QString("MNESCAN/%1").arg(this->getName()));
         connect(this, &Averaging::guiModeChanged,
-                pArtifactSettingsView, &ArtifactSettingsView::setGuiMode);
+                pArtifactSettingsView, &PanelWidget::setGuiMode);
         pArtifactSettingsView->setObjectName("group_tab_Settings_Artifact");
-
-        connect(pArtifactSettingsView, &ArtifactSettingsView::changeArtifactThreshold,
-                this, &Averaging::onChangeArtifactThreshold);
         connect(this, &Averaging::fiffChInfoChanged,
-                pArtifactSettingsView, &ArtifactSettingsView::setChInfo);
+                pArtifactSettingsView, [artifact](const std::vector<FiffChInfo>& channels) {
+                    artifact->set_channels(channels);
+                });
 
         emit fiffChInfoChanged(m_pFiffInfo->chs);
-
 
         offerControlWidgets(std::move(controlWidgets));
 
         // Init the averaging settings
-        const auto currentStimCh = m_mapStimChsIndexNames.find(pAveragingSettingsView->getCurrentStimCh());
+        const auto currentStimCh = m_mapStimChsIndexNames.find(averaging->current_stim_channel());
         int iCurrentStimChIdx = currentStimCh != m_mapStimChsIndexNames.end() ? currentStimCh->second : 0;
 
         if (currentStimCh == m_mapStimChsIndexNames.end()) {
@@ -256,14 +273,14 @@ void Averaging::initPluginControlWidgets()
         }
 
         QMutexLocker locker(&m_qMutex);
-        m_settings.pre_stim = static_cast<int>(pAveragingSettingsView->getPreStimMSeconds() / 1000.0 * m_pFiffInfo->sfreq);
-        m_settings.post_stim = static_cast<int>(pAveragingSettingsView->getPostStimMSeconds() / 1000.0 * m_pFiffInfo->sfreq);
+        m_settings.pre_stim = static_cast<int>(averaging->pre_stim() / 1000.0 * m_pFiffInfo->sfreq);
+        m_settings.post_stim = static_cast<int>(averaging->post_stim() / 1000.0 * m_pFiffInfo->sfreq);
         m_settings.trigger_channel = iCurrentStimChIdx;
-        m_settings.averages = pAveragingSettingsView->getNumAverages();
-        m_settings.reject = toRejection(pArtifactSettingsView->getThresholdMap());
-        m_baseline = {static_cast<float>(pAveragingSettingsView->getBaselineFromSeconds()) / 1000.0f,
-                      static_cast<float>(pAveragingSettingsView->getBaselineToSeconds()) / 1000.0f};
-        m_bBaselineActive = pAveragingSettingsView->getDoBaselineCorrection();
+        m_settings.averages = averaging->num_averages();
+        m_settings.reject = toRejection(artifact->thresholds());
+        m_baseline = {static_cast<float>(averaging->baseline_from()) / 1000.0f,
+                      static_cast<float>(averaging->baseline_to()) / 1000.0f};
+        m_bBaselineActive = averaging->baseline_correction();
         applyBaseline();
 
         m_bPluginControlWidgetsInit = true;

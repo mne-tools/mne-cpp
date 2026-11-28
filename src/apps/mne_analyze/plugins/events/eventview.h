@@ -44,9 +44,14 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace mne::viz
+{
+class TriggerDetectionPanel;
+}
+
 namespace mne::viz::qt
 {
-class TriggerDetectionView;
+class PanelWidget;
 }
 
 namespace mne::analyze
@@ -387,7 +392,8 @@ private:
     QSharedPointer<mne::analyze::EventModel> m_pEventModel;         /** < Pointer to associated model. Points to currently loaded. */
     QSharedPointer<mne::analyze::FiffRawViewModel> m_pFiffRawModel; /** < Pointer to currently loaded FIffRawViewModel */
 
-    std::shared_ptr<mne::viz::qt::TriggerDetectionView> m_pTriggerDetectView; /** < Pointer to viewer to control GUI for detecting triggers */
+    std::shared_ptr<mne::viz::TriggerDetectionPanel> m_pTriggerDetectPanel; /**< Settings of the trigger detection. */
+    std::shared_ptr<mne::viz::qt::PanelWidget> m_pTriggerDetectView;        /**< Window of the trigger detection. */
 
     QColorDialog* m_pColordialog; /** < Used for Prompting users for event type colors */
 

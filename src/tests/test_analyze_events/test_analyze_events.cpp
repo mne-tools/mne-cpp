@@ -19,7 +19,8 @@
 #include <anShared/Management/event.h>
 #include <anShared/Model/eventmodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <mne/viz/backends/qt/viewers/triggerdetectionview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/panel.h>
 #include <mne/base/thread_pool.h>
 
 //=============================================================================================================
@@ -92,9 +93,9 @@ void TestAnalyzeEvents::detectsTriggersLikePython()
     QVERIFY(events);
 
     // The trigger panel: STI014, threshold 1, Detect
-    mne::viz::qt::TriggerDetectionView* view = nullptr;
+    mne::viz::qt::PanelWidget* view = nullptr;
     for (QWidget* w : QApplication::topLevelWidgets()) {
-        if (auto* v = qobject_cast<mne::viz::qt::TriggerDetectionView*>(w))
+        if (auto* v = qobject_cast<mne::viz::qt::PanelWidget*>(w); v && v->panel().id() == "TriggerDetectionView")
             view = v;
     }
     QVERIFY(view);

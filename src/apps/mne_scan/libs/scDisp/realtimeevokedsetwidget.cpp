@@ -37,7 +37,6 @@
 #include <mne/viz/backends/qt/viewers/modalityselectionview.h>
 #include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
 #include <mne/viz/backends/qt/viewers/averageselectionview.h>
-#include <mne/viz/backends/qt/viewers/averagingsettingsview.h>
 #include <scMeas/realtimeevokedset.h>
 #include <mne/dsp/filterkernel.h>
 

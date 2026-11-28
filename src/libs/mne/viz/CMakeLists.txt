@@ -66,6 +66,9 @@ set(SOURCES
   panels/channel_selection_panel.cpp
   panels/compensator_panel.cpp
   panels/forward_panel.cpp
+  panels/trigger_detection_panel.cpp
+  panels/artifact_panel.cpp
+  panels/averaging_panel.cpp
   panels/covariance_panel.cpp
   panels/sphara_panel.cpp
   panels/minimum_norm_panel.cpp
@@ -166,6 +169,9 @@ set(HEADERS
   panels/channel_selection_panel.h
   panels/compensator_panel.h
   panels/forward_panel.h
+  panels/trigger_detection_panel.h
+  panels/artifact_panel.h
+  panels/averaging_panel.h
   panels/covariance_panel.h
   panels/sphara_panel.h
   panels/minimum_norm_panel.h

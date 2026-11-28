@@ -21,7 +21,9 @@
 #include <anShared/Model/averagingdatamodel.h>
 #include <anShared/Model/eventmodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <mne/viz/backends/qt/viewers/averagingsettingsview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/forms/settings_form.h>
+#include <mne/viz/panels/panel.h>
 #include <mne/fiff/fiff_evoked_set.h>
 
 //=============================================================================================================
@@ -87,14 +89,20 @@ void TestAnalyzeAveraging::averagesEveryEventCodeLikePython()
     plugin->handleEvent(QSharedPointer<Event>::create(SELECTED_MODEL_CHANGED, nullptr, QVariant::fromValue(raw.staticCast<AbstractModel>())));
 
     // -100..300 ms with a -100..0 ms baseline, set in the control panel
-    auto* settings = control->findChild<mne::viz::qt::AveragingSettingsView*>();
+    mne::viz::Panel* settings = nullptr;
+    for (auto* widget : control->findChildren<mne::viz::qt::PanelWidget*>()) {
+        if (widget->panel().id() == "AveragingSettingsView") {
+            settings = &widget->panel();
+        }
+    }
     QVERIFY(settings);
-    emit settings->changePreStim(100);
-    emit settings->changePostStim(300);
-    emit settings->changeBaselineFrom(-100);
-    emit settings->changeBaselineTo(0);
-    emit settings->changeBaselineActive(true);
-    emit settings->calculateAverage(true);
+    mne::viz::SettingsForm& form = settings->form();
+    form.set_value("preStimSeconds", 100);
+    form.set_value("postStimSeconds", 300);
+    form.set_value("baselineFromSeconds", -100);
+    form.set_value("baselineToSeconds", 0);
+    form.set_value("doBaselineCorrection", true);
+    form.trigger("compute");
 
     QSharedPointer<AveragingDataModel> average;
     QTRY_VERIFY_WITH_TIMEOUT(

@@ -35,7 +35,8 @@
 #include <mne/viz/backends/qt/viewers/bidsview.h>
 #include <mne/viz/backends/qt/viewers/butterflyview.h>
 #include <mne/viz/backends/qt/viewers/control3dview.h>
-#include <mne/viz/backends/qt/viewers/artifactsettingsview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/artifact_panel.h>
 #include <mne/viz/backends/qt/viewers/projectsettingsview.h>
 #include <mne/viz/backends/qt/viewers/helpers/timerulerwidget.h>
 #include <mne/viz/backends/qt/viewers/helpers/channellabelpanel.h>
@@ -96,7 +97,7 @@ private slots:
     void construct_bidsView();
     void construct_butterflyView();
     void construct_control3DView();
-    void construct_artifactSettingsView();
+    void construct_artifactPanel();
     void construct_projectSettingsView();
     void construct_timeRulerWidget();
     void construct_channelLabelPanel();
@@ -184,13 +185,12 @@ void TestVizQtViewers3::construct_control3DView()
 
 //=============================================================================================================
 
-void TestVizQtViewers3::construct_artifactSettingsView()
+void TestVizQtViewers3::construct_artifactPanel()
 {
     // An empty channel list is the interesting case: it is what the view gets
     // before any data is loaded, and it is where an unguarded index would fault.
-    ArtifactSettingsView* pView = new ArtifactSettingsView(settingsPath(),
-                                                           std::vector<mne::FiffChInfo>(),
-                                                           m_pHolder.data());
+    auto* pView = new PanelWidget(std::make_shared<ArtifactPanel>(std::vector<mne::FiffChInfo>()), settingsPath(),
+                                  m_pHolder.data());
     QVERIFY(pView != nullptr);
 
     pView->resize(320, 240);

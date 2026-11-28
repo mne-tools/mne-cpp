@@ -16,6 +16,8 @@
 
 #include <mne/viz/forms/settings_form.h>
 #include <mne/viz/host/settings_store.h>
+#include <mne/viz/panels/artifact_panel.h>
+#include <mne/viz/panels/averaging_panel.h>
 #include <mne/viz/panels/compensator_panel.h>
 #include <mne/viz/panels/connectivity_panel.h>
 #include <mne/viz/panels/covariance_panel.h>
@@ -25,6 +27,8 @@
 #include <mne/viz/panels/projectors_panel.h>
 #include <mne/viz/panels/sphara_panel.h>
 #include <mne/viz/panels/time_frequency_panel.h>
+#include <mne/viz/panels/trigger_detection_panel.h>
+#include <mne/fiff/fiff_info.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -423,6 +427,85 @@ void test_connectivity_panel()
     CHECK(restored.metric() == "PLV" && restored.number_trials() == 15 && restored.upper_frequency() == 8.0 && metrics.empty());
 }
 
+void test_trigger_detection_panel()
+{
+    mne::FiffInfo info;
+    for (const char* name : {"MEG 0111", "STI 001", "STI 014"}) {
+        mne::FiffChInfo channel;
+        channel.ch_name = name;
+        channel.kind = std::string(name).starts_with("STI") ? FIFFV_STIM_CH : FIFFV_MEG_CH;
+        info.chs.push_back(channel);
+    }
+    // The old keys: the channel by index, the threshold as mantissa and exponent; colours by trigger type
+    MemorySettingsStore store;
+    store.set_value("app/TriggerDetectionView/Activated", true);
+    store.set_value("app/TriggerDetectionView/ChannelIndex", 1);
+    store.set_value("app/TriggerDetectionView/FirstThresholdValue", 2.0);
+    store.set_value("app/TriggerDetectionView/SecondThresholdValue", -2);
+    store.set_value("app/TriggerDetectionView/ColorTypes", std::string("4"));
+    store.set_value("app/TriggerDetectionView/Colors/4", std::string("#00ff00"));
+    TriggerDetectionPanel panel;
+    std::vector<std::string> channels;
+    TriggerDetectionPanel::Callbacks callbacks;
+    callbacks.trigger_info_changed = [&channels](const std::map<double, std::string>&, bool, const std::string& channel, double) {
+        channels.push_back(channel);
+    };
+    panel.set_callbacks(std::move(callbacks));
+    panel.load(store, "app");
+    CHECK(channels.empty() && panel.active() && panel.threshold() == 0.02);
+    panel.init(info);
+    CHECK((channels == std::vector<std::string>{"STI 014"}) && panel.colors().at(4.0) == "#00ff00");
+
+    // The colour of a detected type shows; another colour is kept for the type
+    panel.set_detected_triggers(2, {{2, {{100, 4.0}, {200, 5.0}}}});
+    CHECK(panel.form().get<std::string>("triggerColorType") == "4" && panel.form().get<std::string>("triggerColor") == "#00ff00");
+    panel.form().set_value("triggerColorType", std::string("5"));
+    panel.form().set_value("triggerColor", std::string("#123456"));
+    CHECK(panel.colors().at(5.0) == "#123456" && channels.size() == 2);
+    MemorySettingsStore saved;
+    panel.save(saved, "app");
+    CHECK(saved.read_string("app/TriggerDetectionView/ColorTypes", {}) == "4;5" && saved.read_int("app/TriggerDetectionView/ChannelIndex", -1) == 1);
+    CHECK(saved.read_string("app/TriggerDetectionView/Colors/5", {}) == "#123456");
+}
+
+void test_artifact_and_averaging_panels()
+{
+    mne::FiffChInfo eog;
+    eog.kind = FIFFV_EOG_CH;
+    ArtifactPanel artifact({eog});
+    std::vector<std::map<std::string, double>> thresholds;
+    artifact.set_thresholds_callback([&thresholds](const std::map<std::string, double>& value) {
+        thresholds.push_back(value);
+    });
+    artifact.form().set_value("artifactThresholdsSecond/eog", -4);
+    CHECK(thresholds.size() == 1 && thresholds.back().at("eog") == 1e-4 && thresholds.back().at("Active") == 0.0);
+    artifact.set_channels({});
+    CHECK(thresholds.size() == 2 && thresholds.back().size() == 1 && !artifact.rejection_active());
+
+    // A stored baseline outside the stored epoch window is moved into it, silently
+    MemorySettingsStore store;
+    store.set_value("app/AveragingSettingsView/preStimSeconds", 50);
+    store.set_value("app/AveragingSettingsView/postStimSeconds", 200);
+    store.set_value("app/AveragingSettingsView/baselineFromSeconds", -300);
+    store.set_value("app/AveragingSettingsView/baselineToSeconds", 500);
+    store.set_value("app/AveragingSettingsView/currentStimChannel", std::string("STI 101"));
+    AveragingPanel averaging({{"STI 014", 1}, {"STI 101", 2}});
+    int reports = 0;
+    AveragingPanel::Callbacks callbacks;
+    callbacks.baseline_to_changed = [&reports](int) {
+        ++reports;
+    };
+    callbacks.baseline_from_changed = callbacks.baseline_to_changed;
+    averaging.set_callbacks(std::move(callbacks));
+    averaging.load(store, "app");
+    CHECK(averaging.baseline_from() == -50 && averaging.baseline_to() == 0 && reports == 0);
+    CHECK(averaging.stim_channel_index() == 2);
+    // Shortening the window clamps the baseline and reports it
+    averaging.form().set_value("baselineFromSeconds", -40);
+    averaging.form().set_value("preStimSeconds", 20);
+    CHECK(averaging.baseline_from() == -20 && reports == 2);
+}
+
 } // namespace
 
 //=============================================================================================================
@@ -442,6 +525,8 @@ int main()
         {"forward_panel", test_forward_panel},
         {"processing_panels", test_processing_panels},
         {"connectivity_panel", test_connectivity_panel},
+        {"trigger_detection_panel", test_trigger_detection_panel},
+        {"artifact_and_averaging_panels", test_artifact_and_averaging_panels},
     };
     for (const auto& [name, test] : tests) {
         const int before = g_failures;

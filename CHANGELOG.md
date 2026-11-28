@@ -491,6 +491,13 @@ aliases; replace the old spelling as below.
   `viz::SpectrumPanel` shows the frequency band as sliders above the spectra
   (`set_boundaries()`, `set_bounds_callback()`, `lower_bound()`,
   `upper_bound()`).
+- The trigger detection, artifact rejection and averaging settings are
+  toolkit-free panels too: `viz::TriggerDetectionPanel`, `viz::ArtifactPanel`
+  and `viz::AveragingPanel` replace `TriggerDetectionView`,
+  `ArtifactSettingsView` and `AveragingSettingsView` in mne_scan and
+  mne_analyze and keep their settings keys. Trigger colours are edited in a
+  colour field and stored as text per trigger type; colours stored by the old
+  view are not read. The detected trials of the averaging panel are a list.
 - `ChannelRhiRenderer` hosts a `viz::TraceViewClient`, the same trace view
   client the SDL example runs, instead of wiring its own view, animator,
   markers and frame builder; its host becomes the client's `viz::Surface`.

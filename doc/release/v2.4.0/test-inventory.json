@@ -11352,6 +11352,8 @@
         "windows-2025-vs2026-qt-min": "absent"
       },
       "registry_classes": [
+        "ArtifactPanel",
+        "AveragingPanel",
         "CompensatorPanel",
         "ConnectivityPanel",
         "CovariancePanel",
@@ -11363,7 +11365,8 @@
         "SettingField",
         "SettingsForm",
         "SpharaPanel",
-        "TimeFrequencyPanel"
+        "TimeFrequencyPanel",
+        "TriggerDetectionPanel"
       ]
     },
     {

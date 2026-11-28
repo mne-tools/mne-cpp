@@ -8,8 +8,8 @@
  * @since    2.0.0
  * @date     March, 2026
  * @brief    Tests for additional disp viewer widget classes and helper models.
- *           Covers: HpiSettingsView, CoregSettingsView, ArtifactSettingsView,
- *           PanelWidget (forward solution), FiffRawViewSettings, ProjectSettingsView, BidsView,
+ *           Covers: HpiSettingsView, CoregSettingsView,
+ *           PanelWidget (forward solution, averaging, artifact rejection, trigger detection), FiffRawViewSettings, ProjectSettingsView, BidsView,
  *           ChannelSelectionView, AverageLayoutPanel, AverageSelectionView,
  *           ButterflyView, SpectrumPanel, RtFiffRawViewModel, EvokedSetModel,
  *           ChannelInfoModel, and RtFiffRawView.
@@ -25,16 +25,16 @@
 #include <mne/base/log.h>
 #include <mne/viz/backends/qt/viewers/hpisettingsview.h>
 #include <mne/viz/backends/qt/viewers/coregsettingsview.h>
-#include <mne/viz/backends/qt/viewers/artifactsettingsview.h>
 #include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/artifact_panel.h>
+#include <mne/viz/panels/averaging_panel.h>
 #include <mne/viz/panels/forward_panel.h>
+#include <mne/viz/panels/trigger_detection_panel.h>
 #include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
 #include <mne/viz/backends/qt/viewers/projectsettingsview.h>
 #include <mne/viz/backends/qt/viewers/filterdesignview.h>
 #include <mne/viz/backends/qt/plots/filterplot.h>
 #include <mne/viz/backends/qt/plots/helpers/scenepainter.h>
-#include <mne/viz/backends/qt/viewers/triggerdetectionview.h>
-#include <mne/viz/backends/qt/viewers/averagingsettingsview.h>
 #include <mne/viz/backends/qt/kit/settingspanel.h>
 #include <mne/viz/backends/qt/viewers/bidsview.h>
 #include <mne/viz/backends/qt/kit/itemlistview.h>
@@ -107,6 +107,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QColorDialog>
+#include <QToolButton>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QLocale>
@@ -411,31 +412,24 @@ private slots:
      */
     void filterDesignView_designExportLoad();
 
-    //=========================================================================================================
-    /**
-     * Verifies that ArtifactSettingsView constructs and survives all lifecycle transitions.
-     */
-    void artifactSettingsView_lifecycle();
 
-    //=========================================================================================================
+    //=======================================================================================================
     /**
-     * Verifies ArtifactSettingsView rows per channel type, threshold composition, activation and rebuilds.
+     * Verifies AveragingPanel defaults, stim channel selection, epoch window and baseline controls, stored settings and the detected epochs.
      */
-    void artifactSettingsView_thresholds();
+    void averagingPanel_controlsAndSettings();
 
-    //=========================================================================================================
+    //=======================================================================================================
     /**
-     * Verifies TriggerDetectionView channel list, threshold composition, detected types, colors, reset and the
-     * offline detect button, also after a re-init.
+     * Verifies TriggerDetectionPanel channel list, threshold composition, detected types, colours, reset and the offline detect button, also after a re-init.
      */
-    void triggerDetectionView_settingsAndSignals();
+    void triggerDetectionPanel_settingsAndSignals();
 
-    //=========================================================================================================
+    //=======================================================================================================
     /**
-     * Verifies AveragingSettingsView defaults, stim channel selection, epoch window and baseline controls, saved
-     * settings and the detected-epoch table.
+     * Verifies ArtifactPanel rows per channel type, threshold composition, activation and new channel sets.
      */
-    void averagingSettingsView_controlsAndSettings();
+    void artifactPanel_thresholds();
 
     //=========================================================================================================
     /**
@@ -1177,18 +1171,18 @@ void TestVizQtViewers2::coregSettingsView_lifecycle()
 
 //=============================================================================================================
 
-void TestVizQtViewers2::averagingSettingsView_controlsAndSettings()
+void TestVizQtViewers2::averagingPanel_controlsAndSettings()
 {
     // Defaults without stored settings
     {
-        AveragingSettingsView view(QString{});
-        QCOMPARE(view.getNumAverages(), 10);
-        QCOMPARE(view.getPreStimMSeconds(), 100);
-        QCOMPARE(view.getPostStimMSeconds(), 400);
-        QCOMPARE(view.getBaselineFromSeconds(), 0);
-        QCOMPARE(view.getBaselineToSeconds(), 0);
-        QVERIFY(!view.getDoBaselineCorrection());
-        QCOMPARE(view.getCurrentStimCh(), std::string("STI 014"));
+        AveragingPanel averaging;
+        QCOMPARE(averaging.num_averages(), 10);
+        QCOMPARE(averaging.pre_stim(), 100);
+        QCOMPARE(averaging.post_stim(), 400);
+        QCOMPARE(averaging.baseline_from(), 0);
+        QCOMPARE(averaging.baseline_to(), 0);
+        QVERIFY(!averaging.baseline_correction());
+        QCOMPARE(averaging.current_stim_channel(), std::string("STI 014"));
     }
 
     // Stored settings, including a baseline that ends before the stimulus
@@ -1206,7 +1200,50 @@ void TestVizQtViewers2::averagingSettingsView_controlsAndSettings()
     const auto removeSettings = qScopeGuard([&sPath]() { QSettings("MNECPP").remove(sPath); });
 
     const std::map<std::string, int> stimChannels = {{"STI 014", 306}, {"STI 101", 312}};
-    AveragingSettingsView view(sPath, stimChannels);
+    auto averaging = std::make_shared<AveragingPanel>(stimChannels);
+    std::vector<std::string> stims;
+    std::vector<int> preStims;
+    std::vector<int> postStims;
+    std::vector<int> froms;
+    std::vector<int> tos;
+    std::vector<int> nums;
+    std::vector<bool> baselines;
+    std::vector<bool> autoComputes;
+    int resets = 0;
+    int computes = 0;
+    AveragingPanel::Callbacks callbacks;
+    callbacks.stim_channel_changed = [&stims](const std::string& channel) {
+        stims.push_back(channel);
+    };
+    callbacks.pre_stim_changed = [&preStims](int value) {
+        preStims.push_back(value);
+    };
+    callbacks.post_stim_changed = [&postStims](int value) {
+        postStims.push_back(value);
+    };
+    callbacks.baseline_from_changed = [&froms](int value) {
+        froms.push_back(value);
+    };
+    callbacks.baseline_to_changed = [&tos](int value) {
+        tos.push_back(value);
+    };
+    callbacks.num_averages_changed = [&nums](int value) {
+        nums.push_back(value);
+    };
+    callbacks.baseline_active_changed = [&baselines](bool active) {
+        baselines.push_back(active);
+    };
+    callbacks.auto_compute_changed = [&autoComputes](bool live) {
+        autoComputes.push_back(live);
+    };
+    callbacks.reset = [&resets] {
+        ++resets;
+    };
+    callbacks.compute = [&computes] {
+        ++computes;
+    };
+    averaging->set_callbacks(std::move(callbacks));
+    PanelWidget view(averaging, sPath);
     view.show();
     auto* pChannels = view.findChild<QComboBox*>(QStringLiteral("currentStimChannel"));
     auto* pPre = view.findChild<QSpinBox*>(QStringLiteral("preStimSeconds"));
@@ -1214,82 +1251,70 @@ void TestVizQtViewers2::averagingSettingsView_controlsAndSettings()
     auto* pFrom = view.findChild<QSpinBox*>(QStringLiteral("baselineFromSeconds"));
     auto* pTo = view.findChild<QSpinBox*>(QStringLiteral("baselineToSeconds"));
     auto* pNum = view.findChild<QSpinBox*>(QStringLiteral("numAverages"));
-    QVERIFY(pChannels);
-    QVERIFY(pPre);
-    QVERIFY(pPost);
-    QVERIFY(pFrom);
-    QVERIFY(pTo);
-    QVERIFY(pNum);
+    QVERIFY(pChannels && pPre && pPost && pFrom && pTo && pNum);
 
-    QCOMPARE(view.getNumAverages(), 25);
+    // Restoring reports nothing
+    QVERIFY(stims.empty() && preStims.empty() && froms.empty() && tos.empty() && nums.empty() && baselines.empty());
+    QCOMPARE(averaging->num_averages(), 25);
     QCOMPARE(pNum->value(), 25);
-    QCOMPARE(view.getPreStimMSeconds(), 200);
-    QCOMPARE(view.getPostStimMSeconds(), 500);
-    QCOMPARE(view.getBaselineFromSeconds(), -150);
-    QCOMPARE(view.getBaselineToSeconds(), -50);
+    QCOMPARE(averaging->pre_stim(), 200);
+    QCOMPARE(averaging->post_stim(), 500);
+    QCOMPARE(averaging->baseline_from(), -150);
+    QCOMPARE(averaging->baseline_to(), -50);
     QCOMPARE(pTo->value(), -50);
-    QVERIFY(view.getDoBaselineCorrection());
+    QVERIFY(averaging->baseline_correction());
 
     // Stim channel: the stored one is selected and its channel index is reported
     QCOMPARE(pChannels->currentText(), QStringLiteral("STI 101"));
-    QCOMPARE(view.getStimChannelIdx(), 312);
-    QSignalSpy stimSpy(&view, &AveragingSettingsView::changeStimChannel);
+    QCOMPARE(averaging->stim_channel_index(), 312);
     pChannels->setCurrentText(QStringLiteral("STI 014"));
-    QCOMPARE(stimSpy.count(), 1);
-    QCOMPARE(stimSpy.last().at(0).value<std::string>(), std::string("STI 014"));
-    QCOMPARE(view.getCurrentStimCh(), std::string("STI 014"));
-    QCOMPARE(view.getStimChannelIdx(), 306);
+    QCOMPARE(stims, std::vector<std::string>{"STI 014"});
+    QCOMPARE(averaging->current_stim_channel(), std::string("STI 014"));
+    QCOMPARE(averaging->stim_channel_index(), 306);
 
     // New stim channels keep the selection and do not duplicate the reaction
-    view.setStimChannels(std::map<std::string, int>{{"STI 014", 6}, {"STI 201", 7}});
+    averaging->set_stim_channels(std::map<std::string, int>{{"STI 014", 6}, {"STI 201", 7}});
     QCOMPARE(pChannels->count(), 2);
-    QCOMPARE(view.getStimChannelIdx(), 6);
-    stimSpy.clear();
+    QCOMPARE(averaging->stim_channel_index(), 6);
+    stims.clear();
     pChannels->setCurrentText(QStringLiteral("STI 201"));
-    QCOMPARE(stimSpy.count(), 1);
-    QCOMPARE(view.getCurrentStimCh(), std::string("STI 201"));
-    QCOMPARE(view.getStimChannelIdx(), 7);
+    QCOMPARE(stims.size(), std::size_t{1});
+    QCOMPARE(averaging->current_stim_channel(), std::string("STI 201"));
+    QCOMPARE(averaging->stim_channel_index(), 7);
 
-    // Epoch window and baseline: finished edits emit and constrain the baseline range
-    QSignalSpy preSpy(&view, &AveragingSettingsView::changePreStim);
-    QSignalSpy postSpy(&view, &AveragingSettingsView::changePostStim);
-    QSignalSpy fromSpy(&view, &AveragingSettingsView::changeBaselineFrom);
-    QSignalSpy toSpy(&view, &AveragingSettingsView::changeBaselineTo);
-    QSignalSpy numSpy(&view, &AveragingSettingsView::changeNumAverages);
+    // Epoch window and baseline: finished edits report and constrain the baseline range
     pPre->setValue(300);
     emit pPre->editingFinished();
-    QCOMPARE(preSpy.last().at(0).toInt(), 300);
+    QCOMPARE(preStims.back(), 300);
     QCOMPARE(pFrom->minimum(), -300);
     QCOMPARE(pTo->minimum(), -300);
     pPost->setValue(600);
     emit pPost->editingFinished();
-    QCOMPARE(postSpy.last().at(0).toInt(), 600);
+    QCOMPARE(postStims.back(), 600);
     QCOMPARE(pFrom->maximum(), 600);
     pFrom->setValue(-250);
     emit pFrom->editingFinished();
-    QCOMPARE(fromSpy.last().at(0).toInt(), -250);
+    QCOMPARE(froms.back(), -250);
     QCOMPARE(pTo->minimum(), -250);
     pTo->setValue(-20);
     emit pTo->editingFinished();
-    QCOMPARE(toSpy.last().at(0).toInt(), -20);
+    QCOMPARE(tos.back(), -20);
     QCOMPARE(pFrom->maximum(), -20);
     pNum->setValue(40);
     emit pNum->editingFinished();
-    QCOMPARE(numSpy.last().at(0).toInt(), 40);
-    QCOMPARE(view.getNumAverages(), 40);
+    QCOMPARE(nums.back(), 40);
+    QCOMPARE(averaging->num_averages(), 40);
 
-    QSignalSpy baselineSpy(&view, &AveragingSettingsView::changeBaselineActive);
     auto* pBaseline = view.findChild<QCheckBox*>(QStringLiteral("doBaselineCorrection"));
     pBaseline->click();
-    QCOMPARE(baselineSpy.count(), 1);
-    QCOMPARE(baselineSpy.last().at(0).toBool(), pBaseline->isChecked());
-    QCOMPARE(view.getDoBaselineCorrection(), pBaseline->isChecked());
-    QSignalSpy resetSpy(&view, &AveragingSettingsView::resetAverage);
+    QCOMPARE(baselines.size(), std::size_t{1});
+    QCOMPARE(baselines.back(), pBaseline->isChecked());
+    QCOMPARE(averaging->baseline_correction(), pBaseline->isChecked());
     QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("reset")), Qt::LeftButton);
-    QCOMPARE(resetSpy.count(), 1);
+    QCOMPARE(resets, 1);
 
     // Detected epochs: one row per type, at most ten
-    auto* pTrials = view.findChild<SettingsPanel*>()->customWidget("detectedTrials");
+    auto* pTrials = view.formPanel()->customWidget("detectedTrials");
     QVERIFY(pTrials);
     FiffEvokedSet evokedSet;
     for (int i = 0; i < 12; ++i) {
@@ -1298,86 +1323,100 @@ void TestVizQtViewers2::averagingSettingsView_controlsAndSettings()
         evoked.nave = 3 * i;
         evokedSet.evoked.push_back(evoked);
     }
-    view.setDetectedEpochs(evokedSet);
+    averaging->set_detected_epochs(evokedSet);
     QVERIFY(!pTrials->isHidden());
-    auto* pGrid = pTrials->findChild<QGridLayout*>();
-    QVERIFY(pGrid);
-    QCOMPARE(pGrid->count(), 2 * 11);
-    QCOMPARE(qobject_cast<QLabel*>(pGrid->itemAtPosition(3, 1)->widget())->text(), QStringLiteral("6"));
-    view.setDetectedEpochs(evokedSet);
-    QCOMPARE(pGrid->count(), 2 * 11);
-    view.setDetectedEpochs(FiffEvokedSet());
+    const ItemList* trials = averaging->list("detectedTrials");
+    QCOMPARE(trials->count(), 10);
+    QCOMPARE(trials->items()[2], std::string("3: 6"));
+    averaging->set_detected_epochs(evokedSet);
+    QCOMPARE(trials->count(), 10);
+    averaging->set_detected_epochs(FiffEvokedSet());
     QVERIFY(pTrials->isHidden());
 
     // Offline mode offers the compute controls
-    QSignalSpy computeSpy(&view, &AveragingSettingsView::calculateAverage);
     view.setProcessingMode(AbstractView::ProcessingMode::Offline);
     auto* pCompute = view.findChild<QPushButton*>(QStringLiteral("compute"));
     QVERIFY(!pCompute->isHidden());
     QVERIFY(pChannels->isHidden());
     QTest::mouseClick(pCompute, Qt::LeftButton);
-    QCOMPARE(computeSpy.count(), 1);
+    QCOMPARE(computes, 1);
     auto* pAuto = view.findChild<QCheckBox*>(QStringLiteral("autoCompute"));
-    QSignalSpy autoSpy(&view, &AveragingSettingsView::setAutoCompute);
     pAuto->click();
-    QCOMPARE(autoSpy.count(), 1);
-    QCOMPARE(view.getAutoComputeStatus(), pAuto->isChecked());
+    QCOMPARE(autoComputes.size(), std::size_t{1});
+    QCOMPARE(averaging->auto_compute(), pAuto->isChecked());
     view.setProcessingMode(AbstractView::ProcessingMode::RealTime);
     QVERIFY(pCompute->isHidden());
 }
 
 //=============================================================================================================
 
-void TestVizQtViewers2::triggerDetectionView_settingsAndSignals()
+void TestVizQtViewers2::triggerDetectionPanel_settingsAndSignals()
 {
     auto info = createBrowserTestInfo();
     info->chs[2].kind = FIFFV_STIM_CH;
     info->chs[2].ch_name = "STI 101";
 
-    TriggerDetectionView view(QString{});
+    struct Info
+    {
+        std::map<double, std::string> colors;
+        bool active = false;
+        std::string channel;
+        double threshold = 0.0;
+    };
+    std::vector<Info> infos;
+    int resets = 0;
+    std::vector<std::pair<std::string, double>> detections;
+    auto triggers = std::make_shared<TriggerDetectionPanel>();
+    TriggerDetectionPanel::Callbacks callbacks;
+    callbacks.trigger_info_changed = [&infos](const std::map<double, std::string>& colors, bool active, const std::string& channel,
+                                              double threshold) {
+        infos.push_back({colors, active, channel, threshold});
+    };
+    callbacks.reset_trigger_counter = [&resets] {
+        ++resets;
+    };
+    callbacks.detect_triggers = [&detections](const std::string& channel, double threshold) {
+        detections.emplace_back(channel, threshold);
+    };
+    triggers->set_callbacks(std::move(callbacks));
+    PanelWidget view(triggers);
     view.show();
     auto* pChannels = view.findChild<QComboBox*>(QStringLiteral("triggerChannel"));
     auto* pTypes = view.findChild<QComboBox*>(QStringLiteral("triggerColorType"));
     auto* pActive = view.findChild<QCheckBox*>(QStringLiteral("activateTriggerDetection"));
     auto* pFirst = view.findChild<QDoubleSpinBox*>(QStringLiteral("detectionThresholdFirst"));
     auto* pSecond = view.findChild<QSpinBox*>(QStringLiteral("detectionThresholdSecond"));
-    auto* pCount = view.findChild<QLabel*>(QStringLiteral("numberDetectedTriggersLabel"));
+    auto* pCount = view.findChild<QLabel*>(QStringLiteral("numberDetectedTriggers"));
     auto* pDetect = view.findChild<QPushButton*>(QStringLiteral("detectTriggers"));
-    QVERIFY(pChannels);
-    QVERIFY(pTypes);
-    QVERIFY(pActive);
-    QVERIFY(pFirst);
-    QVERIFY(pSecond);
-    QVERIFY(pCount);
-    QVERIFY(pDetect);
+    auto* pColor = view.findChild<QToolButton*>(QStringLiteral("triggerColor"));
+    QVERIFY(pChannels && pTypes && pActive && pFirst && pSecond && pCount && pDetect && pColor);
 
-    // Re-initialising (new measurement info) must not duplicate the reactions
-    view.init(info);
-    view.init(info);
+    // Re-initialising (new measurement info) must not duplicate the channels; init() reports once
+    triggers->init(*info);
+    triggers->init(*info);
     QCOMPARE(pChannels->count(), 2);
     QCOMPARE(pChannels->itemText(0), QStringLiteral("STI 101"));
-    QCOMPARE(view.getSelectedStimChannel(), std::string("STI 101"));
+    QCOMPARE(triggers->selected_stim_channel(), std::string("STI 101"));
+    QCOMPARE(infos.size(), std::size_t{2});
 
-    QSignalSpy infoSpy(&view, &TriggerDetectionView::triggerInfoChanged);
+    infos.clear();
     pFirst->setValue(2.5);
-    QCOMPARE(infoSpy.count(), 1);
+    QCOMPARE(infos.size(), std::size_t{1});
     pSecond->setValue(-3);
-    QCOMPARE(infoSpy.count(), 2);
-    QVERIFY(qAbs(infoSpy.last().at(3).toDouble() - 2.5e-3) < 1e-15);
+    QCOMPARE(infos.size(), std::size_t{2});
+    QVERIFY(qAbs(infos.back().threshold - 2.5e-3) < 1e-15);
     pActive->setChecked(true);
-    QCOMPARE(infoSpy.last().at(1).toBool(), true);
+    QVERIFY(infos.back().active);
     pChannels->setCurrentIndex(1);
-    QCOMPARE(infoSpy.last().at(2).value<std::string>(), std::string("STI 014"));
-    QCOMPARE(infoSpy.count(), 4);
+    QCOMPARE(infos.back().channel, std::string("STI 014"));
+    QCOMPARE(infos.size(), std::size_t{4});
 
     // Detected triggers fill the count and the type list once per value
-    view.setNumberDetectedTriggersAndTypes(3, {{3, {{10, 1.0}, {20, 4.0}, {30, 1.0}}}});
+    triggers->set_detected_triggers(3, {{3, {{10, 1.0}, {20, 4.0}, {30, 1.0}}}});
     QCOMPARE(pCount->text(), QStringLiteral("3"));
     QCOMPARE(pTypes->count(), 2);
 
-    // The color button shows the color of the selected type; picking a color stores it for that type
-    auto* pColor = view.findChild<QPushButton*>(QStringLiteral("triggerColorButton"));
-    QVERIFY(pColor);
+    // The colour button shows the colour of the selected type; picking a colour stores it for that type
     pTypes->setCurrentIndex(1);
     answerNextModal([](QWidget* pModal) {
         auto* pDialog = qobject_cast<QColorDialog*>(pModal);
@@ -1386,27 +1425,25 @@ void TestVizQtViewers2::triggerDetectionView_settingsAndSignals()
         static_cast<QDialog*>(pDialog)->accept();
     });
     QTest::mouseClick(pColor, Qt::LeftButton);
-    QCOMPARE(pColor->palette().color(QPalette::Button), QColor(10, 200, 30));
-    using ColorMap = std::map<double, QColor>;
-    QCOMPARE(mne::viz::qt::detail::valueOr(infoSpy.last().at(0).value<ColorMap>(), 4.0), QColor(10, 200, 30));
+    QCOMPARE(triggers->form().get<std::string>("triggerColor"), std::string("#0ac81e"));
+    QCOMPARE(mne::viz::qt::detail::valueOr(infos.back().colors, 4.0), std::string("#0ac81e"));
     pTypes->setCurrentIndex(0);
-    QVERIFY(pColor->palette().color(QPalette::Button) != QColor(10, 200, 30));
+    QVERIFY(triggers->form().get<std::string>("triggerColor") != "#0ac81e");
     pTypes->setCurrentIndex(1);
-    QCOMPARE(pColor->palette().color(QPalette::Button), QColor(10, 200, 30));
+    QCOMPARE(triggers->form().get<std::string>("triggerColor"), std::string("#0ac81e"));
     // Cancelling the colour dialog keeps the colour
-    const qsizetype infoCount = infoSpy.size();
+    const std::size_t infoCount = infos.size();
     answerNextModal([](QWidget* pModal) {
         auto* pDialog = qobject_cast<QColorDialog*>(pModal);
         QVERIFY(pDialog);
         static_cast<QDialog*>(pDialog)->reject();
     });
     QTest::mouseClick(pColor, Qt::LeftButton);
-    QCOMPARE(pColor->palette().color(QPalette::Button), QColor(10, 200, 30));
-    QCOMPARE(infoSpy.size(), infoCount);
+    QCOMPARE(triggers->form().get<std::string>("triggerColor"), std::string("#0ac81e"));
+    QCOMPARE(infos.size(), infoCount);
 
-    QSignalSpy resetSpy(&view, &TriggerDetectionView::resetTriggerCounter);
     QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("resetNumberTriggers")), Qt::LeftButton);
-    QCOMPARE(resetSpy.count(), 1);
+    QCOMPARE(resets, 1);
     QCOMPARE(pCount->text(), QStringLiteral("0"));
     QCOMPARE(pTypes->count(), 0);
 
@@ -1414,18 +1451,17 @@ void TestVizQtViewers2::triggerDetectionView_settingsAndSignals()
     view.setProcessingMode(AbstractView::ProcessingMode::Offline);
     QVERIFY(!pDetect->isHidden());
     QVERIFY(pActive->isHidden());
-    QSignalSpy detectSpy(&view, &TriggerDetectionView::detectTriggers);
     QTest::mouseClick(pDetect, Qt::LeftButton);
-    QCOMPARE(detectSpy.count(), 1);
-    QCOMPARE(detectSpy.last().at(0).value<std::string>(), std::string("STI 014"));
-    QVERIFY(qAbs(detectSpy.last().at(1).toDouble() - 2.5e-3) < 1e-15);
+    QCOMPARE(detections.size(), std::size_t{1});
+    QCOMPARE(detections.back().first, std::string("STI 014"));
+    QVERIFY(qAbs(detections.back().second - 2.5e-3) < 1e-15);
     view.setProcessingMode(AbstractView::ProcessingMode::RealTime);
     QVERIFY(pDetect->isHidden());
 }
 
 //=============================================================================================================
 
-void TestVizQtViewers2::artifactSettingsView_thresholds()
+void TestVizQtViewers2::artifactPanel_thresholds()
 {
     auto channel = [](int kind, int unit) {
         FiffChInfo ch;
@@ -1437,7 +1473,12 @@ void TestVizQtViewers2::artifactSettingsView_thresholds()
                                             channel(FIFFV_MEG_CH, FIFF_UNIT_T_M), channel(FIFFV_EEG_CH, FIFF_UNIT_V),
                                             channel(FIFFV_STIM_CH, FIFF_UNIT_NONE)};
 
-    ArtifactSettingsView view(QString{});
+    auto artifact = std::make_shared<ArtifactPanel>();
+    std::vector<std::map<std::string, double>> reports;
+    artifact->set_thresholds_callback([&reports](const std::map<std::string, double>& thresholds) {
+        reports.push_back(thresholds);
+    });
+    PanelWidget view(artifact);
     view.show();
     auto shown = [&view]() {
         QList<QDoubleSpinBox*> boxes;
@@ -1449,11 +1490,10 @@ void TestVizQtViewers2::artifactSettingsView_thresholds()
         return boxes;
     };
     QVERIFY(shown().isEmpty());
-    QVERIFY(!view.getDoArtifactThresholdRejection());
+    QVERIFY(!artifact->rejection_active());
 
     // One row per present type; mantissa and exponent compose the threshold
-    QSignalSpy thresholdSpy(&view, &ArtifactSettingsView::changeArtifactThreshold);
-    view.setChInfo(megEeg);
+    artifact->set_channels(megEeg);
     auto visible = [&view]() {
         QApplication::processEvents();
         QStringList labels;
@@ -1467,55 +1507,33 @@ void TestVizQtViewers2::artifactSettingsView_thresholds()
     };
     QCOMPARE(visible(), QStringList({"eeg", "grad", "mag"}));
     QCOMPARE(shown().size(), 3);
-    QCOMPARE(thresholdSpy.count(), 1);
-    std::map<std::string, double> map = view.getThresholdMap();
+    QCOMPARE(reports.size(), std::size_t{1});
+    std::map<std::string, double> map = artifact->thresholds();
     QCOMPARE(mne::viz::qt::detail::valueOr(map, "Active"), 0.0);
     QCOMPARE(std::vector<std::string>(std::views::keys(map).begin(), std::views::keys(map).end()), (std::vector<std::string>{"Active", "eeg", "grad", "mag"}));
     QCOMPARE(mne::viz::qt::detail::valueOr(map, "grad"), 0.1);
 
-    auto* pPanel = view.findChild<SettingsPanel*>();
-    QVERIFY(pPanel);
+    SettingsPanel* pPanel = view.formPanel();
     qobject_cast<QDoubleSpinBox*>(pPanel->editor("artifactThresholdsFirst/grad"))->setValue(4.0);
     qobject_cast<QSpinBox*>(pPanel->editor("artifactThresholdsSecond/grad"))->setValue(-11);
-    QVERIFY(qAbs(mne::viz::qt::detail::valueOr(view.getThresholdMap(), "grad") - 4e-11) < 1e-20);
-    QVERIFY(qAbs(mne::viz::qt::detail::valueOr(thresholdSpy.last().at(0).value<std::map<std::string, double>>(), "grad") - 4e-11) < 1e-20);
+    QVERIFY(qAbs(mne::viz::qt::detail::valueOr(artifact->thresholds(), "grad") - 4e-11) < 1e-20);
+    QVERIFY(qAbs(mne::viz::qt::detail::valueOr(reports.back(), "grad") - 4e-11) < 1e-20);
 
     // Activation is reported in the map
     auto* pActive = qobject_cast<QCheckBox*>(pPanel->editor("doArtifactThresholdReduction"));
     QVERIFY(pActive);
     QTest::mouseClick(pActive, Qt::LeftButton);
-    QVERIFY(view.getDoArtifactThresholdRejection());
-    QCOMPARE(mne::viz::qt::detail::valueOr(view.getThresholdMap(), "Active"), 1.0);
+    QVERIFY(artifact->rejection_active());
+    QCOMPARE(mne::viz::qt::detail::valueOr(artifact->thresholds(), "Active"), 1.0);
 
     // A new channel set replaces the rows and keeps the active state and the edited threshold
-    view.setChInfo({channel(FIFFV_MEG_CH, FIFF_UNIT_T_M), channel(FIFFV_EOG_CH, FIFF_UNIT_V)});
+    artifact->set_channels({channel(FIFFV_MEG_CH, FIFF_UNIT_T_M), channel(FIFFV_EOG_CH, FIFF_UNIT_V)});
     QCOMPARE(visible(), QStringList({"eog", "grad"}));
     QCOMPARE(view.findChildren<QCheckBox*>().size(), 1);
-    QVERIFY(view.getDoArtifactThresholdRejection());
-    map = view.getThresholdMap();
+    QVERIFY(artifact->rejection_active());
+    map = artifact->thresholds();
     QCOMPARE(std::vector<std::string>(std::views::keys(map).begin(), std::views::keys(map).end()), (std::vector<std::string>{"Active", "eog", "grad"}));
     QVERIFY(qAbs(mne::viz::qt::detail::valueOr(map, "grad") - 4e-11) < 1e-20);
-
-    view.saveSettings();
-    view.loadSettings();
-    view.clearView();
-}
-
-//=============================================================================================================
-
-void TestVizQtViewers2::artifactSettingsView_lifecycle()
-{
-    ArtifactSettingsView view("test_viz_qt_viewers2");
-
-    view.setGuiMode(AbstractView::GuiMode::Clinical);
-    view.setGuiMode(AbstractView::GuiMode::Research);
-    view.setProcessingMode(AbstractView::ProcessingMode::RealTime);
-    view.setProcessingMode(AbstractView::ProcessingMode::Offline);
-    view.saveSettings();
-    view.loadSettings();
-    view.clearView();
-
-    QApplication::processEvents();
 }
 
 //=============================================================================================================

@@ -28,7 +28,7 @@
 #include <mne/viz/backends/qt/viewers/scalingview.h>
 #include <mne/viz/backends/qt/viewers/filtersettingsview.h>
 #include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
-#include <mne/viz/backends/qt/viewers/triggerdetectionview.h>
+#include <mne/viz/panels/trigger_detection_panel.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <mne/dsp/filterkernel.h>
 #include <mne/fiff/fiff_info.h>
@@ -38,6 +38,7 @@
 //=============================================================================================================
 
 #include <QAction>
+#include <QColor>
 #include <QDate>
 #include <QVBoxLayout>
 #include <QCheckBox>
@@ -248,20 +249,36 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
         m_pChannelDataView->setSignalColor(pChannelDataSettingsView->getSignalColor());
 
         // Quick control trigger detection settings
-        TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView(QString("MNESCAN/RTMSAW"), this);
+        auto triggers = std::make_shared<TriggerDetectionPanel>();
+        TriggerDetectionPanel::Callbacks triggerCallbacks;
+        triggerCallbacks.trigger_info_changed = [view = m_pChannelDataView](const std::map<double, std::string>& colors, bool active,
+                                                                            const std::string& channel, double threshold) {
+            if (view) {
+                std::map<double, QColor> qColors;
+                for (const auto& [type, color] : colors) {
+                    qColors[type] = QColor(QString::fromStdString(color.substr(0, 7)));
+                }
+                view->triggerInfoChanged(qColors, active, channel, threshold);
+            }
+        };
+        triggerCallbacks.reset_trigger_counter = [view = m_pChannelDataView] {
+            if (view) {
+                view->resetTriggerCounter();
+            }
+        };
+        triggers->set_callbacks(std::move(triggerCallbacks));
+        auto* pTriggerDetectionView = new PanelWidget(triggers, QString("MNESCAN/RTMSAW"), this);
         pTriggerDetectionView->setObjectName("group_tab_View_Triggers");
         lControlWidgets.append(pTriggerDetectionView);
 
-        connect(pTriggerDetectionView, &TriggerDetectionView::triggerInfoChanged,
-                m_pChannelDataView.data(), &RtFiffRawView::triggerInfoChanged);
-
-        connect(pTriggerDetectionView, &TriggerDetectionView::resetTriggerCounter,
-                m_pChannelDataView.data(), &RtFiffRawView::resetTriggerCounter);
-
         connect(m_pChannelDataView.data(), &RtFiffRawView::triggerDetected,
-                pTriggerDetectionView, &TriggerDetectionView::setNumberDetectedTriggersAndTypes);
+                pTriggerDetectionView, [triggers](int total, const std::map<int, std::vector<std::pair<int, double>>>& detected) {
+                    triggers->set_detected_triggers(total, detected);
+                });
 
-        pTriggerDetectionView->init(m_pFiffInfo);
+        if (m_pFiffInfo) {
+            triggers->init(*m_pFiffInfo);
+        }
 
         emit displayControlWidgetsChanged(lControlWidgets, sRTMSAWName);
 

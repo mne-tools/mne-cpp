@@ -51,11 +51,11 @@ class Communicator;
 namespace mne::viz
 {
 class AverageLayoutPanel;
+class AveragingPanel;
 }
 
 namespace mne::viz::qt
 {
-class AveragingSettingsView;
 class AverageSelectionView;
 class FiffRawViewSettings;
 class PanelWidget;
@@ -315,7 +315,7 @@ private:
     std::shared_ptr<mne::viz::AverageLayoutPanel> m_pAverageLayout; /**< The average layout plot. */
     QPointer<mne::viz::qt::PanelWidget> m_pAverageLayoutView;       /**< The average layout plot view. */
 
-    mne::viz::qt::AveragingSettingsView* m_pAveragingSettingsView; /**< Pointer to averaging settings GUI. */
+    std::shared_ptr<mne::viz::AveragingPanel> m_pAveragingPanel; /**< Averaging settings. */
 
     std::unique_ptr<mne::viz::qt::AverageSelectionView> m_pAverageSelectionView;   /**< Holds the average selection; not shown. */
     std::unique_ptr<mne::viz::qt::FiffRawViewSettings> m_pChannelDataSettingsView; /**< Holds the view settings; not shown. */

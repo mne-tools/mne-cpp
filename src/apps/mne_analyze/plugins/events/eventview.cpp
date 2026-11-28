@@ -25,7 +25,8 @@
 #include <mne/fiff/fiff.h>
 #include <mne/fiff/fiff_events.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <mne/viz/backends/qt/viewers/triggerdetectionview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/trigger_detection_panel.h>
 #include <mne/base/thread_pool.h>
 
 //=============================================================================================================
@@ -84,9 +85,9 @@ EventView::EventView(QWidget* parent)
     onDataChanged();
     createContextMenu();
 
-    m_pTriggerDetectView = std::make_shared<mne::viz::qt::TriggerDetectionView>("MNEANALYZE/EVENTS",
-                                                                                nullptr,
-                                                                                Qt::Window);
+    m_pTriggerDetectPanel = std::make_shared<mne::viz::TriggerDetectionPanel>();
+    m_pTriggerDetectView = std::make_shared<mne::viz::qt::PanelWidget>(m_pTriggerDetectPanel, QStringLiteral("MNEANALYZE/EVENTS"));
+    m_pTriggerDetectView->setWindowFlags(Qt::Window);
     m_pTriggerDetectView->setProcessingMode(mne::viz::qt::AbstractView::ProcessingMode::Offline);
     m_pTriggerDetectView->setWindowFlag(Qt::WindowStaysOnTopHint);
 }
@@ -169,8 +170,11 @@ void EventView::initGUIFunctionality()
     connect(m_pUi->m_pushButtonStim, &QPushButton::clicked,
             this, &EventView::onStimButtonClicked, Qt::UniqueConnection);
 
-    connect(m_pTriggerDetectView.get(), &mne::viz::qt::TriggerDetectionView::detectTriggers,
-            this, &EventView::onDetectTriggers, Qt::UniqueConnection);
+    mne::viz::TriggerDetectionPanel::Callbacks triggerCallbacks;
+    triggerCallbacks.detect_triggers = [this](const std::string& channel, double threshold) {
+        onDetectTriggers(channel, threshold);
+    };
+    m_pTriggerDetectPanel->set_callbacks(std::move(triggerCallbacks));
 
     m_pEventModel->setShowSelected(m_pUi->m_checkBox_showSelectedEventsOnly->isChecked());
 }
@@ -302,8 +306,7 @@ void EventView::disconnectFromModel()
                this, &EventView::customGroupContextMenuRequested);
     disconnect(m_pUi->m_pushButtonStim, &QPushButton::clicked,
                this, &EventView::onStimButtonClicked);
-    disconnect(m_pTriggerDetectView.get(), &mne::viz::qt::TriggerDetectionView::detectTriggers,
-               this, &EventView::onDetectTriggers);
+    m_pTriggerDetectPanel->set_callbacks({});
 }
 
 //=============================================================================================================
@@ -459,7 +462,9 @@ void EventView::onStimButtonClicked()
 
 void EventView::initTriggerDetect(const std::shared_ptr<mne::FiffInfo> info)
 {
-    m_pTriggerDetectView->init(info);
+    if (info) {
+        m_pTriggerDetectPanel->init(*info);
+    }
 }
 
 //=============================================================================================================

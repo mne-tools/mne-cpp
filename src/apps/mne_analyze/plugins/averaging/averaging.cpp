@@ -26,7 +26,7 @@
 #include <anShared/Model/averagingdatamodel.h>
 #include <mne/viz/backends/qt/viewers/helpers/channelinfomodel.h>
 #include <mne/viz/backends/qt/viewers/helpers/evokedsetmodel.h>
-#include <mne/viz/backends/qt/viewers/averagingsettingsview.h>
+#include <mne/viz/panels/averaging_panel.h>
 #include <mne/viz/backends/qt/viewers/modalityselectionview.h>
 #include <mne/viz/backends/qt/viewers/averageselectionview.h>
 #include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
@@ -77,7 +77,6 @@ Averaging::Averaging()
 , m_pTriggerList(nullptr)
 , m_pFiffInfo(nullptr)
 , m_pCommu(nullptr)
-, m_pAveragingSettingsView(nullptr)
 , m_fBaselineFromS(0)
 , m_fBaselineToS(0)
 , m_fPreStim(0)
@@ -188,41 +187,51 @@ QDockWidget* Averaging::getControl()
     m_pTabView = new QTabWidget(pWidget);
 
     //Average Settings View
-    m_pAveragingSettingsView = new mne::viz::qt::AveragingSettingsView(QString("MNEANALYZE/%1").arg(this->getName()), {}, m_pTabView);
+    m_pAveragingPanel = std::make_shared<mne::viz::AveragingPanel>();
+    mne::viz::AveragingPanel::Callbacks callbacks;
+    callbacks.num_averages_changed = [this](int value) {
+        onChangeNumAverages(value);
+    };
+    callbacks.baseline_from_changed = [this](int value) {
+        onChangeBaselineFrom(value);
+    };
+    callbacks.baseline_to_changed = [this](int value) {
+        onChangeBaselineTo(value);
+    };
+    callbacks.post_stim_changed = [this](int value) {
+        onChangePostStim(value);
+    };
+    callbacks.pre_stim_changed = [this](int value) {
+        onChangePreStim(value);
+    };
+    callbacks.baseline_active_changed = [this](bool active) {
+        onChangeBaselineActive(active);
+    };
+    callbacks.reset = [this] {
+        onResetAverage(false);
+    };
+    callbacks.compute = [this] {
+        onComputeButtonClicked(false);
+    };
+    callbacks.drop_rejected_changed = [this](bool drop) {
+        onRejectionChecked(drop);
+    };
+    callbacks.auto_compute_changed = [this](bool live) {
+        setAutoCompute(live);
+    };
+    m_pAveragingPanel->set_callbacks(std::move(callbacks));
+    auto* pAveragingSettingsView = new mne::viz::qt::PanelWidget(m_pAveragingPanel, QString("MNEANALYZE/%1").arg(this->getName()), m_pTabView);
 
-    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::changeNumAverages,
-            this, &Averaging::onChangeNumAverages, Qt::UniqueConnection);
-    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::changeBaselineFrom,
-            this, &Averaging::onChangeBaselineFrom, Qt::UniqueConnection);
-    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::changeBaselineTo,
-            this, &Averaging::onChangeBaselineTo, Qt::UniqueConnection);
-    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::changePostStim,
-            this, &Averaging::onChangePostStim, Qt::UniqueConnection);
-    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::changePreStim,
-            this, &Averaging::onChangePreStim, Qt::UniqueConnection);
-    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::changeBaselineActive,
-            this, &Averaging::onChangeBaselineActive, Qt::UniqueConnection);
-    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::resetAverage,
-            this, &Averaging::onResetAverage, Qt::UniqueConnection);
-    //    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::changeStimChannel,
-    //            this, &Averaging::onChangeStimChannel);
-    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::calculateAverage,
-            this, &Averaging::onComputeButtonClicked, Qt::UniqueConnection);
-    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::changeDropActive,
-            this, &Averaging::onRejectionChecked, Qt::UniqueConnection);
-    connect(m_pAveragingSettingsView, &mne::viz::qt::AveragingSettingsView::setAutoCompute,
-            this, &Averaging::setAutoCompute, Qt::UniqueConnection);
-
-    m_pAveragingSettingsView->setProcessingMode(mne::viz::qt::AbstractView::ProcessingMode::Offline);
-    m_pAveragingSettingsView->setSizePolicy(QSizePolicy::Expanding,
-                                            QSizePolicy::Fixed);
+    pAveragingSettingsView->setProcessingMode(mne::viz::qt::AbstractView::ProcessingMode::Offline);
+    pAveragingSettingsView->setSizePolicy(QSizePolicy::Expanding,
+                                          QSizePolicy::Fixed);
 
     pWidget->setSizePolicy(QSizePolicy::Expanding,
                            QSizePolicy::Preferred);
     m_pTabView->setSizePolicy(QSizePolicy::Expanding,
                               QSizePolicy::Preferred);
 
-    m_pTabView->addTab(m_pAveragingSettingsView, "Parameters");
+    m_pTabView->addTab(pAveragingSettingsView, "Parameters");
 
     m_pLayout->addWidget(m_pTabView);
     m_pLayout->addStretch();
@@ -566,13 +575,13 @@ void Averaging::loadFullGui(std::shared_ptr<mne::FiffInfo> pInfo)
     m_pTabView->addTab(pModalitySelectionView, "Modality");
 
     //Update saved params
-    m_fBaselineFromS = static_cast<float>(m_pAveragingSettingsView->getBaselineFromSeconds()) / 1000.f;
-    m_fBaselineToS = static_cast<float>(m_pAveragingSettingsView->getBaselineToSeconds()) / 1000.f;
+    m_fBaselineFromS = static_cast<float>(m_pAveragingPanel->baseline_from()) / 1000.f;
+    m_fBaselineToS = static_cast<float>(m_pAveragingPanel->baseline_to()) / 1000.f;
 
-    m_fPreStim = -(static_cast<float>(m_pAveragingSettingsView->getPreStimMSeconds()) / 1000.f);
-    m_fPostStim = static_cast<float>(m_pAveragingSettingsView->getPostStimMSeconds()) / 1000.f;
+    m_fPreStim = -(static_cast<float>(m_pAveragingPanel->pre_stim()) / 1000.f);
+    m_fPostStim = static_cast<float>(m_pAveragingPanel->post_stim()) / 1000.f;
 
-    m_bAutoRecompute = m_pAveragingSettingsView->getAutoComputeStatus();
+    m_bAutoRecompute = m_pAveragingPanel->auto_compute();
 
     m_bLoaded = true;
 }
