@@ -392,8 +392,8 @@
       "missing_tests": []
     },
     "viz": {
-      "classes": 162,
-      "tested": 153,
+      "classes": 165,
+      "tested": 156,
       "untested": [
         "ElectrodeObject",
         "GeometryInfo",
@@ -408,15 +408,13 @@
       "missing_tests": []
     },
     "viz_qt": {
-      "classes": 90,
+      "classes": 87,
       "tested": 44,
       "untested": [
         "AbstractTreeItem",
         "AbstractView",
         "ApplyToView",
-        "ArtifactSettingsView",
         "AverageSelectionView",
-        "AveragingSettingsView",
         "Bar",
         "BidsView",
         "BidsViewModel",
@@ -455,8 +453,7 @@
         "TFplot",
         "TimeRulerEventMark",
         "TimeRulerReferenceMark",
-        "TimeRulerWidget",
-        "TriggerDetectionView"
+        "TimeRulerWidget"
       ],
       "missing_tests": []
     },

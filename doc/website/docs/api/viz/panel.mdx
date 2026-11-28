@@ -38,8 +38,12 @@ compensators.save(settings, "ex_scene");
 
 ```mermaid
 classDiagram
+    Panel <|-- ArtifactPanel
+    click ArtifactPanel href "../../viz/artifact-panel/"
     Panel <|-- AverageLayoutPanel
     click AverageLayoutPanel href "../../viz/average-layout-panel/"
+    Panel <|-- AveragingPanel
+    click AveragingPanel href "../../viz/averaging-panel/"
     Panel <|-- ChannelSelectionPanel
     click ChannelSelectionPanel href "../../viz/channel-selection-panel/"
     Panel <|-- CompensatorPanel
@@ -60,6 +64,8 @@ classDiagram
     click SpharaPanel href "../../viz/sphara-panel/"
     Panel <|-- TimeFrequencyPanel
     click TimeFrequencyPanel href "../../viz/time-frequency-panel/"
+    Panel <|-- TriggerDetectionPanel
+    click TriggerDetectionPanel href "../../viz/trigger-detection-panel/"
 ```
 
 ---

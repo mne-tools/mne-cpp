@@ -775,7 +775,10 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz/sphara-panel',
         'api/viz/minimum-norm-panel',
         'api/viz/connectivity-panel',
-        'api/viz/time-frequency-panel'
+        'api/viz/time-frequency-panel',
+        'api/viz/trigger-detection-panel',
+        'api/viz/artifact-panel',
+        'api/viz/averaging-panel'
       ],
     },
     {
@@ -787,9 +790,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       items: [
         'api/viz-qt/abstract-view',
         'api/viz-qt/apply-to-view',
-        'api/viz-qt/artifact-settings-view',
         'api/viz-qt/average-selection-view',
-        'api/viz-qt/averaging-settings-view',
         'api/viz-qt/bar',
         'api/viz-qt/bids-view',
         'api/viz-qt/bids-view-model',
@@ -834,7 +835,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz-qt/spline',
         'api/viz-qt/t-fplot',
         'api/viz-qt/time-ruler-widget',
-        'api/viz-qt/trigger-detection-view',
         'api/viz-qt/multimodal-scene',
         'api/viz-qt/slice-object',
         'api/viz-qt/video-overlay',
