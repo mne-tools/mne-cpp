@@ -392,8 +392,8 @@
       "missing_tests": []
     },
     "viz": {
-      "classes": 168,
-      "tested": 159,
+      "classes": 172,
+      "tested": 163,
       "untested": [
         "ElectrodeObject",
         "GeometryInfo",
@@ -408,7 +408,7 @@
       "missing_tests": []
     },
     "viz_qt": {
-      "classes": 85,
+      "classes": 81,
       "tested": 44,
       "untested": [
         "AbstractTreeItem",
@@ -425,12 +425,9 @@
         "ChannelLabelPanel",
         "ColorMap",
         "Control3DView",
-        "CoregSettingsView",
-        "DipoleFitView",
         "DraggableFramelessWidget",
         "FiffRawViewSettings",
         "Graph",
-        "HpiSettingsView",
         "ImageSc",
         "LinePlot",
         "LiveMarker",
@@ -442,7 +439,6 @@
         "OverviewBarWidget",
         "Plot",
         "ProgressView",
-        "ProjectSettingsView",
         "QuickControlView",
         "ScaleControl",
         "ScalingView",
