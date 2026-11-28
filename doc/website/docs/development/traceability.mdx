@@ -8,7 +8,7 @@ sidebar_label: Traceability
 
 # Class-to-test traceability
 
-426 of 722 public classes name the test that covers them in [`doc/api_registry.json`](https://github.com/mne-tools/mne-cpp/blob/staging/doc/api_registry.json). CI checks that every named test exists and that no library's count falls below its floor in `scripts/compliance/traceability_policy.json`. Libraries in the acquisition, processing and file path are marked safety-relevant and come first.
+429 of 723 public classes name the test that covers them in [`doc/api_registry.json`](https://github.com/mne-tools/mne-cpp/blob/staging/doc/api_registry.json). CI checks that every named test exists and that no library's count falls below its floor in `scripts/compliance/traceability_policy.json`. Libraries in the acquisition, processing and file path are marked safety-relevant and come first.
 
 | Library | Safety-relevant | Classes | With a test | Share |
 |---|---|---:|---:|---:|
@@ -34,8 +34,8 @@ sidebar_label: Traceability
 | mri | no | 8 | 0 | 0 % |
 | pybridge | no | 4 | 4 | 100 % |
 | report | no | 1 | 1 | 100 % |
-| viz | no | 165 | 156 | 95 % |
-| viz_qt | no | 87 | 44 | 51 % |
+| viz | no | 168 | 159 | 95 % |
+| viz_qt | no | 85 | 44 | 52 % |
 | viz_sdl | no | 1 | 0 | 0 % |
 
 ## Classes without a named test
@@ -55,5 +55,5 @@ sidebar_label: Traceability
 - **mna**: `MnaFileRef`, `MnaGraph`, `MnaGraphExecutor`, `MnaIO`, `MnaNode`, `MnaOpRegistry`, `MnaOpSchema`, `MnaOpSchemaAttr`, `MnaOpSchemaPort`, `MnaParamBinding`, `MnaParamTree`, `MnaPort`, `MnaProject`, `MnaProvenance`, `MnaRecording`, `MnaRegistryLoader`, `MnaScript`, `MnaSession`, `MnaSubject`, `MnaVerification`, `MnaVerificationCheck`, `MnaVerificationResult`
 - **mri**: `MriCorFifIO`, `MriCorIO`, `MriMghIO`, `MriNiftiIO`, `MriSlice`, `MriSliceImage`, `MriSlicer`, `MriVolData`
 - **viz**: `ElectrodeObject`, `GeometryInfo`, `Interpolation`, `PickResult`, `RtSensorInterpolationMatWorker`, `RtSourceDataWorker`, `RtSourceInterpolationMatWorker`, `SceneLayer`, `VertexData`
-- **viz_qt**: `AbstractTreeItem`, `AbstractView`, `ApplyToView`, `AverageSelectionView`, `Bar`, `BidsView`, `BidsViewModel`, `ButterflyView`, `ChannelDataModel`, `ChannelDisplayInfo`, `ChannelInfoModel`, `ChannelLabelPanel`, `ColorMap`, `Control3DView`, `CoregSettingsView`, `DipoleFitView`, `DraggableFramelessWidget`, `FiffRawViewSettings`, `FilterDesignView`, `FilterSettingsView`, `Graph`, `HpiSettingsView`, `ImageSc`, `LinePlot`, `LiveMarker`, `MNEOperator`, `ModalitySelectionView`, `MultiView`, `MultiViewWindow`, `MultimodalScene`, `OverviewBarWidget`, `Plot`, `ProgressView`, `ProjectSettingsView`, `QuickControlView`, `ScaleControl`, `ScalingView`, `SensorTreeItem`, `Spline`, `TFplot`, `TimeRulerEventMark`, `TimeRulerReferenceMark`, `TimeRulerWidget`
+- **viz_qt**: `AbstractTreeItem`, `AbstractView`, `ApplyToView`, `AverageSelectionView`, `Bar`, `BidsView`, `BidsViewModel`, `ButterflyView`, `ChannelDataModel`, `ChannelDisplayInfo`, `ChannelInfoModel`, `ChannelLabelPanel`, `ColorMap`, `Control3DView`, `CoregSettingsView`, `DipoleFitView`, `DraggableFramelessWidget`, `FiffRawViewSettings`, `Graph`, `HpiSettingsView`, `ImageSc`, `LinePlot`, `LiveMarker`, `MNEOperator`, `ModalitySelectionView`, `MultiView`, `MultiViewWindow`, `MultimodalScene`, `OverviewBarWidget`, `Plot`, `ProgressView`, `ProjectSettingsView`, `QuickControlView`, `ScaleControl`, `ScalingView`, `SensorTreeItem`, `Spline`, `TFplot`, `TimeRulerEventMark`, `TimeRulerReferenceMark`, `TimeRulerWidget`
 - **viz_sdl**: `SdlHost`

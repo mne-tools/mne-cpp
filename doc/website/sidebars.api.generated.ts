@@ -778,7 +778,10 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz/time-frequency-panel',
         'api/viz/trigger-detection-panel',
         'api/viz/artifact-panel',
-        'api/viz/averaging-panel'
+        'api/viz/averaging-panel',
+        'api/viz/filter-design-panel',
+        'api/viz/filter-settings-panel',
+        'api/viz/filter-response-figure'
       ],
     },
     {
@@ -808,9 +811,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz-qt/draggable-frameless-widget',
         'api/viz-qt/evoked-set-model',
         'api/viz-qt/fiff-raw-view-settings',
-        'api/viz-qt/filter-design-view',
         'api/viz-qt/filter-plot',
-        'api/viz-qt/filter-settings-view',
         'api/viz-qt/graph',
         'api/viz-qt/hpi-settings-view',
         'api/viz-qt/image-sc',

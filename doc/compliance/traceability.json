@@ -392,8 +392,8 @@
       "missing_tests": []
     },
     "viz": {
-      "classes": 165,
-      "tested": 156,
+      "classes": 168,
+      "tested": 159,
       "untested": [
         "ElectrodeObject",
         "GeometryInfo",
@@ -408,7 +408,7 @@
       "missing_tests": []
     },
     "viz_qt": {
-      "classes": 87,
+      "classes": 85,
       "tested": 44,
       "untested": [
         "AbstractTreeItem",
@@ -429,8 +429,6 @@
         "DipoleFitView",
         "DraggableFramelessWidget",
         "FiffRawViewSettings",
-        "FilterDesignView",
-        "FilterSettingsView",
         "Graph",
         "HpiSettingsView",
         "ImageSc",
