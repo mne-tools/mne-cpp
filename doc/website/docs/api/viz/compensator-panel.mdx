@@ -180,7 +180,7 @@ ok &= expect(grade == 3 && compensators.selected() == 3, "a click on a compensat
 
 Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
 
-````cpp title="src/examples/ex_scene_sdl/main.cpp, line 179"
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 225"
     auto compensator = std::make_unique<CompensatorPanel>();
     std::vector<mne::FiffCtfComp> comps(3);
     for (int i = 0; i < 3; ++i) {

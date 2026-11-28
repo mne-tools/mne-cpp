@@ -766,7 +766,9 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz/sensor-layout-figure',
         'api/viz/average-layout-figure',
         'api/viz/average-layout-panel',
-        'api/viz/evoked-averages'
+        'api/viz/evoked-averages',
+        'api/viz/spectrum-figure',
+        'api/viz/spectrum-panel'
       ],
     },
     {
@@ -804,8 +806,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz-qt/filter-design-view',
         'api/viz-qt/filter-plot',
         'api/viz-qt/filter-settings-view',
-        'api/viz-qt/frequency-spectrum-delegate',
-        'api/viz-qt/frequency-spectrum-model',
         'api/viz-qt/graph',
         'api/viz-qt/hpi-settings-view',
         'api/viz-qt/image-sc',
@@ -829,7 +829,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz-qt/scaling-view',
         'api/viz-qt/selection-item',
         'api/viz-qt/spectrum-settings-view',
-        'api/viz-qt/spectrum-view',
         'api/viz-qt/sphara-settings-view',
         'api/viz-qt/spline',
         'api/viz-qt/t-fplot',

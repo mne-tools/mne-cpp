@@ -18,9 +18,9 @@ Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer
 
 The same TraceView, TraceBuffer and TraceFrameBuilder that drive the raw browser of mne_disp run in an SDL3 window. Every frame is executed by the software backend of the GPU frame description and shown as an SDL texture; SDL mouse, wheel and key events are translated to scene input events, so wheel zoom, drag scrolling with inertia, the ruler (right button) and the crosshair (c) work as in the Qt host. A synthetic 32-channel recording streams in at 1 kHz and the view follows its end until the user scrolls.
 
-With --panel the window shows a tool panel instead (projectors, the default, or compensator) through FormView, which draws and edits any SettingsForm without Qt and without a view written for the panel. The average panel shows its figure, synthetic averages at their sensor positions, through FigureView, which zooms, pans and passes clicks to any SceneFigure.
+With --panel the window shows a tool panel instead (projectors, the default, or compensator) through FormView, which draws and edits any SettingsForm without Qt and without a view written for the panel. The average and spectrum panels show their figures, synthetic averages at their sensor positions or synthetic spectra, through FigureView, which zooms, pans or scrolls and passes the pointer to any SceneFigure.
 
-Usage: ex_scene_sdl [--panel [projectors&#124;compensator&#124;average]] [--frames N]; with --frames the example renders N frames and exits (SDL_VIDEODRIVER=dummy runs it without a display).
+Usage: ex_scene_sdl [--panel [projectors&#124;compensator&#124;average&#124;spectrum]] [--frames N]; with --frames the example renders N frames and exits (SDL_VIDEODRIVER=dummy runs it without a display).
 
 ## Build and run
 
@@ -38,11 +38,11 @@ The documented classes this example uses most:
 | [`SdlHost`](../../api/viz-sdl/sdl-host.mdx) | Visualization (SDL) |
 | [`Color`](../../api/viz/color.mdx) | Visualization |
 | [`FiffProj`](../../api/fiff/fiff-proj.mdx) | FIFF I/O |
+| [`TextMetrics`](../../api/viz/text-metrics.mdx) | Visualization |
 | [`TraceBuffer`](../../api/viz/trace-buffer.mdx) | Visualization |
 | [`AverageLayoutFigure`](../../api/viz/average-layout-figure.mdx) | Visualization |
-| [`TextMetrics`](../../api/viz/text-metrics.mdx) | Visualization |
-| [`TraceView`](../../api/viz/trace-view.mdx) | Visualization |
-| [`AverageLayoutPanel`](../../api/viz/average-layout-panel.mdx) | Visualization |
+| [`FiffChInfo`](../../api/fiff/fiff-ch-info.mdx) | FIFF I/O |
+| [`FiffInfo`](../../api/fiff/fiff-info.mdx) | FIFF I/O |
 
 ## Used in the API reference
 
@@ -59,6 +59,9 @@ The documented classes this example uses most:
 - [KeyEvent](../../api/viz/key-event.mdx)
 - [Panel](../../api/viz/panel.mdx)
 - [ProjectorsPanel](../../api/viz/projectors-panel.mdx)
+- [SpectrumFigure](../../api/viz/spectrum-figure.mdx)
+- [SpectrumPanel](../../api/viz/spectrum-panel.mdx)
+- [SpectrumTable](../../api/viz/spectrum-table.mdx)
 - [TextMetrics](../../api/viz/text-metrics.mdx)
 - [TraceBuffer](../../api/viz/trace-buffer.mdx)
 - [TraceViewClient](../../api/viz/trace-view-client.mdx)
@@ -88,11 +91,11 @@ The documented classes this example uses most:
  * at 1 kHz and the view follows its end until the user scrolls.
  *
  * With --panel the window shows a tool panel instead (projectors, the default, or compensator) through FormView,
- * which draws and edits any SettingsForm without Qt and without a view written for the panel. The average panel
- * shows its figure, synthetic averages at their sensor positions, through FigureView, which zooms, pans and
- * passes clicks to any SceneFigure.
+ * which draws and edits any SettingsForm without Qt and without a view written for the panel. The average and
+ * spectrum panels show their figures, synthetic averages at their sensor positions or synthetic spectra, through
+ * FigureView, which zooms, pans or scrolls and passes the pointer to any SceneFigure.
  *
- * Usage: ex_scene_sdl [--panel [projectors|compensator|average]] [--frames N]; with --frames the example renders N frames
+ * Usage: ex_scene_sdl [--panel [projectors|compensator|average|spectrum]] [--frames N]; with --frames the example renders N frames
  * and exits (SDL_VIDEODRIVER=dummy runs it without a display).
  */
 
@@ -111,6 +114,7 @@ The documented classes this example uses most:
 #include <mne/viz/panels/figure_view.h>
 #include <mne/viz/panels/form_view.h>
 #include <mne/viz/panels/projectors_panel.h>
+#include <mne/viz/panels/spectrum_panel.h>
 #include <mne/viz/views/trace_buffer.h>
 
 #include <SDL3/SDL_version.h>
@@ -232,10 +236,52 @@ int run_average_layout(sdl::SdlHost& host, const TextMetrics& metrics)
 
 //=============================================================================================================
 /**
+ * Shows the spectra of eight synthetic channels with an alpha peak through FigureView: the wheel scrolls the rows,
+ * the pointer reads out a bin and a double click freezes the spectra.
+ *
+ * @param[in] host      The window.
+ * @param[in] metrics   Metrics of the fonts the host draws with.
+ *
+ * @return The number of frames drawn.
+ */
+int run_spectrum(sdl::SdlHost& host, const TextMetrics& metrics)
+{
+    constexpr int kSpectrumChannels = 8;
+    constexpr int kBins = 256;
+    //! [spectrum_panel_usage]
+    auto info = std::make_shared<mne::FiffInfo>();
+    info->sfreq = kSfreq;
+    Eigen::MatrixXd spectra(kSpectrumChannels, kBins);
+    for (int i = 0; i < kSpectrumChannels; ++i) {
+        mne::FiffChInfo channel;
+        channel.ch_name = "EEG " + std::to_string(i + 1);
+        info->chs.push_back(channel);
+        info->ch_names.push_back(channel.ch_name);
+        // 1/f background in dB with an alpha peak that grows towards the back of the head
+        for (int bin = 0; bin < kBins; ++bin) {
+            const double frequency = bin * (kSfreq / 2.0) / (kBins - 1);
+            spectra(i, bin) = -10.0 * std::log10(frequency + 1.0) + (1.0 + i) * std::exp(-std::pow((frequency - 10.0) / 1.5, 2));
+        }
+    }
+    info->nchan = kSpectrumChannels;
+
+    SpectrumPanel panel;
+    panel.init(info, SpectrumTable::Scale::Linear);
+    panel.add_data(spectra);
+    panel.set_boundaries(1.0f, 60.0f);
+
+    FigureView view(*panel.figure());
+    view.set_text_metrics(&metrics);
+    return host.run(view);
+    //! [spectrum_panel_usage]
+}
+
+//=============================================================================================================
+/**
  * Shows a tool panel through FormView, the toolkit-free view of any SettingsForm, without a view of its own.
  *
  * @param[in] host      The window.
- * @param[in] which     "projectors", "compensator" or "average".
+ * @param[in] which     "projectors", "compensator", "average" or "spectrum".
  * @param[in] metrics   Metrics of the fonts the host draws with.
  *
  * @return The number of frames drawn.
@@ -244,6 +290,9 @@ int run_panel(sdl::SdlHost& host, const std::string& which, const TextMetrics& m
 {
     if (which == "average") {
         return run_average_layout(host, metrics);
+    }
+    if (which == "spectrum") {
+        return run_spectrum(host, metrics);
     }
     //! [form_view_usage]
     std::unique_ptr<Panel> panel;

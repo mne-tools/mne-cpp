@@ -10652,7 +10652,9 @@
         "EvokedAverages",
         "FigureView",
         "SceneFigure",
-        "SensorLayoutFigure"
+        "SensorLayoutFigure",
+        "SpectrumFigure",
+        "SpectrumPanel"
       ]
     },
     {

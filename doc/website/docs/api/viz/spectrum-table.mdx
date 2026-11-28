@@ -218,7 +218,20 @@ Cuts the frequency axis to a band and renormalises it to [0, 1] over the band.
 
 ## Example
 
-No example of its own: View model of the spectrum viewer; adapted by viz::qt::FrequencySpectrumModel and exercised by test_viz_viewmodels, it has no standalone use without a view.
+No example of its own: View model of the spectrum viewer; drawn by SpectrumFigure, whose panel example shows it, and exercised by test_viz_viewmodels.
+
+## Used in examples
+
+### [ex_scene_sdl](../../examples/viz/ex_scene_sdl.mdx)
+
+Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 193"
+SpectrumPanel panel;
+panel.init(info, SpectrumTable::Scale::Linear);
+panel.add_data(spectra);
+panel.set_boundaries(1.0f, 60.0f);
+````
 
 ## Authors of this file
 
