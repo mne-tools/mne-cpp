@@ -332,13 +332,14 @@ void TestVizQtChannelWindow::renderer_animatesWithoutFrames()
     QSignalSpy zoomed(&renderer, &ChannelRhiRenderer::samplesPerPixelChanged);
     const int requests = host.frameRequests;
 
-    renderer.scrollTo(600.f, 80);
-    QTRY_COMPARE_WITH_TIMEOUT(renderer.scrollSample(), 600.f, 2000);
+    // Long enough for several timer steps on a busy machine, where an 80 ms animation may finish in one step
+    renderer.scrollTo(600.f, 500);
+    QTRY_COMPARE_WITH_TIMEOUT(renderer.scrollSample(), 600.f, 5000);
     QVERIFY(scrolled.count() > 1);
     QVERIFY(host.frameRequests > requests + 1);
 
-    renderer.zoomTo(2.f, 80);
-    QTRY_COMPARE_WITH_TIMEOUT(renderer.samplesPerPixel(), 2.f, 2000);
+    renderer.zoomTo(2.f, 500);
+    QTRY_COMPARE_WITH_TIMEOUT(renderer.samplesPerPixel(), 2.f, 5000);
     QVERIFY(zoomed.count() > 1);
 }
 
