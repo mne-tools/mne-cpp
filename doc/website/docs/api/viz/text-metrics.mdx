@@ -146,20 +146,20 @@ classDiagram
 
 Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
 
-````cpp title="src/examples/ex_scene_sdl/main.cpp, line 99"
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 106"
  *
  * @return The number of frames drawn.
  */
-int run_panel(sdl::SdlHost& host, const std::string& which, const TextMetrics& metrics)
+int run_average_layout(sdl::SdlHost& host, const TextMetrics& metrics)
 {
-    std::unique_ptr<Panel> panel;
-    if (which == "compensator") {
-        auto compensator = std::make_unique<CompensatorPanel>();
-        std::vector<mne::FiffCtfComp> comps(3);
-        for (int i = 0; i < 3; ++i) {
-            comps[static_cast<std::size_t>(i)].kind = i + 1;
-        }
-        compensator->set_compensators(comps);
+    constexpr int kSensors = 16;
+    constexpr int kSamples = 300;
+    constexpr int kPreStimulus = 100;
+    // An N100-like deflection that grows towards the back of the grid, and a later positive wave
+    auto info = std::make_shared<mne::FiffInfo>();
+    Eigen::MatrixXd auditory = Eigen::MatrixXd::Zero(kSensors, kSamples);
+    std::vector<AverageLayoutFigure::Channel> selection;
+    for (int i = 0; i < kSensors; ++i) {
 ````
 
 ## Authors of this file

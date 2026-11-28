@@ -86,20 +86,17 @@ ok &= expect(static_cast<int>(marker->vertexCount()) == MeshFactory::sphereVerte
 
 Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
 
-````cpp title="src/examples/ex_scene_sdl/main.cpp, line 188"
-    TraceBuffer::ChannelSpec spec;
-    spec.name = "EEG " + std::to_string(ch + 1);
-    spec.type_label = "EEG";
-    spec.color = Color{170, 55, 10};
-    spec.default_scale = 40e-6f;
-    spec.bad = ch == 5;
-    specs.push_back(std::move(spec));
-}
-buffer.set_channels(std::move(specs));
-buffer.set_sample_rate(static_cast<float>(kSfreq));
-buffer.set_capacity(60 * static_cast<int>(kSfreq));
-int recorded = 4 * static_cast<int>(kSfreq);
-buffer.set_data(synthetic_block(0, recorded), 0);
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 143"
+panel.set_info(info);
+panel.set_selection(std::move(selection));
+panel.set_scale_map({{FIFFV_EEG_CH, 1e-5f}});
+panel.set_average_colors({{"auditory", Color{31, 111, 235}}});
+EvokedAverages evoked;
+evoked.averages = {{"auditory", auditory.data(), kSamples, kSensors}};
+evoked.first_sample = -kPreStimulus;
+evoked.bad.assign(kSensors, false);
+evoked.bad[5] = true;
+panel.set_evoked(std::move(evoked));
 ````
 
 ## Authors of this file

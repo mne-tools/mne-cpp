@@ -21,6 +21,8 @@ The view's side: what a host drives.
 
 ```mermaid
 classDiagram
+    SurfaceClient <|-- FigureView
+    click FigureView href "../../viz/figure-view/"
     SurfaceClient <|-- FormView
     click FormView href "../../viz/form-view/"
     SurfaceClient <|-- TraceViewClient

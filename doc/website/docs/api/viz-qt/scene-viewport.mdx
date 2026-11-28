@@ -7,7 +7,7 @@ sidebar_position: 118
 
 # SceneViewport
 
-**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/viewers/helpers/sceneviewport.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/viewers/helpers/sceneviewport.h)
+**Namespace:** `mne::viz::qt` &nbsp;·&nbsp; **Library:** Visualization: Qt Backend &nbsp;·&nbsp; **Source:** [`viz/backends/qt/kit/sceneviewport.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/backends/qt/kit/sceneviewport.h)
 
 `#include <mne/viz/backends/qt/sceneviewport.h>`
 
@@ -15,19 +15,13 @@ sidebar_position: 118
 class mne::viz::qt::SceneViewport
 ```
 
-Base of the widgets that show a scene model, such as a sensor layout, with zoom, pan and rubber band.
-
-Subclasses report the area of their contents in `sceneBounds()`, draw them in `drawScene()` and react to clicks and bands in `scenePressed()` and `sceneBandSelected()`.
+Shows a [`SceneFigure`](/docs/api/viz/scene-figure), such as a sensor or average layout, through a [`FigureView`](/docs/api/viz/figure-view).
 
 ### Inheritance
 
 ```mermaid
 classDiagram
     QWidget <|-- SceneViewport
-    SceneViewport <|-- AverageLayoutWidget
-    click AverageLayoutWidget href "../../viz-qt/average-layout-widget/"
-    SceneViewport <|-- SensorLayoutWidget
-    click SensorLayoutWidget href "../../viz-qt/sensor-layout-widget/"
 ```
 
 ---
@@ -36,12 +30,66 @@ classDiagram
 
 ### SceneViewport(parent)
 
-Constructs an empty viewport with a white background.
+Constructs a viewport without a figure on a white background.
 
 **Parameters:**
 
 - **parent** : *QWidget **
   Parent widget.
+
+---
+
+### SceneViewport(figure, parent)
+
+Constructs a viewport that shows `figure`.
+
+**Parameters:**
+
+- **figure** : *std::shared_ptr&lt; [SceneFigure](/docs/api/viz/scene-figure) &gt;*
+  The figure; the viewport shares its ownership.
+
+- **parent** : *QWidget **
+  Parent widget.
+
+---
+
+### ~SceneViewport()
+
+---
+
+### setFigure(figure)
+
+Shows `figure`, fitted.
+
+**Parameters:**
+
+- **figure** : *std::shared_ptr&lt; [SceneFigure](/docs/api/viz/scene-figure) &gt;*
+  The figure, or null to show only the background; the viewport shares its ownership.
+
+---
+
+### figure()
+
+**Returns:**
+
+- *[SceneFigure](/docs/api/viz/scene-figure) ** — The figure shown, or null.
+
+---
+
+### figureView()
+
+**Returns:**
+
+- *[FigureView](/docs/api/viz/figure-view) ** — The navigation of the figure, or null without a figure.
+
+---
+
+### setTheme(theme)
+
+**Parameters:**
+
+- **theme** : *const [Theme](/docs/api/viz/theme) &*
+  Colours of the rubber band.
 
 ---
 
@@ -135,16 +183,16 @@ Moves the contents.
 
 ---
 
-### figure(size)
+### picture(size)
 
-The contents fitted into a figure, e.g.
+The contents fitted into a picture, e.g.
 
 to export them with `viz::write_svg()`.
 
 **Parameters:**
 
 - **size** : *const QSize &*
-  Size of the figure in pixels.
+  Size of the picture in pixels.
 
 **Returns:**
 
@@ -154,7 +202,7 @@ to export them with `viz::write_svg()`.
 
 ## Example
 
-No example of its own: Abstract base of SensorLayoutWidget and AverageLayoutWidget; its zoom, pan and rubber band are tested through them in test_viz_qt_viewers2.
+No example of its own: Qt host of any viz::SceneFigure, shown inside PanelWidget, ChannelSelectionView and mne_browse; its navigation is FigureView, whose example shows it, and it is exercised by test_viz_qt_viewers2.
 
 ## Authors of this file
 

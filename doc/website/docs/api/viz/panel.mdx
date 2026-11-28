@@ -15,7 +15,7 @@ sidebar_position: 150
 class mne::viz::Panel
 ```
 
-Base of the toolkit-free tool panels: a title, a settings form, modes and persistence.
+Base of the toolkit-free tool panels: a title, a settings form, an optional figure, modes and persistence.
 
 ```cpp title="src/examples/ex_scene/main.cpp"
 // A tool panel holds its state and rules once; every backend shows it with one generic host
@@ -38,6 +38,8 @@ compensators.save(settings, "ex_scene");
 
 ```mermaid
 classDiagram
+    Panel <|-- AverageLayoutPanel
+    click AverageLayoutPanel href "../../viz/average-layout-panel/"
     Panel <|-- CompensatorPanel
     click CompensatorPanel href "../../viz/compensator-panel/"
     Panel <|-- ForwardPanel
@@ -160,6 +162,14 @@ Sets how the data arrive; panels hide or show options.
 
 ---
 
+### figure()
+
+**Returns:**
+
+- *const std::shared_ptr&lt; [SceneFigure](/docs/api/viz/scene-figure) &gt; &* — The interactive figure that hosts show below the form, or null for panels with only a form.
+
+---
+
 ### load(store, path)
 
 Restores the panel from `store`.
@@ -202,7 +212,7 @@ Stores the panel in `store`, under the keys `load()` reads.
 
 Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
 
-````cpp title="src/examples/ex_scene_sdl/main.cpp, line 105"
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 177"
 std::unique_ptr<Panel> panel;
 if (which == "compensator") {
     auto compensator = std::make_unique<CompensatorPanel>();

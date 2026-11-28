@@ -1821,7 +1821,8 @@
       "library": "viz",
       "libraries": [
         "viz_sdl",
-        "viz"
+        "viz",
+        "fiff"
       ],
       "tasks": [
         "visualization",

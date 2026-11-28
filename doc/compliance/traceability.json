@@ -392,8 +392,8 @@
       "missing_tests": []
     },
     "viz": {
-      "classes": 147,
-      "tested": 138,
+      "classes": 153,
+      "tested": 144,
       "untested": [
         "ElectrodeObject",
         "GeometryInfo",
@@ -408,14 +408,13 @@
       "missing_tests": []
     },
     "viz_qt": {
-      "classes": 102,
+      "classes": 99,
       "tested": 43,
       "untested": [
         "AbstractTreeItem",
         "AbstractView",
         "ApplyToView",
         "ArtifactSettingsView",
-        "AverageLayoutView",
         "AverageSelectionView",
         "AveragingSettingsView",
         "Bar",
@@ -434,7 +433,6 @@
         "CovarianceSettingsView",
         "DipoleFitView",
         "DraggableFramelessWidget",
-        "EvokedSetModel",
         "FiffRawViewSettings",
         "FilterDesignView",
         "FilterSettingsView",
@@ -458,7 +456,6 @@
         "QuickControlView",
         "ScaleControl",
         "ScalingView",
-        "SelectionItem",
         "SensorTreeItem",
         "SpectrumSettingsView",
         "SpectrumView",

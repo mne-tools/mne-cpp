@@ -244,6 +244,27 @@ ok &= expect(eventsWritten && eventsBack.rows() == 25 && eventsBack(0, 0) == 139
              "FiffEvents/FiffProj: event file round trip and SSP projector like mne.find_events / make_projector");
 ````
 
+### [ex_scene_sdl](../../examples/viz/ex_scene_sdl.mdx)
+
+Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 190"
+auto projectors = std::make_unique<ProjectorsPanel>();
+std::vector<mne::FiffProj> projs(4);
+const char* descriptions[] = {"Average EEG reference", "PCA-v1 (planar)", "PCA-v2 (axial)", "ECG-planar-999--0.200-0.400-PCA-01"};
+for (std::size_t i = 0; i < projs.size(); ++i) {
+    projs[i].desc = descriptions[i];
+    projs[i].active = i != 2;
+}
+projectors->set_projectors(projs);
+projectors->set_selection_callback([](const std::vector<mne::FiffProj>& selected) {
+    std::printf("Projectors:");
+    for (const mne::FiffProj& proj : selected) {
+        std::printf(" %d", proj.active ? 1 : 0);
+    }
+    std::printf("\n");
+````
+
 ## Authors of this file
 
 - Matti Hamalainen &lt;msh@nmr.mgh.harvard.edu&gt;

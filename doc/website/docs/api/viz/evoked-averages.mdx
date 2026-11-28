@@ -1,0 +1,94 @@
+---
+id: evoked-averages
+title: "mne::viz::EvokedAverages"
+sidebar_label: EvokedAverages
+sidebar_position: 169
+---
+
+# EvokedAverages
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/panels/average_layout_panel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/panels/average_layout_panel.h)
+
+`#include <mne/viz/average_layout_panel.h>`
+
+```cpp
+struct mne::viz::EvokedAverages
+```
+
+The averages of an evoked set: per average the values of the first channel in a column-major channels x samples matrix, the other channels following at the channel count.
+
+```cpp title="src/examples/ex_scene_sdl/main.cpp"
+// An N100-like deflection that grows towards the back of the grid, and a later positive wave
+auto info = std::make_shared<mne::FiffInfo>();
+Eigen::MatrixXd auditory = Eigen::MatrixXd::Zero(kSensors, kSamples);
+std::vector<AverageLayoutFigure::Channel> selection;
+for (int i = 0; i < kSensors; ++i) {
+    const int row = i / 4;
+    const int column = i % 4;
+    mne::FiffChInfo channel;
+    channel.ch_name = "EEG " + std::to_string(i + 1);
+    channel.kind = FIFFV_EEG_CH;
+    channel.unit = FIFF_UNIT_V;
+    info->chs.push_back(channel);
+    info->ch_names.push_back(channel.ch_name);
+    for (int s = kPreStimulus; s < kSamples; ++s) {
+        const double t = (s - kPreStimulus) / kSfreq;
+        const double n100 = -std::exp(-std::pow((t - 0.1) / 0.02, 2));
+        const double p300 = 0.6 * std::exp(-std::pow((t - 0.3) / 0.05, 2));
+        auditory(i, s) = (n100 * (1.0 + row) + p300) * 5e-6;
+    }
+    AverageLayoutFigure::Channel tile;
+    tile.name = channel.ch_name;
+    tile.number = i;
+    tile.position = {1.6 * column, -1.2 * row};
+    selection.push_back(std::move(tile));
+}
+info->nchan = kSensors;
+
+AverageLayoutPanel panel;
+panel.set_info(info);
+panel.set_selection(std::move(selection));
+panel.set_scale_map({{FIFFV_EEG_CH, 1e-5f}});
+panel.set_average_colors({{"auditory", Color{31, 111, 235}}});
+EvokedAverages evoked;
+evoked.averages = {{"auditory", auditory.data(), kSamples, kSensors}};
+evoked.first_sample = -kPreStimulus;
+evoked.bad.assign(kSensors, false);
+evoked.bad[5] = true;
+panel.set_evoked(std::move(evoked));
+
+// Any panel's figure, without a view written for it
+FigureView view(*panel.figure());
+view.set_text_metrics(&metrics);
+return host.run(view);
+```
+
+---
+
+## Example
+
+- Start here: [ex_scene_sdl](../../examples/viz/ex_scene_sdl.mdx) — Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+- Full source: [`src/examples/ex_scene_sdl/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_scene_sdl/main.cpp)
+- Build target: `ex_scene_sdl` (runs under CTest)
+
+## Used in examples
+
+### [ex_scene_sdl](../../examples/viz/ex_scene_sdl.mdx)
+
+Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 144"
+panel.set_selection(std::move(selection));
+panel.set_scale_map({{FIFFV_EEG_CH, 1e-5f}});
+panel.set_average_colors({{"auditory", Color{31, 111, 235}}});
+EvokedAverages evoked;
+evoked.averages = {{"auditory", auditory.data(), kSamples, kSensors}};
+evoked.first_sample = -kPreStimulus;
+evoked.bad.assign(kSensors, false);
+evoked.bad[5] = true;
+panel.set_evoked(std::move(evoked));
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

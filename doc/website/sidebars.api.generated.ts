@@ -760,7 +760,13 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz/system-fonts',
         'api/viz/system-font-info',
         'api/viz/placed-glyph',
-        'api/viz/glyph-run'
+        'api/viz/glyph-run',
+        'api/viz/scene-figure',
+        'api/viz/figure-view',
+        'api/viz/sensor-layout-figure',
+        'api/viz/average-layout-figure',
+        'api/viz/average-layout-panel',
+        'api/viz/evoked-averages'
       ],
     },
     {
@@ -773,7 +779,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz-qt/abstract-view',
         'api/viz-qt/apply-to-view',
         'api/viz-qt/artifact-settings-view',
-        'api/viz-qt/average-layout-view',
         'api/viz-qt/average-selection-view',
         'api/viz-qt/averaging-settings-view',
         'api/viz-qt/bar',
@@ -861,8 +866,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz-qt/surface-tree-item',
         'api/viz-qt/qt-text-metrics',
         'api/viz-qt/scene-viewport',
-        'api/viz-qt/sensor-layout-widget',
-        'api/viz-qt/average-layout-widget',
         'api/viz-qt/channel-rhi-renderer',
         'api/viz-qt/channel-rhi-host',
         'api/viz-qt/channel-window',

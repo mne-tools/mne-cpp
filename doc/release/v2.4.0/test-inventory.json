@@ -6,9 +6,9 @@
     "commit": "0800c9a1bf606c2df8c44e35fbb42ea13029b549"
   },
   "summary": {
-    "directories": 302,
+    "directories": 303,
     "registration": {
-      "unconditional": 289,
+      "unconditional": 290,
       "conditional": 10,
       "unregistered": 3
     },
@@ -73,6 +73,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_figure_view",
           "test_viz_fonts",
           "test_viz_form_view",
           "test_viz_gpu_frame",
@@ -200,6 +201,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_figure_view",
           "test_viz_fonts",
           "test_viz_form_view",
           "test_viz_gpu_frame",
@@ -327,6 +329,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_figure_view",
           "test_viz_fonts",
           "test_viz_form_view",
           "test_viz_gpu_frame",
@@ -454,6 +457,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_figure_view",
           "test_viz_fonts",
           "test_viz_form_view",
           "test_viz_gpu_frame",
@@ -581,6 +585,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_figure_view",
           "test_viz_fonts",
           "test_viz_form_view",
           "test_viz_gpu_frame",
@@ -708,6 +713,7 @@
           "test_rtserver_commands",
           "test_rtserver_observer_pattern",
           "test_viz_brain_view",
+          "test_viz_figure_view",
           "test_viz_fonts",
           "test_viz_form_view",
           "test_viz_gpu_frame",
@@ -10611,6 +10617,45 @@
       ]
     },
     {
+      "name": "test_viz_figure_view",
+      "cmake": "src/tests/test_viz_figure_view/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_viz_figure_view"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "AverageLayoutFigure",
+        "AverageLayoutPanel",
+        "EvokedAverages",
+        "FigureView",
+        "SceneFigure",
+        "SensorLayoutFigure"
+      ]
+    },
+    {
       "name": "test_viz_fonts",
       "cmake": "src/tests/test_viz_fonts/CMakeLists.txt",
       "registration": {
@@ -11123,15 +11168,15 @@
         "windows-2025-vs2026-qt-min": "absent"
       },
       "registry_classes": [
-        "AverageLayoutWidget",
         "ChannelDataView",
         "ChannelRhiView",
+        "EvokedSetModel",
         "FilterPlot",
         "RtFiffRawView",
         "RtFiffRawViewDelegate",
         "RtFiffRawViewModel",
         "SceneViewport",
-        "SensorLayoutWidget"
+        "SelectionItem"
       ]
     },
     {

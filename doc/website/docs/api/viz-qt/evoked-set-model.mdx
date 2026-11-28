@@ -17,7 +17,7 @@ class mne::viz::qt::EvokedSetModel
 
 QAbstractTableModel wrapping a [`FiffEvokedSet`](/docs/api/fiff/fiff-evoked-set) (one row per channel, one column per condition).
 
-Propagates baseline-correction, SSP-projection and bad-channel updates so connected views ([`ButterflyView`](/docs/api/viz-qt/butterfly-view), [`AverageLayoutView`](/docs/api/viz-qt/average-layout-view)) stay in sync with the latest pre-processing settings.
+Propagates baseline-correction, SSP-projection and bad-channel updates so connected views ([`ButterflyView`](/docs/api/viz-qt/butterfly-view), [`AverageLayoutPanel`](/docs/api/viz/average-layout-panel)) stay in sync with the latest pre-processing settings.
 
 ### Inheritance
 
@@ -331,6 +331,16 @@ Returns the number of pre-stimulus samples.
 **Returns:**
 
 - *qint32* — the number of pre-stimulus samples.
+
+---
+
+### evokedAverages()
+
+The averages as an average layout shows them: the shown data of each average (frozen while frozen), the first sample relative to the stimulus and the bad channels.
+
+**Returns:**
+
+- *[EvokedAverages](/docs/api/viz/evoked-averages)* — The averages; their data stay valid until the model's data change.
 
 ---
 

@@ -15,7 +15,7 @@ sidebar_position: 18
 class mne::viz::qt::PanelWidget
 ```
 
-The Qt host of every [`Panel`](/docs/api/viz/panel): its form as a [`SettingsPanel`](/docs/api/viz-qt/settings-panel), its title, width, modes and settings.
+The Qt host of every [`Panel`](/docs/api/viz/panel): its form as a [`SettingsPanel`](/docs/api/viz-qt/settings-panel), its figure in a [`SceneViewport`](/docs/api/viz-qt/scene-viewport), its title, width, modes and settings.
 
 The widget shares the panel with its owner. It restores the panel from QSettings("MNECPP") under the settings path when it is created and stores it when it is destroyed.
 
@@ -65,6 +65,14 @@ Shows a panel.
 **Returns:**
 
 - *[SettingsPanel](/docs/api/viz-qt/settings-panel) ** — The widgets of the panel's form.
+
+---
+
+### figureViewport()
+
+**Returns:**
+
+- *[SceneViewport](/docs/api/viz-qt/scene-viewport) ** — The viewport of the panel's figure, or null for panels without a figure.
 
 ---
 

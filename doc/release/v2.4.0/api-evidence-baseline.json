@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 549,
-    "exported_free_functions": 258,
-    "registered_classes": 719,
+    "exported_classes": 551,
+    "exported_free_functions": 260,
+    "registered_classes": 722,
     "exported_not_registered": 2,
     "registered_function_modules": 15,
-    "registered_header_only": 157,
+    "registered_header_only": 158,
     "registered_stale": 0,
-    "registered_with_test": 407,
+    "registered_with_test": 413,
     "registered_test_unresolved": 0,
-    "registered_with_example": 477,
+    "registered_with_example": 480,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 102,
     "registered_without_api_page": 0,
-    "with_snippet": 524,
-    "public_api_units": 721,
-    "example_eligible": 477,
+    "with_snippet": 527,
+    "public_api_units": 724,
+    "example_eligible": 480,
     "example_exempt": 244,
-    "eligible_backed_by_registry_example": 475,
-    "eligible_used_by_some_example": 403,
+    "eligible_backed_by_registry_example": 478,
+    "eligible_used_by_some_example": 406,
     "examples_on_disk": 82,
     "examples_built": 82
   },
@@ -225,13 +225,13 @@
       "with_snippet": 12
     },
     "viz": {
-      "public": 250,
-      "registered": 250,
-      "with_test": 181,
-      "eligible": 66,
-      "eligible_with_registry_example": 66,
-      "eligible_used_by_example": 51,
-      "with_snippet": 82
+      "public": 253,
+      "registered": 253,
+      "with_test": 187,
+      "eligible": 69,
+      "eligible_with_registry_example": 69,
+      "eligible_used_by_example": 54,
+      "with_snippet": 85
     }
   },
   "exported_free_functions": [
@@ -1353,6 +1353,16 @@
     {
       "name": "mneAnalyzeColor",
       "header": "viz/brain/viewstate.h",
+      "library": "viz"
+    },
+    {
+      "name": "default_channel_scale",
+      "header": "viz/figures/channel_scale.h",
+      "library": "viz"
+    },
+    {
+      "name": "channel_scale",
+      "header": "viz/figures/channel_scale.h",
       "library": "viz"
     },
     {
@@ -6917,7 +6927,8 @@
       "including_examples": [
         "ex_dsp_artifacts",
         "ex_fiff_api",
-        "ex_fiff_sniffer"
+        "ex_fiff_sniffer",
+        "ex_scene_sdl"
       ],
       "snippets": [
         "ex_fiff_api/main.cpp#fiff_info_usage"
@@ -7536,7 +7547,8 @@
         "ex_dsp_artifacts",
         "ex_fiff_api",
         "ex_hpiFit",
-        "ex_inv_hpi"
+        "ex_inv_hpi",
+        "ex_scene_sdl"
       ],
       "snippets": [
         "ex_acq_record/main.cpp#acq_record_read",
@@ -7564,7 +7576,8 @@
         "ex_dsp_artifacts",
         "ex_fiff_api",
         "ex_hpiFit",
-        "ex_inv_hpi"
+        "ex_inv_hpi",
+        "ex_scene_sdl"
       ],
       "snippets": [
         "ex_acq_record/main.cpp#acq_record_read",
@@ -13478,6 +13491,25 @@
       "exempt_reason": "registry: Qt host of the toolkit-free viz::Panel classes, created by the MNE Scan plugins; exercised by test_viz_qt_viewers."
     },
     {
+      "name": "SceneViewport",
+      "header": "viz/backends/qt/kit/sceneviewport.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_qt_viewers2",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/viz-qt/scene-viewport.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Qt host of any viz::SceneFigure, shown inside PanelWidget, ChannelSelectionView and mne_browse; its navigation is FigureView, whose example shows it, and it is exercised by test_viz_qt_viewers2."
+    },
+    {
       "name": "SettingsPanel",
       "header": "viz/backends/qt/kit/settingspanel.h",
       "library": "viz",
@@ -13903,25 +13935,6 @@
       "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
     },
     {
-      "name": "AverageLayoutView",
-      "header": "viz/backends/qt/viewers/averagelayoutview.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
-      "api_page": "doc/website/docs/api/viz-qt/average-layout-view.mdx",
-      "python_equiv": null,
-      "example_eligible": false,
-      "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
-    },
-    {
       "name": "AverageSelectionView",
       "header": "viz/backends/qt/viewers/averageselectionview.h",
       "library": "viz",
@@ -14193,25 +14206,6 @@
       "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
     },
     {
-      "name": "AverageLayoutWidget",
-      "header": "viz/backends/qt/viewers/helpers/averagelayoutwidget.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": "test_viz_qt_viewers2",
-      "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
-      "api_page": "doc/website/docs/api/viz-qt/average-layout-widget.mdx",
-      "python_equiv": null,
-      "example_eligible": false,
-      "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
-    },
-    {
       "name": "BidsViewModel",
       "header": "viz/backends/qt/viewers/helpers/bidsviewmodel.h",
       "library": "viz",
@@ -14409,8 +14403,8 @@
       "exported": true,
       "registered": true,
       "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
+      "test": "test_viz_qt_viewers2",
+      "test_resolves": true,
       "example": null,
       "example_state": "none",
       "including_examples": [],
@@ -14554,25 +14548,6 @@
       "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
     },
     {
-      "name": "SceneViewport",
-      "header": "viz/backends/qt/viewers/helpers/sceneviewport.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": "test_viz_qt_viewers2",
-      "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
-      "api_page": "doc/website/docs/api/viz-qt/scene-viewport.mdx",
-      "python_equiv": null,
-      "example_eligible": false,
-      "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
-    },
-    {
       "name": "SelectionItem",
       "header": "viz/backends/qt/viewers/helpers/selectionitem.h",
       "library": "viz",
@@ -14580,32 +14555,13 @@
       "exported": true,
       "registered": true,
       "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
-      "api_page": "doc/website/docs/api/viz-qt/selection-item.mdx",
-      "python_equiv": null,
-      "example_eligible": false,
-      "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
-    },
-    {
-      "name": "SensorLayoutWidget",
-      "header": "viz/backends/qt/viewers/helpers/sensorlayoutwidget.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
       "test": "test_viz_qt_viewers2",
       "test_resolves": true,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": "doc/website/docs/api/viz-qt/sensor-layout-widget.mdx",
+      "api_page": "doc/website/docs/api/viz-qt/selection-item.mdx",
       "python_equiv": null,
       "example_eligible": false,
       "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
@@ -15756,6 +15712,25 @@
       "exempt_reason": null
     },
     {
+      "name": "AverageLayoutFigure",
+      "header": "viz/figures/average_layout_figure.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_figure_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/viz/average-layout-figure.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: The figure of AverageLayoutPanel, whose example shows it with synthetic averages."
+    },
+    {
       "name": "AverageTile",
       "header": "viz/figures/average_tile.h",
       "library": "viz",
@@ -16331,6 +16306,25 @@
       "exempt_reason": null
     },
     {
+      "name": "SceneFigure",
+      "header": "viz/figures/scene_figure.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_figure_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/viz/scene-figure.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Abstract contract of interactive figures; SensorLayoutFigure and AverageLayoutFigure implement it and the AverageLayoutPanel example shows one in use."
+    },
+    {
       "name": "SensorLayout",
       "header": "viz/figures/sensor_layout.h",
       "library": "viz",
@@ -16352,6 +16346,25 @@
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
+    },
+    {
+      "name": "SensorLayoutFigure",
+      "header": "viz/figures/sensor_layout_figure.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_figure_view",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/viz/sensor-layout-figure.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: The sensor picker of ChannelSelectionView; it needs a layout file and user input, exercised by test_viz_figure_view and test_viz_qt_viewers2."
     },
     {
       "name": "SplinePlot",
@@ -17431,6 +17444,54 @@
       "exempt_reason": "registry: View model of the spectrum viewer; adapted by viz::qt::FrequencySpectrumModel and exercised by test_viz_viewmodels, it has no standalone use without a view."
     },
     {
+      "name": "AverageLayoutPanel",
+      "header": "viz/panels/average_layout_panel.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_figure_view",
+      "test_resolves": true,
+      "example": "ex_scene_sdl",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
+      "snippets": [
+        "ex_scene_sdl/main.cpp#average_layout_panel_usage",
+        "ex_scene_sdl/main.cpp#average_layout_panel_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/average-layout-panel.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "EvokedAverages",
+      "header": "viz/panels/average_layout_panel.h",
+      "library": "viz",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_figure_view",
+      "test_resolves": true,
+      "example": "ex_scene_sdl",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
+      "snippets": [
+        "ex_scene_sdl/main.cpp#average_layout_panel_usage",
+        "ex_scene_sdl/main.cpp#average_layout_panel_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/evoked-averages.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "CompensatorPanel",
       "header": "viz/panels/compensator_panel.h",
       "library": "viz",
@@ -17450,6 +17511,29 @@
         "ex_scene/main.cpp#panel_usage"
       ],
       "api_page": "doc/website/docs/api/viz/compensator-panel.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "FigureView",
+      "header": "viz/panels/figure_view.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_figure_view",
+      "test_resolves": true,
+      "example": "ex_scene_sdl",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
+      "snippets": [
+        "ex_scene_sdl/main.cpp#average_layout_panel_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/figure-view.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
