@@ -27,7 +27,6 @@
 #include <mne/viz/backends/qt/viewers/rtfiffrawview.h>
 #include <mne/viz/backends/qt/viewers/scalingview.h>
 #include <mne/viz/backends/qt/viewers/filtersettingsview.h>
-#include <mne/viz/backends/qt/viewers/spharasettingsview.h>
 #include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
 #include <mne/viz/backends/qt/viewers/triggerdetectionview.h>
 #include <scMeas/realtimemultisamplearray.h>
@@ -208,17 +207,6 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
         //        pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
         //        pFilterSettingsView->getFilterView()->setMaxAllowedFilterTaps(m_iMaxFilterTapSize);
         //        pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
-
-        //        // Quick control SPHARA settings
-        //        SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView();
-        //        pSpharaSettingsView->setObjectName("group_tab_Noise_SPHARA");
-        //        lControlWidgets.append(pSpharaSettingsView);
-
-        //        connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,
-        //                m_pChannelDataView.data(), &RtFiffRawView::updateSpharaActivation);
-
-        //        connect(pSpharaSettingsView, &SpharaSettingsView::spharaOptionsChanged,
-        //                m_pChannelDataView.data(), &RtFiffRawView::updateSpharaOptions);
 
         // Quick control scaling
         ScalingView* pScalingView = new ScalingView(QString("MNESCAN/RTMSAW"), this, Qt::Widget, m_pFiffInfo->get_channel_types());

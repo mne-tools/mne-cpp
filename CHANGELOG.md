@@ -480,6 +480,17 @@ aliases; replace the old spelling as below.
   `ChannelInfoModel::table()`, `sharedTable()` and `setLayout()` and
   `SelectionItem::fromSensors()` connect it to the Qt models;
   `ex_scene_sdl --panel channels` shows it in an SDL window.
+- More mne_scan settings are toolkit-free panels: `viz::CovariancePanel`,
+  `viz::SpharaPanel`, `viz::MinimumNormPanel`, `viz::ConnectivityPanel` and
+  `viz::TimeFrequencyPanel` replace `CovarianceSettingsView`,
+  `SpharaSettingsView`, `MinimumNormSettingsView`,
+  `ConnectivitySettingsView` and `TfSettingsView` and keep their settings
+  keys. The plugins and the connectivity examples host them in
+  `PanelWidget`s and get callbacks instead of signals.
+  `SpectrumSettingsView` and the F12 action of the spectrum display are gone:
+  `viz::SpectrumPanel` shows the frequency band as sliders above the spectra
+  (`set_boundaries()`, `set_bounds_callback()`, `lower_bound()`,
+  `upper_bound()`).
 - `ChannelRhiRenderer` hosts a `viz::TraceViewClient`, the same trace view
   client the SDL example runs, instead of wiring its own view, animator,
   markers and frame builder; its host becomes the client's `viz::Surface`.

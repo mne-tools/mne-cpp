@@ -9,10 +9,9 @@
  * @date     March, 2026
  * @brief    Tests for the disp viewer widget classes: construction, getter/setter round-trips,
  *           settings persistence, GuiMode/ProcessingMode switching, and clearView.
- *           Covers: ScalingView, PanelWidget (compensators, projectors), ModalitySelectionView,
- *           MinimumNormSettingsView, FilterSettingsView, FilterDesignView,
- *           SpectrumSettingsView, AveragingSettingsView, CovarianceSettingsView,
- *           ArtifactSettingsView, SettingsPanel, SpharaSettingsView, TfSettingsView, ConnectivitySettingsView,
+ *           Covers: ScalingView, PanelWidget (compensators, projectors, covariance, time-frequency, SPHARA,
+ *           minimum norm, connectivity), ModalitySelectionView, FilterSettingsView, FilterDesignView,
+ *           AveragingSettingsView, ArtifactSettingsView, SettingsPanel,
  *           TriggerDetectionView, ProgressView, QuickControlView, and MultiView.
  */
 
@@ -24,20 +23,19 @@
 #include <mne/viz/backends/qt/viewers/scalingview.h>
 #include <mne/viz/backends/qt/kit/panelwidget.h>
 #include <mne/viz/panels/compensator_panel.h>
+#include <mne/viz/panels/connectivity_panel.h>
+#include <mne/viz/panels/covariance_panel.h>
 #include <mne/viz/panels/forward_panel.h>
 #include <mne/viz/figures/theme.h>
+#include <mne/viz/panels/minimum_norm_panel.h>
 #include <mne/viz/panels/projectors_panel.h>
+#include <mne/viz/panels/sphara_panel.h>
+#include <mne/viz/panels/time_frequency_panel.h>
 #include <mne/viz/backends/qt/viewers/modalityselectionview.h>
-#include <mne/viz/backends/qt/viewers/minimumnormsettingsview.h>
 #include <mne/viz/backends/qt/viewers/filtersettingsview.h>
 #include <mne/viz/backends/qt/viewers/filterdesignview.h>
-#include <mne/viz/backends/qt/viewers/spectrumsettingsview.h>
 #include <mne/viz/backends/qt/viewers/averagingsettingsview.h>
 #include <mne/viz/backends/qt/viewers/artifactsettingsview.h>
-#include <mne/viz/backends/qt/viewers/covariancesettingsview.h>
-#include <mne/viz/backends/qt/viewers/spharasettingsview.h>
-#include <mne/viz/backends/qt/viewers/tfsettingsview.h>
-#include <mne/viz/backends/qt/viewers/connectivitysettingsview.h>
 #include <mne/viz/backends/qt/viewers/triggerdetectionview.h>
 #include <mne/viz/backends/qt/viewers/progressview.h>
 #include <mne/viz/backends/qt/viewers/quickcontrolview.h>
@@ -139,12 +137,6 @@ private slots:
      */
     void modalitySelectionView_setAndGet();
 
-    //=========================================================================================================
-    /**
-     * Verifies that MinimumNormSettingsView accepts trigger type lists and survives
-     * all GuiMode/ProcessingMode transitions.
-     */
-    void minimumNormSettingsView_lifecycle();
 
     //=========================================================================================================
     /**
@@ -160,11 +152,6 @@ private slots:
      */
     void filterDesignView_setAndGet();
 
-    //=========================================================================================================
-    /**
-     * Verifies that SpectrumSettingsView accepts boundaries and updateValue without crashing.
-     */
-    void spectrumSettingsView_boundaries();
 
     //=========================================================================================================
     /**
@@ -175,9 +162,8 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies that CovarianceSettingsView survives all lifecycle transitions.
+     * Verifies that SettingsPanel builds a widget per field and keeps widgets and form in sync.
      */
-    void covarianceSettingsView_lifecycle();
     void settingsPanel_buildsAndSyncsWidgets();
 
     //=========================================================================================================
@@ -215,30 +201,36 @@ private slots:
      */
     void artifactSettingsView_formPanel();
 
-    //=========================================================================================================
-    /**
-     * Verifies the form-built TfSettingsView: spin boxes for trial and row number and their signal.
-     */
-    void tfSettingsView_formPanel();
 
-    //=========================================================================================================
+    //============================================================================================================
     /**
-     * Verifies that SpharaSettingsView survives all lifecycle transitions.
+     * Verifies the covariance panel in a widget: the range of samples, reports and the silent setter.
      */
-    void spharaSettingsView_lifecycle();
+    void covariancePanel_widget();
 
-    //=========================================================================================================
+    //============================================================================================================
     /**
-     * Verifies that TfSettingsView survives all lifecycle transitions.
+     * Verifies the time-frequency panel in a widget: spin boxes for trial and row number and their report.
      */
-    void tfSettingsView_lifecycle();
+    void timeFrequencyPanel_widget();
 
-    //=========================================================================================================
+    //============================================================================================================
     /**
-     * Verifies that ConnectivitySettingsView getters return non-empty defaults, setters do not
-     * crash, and the view survives lifecycle transitions.
+     * Verifies the SPHARA panel in a widget: activation and option reports and the relabelled fields per system.
      */
-    void connectivitySettingsView_setAndGet();
+    void spharaPanel_widget();
+
+    //============================================================================================================
+    /**
+     * Verifies the minimum norm panel in a widget: method, trigger type, time point and CMNE checkpoint.
+     */
+    void minimumNormPanel_widget();
+
+    //============================================================================================================
+    /**
+     * Verifies the connectivity panel in a widget: its reports and the persisted values under the old keys.
+     */
+    void connectivityPanel_widget();
 
     //=========================================================================================================
     /**
@@ -246,23 +238,6 @@ private slots:
      */
     void triggerDetectionView_lifecycle();
 
-    //=========================================================================================================
-    /**
-     * Verifies the form-built SpharaSettingsView: activation and option signals and the relabelled fields per system.
-     */
-    void spharaSettingsView_formPanel();
-
-    //=========================================================================================================
-    /**
-     * Verifies the form-built MinimumNormSettingsView: method, trigger type, time point and CMNE checkpoint.
-     */
-    void minimumNormSettingsView_formPanel();
-
-    //=========================================================================================================
-    /**
-     * Verifies the form-built ConnectivitySettingsView: its signals and the persisted values.
-     */
-    void connectivitySettingsView_formPanel();
 
     //=========================================================================================================
     /**
@@ -501,25 +476,6 @@ void TestVizQtViewers::modalitySelectionView_setAndGet()
 
 //=============================================================================================================
 
-void TestVizQtViewers::minimumNormSettingsView_lifecycle()
-{
-    MinimumNormSettingsView view("test_viz_qt_viewers");
-
-    view.setTriggerTypes(QStringList() << "1" << "2" << "face" << "scrambled");
-
-    view.setGuiMode(AbstractView::GuiMode::Clinical);
-    view.setGuiMode(AbstractView::GuiMode::Research);
-    view.setProcessingMode(AbstractView::ProcessingMode::RealTime);
-    view.setProcessingMode(AbstractView::ProcessingMode::Offline);
-    view.saveSettings();
-    view.loadSettings();
-    view.clearView();
-
-    QApplication::processEvents();
-}
-
-//=============================================================================================================
-
 void TestVizQtViewers::filterSettingsView_lifecycle()
 {
     FilterSettingsView view("test_viz_qt_viewers");
@@ -565,41 +521,6 @@ void TestVizQtViewers::filterDesignView_setAndGet()
 
 //=============================================================================================================
 
-void TestVizQtViewers::spectrumSettingsView_boundaries()
-{
-    SpectrumSettingsView view("test_viz_qt_viewers");
-
-    // Typical MEG/EEG frequency range at 600 Hz sfreq
-    view.setBoundaries(600.0f, 0.1f, 100.0f);
-    QCOMPARE(view.getLowerBound(), 0.1f);
-    QCOMPARE(view.getUpperBound(), 100.0f);
-    // The sliders run in steps of 1 mHz up to the Nyquist frequency; the lower bound stays below the upper one
-    auto* lower = view.findChild<QSlider*>(QStringLiteral("lower"));
-    auto* upper = view.findChild<QSlider*>(QStringLiteral("upper"));
-    QVERIFY(lower && upper);
-    QCOMPARE(upper->maximum(), 300000);
-    QSignalSpy changed(&view, &SpectrumSettingsView::settingsChanged);
-    upper->setValue(50000);
-    QCOMPARE(view.getUpperBound(), 50.0f);
-    QVERIFY(changed.count() >= 1);
-    lower->setValue(80000);
-    QCOMPARE(view.getLowerBound(), 50.0f);
-
-    view.updateValue(50);
-    view.updateValue(0);
-    view.updateValue(100);
-
-    view.setGuiMode(AbstractView::GuiMode::Research);
-    view.setProcessingMode(AbstractView::ProcessingMode::Offline);
-    view.saveSettings();
-    view.loadSettings();
-    view.clearView();
-
-    QApplication::processEvents();
-}
-
-//=============================================================================================================
-
 void TestVizQtViewers::averagingSettingsView_setAndGet()
 {
     std::map<std::string, int> stimMap;
@@ -628,35 +549,6 @@ void TestVizQtViewers::averagingSettingsView_setAndGet()
 
     view.clearSelectionGroup();
     view.setGuiMode(AbstractView::GuiMode::Research);
-    view.setProcessingMode(AbstractView::ProcessingMode::Offline);
-    view.saveSettings();
-    view.loadSettings();
-    view.clearView();
-
-    QApplication::processEvents();
-}
-
-//=============================================================================================================
-
-void TestVizQtViewers::covarianceSettingsView_lifecycle()
-{
-    CovarianceSettingsView view("test_viz_qt_viewers");
-    auto* samples = view.findChild<QSpinBox*>(QStringLiteral("samples"));
-    QVERIFY(samples);
-    QCOMPARE(samples->minimum(), 600);
-    QCOMPARE(samples->maximum(), 36000);
-    QSignalSpy changed(&view, &CovarianceSettingsView::samplesChanged);
-    samples->setValue(1200);
-    QCOMPARE(changed.count(), 1);
-    QCOMPARE(changed.at(0).at(0).toInt(), 1200);
-    view.setMinSamples(100);
-    QCOMPARE(samples->maximum(), 6000);
-    view.setCurrentSamples(9000);
-    QCOMPARE(samples->value(), 6000);
-
-    view.setGuiMode(AbstractView::GuiMode::Clinical);
-    view.setGuiMode(AbstractView::GuiMode::Research);
-    view.setProcessingMode(AbstractView::ProcessingMode::RealTime);
     view.setProcessingMode(AbstractView::ProcessingMode::Offline);
     view.saveSettings();
     view.loadSettings();
@@ -1096,93 +988,6 @@ void TestVizQtViewers::artifactSettingsView_formPanel()
 
 //=============================================================================================================
 
-void TestVizQtViewers::tfSettingsView_formPanel()
-{
-    TfSettingsView view;
-    auto* panel = view.findChild<SettingsPanel*>();
-    QVERIFY(panel);
-    auto* trials = qobject_cast<QSpinBox*>(panel->editor("trialNumber"));
-    auto* rows = qobject_cast<QSpinBox*>(panel->editor("rowNumber"));
-    QVERIFY(trials && rows);
-    QCOMPARE(trials->maximum(), 10000);
-
-    QSignalSpy changed(&view, &TfSettingsView::numberTrialRowChanged);
-    trials->setValue(5);
-    rows->setValue(3);
-    QCOMPARE(changed.count(), 2);
-    QCOMPARE(changed.last().at(0).toInt(), 5);
-    QCOMPARE(changed.last().at(1).toInt(), 3);
-    panel->form().set_value("trialNumber", 8);
-    QCOMPARE(trials->value(), 8);
-    QCOMPARE(changed.last().at(0).toInt(), 8);
-}
-
-//=============================================================================================================
-
-void TestVizQtViewers::spharaSettingsView_lifecycle()
-{
-    SpharaSettingsView view("test_viz_qt_viewers");
-
-    view.setGuiMode(AbstractView::GuiMode::Clinical);
-    view.setGuiMode(AbstractView::GuiMode::Research);
-    view.setProcessingMode(AbstractView::ProcessingMode::RealTime);
-    view.setProcessingMode(AbstractView::ProcessingMode::Offline);
-    view.saveSettings();
-    view.loadSettings();
-    view.clearView();
-
-    QApplication::processEvents();
-}
-
-//=============================================================================================================
-
-void TestVizQtViewers::tfSettingsView_lifecycle()
-{
-    TfSettingsView view("test_viz_qt_viewers");
-
-    view.setGuiMode(AbstractView::GuiMode::Clinical);
-    view.setGuiMode(AbstractView::GuiMode::Research);
-    view.setProcessingMode(AbstractView::ProcessingMode::RealTime);
-    view.setProcessingMode(AbstractView::ProcessingMode::Offline);
-    view.saveSettings();
-    view.loadSettings();
-    view.clearView();
-
-    QApplication::processEvents();
-}
-
-//=============================================================================================================
-
-void TestVizQtViewers::connectivitySettingsView_setAndGet()
-{
-    ConnectivitySettingsView view("test_viz_qt_viewers");
-
-    QString metric = view.getConnectivityMetric();
-    QVERIFY(!metric.isEmpty());
-
-    QString windowType = view.getWindowType();
-    QVERIFY(!windowType.isEmpty());
-
-    int nTrials = view.getNumberTrials();
-    QVERIFY(nTrials >= 0);
-    Q_UNUSED(view.getTriggerType());
-
-    view.setTriggerTypes(QStringList() << "1" << "2");
-    view.setNumberTrials(10);
-    view.setFrequencyBand(1.0, 40.0);
-    QCOMPARE(view.getNumberTrials(), 10);
-
-    view.setGuiMode(AbstractView::GuiMode::Research);
-    view.setProcessingMode(AbstractView::ProcessingMode::Offline);
-    view.saveSettings();
-    view.loadSettings();
-    view.clearView();
-
-    QApplication::processEvents();
-}
-
-//=============================================================================================================
-
 void TestVizQtViewers::triggerDetectionView_lifecycle()
 {
     TriggerDetectionView view("test_viz_qt_viewers");
@@ -1220,15 +1025,74 @@ QString fieldLabel(QWidget* editor)
 
 //=============================================================================================================
 
-void TestVizQtViewers::spharaSettingsView_formPanel()
+void TestVizQtViewers::covariancePanel_widget()
 {
-    SpharaSettingsView view;
-    auto* panel = view.findChild<SettingsPanel*>();
-    QVERIFY(panel);
-    auto* activate = qobject_cast<QCheckBox*>(panel->editor("activateSphara"));
-    auto* system = qobject_cast<QComboBox*>(panel->editor("system"));
-    auto* first = qobject_cast<QSpinBox*>(panel->editor("first"));
-    auto* second = qobject_cast<QSpinBox*>(panel->editor("second"));
+    auto panel = std::make_shared<CovariancePanel>();
+    std::vector<int> reports;
+    panel->set_samples_callback([&reports](int samples) {
+        reports.push_back(samples);
+    });
+    PanelWidget view(panel);
+    QCOMPARE(view.windowTitle(), QStringLiteral("Covariance Settings"));
+    auto* samples = qobject_cast<QSpinBox*>(view.formPanel()->editor("samples"));
+    QVERIFY(samples);
+    QCOMPARE(samples->minimum(), 600);
+    QCOMPARE(samples->maximum(), 36000);
+    samples->setValue(1200);
+    QCOMPARE(reports, std::vector<int>{1200});
+    panel->set_minimum_samples(100);
+    QCOMPARE(samples->maximum(), 6000);
+    panel->set_samples(9000);
+    QCOMPARE(samples->value(), 6000);
+    QCOMPARE(panel->samples(), 6000);
+    QCOMPARE(reports.size(), std::size_t{1});
+}
+
+//=============================================================================================================
+
+void TestVizQtViewers::timeFrequencyPanel_widget()
+{
+    auto panel = std::make_shared<TimeFrequencyPanel>();
+    std::vector<std::pair<int, int>> reports;
+    panel->set_callback([&reports](int trial, int row) {
+        reports.emplace_back(trial, row);
+    });
+    PanelWidget view(panel);
+    auto* trials = qobject_cast<QSpinBox*>(view.formPanel()->editor("trialNumber"));
+    auto* rows = qobject_cast<QSpinBox*>(view.formPanel()->editor("rowNumber"));
+    QVERIFY(trials && rows);
+    QCOMPARE(trials->maximum(), 10000);
+    trials->setValue(5);
+    rows->setValue(3);
+    QCOMPARE(reports.size(), std::size_t{2});
+    QCOMPARE(reports.back(), std::make_pair(5, 3));
+    panel->form().set_value("trialNumber", 8);
+    QCOMPARE(trials->value(), 8);
+    QCOMPARE(panel->trial(), 8);
+    QCOMPARE(reports.back().first, 8);
+}
+
+//=============================================================================================================
+
+void TestVizQtViewers::spharaPanel_widget()
+{
+    auto panel = std::make_shared<SpharaPanel>();
+    std::vector<bool> activations;
+    std::vector<std::tuple<std::string, int, int>> options;
+    SpharaPanel::Callbacks callbacks;
+    callbacks.activation_changed = [&activations](bool active) {
+        activations.push_back(active);
+    };
+    callbacks.options_changed = [&options](const std::string& system, int first, int second) {
+        options.emplace_back(system, first, second);
+    };
+    panel->set_callbacks(std::move(callbacks));
+    PanelWidget view(panel);
+    SettingsPanel* form = view.formPanel();
+    auto* activate = qobject_cast<QCheckBox*>(form->editor("activateSphara"));
+    auto* system = qobject_cast<QComboBox*>(form->editor("system"));
+    auto* first = qobject_cast<QSpinBox*>(form->editor("first"));
+    auto* second = qobject_cast<QSpinBox*>(form->editor("second"));
     QVERIFY(activate && system && first && second);
     QCOMPARE(view.windowTitle(), QStringLiteral("SPHARA Settings"));
     QCOMPARE(system->count(), 3);
@@ -1238,18 +1102,13 @@ void TestVizQtViewers::spharaSettingsView_formPanel()
     QCOMPARE(second->value(), 105);
     QCOMPARE(fieldLabel(first), QStringLiteral("Inner layer:"));
 
-    QSignalSpy activation(&view, &SpharaSettingsView::spharaActivationChanged);
     activate->setChecked(true);
-    QCOMPARE(activation.count(), 1);
-    QCOMPARE(activation.last().at(0).toBool(), true);
+    QCOMPARE(activations, std::vector<bool>{true});
 
-    // VectorView: Mag and Grad, at most 102 each; one signal with the clamped values
-    QSignalSpy options(&view, &SpharaSettingsView::spharaOptionsChanged);
+    // VectorView: Mag and Grad, at most 102 each; one report with the clamped values
     system->setCurrentIndex(system->findText(QStringLiteral("VectorView")));
-    QCOMPARE(options.count(), 1);
-    QCOMPARE(options.last().at(0).toString(), QStringLiteral("VectorView"));
-    QCOMPARE(options.last().at(1).toInt(), 102);
-    QCOMPARE(options.last().at(2).toInt(), 102);
+    QCOMPARE(options.size(), std::size_t{1});
+    QCOMPARE(options.back(), std::make_tuple(std::string("VectorView"), 102, 102));
     QCOMPARE(fieldLabel(first), QStringLiteral("Mag"));
     QCOMPARE(fieldLabel(second), QStringLiteral("Grad"));
     QCOMPARE(first->maximum(), 102);
@@ -1257,15 +1116,15 @@ void TestVizQtViewers::spharaSettingsView_formPanel()
 
     // Spin boxes report when editing finishes
     first->setValue(50);
-    QCOMPARE(options.count(), 1);
+    QCOMPARE(options.size(), std::size_t{1});
     emit first->editingFinished();
-    QCOMPARE(options.count(), 2);
-    QCOMPARE(options.last().at(1).toInt(), 50);
+    QCOMPARE(options.size(), std::size_t{2});
+    QCOMPARE(std::get<1>(options.back()), 50);
 
     // EEG: one field of at most 256, the second one hidden
     system->setCurrentIndex(system->findText(QStringLiteral("EEG")));
-    QCOMPARE(options.count(), 3);
-    QCOMPARE(options.last().at(0).toString(), QStringLiteral("EEG"));
+    QCOMPARE(options.size(), std::size_t{3});
+    QCOMPARE(std::get<0>(options.back()), std::string("EEG"));
     QCOMPARE(fieldLabel(first), QStringLiteral("EEG"));
     QCOMPARE(first->maximum(), 256);
     QVERIFY(second->isHidden());
@@ -1279,23 +1138,41 @@ void TestVizQtViewers::spharaSettingsView_formPanel()
 
 //=============================================================================================================
 
-void TestVizQtViewers::minimumNormSettingsView_formPanel()
+void TestVizQtViewers::minimumNormPanel_widget()
 {
     {
-        MinimumNormSettingsView fixed(QString{}, QStringLiteral("dSPM"));
-        auto* method = qobject_cast<QComboBox*>(fixed.findChild<SettingsPanel*>()->editor("method"));
+        PanelWidget fixed(std::make_shared<MinimumNormPanel>("dSPM"));
+        auto* method = qobject_cast<QComboBox*>(fixed.formPanel()->editor("method"));
         QVERIFY(method);
         QCOMPARE(method->currentText(), QStringLiteral("dSPM"));
         QVERIFY(!method->isEnabled());
     }
 
-    MinimumNormSettingsView view;
-    auto* panel = view.findChild<SettingsPanel*>();
-    QVERIFY(panel);
-    auto* method = qobject_cast<QComboBox*>(panel->editor("method"));
-    auto* trigger = qobject_cast<QComboBox*>(panel->editor("triggerType"));
-    auto* timePoint = qobject_cast<QSpinBox*>(panel->editor("timePoint"));
-    QWidget* checkpoint = panel->editor("modelCheckpoint");
+    auto panel = std::make_shared<MinimumNormPanel>();
+    std::vector<std::string> methods;
+    std::vector<std::string> triggers;
+    std::vector<int> timePoints;
+    std::vector<std::filesystem::path> checkpoints;
+    MinimumNormPanel::Callbacks callbacks;
+    callbacks.method_changed = [&methods](const std::string& method) {
+        methods.push_back(method);
+    };
+    callbacks.trigger_type_changed = [&triggers](const std::string& type) {
+        triggers.push_back(type);
+    };
+    callbacks.time_point_changed = [&timePoints](int milliseconds) {
+        timePoints.push_back(milliseconds);
+    };
+    callbacks.model_checkpoint_changed = [&checkpoints](const std::filesystem::path& path) {
+        checkpoints.push_back(path);
+    };
+    panel->set_callbacks(std::move(callbacks));
+    PanelWidget view(panel);
+    SettingsPanel* form = view.formPanel();
+    auto* method = qobject_cast<QComboBox*>(form->editor("method"));
+    auto* trigger = qobject_cast<QComboBox*>(form->editor("triggerType"));
+    auto* timePoint = qobject_cast<QSpinBox*>(form->editor("timePoint"));
+    QWidget* checkpoint = form->editor("modelCheckpoint");
     QVERIFY(method && trigger && timePoint && checkpoint);
     QCOMPARE(view.windowTitle(), QStringLiteral("InvMinimumNorm Settings"));
     QVERIFY(method->isEnabled());
@@ -1304,118 +1181,128 @@ void TestVizQtViewers::minimumNormSettingsView_formPanel()
     QVERIFY(checkpoint->isHidden());
 
     // The first trigger type is selected and reported; known types are not added twice
-    QSignalSpy triggerSpy(&view, &MinimumNormSettingsView::triggerTypeChanged);
-    view.setTriggerTypes(QStringList() << "1" << "2");
-    view.setTriggerTypes(QStringList() << "2" << "face");
+    panel->set_trigger_types({"1", "2"});
+    panel->set_trigger_types({"2", "face"});
     QCOMPARE(trigger->count(), 3);
-    QCOMPARE(triggerSpy.count(), 1);
-    QCOMPARE(triggerSpy.last().at(0).toString(), QStringLiteral("1"));
+    QCOMPARE(triggers, std::vector<std::string>{"1"});
     trigger->setCurrentIndex(2);
-    QCOMPARE(triggerSpy.last().at(0).toString(), QStringLiteral("face"));
+    QCOMPARE(triggers.back(), std::string("face"));
 
-    QSignalSpy timeSpy(&view, &MinimumNormSettingsView::timePointChanged);
     timePoint->setValue(120);
-    QCOMPARE(timeSpy.count(), 0);
+    QVERIFY(timePoints.empty());
     emit timePoint->editingFinished();
-    QCOMPARE(timeSpy.count(), 1);
-    QCOMPARE(timeSpy.last().at(0).toInt(), 120);
+    QCOMPARE(timePoints, std::vector<int>{120});
 
     // CMNE shows the model checkpoint
-    QSignalSpy methodSpy(&view, &MinimumNormSettingsView::methodChanged);
     method->setCurrentIndex(method->findText(QStringLiteral("CMNE")));
-    QCOMPARE(methodSpy.count(), 1);
-    QCOMPARE(methodSpy.last().at(0).toString(), QStringLiteral("CMNE"));
+    QCOMPARE(methods, std::vector<std::string>{"CMNE"});
+    QCOMPARE(panel->method(), std::string("CMNE"));
     QVERIFY(!checkpoint->isHidden());
 
-    QSignalSpy checkpointSpy(&view, &MinimumNormSettingsView::modelCheckpointChanged);
-    view.setModelCheckpoint("model.onnx");
-    QCOMPARE(checkpointSpy.count(), 1);
-    QCOMPARE(view.getModelCheckpoint(), std::filesystem::path("model.onnx"));
+    panel->set_model_checkpoint("model.onnx");
+    QCOMPARE(checkpoints.size(), std::size_t{1});
+    QCOMPARE(panel->model_checkpoint(), std::filesystem::path("model.onnx"));
     auto* edit = checkpoint->findChild<QLineEdit*>();
     QVERIFY(edit);
     QCOMPARE(edit->text(), QStringLiteral("model.onnx"));
-    view.setModelCheckpoint("model.onnx");
-    QCOMPARE(checkpointSpy.count(), 1);
+    panel->set_model_checkpoint("model.onnx");
+    QCOMPARE(checkpoints.size(), std::size_t{1});
 }
 
 //=============================================================================================================
 
-void TestVizQtViewers::connectivitySettingsView_formPanel()
+void TestVizQtViewers::connectivityPanel_widget()
 {
     const QString path = QStringLiteral("test_viz_qt_viewers_connectivity_form");
     QSettings("MNECPP").remove(path);
+    std::vector<std::string> metrics;
+    std::vector<std::string> windows;
+    std::vector<int> trialReports;
+    std::vector<std::string> triggers;
+    std::vector<std::pair<float, float>> bands;
+    ConnectivityPanel::Callbacks callbacks;
+    callbacks.metric_changed = [&metrics](const std::string& metric) {
+        metrics.push_back(metric);
+    };
+    callbacks.window_type_changed = [&windows](const std::string& window) {
+        windows.push_back(window);
+    };
+    callbacks.number_trials_changed = [&trialReports](int trials) {
+        trialReports.push_back(trials);
+    };
+    callbacks.trigger_type_changed = [&triggers](const std::string& type) {
+        triggers.push_back(type);
+    };
+    callbacks.frequency_band_changed = [&bands](float low, float high) {
+        bands.emplace_back(low, high);
+    };
     {
-        ConnectivitySettingsView view(path);
-        auto* panel = view.findChild<SettingsPanel*>();
-        QVERIFY(panel);
-        auto* metric = qobject_cast<QComboBox*>(panel->editor("connMethod"));
-        auto* window = qobject_cast<QComboBox*>(panel->editor("connWindowType"));
-        auto* trials = qobject_cast<QSpinBox*>(panel->editor("connNrTrials"));
-        auto* trigger = qobject_cast<QComboBox*>(panel->editor("connTriggerType"));
-        auto* low = qobject_cast<QDoubleSpinBox*>(panel->editor("connFreqLow"));
-        auto* high = qobject_cast<QDoubleSpinBox*>(panel->editor("connFreqHigh"));
+        auto panel = std::make_shared<ConnectivityPanel>();
+        panel->set_callbacks(callbacks);
+        PanelWidget view(panel, path);
+        SettingsPanel* form = view.formPanel();
+        auto* metric = qobject_cast<QComboBox*>(form->editor("connMethod"));
+        auto* window = qobject_cast<QComboBox*>(form->editor("connWindowType"));
+        auto* trials = qobject_cast<QSpinBox*>(form->editor("connNrTrials"));
+        auto* trigger = qobject_cast<QComboBox*>(form->editor("connTriggerType"));
+        auto* low = qobject_cast<QDoubleSpinBox*>(form->editor("connFreqLow"));
+        auto* high = qobject_cast<QDoubleSpinBox*>(form->editor("connFreqHigh"));
         QVERIFY(metric && window && trials && trigger && low && high);
         QCOMPARE(view.windowTitle(), QStringLiteral("Connectivity Settings"));
         QCOMPARE(metric->count(), 9);
-        QCOMPARE(view.getConnectivityMetric(), QStringLiteral("COR"));
-        QCOMPARE(view.getWindowType(), QStringLiteral("Hanning"));
-        QCOMPARE(view.getNumberTrials(), 10);
-        QCOMPARE(view.getLowerFreq(), 7.0);
-        QCOMPARE(view.getUpperFreq(), 13.0);
+        QCOMPARE(panel->metric(), std::string("COR"));
+        QCOMPARE(panel->window_type(), std::string("Hanning"));
+        QCOMPARE(panel->number_trials(), 10);
+        QCOMPARE(panel->lower_frequency(), 7.0);
+        QCOMPARE(panel->upper_frequency(), 13.0);
 
-        QSignalSpy metricSpy(&view, &ConnectivitySettingsView::connectivityMetricChanged);
         metric->setCurrentIndex(metric->findText(QStringLiteral("PLI")));
-        QCOMPARE(metricSpy.count(), 1);
-        QCOMPARE(metricSpy.last().at(0).toString(), QStringLiteral("PLI"));
-
-        QSignalSpy windowSpy(&view, &ConnectivitySettingsView::windowTypeChanged);
+        QCOMPARE(metrics, std::vector<std::string>{"PLI"});
         window->setCurrentIndex(1);
-        QCOMPARE(windowSpy.last().at(0).toString(), QStringLiteral("Ones"));
+        QCOMPARE(windows.back(), std::string("Ones"));
 
-        // Only a finished edit to another number of trials is reported; setNumberTrials() is silent
-        QSignalSpy trialsSpy(&view, &ConnectivitySettingsView::numberTrialsChanged);
-        view.setNumberTrials(20);
+        // Only a finished edit to another number of trials is reported; set_number_trials() is silent
+        panel->set_number_trials(20);
         QCOMPARE(trials->value(), 20);
-        QCOMPARE(trialsSpy.count(), 0);
+        QVERIFY(trialReports.empty());
         trials->setValue(30);
         emit trials->editingFinished();
-        QCOMPARE(trialsSpy.count(), 1);
-        QCOMPARE(trialsSpy.last().at(0).toInt(), 30);
+        QCOMPARE(trialReports, std::vector<int>{30});
 
-        QSignalSpy triggerSpy(&view, &ConnectivitySettingsView::triggerTypeChanged);
-        view.setTriggerTypes(QStringList() << "1" << "2");
+        panel->set_trigger_types({"1", "2"});
         QCOMPARE(trigger->count(), 2);
-        QCOMPARE(triggerSpy.count(), 1);
+        QCOMPARE(triggers.size(), std::size_t{1});
         trigger->setCurrentIndex(1);
-        QCOMPARE(triggerSpy.last().at(0).toString(), QStringLiteral("2"));
+        QCOMPARE(triggers.back(), std::string("2"));
 
-        QSignalSpy bandSpy(&view, &ConnectivitySettingsView::freqBandChanged);
         high->setValue(30.0);
-        QCOMPARE(bandSpy.count(), 1);
-        QCOMPARE(bandSpy.last().at(0).toFloat(), 7.0f);
-        QCOMPARE(bandSpy.last().at(1).toFloat(), 30.0f);
-        view.setFrequencyBand(8.0, 12.0);
+        QCOMPARE(bands.size(), std::size_t{1});
+        QCOMPARE(bands.back(), std::make_pair(7.0f, 30.0f));
+        panel->set_frequency_band(8.0, 12.0);
         QCOMPARE(low->value(), 8.0);
-        QCOMPARE(bandSpy.last().at(1).toFloat(), 12.0f);
+        QCOMPARE(bands.back().second, 12.0f);
     }
 
-    // The values persist under the original keys and load without signals
+    // The values persist under the original keys and load without reports
     QSettings settings("MNECPP");
     QCOMPARE(settings.value(path + "/ConnectivitySettingsView/connMethod").toString(), QStringLiteral("PLI"));
     QCOMPARE(settings.value(path + "/ConnectivitySettingsView/connNrTrials").toInt(), 30);
     QCOMPARE(settings.value(path + "/ConnectivitySettingsView/connFreqHigh").toDouble(), 12.0);
     {
-        ConnectivitySettingsView view(path);
-        QCOMPARE(view.getConnectivityMetric(), QStringLiteral("PLI"));
-        QCOMPARE(view.getWindowType(), QStringLiteral("Ones"));
-        QCOMPARE(view.getNumberTrials(), 30);
-        QCOMPARE(view.getLowerFreq(), 8.0);
-        QCOMPARE(view.getUpperFreq(), 12.0);
+        const std::size_t reported = metrics.size() + trialReports.size() + bands.size();
+        auto panel = std::make_shared<ConnectivityPanel>();
+        panel->set_callbacks(callbacks);
+        PanelWidget view(panel, path);
+        QCOMPARE(metrics.size() + trialReports.size() + bands.size(), reported);
+        QCOMPARE(panel->metric(), std::string("PLI"));
+        QCOMPARE(panel->window_type(), std::string("Ones"));
+        QCOMPARE(panel->number_trials(), 30);
+        QCOMPARE(panel->lower_frequency(), 8.0);
+        QCOMPARE(panel->upper_frequency(), 12.0);
         // The loaded number of trials is the reference for changes
-        QSignalSpy trialsSpy(&view, &ConnectivitySettingsView::numberTrialsChanged);
-        auto* trials = qobject_cast<QSpinBox*>(view.findChild<SettingsPanel*>()->editor("connNrTrials"));
+        auto* trials = qobject_cast<QSpinBox*>(view.formPanel()->editor("connNrTrials"));
         emit trials->editingFinished();
-        QCOMPARE(trialsSpy.count(), 0);
+        QCOMPARE(trialReports.size(), std::size_t{1});
     }
     settings.remove(path);
 }
@@ -1540,4 +1427,7 @@ void TestVizQtViewers::multiView_addWidget()
 QTEST_MAIN(TestVizQtViewers)
 #include "test_viz_qt_viewers.moc"
 
+#include <filesystem>
+#include <tuple>
+#include <utility>
 #include <vector>

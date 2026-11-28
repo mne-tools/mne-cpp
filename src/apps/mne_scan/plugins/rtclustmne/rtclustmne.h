@@ -50,11 +50,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace mne::viz::qt
-{
-class MinimumNormSettingsView;
-}
-
 namespace mne
 {
 class MNEForwardSolution;

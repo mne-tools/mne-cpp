@@ -18,7 +18,6 @@
 
 #include "realtimespectrumwidget.h"
 
-#include <mne/viz/backends/qt/viewers/spectrumsettingsview.h>
 #include <mne/viz/backends/qt/kit/panelwidget.h>
 #include <mne/viz/panels/spectrum_panel.h>
 #include <scMeas/realtimespectrum.h>
@@ -43,6 +42,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <memory>
 
 //=============================================================================================================
@@ -67,16 +67,11 @@ RealTimeSpectrumWidget::RealTimeSpectrumWidget(QSharedPointer<RealTimeSpectrum> 
 {
     Q_UNUSED(pTime)
 
-    m_pActionFrequencySettings = new QAction(QIcon(":/images/frqResolution.png"), tr("Shows the frequency spectrum settings widget (F12)"), this);
-    m_pActionFrequencySettings->setShortcut(tr("F12"));
-    m_pActionFrequencySettings->setStatusTip(tr("Shows the frequency spectrum settings widget (F12)"));
-    connect(m_pActionFrequencySettings.data(), &QAction::triggered,
-            this, &RealTimeSpectrumWidget::showSpectrumSettingsView);
-    addDisplayAction(m_pActionFrequencySettings);
-
-    m_pActionFrequencySettings->setVisible(false);
-
     m_pSpectrum = std::make_shared<viz::SpectrumPanel>();
+    m_pSpectrum->set_bounds_callback([this](float lower, float upper) {
+        m_fLowerFrqBound = lower;
+        m_fUpperFrqBound = upper;
+    });
     m_pSpectrumView = new PanelWidget(m_pSpectrum, "MNESCAN", this);
 
     //set vertical layout
@@ -123,8 +118,6 @@ void RealTimeSpectrumWidget::getData()
         }
 
         m_pSpectrum->add_data(m_pFS->getValue());
-
-        initSettingsWidget();
     } else {
         m_pSpectrum->add_data(m_pFS->getValue());
     }
@@ -142,9 +135,8 @@ void RealTimeSpectrumWidget::initDisplayControllWidgets()
             m_fUpperFrqBound = settings.value(QString("MNESCAN/RTSW/upperFrqBound").arg(t_sFSName), 300).toFloat();
         }
 
-        m_pActionFrequencySettings->setVisible(true);
-
         m_pSpectrum->init(m_pFS->getFiffInfo(), m_pFS->getScaleType() ? viz::SpectrumTable::Scale::Log : viz::SpectrumTable::Scale::Linear);
+        initSettingsWidget();
 
         m_bDisplayWidgetsInitialized = true;
     }
@@ -154,40 +146,8 @@ void RealTimeSpectrumWidget::initDisplayControllWidgets()
 
 void RealTimeSpectrumWidget::initSettingsWidget()
 {
-    if (!m_pSpectrumSettingsView) {
-        m_pSpectrumSettingsView = std::make_shared<SpectrumSettingsView>("MNESCAN", this, Qt::Window);
-
-        m_pSpectrumSettingsView->setWindowTitle("Frequency Spectrum Settings");
-
-        connect(m_pSpectrumSettingsView.get(), &SpectrumSettingsView::settingsChanged, this, &RealTimeSpectrumWidget::broadcastSettings);
-    }
-
-    if (m_pFS->isInit() && m_pFS->getFiffInfo()) {
-        m_fUpperFrqBound = m_fLowerFrqBound < m_fUpperFrqBound ? m_fUpperFrqBound : m_fLowerFrqBound;
-
-        m_pSpectrumSettingsView->setBoundaries(m_pFS->getFiffInfo()->sfreq,
-                                               m_fLowerFrqBound,
-                                               m_fUpperFrqBound);
-    }
-}
-
-//=============================================================================================================
-
-void RealTimeSpectrumWidget::broadcastSettings()
-{
-    if (m_pSpectrumSettingsView) {
-        m_fLowerFrqBound = m_pSpectrumSettingsView->getLowerBound();
-        m_fUpperFrqBound = m_pSpectrumSettingsView->getUpperBound();
-        m_pSpectrum->set_boundaries(m_fLowerFrqBound, m_fUpperFrqBound);
-    }
-}
-
-//=============================================================================================================
-
-void RealTimeSpectrumWidget::showSpectrumSettingsView()
-{
-    initSettingsWidget();
-    m_pSpectrumSettingsView->show();
+    m_fUpperFrqBound = std::max(m_fLowerFrqBound, m_fUpperFrqBound);
+    m_pSpectrum->set_boundaries(m_fLowerFrqBound, m_fUpperFrqBound);
 }
 
 //=============================================================================================================

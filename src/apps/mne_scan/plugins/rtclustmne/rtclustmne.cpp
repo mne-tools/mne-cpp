@@ -21,7 +21,8 @@
 
 #include "FormFiles/rtclustmnesetupwidget.h"
 #include <mne/base/string_utils.h>
-#include <mne/viz/backends/qt/viewers/minimumnormsettingsview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/minimum_norm_panel.h>
 #include <mne/fs/fs_annotationset.h>
 #include <mne/fs/fs_surfaceset.h>
 #include <mne/fiff/fiff_ch_name.h>
@@ -157,28 +158,40 @@ void RtClustMne::initPluginControlWidgets()
 {
     std::vector<std::unique_ptr<QWidget>> controlWidgets;
 
-    MinimumNormSettingsView* pMinimumNormSettingsView = makeControlWidget<MinimumNormSettingsView>(controlWidgets, QString("MNESCAN/%1").arg(this->getName()));
+    auto panel = std::make_shared<MinimumNormPanel>();
+    MinimumNormPanel::Callbacks callbacks;
+    callbacks.method_changed = [this](const std::string& method) {
+        onMethodChanged(QString::fromStdString(method));
+    };
+    callbacks.trigger_type_changed = [this](const std::string& type) {
+        onTriggerTypeChanged(QString::fromStdString(type));
+    };
+    callbacks.time_point_changed = [this](int milliseconds) {
+        onTimePointValueChanged(milliseconds);
+    };
+    callbacks.model_checkpoint_changed = [this](const std::filesystem::path& path) {
+        onModelCheckpointChanged(path);
+    };
+    // The widget restores a stored checkpoint, which the plugin hears about
+    const QString restored = m_sModelCheckpoint;
+    panel->set_callbacks(std::move(callbacks));
+    PanelWidget* pMinimumNormSettingsView = makeControlWidget<PanelWidget>(controlWidgets, panel, QString("MNESCAN/%1").arg(this->getName()));
     connect(this, &RtClustMne::guiModeChanged,
-            pMinimumNormSettingsView, &MinimumNormSettingsView::setGuiMode);
+            pMinimumNormSettingsView, &PanelWidget::setGuiMode);
     pMinimumNormSettingsView->setObjectName("group_tab_Settings_Source Localization");
-
-    connect(pMinimumNormSettingsView, &MinimumNormSettingsView::methodChanged,
-            this, &RtClustMne::onMethodChanged);
-    connect(pMinimumNormSettingsView, &MinimumNormSettingsView::triggerTypeChanged,
-            this, &RtClustMne::onTriggerTypeChanged);
-    connect(pMinimumNormSettingsView, &MinimumNormSettingsView::timePointChanged,
-            this, &RtClustMne::onTimePointValueChanged);
-    connect(pMinimumNormSettingsView, &MinimumNormSettingsView::modelCheckpointChanged,
-            this, &RtClustMne::onModelCheckpointChanged);
     connect(this, &RtClustMne::responsibleTriggerTypesChanged,
-            pMinimumNormSettingsView, &MinimumNormSettingsView::setTriggerTypes);
+            this, [panel](const QStringList& types) {
+                std::vector<std::string> names;
+                names.reserve(static_cast<std::size_t>(types.size()));
+                for (const QString& type : types) {
+                    names.push_back(type.toStdString());
+                }
+                panel->set_trigger_types(names);
+            });
 
-    // Push any restored checkpoint path to the view so the user sees the persisted value.
-    if (!m_sModelCheckpoint.isEmpty()) {
-        pMinimumNormSettingsView->setModelCheckpoint(mne::path_from_utf8(m_sModelCheckpoint.toStdString()));
-    } else if (!pMinimumNormSettingsView->getModelCheckpoint().empty()) {
-        // The view loaded a previously persisted path via its own QSettings.
-        m_sModelCheckpoint = QString::fromStdString(mne::utf8_from_path(pMinimumNormSettingsView->getModelCheckpoint()));
+    // A checkpoint the plugin already has wins over the stored one
+    if (!restored.isEmpty()) {
+        panel->set_model_checkpoint(mne::path_from_utf8(restored.toStdString()));
     }
 
 

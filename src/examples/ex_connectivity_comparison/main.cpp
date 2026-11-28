@@ -36,7 +36,8 @@
 #include <mne/inv/minimum_norm/inv_minimum_norm.h>
 #include <mne/base/log.h>
 #include <mne/fiff/fiff_events.h>
-#include <mne/viz/backends/qt/viewers/connectivitysettingsview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/connectivity_panel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -366,9 +367,10 @@ int main(int argc, char* argv[])
     pBrainView->setNetworkThreshold(0.9);
 
     // Create ConnectivitySettingsView as standalone widget
-    std::shared_ptr<ConnectivitySettingsView> pConnSettingsView = std::make_shared<ConnectivitySettingsView>("EX_CONNECTIVITY_COMP");
-    pConnSettingsView->setNumberTrials(iNumTrials);
-    pConnSettingsView->setFrequencyBand(dFreqMin, dFreqMax);
+    auto pConnPanel = std::make_shared<ConnectivityPanel>();
+    auto pConnSettingsView = std::make_unique<PanelWidget>(pConnPanel, QStringLiteral("EX_CONNECTIVITY_COMP"));
+    pConnPanel->set_number_trials(iNumTrials);
+    pConnPanel->set_frequency_band(dFreqMin, dFreqMax);
 
     //Read and show sensor helmets
     if (!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
@@ -416,11 +418,15 @@ int main(int argc, char* argv[])
         pBrainView->loadSourceEstimate(lhStcPath.toStdU16String(), rhStcPath.toStdU16String());
     }
 
-    QObject::connect(pConnSettingsView.get(), &ConnectivitySettingsView::numberTrialsChanged,
-                     [&pConnSettingsView, iNumTrials]() { pConnSettingsView->setNumberTrials(iNumTrials); });
-
-    QObject::connect(pConnSettingsView.get(), &ConnectivitySettingsView::freqBandChanged,
-                     [&pConnSettingsView, dFreqMin, dFreqMax]() { pConnSettingsView->setFrequencyBand(dFreqMin, dFreqMax); });
+    // The comparison uses fixed trials and band, so changes are reverted
+    ConnectivityPanel::Callbacks connCallbacks;
+    connCallbacks.number_trials_changed = [&pConnPanel, iNumTrials]([[maybe_unused]] int trials) {
+        pConnPanel->set_number_trials(iNumTrials);
+    };
+    connCallbacks.frequency_band_changed = [&pConnPanel, dFreqMin, dFreqMax](float, float) {
+        pConnPanel->set_frequency_band(dFreqMin, dFreqMax);
+    };
+    pConnPanel->set_callbacks(std::move(connCallbacks));
 
     pConnSettingsView->show();
     pBrainView->show();

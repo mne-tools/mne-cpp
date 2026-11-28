@@ -36,9 +36,8 @@
 #include <mne/inv/minimum_norm/inv_minimum_norm.h>
 #include <mne/base/log.h>
 #include <mne/fiff/fiff_events.h>
-#include <mne/viz/backends/qt/viewers/connectivitysettingsview.h>
-#include <mne/viz/backends/qt/viewers/minimumnormsettingsview.h>
-#include <mne/viz/backends/qt/viewers/tfsettingsview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/connectivity_panel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -366,19 +365,21 @@ int main(int argc, char* argv[])
     BrainTreeModel* pModel = new BrainTreeModel();
     pBrainView->setModel(pModel);
 
-    // Create ConnectivitySettingsView as standalone widget
-    std::shared_ptr<ConnectivitySettingsView> pConnSettingsView = std::make_shared<ConnectivitySettingsView>("EX_CONNECTIVITY");
-
-    QObject::connect(pConnSettingsView.get(), &ConnectivitySettingsView::connectivityMetricChanged,
-                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onConnectivityMetricChanged);
-
-    QObject::connect(pConnSettingsView.get(), &ConnectivitySettingsView::numberTrialsChanged,
-                     [&pConnectivitySettingsManager, &pConnSettingsView, iNumTrials](int a) {
-                         pConnSettingsView->setNumberTrials(qMin(iNumTrials,a));
-                         pConnectivitySettingsManager.data()->onNumberTrialsChanged(qMin(iNumTrials,a)); });
-
-    QObject::connect(pConnSettingsView.get(), &ConnectivitySettingsView::freqBandChanged,
-                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onFreqBandChanged);
+    // The connectivity settings as a standalone panel
+    auto pConnPanel = std::make_shared<ConnectivityPanel>();
+    ConnectivityPanel::Callbacks connCallbacks;
+    connCallbacks.metric_changed = [&pConnectivitySettingsManager](const std::string& metric) {
+        pConnectivitySettingsManager->onConnectivityMetricChanged(QString::fromStdString(metric));
+    };
+    connCallbacks.number_trials_changed = [&pConnectivitySettingsManager, &pConnPanel, iNumTrials](int trials) {
+        pConnPanel->set_number_trials(qMin(iNumTrials, trials));
+        pConnectivitySettingsManager->onNumberTrialsChanged(qMin(iNumTrials, trials));
+    };
+    connCallbacks.frequency_band_changed = [&pConnectivitySettingsManager](float low, float high) {
+        pConnectivitySettingsManager->onFreqBandChanged(low, high);
+    };
+    pConnPanel->set_callbacks(std::move(connCallbacks));
+    auto pConnSettingsView = std::make_unique<PanelWidget>(pConnPanel, QStringLiteral("EX_CONNECTIVITY"));
 
     QObject::connect(pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::newConnectivityResultAvailable,
                      [&]([[maybe_unused]] const QString& a, const QString& b, const Network& c) {
@@ -433,9 +434,9 @@ int main(int argc, char* argv[])
         pBrainView->loadSourceEstimate(lhStcPath.toStdU16String(), rhStcPath.toStdU16String());
     }
 
-    pConnSettingsView->setNumberTrials(iNumTrials);
+    pConnPanel->set_number_trials(iNumTrials);
     pConnectivitySettingsManager->onNumberTrialsChanged(iNumTrials);
-    pConnectivitySettingsManager->onFreqBandChanged(pConnSettingsView->getLowerFreq(), pConnSettingsView->getUpperFreq());
+    pConnectivitySettingsManager->onFreqBandChanged(static_cast<float>(pConnPanel->lower_frequency()), static_cast<float>(pConnPanel->upper_frequency()));
 
     pConnSettingsView->show();
     pBrainView->show();

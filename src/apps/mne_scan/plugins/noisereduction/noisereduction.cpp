@@ -27,7 +27,7 @@
 #include <mne/viz/panels/projectors_panel.h>
 #include <mne/viz/backends/qt/viewers/filtersettingsview.h>
 #include <mne/viz/backends/qt/viewers/filterdesignview.h>
-#include <mne/viz/backends/qt/viewers/spharasettingsview.h>
+#include <mne/viz/panels/sphara_panel.h>
 #include <mne/dsp/rt/rt_filter.h>
 #include <mne/dsp/sphara.h>
 #include <mne/math/matrix_io.h>
@@ -274,16 +274,19 @@ void NoiseReduction::initPluginControlWidgets()
         this->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
 
         // SPHARA settings
-        SpharaSettingsView* pSpharaSettingsView = makeControlWidget<SpharaSettingsView>(controlWidgets, QString("MNESCAN/%1").arg(this->getName()));
+        auto sphara = std::make_shared<SpharaPanel>();
+        SpharaPanel::Callbacks spharaCallbacks;
+        spharaCallbacks.activation_changed = [this](bool active) {
+            setSpharaActive(active);
+        };
+        spharaCallbacks.options_changed = [this](const std::string& system, int first, int second) {
+            setSpharaOptions(QString::fromStdString(system), first, second);
+        };
+        sphara->set_callbacks(std::move(spharaCallbacks));
+        PanelWidget* pSpharaSettingsView = makeControlWidget<PanelWidget>(controlWidgets, sphara, QString("MNESCAN/%1").arg(this->getName()));
         connect(this, &NoiseReduction::guiModeChanged,
-                pSpharaSettingsView, &SpharaSettingsView::setGuiMode);
+                pSpharaSettingsView, &PanelWidget::setGuiMode);
         pSpharaSettingsView->setObjectName("group_tab_Settings_SPHARA");
-
-        connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,
-                this, &NoiseReduction::setSpharaActive);
-
-        connect(pSpharaSettingsView, &SpharaSettingsView::spharaOptionsChanged,
-                this, &NoiseReduction::setSpharaOptions);
 
         offerControlWidgets(std::move(controlWidgets));
     }

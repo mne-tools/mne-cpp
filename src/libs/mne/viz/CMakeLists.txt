@@ -66,6 +66,11 @@ set(SOURCES
   panels/channel_selection_panel.cpp
   panels/compensator_panel.cpp
   panels/forward_panel.cpp
+  panels/covariance_panel.cpp
+  panels/sphara_panel.cpp
+  panels/minimum_norm_panel.cpp
+  panels/connectivity_panel.cpp
+  panels/time_frequency_panel.cpp
   panels/panel.cpp
   panels/projectors_panel.cpp
   panels/spectrum_panel.cpp
@@ -161,6 +166,11 @@ set(HEADERS
   panels/channel_selection_panel.h
   panels/compensator_panel.h
   panels/forward_panel.h
+  panels/covariance_panel.h
+  panels/sphara_panel.h
+  panels/minimum_norm_panel.h
+  panels/connectivity_panel.h
+  panels/time_frequency_panel.h
   panels/panel.h
   panels/projectors_panel.h
   panels/spectrum_panel.h

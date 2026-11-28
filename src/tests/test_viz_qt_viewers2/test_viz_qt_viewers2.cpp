@@ -1980,7 +1980,8 @@ void TestVizQtViewers2::spectrumPanel_inPanelWidget()
     view.saveSettings();
     view.loadSettings();
     SceneViewport* viewport = view.figureViewport();
-    QVERIFY(viewport != nullptr && view.formPanel()->isHidden());
+    // The frequency band shows above the spectra
+    QVERIFY(viewport != nullptr && !view.formPanel()->isHidden());
 
     // mne_scan may send spectra and bounds before the channels: they are dropped
     panel->set_boundaries(1, 40);
@@ -1989,6 +1990,18 @@ void TestVizQtViewers2::spectrumPanel_inPanelWidget()
     panel->init(info, mne::viz::SpectrumTable::Scale::Linear);
     panel->add_data(psd);
     QCOMPARE(panel->spectrum().table().row_count(), 4);
+    // Bounds set before the data apply with the first spectra; the user's changes are reported
+    QVERIFY(panel->spectrum().table().upper_bin() < 20);
+    std::vector<float> bounds;
+    panel->set_bounds_callback([&bounds](float lower, float upper) {
+        bounds = {lower, upper};
+    });
+    panel->form().set_value("upper", 500.0);
+    QCOMPARE(bounds, (std::vector<float>{1.0f, 500.0f}));
+    panel->form().set_value("lower", 600.0);
+    QCOMPARE(panel->lower_bound(), 500.0f);
+    panel->set_boundaries(0, 500);
+    QCOMPARE(panel->spectrum().table().upper_bin(), 100);
 
     view.resize(500, 600);
     view.show();

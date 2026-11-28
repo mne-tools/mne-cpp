@@ -52,7 +52,6 @@ class SpectrumPanel;
 
 namespace mne::viz::qt
 {
-class SpectrumSettingsView;
 class PanelWidget;
 }
 
@@ -120,7 +119,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Initialise the SettingsWidget.
+     * Applies the stored frequency bounds to the spectra.
      */
     void initSettingsWidget();
 
@@ -133,24 +132,10 @@ private:
      */
     void initDisplayControllWidgets();
 
-    //=========================================================================================================
-    /**
-     * Broadcast settings of frequency spectrum settings widget
-     */
-    void broadcastSettings();
-
-    //=========================================================================================================
-    /**
-     * Show the frequency spectrum settings widget
-     */
-    void showSpectrumSettingsView();
-
-    QPointer<QAction> m_pActionFrequencySettings;         /**< Frequency spectrum settings action. */
     std::shared_ptr<mne::viz::SpectrumPanel> m_pSpectrum; /**< Frequency spectra. */
     QPointer<mne::viz::qt::PanelWidget> m_pSpectrumView;  /**< Frequency spectrum view. */
 
-    std::shared_ptr<mne::viz::qt::SpectrumSettingsView> m_pSpectrumSettingsView; /**< Frequency spectrum settings modality widget. */
-    QSharedPointer<mne::scan::RealTimeSpectrum> m_pFS;                           /**< The frequency spectrum measurement. */
+    QSharedPointer<mne::scan::RealTimeSpectrum> m_pFS; /**< The frequency spectrum measurement. */
 
     float m_fLowerFrqBound; /**< Lower frequency bound. */
     float m_fUpperFrqBound; /**< Upper frequency bound. */

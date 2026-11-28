@@ -31,7 +31,9 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <functional>
 #include <memory>
+#include <utility>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne::viz
@@ -42,7 +44,8 @@ namespace mne::viz
 
 //=============================================================================================================
 /**
- * @brief Tool panel with the spectra of the channels, one row each, as a SpectrumFigure.
+ * @brief Tool panel with the spectra of the channels, one row each, as a SpectrumFigure, and the frequency band
+ * shown as sliders between 0 Hz and the Nyquist frequency.
  *
  * Spectra that arrive before init() are dropped, as mne_scan may send them before the channels are known.
  *
@@ -88,15 +91,39 @@ public:
 
     //=========================================================================================================
     /**
-     * Shows only the frequencies between @p lower and @p upper; ignored until data have arrived.
+     * Shows only the frequencies between @p lower and @p upper, applied once data have arrived; the bounds are
+     * the panel's settings, without a report.
      *
      * @param[in] lower   Lower bound in Hz.
      * @param[in] upper   Upper bound in Hz.
      */
     void set_boundaries(float lower, float upper);
 
+    //=========================================================================================================
+    /**
+     * @param[in] callback   Called with the bounds in Hz when the user changed them.
+     *
+     * @since 3.0.0
+     */
+    void set_bounds_callback(std::function<void(float lower, float upper)> callback)
+    {
+        m_boundsCallback = std::move(callback);
+    }
+
+    /** @return The lower bound in Hz. */
+    float lower_bound() const;
+
+    /** @return The upper bound in Hz. */
+    float upper_bound() const;
+
 private:
-    std::shared_ptr<SpectrumFigure> m_spectrum; /**< The spectra. */
+    void apply_bounds();
+
+    std::shared_ptr<SpectrumFigure> m_spectrum;         /**< The spectra. */
+    std::function<void(float, float)> m_boundsCallback; /**< Called when the user changed the bounds. */
+    int m_listener = 0;                                 /**< Listener on the form. */
+    bool m_updating = false;                            /**< Whether the panel sets the bounds itself. */
+    bool m_boundsApplied = false;                       /**< Whether the figure has the bounds of the form. */
 };
 
 } // namespace mne::viz

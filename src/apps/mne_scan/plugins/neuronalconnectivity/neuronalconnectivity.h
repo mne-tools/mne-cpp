@@ -53,11 +53,6 @@ namespace mne
 class FiffInfo;
 }
 
-namespace mne::viz::qt
-{
-class ConnectivitySettingsView;
-}
-
 namespace mne::scan
 {
 class RealTimeSourceEstimate;

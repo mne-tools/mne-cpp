@@ -17,18 +17,25 @@
 #include <mne/viz/forms/settings_form.h>
 #include <mne/viz/host/settings_store.h>
 #include <mne/viz/panels/compensator_panel.h>
+#include <mne/viz/panels/connectivity_panel.h>
+#include <mne/viz/panels/covariance_panel.h>
 #include <mne/viz/panels/forward_panel.h>
 #include <mne/fiff/fiff_constants.h>
+#include <mne/viz/panels/minimum_norm_panel.h>
 #include <mne/viz/panels/projectors_panel.h>
+#include <mne/viz/panels/sphara_panel.h>
+#include <mne/viz/panels/time_frequency_panel.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <cstdio>
+#include <filesystem>
 #include <functional>
 #include <optional>
 #include <string>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -326,6 +333,96 @@ void test_forward_panel()
     CHECK(store.values().empty());
 }
 
+void test_processing_panels()
+{
+    // Covariance: whole seconds of samples, reported only on user changes
+    CovariancePanel covariance;
+    std::vector<int> samples;
+    covariance.set_samples_callback([&samples](int value) {
+        samples.push_back(value);
+    });
+    covariance.set_minimum_samples(1000);
+    covariance.set_samples(90000);
+    CHECK(covariance.samples() == 60000 && samples.empty());
+    covariance.form().set_value("samples", 2000);
+    CHECK((samples == std::vector<int>{2000}));
+
+    // Time-frequency: trial and row together
+    TimeFrequencyPanel timeFrequency;
+    std::vector<std::pair<int, int>> trialRows;
+    timeFrequency.set_callback([&trialRows](int trial, int row) {
+        trialRows.emplace_back(trial, row);
+    });
+    timeFrequency.form().set_value("rowNumber", 4);
+    CHECK(trialRows.size() == 1 && trialRows.back().second == 4 && timeFrequency.row() == 4);
+
+    // SPHARA: the system sets labels and limits and reports clamped values
+    SpharaPanel sphara;
+    std::vector<std::tuple<std::string, int, int>> options;
+    SpharaPanel::Callbacks spharaCallbacks;
+    spharaCallbacks.options_changed = [&options](const std::string& system, int first, int second) {
+        options.emplace_back(system, first, second);
+    };
+    sphara.set_callbacks(std::move(spharaCallbacks));
+    sphara.form().set_value("system", std::string("EEG"));
+    CHECK(options.size() == 1 && std::get<0>(options.back()) == "EEG" && std::get<1>(options.back()) == 256);
+    CHECK(!sphara.form().is_visible("second") && sphara.form().field("first")->label == "EEG");
+
+    // Minimum norm: a fixed method cannot change; the CMNE checkpoint persists
+    MinimumNormPanel fixed("dSPM");
+    CHECK(fixed.method() == "dSPM" && !fixed.form().is_enabled("method"));
+    MinimumNormPanel minimumNorm;
+    minimumNorm.set_model_checkpoint("model.onnx");
+    MemorySettingsStore store;
+    minimumNorm.save(store, "app");
+    CHECK(store.values().size() == 1);
+    MinimumNormPanel restoredNorm;
+    std::vector<std::filesystem::path> checkpoints;
+    MinimumNormPanel::Callbacks normCallbacks;
+    normCallbacks.model_checkpoint_changed = [&checkpoints](const std::filesystem::path& path) {
+        checkpoints.push_back(path);
+    };
+    restoredNorm.set_callbacks(std::move(normCallbacks));
+    restoredNorm.load(store, "app");
+    CHECK(restoredNorm.model_checkpoint() == std::filesystem::path("model.onnx") && checkpoints.size() == 1);
+}
+
+void test_connectivity_panel()
+{
+    ConnectivityPanel panel;
+    CHECK(panel.metric() == "COR" && panel.number_trials() == 10 && panel.lower_frequency() == 7.0);
+    std::vector<std::pair<float, float>> bands;
+    std::vector<int> trials;
+    ConnectivityPanel::Callbacks callbacks;
+    // A host may revert changes while being told about them
+    callbacks.number_trials_changed = [&panel, &trials](int value) {
+        trials.push_back(value);
+        panel.set_number_trials(15);
+    };
+    callbacks.frequency_band_changed = [&bands](float low, float high) {
+        bands.emplace_back(low, high);
+    };
+    panel.set_callbacks(std::move(callbacks));
+    panel.form().set_value("connNrTrials", 40);
+    CHECK((trials == std::vector<int>{40}) && panel.number_trials() == 15);
+    panel.set_frequency_band(4.0, 8.0);
+    CHECK(bands.size() == 2 && bands.back() == std::make_pair(4.0f, 8.0f));
+
+    // Restored settings are not reported
+    MemorySettingsStore store;
+    panel.form().set_value("connMethod", std::string("PLV"));
+    panel.save(store, "app");
+    ConnectivityPanel restored;
+    std::vector<std::string> metrics;
+    ConnectivityPanel::Callbacks restoredCallbacks;
+    restoredCallbacks.metric_changed = [&metrics](const std::string& metric) {
+        metrics.push_back(metric);
+    };
+    restored.set_callbacks(std::move(restoredCallbacks));
+    restored.load(store, "app");
+    CHECK(restored.metric() == "PLV" && restored.number_trials() == 15 && restored.upper_frequency() == 8.0 && metrics.empty());
+}
+
 } // namespace
 
 //=============================================================================================================
@@ -343,6 +440,8 @@ int main()
         {"compensator_panel", test_compensator_panel},
         {"projectors_panel", test_projectors_panel},
         {"forward_panel", test_forward_panel},
+        {"processing_panels", test_processing_panels},
+        {"connectivity_panel", test_connectivity_panel},
     };
     for (const auto& [name, test] : tests) {
         const int before = g_failures;

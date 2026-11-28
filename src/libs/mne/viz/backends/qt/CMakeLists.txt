@@ -57,27 +57,21 @@ set(SOURCES
     viewers/progressview.cpp
     viewers/modalityselectionview.cpp
     viewers/butterflyview.cpp
-    viewers/spectrumsettingsview.cpp
     viewers/scalingview.cpp
     viewers/filtersettingsview.cpp
-    viewers/spharasettingsview.cpp
     viewers/fiffrawviewsettings.cpp
     viewers/averageselectionview.cpp
     viewers/triggerdetectionview.cpp
     viewers/quickcontrolview.cpp
-    viewers/connectivitysettingsview.cpp
-    viewers/minimumnormsettingsview.cpp
     viewers/averagingsettingsview.cpp
     viewers/projectsettingsview.cpp
     viewers/control3dview.cpp
-    viewers/tfsettingsview.cpp
     viewers/artifactsettingsview.cpp
     viewers/channeldataview.cpp
     viewers/rtfiffrawview.cpp
     viewers/multiviewwindow.cpp
     viewers/multiview.cpp
     viewers/hpisettingsview.cpp
-    viewers/covariancesettingsview.cpp
     kit/itemlistview.cpp
     kit/panelwidget.cpp
     kit/qttheme.cpp
@@ -148,27 +142,21 @@ set(HEADERS
     viewers/progressview.h
     viewers/modalityselectionview.h
     viewers/butterflyview.h
-    viewers/spectrumsettingsview.h
     viewers/scalingview.h
     viewers/filtersettingsview.h
-    viewers/spharasettingsview.h
     viewers/fiffrawviewsettings.h
     viewers/averageselectionview.h
     viewers/triggerdetectionview.h
     viewers/quickcontrolview.h
-    viewers/connectivitysettingsview.h
-    viewers/minimumnormsettingsview.h
     viewers/averagingsettingsview.h
     viewers/projectsettingsview.h
     viewers/control3dview.h
-    viewers/tfsettingsview.h
     viewers/artifactsettingsview.h
     viewers/channeldataview.h
     viewers/rtfiffrawview.h
     viewers/multiviewwindow.h
     viewers/multiview.h
     viewers/hpisettingsview.h
-    viewers/covariancesettingsview.h
     kit/itemlistview.h
     kit/panelwidget.h
     kit/qttheme.h

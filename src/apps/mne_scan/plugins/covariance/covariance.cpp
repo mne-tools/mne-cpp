@@ -19,7 +19,8 @@
 #include "covariance.h"
 
 #include "FormFiles/covariancesetupwidget.h"
-#include <mne/viz/backends/qt/viewers/covariancesettingsview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/covariance_panel.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimecov.h>
 #include <mne/dsp/rt/rt_cov.h>
@@ -106,13 +107,15 @@ void Covariance::initPluginControlWidgets()
     if (m_pFiffInfo) {
         std::vector<std::unique_ptr<QWidget>> controlWidgets;
 
-        CovarianceSettingsView* pCovarianceWidget = makeControlWidget<CovarianceSettingsView>(controlWidgets, QString("MNESCAN/%1").arg(this->getName()));
+        auto panel = std::make_shared<CovariancePanel>();
+        panel->set_minimum_samples(static_cast<int>(m_pFiffInfo->sfreq));
+        panel->set_samples(m_iEstimationSamples);
+        panel->set_samples_callback([this](int samples) {
+            changeSamples(samples);
+        });
+        PanelWidget* pCovarianceWidget = makeControlWidget<PanelWidget>(controlWidgets, panel, QString("MNESCAN/%1").arg(this->getName()));
         connect(this, &Covariance::guiModeChanged,
-                pCovarianceWidget, &CovarianceSettingsView::setGuiMode);
-        connect(pCovarianceWidget, &CovarianceSettingsView::samplesChanged,
-                this, &Covariance::changeSamples);
-        pCovarianceWidget->setMinSamples(m_pFiffInfo->sfreq);
-        pCovarianceWidget->setCurrentSamples(m_iEstimationSamples);
+                pCovarianceWidget, &PanelWidget::setGuiMode);
         pCovarianceWidget->setObjectName("group_Settings");
 
         offerControlWidgets(std::move(controlWidgets));

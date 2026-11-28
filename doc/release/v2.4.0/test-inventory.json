@@ -11353,12 +11353,17 @@
       },
       "registry_classes": [
         "CompensatorPanel",
+        "ConnectivityPanel",
+        "CovariancePanel",
         "ForwardPanel",
+        "MinimumNormPanel",
         "Panel",
         "ProjectorsPanel",
         "SettingChoice",
         "SettingField",
-        "SettingsForm"
+        "SettingsForm",
+        "SpharaPanel",
+        "TimeFrequencyPanel"
       ]
     },
     {

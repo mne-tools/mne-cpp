@@ -23,7 +23,8 @@
 #include <mne/base/string_utils.h>
 #include <mne/connectivity/connectivity.h>
 #include <mne/dsp/rt/rt_connectivity.h>
-#include <mne/viz/backends/qt/viewers/connectivitysettingsview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/connectivity_panel.h>
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimeconnectivityestimate.h>
 #include <scMeas/realtimemultisamplearray.h>
@@ -122,29 +123,41 @@ void NeuronalConnectivity::initPluginControlWidgets()
 {
     std::vector<std::unique_ptr<QWidget>> controlWidgets;
 
-    ConnectivitySettingsView* pConnectivitySettingsView = makeControlWidget<ConnectivitySettingsView>(controlWidgets, QString("MNESCAN/%1").arg(this->getName()));
+    auto panel = std::make_shared<ConnectivityPanel>();
+    ConnectivityPanel::Callbacks callbacks;
+    callbacks.metric_changed = [this](const std::string& metric) {
+        onMetricChanged(QString::fromStdString(metric));
+    };
+    callbacks.number_trials_changed = [this](int trials) {
+        onNumberTrialsChanged(trials);
+    };
+    callbacks.trigger_type_changed = [this](const std::string& type) {
+        onTriggerTypeChanged(QString::fromStdString(type));
+    };
+    callbacks.frequency_band_changed = [this](float low, float high) {
+        onFrequencyBandChanged(low, high);
+    };
+    panel->set_callbacks(std::move(callbacks));
+    PanelWidget* pConnectivitySettingsView = makeControlWidget<PanelWidget>(controlWidgets, panel, QString("MNESCAN/%1").arg(this->getName()));
     connect(this, &NeuronalConnectivity::guiModeChanged,
-            pConnectivitySettingsView, &ConnectivitySettingsView::setGuiMode);
+            pConnectivitySettingsView, &PanelWidget::setGuiMode);
     pConnectivitySettingsView->setObjectName("group_tab_Settings_Connectivity");
-
-    //Add control widgets to output data (will be used by QuickControlView by the measurements display)
-    connect(pConnectivitySettingsView, &ConnectivitySettingsView::connectivityMetricChanged,
-            this, &NeuronalConnectivity::onMetricChanged);
-    connect(pConnectivitySettingsView, &ConnectivitySettingsView::numberTrialsChanged,
-            this, &NeuronalConnectivity::onNumberTrialsChanged);
-    connect(pConnectivitySettingsView, &ConnectivitySettingsView::triggerTypeChanged,
-            this, &NeuronalConnectivity::onTriggerTypeChanged);
-    connect(pConnectivitySettingsView, &ConnectivitySettingsView::freqBandChanged,
-            this, &NeuronalConnectivity::onFrequencyBandChanged);
     connect(this, &NeuronalConnectivity::responsibleTriggerTypesChaged,
-            pConnectivitySettingsView, &ConnectivitySettingsView::setTriggerTypes);
+            this, [panel](const QStringList& types) {
+                std::vector<std::string> names;
+                names.reserve(static_cast<std::size_t>(types.size()));
+                for (const QString& type : types) {
+                    names.push_back(type.toStdString());
+                }
+                panel->set_trigger_types(names);
+            });
 
-
-    onFrequencyBandChanged(pConnectivitySettingsView->getLowerFreq(), pConnectivitySettingsView->getUpperFreq());
-    onMetricChanged(pConnectivitySettingsView->getConnectivityMetric());
-    onWindowTypeChanged(pConnectivitySettingsView->getWindowType());
-    onNumberTrialsChanged(pConnectivitySettingsView->getNumberTrials());
-    onTriggerTypeChanged(pConnectivitySettingsView->getTriggerType());
+    // The widget restored the settings without reports; the plugin starts from them
+    onFrequencyBandChanged(static_cast<float>(panel->lower_frequency()), static_cast<float>(panel->upper_frequency()));
+    onMetricChanged(QString::fromStdString(panel->metric()));
+    onWindowTypeChanged(QString::fromStdString(panel->window_type()));
+    onNumberTrialsChanged(panel->number_trials());
+    onTriggerTypeChanged(QString::fromStdString(panel->trigger_type()));
 
     offerControlWidgets(std::move(controlWidgets));
 
