@@ -392,8 +392,8 @@
       "missing_tests": []
     },
     "viz": {
-      "classes": 155,
-      "tested": 146,
+      "classes": 157,
+      "tested": 148,
       "untested": [
         "ElectrodeObject",
         "GeometryInfo",
@@ -409,7 +409,7 @@
     },
     "viz_qt": {
       "classes": 96,
-      "tested": 43,
+      "tested": 44,
       "untested": [
         "AbstractTreeItem",
         "AbstractView",
@@ -425,7 +425,6 @@
         "ChannelDisplayInfo",
         "ChannelInfoModel",
         "ChannelLabelPanel",
-        "ChannelSelectionView",
         "ColorMap",
         "ConnectivitySettingsView",
         "Control3DView",

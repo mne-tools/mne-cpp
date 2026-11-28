@@ -768,7 +768,9 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz/average-layout-panel',
         'api/viz/evoked-averages',
         'api/viz/spectrum-figure',
-        'api/viz/spectrum-panel'
+        'api/viz/spectrum-panel',
+        'api/viz/item-list',
+        'api/viz/channel-selection-panel'
       ],
     },
     {
@@ -792,7 +794,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz-qt/channel-info-model',
         'api/viz-qt/channel-label-panel',
         'api/viz-qt/channel-rhi-view',
-        'api/viz-qt/channel-selection-view',
         'api/viz-qt/color-map',
         'api/viz-qt/panel-widget',
         'api/viz-qt/connectivity-settings-view',
@@ -873,7 +874,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/viz-qt/brain-view-core',
         'api/viz-qt/brain-view-host',
         'api/viz-qt/brain-window',
-        'api/viz-qt/qt-settings-store'
+        'api/viz-qt/qt-settings-store',
+        'api/viz-qt/item-list-view'
       ],
     },
     {

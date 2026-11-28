@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 550,
+    "exported_classes": 552,
     "exported_free_functions": 260,
-    "registered_classes": 721,
+    "registered_classes": 723,
     "exported_not_registered": 2,
     "registered_function_modules": 15,
     "registered_header_only": 158,
     "registered_stale": 0,
-    "registered_with_test": 415,
+    "registered_with_test": 418,
     "registered_test_unresolved": 0,
-    "registered_with_example": 482,
+    "registered_with_example": 484,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 102,
     "registered_without_api_page": 0,
-    "with_snippet": 529,
-    "public_api_units": 723,
-    "example_eligible": 482,
+    "with_snippet": 531,
+    "public_api_units": 725,
+    "example_eligible": 484,
     "example_exempt": 241,
-    "eligible_backed_by_registry_example": 480,
-    "eligible_used_by_some_example": 407,
+    "eligible_backed_by_registry_example": 482,
+    "eligible_used_by_some_example": 408,
     "examples_on_disk": 82,
     "examples_built": 82
   },
@@ -225,13 +225,13 @@
       "with_snippet": 12
     },
     "viz": {
-      "public": 252,
-      "registered": 252,
-      "with_test": 189,
-      "eligible": 71,
-      "eligible_with_registry_example": 71,
-      "eligible_used_by_example": 55,
-      "with_snippet": 87
+      "public": 254,
+      "registered": 254,
+      "with_test": 192,
+      "eligible": 73,
+      "eligible_with_registry_example": 73,
+      "eligible_used_by_example": 56,
+      "with_snippet": 89
     }
   },
   "exported_free_functions": [
@@ -13472,6 +13472,25 @@
       "exempt_reason": "header prefix 'viz/backends/qt/3d/workers/': Real-time controller owned by a view; its behaviour is exercised through the owning view."
     },
     {
+      "name": "ItemListView",
+      "header": "viz/backends/qt/kit/itemlistview.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_qt_viewers2",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/viz-qt/item-list-view.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "registry: Qt view of any viz::ItemList, created by PanelWidget for the lists of a panel; exercised by test_viz_qt_viewers2."
+    },
+    {
       "name": "PanelWidget",
       "header": "viz/backends/qt/kit/panelwidget.h",
       "library": "viz",
@@ -14027,25 +14046,6 @@
       ],
       "snippets": [],
       "api_page": "doc/website/docs/api/viz-qt/channel-data-view.mdx",
-      "python_equiv": null,
-      "example_eligible": false,
-      "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
-    },
-    {
-      "name": "ChannelSelectionView",
-      "header": "viz/backends/qt/viewers/channelselectionview.h",
-      "library": "viz",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
-      "api_page": "doc/website/docs/api/viz-qt/channel-selection-view.mdx",
       "python_equiv": null,
       "example_eligible": false,
       "exempt_reason": "header prefix 'viz/backends/qt/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
@@ -17389,6 +17389,27 @@
       "exempt_reason": "registry: View model of the channel information table; adapted by viz::qt::ChannelInfoModel and exercised by test_viz_viewmodels, it has no standalone use without a view."
     },
     {
+      "name": "ItemList",
+      "header": "viz/models/item_list.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_form_view",
+      "test_resolves": true,
+      "example": "ex_scene_sdl",
+      "example_state": "built",
+      "including_examples": [],
+      "snippets": [
+        "ex_scene_sdl/main.cpp#channel_selection_panel_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/item-list.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "SpectrumTable",
       "header": "viz/models/spectrum_table.h",
       "library": "viz",
@@ -17451,6 +17472,29 @@
         "ex_scene_sdl/main.cpp#average_layout_panel_usage"
       ],
       "api_page": "doc/website/docs/api/viz/evoked-averages.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "ChannelSelectionPanel",
+      "header": "viz/panels/channel_selection_panel.h",
+      "library": "viz",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_viz_form_view",
+      "test_resolves": true,
+      "example": "ex_scene_sdl",
+      "example_state": "built",
+      "including_examples": [
+        "ex_scene_sdl"
+      ],
+      "snippets": [
+        "ex_scene_sdl/main.cpp#channel_selection_panel_usage"
+      ],
+      "api_page": "doc/website/docs/api/viz/channel-selection-panel.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null

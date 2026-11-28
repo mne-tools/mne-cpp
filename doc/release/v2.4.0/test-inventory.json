@@ -10729,7 +10729,9 @@
         "windows-2025-vs2026-qt-min": "absent"
       },
       "registry_classes": [
+        "ChannelSelectionPanel",
         "FormView",
+        "ItemList",
         "Theme"
       ]
     },
@@ -11158,7 +11160,7 @@
         "test-data"
       ],
       "gui": true,
-      "qskip_sites": 2,
+      "qskip_sites": 1,
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
@@ -11174,6 +11176,7 @@
         "ChannelRhiView",
         "EvokedSetModel",
         "FilterPlot",
+        "ItemListView",
         "RtFiffRawView",
         "RtFiffRawViewDelegate",
         "RtFiffRawViewModel",

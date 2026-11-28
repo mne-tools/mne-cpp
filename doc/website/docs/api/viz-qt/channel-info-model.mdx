@@ -114,6 +114,27 @@ Updates the layout map.
 
 ---
 
+### setLayout(layout)
+
+Updates the layout map from toolkit-free layout positions, e.g.
+
+those [`ChannelSelectionPanel`](/docs/api/viz/channel-selection-panel) loaded.
+
+**Parameters:**
+
+- **layout** : *const std::map&lt; std::string, [Point](/docs/api/viz/point) &gt; &*
+  Layout position of each channel by layout name.
+
+---
+
+### table()
+
+**Returns:**
+
+- *const [ChannelTable](/docs/api/viz/channel-table) &* — The toolkit-free channel rows the model adapts.
+
+---
+
 ### getMappedChannelsList()
 
 Updates the layout map.
@@ -167,6 +188,21 @@ Returns bad channel list.
 ### clearModel()
 
 clearModel clears all model's members
+
+---
+
+## Static Methods
+
+### sharedTable(model)
+
+**Parameters:**
+
+- **model** : *const std::shared_ptr&lt; ChannelInfoModel &gt; &*
+  A model.
+
+**Returns:**
+
+- *std::shared_ptr&lt; const [ChannelTable](/docs/api/viz/channel-table) &gt;* — Its channel rows, keeping the model alive, e.g. for `viz::ChannelSelectionPanel::set_channel_table()`.
 
 ---
 

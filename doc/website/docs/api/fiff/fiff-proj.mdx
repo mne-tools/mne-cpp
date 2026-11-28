@@ -248,7 +248,7 @@ ok &= expect(eventsWritten && eventsBack.rows() == 25 && eventsBack(0, 0) == 139
 
 Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
 
-````cpp title="src/examples/ex_scene_sdl/main.cpp, line 236"
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 273"
 auto projectors = std::make_unique<ProjectorsPanel>();
 std::vector<mne::FiffProj> projs(4);
 const char* descriptions[] = {"Average EEG reference", "PCA-v1 (planar)", "PCA-v2 (axial)", "ECG-planar-999--0.200-0.400-PCA-01"};

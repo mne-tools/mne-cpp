@@ -17,7 +17,7 @@ class mne::viz::FormView
 
 Shows and edits a [`SettingsForm`](/docs/api/viz/settings-form) in a [`Surface`](/docs/api/viz/surface), drawn toolkit-free in the look of a [`Theme`](/docs/api/viz/theme).
 
-The title of the form comes first, then each group as a card with one row per visible field: the label on the left, the editor on the right. Bool fields are switches, numbers steppers with - and + buttons (the wheel steps too), choices cycle with &lt; and &gt; buttons, text, path and directory fields are line edits, actions buttons, colours swatches and info fields toned text. Disabled fields are greyed and ignore input. The view follows the form: it lays out again when fields are added, removed or relabelled and repaints when values change. Content taller than the surface scrolls with the wheel.
+The title of the form comes first, then each group as a card with one row per visible field: the label on the left, the editor on the right. Bool fields are switches, numbers steppers with - and + buttons (the wheel steps too), choices cycle with &lt; and &gt; buttons, text, path and directory fields are line edits, actions buttons, colours swatches and info fields toned text. The item lists of a panel fill their custom fields as list boxes: a click selects, Ctrl or Cmd extends the selection of multi-selection lists, the wheel scrolls them, the arrow keys move the selection and Delete removes the selected items of removable lists. Disabled fields are greyed and ignore input. The view follows the form: it lays out again when fields are added, removed or relabelled and repaints when values change. Content taller than the surface scrolls with the wheel.
 
 The form must outlive the view.
 
@@ -208,6 +208,22 @@ Scrolls the content, clamped so it stays in view.
 
 ---
 
+### item_rect(key, index)
+
+**Parameters:**
+
+- **key** : *const std::string &*
+  `Key` of an item list of the panel.
+
+- **index** : *int*
+  Row of an item.
+
+**Returns:**
+
+- *std::optional&lt; [Rect](/docs/api/viz/rect) &gt;* — Where the item is shown in view coordinates (scrolling applied), or nothing if the list or the item is not shown.
+
+---
+
 ### focused_key()
 
 **Returns:**
@@ -325,8 +341,9 @@ Describes the next frame.
 
 Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
 
-````cpp title="src/examples/ex_scene_sdl/main.cpp, line 253"
-    FormView view(*panel);
+````cpp title="src/examples/ex_scene_sdl/main.cpp, line 231"
+    // Any panel's lists, without a view written for them
+    FormView view(panel);
     view.set_text_metrics(&metrics);
     return host.run(view);
 }

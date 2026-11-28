@@ -1,0 +1,258 @@
+---
+id: item-list
+title: "mne::viz::ItemList"
+sidebar_label: ItemList
+sidebar_position: 172
+---
+
+# ItemList
+
+**Namespace:** `mne::viz` &nbsp;·&nbsp; **Library:** Visualization Library &nbsp;·&nbsp; **Source:** [`viz/models/item_list.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/viz/models/item_list.h)
+
+`#include <mne/viz/item_list.h>`
+
+```cpp
+class mne::viz::ItemList
+```
+
+Toolkit-free model of a list view: its items, which of them are selected, and whether the user may remove them.
+
+Panels hold item lists and hosts show them, e.g. [`ItemListView`](/docs/api/viz-qt/item-list-view) in Qt and [`FormView`](/docs/api/viz/form-view) without a toolkit. The selection follows the clicks of a list view: in Single mode a click selects one item; in Multi mode a click selects one item and a click with `extend` (Ctrl held) toggles it. Removable lists drop their selected items, except the protected ones, when the user presses Delete.
+
+```cpp title="src/examples/ex_scene_sdl/main.cpp"
+// The Vectorview layout and the mne_browse_raw groups of the installed resources
+ChannelSelectionPanel panel;
+ChannelSelectionPanel::Callbacks callbacks;
+callbacks.channels_shown = [](const std::vector<std::string>& channels) {
+    std::printf("Showing %zu channels\n", channels.size());
+};
+panel.set_callbacks(std::move(callbacks));
+panel.set_mapped_channels({"MEG 0111", "MEG 0112", "MEG 0113", "MEG 0121"});
+panel.select_channels({"MEG 0112"});
+
+// Any panel's lists, without a view written for them
+FormView view(panel);
+view.set_text_metrics(&metrics);
+return host.run(view);
+```
+
+---
+
+## Public Methods
+
+### ItemList(mode)
+
+Constructs an empty list.
+
+**Parameters:**
+
+- **mode** : *SelectionMode*
+  How items are selected.
+
+---
+
+### selection_mode()
+
+**Returns:**
+
+- *SelectionMode* — How items are selected.
+
+---
+
+### set_items(items)
+
+Replaces the items; nothing is selected afterwards.
+
+**Parameters:**
+
+- **items** : *std::vector&lt; std::string &gt;*
+  The items.
+
+---
+
+### items()
+
+**Returns:**
+
+- *const std::vector&lt; std::string &gt; &* — The items.
+
+---
+
+### count()
+
+**Returns:**
+
+- *int* — The number of items.
+
+---
+
+### append(item)
+
+Adds an item at the end.
+
+**Parameters:**
+
+- **item** : *std::string*
+  The item.
+
+---
+
+### find(item)
+
+**Parameters:**
+
+- **item** : *const std::string &*
+  An item.
+
+**Returns:**
+
+- *int* — Its row, or -1.
+
+---
+
+### click(row, extend)
+
+Changes the selection as a click on `row` does; a row outside the list clears the selection.
+
+**Parameters:**
+
+- **row** : *int*
+  Row clicked.
+
+- **extend** : *bool*
+  Toggle the row instead of selecting only it (Multi mode, Ctrl held).
+
+---
+
+### set_selected(rows)
+
+Selects exactly `rows`; rows outside the list are ignored, and Single mode keeps only the first.
+
+**Parameters:**
+
+- **rows** : *std::vector&lt; int &gt;*
+  Rows to select.
+
+---
+
+### selected()
+
+**Returns:**
+
+- *const std::vector&lt; int &gt; &* — The selected rows in increasing order.
+
+---
+
+### is_selected(row)
+
+**Parameters:**
+
+- **row** : *int*
+  A row.
+
+**Returns:**
+
+- *bool* — Whether it is selected.
+
+---
+
+### current()
+
+**Returns:**
+
+- *int* — The first selected row, or -1.
+
+---
+
+### current_item()
+
+**Returns:**
+
+- *std::string* — The first selected item, or an empty text.
+
+---
+
+### set_removable(removable)
+
+**Parameters:**
+
+- **removable** : *bool*
+  Whether the user may remove the selected items.
+
+---
+
+### removable()
+
+**Returns:**
+
+- *bool* — Whether the user may remove the selected items.
+
+---
+
+### set_protected_items(items)
+
+**Parameters:**
+
+- **items** : *std::vector&lt; std::string &gt;*
+  Items that are never removed, e.g. "All".
+
+---
+
+### remove_selected()
+
+Removes the selected items but the protected ones, as Delete does in a removable list.
+
+**Returns:**
+
+- *bool* — Whether an item was removed; false for lists that are not removable.
+
+---
+
+### set_visible_rows(rows)
+
+**Parameters:**
+
+- **rows** : *int*
+  Rows a host shows without scrolling.
+
+---
+
+### visible_rows()
+
+**Returns:**
+
+- *int* — Rows a host shows without scrolling.
+
+---
+
+### add_listener(listener)
+
+**Parameters:**
+
+- **listener** : *std::function&lt; void(Change)&gt;*
+  Called after every change.
+
+**Returns:**
+
+- *int* — An id for `remove_listener()`.
+
+---
+
+### remove_listener(id)
+
+**Parameters:**
+
+- **id** : *int*
+  Id from `add_listener()`; unknown ids are ignored.
+
+---
+
+## Example
+
+- Start here: [ex_scene_sdl](../../examples/viz/ex_scene_sdl.mdx) — Trace view in an SDL3 window, without Qt: mne_scene's view and software renderer in another toolkit.
+- Full source: [`src/examples/ex_scene_sdl/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_scene_sdl/main.cpp)
+- Build target: `ex_scene_sdl` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

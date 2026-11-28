@@ -17,7 +17,7 @@ class mne::viz::qt::SelectionItem
 
 The channels picked in a sensor layout: names, numbers, kinds, units and layout positions, one entry per channel in each vector.
 
-[`ChannelSelectionView`](/docs/api/viz-qt/channel-selection-view) emits it when the selection changes; the average layout and the analysis plugins show only these channels.
+The hosts of [`ChannelSelectionPanel`](/docs/api/viz/channel-selection-panel) pass it on when the selection changes; the average layout and the analysis plugins show only these channels.
 
 ---
 
@@ -28,6 +28,21 @@ The channels picked in a sensor layout: names, numbers, kinds, units and layout 
 **Returns:**
 
 - *std::vector&lt; viz::[AverageLayoutFigure](/docs/api/viz/average-layout-figure)::Channel &gt;* — One channel of an average layout per entry, without averages.
+
+---
+
+## Static Methods
+
+### fromSensors(sensors)
+
+**Parameters:**
+
+- **sensors** : *const std::vector&lt; viz::[SensorLayout](/docs/api/viz/sensor-layout)::Sensor &gt; &*
+  Sensors of a layout, e.g. `viz::SensorLayoutFigure::selection()`.
+
+**Returns:**
+
+- *[SelectionItem](/docs/api/viz-qt/selection-item)* — Their names, kinds, units and layout positions, with channel number 0.
 
 ---
 
