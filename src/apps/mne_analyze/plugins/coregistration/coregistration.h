@@ -52,9 +52,9 @@ class Communicator;
 class AbstractModel;
 }
 
-namespace mne::viz::qt
+namespace mne::viz
 {
-class CoregSettingsView;
+class CoregistrationPanel;
 }
 
 namespace mne
@@ -119,6 +119,12 @@ private:
      * Updates the dropdown display for selecting the bem model.
      */
     void updateBemList(QSharedPointer<mne::analyze::AbstractModel> pNewModel);
+
+    //=========================================================================================================
+    /**
+     * Shows the stored BEM models in the panel and loads the one it chooses.
+     */
+    void showBemList();
 
     //=========================================================================================================
     /**
@@ -330,7 +336,7 @@ private:
 
     QPointer<mne::analyze::Communicator> m_pCommu;
 
-    mne::viz::qt::CoregSettingsView* m_pCoregSettingsView; /**< Pointer to coreg GUI. */
+    std::shared_ptr<mne::viz::CoregistrationPanel> m_pCoregPanel; /**< Controls of the co-registration. */
 
     std::future<mne::FiffCoordTrans> m_Future; /**< Pending ICP fit; valid until its result is consumed. */
     QMutex m_ParameterMutex;

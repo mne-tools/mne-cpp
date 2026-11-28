@@ -1189,14 +1189,6 @@
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/viz/backends/qt/viewers/coregsettingsview.h": {
-      "modernize-use-nullptr": 1,
-      "modernize-use-override": 6
-    },
-    "src/libs/mne/viz/backends/qt/viewers/dipolefitview.h": {
-      "modernize-use-nullptr": 1,
-      "modernize-use-override": 5
-    },
     "src/libs/mne/viz/backends/qt/viewers/fiffrawviewsettings.cpp": {
       "bugprone-switch-missing-default-case": 1,
       "clang-analyzer-cplusplus.NewDeleteLeaks": 1
@@ -1256,14 +1248,6 @@
     "src/libs/mne/viz/backends/qt/viewers/helpers/timerulerwidget.cpp": {
       "bugprone-incorrect-roundings": 1
     },
-    "src/libs/mne/viz/backends/qt/viewers/hpisettingsview.cpp": {
-      "bugprone-switch-missing-default-case": 1,
-      "performance-unnecessary-value-param": 1
-    },
-    "src/libs/mne/viz/backends/qt/viewers/hpisettingsview.h": {
-      "modernize-use-nullptr": 1,
-      "modernize-use-override": 6
-    },
     "src/libs/mne/viz/backends/qt/viewers/modalityselectionview.cpp": {
       "modernize-use-nullptr": 1
     },
@@ -1278,10 +1262,6 @@
       "modernize-use-override": 1
     },
     "src/libs/mne/viz/backends/qt/viewers/progressview.h": {
-      "modernize-use-override": 6
-    },
-    "src/libs/mne/viz/backends/qt/viewers/projectsettingsview.h": {
-      "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
     "src/libs/mne/viz/backends/qt/viewers/quickcontrolview.h": {

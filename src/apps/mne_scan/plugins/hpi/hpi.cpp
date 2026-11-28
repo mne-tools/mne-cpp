@@ -22,7 +22,8 @@
 
 #include "FormFiles/hpisetupwidget.h"
 #include <mne/base/string_utils.h>
-#include <mne/viz/backends/qt/viewers/hpisettingsview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/hpi_panel.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimehpiresult.h>
 #include <mne/dsp/rt/rt_hpi.h>
@@ -290,51 +291,78 @@ void Hpi::initPluginControlWidgets()
     if (bFiffInfo) {
         std::vector<std::unique_ptr<QWidget>> controlWidgets;
 
-        // Projects Settings
-        HpiSettingsView* pHpiSettingsView = makeControlWidget<HpiSettingsView>(controlWidgets, QString("MNESCAN/%1/").arg(this->getName()));
+        // HPI Settings
+        auto panel = std::make_shared<mne::viz::HpiPanel>();
+        mne::viz::HpiPanel::Callbacks callbacks;
+        callbacks.coil_frequencies_changed = [this](const std::vector<int>& frequencies) {
+            onCoilFrequenciesChanged(frequencies);
+        };
+        callbacks.digitizers_changed = [this](const mne::FiffDigPointSet& digitizers, const std::filesystem::path& file) {
+            onDigitizersChanged(digitizers, file);
+        };
+        callbacks.order_frequencies = [this]() {
+            onDoFreqOrder();
+        };
+        callbacks.single_fit = [this]() {
+            onDoSingleHpiFit();
+        };
+        callbacks.ssp_changed = [this](bool on) {
+            onSspStatusChanged(on);
+        };
+        callbacks.compensators_changed = [this](bool on) {
+            onCompStatusChanged(on);
+        };
+        callbacks.continuous_fitting_changed = [this](bool on) {
+            onContHpiStatusChanged(on);
+        };
+        callbacks.fitting_window_size_changed = [this](int samples) {
+            setFittingWindowSize(samples);
+        };
+        callbacks.allowed_error_changed = [this](double millimeters) {
+            onAllowedMeanErrorDistChanged(millimeters);
+        };
+        callbacks.allowed_movement_changed = [this](double millimeters) {
+            onAllowedMovementChanged(millimeters);
+        };
+        callbacks.allowed_rotation_changed = [this](double degrees) {
+            onAllowedRotationChanged(degrees);
+        };
+        panel->set_callbacks(std::move(callbacks));
+        PanelWidget* pPanelWidget = makeControlWidget<PanelWidget>(controlWidgets, panel, QString("MNESCAN/%1").arg(this->getName()));
 
         connect(this, &Hpi::guiModeChanged,
-                pHpiSettingsView, &HpiSettingsView::setGuiMode);
-        pHpiSettingsView->setObjectName("widget_");
+                pPanelWidget, &PanelWidget::setGuiMode);
+        pPanelWidget->setObjectName("widget_");
 
-        connect(pHpiSettingsView, &HpiSettingsView::digitizersChanged,
-                this, &Hpi::onDigitizersChanged);
-        connect(pHpiSettingsView, &HpiSettingsView::doFreqOrder,
-                this, &Hpi::onDoFreqOrder);
-        connect(pHpiSettingsView, &HpiSettingsView::doSingleHpiFit,
-                this, &Hpi::onDoSingleHpiFit);
-        connect(pHpiSettingsView, &HpiSettingsView::coilFrequenciesChanged,
-                this, &Hpi::onCoilFrequenciesChanged);
-        connect(pHpiSettingsView, &HpiSettingsView::sspStatusChanged,
-                this, &Hpi::onSspStatusChanged);
-        connect(pHpiSettingsView, &HpiSettingsView::compStatusChanged,
-                this, &Hpi::onCompStatusChanged);
-        connect(pHpiSettingsView, &HpiSettingsView::contHpiStatusChanged,
-                this, &Hpi::onContHpiStatusChanged);
-        connect(pHpiSettingsView, &HpiSettingsView::allowedMeanErrorDistChanged,
-                this, &Hpi::onAllowedMeanErrorDistChanged);
-        connect(pHpiSettingsView, &HpiSettingsView::allowedMovementChanged,
-                this, &Hpi::onAllowedMovementChanged);
-        connect(pHpiSettingsView, &HpiSettingsView::allowedRotationChanged,
-                this, &Hpi::onAllowedRotationChanged);
-        connect(pHpiSettingsView, &HpiSettingsView::fittingWindowSizeChanged,
-                this, &Hpi::setFittingWindowSize);
-        connect(this, &Hpi::errorsChanged,
-                pHpiSettingsView, &HpiSettingsView::setErrorLabels, Qt::BlockingQueuedConnection);
-        connect(this, &Hpi::gofChanged,
-                pHpiSettingsView, &HpiSettingsView::setGoFLabels, Qt::BlockingQueuedConnection);
-        connect(this, &Hpi::movementResultsChanged,
-                pHpiSettingsView, &HpiSettingsView::setMovementResults, Qt::BlockingQueuedConnection);
-        connect(this, &Hpi::newDigitizerList,
-                pHpiSettingsView, &HpiSettingsView::newDigitizerList);
+        // The results arrive from the fitting thread, which waits until they are shown
+        connect(
+            this, &Hpi::errorsChanged, pPanelWidget, [panel](const std::vector<double>& errors, double meanError) {
+                panel->set_errors(errors, meanError);
+            },
+            Qt::BlockingQueuedConnection);
+        connect(
+            this, &Hpi::gofChanged, pPanelWidget, [panel](const Eigen::VectorXd& goodness, double meanGoodness) {
+                panel->set_goodness_of_fit(goodness, meanGoodness);
+            },
+            Qt::BlockingQueuedConnection);
+        connect(
+            this, &Hpi::movementResultsChanged, pPanelWidget, [panel](double movement, double rotation) {
+                panel->set_movement(movement, rotation);
+            },
+            Qt::BlockingQueuedConnection);
+        connect(this, &Hpi::newDigitizerList, pPanelWidget, [this, panel](const mne::FiffDigPointSet& digitizers) {
+            panel->set_digitizers(digitizers);
+            onCoilFrequenciesChanged(panel->coil_frequencies());
+        });
 
-        onSspStatusChanged(pHpiSettingsView->getSspStatusChanged());
-        onCompStatusChanged(pHpiSettingsView->getCompStatusChanged());
-        onAllowedMeanErrorDistChanged(pHpiSettingsView->getAllowedMeanErrorDistChanged());
-        onAllowedMovementChanged(pHpiSettingsView->getAllowedMovementChanged());
-        onAllowedRotationChanged(pHpiSettingsView->getAllowedRotationChanged());
-        setFittingWindowSize(pHpiSettingsView->getFittingWindowSize());
-        onContHpiStatusChanged(pHpiSettingsView->continuousHPIChecked());
+        // The widget restored the settings without reports; the plugin starts from them
+        onSspStatusChanged(panel->use_ssp());
+        onCompStatusChanged(panel->use_compensators());
+        onAllowedMeanErrorDistChanged(panel->allowed_error());
+        onAllowedMovementChanged(panel->allowed_movement());
+        onAllowedRotationChanged(panel->allowed_rotation());
+        setFittingWindowSize(panel->fitting_window_size());
+        onContHpiStatusChanged(panel->continuous_fitting());
 
         // The digitizers may already have been loaded before this view existed,
         // in which case the newDigitizerList signal was emitted with nobody
@@ -345,7 +373,8 @@ void Hpi::initPluginControlWidgets()
         m_mutex.unlock();
 
         if (bHaveDigitizers) {
-            pHpiSettingsView->newDigitizerList(digitizers);
+            panel->set_digitizers(digitizers);
+            onCoilFrequenciesChanged(panel->coil_frequencies());
         }
 
 

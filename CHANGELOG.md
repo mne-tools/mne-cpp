@@ -506,6 +506,13 @@ aliases; replace the old spelling as below.
   offers the filter type (low-pass, high-pass, band-pass, notch). The
   mne_analyze filtering and mne_scan noise reduction plugins host the panels
   and open the design in a window of its own. `mne_viz` links `mne_dsp`.
+- The recording, HPI, co-registration and dipole fit settings are toolkit-free
+  panels: `viz::ProjectPanel`, `viz::HpiPanel`, `viz::CoregistrationPanel` and
+  `viz::DipoleFitPanel` replace `ProjectSettingsView`, `HpiSettingsView`,
+  `CoregSettingsView` and `DipoleFitView` in the mne_scan writetofile and hpi
+  and the mne_analyze coregistration and dipolefit plugins. The HPI settings
+  keep their keys; coil frequencies are typed as a list ("none" for a coil
+  without one) and the fit results are a list. File choices are path fields.
 - `ChannelRhiRenderer` hosts a `viz::TraceViewClient`, the same trace view
   client the SDL example runs, instead of wiring its own view, animator,
   markers and frame builder; its host becomes the client's `viz::Surface`.

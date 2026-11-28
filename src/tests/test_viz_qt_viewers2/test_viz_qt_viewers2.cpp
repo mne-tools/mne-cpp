@@ -8,8 +8,8 @@
  * @since    2.0.0
  * @date     March, 2026
  * @brief    Tests for additional disp viewer widget classes and helper models.
- *           Covers: HpiSettingsView, CoregSettingsView,
- *           PanelWidget (forward solution, averaging, artifact rejection, trigger detection), FiffRawViewSettings, ProjectSettingsView, BidsView,
+ *           Covers: PanelWidget (HPI, co-registration, forward solution, project, dipole fit, averaging,
+ *           artifact rejection, trigger detection), FiffRawViewSettings, BidsView,
  *           ChannelSelectionView, AverageLayoutPanel, AverageSelectionView,
  *           ButterflyView, SpectrumPanel, RtFiffRawViewModel, EvokedSetModel,
  *           ChannelInfoModel, and RtFiffRawView.
@@ -23,15 +23,15 @@
 #include <mne/viz/backends/qt/detail/map_value.h>
 #include <mne/base/string_utils.h>
 #include <mne/base/log.h>
-#include <mne/viz/backends/qt/viewers/hpisettingsview.h>
-#include <mne/viz/backends/qt/viewers/coregsettingsview.h>
+#include <mne/viz/panels/hpi_panel.h>
+#include <mne/viz/panels/coregistration_panel.h>
 #include <mne/viz/backends/qt/kit/panelwidget.h>
 #include <mne/viz/panels/artifact_panel.h>
 #include <mne/viz/panels/averaging_panel.h>
 #include <mne/viz/panels/forward_panel.h>
 #include <mne/viz/panels/trigger_detection_panel.h>
 #include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
-#include <mne/viz/backends/qt/viewers/projectsettingsview.h>
+#include <mne/viz/panels/project_panel.h>
 #include <mne/viz/panels/filter_design_panel.h>
 #include <mne/viz/backends/qt/plots/helpers/scenepainter.h>
 #include <mne/viz/backends/qt/kit/settingspanel.h>
@@ -53,7 +53,7 @@
 #include <mne/viz/backends/qt/viewers/helpers/rtfiffrawviewmodel.h>
 #include <mne/viz/backends/qt/viewers/helpers/evokedsetmodel.h>
 #include <mne/viz/backends/qt/viewers/helpers/channelinfomodel.h>
-#include <mne/viz/backends/qt/viewers/dipolefitview.h>
+#include <mne/viz/panels/dipole_fit_panel.h>
 #include <mne/viz/backends/qt/viewers/control3dview.h>
 #include <mne/viz/backends/qt/viewers/applytoview.h>
 #include <mne/viz/backends/qt/viewers/helpers/rtfiffrawviewdelegate.h>
@@ -103,7 +103,6 @@
 #include <QTableView>
 #include <QTableWidget>
 #include <QTemporaryDir>
-#include <QInputDialog>
 #include <QMessageBox>
 #include <QColorDialog>
 #include <QToolButton>
@@ -284,35 +283,6 @@ void clickNextMessageBoxButton(const QString& sText)
     });
 }
 
-/** Selects sPath in the next modal QFileDialog and accepts it, then runs afterAccept (e.g. to answer a follow-up dialog). */
-void chooseFileInNextDialog(const QString& sPath, const std::function<void()>& afterAccept = {})
-{
-    answerNextModal([sPath, afterAccept](QWidget* pModal) {
-        auto* pDialog = qobject_cast<QFileDialog*>(pModal);
-        QVERIFY(pDialog);
-        // Typing the name works for open dialogs too, whose selectFile() is dropped for an existing file
-        auto* pName = pDialog->findChild<QLineEdit*>(QStringLiteral("fileNameEdit"));
-        QVERIFY(pName);
-        pDialog->setDirectory(QFileInfo(sPath).absolutePath());
-        pName->setText(QFileInfo(sPath).fileName());
-        static_cast<QDialog*>(pDialog)->accept();
-        if (afterAccept) {
-            afterAccept();
-        }
-    });
-}
-
-/** Enters sText into the next modal QInputDialog and accepts it. */
-void answerNextInputDialog(const QString& sText)
-{
-    answerNextModal([sText](QWidget* pModal) {
-        auto* pDialog = qobject_cast<QInputDialog*>(pModal);
-        QVERIFY(pDialog);
-        pDialog->setTextValue(sText);
-        pDialog->accept();
-    });
-}
-
 std::shared_ptr<FiffInfo> createBrowserTestInfo()
 {
     std::shared_ptr<FiffInfo> info(new FiffInfo);
@@ -385,24 +355,15 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies that HpiSettingsView constructs, exposes getter defaults, and survives
-     * lifecycle transitions.
+     * Verifies HpiPanel in a PanelWidget: digitizers, coil frequencies and presets, fit results and reports.
      */
-    void hpiSettingsView_lifecycle();
-    void hpiSettingsView_coilTablesPresetsAndFeedback();
+    void hpiPanel_inPanelWidget();
 
     //=========================================================================================================
     /**
-     * Verifies that CoregSettingsView constructs, exposes getter defaults, and survives
-     * lifecycle transitions.
+     * Verifies CoregistrationPanel in a PanelWidget: fiducial picking, transformation, scaling modes, BEMs and files.
      */
-    void coregSettingsView_lifecycle();
-
-    //=========================================================================================================
-    /**
-     * Verifies CoregSettingsView fiducial picking, transformation parameters, scaling modes and signals.
-     */
-    void coregSettingsView_fiducialsAndParams();
+    void coregistrationPanel_inPanelWidget();
 
     //=========================================================================================================
     /**
@@ -443,12 +404,6 @@ private slots:
      * and setters do not crash.
      */
     void fiffRawViewSettings_setAndGet();
-
-    //=========================================================================================================
-    /**
-     * Verifies that ProjectSettingsView constructs and survives all lifecycle transitions.
-     */
-    void projectSettingsView_lifecycle();
 
     //=========================================================================================================
     /**
@@ -584,16 +539,9 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies that DipoleFitView constructs headlessly, exposes getters,
-     * and survives lifecycle transitions.
+     * Verifies DipoleFitPanel in a PanelWidget: parameter reports, the reported parameter set, models and the fit name.
      */
-    void dipoleFitView_lifecycle();
-
-    //=========================================================================================================
-    /**
-     * Verifies DipoleFitView parameter signals, the requested parameter set, model lists and the fit name.
-     */
-    void dipoleFitView_paramsModelsAndFit();
+    void dipoleFitPanel_inPanelWidget();
 
     //=========================================================================================================
     /**
@@ -662,9 +610,9 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies ProjectSettingsView project/subject scanning, adding, deleting, file naming and timer.
+     * Verifies ProjectPanel in a PanelWidget: project and subject scanning, adding, file naming and timer.
      */
-    void projectSettingsView_projectsSubjectsAndTimer();
+    void projectPanel_inPanelWidget();
 
     //=========================================================================================================
     /**
@@ -695,14 +643,40 @@ void TestVizQtViewers2::cleanupTestCase()
 
 //=============================================================================================================
 
-void TestVizQtViewers2::hpiSettingsView_coilTablesPresetsAndFeedback()
+void TestVizQtViewers2::hpiPanel_inPanelWidget()
 {
     // An empty settings path keeps the user's stored coil frequencies out of the test
-    HpiSettingsView view(QString{});
-    QSignalSpy freqSpy(&view, &HpiSettingsView::coilFrequenciesChanged);
-    auto* freqTable = view.findChild<QTableWidget*>(QStringLiteral("m_tableWidget_Frequencies"));
-    auto* resultTable = view.findChild<QTableWidget*>(QStringLiteral("m_tableWidget_results"));
-    QVERIFY(freqTable && resultTable);
+    auto panel = std::make_shared<HpiPanel>();
+    PanelWidget view(panel, QString());
+    std::vector<std::vector<int>> frequencies;
+    std::vector<bool> ssp;
+    std::vector<bool> continuous;
+    std::vector<int> windows;
+    std::vector<std::filesystem::path> digitizerFiles;
+    int singleFits = 0;
+    HpiPanel::Callbacks callbacks;
+    callbacks.coil_frequencies_changed = [&frequencies](const std::vector<int>& coils) {
+        frequencies.push_back(coils);
+    };
+    callbacks.ssp_changed = [&ssp](bool on) {
+        ssp.push_back(on);
+    };
+    callbacks.continuous_fitting_changed = [&continuous](bool on) {
+        continuous.push_back(on);
+    };
+    callbacks.fitting_window_size_changed = [&windows](int samples) {
+        windows.push_back(samples);
+    };
+    callbacks.digitizers_changed = [&digitizerFiles](const FiffDigPointSet&, const std::filesystem::path& file) {
+        digitizerFiles.push_back(file);
+    };
+    callbacks.single_fit = [&singleFits] {
+        ++singleFits;
+    };
+    panel->set_callbacks(std::move(callbacks));
+    const auto text = [&view](const char* key) {
+        return qobject_cast<QLabel*>(view.formPanel()->editor(key))->text();
+    };
 
     // 4 HPI coils, 3 fiducials, 2 EEG and 1 extra point
     FiffDigPointSet points;
@@ -715,144 +689,112 @@ void TestVizQtViewers2::hpiSettingsView_coilTablesPresetsAndFeedback()
         p.ident = i + 1;
         points.push_back(p);
     }
-    view.newDigitizerList(points);
-    auto label = [&view](const char* name) {
-        return view.findChild<QLabel*>(QLatin1String(name))->text();
-    };
-    QCOMPARE(label("m_label_numberLoadedCoils"), QStringLiteral("4"));
-    QCOMPARE(label("m_label_numberLoadedFiducials"), QStringLiteral("3"));
-    QCOMPARE(label("m_label_numberLoadedEEG"), QStringLiteral("2"));
-    QCOMPARE(label("m_label_numberLoadedAdditional"), QStringLiteral("1"));
-    QCOMPARE(freqTable->rowCount(), 4);
-    QCOMPARE(resultTable->rowCount(), 4);
-    QCOMPARE(freqSpy.last().at(0).value<std::vector<int>>(), (std::vector<int>{293, 307, 314, 321}));
+    panel->set_digitizers(points);
+    QCOMPARE(text("loadedCoils"), QStringLiteral("4"));
+    QCOMPARE(text("loadedFiducials"), QStringLiteral("3"));
+    QCOMPARE(text("loadedEeg"), QStringLiteral("2"));
+    QCOMPARE(text("loadedAdditional"), QStringLiteral("1"));
+    QCOMPARE(panel->coil_frequencies(), (std::vector<int>{293, 307, 314, 321}));
+    QCOMPARE(panel->list("coilResults")->count(), 4);
+    QVERIFY(frequencies.empty());
 
     // The VectorView presets are built in; a file that cannot be read keeps them
-    auto* preset = view.findChild<QComboBox*>(QStringLiteral("comboBox_coilPreset"));
+    auto* preset = qobject_cast<QComboBox*>(view.formPanel()->editor("coilPreset"));
+    QVERIFY(preset);
     QCOMPARE(preset->count(), 4);
     QCOMPARE(preset->itemText(2), QStringLiteral("VV 293-321Hz"));
     QTemporaryDir dir;
     QVERIFY(dir.isValid());
-    QVERIFY(!view.loadCoilPresets(dir.filePath(QStringLiteral("missing.json")).toStdU16String()));
+    QVERIFY(!panel->load_coil_presets(dir.filePath(QStringLiteral("missing.json")).toStdU16String()));
     QFile presets(dir.filePath(QStringLiteral("presets.json")));
     QVERIFY(presets.open(QIODevice::WriteOnly));
     presets.write("{\"4\": [");
     presets.close();
-    QVERIFY(!view.loadCoilPresets(presets.fileName().toStdU16String()));
+    QVERIFY(!panel->load_coil_presets(presets.fileName().toStdU16String()));
     QCOMPARE(preset->count(), 4);
 
-    // A preset file replaces them for the loaded number of coils; choosing a preset fills the table
+    // A preset file replaces them for the loaded number of coils; choosing a preset sets the frequencies
     QVERIFY(presets.open(QIODevice::WriteOnly | QIODevice::Truncate));
     presets.write(R"({"4": [{"name": "VectorView", "coils": [154, 158, 162, 166]}]})");
     presets.close();
-    QVERIFY(view.loadCoilPresets(presets.fileName().toStdU16String()));
+    QVERIFY(panel->load_coil_presets(presets.fileName().toStdU16String()));
     QCOMPARE(preset->count(), 2);
     preset->setCurrentIndex(1);
-    QCOMPARE(freqSpy.last().at(0).value<std::vector<int>>(), (std::vector<int>{154, 158, 162, 166}));
-    QCOMPARE(freqTable->item(3, 1)->text(), QStringLiteral("166"));
+    QCOMPARE(frequencies.back(), (std::vector<int>{154, 158, 162, 166}));
+    auto* coils = qobject_cast<QLineEdit*>(view.formPanel()->editor("coilFreqs"));
+    QVERIFY(coils);
+    QCOMPARE(coils->text(), QStringLiteral("154, 158, 162, 166"));
 
-    // Editing a frequency cell, and "none" for an unused coil
-    freqTable->item(0, 1)->setText(QStringLiteral("300"));
-    freqTable->item(2, 1)->setText(QStringLiteral("none"));
-    QCOMPARE(freqSpy.last().at(0).value<std::vector<int>>(), (std::vector<int>{300, 158, -1, 166}));
-
-    // Removing coil 2 renumbers both tables; adding one back appends an unset frequency
-    freqTable->setCurrentCell(1, 1);
-    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_removeCoil")), Qt::LeftButton);
-    QCOMPARE(freqSpy.last().at(0).value<std::vector<int>>(), (std::vector<int>{300, -1, 166}));
-    QCOMPARE(freqTable->rowCount(), 3);
-    QCOMPARE(freqTable->item(2, 0)->text(), QStringLiteral("3"));
-    QCOMPARE(resultTable->item(2, 0)->text(), QStringLiteral("3"));
-    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_addCoil")), Qt::LeftButton);
-    QCOMPARE(freqTable->rowCount(), 4);
-    QCOMPARE(freqTable->item(3, 1)->text(), QStringLiteral("none"));
-    QCOMPARE(freqSpy.last().at(0).value<std::vector<int>>(), (std::vector<int>{300, -1, 166, -1}));
+    // Typed frequencies, "none" for an unused coil; the list sets the number of coils
+    coils->setText(QStringLiteral("300, 158, none, 166"));
+    emit coils->editingFinished();
+    QCOMPARE(frequencies.back(), (std::vector<int>{300, 158, -1, 166}));
+    coils->setText(QStringLiteral("300 -1 166 x 170"));
+    emit coils->editingFinished();
+    QCOMPARE(frequencies.back(), (std::vector<int>{300, -1, 166, -1, 170}));
+    QCOMPARE(coils->text(), QStringLiteral("300, none, 166, none, 170"));
+    QCOMPARE(panel->list("coilResults")->count(), 5);
 
     // Fit results: errors in mm, GoF in %, good/bad against the allowed mean error
-    view.findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_maxHPIContinousDist"))->setValue(3.0);
-    view.setErrorLabels({0.0011, 0.0024, 0.0005, 0.0039}, 0.002);
-    QCOMPARE(resultTable->item(1, 1)->text(), QStringLiteral("2.40 mm"));
-    QCOMPARE(label("m_label_averagedFitError"), QStringLiteral("2.00 mm"));
-    QCOMPARE(label("m_label_fitFeedback"), QStringLiteral("Last fit: Good"));
-    view.setErrorLabels({0.004}, 0.0045);
-    QCOMPARE(label("m_label_fitFeedback"), QStringLiteral("Last fit: Bad"));
+    qobject_cast<QDoubleSpinBox*>(view.formPanel()->editor("maxError"))->setValue(3.0);
+    QCOMPARE(panel->allowed_error(), 3.0);
+    panel->set_errors({0.0011, 0.0024, 0.0005, 0.0039, 0.001}, 0.002);
+    QCOMPARE(panel->list("coilResults")->items().at(1), std::string("Coil 2: 2.40 mm, 00.00%"));
+    QCOMPARE(text("averageError"), QStringLiteral("2.00 mm"));
+    QCOMPARE(text("fitFeedback"), QStringLiteral("Good"));
+    panel->set_errors({0.004}, 0.0045);
+    QCOMPARE(text("fitFeedback"), QStringLiteral("Bad"));
     Eigen::VectorXd gof(4);
     gof << 0.991, 0.95, 0.9, 0.875;
-    view.setGoFLabels(gof, 0.929);
-    QCOMPARE(resultTable->item(3, 2)->text(), QStringLiteral("87.50 %"));
-    QCOMPARE(label("m_average_gof_set"), QStringLiteral("92.90 %"));
+    panel->set_goodness_of_fit(gof, 0.929);
+    QCOMPARE(panel->list("coilResults")->items().at(3), std::string("Coil 4: 3.90 mm, 87.50 %"));
+    QCOMPARE(text("averageGof"), QStringLiteral("92.90 %"));
 
-    view.findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_moveThreshold"))->setValue(3.0);
-    view.findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_rotThreshold"))->setValue(5.0);
-    QCOMPARE(view.getAllowedMovementChanged(), 3.0);
-    QCOMPARE(view.getAllowedRotationChanged(), 5.0);
-    view.setMovementResults(0.002, 4.0);
-    QCOMPARE(view.findChild<QLineEdit*>(QStringLiteral("m_qLineEdit_moveResult"))->text(), QStringLiteral("2.00 mm"));
-    QCOMPARE(label("m_label_movementFeedback"), QStringLiteral("Small"));
-    view.setMovementResults(0.002, 6.0);
-    QCOMPARE(label("m_label_movementFeedback"), QStringLiteral("Big"));
-    view.setMovementResults(0.0031, 1.0);
-    QCOMPARE(label("m_label_movementFeedback"), QStringLiteral("Big"));
+    QCOMPARE(panel->allowed_movement(), 3.0);
+    QCOMPARE(panel->allowed_rotation(), 5.0);
+    panel->set_movement(0.002, 4.0);
+    QCOMPARE(text("moveResult"), QStringLiteral("2.00 mm"));
+    QCOMPARE(text("movementFeedback"), QStringLiteral("Small"));
+    panel->set_movement(0.002, 6.0);
+    QCOMPARE(text("movementFeedback"), QStringLiteral("Big"));
+    panel->set_movement(0.0031, 1.0);
+    QCOMPARE(text("movementFeedback"), QStringLiteral("Big"));
 
-    // Check boxes and spin boxes report through their signals
-    QSignalSpy sspSpy(&view, &HpiSettingsView::sspStatusChanged);
-    QSignalSpy contSpy(&view, &HpiSettingsView::contHpiStatusChanged);
-    QSignalSpy windowSpy(&view, &HpiSettingsView::fittingWindowSizeChanged);
-    QTest::mouseClick(view.findChild<QCheckBox*>(QStringLiteral("m_checkBox_useSSP")), Qt::LeftButton);
-    QTest::mouseClick(view.findChild<QCheckBox*>(QStringLiteral("m_checkBox_continousHPI")), Qt::LeftButton);
-    view.findChild<QSpinBox*>(QStringLiteral("m_spinBox_samplesToFit"))->setValue(450);
-    QCOMPARE(sspSpy.size(), 1);
-    QVERIFY(view.getSspStatusChanged());
-    QVERIFY(view.continuousHPIChecked());
-    QCOMPARE(contSpy.size(), 1);
-    QCOMPARE(windowSpy.last().at(0).toInt(), 450);
-    QCOMPARE(view.getFittingWindowSize(), 450);
+    // Check boxes, spin boxes and buttons report
+    view.findChild<QCheckBox*>(QStringLiteral("useSSP"))->click();
+    view.findChild<QCheckBox*>(QStringLiteral("continousHPI"))->click();
+    qobject_cast<QSpinBox*>(view.formPanel()->editor("fittingWindowSize"))->setValue(450);
+    view.findChild<QPushButton*>(QStringLiteral("doSingleFit"))->click();
+    QCOMPARE(ssp, std::vector<bool>({true}));
+    QVERIFY(panel->use_ssp() && panel->continuous_fitting());
+    QCOMPARE(continuous, std::vector<bool>({true}));
+    QCOMPARE(windows.back(), 450);
+    QCOMPARE(panel->fitting_window_size(), 450);
+    QCOMPARE(singleFits, 1);
 
-    // Loading digitizers from a file; a FIFF file without any is refused with a message
+    // Loading digitizers from a file stops continuous fitting; a FIFF file without any is refused
     const QString sampleDir = QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/MEG/sample/");
-    QSignalSpy digSpy(&view, &HpiSettingsView::digitizersChanged);
-    auto* loadButton = view.findChild<QPushButton*>(QStringLiteral("m_pushButton_loadDigitizers"));
-    chooseFileInNextDialog(sampleDir + QStringLiteral("sample_audvis_trunc_raw.fif"));
-    QTest::mouseClick(loadButton, Qt::LeftButton);
-    QCOMPARE(digSpy.size(), 1);
-    QCOMPARE(label("m_label_numberLoadedCoils"), QStringLiteral("4"));
-    QCOMPARE(label("m_label_numberLoadedEEG"), QStringLiteral("61"));
-    chooseFileInNextDialog(sampleDir + QStringLiteral("sample_audvis-cov.fif"),
-                           []() { clickNextMessageBoxButton(QStringLiteral("OK")); });
-    QTest::mouseClick(loadButton, Qt::LeftButton);
-    QCOMPARE(digSpy.size(), 1);
-    QCOMPARE(label("m_label_numberLoadedEEG"), QStringLiteral("61"));
-}
-
-//=============================================================================================================
-
-void TestVizQtViewers2::hpiSettingsView_lifecycle()
-{
-    HpiSettingsView view("test_viz_qt_viewers2");
-
-    QVERIFY(view.getFittingWindowSize() > 0);
-    QVERIFY(view.getAllowedMeanErrorDistChanged() > 0.0);
-    QVERIFY(view.getAllowedMovementChanged() > 0.0);
-    QVERIFY(view.getAllowedRotationChanged() > 0.0);
-
-    // Pass empty digitizer list
-    view.newDigitizerList(FiffDigPointSet());
-
-    // Pass non-trivial error and GoF data
-    view.setErrorLabels({1.2, 0.8}, 1.0);
-    Eigen::VectorXd gof(2);
-    gof << 0.95, 0.90;
-    view.setGoFLabels(gof, 0.925);
-    view.setMovementResults(0.5, 0.1);
+    auto* file = view.formPanel()->editor("digitizerFile")->findChild<QLineEdit*>();
+    QVERIFY(file);
+    file->setText(sampleDir + QStringLiteral("sample_audvis_trunc_raw.fif"));
+    emit file->editingFinished();
+    QCOMPARE(digitizerFiles.size(), 1);
+    QCOMPARE(text("loadedCoils"), QStringLiteral("4"));
+    QCOMPARE(text("loadedEeg"), QStringLiteral("61"));
+    QVERIFY(!panel->continuous_fitting());
+    QCOMPARE(continuous.back(), false);
+    QCOMPARE(panel->coil_frequencies().size(), 4);
+    file->setText(sampleDir + QStringLiteral("sample_audvis-cov.fif"));
+    emit file->editingFinished();
+    QCOMPARE(digitizerFiles.size(), 1);
+    QCOMPARE(text("loadedEeg"), QStringLiteral("61"));
+    QCOMPARE(text("digitizerStatus"), QStringLiteral("File could not be loaded!"));
 
     view.setGuiMode(AbstractView::GuiMode::Clinical);
-    view.setGuiMode(AbstractView::GuiMode::Research);
-    view.setProcessingMode(AbstractView::ProcessingMode::RealTime);
     view.setProcessingMode(AbstractView::ProcessingMode::Offline);
     view.saveSettings();
     view.loadSettings();
     view.clearView();
-
     QApplication::processEvents();
 }
 
@@ -1001,185 +943,192 @@ void TestVizQtViewers2::filterDesignPanel_designExportLoad()
 
 //=============================================================================================================
 
-void TestVizQtViewers2::coregSettingsView_fiducialsAndParams()
+void TestVizQtViewers2::coregistrationPanel_inPanelWidget()
 {
-    CoregSettingsView view(QString{});
+    auto panel = std::make_shared<CoregistrationPanel>();
+    PanelWidget view(panel, QString());
     // A decimal-comma locale makes number parsing of displayed text observable.
     view.setLocale(QLocale(QLocale::German, QLocale::Germany));
     view.show();
-    auto* pPick = view.findChild<QCheckBox*>(QStringLiteral("m_qCheckBox_PickFiducials"));
-    auto* pResult = view.findChild<QWidget*>(QStringLiteral("m_qWidget_ResultFiducials"));
-    auto* pFidX = view.findChild<QLineEdit*>(QStringLiteral("m_qLineEdit_FidX"));
-    auto* pFidZ = view.findChild<QLineEdit*>(QStringLiteral("m_qLineEdit_FidZ"));
-    QVERIFY(pPick);
-    QVERIFY(pResult);
-    QVERIFY(pFidX);
-    QVERIFY(pFidZ);
 
-    // Picking toggles the result widget and reports the state.
-    QSignalSpy pickSpy(&view, &CoregSettingsView::pickFiducials);
-    pPick->setChecked(true);
-    QCOMPARE(pickSpy.last().at(0).toBool(), true);
-    QVERIFY(pResult->isEnabled());
+    std::vector<bool> picks;
+    std::vector<int> fiducials;
+    std::vector<std::string> bems;
+    std::vector<std::filesystem::path> digitizerFiles;
+    std::vector<std::filesystem::path> storedTransforms;
+    int fiducialFits = 0;
+    int icpFits = 0;
+    int transformationChanges = 0;
+    CoregistrationPanel::Callbacks callbacks;
+    callbacks.picking_changed = [&picks](bool on) {
+        picks.push_back(on);
+    };
+    callbacks.fiducial_changed = [&fiducials](int fiducial) {
+        fiducials.push_back(fiducial);
+    };
+    callbacks.bem_changed = [&bems](const std::string& name) {
+        bems.push_back(name);
+    };
+    callbacks.digitizers_loaded = [&digitizerFiles](const std::filesystem::path& file) {
+        digitizerFiles.push_back(file);
+    };
+    callbacks.transformation_stored = [&storedTransforms](const std::filesystem::path& file) {
+        storedTransforms.push_back(file);
+    };
+    callbacks.fit_fiducials = [&fiducialFits] {
+        ++fiducialFits;
+    };
+    callbacks.fit_icp = [&icpFits] {
+        ++icpFits;
+    };
+    callbacks.transformation_changed = [&transformationChanges] {
+        ++transformationChanges;
+    };
+    panel->set_callbacks(std::move(callbacks));
+    const auto editor = [&view](const char* key) {
+        return view.formPanel()->editor(key);
+    };
+    const auto text = [&editor](const char* key) {
+        return qobject_cast<QLabel*>(editor(key))->text();
+    };
 
-    // Each picked position is stored and the selection steps LPA -> NAS -> RPA -> LPA.
-    QSignalSpy fidSpy(&view, &CoregSettingsView::fiducialChanged);
-    view.findChild<QRadioButton*>(QStringLiteral("m_qRadioButton_LPA"))->setChecked(true);
-    QCOMPARE(view.getCurrentFiducial(), FIFFV_POINT_LPA);
-    view.setFiducials(QVector3D(-0.07f, 0.0f, 0.0f));
-    QCOMPARE(view.getCurrentFiducial(), FIFFV_POINT_NASION);
-    view.setFiducials(QVector3D(0.0f, 0.09f, 0.01f));
-    QCOMPARE(view.getCurrentFiducial(), FIFFV_POINT_RPA);
-    view.setFiducials(QVector3D(0.07f, 0.0f, 0.0f));
-    QCOMPARE(view.getCurrentFiducial(), FIFFV_POINT_LPA);
-    QVERIFY(fidSpy.count() >= 3);
-    QCOMPARE(fidSpy.last().at(0).toInt(), FIFFV_POINT_LPA);
-    // Back at LPA the stored LPA position is displayed (cm-truncated, in mm).
-    QCOMPARE(pFidX->text(), QStringLiteral("-70 mm"));
-    view.findChild<QRadioButton*>(QStringLiteral("m_qRadioButton_NAS"))->setChecked(true);
-    QCOMPARE(fidSpy.last().at(0).toInt(), FIFFV_POINT_NASION);
-    QCOMPARE(pFidZ->text(), QStringLiteral("10 mm"));
+    // Picking enables the fiducial choice and reports the state
+    auto* pick = view.findChild<QCheckBox*>(QStringLiteral("pickFiducials"));
+    auto* fiducial = qobject_cast<QComboBox*>(editor("fiducial"));
+    QVERIFY(pick && fiducial);
+    QVERIFY(!fiducial->isEnabled());
+    pick->click();
+    QCOMPARE(picks, std::vector<bool>({true}));
+    QVERIFY(fiducial->isEnabled());
 
-    // Fitting ends picking.
-    QSignalSpy fitFidSpy(&view, &CoregSettingsView::fitFiducials);
-    QSignalSpy fitIcpSpy(&view, &CoregSettingsView::fitICP);
-    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_qPushButton_FitFiducials")), Qt::LeftButton);
-    QCOMPARE(fitFidSpy.count(), 1);
-    QVERIFY(!pPick->isChecked());
-    QVERIFY(!pResult->isEnabled());
-    QCOMPARE(pickSpy.last().at(0).toBool(), false);
-    pPick->setChecked(true);
-    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_qPushButton_FitICP")), Qt::LeftButton);
-    QCOMPARE(fitIcpSpy.count(), 1);
-    QVERIFY(!pPick->isChecked());
+    // Each picked position is stored and the choice steps LPA -> nasion -> RPA -> LPA without reports
+    QCOMPARE(panel->fiducial(), FIFFV_POINT_LPA);
+    panel->set_fiducial(Eigen::Vector3f(-0.07f, 0.0f, 0.0f));
+    QCOMPARE(panel->fiducial(), FIFFV_POINT_NASION);
+    panel->set_fiducial(Eigen::Vector3f(0.0f, 0.09f, 0.01f));
+    QCOMPARE(panel->fiducial(), FIFFV_POINT_RPA);
+    panel->set_fiducial(Eigen::Vector3f(0.07f, 0.0f, 0.0f));
+    QCOMPARE(panel->fiducial(), FIFFV_POINT_LPA);
+    QVERIFY(fiducials.empty());
+    // Back at LPA the stored LPA position is shown in mm
+    QCOMPARE(text("fiducialX"), QStringLiteral("-70.00 mm"));
+    fiducial->setCurrentIndex(1);
+    QCOMPARE(fiducials, std::vector<int>({FIFFV_POINT_NASION}));
+    QCOMPARE(text("fiducialZ"), QStringLiteral("10.00 mm"));
 
-    // Scaling mode enables the matching spin boxes and selects how the scale is read back.
-    auto* pMode = view.findChild<QComboBox*>(QStringLiteral("m_qComboBox_ScalingMode"));
-    auto* pScaleX = view.findChild<QDoubleSpinBox*>(QStringLiteral("m_qDoubleSpinBox_ScalingX"));
-    auto* pScaleY = view.findChild<QDoubleSpinBox*>(QStringLiteral("m_qDoubleSpinBox_ScalingY"));
-    auto* pScaleZ = view.findChild<QDoubleSpinBox*>(QStringLiteral("m_qDoubleSpinBox_ScalingZ"));
-    QVERIFY(pMode && pScaleX && pScaleY && pScaleZ);
+    // Fitting ends picking
+    view.findChild<QPushButton*>(QStringLiteral("fitFiducials"))->click();
+    QCOMPARE(fiducialFits, 1);
+    QVERIFY(!pick->isChecked() && !panel->picking());
+    QCOMPARE(picks.back(), false);
+    pick->click();
+    view.findChild<QPushButton*>(QStringLiteral("fitIcp"))->click();
+    QCOMPARE(icpFits, 1);
+    QVERIFY(!pick->isChecked());
 
-    QSignalSpy paramSpy(&view, &CoregSettingsView::transParamChanged);
-    const Eigen::Vector3f vecTransIn(0.001f, -0.002f, 0.003f);
-    const Eigen::Vector3f vecRotIn(0.1f, 0.2f, 0.3f);
-    const Eigen::Vector3f vecScaleIn(1.0f, 1.0f, 1.0f);
-    view.setTransParams(vecTransIn, vecRotIn, vecScaleIn);
-    QCOMPARE(paramSpy.count(), 0); // programmatic update must not echo back
+    // The scaling mode enables the matching spin boxes and selects how the scale is read back
+    auto* mode = qobject_cast<QComboBox*>(editor("scalingMode"));
+    auto* scaleX = qobject_cast<QDoubleSpinBox*>(editor("scaleX"));
+    auto* scaleY = qobject_cast<QDoubleSpinBox*>(editor("scaleY"));
+    auto* scaleZ = qobject_cast<QDoubleSpinBox*>(editor("scaleZ"));
+    QVERIFY(mode && scaleX && scaleY && scaleZ);
+    const Eigen::Vector3f translationIn(0.001f, -0.002f, 0.003f);
+    const Eigen::Vector3f rotationIn(0.1f, 0.2f, 0.3f);
+    panel->set_transformation(translationIn, rotationIn, Eigen::Vector3f::Ones());
+    QCOMPARE(transformationChanges, 0);
 
-    Eigen::Vector3f vecRot, vecTrans, vecScale;
-    pMode->setCurrentText(QStringLiteral("None"));
-    QVERIFY(!pScaleX->isEnabled() && !pScaleY->isEnabled() && !pScaleZ->isEnabled());
-    view.getTransParams(vecRot, vecTrans, vecScale);
-    QVERIFY(vecTrans.isApprox(vecTransIn, 1e-3f));
-    QVERIFY(vecRot.isApprox(vecRotIn, 1e-3f));
-    QVERIFY(vecScale.isApprox(Eigen::Vector3f::Ones()));
+    Eigen::Vector3f rotation;
+    Eigen::Vector3f translation;
+    Eigen::Vector3f scaling;
+    mode->setCurrentText(QStringLiteral("None"));
+    QVERIFY(!scaleX->isEnabled() && !scaleY->isEnabled() && !scaleZ->isEnabled());
+    panel->transformation(rotation, translation, scaling);
+    QVERIFY(translation.isApprox(translationIn, 1e-3f));
+    QVERIFY(rotation.isApprox(rotationIn, 1e-3f));
+    QVERIFY(scaling.isApprox(Eigen::Vector3f::Ones()));
 
-    pMode->setCurrentText(QStringLiteral("Uniform"));
-    QVERIFY(pScaleX->isEnabled() && !pScaleY->isEnabled() && !pScaleZ->isEnabled());
-    pScaleX->setValue(1.25);
-    QVERIFY(paramSpy.count() >= 1);
-    view.getTransParams(vecRot, vecTrans, vecScale);
-    QVERIFY(vecScale.isApprox(Eigen::Vector3f::Constant(1.25f)));
+    mode->setCurrentText(QStringLiteral("Uniform"));
+    QVERIFY(scaleX->isEnabled() && !scaleY->isEnabled() && !scaleZ->isEnabled());
+    scaleX->setValue(1.25);
+    QVERIFY(transformationChanges >= 1);
+    panel->transformation(rotation, translation, scaling);
+    QVERIFY(scaling.isApprox(Eigen::Vector3f::Constant(1.25f)));
 
-    pMode->setCurrentText(QStringLiteral("3-Axis"));
-    QVERIFY(pScaleX->isEnabled() && pScaleY->isEnabled() && pScaleZ->isEnabled());
-    pScaleY->setValue(0.9);
-    pScaleZ->setValue(1.1);
-    view.getTransParams(vecRot, vecTrans, vecScale);
-    QVERIFY(vecScale.isApprox(Eigen::Vector3f(1.25f, 0.9f, 1.1f), 1e-4f));
+    mode->setCurrentText(QStringLiteral("3-Axis"));
+    QVERIFY(scaleX->isEnabled() && scaleY->isEnabled() && scaleZ->isEnabled());
+    scaleY->setValue(0.9);
+    scaleZ->setValue(1.1);
+    panel->transformation(rotation, translation, scaling);
+    QVERIFY(scaling.isApprox(Eigen::Vector3f(1.25f, 0.9f, 1.1f), 1e-4f));
 
-    // A non-uniform scale survives the set/get round trip (index 0 is x).
-    view.setTransParams(vecTransIn, vecRotIn, Eigen::Vector3f(1.1f, 1.2f, 1.3f));
-    QCOMPARE(pScaleX->value(), 1.1);
-    view.getTransParams(vecRot, vecTrans, vecScale);
-    QVERIFY(vecScale.isApprox(Eigen::Vector3f(1.1f, 1.2f, 1.3f), 1e-4f));
-    QVERIFY(vecRot.isApprox(vecRotIn, 1e-3f));
+    // A non-uniform scale survives the set/get round trip (index 0 is x)
+    panel->set_transformation(translationIn, rotationIn, Eigen::Vector3f(1.1f, 1.2f, 1.3f));
+    QCOMPARE(scaleX->value(), 1.1);
+    panel->transformation(rotation, translation, scaling);
+    QVERIFY(scaling.isApprox(Eigen::Vector3f(1.1f, 1.2f, 1.3f), 1e-4f));
+    QVERIFY(rotation.isApprox(rotationIn, 1e-3f));
 
-    // Fit settings and result labels.
-    view.findChild<QSpinBox*>(QStringLiteral("m_qSpinBox_MaxIter"))->setValue(42);
-    QCOMPARE(view.getMaxIter(), 42);
-    view.findChild<QDoubleSpinBox*>(QStringLiteral("m_qDoubleSpinBox_Converge"))->setValue(0.5);
-    QVERIFY(qAbs(view.getConvergence() - 0.0005f) < 1e-7f);
-    view.findChild<QSpinBox*>(QStringLiteral("m_qSpinBox_MaxDist"))->setValue(7);
-    QVERIFY(qAbs(view.getOmmitDistance() - 0.007f) < 1e-7f);
-    view.findChild<QCheckBox*>(QStringLiteral("m_qCheckBox_AutoScale"))->setChecked(true);
-    QVERIFY(view.getAutoScale());
-    view.findChild<QDoubleSpinBox*>(QStringLiteral("m_qDoubleSpinBox_WeightLpa"))->setValue(2.0);
-    view.findChild<QDoubleSpinBox*>(QStringLiteral("m_qDoubleSpinBox_WeightHSP"))->setValue(3.0);
-    QCOMPARE(view.getWeightLPA(), 2.0f);
-    QCOMPARE(view.getWeightHSP(), 3.0f);
-    QCOMPARE(view.getWeightRPA(), 1.0f);
-    QCOMPARE(view.getWeightNAS(), 10.0f);
+    // Fit settings and results
+    qobject_cast<QSpinBox*>(editor("maxIterations"))->setValue(42);
+    QCOMPARE(panel->max_iterations(), 42);
+    qobject_cast<QDoubleSpinBox*>(editor("convergence"))->setValue(0.5);
+    QVERIFY(qAbs(panel->convergence() - 0.0005f) < 1e-7f);
+    qobject_cast<QSpinBox*>(editor("maxDistance"))->setValue(7);
+    QVERIFY(qAbs(panel->omit_distance() - 0.007f) < 1e-7f);
+    view.findChild<QCheckBox*>(QStringLiteral("autoScale"))->click();
+    QVERIFY(panel->auto_scale());
+    qobject_cast<QDoubleSpinBox*>(editor("weightLpa"))->setValue(2.0);
+    qobject_cast<QDoubleSpinBox*>(editor("weightHsp"))->setValue(3.0);
+    QCOMPARE(panel->weight_lpa(), 2.0f);
+    QCOMPARE(panel->weight_hsp(), 3.0f);
+    QCOMPARE(panel->weight_rpa(), 1.0f);
+    QCOMPARE(panel->weight_nasion(), 10.0f);
 
-    // Digitizer picks follow the check boxes; cardinal points are always used.
-    auto* pEeg = view.findChild<QCheckBox*>(QStringLiteral("m_qCheckBox_EEG"));
-    auto* pHpi = view.findChild<QCheckBox*>(QStringLiteral("m_qCheckBox_HPI"));
-    auto* pHsp = view.findChild<QCheckBox*>(QStringLiteral("m_qCheckBox_HSP"));
-    pEeg->setChecked(true);
-    pHpi->setChecked(true);
-    pHsp->setChecked(true);
-    QCOMPARE(view.getDigitizerCheckState(), std::vector<int>({FIFFV_POINT_CARDINAL, FIFFV_POINT_EEG, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA}));
-    pEeg->setChecked(false);
-    pHsp->setChecked(false);
-    QCOMPARE(view.getDigitizerCheckState(), std::vector<int>({FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI}));
-    view.setOmittedPoints(5);
-    QCOMPARE(view.findChild<QLabel*>(QStringLiteral("m_qLabel_NOmitted"))->text(), QStringLiteral("5"));
-    view.setRMSE(0.0025f);
-    QCOMPARE(view.findChild<QLabel*>(QStringLiteral("m_qLabel_RMSE"))->text(), QStringLiteral("2.5 mm"));
+    // The digitizer kinds follow the check boxes; the fiducials are always used
+    view.findChild<QCheckBox*>(QStringLiteral("useEeg"))->click();
+    QCOMPARE(panel->digitizer_kinds(), std::vector<int>({FIFFV_POINT_CARDINAL, FIFFV_POINT_EEG, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA}));
+    view.findChild<QCheckBox*>(QStringLiteral("useEeg"))->click();
+    view.findChild<QCheckBox*>(QStringLiteral("useHsp"))->click();
+    QCOMPARE(panel->digitizer_kinds(), std::vector<int>({FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI}));
+    panel->set_omitted_points(5);
+    QCOMPARE(text("omittedPoints"), QStringLiteral("5"));
+    panel->set_rmse(0.0025f);
+    QCOMPARE(text("rmse"), QStringLiteral("2.50 mm"));
 
-    // BEM selection: clearing (the placeholder) is silent, the first added BEM becomes current.
-    QSignalSpy bemSpy(&view, &CoregSettingsView::changeSelectedBem);
-    QCOMPARE(view.getCurrentSelectedBem(), QStringLiteral("Select BEM"));
-    view.clearSelectionBem();
-    QCOMPARE(bemSpy.count(), 0);
-    view.addSelectionBem(QStringLiteral("sample-head.fif"));
-    view.addSelectionBem(QStringLiteral("sample-5120-bem.fif"));
-    QCOMPARE(bemSpy.count(), 1);
-    QCOMPARE(view.getCurrentSelectedBem(), QStringLiteral("sample-head.fif"));
-    view.findChild<QComboBox*>(QStringLiteral("m_qComboBox_BemItems"))->setCurrentIndex(1);
-    QCOMPARE(bemSpy.last().at(0).toString(), QStringLiteral("sample-5120-bem.fif"));
-    view.clearSelectionBem();
-    QCOMPARE(bemSpy.count(), 2);
-    QVERIFY(view.getCurrentSelectedBem().isEmpty());
+    // BEMs: set silently, the chosen one stays while it is there, the user's choice is reported
+    auto* bem = qobject_cast<QComboBox*>(editor("bem"));
+    QCOMPARE(bem->itemText(0), QStringLiteral("Select BEM"));
+    QVERIFY(panel->bem().empty());
+    panel->set_bems({"sample-head.fif", "sample-5120-bem.fif"});
+    QCOMPARE(panel->bem(), std::string("sample-head.fif"));
+    bem->setCurrentIndex(1);
+    QCOMPARE(bems, std::vector<std::string>({"sample-5120-bem.fif"}));
+    panel->set_bems({"other.fif", "sample-5120-bem.fif"});
+    QCOMPARE(panel->bem(), std::string("sample-5120-bem.fif"));
+    panel->set_bems({});
+    QVERIFY(panel->bem().empty());
+    QCOMPARE(bems.size(), 1);
 
-    // File buttons emit the chosen path and nothing when cancelled.
-    QSignalSpy digSpy(&view, &CoregSettingsView::digFileChanged);
-    answerNextModal([](QWidget* pModal) {
-        auto* pDialog = qobject_cast<QFileDialog*>(pModal);
-        QVERIFY(pDialog);
-        pDialog->reject();
-    });
-    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_qPushButton_LoadDig")), Qt::LeftButton);
-    QCOMPARE(digSpy.count(), 0);
-}
-
-//=============================================================================================================
-
-void TestVizQtViewers2::coregSettingsView_lifecycle()
-{
-    CoregSettingsView view("test_viz_qt_viewers2");
-
-    QVERIFY(view.getMaxIter() > 0);
-    QVERIFY(view.getConvergence() > 0.0f);
-    QVERIFY(view.getOmmitDistance() > 0.0f);
-    Q_UNUSED(view.getAutoScale());
-    Q_UNUSED(view.getCurrentFiducial());
-    Q_UNUSED(view.getCurrentSelectedBem());
-
-    view.addSelectionBem("sample-head.fif");
-    view.clearSelectionBem();
-
-    view.setFiducials(QVector3D(0.05f, 0.0f, 0.08f));
-    view.setOmittedPoints(3);
-    view.setRMSE(1.5f);
+    // Files: a store path is cleared once reported, so the same file can be stored again
+    auto* store = editor("transStoreFile")->findChild<QLineEdit*>();
+    QVERIFY(store);
+    for (int i = 0; i < 2; ++i) {
+        store->setText(QStringLiteral("fit-trans.fif"));
+        emit store->editingFinished();
+    }
+    QCOMPARE(storedTransforms, std::vector<std::filesystem::path>(2, std::filesystem::path("fit-trans.fif")));
+    QVERIFY(store->text().isEmpty());
+    auto* digitizers = editor("digitizerFile")->findChild<QLineEdit*>();
+    digitizers->setText(QStringLiteral("sample-dig.fif"));
+    emit digitizers->editingFinished();
+    QCOMPARE(digitizerFiles, std::vector<std::filesystem::path>({std::filesystem::path("sample-dig.fif")}));
+    QCOMPARE(digitizers->text(), QStringLiteral("sample-dig.fif"));
 
     view.setGuiMode(AbstractView::GuiMode::Research);
     view.setProcessingMode(AbstractView::ProcessingMode::Offline);
     view.saveSettings();
     view.loadSettings();
     view.clearView();
-
     QApplication::processEvents();
 }
 
@@ -1677,23 +1626,6 @@ void TestVizQtViewers2::fiffRawViewSettings_setAndGet()
     QVERIFY(bg.isValid());
 
     view.setGuiMode(AbstractView::GuiMode::Research);
-    view.setProcessingMode(AbstractView::ProcessingMode::Offline);
-    view.saveSettings();
-    view.loadSettings();
-    view.clearView();
-
-    QApplication::processEvents();
-}
-
-//=============================================================================================================
-
-void TestVizQtViewers2::projectSettingsView_lifecycle()
-{
-    ProjectSettingsView view("test_viz_qt_viewers2");
-
-    view.setGuiMode(AbstractView::GuiMode::Clinical);
-    view.setGuiMode(AbstractView::GuiMode::Research);
-    view.setProcessingMode(AbstractView::ProcessingMode::RealTime);
     view.setProcessingMode(AbstractView::ProcessingMode::Offline);
     view.saveSettings();
     view.loadSettings();
@@ -4109,134 +4041,140 @@ void TestVizQtViewers2::averageLayoutFigure_paintsScaledClampedCurves()
 
 //=============================================================================================================
 
-void TestVizQtViewers2::dipoleFitView_paramsModelsAndFit()
+void TestVizQtViewers2::dipoleFitPanel_inPanelWidget()
 {
-    DipoleFitView view;
-    auto spin = [&view](const char* name) {
-        return view.findChild<QSpinBox*>(QLatin1String(name));
+    auto panel = std::make_shared<DipoleFitPanel>();
+    PanelWidget view(panel, QString());
+    std::vector<std::vector<double>> times;
+    std::vector<std::vector<double>> baselines;
+    std::vector<std::vector<double>> modalities;
+    std::vector<std::vector<double>> fittings;
+    std::vector<std::vector<double>> noises;
+    std::vector<std::vector<double>> regularizations;
+    std::vector<std::vector<double>> spheres;
+    std::vector<std::pair<DipoleFitPanel::Model, std::string>> models;
+    std::vector<std::string> fits;
+    DipoleFitPanel::Callbacks callbacks;
+    callbacks.time_changed = [&times](int tmin, int tmax, int tstep, int tint) {
+        times.push_back({static_cast<double>(tmin), static_cast<double>(tmax), static_cast<double>(tstep), static_cast<double>(tint)});
     };
-    auto dspin = [&view](const char* name) {
-        return view.findChild<QDoubleSpinBox*>(QLatin1String(name));
+    callbacks.baseline_changed = [&baselines](int bmin, int bmax) {
+        baselines.push_back({static_cast<double>(bmin), static_cast<double>(bmax)});
+    };
+    callbacks.modality_changed = [&modalities](bool eeg, bool meg) {
+        modalities.push_back({eeg ? 1.0 : 0.0, meg ? 1.0 : 0.0});
+    };
+    callbacks.fitting_changed = [&fittings](double minDistance, double radius) {
+        fittings.push_back({minDistance, radius});
+    };
+    callbacks.noise_changed = [&noises](double grad, double mag, double eeg) {
+        noises.push_back({grad, mag, eeg});
+    };
+    callbacks.regularization_changed = [&regularizations](double grad, double mag, double eeg) {
+        regularizations.push_back({grad, mag, eeg});
+    };
+    callbacks.sphere_changed = [&spheres](double x, double y, double z, double radius) {
+        spheres.push_back({x, y, z, radius});
+    };
+    callbacks.model_changed = [&models](DipoleFitPanel::Model kind, const std::string& name) {
+        models.emplace_back(kind, name);
+    };
+    callbacks.fit = [&fits](const std::string& name) {
+        fits.push_back(name);
+    };
+    panel->set_callbacks(std::move(callbacks));
+    const auto spin = [&view](const char* key) {
+        return qobject_cast<QSpinBox*>(view.formPanel()->editor(key));
+    };
+    const auto dspin = [&view](const char* key) {
+        return qobject_cast<QDoubleSpinBox*>(view.formPanel()->editor(key));
     };
 
     // The sphere starts at MNE-C's defaults: origin (0, 0, 40) mm, EEG sphere radius 90 mm
-    {
-        QSignalSpy defaults(&view, &DipoleFitView::sphereChanged);
-        view.requestParams();
-        QCOMPARE(defaults.last(), (QList<QVariant>{0.0, 0.0, 40.0, 90.0}));
-    }
+    panel->report_parameters();
+    QCOMPARE(spheres.back(), (std::vector<double>{0.0, 0.0, 40.0, 90.0}));
+    QCOMPARE(baselines.back(), (std::vector<double>{1000000.0, 1000000.0}));
 
     // Each control reports its whole parameter group
-    QSignalSpy timeSpy(&view, &DipoleFitView::timeChanged);
-    QSignalSpy baselineSpy(&view, &DipoleFitView::baselineChanged);
-    QSignalSpy modalitySpy(&view, &DipoleFitView::modalityChanged);
-    QSignalSpy fittingSpy(&view, &DipoleFitView::fittingChanged);
-    QSignalSpy noiseSpy(&view, &DipoleFitView::noiseChanged);
-    QSignalSpy regSpy(&view, &DipoleFitView::regChanged);
-    QSignalSpy sphereSpy(&view, &DipoleFitView::sphereChanged);
-    spin("spinBox_tmin")->setValue(10);
-    spin("spinBox_tmax")->setValue(120);
-    spin("spinBox_tstep")->setValue(5);
-    spin("spinBox_tint")->setValue(2);
-    QCOMPARE(timeSpy.count(), 4);
-    QCOMPARE(timeSpy.last(), (QList<QVariant>{10, 120, 5, 2}));
+    spin("tmin")->setValue(10);
+    spin("tmax")->setValue(120);
+    spin("tstep")->setValue(5);
+    spin("tint")->setValue(2);
+    QCOMPARE(times.back(), (std::vector<double>{10.0, 120.0, 5.0, 2.0}));
 
-    spin("spinBox_bmin")->setValue(-100);
-    spin("spinBox_bmax")->setValue(-20);
-    QCOMPARE(baselineSpy.last(), (QList<QVariant>{-100, -20}));
-    spin("spinBox_bmax")->setValue(-100);
-    QCOMPARE(baselineSpy.last(), (QList<QVariant>{1000000, 1000000}));
-    spin("spinBox_bmax")->setValue(-20);
+    spin("bmin")->setValue(-100);
+    spin("bmax")->setValue(-20);
+    QCOMPARE(baselines.back(), (std::vector<double>{-100.0, -20.0}));
+    spin("bmax")->setValue(-100);
+    QCOMPARE(baselines.back(), (std::vector<double>{1000000.0, 1000000.0}));
+    spin("bmax")->setValue(-20);
 
-    view.findChild<QCheckBox*>(QStringLiteral("checkBox_EEG"))->setChecked(false);
-    view.findChild<QCheckBox*>(QStringLiteral("checkBox_MEG"))->setChecked(true);
-    QCOMPARE(modalitySpy.last(), (QList<QVariant>{false, true}));
+    view.findChild<QCheckBox*>(QStringLiteral("meg"))->click();
+    QCOMPARE(modalities.back(), (std::vector<double>{0.0, 1.0}));
 
-    dspin("doubleSpinBox_dist")->setValue(7.0);
-    dspin("doubleSpinBox_grid")->setValue(9.0);
-    QCOMPARE(fittingSpy.last(), (QList<QVariant>{7.0, 9.0}));
-    dspin("doubleSpinBox_gradnoise")->setValue(4.0);
-    dspin("doubleSpinBox_magnoise")->setValue(30.0);
-    dspin("doubleSpinBox_eegnoise")->setValue(0.4);
-    QCOMPARE(noiseSpy.last(), (QList<QVariant>{4.0, 30.0, 0.4}));
-    dspin("doubleSpinBox_gradreg")->setValue(0.2);
-    dspin("doubleSpinBox_magreg")->setValue(0.3);
-    dspin("doubleSpinBox_eegreg")->setValue(0.4);
-    QCOMPARE(regSpy.last(), (QList<QVariant>{0.2, 0.3, 0.4}));
-    dspin("doubleSpinBox_orgx")->setValue(1.0);
-    dspin("doubleSpinBox_orgy")->setValue(2.0);
-    dspin("doubleSpinBox_orgz")->setValue(40.0);
-    dspin("doubleSpinBox_rad")->setValue(80.0);
-    QCOMPARE(sphereSpy.last(), (QList<QVariant>{1.0, 2.0, 40.0, 80.0}));
+    dspin("minDistance")->setValue(7.5);
+    dspin("guessRadius")->setValue(9.0);
+    QCOMPARE(fittings.back(), (std::vector<double>{7.5, 9.0}));
+    dspin("gradNoise")->setValue(4.0);
+    dspin("magNoise")->setValue(30.0);
+    dspin("eegNoise")->setValue(0.4);
+    QCOMPARE(noises.back(), (std::vector<double>{4.0, 30.0, 0.4}));
+    dspin("gradReg")->setValue(0.2);
+    dspin("magReg")->setValue(0.3);
+    dspin("eegReg")->setValue(0.4);
+    QCOMPARE(regularizations.back(), (std::vector<double>{0.2, 0.3, 0.4}));
+    dspin("originX")->setValue(1.0);
+    dspin("originY")->setValue(2.0);
+    dspin("eegRadius")->setValue(80.0);
+    QCOMPARE(spheres.back(), (std::vector<double>{1.0, 2.0, 40.0, 80.0}));
 
-    // Requesting the parameters repeats exactly what the controls reported
-    const QList<QSignalSpy*> spies = {&timeSpy, &baselineSpy, &modalitySpy, &fittingSpy, &noiseSpy, &regSpy, &sphereSpy};
-    QList<QList<QVariant>> lastReported;
-    for (QSignalSpy* pSpy : spies) {
-        lastReported << pSpy->last();
-        pSpy->clear();
+    // Reporting the parameters repeats exactly what the controls reported
+    const std::vector<std::vector<std::vector<double>>*> reports = {&times, &baselines, &modalities, &fittings, &noises, &regularizations, &spheres};
+    std::vector<std::vector<double>> lastReported;
+    lastReported.reserve(reports.size());
+    for (auto* pReport : reports) {
+        lastReported.push_back(pReport->back());
+        pReport->clear();
     }
-    view.requestParams();
-    for (int i = 0; i < spies.size(); ++i) {
-        QCOMPARE(spies.at(i)->count(), 1);
-        QCOMPARE(spies.at(i)->last(), lastReported.at(i));
+    panel->report_parameters();
+    for (std::size_t i = 0; i < reports.size(); ++i) {
+        QCOMPARE(reports[i]->size(), std::size_t(1));
+        QCOMPARE(reports[i]->back(), lastReported[i]);
     }
 
-    // Model lists; the measurement selection derives the fit name
-    QSignalSpy measSpy(&view, &DipoleFitView::selectedMeas);
-    QSignalSpy bemSpy(&view, &DipoleFitView::selectedBem);
-    QSignalSpy fitSpy(&view, &DipoleFitView::performDipoleFit);
-    auto* pMeas = view.findChild<QComboBox*>(QStringLiteral("comboBox_meas"));
-    auto* pBem = view.findChild<QComboBox*>(QStringLiteral("comboBox_bem"));
-    auto* pName = view.findChild<QLineEdit*>(QStringLiteral("lineEdit_name"));
-    view.addMeas(QStringLiteral("sample_audvis-ave.fif"));
-    view.addBem(QStringLiteral("sample-5120-bem-sol.fif"));
-    view.addMri(QStringLiteral("all-trans.fif"));
-    view.addNoise(QStringLiteral("sample_audvis-cov.fif"));
+    // Models are added silently; choosing the measurement names the fit
+    auto* pMeas = qobject_cast<QComboBox*>(view.formPanel()->editor("measurement"));
+    auto* pBem = qobject_cast<QComboBox*>(view.formPanel()->editor("bem"));
+    auto* pName = qobject_cast<QLineEdit*>(view.formPanel()->editor("name"));
+    QVERIFY(pMeas && pBem && pName);
+    panel->add_model(DipoleFitPanel::Model::Measurement, "sample_audvis-ave.fif");
+    panel->add_model(DipoleFitPanel::Model::Bem, "sample-5120-bem-sol.fif");
+    panel->add_model(DipoleFitPanel::Model::Mri, "all-trans.fif");
+    panel->add_model(DipoleFitPanel::Model::Noise, "sample_audvis-cov.fif");
+    QVERIFY(models.empty());
     pMeas->setCurrentIndex(1);
-    QCOMPARE(measSpy.last().at(0).toString(), QStringLiteral("sample_audvis-ave.fif"));
+    QCOMPARE(models.back(), std::make_pair(DipoleFitPanel::Model::Measurement, std::string("sample_audvis-ave.fif")));
     QVERIFY(pName->text().startsWith(QStringLiteral("Dipole Fit - sample_audvis - ")));
     pBem->setCurrentIndex(1);
-    QCOMPARE(bemSpy.last().at(0).toString(), QStringLiteral("sample-5120-bem-sol.fif"));
-    view.findChild<QPushButton*>(QStringLiteral("pushButton_fit"))->click();
-    QCOMPARE(fitSpy.last().at(0).toString(), pName->text());
+    QCOMPARE(models.back(), std::make_pair(DipoleFitPanel::Model::Bem, std::string("sample-5120-bem-sol.fif")));
+    view.findChild<QPushButton*>(QStringLiteral("fit"))->click();
+    QCOMPARE(QString::fromStdString(fits.back()), pName->text());
 
-    view.removeModel(QStringLiteral("sample-5120-bem-sol.fif"), 2);
+    // A removed model gives way to "None"
+    panel->remove_model(DipoleFitPanel::Model::Bem, "sample-5120-bem-sol.fif");
     QCOMPARE(pBem->findText(QStringLiteral("sample-5120-bem-sol.fif")), -1);
-    view.removeModel(QStringLiteral("all-trans.fif"), 3);
-    view.removeModel(QStringLiteral("sample_audvis-cov.fif"), 4);
-    view.removeModel(QStringLiteral("sample_audvis-ave.fif"), 1);
+    QCOMPARE(panel->model(DipoleFitPanel::Model::Bem), std::string("None"));
+    panel->remove_model(DipoleFitPanel::Model::Mri, "all-trans.fif");
+    panel->remove_model(DipoleFitPanel::Model::Noise, "sample_audvis-cov.fif");
+    panel->remove_model(DipoleFitPanel::Model::Measurement, "sample_audvis-ave.fif");
+    panel->remove_model(DipoleFitPanel::Model::Measurement, "None");
     QCOMPARE(pMeas->count(), 1);
-    view.removeModel(QStringLiteral("x"), 9);
-    view.clearView();
-    QCOMPARE(pMeas->count(), 0);
-    QVERIFY(pName->text().isEmpty());
-}
 
-//=============================================================================================================
-
-void TestVizQtViewers2::dipoleFitView_lifecycle()
-{
-    DipoleFitView view;
     view.setGuiMode(AbstractView::GuiMode::Research);
     view.setProcessingMode(AbstractView::ProcessingMode::Offline);
-
-    view.addMeas(QStringLiteral("sample_audvis-ave.fif"));
-    view.addBem(QStringLiteral("sample-5120-bem-sol.fif"));
-    view.addMri(QStringLiteral("all-trans.fif"));
-    view.addNoise(QStringLiteral("sample_audvis-cov.fif"));
-    view.removeModel(QStringLiteral("all-trans.fif"), 3);
-
-    QSignalSpy timeSpy(&view, &DipoleFitView::timeChanged);
-    QSignalSpy sphereSpy(&view, &DipoleFitView::sphereChanged);
-    view.requestParams();
-    QCOMPARE(timeSpy.count(), 1);
-    QCOMPARE(sphereSpy.count(), 1);
-
     view.saveSettings();
     view.loadSettings();
     view.clearView();
-
     QApplication::processEvents();
 }
 
@@ -4754,7 +4692,7 @@ void TestVizQtViewers2::bidsView_treeMovesAndSelection()
 
 //=============================================================================================================
 
-void TestVizQtViewers2::projectSettingsView_projectsSubjectsAndTimer()
+void TestVizQtViewers2::projectPanel_inPanelWidget()
 {
     QTemporaryDir root;
     QVERIFY(root.isValid());
@@ -4763,163 +4701,152 @@ void TestVizQtViewers2::projectSettingsView_projectsSubjectsAndTimer()
         QVERIFY(QDir().mkpath(sRoot + QLatin1Char('/') + sSub));
     }
 
-    ProjectSettingsView view(QString(), sRoot, QStringLiteral("ProjA"), QStringLiteral("Sub2"), QString());
+    auto panel = std::make_shared<ProjectPanel>(sRoot.toStdU16String(), "ProjA", "Sub2", "");
+    PanelWidget view(panel, QString());
     view.show();
-    auto* pProjects = view.findChild<QComboBox*>(QStringLiteral("m_qComboBox_ProjectSelection"));
-    auto* pSubjects = view.findChild<QComboBox*>(QStringLiteral("m_qComboBox_SubjectSelection"));
-    auto* pParadigm = view.findChild<QLineEdit*>(QStringLiteral("m_qLineEditParadigm"));
-    auto* pFileName = view.findChild<QLineEdit*>(QStringLiteral("m_qLineEditFileName"));
-    QVERIFY(pProjects && pSubjects && pParadigm && pFileName);
-
-    auto items = [](QComboBox* pBox) {
+    std::vector<std::string> projects;
+    std::vector<std::string> subjects;
+    std::vector<std::string> paradigms;
+    std::vector<std::string> fileNames;
+    std::vector<int> times;
+    std::vector<bool> timers;
+    ProjectPanel::Callbacks callbacks;
+    callbacks.project_changed = [&projects](const std::string& project) {
+        projects.push_back(project);
+    };
+    callbacks.subject_changed = [&subjects](const std::string& subject) {
+        subjects.push_back(subject);
+    };
+    callbacks.paradigm_changed = [&paradigms](const std::string& paradigm) {
+        paradigms.push_back(paradigm);
+    };
+    callbacks.file_name_changed = [&fileNames](const std::string& fileName) {
+        fileNames.push_back(fileName);
+    };
+    callbacks.recording_time_changed = [&times](int milliseconds) {
+        times.push_back(milliseconds);
+    };
+    callbacks.recording_timer_changed = [&timers](bool on) {
+        timers.push_back(on);
+    };
+    panel->set_callbacks(std::move(callbacks));
+    const auto editor = [&view](const char* key) {
+        return view.formPanel()->editor(key);
+    };
+    const auto text = [&editor](const char* key) {
+        return qobject_cast<QLabel*>(editor(key))->text();
+    };
+    auto* pProjects = qobject_cast<QComboBox*>(editor("project"));
+    auto* pSubjects = qobject_cast<QComboBox*>(editor("subject"));
+    auto* pParadigm = qobject_cast<QLineEdit*>(editor("paradigm"));
+    QVERIFY(pProjects && pSubjects && pParadigm);
+    const auto items = [](QComboBox* pBox) {
         QStringList list;
         for (int i = 0; i < pBox->count(); ++i) {
             list << pBox->itemText(i);
         }
         return list;
     };
+    const auto type = [](QLineEdit* pEdit, const QString& sText) {
+        pEdit->setText(sText);
+        emit pEdit->textEdited(sText);
+    };
 
-    // Initial scan picks up both projects and keeps the requested subject.
+    // The initial scan picks up both projects and keeps the requested subject
     QCOMPARE(items(pProjects), QStringList({"ProjA", "ProjB"}));
     QCOMPARE(pProjects->currentText(), QStringLiteral("ProjA"));
     QCOMPARE(items(pSubjects), QStringList({"Sub1", "Sub2"}));
     QCOMPARE(pSubjects->currentText(), QStringLiteral("Sub2"));
 
     // File name: <root>/<project>/<subject>/<stamp>_<subject>[_<paradigm>]_raw.fif
-    QString sFile = view.getCurrentFileName();
+    const QString sFile = QString::fromStdString(panel->current_file_name());
     QVERIFY(sFile.startsWith(sRoot + QStringLiteral("/ProjA/Sub2/")));
     QVERIFY(sFile.endsWith(QStringLiteral("_Sub2_raw.fif")));
-    QCOMPARE(pFileName->text(), sFile);
+    QCOMPARE(text("fileName"), sFile);
+    QVERIFY(fileNames.empty());
 
-    QSignalSpy paradigmSpy(&view, &ProjectSettingsView::newParadigm);
-    QSignalSpy fileSpy(&view, &ProjectSettingsView::fileNameChanged);
-    pParadigm->setText(QStringLiteral("Rest"));
-    QCOMPARE(paradigmSpy.last().at(0).toString(), QStringLiteral("Rest"));
-    QVERIFY(fileSpy.last().at(0).toString().endsWith(QStringLiteral("_Sub2_Rest_raw.fif")));
-    view.triggerFileNameUpdate();
-    QVERIFY(pFileName->text().endsWith(QStringLiteral("_Sub2_Rest_raw.fif")));
+    type(pParadigm, QStringLiteral("Rest"));
+    QCOMPARE(paradigms.back(), std::string("Rest"));
+    QVERIFY(fileNames.back().ends_with("_Sub2_Rest_raw.fif"));
+    QVERIFY(text("fileName").endsWith(QStringLiteral("_Sub2_Rest_raw.fif")));
 
-    // Switching project rescans subjects and falls back to the first one.
-    QSignalSpy projectSpy(&view, &ProjectSettingsView::newProject);
-    QSignalSpy subjectSpy(&view, &ProjectSettingsView::newSubject);
+    // Switching the project rescans the subjects and falls back to the first one
     pProjects->setCurrentText(QStringLiteral("ProjB"));
-    QCOMPARE(projectSpy.last().at(0).toString(), QStringLiteral("ProjB"));
+    QCOMPARE(projects.back(), std::string("ProjB"));
     QCOMPARE(items(pSubjects), QStringList({"SubX"}));
-    QCOMPARE(subjectSpy.last().at(0).toString(), QStringLiteral("SubX"));
-    QVERIFY(view.getCurrentFileName().startsWith(sRoot + QStringLiteral("/ProjB/SubX/")));
+    QCOMPARE(subjects.back(), std::string("SubX"));
+    QVERIFY(QString::fromStdString(panel->current_file_name()).startsWith(sRoot + QStringLiteral("/ProjB/SubX/")));
 
-    // Adding a project creates its folder and selects it.
-    answerNextInputDialog(QStringLiteral("ProjC"));
-    view.findChild<QPushButton*>(QStringLiteral("m_qPushButtonNewProject"))->click();
+    // Adding a project creates its directory and chooses it
+    type(qobject_cast<QLineEdit*>(editor("newProject")), QStringLiteral("ProjC"));
+    view.findChild<QPushButton*>(QStringLiteral("addProject"))->click();
     QVERIFY(QDir(sRoot + QStringLiteral("/ProjC")).exists());
     QCOMPARE(items(pProjects), QStringList({"ProjA", "ProjB", "ProjC"}));
     QCOMPARE(pProjects->currentText(), QStringLiteral("ProjC"));
-    QCOMPARE(projectSpy.last().at(0).toString(), QStringLiteral("ProjC"));
+    QCOMPARE(projects.back(), std::string("ProjC"));
     QCOMPARE(pSubjects->count(), 0);
-    QVERIFY(pFileName->text().startsWith(sRoot + QStringLiteral("/ProjC/")));
+    QVERIFY(qobject_cast<QLineEdit*>(editor("newProject"))->text().isEmpty());
+    QVERIFY(text("fileName").startsWith(sRoot + QStringLiteral("/ProjC/")));
 
-    // Adding a subject creates its folder below the current project and selects it.
-    answerNextInputDialog(QStringLiteral("SubNew"));
-    view.findChild<QPushButton*>(QStringLiteral("m_qPushButtonNewSubject"))->click();
+    // Adding a subject creates its directory below the current project and chooses it
+    type(qobject_cast<QLineEdit*>(editor("newSubject")), QStringLiteral("SubNew"));
+    view.findChild<QPushButton*>(QStringLiteral("addSubject"))->click();
     QVERIFY(QDir(sRoot + QStringLiteral("/ProjC/SubNew")).exists());
     QCOMPARE(items(pSubjects), QStringList({"SubNew"}));
     QCOMPARE(pSubjects->currentText(), QStringLiteral("SubNew"));
-    QVERIFY(view.getCurrentFileName().startsWith(sRoot + QStringLiteral("/ProjC/SubNew/")));
+    QVERIFY(fileNames.back().starts_with((sRoot + QStringLiteral("/ProjC/SubNew/")).toStdString()));
 
-    // ... also when the project already has subjects sorting before the new one.
+    // ... also when the project already has subjects sorting before the new one
     pProjects->setCurrentText(QStringLiteral("ProjA"));
-    answerNextInputDialog(QStringLiteral("Sub3"));
-    view.findChild<QPushButton*>(QStringLiteral("m_qPushButtonNewSubject"))->click();
-    QVERIFY(QDir(sRoot + QStringLiteral("/ProjA/Sub3")).exists());
+    QVERIFY(panel->add_subject("Sub3"));
     QCOMPARE(items(pSubjects), QStringList({"Sub1", "Sub2", "Sub3"}));
     QCOMPARE(pSubjects->currentText(), QStringLiteral("Sub3"));
-    QCOMPARE(subjectSpy.last().at(0).toString(), QStringLiteral("Sub3"));
-    QVERIFY(view.getCurrentFileName().startsWith(sRoot + QStringLiteral("/ProjA/Sub3/")));
+    QCOMPARE(subjects.back(), std::string("Sub3"));
 
-    // Cancelled add dialog changes nothing.
-    answerNextModal([](QWidget* pModal) { qobject_cast<QDialog*>(pModal)->reject(); });
-    view.findChild<QPushButton*>(QStringLiteral("m_qPushButtonNewProject"))->click();
+    // Without a name nothing is added
+    view.findChild<QPushButton*>(QStringLiteral("addProject"))->click();
     QCOMPARE(pProjects->count(), 3);
 
-    // Delete subject: "Keep data" and a declined confirmation keep the folder, confirming removes it.
-    pProjects->setCurrentText(QStringLiteral("ProjA"));
-    pSubjects->setCurrentText(QStringLiteral("Sub1"));
-    auto* pDeleteSubject = view.findChild<QPushButton*>(QStringLiteral("m_qPushButtonDeleteSubject"));
-    clickNextMessageBoxButton(QStringLiteral("Keep data"));
-    pDeleteSubject->click();
-    QVERIFY(QDir(sRoot + QStringLiteral("/ProjA/Sub1")).exists());
+    // Another data directory rescans the projects
+    QTemporaryDir other;
+    QVERIFY(other.isValid() && QDir().mkpath(other.path() + QStringLiteral("/Other/S1")));
+    auto* pDirectory = editor("dataDirectory")->findChild<QLineEdit*>();
+    pDirectory->setText(other.path());
+    emit pDirectory->editingFinished();
+    QCOMPARE(items(pProjects), QStringList({"Other"}));
+    QCOMPARE(projects.back(), std::string("Other"));
+    QCOMPARE(subjects.back(), std::string("S1"));
+    QVERIFY(fileNames.back().starts_with((other.path() + QStringLiteral("/Other/S1/")).toStdString()));
 
-    answerNextModal([](QWidget* pModal) {
-        clickNextMessageBoxButton(QStringLiteral("No"));
-        auto* pBox = qobject_cast<QMessageBox*>(pModal);
-        for (QAbstractButton* pButton : pBox->buttons()) {
-            if (pButton->text() == QStringLiteral("Delete data")) {
-                pButton->click();
-            }
-        }
-    });
-    pDeleteSubject->click();
-    QVERIFY(QDir(sRoot + QStringLiteral("/ProjA/Sub1")).exists());
+    // Recording timer: the spin boxes set the total, the elapsed time counts up
+    qobject_cast<QSpinBox*>(editor("hours"))->setValue(1);
+    qobject_cast<QSpinBox*>(editor("minutes"))->setValue(2);
+    qobject_cast<QSpinBox*>(editor("seconds"))->setValue(3);
+    QCOMPARE(times.back(), 3723000);
+    QCOMPARE(panel->recording_time(), 3723000);
+    panel->set_recording_elapsed_time(1000);
+    QCOMPARE(text("passedTime"), QStringLiteral("00:00:01"));
+    panel->set_recording_elapsed_time(3723000 - 200);
+    QCOMPARE(text("passedTime"), QStringLiteral("01:02:03"));
+    view.findChild<QCheckBox*>(QStringLiteral("useRecordingTimer"))->click();
+    QCOMPARE(timers, std::vector<bool>({true}));
+    QVERIFY(panel->recording_timer());
 
-    answerNextModal([](QWidget* pModal) {
-        clickNextMessageBoxButton(QStringLiteral("Yes"));
-        auto* pBox = qobject_cast<QMessageBox*>(pModal);
-        for (QAbstractButton* pButton : pBox->buttons()) {
-            if (pButton->text() == QStringLiteral("Delete data")) {
-                pButton->click();
-            }
-        }
-    });
-    pDeleteSubject->click();
-    QVERIFY(!QDir(sRoot + QStringLiteral("/ProjA/Sub1")).exists());
-    QVERIFY(QDir(sRoot + QStringLiteral("/ProjA/Sub2")).exists());
-    QCOMPARE(items(pSubjects), QStringList({"Sub2", "Sub3"}));
+    // The file name and paradigm can be hidden and shown again
+    panel->set_file_name_visible(false);
+    panel->set_paradigm_visible(false);
+    QVERIFY(!editor("fileName")->isVisible());
+    QVERIFY(!pParadigm->isVisible());
+    panel->set_file_name_visible(true);
+    panel->set_paradigm_visible(true);
+    QVERIFY(editor("fileName")->isVisible());
+    QVERIFY(pParadigm->isVisible());
 
-    // Delete project removes the whole tree.
-    pProjects->setCurrentText(QStringLiteral("ProjB"));
-    answerNextModal([](QWidget* pModal) {
-        clickNextMessageBoxButton(QStringLiteral("Yes"));
-        auto* pBox = qobject_cast<QMessageBox*>(pModal);
-        for (QAbstractButton* pButton : pBox->buttons()) {
-            if (pButton->text() == QStringLiteral("Delete data")) {
-                pButton->click();
-            }
-        }
-    });
-    view.findChild<QPushButton*>(QStringLiteral("m_qPushButtonDeleteProject"))->click();
-    QVERIFY(!QDir(sRoot + QStringLiteral("/ProjB")).exists());
-    QCOMPARE(items(pProjects), QStringList({"ProjA", "ProjC"}));
-
-    // Recording timer: spin boxes set the total, elapsed time counts up and down.
-    QSignalSpy timerSpy(&view, &ProjectSettingsView::timerChanged);
-    view.findChild<QSpinBox*>(QStringLiteral("m_spinBox_hours"))->setValue(1);
-    view.findChild<QSpinBox*>(QStringLiteral("m_spinBox_min"))->setValue(2);
-    view.findChild<QSpinBox*>(QStringLiteral("m_spinBox_sec"))->setValue(3);
-    QCOMPARE(timerSpy.last().at(0).toInt(), 3723000);
-    auto* pToGo = view.findChild<QLabel*>(QStringLiteral("m_label_timeToGo"));
-    auto* pPassed = view.findChild<QLabel*>(QStringLiteral("m_label_timePassed"));
-    QCOMPARE(pToGo->text(), QStringLiteral("01:02:03"));
-    view.setRecordingElapsedTime(1000);
-    QCOMPARE(pToGo->text(), QStringLiteral("01:02:02"));
-    QCOMPARE(pPassed->text(), QStringLiteral("00:00:01"));
-    view.setRecordingElapsedTime(3723000 - 200);
-    QCOMPARE(pPassed->text(), QStringLiteral("01:02:03"));
-
-    QSignalSpy timerStateSpy(&view, &ProjectSettingsView::recordingTimerStateChanged);
-    auto* pUseTimer = view.findChild<QCheckBox*>(QStringLiteral("m_checkBox_useRecordingTimer"));
-    pUseTimer->setChecked(!pUseTimer->isChecked());
-    QCOMPARE(timerStateSpy.count(), 1);
-    QCOMPARE(timerStateSpy.last().at(0).toBool(), pUseTimer->isChecked());
-
-    // Optional UI parts can be hidden and shown again.
-    view.hideFileNameUi();
-    view.hideParadigmUi();
-    QVERIFY(pFileName->isHidden());
-    QVERIFY(pParadigm->isHidden());
-    view.showFileNameUi();
-    view.showParadigmUi();
-    QVERIFY(!pFileName->isHidden());
-    QVERIFY(!pParadigm->isHidden());
+    view.setGuiMode(AbstractView::GuiMode::Clinical);
+    view.setProcessingMode(AbstractView::ProcessingMode::Offline);
+    view.saveSettings();
+    view.loadSettings();
+    view.clearView();
 }
 
 //=============================================================================================================

@@ -77,6 +77,10 @@ set(SOURCES
   panels/time_frequency_panel.cpp
   panels/filter_design_panel.cpp
   panels/filter_settings_panel.cpp
+  panels/project_panel.cpp
+  panels/hpi_panel.cpp
+  panels/coregistration_panel.cpp
+  panels/dipole_fit_panel.cpp
   panels/panel.cpp
   panels/projectors_panel.cpp
   panels/spectrum_panel.cpp
@@ -183,6 +187,10 @@ set(HEADERS
   panels/time_frequency_panel.h
   panels/filter_design_panel.h
   panels/filter_settings_panel.h
+  panels/project_panel.h
+  panels/hpi_panel.h
+  panels/coregistration_panel.h
+  panels/dipole_fit_panel.h
   panels/panel.h
   panels/projectors_panel.h
   panels/spectrum_panel.h

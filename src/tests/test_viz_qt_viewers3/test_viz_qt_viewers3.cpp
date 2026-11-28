@@ -31,13 +31,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/viz/backends/qt/viewers/dipolefitview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/dipole_fit_panel.h>
 #include <mne/viz/backends/qt/viewers/bidsview.h>
 #include <mne/viz/backends/qt/viewers/butterflyview.h>
 #include <mne/viz/backends/qt/viewers/control3dview.h>
 #include <mne/viz/backends/qt/kit/panelwidget.h>
 #include <mne/viz/panels/artifact_panel.h>
-#include <mne/viz/backends/qt/viewers/projectsettingsview.h>
+#include <mne/viz/panels/project_panel.h>
 #include <mne/viz/backends/qt/viewers/helpers/timerulerwidget.h>
 #include <mne/viz/backends/qt/viewers/helpers/channellabelpanel.h>
 #include <mne/viz/backends/qt/viewers/helpers/overviewbarwidget.h>
@@ -93,12 +94,12 @@ private:
 
 private slots:
     void initTestCase();
-    void construct_dipoleFitView();
+    void construct_dipoleFitPanel();
     void construct_bidsView();
     void construct_butterflyView();
     void construct_control3DView();
     void construct_artifactPanel();
-    void construct_projectSettingsView();
+    void construct_projectPanel();
     void construct_timeRulerWidget();
     void construct_channelLabelPanel();
     void construct_overviewBarWidget();
@@ -125,11 +126,11 @@ void TestVizQtViewers3::initTestCase()
 
 //=============================================================================================================
 
-void TestVizQtViewers3::construct_dipoleFitView()
+void TestVizQtViewers3::construct_dipoleFitPanel()
 {
     // Widgets are parented so teardown goes through Qt ownership, the way the
     // applications use them, rather than through a bare delete.
-    DipoleFitView* pView = new DipoleFitView(m_pHolder.data());
+    PanelWidget* pView = new PanelWidget(std::make_shared<DipoleFitPanel>(), QString(), m_pHolder.data());
     QVERIFY(pView != nullptr);
 
     pView->resize(320, 240);
@@ -202,14 +203,11 @@ void TestVizQtViewers3::construct_artifactPanel()
 
 //=============================================================================================================
 
-void TestVizQtViewers3::construct_projectSettingsView()
+void TestVizQtViewers3::construct_projectPanel()
 {
-    ProjectSettingsView* pView = new ProjectSettingsView(settingsPath(),
-                                                         "/TestData",
-                                                         "TestProject",
-                                                         "TestSubject",
-                                                         "UnknownParadigm",
-                                                         m_pHolder.data());
+    PanelWidget* pView = new PanelWidget(std::make_shared<ProjectPanel>("/TestData", "TestProject", "TestSubject", "UnknownParadigm"),
+                                         settingsPath(),
+                                         m_pHolder.data());
     QVERIFY(pView != nullptr);
 
     pView->resize(320, 240);

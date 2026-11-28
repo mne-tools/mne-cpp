@@ -21,7 +21,9 @@
 
 #include "FormFiles/writetofilesetupwidget.h"
 #include "FormFiles/writetofilestatuswidget.h"
-#include <mne/viz/backends/qt/viewers/projectsettingsview.h>
+#include <mne/base/string_utils.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/project_panel.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_stream.h>
@@ -236,39 +238,36 @@ void WriteToFile::initPluginControlWidgets()
         }
 
         // Projects Settings
-        ProjectSettingsView* pProjectSettingsView = makeControlWidget<ProjectSettingsView>(controlWidgets, QString("MNESCAN/%1").arg(this->getName()),
-                                                                                           sMneScanDataPath,
-                                                                                           sCurrentProject,
-                                                                                           sCurrentSubject,
-                                                                                           "");
+        auto panel = std::make_shared<mne::viz::ProjectPanel>(mne::path_from_utf8(sMneScanDataPath.toStdString()),
+                                                              sCurrentProject.toStdString(),
+                                                              sCurrentSubject.toStdString(),
+                                                              "");
+        mne::viz::ProjectPanel::Callbacks callbacks;
+        callbacks.recording_time_changed = [this](int milliseconds) {
+            setRecordingTimerChanged(milliseconds);
+        };
+        callbacks.recording_timer_changed = [this](bool on) {
+            setRecordingTimerStateChanged(on);
+        };
+        callbacks.file_name_changed = [this, pPanel = panel.get()](const std::string& fileName) {
+            onFileNameChanged(QString::fromStdString(fileName));
+            pPanel->set_recording_elapsed_time(static_cast<int>(m_recordingStartedTime.elapsed()));
+        };
+        panel->set_callbacks(std::move(callbacks));
+        panel->set_file_name_visible(false);
+        panel->set_paradigm_visible(false);
+        PanelWidget* pPanelWidget = makeControlWidget<PanelWidget>(controlWidgets, panel, QString("MNESCAN/%1").arg(this->getName()));
         connect(this, &WriteToFile::guiModeChanged,
-                pProjectSettingsView, &ProjectSettingsView::setGuiMode);
-        pProjectSettingsView->setObjectName("widget_");
-        m_sRecordFileName = pProjectSettingsView->getCurrentFileName();
-
-        connect(pProjectSettingsView, &ProjectSettingsView::timerChanged,
-                this, &WriteToFile::setRecordingTimerChanged);
-
-        connect(pProjectSettingsView, &ProjectSettingsView::recordingTimerStateChanged,
-                this, &WriteToFile::setRecordingTimerStateChanged);
-
-        connect(pProjectSettingsView, &ProjectSettingsView::fileNameChanged,
-                this, &WriteToFile::onFileNameChanged);
-
-        connect(pProjectSettingsView, &ProjectSettingsView::fileNameChanged, [=, this]() {
-            pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
-        });
-
-        pProjectSettingsView->hideFileNameUi();
-        pProjectSettingsView->hideParadigmUi();
-
+                pPanelWidget, &PanelWidget::setGuiMode);
+        pPanelWidget->setObjectName("widget_");
+        m_sRecordFileName = QString::fromStdString(panel->current_file_name());
 
         offerControlWidgets(std::move(controlWidgets));
 
         if (!m_pUpdateTimeInfoTimer) {
             m_pUpdateTimeInfoTimer = QSharedPointer<QTimer>(new QTimer(this));
-            connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout, [=, this]() {
-                pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
+            connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout, [this, panel]() {
+                panel->set_recording_elapsed_time(static_cast<int>(m_recordingStartedTime.elapsed()));
             });
         }
 

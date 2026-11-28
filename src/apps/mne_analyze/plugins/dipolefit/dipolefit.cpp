@@ -28,7 +28,8 @@
 #include <anShared/Model/covariancemodel.h>
 #include <anShared/Model/averagingdatamodel.h>
 #include <anShared/Model/dipolefitmodel.h>
-#include <mne/viz/backends/qt/viewers/dipolefitview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/dipole_fit_panel.h>
 #include <mne/inv/dipole_fit/inv_dipole_fit_data.h>
 #include <mne/inv/dipole_fit/inv_dipole_fit.h>
 #include <mne/inv/dipole_fit/inv_ecd_set.h>
@@ -109,53 +110,71 @@ QMenu* InvDipoleFit::getMenu()
 
 QDockWidget* InvDipoleFit::getControl()
 {
+    using mne::viz::DipoleFitPanel;
     auto pDockWidgt = std::make_unique<QDockWidget>(getName());
-    mne::viz::qt::DipoleFitView* pDipoleView = new mne::viz::qt::DipoleFitView(pDockWidgt.get());
-
-    //Send Gui updates
-    connect(this, &InvDipoleFit::newBemModel,
-            pDipoleView, &mne::viz::qt::DipoleFitView::addBem, Qt::UniqueConnection);
-    connect(this, &InvDipoleFit::newCovarianceModel,
-            pDipoleView, &mne::viz::qt::DipoleFitView::addNoise, Qt::UniqueConnection);
-    connect(this, &InvDipoleFit::newMriModel,
-            pDipoleView, &mne::viz::qt::DipoleFitView::addMri, Qt::UniqueConnection);
-    connect(this, &InvDipoleFit::newMeasurment,
-            pDipoleView, &mne::viz::qt::DipoleFitView::addMeas, Qt::UniqueConnection);
-    connect(this, &InvDipoleFit::getUpdate,
-            pDipoleView, &mne::viz::qt::DipoleFitView::requestParams, Qt::UniqueConnection);
-    connect(this, &InvDipoleFit::removeModel,
-            pDipoleView, &mne::viz::qt::DipoleFitView::removeModel, Qt::UniqueConnection);
+    auto panel = std::make_shared<DipoleFitPanel>();
 
     //Receive Gui updates
-    connect(pDipoleView, &mne::viz::qt::DipoleFitView::modalityChanged,
-            this, &InvDipoleFit::onModalityChanged, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::viz::qt::DipoleFitView::timeChanged,
-            this, &InvDipoleFit::onTimeChanged, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::viz::qt::DipoleFitView::fittingChanged,
-            this, &InvDipoleFit::onFittingChanged, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::viz::qt::DipoleFitView::baselineChanged,
-            this, &InvDipoleFit::onBaselineChanged, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::viz::qt::DipoleFitView::noiseChanged,
-            this, &InvDipoleFit::onNoiseChanged, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::viz::qt::DipoleFitView::regChanged,
-            this, &InvDipoleFit::onRegChanged, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::viz::qt::DipoleFitView::setChanged,
-            this, &InvDipoleFit::onSetChanged, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::viz::qt::DipoleFitView::sphereChanged,
-            this, &InvDipoleFit::onSphereChanged, Qt::UniqueConnection);
+    DipoleFitPanel::Callbacks callbacks;
+    callbacks.fit = [this](const std::string& name) {
+        onPerformDipoleFit(QString::fromStdString(name));
+    };
+    callbacks.set_changed = [this](int set) {
+        onSetChanged(set);
+    };
+    callbacks.modality_changed = [this](bool eeg, bool meg) {
+        onModalityChanged(eeg, meg);
+    };
+    callbacks.time_changed = [this](int tmin, int tmax, int tstep, int tint) {
+        onTimeChanged(tmin, tmax, tstep, tint);
+    };
+    callbacks.baseline_changed = [this](int bmin, int bmax) {
+        onBaselineChanged(bmin, bmax);
+    };
+    callbacks.fitting_changed = [this](double minDistance, double radius) {
+        onFittingChanged(static_cast<float>(minDistance), static_cast<float>(radius));
+    };
+    callbacks.noise_changed = [this](double grad, double mag, double eeg) {
+        onNoiseChanged(grad, mag, eeg);
+    };
+    callbacks.regularization_changed = [this](double grad, double mag, double eeg) {
+        onRegChanged(grad, mag, eeg);
+    };
+    callbacks.sphere_changed = [this](double x, double y, double z, double radius) {
+        onSphereChanged(x, y, z, radius);
+    };
+    callbacks.model_changed = [this](DipoleFitPanel::Model kind, const std::string& name) {
+        onModelSelected(static_cast<int>(kind), QString::fromStdString(name));
+    };
+    panel->set_callbacks(std::move(callbacks));
+    auto* pDipoleView = new mne::viz::qt::PanelWidget(panel, QString(), pDockWidgt.get());
 
-    connect(pDipoleView, &mne::viz::qt::DipoleFitView::selectedBem,
-            this, &InvDipoleFit::onNewBemSelected, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::viz::qt::DipoleFitView::selectedMri,
-            this, &InvDipoleFit::onNewMriSelected, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::viz::qt::DipoleFitView::selectedNoise,
-            this, &InvDipoleFit::onNewNoiseSelected, Qt::UniqueConnection);
-    connect(pDipoleView, &mne::viz::qt::DipoleFitView::selectedMeas,
-            this, &InvDipoleFit::onNewMeasSelected, Qt::UniqueConnection);
-
-    //Fit
-    connect(pDipoleView, &mne::viz::qt::DipoleFitView::performDipoleFit,
-            this, &InvDipoleFit::onPerformDipoleFit, Qt::UniqueConnection);
+    //Send Gui updates
+    const auto add = [panel](DipoleFitPanel::Model kind) {
+        return [panel, kind](const QString& sModelName) {
+            panel->add_model(kind, sModelName.toStdString());
+        };
+    };
+    connect(this, &InvDipoleFit::newBemModel, pDipoleView, add(DipoleFitPanel::Model::Bem));
+    connect(this, &InvDipoleFit::newCovarianceModel, pDipoleView, add(DipoleFitPanel::Model::Noise));
+    connect(this, &InvDipoleFit::newMriModel, pDipoleView, add(DipoleFitPanel::Model::Mri));
+    connect(this, &InvDipoleFit::newMeasurment, pDipoleView, add(DipoleFitPanel::Model::Measurement));
+    connect(this, &InvDipoleFit::getUpdate, pDipoleView, [panel]() {
+        panel->report_parameters();
+    });
+    connect(this, &InvDipoleFit::removeModel, pDipoleView, [this, panel](const QString& sModelName, int iType) {
+        if (iType < 1 || iType > 4) {
+            mne::Log::warning("[InvDipoleFit::removeModel] Model type not recognized");
+            return;
+        }
+        const auto kind = static_cast<DipoleFitPanel::Model>(iType);
+        const std::string selected = panel->model(kind);
+        panel->remove_model(kind, sModelName.toStdString());
+        // A removed choice gives way to "None"
+        if (panel->model(kind) != selected) {
+            onModelSelected(iType, QString::fromStdString(panel->model(kind)));
+        }
+    });
 
     pDockWidgt->setWidget(pDipoleView);
     pDockWidgt->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -375,6 +394,26 @@ void InvDipoleFit::onNewBemSelected(const QString& sName)
             m_DipoleSettings.bemname = pModel->getModelPath().toStdString();
             return;
         }
+    }
+}
+
+//=============================================================================================================
+
+void InvDipoleFit::onModelSelected(int iType, const QString& sName)
+{
+    switch (iType) {
+        case 1:
+            onNewMeasSelected(sName);
+            break;
+        case 2:
+            onNewBemSelected(sName);
+            break;
+        case 3:
+            onNewMriSelected(sName);
+            break;
+        default:
+            onNewNoiseSelected(sName);
+            break;
     }
 }
 

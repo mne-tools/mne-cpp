@@ -16,6 +16,11 @@
 
 #include <mne/viz/forms/settings_form.h>
 #include <mne/viz/host/settings_store.h>
+#include <mne/viz/models/item_list.h>
+#include <mne/viz/panels/coregistration_panel.h>
+#include <mne/viz/panels/dipole_fit_panel.h>
+#include <mne/viz/panels/hpi_panel.h>
+#include <mne/viz/panels/project_panel.h>
 #include <mne/viz/panels/artifact_panel.h>
 #include <mne/viz/panels/averaging_panel.h>
 #include <mne/viz/panels/compensator_panel.h>
@@ -680,6 +685,118 @@ void test_filter_settings_panel()
     CHECK(restored.form().get<double>(FilterSettingsPanel::to_key) == 60.0);
 }
 
+
+void test_hpi_panel()
+{
+    CHECK((HpiPanel::parse_frequencies("293, 307;none 0 -5 12x 321") == std::vector<int>{293, 307, -1, -1, -1, -1, 321}));
+    CHECK(HpiPanel::parse_frequencies(" , ").empty());
+    CHECK(HpiPanel::format_frequencies({154, -1, 166}) == "154, none, 166");
+
+    // Stored settings are restored without reports; an unreadable frequency list keeps the current one
+    HpiPanel panel;
+    std::vector<std::vector<int>> reported;
+    HpiPanel::Callbacks callbacks;
+    callbacks.coil_frequencies_changed = [&reported](const std::vector<int>& frequencies) {
+        reported.push_back(frequencies);
+    };
+    panel.set_callbacks(std::move(callbacks));
+    MemorySettingsStore store;
+    store.set_value("app/HpiSettingsView/coilFreqs", std::string("154, 158, 161"));
+    store.set_value("app/HpiSettingsView/fittingWindowSize", 500);
+    panel.load(store, "app");
+    CHECK((panel.coil_frequencies() == std::vector<int>{154, 158, 161}) && panel.fitting_window_size() == 500 && reported.empty());
+    CHECK(panel.list("coilResults")->count() == 3 && panel.coil_presets().empty());
+    store.set_value("app/HpiSettingsView/coilFreqs", std::string());
+    panel.load(store, "app");
+    CHECK((panel.coil_frequencies() == std::vector<int>{154, 158, 161}));
+    panel.form().set_value("coilFreqs", std::string("1, 2, 3, 4"));
+    CHECK(reported.size() == 1 && panel.coil_presets().size() == 3);
+    MemorySettingsStore saved;
+    panel.save(saved, "app");
+    CHECK(saved.read_string("app/HpiSettingsView/coilFreqs", {}) == "1, 2, 3, 4" && !saved.contains("app/HpiSettingsView/moveThreshold"));
+}
+
+void test_coregistration_panel()
+{
+    CoregistrationPanel panel;
+    std::vector<std::filesystem::path> stored;
+    CoregistrationPanel::Callbacks callbacks;
+    callbacks.transformation_stored = [&stored](const std::filesystem::path& file) {
+        stored.push_back(file);
+    };
+    panel.set_callbacks(std::move(callbacks));
+    // The same file can be stored twice
+    panel.form().set_value("transStoreFile", std::string("a-trans.fif"));
+    panel.form().set_value("transStoreFile", std::string("a-trans.fif"));
+    CHECK(stored.size() == 2 && panel.form().get<std::string>("transStoreFile").empty());
+
+    // Rotation is kept in Euler order (z, y, x); scaling follows the mode
+    panel.set_transformation(Eigen::Vector3f(0.01f, 0.0f, 0.0f), Eigen::Vector3f(0.5f, 0.0f, 0.0f), Eigen::Vector3f(2.0f, 3.0f, 4.0f));
+    CHECK(panel.form().get<double>("translationX") > 9.99 && panel.form().get<double>("rotationZ") > 28.6);
+    Eigen::Vector3f rotation;
+    Eigen::Vector3f translation;
+    Eigen::Vector3f scaling;
+    panel.transformation(rotation, translation, scaling);
+    CHECK(rotation.isApprox(Eigen::Vector3f(0.5f, 0.0f, 0.0f), 1e-3f) && scaling.isApprox(Eigen::Vector3f::Ones()));
+    panel.form().set_value("scalingMode", std::string("Uniform"));
+    panel.transformation(rotation, translation, scaling);
+    CHECK(scaling.isApprox(Eigen::Vector3f::Constant(2.0f)) && panel.form().is_enabled("scaleX") && !panel.form().is_enabled("scaleY"));
+
+    // Picked fiducials step LPA -> nasion -> RPA
+    panel.set_fiducial(Eigen::Vector3f(0.001f, 0.002f, 0.003f));
+    CHECK(panel.fiducial() == FIFFV_POINT_NASION && panel.form().get<std::string>("fiducialX") == "0.00 mm");
+    CHECK(panel.bem().empty() && panel.omit_distance() > 0.0f && panel.max_iterations() == 20);
+}
+
+void test_dipole_fit_panel()
+{
+    CHECK(DipoleFitPanel::measurement_name("sample_audvis-ave.fif") == "sample_audvis");
+    CHECK(DipoleFitPanel::measurement_name("..run_raw.fif") == "run");
+    CHECK(DipoleFitPanel::measurement_name("noext") == "noext" && DipoleFitPanel::measurement_name("...").empty());
+
+    DipoleFitPanel panel;
+    std::vector<std::string> names;
+    DipoleFitPanel::Callbacks callbacks;
+    callbacks.model_changed = [&names](DipoleFitPanel::Model, const std::string& name) {
+        names.push_back(name);
+    };
+    panel.set_callbacks(std::move(callbacks));
+    panel.add_model(DipoleFitPanel::Model::Noise, "cov.fif");
+    CHECK(panel.model(DipoleFitPanel::Model::Noise) == "None" && names.empty());
+    panel.form().set_value("noise", std::string("cov.fif"));
+    CHECK(names.size() == 1 && names.back() == "cov.fif" && panel.fit_name().empty());
+    panel.remove_model(DipoleFitPanel::Model::Noise, "cov.fif");
+    CHECK(panel.model(DipoleFitPanel::Model::Noise) == "None" && names.size() == 1);
+    panel.form().set_value("measurement", std::string("None"));
+    CHECK(panel.fit_name().empty());
+}
+
+void test_project_panel()
+{
+    // A data directory that does not exist keeps the given project; without subjects there is none
+    ProjectPanel panel("missing-directory", "Project", "Subject", "Rest");
+    CHECK(panel.projects().empty() && panel.project() == "Project" && panel.subject().empty());
+    const std::string file = panel.current_file_name();
+    CHECK(file.starts_with("missing-directory/Project//") && file.ends_with("_Rest_raw.fif"));
+    CHECK(panel.recording_time() == 300000 && !panel.recording_timer());
+    std::vector<int> times;
+    ProjectPanel::Callbacks callbacks;
+    callbacks.recording_time_changed = [&times](int milliseconds) {
+        times.push_back(milliseconds);
+    };
+    panel.set_callbacks(std::move(callbacks));
+    panel.form().set_value("seconds", 30);
+    CHECK((times == std::vector<int>{330000}));
+    panel.set_recording_elapsed_time(330000 - 499);
+    CHECK(panel.form().get<std::string>("passedTime") == "00:05:30");
+    panel.set_recording_elapsed_time(61000);
+    CHECK(panel.form().get<std::string>("passedTime") == "00:01:01");
+    panel.set_paradigm_visible(false);
+    CHECK(!panel.form().is_visible("paradigm") && panel.form().is_visible("fileName"));
+    CHECK(!panel.add_subject("New"));
+}
+
+
 } // namespace
 
 //=============================================================================================================
@@ -703,6 +820,10 @@ int main()
         {"artifact_and_averaging_panels", test_artifact_and_averaging_panels},
         {"filter_design_panel", test_filter_design_panel},
         {"filter_settings_panel", test_filter_settings_panel},
+        {"hpi_panel", test_hpi_panel},
+        {"coregistration_panel", test_coregistration_panel},
+        {"dipole_fit_panel", test_dipole_fit_panel},
+        {"project_panel", test_project_panel},
     };
     for (const auto& [name, test] : tests) {
         const int before = g_failures;

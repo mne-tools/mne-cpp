@@ -23,7 +23,8 @@
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Model/bemdatamodel.h>
-#include <mne/viz/backends/qt/viewers/coregsettingsview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/coregistration_panel.h>
 #include <mne/fiff/fiff_dig_point_set.h>
 #include <mne/mne/mne_bem.h>
 #include <mne/mne/mne_project_to_surface.h>
@@ -68,7 +69,7 @@ using namespace mne::viz::qt;
 CoRegistration::CoRegistration()
 : m_fRMSE(0.0f)
 , m_iNDiscarded(0)
-, m_pCoregSettingsView(nullptr)
+, m_pCoregPanel(std::make_shared<CoregistrationPanel>())
 {
     m_vecBemDataModels = QVector<QSharedPointer<mne::analyze::AbstractModel>>();
 
@@ -142,40 +143,49 @@ QDockWidget* CoRegistration::getControl()
 {
     // Coregistration Settings
     auto pControlDock = std::make_unique<QDockWidget>(getName());
-    m_pCoregSettingsView = new CoregSettingsView(QString("MNEANALYZE/%1").arg(this->getName()), pControlDock.get());
+    CoregistrationPanel::Callbacks callbacks;
+    callbacks.bem_changed = [this](const std::string& name) {
+        onChangeSelectedBem(QString::fromStdString(name));
+    };
+    callbacks.digitizers_loaded = [this](const std::filesystem::path& file) {
+        onDigitizersChanged(file);
+    };
+    callbacks.fiducials_loaded = [this](const std::filesystem::path& file) {
+        onFiducialsChanged(file);
+    };
+    callbacks.fiducials_stored = [this](const std::filesystem::path& file) {
+        onStoreFiducials(file);
+    };
+    callbacks.transformation_loaded = [this](const std::filesystem::path& file) {
+        onLoadTrans(file);
+    };
+    callbacks.transformation_stored = [this](const std::filesystem::path& file) {
+        onStoreTrans(file);
+    };
+    callbacks.fit_fiducials = [this]() {
+        onFitFiducials();
+    };
+    callbacks.fit_icp = [this]() {
+        onFitICP();
+    };
+    callbacks.transformation_changed = [this]() {
+        onUpdateTrans();
+    };
+    callbacks.picking_changed = [this](bool on) {
+        onPickFiducials(on);
+    };
+    callbacks.fiducial_changed = [this](int fiducial) {
+        onPickedFiducialChanged(fiducial);
+    };
+    m_pCoregPanel->set_callbacks(std::move(callbacks));
+    auto* pPanelWidget = new PanelWidget(m_pCoregPanel, QString("MNEANALYZE/%1").arg(this->getName()), pControlDock.get());
 
     pControlDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
-    pControlDock->setWidget(m_pCoregSettingsView);
+    pControlDock->setWidget(pPanelWidget);
     pControlDock->setObjectName(getName());
 
-    // connect buttons
-    connect(m_pCoregSettingsView, &CoregSettingsView::changeSelectedBem,
-            this, &CoRegistration::onChangeSelectedBem, Qt::UniqueConnection);
-    connect(m_pCoregSettingsView, &CoregSettingsView::digFileChanged,
-            this, &CoRegistration::onDigitizersChanged);
-    connect(m_pCoregSettingsView, &CoregSettingsView::fidFileChanged,
-            this, &CoRegistration::onFiducialsChanged);
-    connect(m_pCoregSettingsView, &CoregSettingsView::fitFiducials,
-            this, &CoRegistration::onFitFiducials);
-    connect(m_pCoregSettingsView, &CoregSettingsView::fitICP,
-            this, &CoRegistration::onFitICP);
-    connect(m_pCoregSettingsView, &CoregSettingsView::fidStoreFileChanged,
-            this, &CoRegistration::onStoreFiducials);
-    connect(m_pCoregSettingsView, &CoregSettingsView::transParamChanged,
-            this, &CoRegistration::onUpdateTrans);
-    connect(m_pCoregSettingsView, &CoregSettingsView::loadTrans,
-            this, &CoRegistration::onLoadTrans);
-    connect(m_pCoregSettingsView, &CoregSettingsView::storeTrans,
-            this, &CoRegistration::onStoreTrans);
-
-    // connect fiducial selection
-    connect(m_pCoregSettingsView, &CoregSettingsView::pickFiducials,
-            this, &CoRegistration::onPickFiducials);
-    connect(m_pCoregSettingsView, &CoregSettingsView::fiducialChanged,
-            this, &CoRegistration::onPickedFiducialChanged);
-
     // automaticly load Bem if available
-    onChangeSelectedBem(m_pCoregSettingsView->getCurrentSelectedBem());
+    onChangeSelectedBem(QString::fromStdString(m_pCoregPanel->bem()));
 
     return pControlDock.release();
 }
@@ -224,12 +234,23 @@ void CoRegistration::updateBemList(QSharedPointer<mne::analyze::AbstractModel> p
 {
     // check first if model was already added and if the passed model is actually a BemDataModel
     if (!m_vecBemDataModels.contains(pNewModel) && pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
-        m_pCoregSettingsView->clearSelectionBem();
         m_vecBemDataModels.append(pNewModel);
-        for (auto& pBemDataModel : m_vecBemDataModels) {
-            m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
-        }
+        showBemList();
     }
+}
+
+//=============================================================================================================
+
+void CoRegistration::showBemList()
+{
+    std::vector<std::string> names;
+    names.reserve(static_cast<std::size_t>(m_vecBemDataModels.size()));
+    for (const auto& pBemDataModel : m_vecBemDataModels) {
+        names.push_back(pBemDataModel->getModelName().toStdString());
+    }
+    m_pCoregPanel->set_bems(names);
+    // The panel keeps the chosen BEM if it is still there, else it chooses the first one
+    onChangeSelectedBem(QString::fromStdString(m_pCoregPanel->bem()));
 }
 
 //=============================================================================================================
@@ -259,7 +280,7 @@ void CoRegistration::onPickFiducials(const bool bActivatePicking)
 {
     // rotate camera to recently selected fiducial in 3DView
     if (bActivatePicking) {
-        onPickedFiducialChanged(m_pCoregSettingsView->getCurrentFiducial());
+        onPickedFiducialChanged(m_pCoregPanel->fiducial());
     }
 
     QVariant data = QVariant::fromValue(bActivatePicking);
@@ -275,26 +296,28 @@ void CoRegistration::onSetFiducial(const QVector3D vecResult)
     for (int i = 0; i < 3; i++) {
         r[i] = vecResult[i];
     }
-    fiff_int_t iFiducial = m_pCoregSettingsView->getCurrentFiducial();
+    fiff_int_t iFiducial = m_pCoregPanel->fiducial();
     switch (iFiducial) {
         case FIFFV_POINT_LPA:
             m_digFidMri[0].r[0] = r[0];
             m_digFidMri[0].r[1] = r[1];
             m_digFidMri[0].r[2] = r[2];
-            m_pCoregSettingsView->setFiducials(vecResult);
             break;
         case FIFFV_POINT_NASION:
             m_digFidMri[1].r[0] = r[0];
             m_digFidMri[1].r[1] = r[1];
             m_digFidMri[1].r[2] = r[2];
-            m_pCoregSettingsView->setFiducials(vecResult);
             break;
         case FIFFV_POINT_RPA:
             m_digFidMri[2].r[0] = r[0];
             m_digFidMri[2].r[1] = r[1];
             m_digFidMri[2].r[2] = r[2];
-            m_pCoregSettingsView->setFiducials(vecResult);
             break;
+    }
+    if (iFiducial == FIFFV_POINT_LPA || iFiducial == FIFFV_POINT_NASION || iFiducial == FIFFV_POINT_RPA) {
+        // The panel steps to the next fiducial, which the 3D view turns to
+        m_pCoregPanel->set_fiducial(Eigen::Vector3f(vecResult.x(), vecResult.y(), vecResult.z()));
+        onPickedFiducialChanged(m_pCoregPanel->fiducial());
     }
 
     QVariant data = QVariant::fromValue(m_digFidMri);
@@ -384,7 +407,7 @@ void CoRegistration::onLoadTrans(const std::filesystem::path& sFilePath)
 
         // Update Widget
         getParamFromTrans(m_transHeadMri.trans, vecRot, vecTrans, vecScale);
-        m_pCoregSettingsView->setTransParams(vecTrans, vecRot, vecScale);
+        m_pCoregPanel->set_transformation(vecTrans, vecRot, vecScale);
 
         // Send event
         QVariant data = QVariant::fromValue(m_transHeadMri);
@@ -396,7 +419,7 @@ void CoRegistration::onLoadTrans(const std::filesystem::path& sFilePath)
 
         // Update Widget
         getParamFromTrans(m_transHeadMri.trans, vecRot, vecTrans, vecScale);
-        m_pCoregSettingsView->setTransParams(vecTrans, vecRot, vecScale);
+        m_pCoregPanel->set_transformation(vecTrans, vecRot, vecScale);
 
         // send event
         QVariant data = QVariant::fromValue(m_transHeadMri);
@@ -429,10 +452,10 @@ void CoRegistration::onFitFiducials()
     }
 
     // get values from view
-    bool bScale = m_pCoregSettingsView->getAutoScale();
-    float fWeightLPA = m_pCoregSettingsView->getWeightLPA();
-    float fWeightNAS = m_pCoregSettingsView->getWeightNAS();
-    float fWeightRPA = m_pCoregSettingsView->getWeightRPA();
+    bool bScale = m_pCoregPanel->auto_scale();
+    float fWeightLPA = m_pCoregPanel->weight_lpa();
+    float fWeightNAS = m_pCoregPanel->weight_nasion();
+    float fWeightRPA = m_pCoregPanel->weight_rpa();
 
     // Pair the head and MRI fiducials by identity; the two files need not list them in the same order
     Matrix3f matHead;
@@ -478,7 +501,7 @@ void CoRegistration::onFitFiducials()
     Vector3f vecScale;
     Vector3f vecTrans;
     getParamFromTrans(m_transHeadMri.trans, vecRot, vecTrans, vecScale);
-    m_pCoregSettingsView->setTransParams(vecTrans, vecRot, vecScale);
+    m_pCoregPanel->set_transformation(vecTrans, vecRot, vecScale);
 
     // send event
     QVariant data = QVariant::fromValue(m_transHeadMri);
@@ -539,17 +562,17 @@ void CoRegistration::onFitICP()
 void CoRegistration::setIcpProperties()
 {
     // get values from view
-    m_bScale = m_pCoregSettingsView->getAutoScale();
-    m_fWeightLPA = m_pCoregSettingsView->getWeightLPA();
-    m_fWeightNAS = m_pCoregSettingsView->getWeightNAS();
-    m_fWeightRPA = m_pCoregSettingsView->getWeightRPA();
-    m_fWeightHPI = m_pCoregSettingsView->getWeightHPI();
-    m_fWeightHSP = m_pCoregSettingsView->getWeightHSP();
-    m_fWeightEEG = m_pCoregSettingsView->getWeightEEG();
-    m_fMaxDist = m_pCoregSettingsView->getOmmitDistance();
-    m_fTol = m_pCoregSettingsView->getConvergence();
-    m_iMaxIter = m_pCoregSettingsView->getMaxIter();
-    m_lPickHSP = m_pCoregSettingsView->getDigitizerCheckState();
+    m_bScale = m_pCoregPanel->auto_scale();
+    m_fWeightLPA = m_pCoregPanel->weight_lpa();
+    m_fWeightNAS = m_pCoregPanel->weight_nasion();
+    m_fWeightRPA = m_pCoregPanel->weight_rpa();
+    m_fWeightHPI = m_pCoregPanel->weight_hpi();
+    m_fWeightHSP = m_pCoregPanel->weight_hsp();
+    m_fWeightEEG = m_pCoregPanel->weight_eeg();
+    m_fMaxDist = m_pCoregPanel->omit_distance();
+    m_fTol = m_pCoregPanel->convergence();
+    m_iMaxIter = m_pCoregPanel->max_iterations();
+    m_lPickHSP = m_pCoregPanel->digitizer_kinds();
 }
 
 //=============================================================================================================
@@ -665,11 +688,11 @@ void CoRegistration::createNewTrans()
     Vector3f vecScale;
     Vector3f vecTrans;
     getParamFromTrans(m_transHeadMri.trans, vecRot, vecTrans, vecScale);
-    m_pCoregSettingsView->setTransParams(vecTrans, vecRot, vecScale);
+    m_pCoregPanel->set_transformation(vecTrans, vecRot, vecScale);
     {
         QMutexLocker locker(&m_ParameterMutex);
-        m_pCoregSettingsView->setOmittedPoints(m_iNDiscarded);
-        m_pCoregSettingsView->setRMSE(m_fRMSE);
+        m_pCoregPanel->set_omitted_points(m_iNDiscarded);
+        m_pCoregPanel->set_rmse(m_fRMSE);
     }
 
     // send event
@@ -689,7 +712,7 @@ void CoRegistration::onUpdateTrans()
     Matrix4f matTrans;
 
     // update transformation
-    m_pCoregSettingsView->getTransParams(vecRot, vecTrans, vecScale);
+    m_pCoregPanel->transformation(vecRot, vecTrans, vecScale);
     getTransFromParam(matTrans, vecRot, vecTrans, vecScale);
 
     // send event
@@ -759,22 +782,16 @@ void CoRegistration::getTransFromParam(Matrix4f& matTrans,
 void CoRegistration::deleteModels()
 {
     QVector<QSharedPointer<AbstractModel>> vecModels = m_pAnalyzeData->getModelsByType(ANSHAREDLIB_BEMDATA_MODEL);
-    m_pCoregSettingsView->clearSelectionBem();
 
     if (m_vecBemDataModels != vecModels) {
         m_vecBemDataModels = vecModels;
         if (m_vecBemDataModels.isEmpty()) {
             // empty bem and string
-            m_pCoregSettingsView->addSelectionBem("Select Bem");
             m_pBem->clear();
             m_sCurrentSelectedBem = "";
-        } else {
-            // update new bem list
-            for (auto& pBemDataModel : m_vecBemDataModels) {
-                m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
-            }
         }
     }
+    showBemList();
 }
 
 //=============================================================================================================
@@ -806,10 +823,7 @@ bool CoRegistration::removeFromBemList(QSharedPointer<mne::analyze::AbstractMode
             m_sCurrentSelectedBem = "";
         }
 
-        m_pCoregSettingsView->clearSelectionBem();
-        for (auto& pBemDataModel : m_vecBemDataModels) {
-            m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
-        }
+        showBemList();
         return true;
     }
     return false;

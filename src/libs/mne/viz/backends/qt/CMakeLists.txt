@@ -50,8 +50,6 @@ set(SOURCES
     detail/scoped_flag.h
     viewers/abstractview.cpp
     viewers/applytoview.cpp
-    viewers/coregsettingsview.cpp
-    viewers/dipolefitview.cpp
     viewers/helpers/scalecontrol.cpp
     viewers/progressview.cpp
     viewers/modalityselectionview.cpp
@@ -60,13 +58,11 @@ set(SOURCES
     viewers/fiffrawviewsettings.cpp
     viewers/averageselectionview.cpp
     viewers/quickcontrolview.cpp
-    viewers/projectsettingsview.cpp
     viewers/control3dview.cpp
     viewers/channeldataview.cpp
     viewers/rtfiffrawview.cpp
     viewers/multiviewwindow.cpp
     viewers/multiview.cpp
-    viewers/hpisettingsview.cpp
     kit/itemlistview.cpp
     kit/panelwidget.cpp
     kit/qttheme.cpp
@@ -130,8 +126,6 @@ set(HEADERS
     plots/helpers/rhiframerenderer.h
     viewers/abstractview.h
     viewers/applytoview.h
-    viewers/coregsettingsview.h
-    viewers/dipolefitview.h
     viewers/helpers/scalecontrol.h
     viewers/progressview.h
     viewers/modalityselectionview.h
@@ -140,13 +134,11 @@ set(HEADERS
     viewers/fiffrawviewsettings.h
     viewers/averageselectionview.h
     viewers/quickcontrolview.h
-    viewers/projectsettingsview.h
     viewers/control3dview.h
     viewers/channeldataview.h
     viewers/rtfiffrawview.h
     viewers/multiviewwindow.h
     viewers/multiview.h
-    viewers/hpisettingsview.h
     kit/itemlistview.h
     kit/panelwidget.h
     kit/qttheme.h
@@ -199,16 +191,12 @@ set(HEADERS
 
 set(UI
     viewers/formfiles/applytoview.ui
-    viewers/formfiles/coregsettingsview.ui
-    viewers/formfiles/dipolefitview.ui
     viewers/formfiles/scalecontrol.ui
     viewers/formfiles/progressview.ui
     viewers/formfiles/scalingview.ui
     viewers/formfiles/fiffrawviewsettings.ui
     viewers/formfiles/quickcontrolview.ui
-    viewers/formfiles/projectsettingsview.ui
     viewers/formfiles/control3dview.ui
-    viewers/formfiles/hpisettingsview.ui
     viewers/formfiles/bidsview.ui
 )
 

@@ -217,6 +217,15 @@ private:
 
     //=========================================================================================================
     /**
+     * Selects a model of the panel.
+     *
+     * @param[in] iType    Type of model (1-measurement, 2-BEM, 3-MRI, 4-Cov).
+     * @param[in] sName    File name of the model; "None" for none.
+     */
+    void onModelSelected(int iType, const QString& sName);
+
+    //=========================================================================================================
+    /**
      * Set new Bem model
      *
      * @param[in] sName    file name.

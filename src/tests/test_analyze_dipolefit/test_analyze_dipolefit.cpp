@@ -27,17 +27,15 @@
 #include <mne/inv/dipole_fit/inv_dipole_fit.h>
 #include <mne/inv/dipole_fit/inv_dipole_fit_settings.h>
 #include <mne/inv/dipole_fit/inv_ecd_set.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/dipole_fit_panel.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QtTest>
-#include <QCheckBox>
-#include <QComboBox>
 #include <QDockWidget>
-#include <QPushButton>
-#include <QSpinBox>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -86,13 +84,15 @@ void TestAnalyzeDipoleFit::defaultPanelFitsLikeMneC()
     plugin->handleEvent(QSharedPointer<Event>::create(SELECTED_MODEL_CHANGED, nullptr, QVariant::fromValue(average.staticCast<AbstractModel>())));
 
     // A user picks the measurement, MEG, 90..100 ms, and presses Fit; everything else stays at its default
-    auto* meas = control->findChild<QComboBox*>("comboBox_meas");
-    QVERIFY(meas);
-    meas->setCurrentText(QFileInfo(avePath).fileName());
-    control->findChild<QCheckBox*>("checkBox_MEG")->setChecked(true);
-    control->findChild<QSpinBox*>("spinBox_tmax")->setValue(100);
-    control->findChild<QSpinBox*>("spinBox_tmin")->setValue(90);
-    control->findChild<QPushButton*>("pushButton_fit")->click();
+    auto* widget = qobject_cast<mne::viz::qt::PanelWidget*>(control->widget());
+    QVERIFY(widget);
+    mne::viz::SettingsForm& form = widget->panel().form();
+    QVERIFY(form.set_value("measurement", QFileInfo(avePath).fileName().toStdString()));
+    QVERIFY(form.get<std::string>("name").starts_with("Dipole Fit - sample_audvis - "));
+    form.set_value("meg", true);
+    form.set_value("tmax", 100);
+    form.set_value("tmin", 90);
+    form.trigger("fit");
 
     QSharedPointer<DipoleFitModel> fitModel;
     QTRY_VERIFY_WITH_TIMEOUT(
