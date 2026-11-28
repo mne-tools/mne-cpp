@@ -55,7 +55,6 @@ set(SOURCES
     viewers/filterdesignview.cpp
     viewers/helpers/scalecontrol.cpp
     viewers/progressview.cpp
-    viewers/spectrumview.cpp
     viewers/modalityselectionview.cpp
     viewers/butterflyview.cpp
     viewers/channelselectionview.cpp
@@ -98,8 +97,6 @@ set(SOURCES
     viewers/helpers/channelinfomodel.cpp
     viewers/helpers/mneoperator.cpp
     viewers/helpers/draggableframelesswidget.cpp
-    viewers/helpers/frequencyspectrumdelegate.cpp
-    viewers/helpers/frequencyspectrummodel.cpp
     viewers/helpers/bidsviewmodel.cpp
     3d/input/cameracontroller.cpp
     3d/input/raypicker.cpp
@@ -149,7 +146,6 @@ set(HEADERS
     viewers/filterdesignview.h
     viewers/helpers/scalecontrol.h
     viewers/progressview.h
-    viewers/spectrumview.h
     viewers/modalityselectionview.h
     viewers/butterflyview.h
     viewers/channelselectionview.h
@@ -193,8 +189,6 @@ set(HEADERS
     viewers/helpers/channelinfomodel.h
     viewers/helpers/mneoperator.h
     viewers/helpers/draggableframelesswidget.h
-    viewers/helpers/frequencyspectrumdelegate.h
-    viewers/helpers/frequencyspectrummodel.h
     viewers/helpers/bidsviewmodel.h
     3d/input/cameracontroller.h
     3d/input/raypicker.h

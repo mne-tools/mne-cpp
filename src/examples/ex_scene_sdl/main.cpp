@@ -16,11 +16,11 @@
  * at 1 kHz and the view follows its end until the user scrolls.
  *
  * With --panel the window shows a tool panel instead (projectors, the default, or compensator) through FormView,
- * which draws and edits any SettingsForm without Qt and without a view written for the panel. The average panel
- * shows its figure, synthetic averages at their sensor positions, through FigureView, which zooms, pans and
- * passes clicks to any SceneFigure.
+ * which draws and edits any SettingsForm without Qt and without a view written for the panel. The average and
+ * spectrum panels show their figures, synthetic averages at their sensor positions or synthetic spectra, through
+ * FigureView, which zooms, pans or scrolls and passes the pointer to any SceneFigure.
  *
- * Usage: ex_scene_sdl [--panel [projectors|compensator|average]] [--frames N]; with --frames the example renders N frames
+ * Usage: ex_scene_sdl [--panel [projectors|compensator|average|spectrum]] [--frames N]; with --frames the example renders N frames
  * and exits (SDL_VIDEODRIVER=dummy runs it without a display).
  */
 
@@ -39,6 +39,7 @@
 #include <mne/viz/panels/figure_view.h>
 #include <mne/viz/panels/form_view.h>
 #include <mne/viz/panels/projectors_panel.h>
+#include <mne/viz/panels/spectrum_panel.h>
 #include <mne/viz/views/trace_buffer.h>
 
 #include <SDL3/SDL_version.h>
@@ -160,10 +161,52 @@ int run_average_layout(sdl::SdlHost& host, const TextMetrics& metrics)
 
 //=============================================================================================================
 /**
+ * Shows the spectra of eight synthetic channels with an alpha peak through FigureView: the wheel scrolls the rows,
+ * the pointer reads out a bin and a double click freezes the spectra.
+ *
+ * @param[in] host      The window.
+ * @param[in] metrics   Metrics of the fonts the host draws with.
+ *
+ * @return The number of frames drawn.
+ */
+int run_spectrum(sdl::SdlHost& host, const TextMetrics& metrics)
+{
+    constexpr int kSpectrumChannels = 8;
+    constexpr int kBins = 256;
+    //! [spectrum_panel_usage]
+    auto info = std::make_shared<mne::FiffInfo>();
+    info->sfreq = kSfreq;
+    Eigen::MatrixXd spectra(kSpectrumChannels, kBins);
+    for (int i = 0; i < kSpectrumChannels; ++i) {
+        mne::FiffChInfo channel;
+        channel.ch_name = "EEG " + std::to_string(i + 1);
+        info->chs.push_back(channel);
+        info->ch_names.push_back(channel.ch_name);
+        // 1/f background in dB with an alpha peak that grows towards the back of the head
+        for (int bin = 0; bin < kBins; ++bin) {
+            const double frequency = bin * (kSfreq / 2.0) / (kBins - 1);
+            spectra(i, bin) = -10.0 * std::log10(frequency + 1.0) + (1.0 + i) * std::exp(-std::pow((frequency - 10.0) / 1.5, 2));
+        }
+    }
+    info->nchan = kSpectrumChannels;
+
+    SpectrumPanel panel;
+    panel.init(info, SpectrumTable::Scale::Linear);
+    panel.add_data(spectra);
+    panel.set_boundaries(1.0f, 60.0f);
+
+    FigureView view(*panel.figure());
+    view.set_text_metrics(&metrics);
+    return host.run(view);
+    //! [spectrum_panel_usage]
+}
+
+//=============================================================================================================
+/**
  * Shows a tool panel through FormView, the toolkit-free view of any SettingsForm, without a view of its own.
  *
  * @param[in] host      The window.
- * @param[in] which     "projectors", "compensator" or "average".
+ * @param[in] which     "projectors", "compensator", "average" or "spectrum".
  * @param[in] metrics   Metrics of the fonts the host draws with.
  *
  * @return The number of frames drawn.
@@ -172,6 +215,9 @@ int run_panel(sdl::SdlHost& host, const std::string& which, const TextMetrics& m
 {
     if (which == "average") {
         return run_average_layout(host, metrics);
+    }
+    if (which == "spectrum") {
+        return run_spectrum(host, metrics);
     }
     //! [form_view_usage]
     std::unique_ptr<Panel> panel;

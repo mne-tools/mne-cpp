@@ -165,8 +165,8 @@
       "modules": []
     },
     "viz/backends/qt": {
-      "tokens": 5639,
-      "public_header_includes": 131,
+      "tokens": 5396,
+      "public_header_includes": 127,
       "modules": [
         "Core",
         "Gui",
@@ -175,12 +175,12 @@
       ],
       "by_category": {
         "containers": 17,
-        "files": 88,
-        "global": 905,
-        "gui": 1719,
-        "objects_signals": 594,
-        "other": 1517,
-        "strings": 785,
+        "files": 86,
+        "global": 807,
+        "gui": 1695,
+        "objects_signals": 554,
+        "other": 1445,
+        "strings": 778,
         "time": 14
       }
     },
@@ -471,7 +471,6 @@
         "src/libs/mne/viz/backends/qt/viewers/helpers/channeldatamodel.*",
         "src/libs/mne/viz/backends/qt/viewers/helpers/channelinfomodel.*",
         "src/libs/mne/viz/backends/qt/viewers/helpers/evokedsetmodel.*",
-        "src/libs/mne/viz/backends/qt/viewers/helpers/frequencyspectrummodel.*",
         "src/libs/mne/viz/backends/qt/viewers/helpers/rtfiffrawviewmodel.*",
         "src/libs/mne/viz/backends/qt/viewers/helpers/mneoperator.*",
         "src/libs/mne/viz/backends/qt/viewers/helpers/channelrhirenderer.*",

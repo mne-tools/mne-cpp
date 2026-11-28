@@ -7,8 +7,8 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    3.0.0
  * @date     November 2026
- * @brief    Tests FigureView, the toolkit-free host of interactive figures, the sensor and average layout figures
- *           and AverageLayoutPanel, with synthetic input and a golden image.
+ * @brief    Tests FigureView, the toolkit-free host of interactive figures, the sensor and average layout figures,
+ *           AverageLayoutPanel and SpectrumPanel, with synthetic input and golden images.
  */
 
 //=============================================================================================================
@@ -29,6 +29,7 @@
 #include <mne/viz/host/surface.h>
 #include <mne/viz/panels/average_layout_panel.h>
 #include <mne/viz/panels/figure_view.h>
+#include <mne/viz/panels/spectrum_panel.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -40,6 +41,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
@@ -47,6 +49,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <variant>
 #include <vector>
 
 //=============================================================================================================
@@ -443,6 +446,125 @@ void test_average_layout_panel()
 
 //=============================================================================================================
 
+std::vector<std::string> texts(const DisplayList& list)
+{
+    std::vector<std::string> result;
+    for (const Command& command : list.commands) {
+        if (const auto* text = std::get_if<TextShape>(&command.shape)) {
+            result.push_back(text->text);
+        }
+    }
+    return result;
+}
+
+bool contains(const std::vector<std::string>& list, const std::string& text)
+{
+    return std::ranges::find(list, text) != list.end();
+}
+
+//=============================================================================================================
+
+void test_spectrum_panel()
+{
+    // 3 channels at 1000 Hz, 101 bins of 5 Hz up to 500 Hz; channel 0 peaks at 100 Hz (bin 20)
+    auto info = std::make_shared<mne::FiffInfo>();
+    const char* names[] = {"MEG 0111", "MEG 0112", "EEG 001"};
+    for (const char* name : names) {
+        mne::FiffChInfo ch;
+        ch.ch_name = name;
+        info->chs.push_back(ch);
+        info->ch_names.push_back(name);
+    }
+    info->nchan = 3;
+    info->sfreq = 1000.0;
+    Eigen::MatrixXd spectrum = Eigen::MatrixXd::Constant(3, 101, 1.0);
+    for (int b = 0; b < 101; ++b) {
+        spectrum(0, b) = 1.0 + 9.0 * std::exp(-0.5 * std::pow((b - 20) / 2.0, 2));
+    }
+
+    SpectrumPanel panel;
+    SpectrumFigure& figure = panel.spectrum();
+    CHECK(panel.figure().get() == &figure && !figure.zoomable());
+    // Spectra before the channels are known are dropped
+    panel.add_data(spectrum);
+    CHECK(figure.table().bins() == 0);
+    panel.init(info, SpectrumTable::Scale::Linear);
+    panel.add_data(spectrum);
+    CHECK(figure.table().row_count() == 3 && figure.table().bins() == 101);
+
+    // One 140 px row per channel across the view, scrolled by the host
+    FigureView view(figure);
+    view.set_view_size(480, 300);
+    CHECK(near(figure.bounds().width, 480) && near(figure.bounds().height, 3 * SpectrumFigure::row_height));
+    CHECK(view.handle_wheel(wheel(10, 10, -120)) && near(view.map_to_scene({0, 0}).y, 48));
+    view.fit_to_contents();
+
+    // Names, and a grid labelled at 100..400 Hz
+    std::vector<std::string> drawn = texts(view.draw());
+    CHECK(contains(drawn, "MEG 0111") && contains(drawn, "EEG 001"));
+    CHECK(contains(drawn, "100Hz") && contains(drawn, "400Hz") && !contains(drawn, "0Hz"));
+
+    // The pointer over the peak of row 0 reads out its bin; the plot starts right of the names
+    const double plotWidth = 480 - SpectrumFigure::name_width;
+    const double peakX = SpectrumFigure::name_width + 0.2 * plotWidth;
+    view.handle_pointer(pointer(PointerEvent::Type::Move, peakX, 70));
+    std::optional<SpectrumFigure::Readout> readout = figure.readout();
+    CHECK(readout && readout->row == 0 && readout->bin == 20);
+    CHECK(readout && near(readout->value, 10.0) && near(readout->frequency, 100.0, 1e-6));
+    drawn = texts(view.draw());
+    CHECK(contains(drawn, "10 [dB], 100 [Hz]"));
+    // Over the names, or after leaving, there is no read-out
+    view.handle_pointer(pointer(PointerEvent::Type::Move, 10, 70));
+    CHECK(!figure.readout());
+    view.handle_pointer(pointer(PointerEvent::Type::Move, peakX, 70 + SpectrumFigure::row_height));
+    CHECK(figure.readout() && figure.readout()->row == 1);
+    view.leave();
+    CHECK(!figure.readout());
+
+    // Narrowing the bounds to 50..150 Hz stretches the band: the peak moves to the centre
+    panel.set_boundaries(50.0f, 150.0f);
+    CHECK(figure.table().lower_bin() == 9 && figure.table().upper_bin() == 31);
+    view.handle_pointer(pointer(PointerEvent::Type::Move, SpectrumFigure::name_width + 0.5 * plotWidth, 70));
+    CHECK(figure.readout() && figure.readout()->bin == 20);
+    panel.set_boundaries(0.0f, 500.0f);
+
+    // A double click freezes the spectra while new data arrive, and a second thaws them
+    CHECK(view.handle_pointer(pointer(PointerEvent::Type::DoubleClick, peakX, 70, MouseButton::Left)));
+    CHECK(figure.table().frozen());
+    panel.add_data(spectrum * 2.0);
+    CHECK(near((*figure.table().spectrum(0))[20], 10.0));
+    view.handle_pointer(pointer(PointerEvent::Type::DoubleClick, peakX, 70, MouseButton::Left));
+    CHECK(!figure.table().frozen() && near((*figure.table().spectrum(0))[20], 20.0));
+
+    // A selection of channels shows fewer rows
+    figure.select({2});
+    CHECK(figure.table().row_count() == 1 && near(figure.bounds().height, SpectrumFigure::row_height));
+    figure.reset_selection();
+
+    // A log scale labels the decades
+    panel.init(info, SpectrumTable::Scale::Log);
+    panel.add_data(spectrum);
+    drawn = texts(view.draw());
+    CHECK(contains(drawn, "10Hz") && contains(drawn, "100Hz"));
+
+    // Two rows with the read-out over the peak, drawn with the bundled fonts
+    panel.init(info, SpectrumTable::Scale::Linear);
+    panel.add_data(spectrum);
+    const auto fonts = std::make_shared<FontLibrary>();
+    const FontTextMetrics metrics(fonts);
+    view.set_text_metrics(&metrics);
+    GpuFrameTarget target;
+    target.pixel_width = 480;
+    target.pixel_height = 280;
+    view.set_view_size(480, 280);
+    view.handle_pointer(pointer(PointerEvent::Type::Move, peakX, 70));
+    SoftwareRenderer renderer;
+    renderer.set_fonts(fonts);
+    CHECK(scene_golden::matches_png(renderer.render(view.frame(target), view.resources()), GOLDEN_DIR "/spectrum_panel.png"));
+}
+
+//=============================================================================================================
+
 void test_golden()
 {
     // A sensor layout with a selection and a rubber band, through the GPU frame of the view
@@ -527,6 +649,7 @@ int main()
     test_sensor_layout_figure();
     test_channel_scale();
     test_average_layout_panel();
+    test_spectrum_panel();
     test_golden();
     if (g_failures != 0) {
         std::fprintf(stderr, "%d check(s) failed\n", g_failures);

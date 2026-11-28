@@ -51,6 +51,7 @@ set(SOURCES
   figures/scene_figure.cpp
   figures/sensor_layout.cpp
   figures/sensor_layout_figure.cpp
+  figures/spectrum_figure.cpp
   figures/spline_plot.cpp
   figures/svg_renderer.cpp
   figures/system_fonts.cpp
@@ -66,6 +67,7 @@ set(SOURCES
   panels/forward_panel.cpp
   panels/panel.cpp
   panels/projectors_panel.cpp
+  panels/spectrum_panel.cpp
   gpu/brain_frame.cpp
   gpu/detail/software_shaders.cpp
   gpu/gpu_frame.cpp
@@ -141,6 +143,7 @@ set(HEADERS
   figures/scene_figure.h
   figures/sensor_layout.h
   figures/sensor_layout_figure.h
+  figures/spectrum_figure.h
   figures/spline_plot.h
   figures/style.h
   figures/svg_renderer.h
@@ -157,6 +160,7 @@ set(HEADERS
   panels/forward_panel.h
   panels/panel.h
   panels/projectors_panel.h
+  panels/spectrum_panel.h
   gpu/brain_frame.h
   gpu/gpu_frame.h
   gpu/software_renderer.h

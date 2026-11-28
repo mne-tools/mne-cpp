@@ -19,7 +19,8 @@
 #include "realtimespectrumwidget.h"
 
 #include <mne/viz/backends/qt/viewers/spectrumsettingsview.h>
-#include <mne/viz/backends/qt/viewers/spectrumview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/spectrum_panel.h>
 #include <scMeas/realtimespectrum.h>
 #include <math.h>
 
@@ -75,7 +76,8 @@ RealTimeSpectrumWidget::RealTimeSpectrumWidget(QSharedPointer<RealTimeSpectrum> 
 
     m_pActionFrequencySettings->setVisible(false);
 
-    m_pSpectrumView = new SpectrumView("MNESCAN", this, Qt::Window);
+    m_pSpectrum = std::make_shared<viz::SpectrumPanel>();
+    m_pSpectrumView = new PanelWidget(m_pSpectrum, "MNESCAN", this);
 
     //set vertical layout
     QVBoxLayout* neLayout = new QVBoxLayout(this);
@@ -120,11 +122,11 @@ void RealTimeSpectrumWidget::getData()
             initDisplayControllWidgets();
         }
 
-        m_pSpectrumView->addData(m_pFS->getValue());
+        m_pSpectrum->add_data(m_pFS->getValue());
 
         initSettingsWidget();
     } else {
-        m_pSpectrumView->addData(m_pFS->getValue());
+        m_pSpectrum->add_data(m_pFS->getValue());
     }
 }
 
@@ -142,7 +144,7 @@ void RealTimeSpectrumWidget::initDisplayControllWidgets()
 
         m_pActionFrequencySettings->setVisible(true);
 
-        m_pSpectrumView->init(m_pFS->getFiffInfo(), m_pFS->getScaleType());
+        m_pSpectrum->init(m_pFS->getFiffInfo(), m_pFS->getScaleType() ? viz::SpectrumTable::Scale::Log : viz::SpectrumTable::Scale::Linear);
 
         m_bDisplayWidgetsInitialized = true;
     }
@@ -176,7 +178,7 @@ void RealTimeSpectrumWidget::broadcastSettings()
     if (m_pSpectrumSettingsView) {
         m_fLowerFrqBound = m_pSpectrumSettingsView->getLowerBound();
         m_fUpperFrqBound = m_pSpectrumSettingsView->getUpperBound();
-        m_pSpectrumView->setBoundaries(m_fLowerFrqBound, m_fUpperFrqBound);
+        m_pSpectrum->set_boundaries(m_fLowerFrqBound, m_fUpperFrqBound);
     }
 }
 

@@ -11,8 +11,7 @@
  *
  * A spectrum viewer shows one power spectrum per selected channel over a frequency axis that is linear or
  * logarithmic and can be cut to a frequency band. SpectrumTable holds the latest spectra, the channel selection,
- * a frozen copy and the normalised frequency axis, without a GUI toolkit; viz::qt::FrequencySpectrumModel adapts it
- * to a Qt item model.
+ * a frozen copy and the normalised frequency axis, without a GUI toolkit; viz::SpectrumFigure draws it.
  */
 
 #ifndef VIZ_SPECTRUM_TABLE_H

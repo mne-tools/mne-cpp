@@ -1276,20 +1276,6 @@
       "modernize-use-nullptr": 1,
       "modernize-use-override": 5
     },
-    "src/libs/mne/viz/backends/qt/viewers/helpers/frequencyspectrumdelegate.cpp": {
-      "bugprone-switch-missing-default-case": 2
-    },
-    "src/libs/mne/viz/backends/qt/viewers/helpers/frequencyspectrumdelegate.h": {
-      "modernize-use-nullptr": 1,
-      "modernize-use-override": 2
-    },
-    "src/libs/mne/viz/backends/qt/viewers/helpers/frequencyspectrummodel.cpp": {
-      "bugprone-switch-missing-default-case": 4
-    },
-    "src/libs/mne/viz/backends/qt/viewers/helpers/frequencyspectrummodel.h": {
-      "modernize-use-nullptr": 1,
-      "modernize-use-override": 4
-    },
     "src/libs/mne/viz/backends/qt/viewers/helpers/rtfiffrawviewdelegate.cpp": {
       "bugprone-integer-division": 5,
       "bugprone-switch-missing-default-case": 3
@@ -1361,10 +1347,6 @@
     },
     "src/libs/mne/viz/backends/qt/viewers/spectrumsettingsview.h": {
       "modernize-use-override": 6
-    },
-    "src/libs/mne/viz/backends/qt/viewers/spectrumview.h": {
-      "modernize-use-nullptr": 1,
-      "modernize-use-override": 7
     },
     "src/libs/mne/viz/backends/qt/viewers/spharasettingsview.h": {
       "modernize-use-nullptr": 1,

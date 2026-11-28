@@ -456,6 +456,14 @@ aliases; replace the old spelling as below.
   `viz::channel_scale()` (`viz/figures/channel_scale.h`).
   `test_viz_figure_view` drives the view with synthetic input and compares
   golden PNGs.
+- `SpectrumView` with `FrequencySpectrumModel` and `FrequencySpectrumDelegate`
+  is replaced by `viz::SpectrumPanel` and its `viz::SpectrumFigure`
+  (`viz/figures/spectrum_figure.h`): one row per channel scrolled by the
+  host, the bin under the pointer read out, a double click freezing the
+  spectra. mne_scan's spectrum display uses it; `ex_scene_sdl --panel
+  spectrum` shows it in an SDL window. The read-out names the frequency where
+  the axis places the bin, and the grid labels the frequencies of the lines
+  instead of their normalised positions.
 - `ChannelRhiRenderer` hosts a `viz::TraceViewClient`, the same trace view
   client the SDL example runs, instead of wiring its own view, animator,
   markers and frame builder; its host becomes the client's `viz::Surface`.

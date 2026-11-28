@@ -145,7 +145,8 @@
       "generators": [],
       "fixtures": {
         "src/tests/test_viz_figure_view/data/average_layout_panel.png": "fb7bb3442a9d6143bcbb69fd260f2625d4fe176afb54358d7ce9ada65f723393",
-        "src/tests/test_viz_figure_view/data/figure_view.png": "46e8719253e6ade31499ef797429f23ad2d18d1240d3282280608006f0e5bc12"
+        "src/tests/test_viz_figure_view/data/figure_view.png": "46e8719253e6ade31499ef797429f23ad2d18d1240d3282280608006f0e5bc12",
+        "src/tests/test_viz_figure_view/data/spectrum_panel.png": "aafedc13b3632f2a9b7e09384ae112abb5dd489fc0d2852db77013586ada099a"
       }
     },
     "test_viz_fonts": {

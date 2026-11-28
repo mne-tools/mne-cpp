@@ -14,7 +14,7 @@
  * @brief    Lower / upper frequency-bound sliders for the FFT spectrum viewer.
  *
  * SpectrumSettingsView holds two @c QSliders that crop the frequency
- * axis of @ref mne::viz::qt::SpectrumView; slider changes are emitted as
+ * axis of @ref mne::viz::SpectrumPanel; slider changes are emitted as
  * @c lowerFreqChanged / @c upperFreqChanged signals.
  */
 
@@ -56,7 +56,7 @@ namespace mne::viz::qt
  * @brief Lower / upper-bound frequency sliders for the FFT spectrum viewer.
  *
  * Two @c QSliders emit @c lowerFreqChanged / @c upperFreqChanged so
- * the connected @ref SpectrumView can crop the displayed frequency
+ * the connected @ref mne::viz::SpectrumPanel can crop the displayed frequency
  * axis.
  */
 class VIZQTSHARED_EXPORT SpectrumSettingsView : public AbstractView

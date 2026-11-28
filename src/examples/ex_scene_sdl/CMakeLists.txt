@@ -29,4 +29,6 @@ if(BUILD_TESTS)
                  ENVIRONMENT SDL_VIDEODRIVER=dummy LABELS example unit TIMEOUT 120)
     mne_add_test(${PROJECT_NAME}_figure COMMAND $<TARGET_FILE:${PROJECT_NAME}> --panel average --frames 5
                  ENVIRONMENT SDL_VIDEODRIVER=dummy LABELS example unit TIMEOUT 120)
+    mne_add_test(${PROJECT_NAME}_spectrum COMMAND $<TARGET_FILE:${PROJECT_NAME}> --panel spectrum --frames 5
+                 ENVIRONMENT SDL_VIDEODRIVER=dummy LABELS example unit TIMEOUT 120)
 endif()

@@ -4133,40 +4133,6 @@
       "python_url": null
     },
     {
-      "name": "FrequencySpectrumDelegate",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/viewers/helpers/frequencyspectrumdelegate.h",
-      "origin": "custom",
-      "mne_c_tool": null,
-      "mne_python": null,
-      "sklearn": null,
-      "test": null,
-      "example": null,
-      "status": "documented",
-      "documented": true,
-      "sidebar_position": 30,
-      "guide": null,
-      "python_equiv": null,
-      "python_url": null
-    },
-    {
-      "name": "FrequencySpectrumModel",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/viewers/helpers/frequencyspectrummodel.h",
-      "origin": "custom",
-      "mne_c_tool": null,
-      "mne_python": null,
-      "sklearn": null,
-      "test": null,
-      "example": null,
-      "status": "documented",
-      "documented": true,
-      "sidebar_position": 31,
-      "guide": null,
-      "python_equiv": null,
-      "python_url": null
-    },
-    {
       "name": "Graph",
       "module": "viz_qt",
       "header": "viz/backends/qt/plots/graph.h",
@@ -4577,23 +4543,6 @@
       "status": "documented",
       "documented": true,
       "sidebar_position": 56,
-      "guide": null,
-      "python_equiv": null,
-      "python_url": null
-    },
-    {
-      "name": "SpectrumView",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/viewers/spectrumview.h",
-      "origin": "custom",
-      "mne_c_tool": null,
-      "mne_python": null,
-      "sklearn": null,
-      "test": null,
-      "example": null,
-      "status": "documented",
-      "documented": true,
-      "sidebar_position": 57,
       "guide": null,
       "python_equiv": null,
       "python_url": null
@@ -10896,7 +10845,7 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "View model of the spectrum viewer; adapted by viz::qt::FrequencySpectrumModel and exercised by test_viz_viewmodels, it has no standalone use without a view."
+      "example_exempt_reason": "View model of the spectrum viewer; drawn by SpectrumFigure, whose panel example shows it, and exercised by test_viz_viewmodels."
     },
     {
       "name": "BidsTree",
@@ -15323,6 +15272,48 @@
         "ex_scene_sdl/main.cpp#average_layout_panel_usage"
       ],
       "sidebar_position": 169
+    },
+    {
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "status": "documented",
+      "documented": true,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null,
+      "name": "SpectrumFigure",
+      "module": "viz",
+      "header": "viz/figures/spectrum_figure.h",
+      "test": "test_viz_figure_view",
+      "example": "ex_scene_sdl",
+      "example_mode": "run",
+      "example_snippet": [
+        "ex_scene_sdl/main.cpp#spectrum_panel_usage"
+      ],
+      "sidebar_position": 170
+    },
+    {
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "status": "documented",
+      "documented": true,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null,
+      "name": "SpectrumPanel",
+      "module": "viz",
+      "header": "viz/panels/spectrum_panel.h",
+      "test": "test_viz_figure_view",
+      "example": "ex_scene_sdl",
+      "example_mode": "run",
+      "example_snippet": [
+        "ex_scene_sdl/main.cpp#spectrum_panel_usage"
+      ],
+      "sidebar_position": 171
     }
   ],
   "parity": {

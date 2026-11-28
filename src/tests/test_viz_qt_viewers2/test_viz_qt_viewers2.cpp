@@ -11,7 +11,7 @@
  *           Covers: HpiSettingsView, CoregSettingsView, ArtifactSettingsView,
  *           PanelWidget (forward solution), FiffRawViewSettings, ProjectSettingsView, BidsView,
  *           ChannelSelectionView, AverageLayoutPanel, AverageSelectionView,
- *           ButterflyView, SpectrumView, RtFiffRawViewModel, EvokedSetModel,
+ *           ButterflyView, SpectrumPanel, RtFiffRawViewModel, EvokedSetModel,
  *           ChannelInfoModel, and RtFiffRawView.
  */
 
@@ -47,7 +47,7 @@
 #include <mne/viz/panels/average_layout_panel.h>
 #include <mne/viz/backends/qt/viewers/averageselectionview.h>
 #include <mne/viz/backends/qt/viewers/butterflyview.h>
-#include <mne/viz/backends/qt/viewers/spectrumview.h>
+#include <mne/viz/panels/spectrum_panel.h>
 #include <mne/viz/backends/qt/viewers/rtfiffrawview.h>
 #include <mne/viz/backends/qt/viewers/helpers/rtfiffrawviewmodel.h>
 #include <mne/viz/backends/qt/viewers/helpers/evokedsetmodel.h>
@@ -56,8 +56,6 @@
 #include <mne/viz/backends/qt/viewers/control3dview.h>
 #include <mne/viz/backends/qt/viewers/applytoview.h>
 #include <mne/viz/backends/qt/viewers/helpers/rtfiffrawviewdelegate.h>
-#include <mne/viz/backends/qt/viewers/helpers/frequencyspectrummodel.h>
-#include <mne/viz/backends/qt/viewers/helpers/frequencyspectrumdelegate.h>
 #include <mne/viz/backends/qt/viewers/helpers/bidsviewmodel.h>
 #include <mne/viz/backends/qt/viewers/helpers/mneoperator.h>
 #include <mne/viz/backends/qt/viewers/helpers/channelrhiview.h>
@@ -499,9 +497,10 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies that SpectrumView constructs and survives lifecycle transitions.
+     * Verifies a SpectrumPanel in a PanelWidget: data before init dropped, the read-out under the mouse, freezing
+     * by double click and the frequency bounds.
      */
-    void spectrumView_lifecycle();
+    void spectrumPanel_inPanelWidget();
 
     //=========================================================================================================
     /**
@@ -615,12 +614,6 @@ private slots:
      */
     void averageLayoutFigure_paintsScaledClampedCurves();
 
-    //=========================================================================================================
-    /**
-     * Verifies FrequencySpectrumDelegate drawing: the spectrum curve rises with power, spans the frequency
-     * bounds, frequency grid labels, and the mouse read-out of frequency and value.
-     */
-    void frequencySpectrumDelegate_paintsSpectrumAndReadout();
 
     //=========================================================================================================
     /**
@@ -663,20 +656,8 @@ private slots:
      */
     void evokedSetModel_extended();
 
-    //=========================================================================================================
-    /**
-     * Verifies that FrequencySpectrumModel constructs, reports sensible defaults, and
-     * setInfo, setScaleType, addData, selectRows, resetSelection, setBoundaries do not crash.
-     */
-    void frequencySpectrumModel_basics();
 
     //=========================================================================================================
-    /**
-     * Verifies that FrequencySpectrumDelegate constructs with a null QTableView,
-     * setScaleType does not crash, and sizeHint returns a valid size.
-     */
-    void spectrumView_scalesBoundsAndPaints();
-    void frequencySpectrumDelegate_basics();
 
     //=========================================================================================================
     /**
@@ -1944,17 +1925,64 @@ void TestVizQtViewers2::butterflyView_drawsAveragesAcrossTheFullWidth()
 
 //=============================================================================================================
 
-void TestVizQtViewers2::spectrumView_lifecycle()
+void TestVizQtViewers2::spectrumPanel_inPanelWidget()
 {
-    SpectrumView view("test_viz_qt_viewers2");
+    // 4 channels at 1000 Hz, 101 bins up to 500 Hz; channel 0 peaks at 100 Hz (bin 20)
+    std::shared_ptr<FiffInfo> info = createBrowserTestInfo();
+    Eigen::MatrixXd psd = Eigen::MatrixXd::Constant(4, 101, 1.0);
+    for (int b = 0; b < 101; ++b) {
+        psd(0, b) = 1.0 + 9.0 * std::exp(-0.5 * std::pow((b - 20) / 2.0, 2));
+    }
 
+    auto panel = std::make_shared<mne::viz::SpectrumPanel>();
+    PanelWidget view(panel, QStringLiteral("test_viz_qt_viewers2_spectrum"));
     view.setGuiMode(AbstractView::GuiMode::Research);
     view.setProcessingMode(AbstractView::ProcessingMode::Offline);
     view.saveSettings();
     view.loadSettings();
-    view.clearView();
+    SceneViewport* viewport = view.figureViewport();
+    QVERIFY(viewport != nullptr && view.formPanel()->isHidden());
 
-    QApplication::processEvents();
+    // mne_scan may send spectra and bounds before the channels: they are dropped
+    panel->set_boundaries(1, 40);
+    panel->add_data(psd);
+    QCOMPARE(panel->spectrum().table().bins(), 0);
+    panel->init(info, mne::viz::SpectrumTable::Scale::Linear);
+    panel->add_data(psd);
+    QCOMPARE(panel->spectrum().table().row_count(), 4);
+
+    view.resize(500, 600);
+    view.show();
+    QVERIFY(QTest::qWaitForWindowExposed(&view));
+    QVERIFY(!view.grab().isNull());
+
+    // The mouse over the peak of the first row reads out its bin
+    const double plotWidth = viewport->width() - mne::viz::SpectrumFigure::name_width;
+    const QPoint peak(static_cast<int>(std::lround(mne::viz::SpectrumFigure::name_width + 0.2 * plotWidth)), 70);
+    QMouseEvent move(QEvent::MouseMove, QPointF(peak), viewport->mapToGlobal(QPointF(peak)), Qt::NoButton, Qt::NoButton,
+                     Qt::NoModifier);
+    QApplication::sendEvent(viewport, &move);
+    const std::optional<mne::viz::SpectrumFigure::Readout> readout = panel->spectrum().readout();
+    QVERIFY(readout.has_value());
+    QCOMPARE(readout->row, 0);
+    QVERIFY(std::abs(readout->bin - 20) <= 1);
+    QVERIFY(!view.grab().isNull());
+
+    // A double click freezes the spectra while new ones arrive
+    QTest::mouseDClick(viewport, Qt::LeftButton, Qt::NoModifier, peak);
+    QVERIFY(panel->spectrum().table().frozen());
+    panel->add_data(psd * 2.0);
+    QCOMPARE((*panel->spectrum().table().spectrum(0))[20], 10.0);
+    QTest::mouseDClick(viewport, Qt::LeftButton, Qt::NoModifier, peak);
+    QVERIFY(!panel->spectrum().table().frozen());
+
+    // Bounds crop the frequency axis; leaving the view ends the read-out
+    panel->set_boundaries(20, 200);
+    QVERIFY(panel->spectrum().table().lower_bin() > 0);
+    QEvent leave(QEvent::Leave);
+    QApplication::sendEvent(viewport, &leave);
+    QVERIFY(!panel->spectrum().readout().has_value());
+    view.clearView();
 }
 
 //=============================================================================================================
@@ -3894,133 +3922,6 @@ void TestVizQtViewers2::rtFiffRawView_paintsHidesRowsAndAddsEvents()
 
 //=============================================================================================================
 
-void TestVizQtViewers2::frequencySpectrumDelegate_paintsSpectrumAndReadout()
-{
-    // 4 channels, 101 bins over 0..500 Hz (5 Hz per bin); channel 0 is a peak at 100 Hz (bin 20)
-    auto info = createBrowserTestInfo();
-    FrequencySpectrumModel model;
-    model.setInfo(info);
-    // Rows exist before the first spectrum: no data yet
-    QCOMPARE(model.rowCount(), 4);
-    QVERIFY(!model.data(model.index(0, 1)).isValid());
-    model.toggleFreeze(QModelIndex());
-    QVERIFY(!model.data(model.index(0, 1)).isValid());
-    model.toggleFreeze(QModelIndex());
-    Eigen::MatrixXd spectrum = Eigen::MatrixXd::Constant(4, 101, 1.0);
-    for (int b = 0; b < 101; ++b) {
-        spectrum(0, b) = 1.0 + 9.0 * std::exp(-0.5 * std::pow((b - 20) / 2.0, 2));
-    }
-    model.addData(spectrum);
-
-    QTableView table;
-    table.setModel(&model);
-    FrequencySpectrumDelegate delegate(&table);
-    table.setItemDelegate(&delegate);
-
-    // Paint row 0 into a 400 x 100 cell; SpectrumView hides the name column, so the plot cell starts at x = 0
-    const QRect cell(0, 20, 400, 100);
-    auto render = [&]() {
-        QImage image(cell.right() + 20, cell.bottom() + 20, QImage::Format_RGB32);
-        image.fill(Qt::white);
-        QPainter painter(&image);
-        QStyleOptionViewItem option;
-        option.rect = cell;
-        delegate.paint(&painter, option, model.index(0, 1));
-        return image;
-    };
-    auto curveRow = [](const QImage& image, int x) {
-        for (int y = 0; y < image.height(); ++y) {
-            const QRgb c = image.pixel(x, y);
-            if (qBlue(c) > qRed(c) + 60 && qBlue(c) > qGreen(c) + 60) {
-                return y;
-            }
-        }
-        return -1;
-    };
-
-    QImage image = render();
-    // The curve spans the cell width and deviates from the flat level only around the 100 Hz peak (x = 0.2 * 400)
-    const int yFlat = curveRow(image, cell.left() + 300);
-    QVERIFY2(yFlat >= cell.top() && yFlat <= cell.bottom(), qPrintable(QString::number(yFlat)));
-    QCOMPARE(curveRow(image, cell.left() + 2), yFlat);
-    QCOMPARE(curveRow(image, cell.right() - 2), yFlat);
-    QVERIFY(curveRow(image, cell.left() + 80) != yFlat);
-    // More power is drawn higher up, and the peak stays inside the cell
-    const int yPeak = curveRow(image, cell.left() + 80);
-    QVERIFY2(yPeak >= cell.top() && yPeak < yFlat - 20, qPrintable(QStringLiteral("peak %1 flat %2").arg(yPeak).arg(yFlat)));
-    for (int x = cell.left(); x < cell.right(); ++x) {
-        for (int y = cell.bottom() + 1; y < image.height(); ++y) {
-            QVERIFY2(qBlue(image.pixel(x, y)) <= qRed(image.pixel(x, y)) + 60, qPrintable(QStringLiteral("curve below the cell at %1,%2").arg(x).arg(y)));
-        }
-    }
-
-    // Grid: 5 linear divisions labelled at 100..400 Hz
-    auto hasDarkPixelNear = [](const QImage& image, int x, int y) {
-        for (int dx = -2; dx <= 20; ++dx) {
-            for (int dy = -12; dy <= 2; ++dy) {
-                if (qGray(image.pixel(x + dx, y + dy)) < 100) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    };
-    for (int f = 100; f <= 400; f += 100) {
-        QVERIFY2(hasDarkPixelNear(image, cell.left() + f * 400 / 500, cell.top()), qPrintable(QString::number(f)));
-    }
-
-    // Narrowing the bounds to 50..150 Hz stretches the band over the whole width: the peak moves to the centre
-    model.setBoundaries(50.0f, 150.0f);
-    QCOMPARE(model.getLowerFrqBound(), 9);
-    QCOMPARE(model.getUpperFrqBound(), 31);
-    image = render();
-    QVERIFY(curveRow(image, cell.left() + 200) != curveRow(image, cell.left() + 2));
-
-    // Mouse read-out over the cell: a vertical marker and the frequency/value text for the hovered row
-    model.setBoundaries(0.0f, 500.0f);
-    table.resize(500, 300);
-    delegate.rcvMouseLoc(0, cell.left() + 80, cell.top() + 50, cell);
-    image = render();
-    int iMarker = 0;
-    for (int y = cell.top(); y < cell.bottom(); ++y) {
-        const QRgb c = image.pixel(cell.left() + 80, y);
-        if (qGray(c) < 200 && std::abs(qRed(c) - qBlue(c)) < 20) {
-            ++iMarker;
-        }
-    }
-    QVERIFY2(iMarker > 30, qPrintable(QString::number(iMarker)));
-    QVERIFY(hasDarkPixelNear(image, cell.left() + 88, cell.top() + 42));
-    // At exactly 100 Hz the read-out names that bin
-    TextRecordingDevice recorder(image.size());
-    {
-        QPainter painter(&recorder);
-        QStyleOptionViewItem option;
-        option.rect = cell;
-        delegate.paint(&painter, option, model.index(0, 1));
-    }
-    QVERIFY2(recorder.texts().contains(QStringLiteral("10 [DB], 100 [Hz]")), qPrintable(recorder.texts().join(u'|')));
-
-    // Other rows show no read-out; the name column is rotated text
-    QStyleOptionViewItem option;
-    option.rect = cell;
-    QImage other(cell.right() + 20, cell.bottom() + 20, QImage::Format_RGB32);
-    other.fill(Qt::white);
-    {
-        QPainter painter(&other);
-        delegate.paint(&painter, option, model.index(1, 1));
-        delegate.paint(&painter, option, model.index(1, 0));
-    }
-    QVERIFY(!hasDarkPixelNear(other, cell.left() + 88, cell.top() + 42));
-    QCOMPARE(delegate.sizeHint(option, model.index(0, 0)), QSize(20, cell.height()));
-
-    // Log scale: decade grid lines
-    delegate.setScaleType(1);
-    image = render();
-    QVERIFY(curveRow(image, cell.left() + 300) >= 0);
-}
-
-//=============================================================================================================
-
 void TestVizQtViewers2::averageLayoutFigure_paintsScaledClampedCurves()
 {
     // Channel 1 of 2, 120 samples, stimulus at sample 30; "aud" ramps to 2x full scale, "vis" is inactive
@@ -4597,146 +4498,6 @@ void TestVizQtViewers2::evokedSetModel_extended()
 
     // data() with invalid index — QVariant()
     model.data(QModelIndex(), Qt::DisplayRole);
-
-    QApplication::processEvents();
-}
-
-//=============================================================================================================
-
-void TestVizQtViewers2::frequencySpectrumModel_basics()
-{
-    FrequencySpectrumModel model;
-
-    // Default state — no data loaded
-    QVERIFY(model.rowCount() >= 0);
-    QCOMPARE(model.columnCount(), 2);
-
-    // headerData on column 0 and 1
-    model.headerData(0, Qt::Horizontal, Qt::DisplayRole);
-    model.headerData(1, Qt::Horizontal, Qt::DisplayRole);
-    model.headerData(1, Qt::Horizontal, Qt::TextAlignmentRole);
-    model.headerData(0, Qt::Vertical, Qt::DisplayRole);
-
-    // data() with invalid index — returns QVariant immediately
-    model.data(QModelIndex(), Qt::DisplayRole);
-
-    // setInfo with an empty FiffInfo
-    std::shared_ptr<FiffInfo> pInfo(new FiffInfo);
-    model.setInfo(pInfo);
-
-    // Scale type
-    model.setScaleType(0);
-    model.setScaleType(1);
-
-    // toggleFreeze — just toggles a bool flag
-    model.toggleFreeze(QModelIndex());
-    model.toggleFreeze(QModelIndex());
-
-    // setBoundaries — returns early since m_bInitialized is false
-    model.setBoundaries(1.0f, 40.0f);
-    model.setBoundaries(0.5f, 100.0f);
-
-    // selectRows / resetSelection with empty selection
-    std::vector<int> empty;
-    model.selectRows(empty);
-    model.resetSelection();
-
-    // selectRows with a small selection (values exceed pInfo->chs.size() == 0, so skipped)
-    std::vector<int> sel{0, 1};
-    model.selectRows(sel);
-    model.resetSelection();
-
-    QApplication::processEvents();
-}
-
-//=============================================================================================================
-
-void TestVizQtViewers2::spectrumView_scalesBoundsAndPaints()
-{
-    // 4 channels at 1000 Hz, 100 frequency bins of 5 Hz up to Nyquist (500 Hz)
-    std::shared_ptr<FiffInfo> info = createBrowserTestInfo();
-    Eigen::MatrixXd psd(4, 100);
-    for (int b = 0; b < 100; ++b) {
-        psd.col(b).setConstant(1.0 + 0.1 * b);
-    }
-    psd(1, 20) = 50.0;
-
-    for (const int scaleType : {0, 1}) {
-        SpectrumView view(QStringLiteral("test_viz_qt_viewers2_spectrum"));
-        view.resize(500, 600);
-        view.setBoundaries(1, 40);
-        view.addData(psd);
-        view.init(info, scaleType);
-        view.addData(psd);
-        auto* table = view.findChild<QTableView*>();
-        QVERIFY(table != nullptr);
-        auto* model = qobject_cast<FrequencySpectrumModel*>(table->model());
-        QVERIFY(model != nullptr);
-        QCOMPARE(model->rowCount(), 4);
-        QCOMPARE(model->getNumStems(), 100);
-        QCOMPARE(model->getInfo(), info);
-        // Linear: bin k at 5k Hz, normalised by the last bin (495 Hz); log: log10(f + 1) / log10(496)
-        const Eigen::RowVectorXd scale = model->getFreqScale();
-        const double expected20 = scaleType ? std::log10(101.0) / std::log10(496.0) : 100.0 / 495.0;
-        QVERIFY(std::fabs(scale[20] - expected20) < 1e-12);
-        QCOMPARE(scale[99], 1.0);
-
-        // 20..200 Hz: the last bin below 20 Hz and the first above 200 Hz bound the scale
-        view.setBoundaries(20, 200);
-        const double nf = 500.0;
-        QVERIFY(scale[model->getLowerFrqBound()] * nf < 20.0);
-        QVERIFY(scale[model->getLowerFrqBound() + 1] * nf >= 20.0);
-        QVERIFY(scale[model->getUpperFrqBound()] * nf > 200.0);
-        QVERIFY(scale[model->getUpperFrqBound() - 1] * nf <= 200.0);
-        const Eigen::RowVectorXd bound = model->getFreqScaleBound();
-        QCOMPARE(bound[model->getLowerFrqBound()], 0.0);
-        QCOMPARE(bound[model->getUpperFrqBound()], 1.0);
-
-        QCOMPARE(model->data(model->index(2, 0)).toString(), QStringLiteral("MEG 0113"));
-        QCOMPARE(model->data(model->index(1, 1)).value<Eigen::RowVectorXd>(), psd.row(1));
-        QCOMPARE(model->headerData(1, Qt::Horizontal).toString(), QStringLiteral("data plot"));
-        QCOMPARE(model->headerData(3, Qt::Vertical).toString(), QStringLiteral("STI 014"));
-
-        // Freeze keeps the old spectrum while new data arrives
-        model->toggleFreeze(QModelIndex());
-        view.addData(psd * 2.0);
-        QCOMPARE(model->data(model->index(1, 1)).value<Eigen::RowVectorXd>(), psd.row(1));
-        model->toggleFreeze(QModelIndex());
-        QCOMPARE(model->data(model->index(1, 1)).value<Eigen::RowVectorXd>(), Eigen::RowVectorXd(psd.row(1) * 2.0));
-
-        model->selectRows({1, 3, 7});
-        QCOMPARE(model->rowCount(), 2);
-        QCOMPARE(model->data(model->index(1, 0)).toString(), QStringLiteral("STI 014"));
-        model->resetSelection();
-
-        // Paint the plot rows and move the mouse over the first one to draw the read-out
-        view.show();
-        QVERIFY(QTest::qWaitForWindowExposed(&view));
-        QVERIFY(!view.grab().isNull());
-        QMouseEvent move(QEvent::MouseMove, QPointF(250, 70), table->viewport()->mapToGlobal(QPointF(250, 70)),
-                         Qt::NoButton, Qt::NoButton, Qt::NoModifier);
-        QApplication::sendEvent(table->viewport(), &move);
-        QVERIFY(!view.grab().isNull());
-        QCOMPARE(table->currentIndex().row(), 0);
-    }
-}
-
-//=============================================================================================================
-
-void TestVizQtViewers2::frequencySpectrumDelegate_basics()
-{
-    // Construct with a real (hidden) QTableView — constructor calls setMouseTracking
-    QTableView tableView;
-    FrequencySpectrumDelegate delegate(&tableView);
-
-    delegate.setScaleType(0);
-    delegate.setScaleType(1);
-
-    // sizeHint with a dummy invalid index — column() == -1, no crash (switch falls through)
-    QStyleOptionViewItem opt;
-    QModelIndex invalidIdx;
-    QSize sz = delegate.sizeHint(opt, invalidIdx);
-    Q_UNUSED(sz);
 
     QApplication::processEvents();
 }

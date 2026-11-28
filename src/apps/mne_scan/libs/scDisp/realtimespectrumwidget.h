@@ -45,10 +45,15 @@ namespace mne::scan
 class RealTimeSpectrum;
 }
 
+namespace mne::viz
+{
+class SpectrumPanel;
+}
+
 namespace mne::viz::qt
 {
 class SpectrumSettingsView;
-class SpectrumView;
+class PanelWidget;
 }
 
 //=============================================================================================================
@@ -141,7 +146,8 @@ private:
     void showSpectrumSettingsView();
 
     QPointer<QAction> m_pActionFrequencySettings;         /**< Frequency spectrum settings action. */
-    QPointer<mne::viz::qt::SpectrumView> m_pSpectrumView; /**< Frequency spectrum view. */
+    std::shared_ptr<mne::viz::SpectrumPanel> m_pSpectrum; /**< Frequency spectra. */
+    QPointer<mne::viz::qt::PanelWidget> m_pSpectrumView;  /**< Frequency spectrum view. */
 
     std::shared_ptr<mne::viz::qt::SpectrumSettingsView> m_pSpectrumSettingsView; /**< Frequency spectrum settings modality widget. */
     QSharedPointer<mne::scan::RealTimeSpectrum> m_pFS;                           /**< The frequency spectrum measurement. */
