@@ -290,7 +290,7 @@ private:
     {
         const Font& font = text.font;
         // The x position comes from the anchor, so only the vertical placement uses the metrics
-        const Point origin = detail::text_origin(text, 0.0, m_metrics.ascent(font), m_metrics.descent(font));
+        const Point origin = detail::text_origin(text, 0.0, m_metrics.ascent(font), m_metrics.descent(font), m_metrics.cap_height(font));
         std::string_view anchor = "start";
         double x = text.box.x;
         if (!has_flag(text.align, Align::Baseline)) {

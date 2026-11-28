@@ -62,6 +62,7 @@ public:
     double advance(const Font& font, std::string_view text) const override;
     double ascent(const Font& font) const override;
     double descent(const Font& font) const override;
+    double cap_height(const Font& font) const override;
 
 private:
     std::shared_ptr<const FontSource> m_fonts;

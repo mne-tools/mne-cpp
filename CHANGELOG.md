@@ -432,7 +432,10 @@ aliases; replace the old spelling as below.
   `viz::FontLibrary` (bundled faces, installed fonts as fallback for missing
   glyphs, `viz::SystemFonts`) and `viz::FontTextMetrics`. The software
   renderer, `SdlHost` and `mne_render --fonts` use them; `RasterOptions` and
-  `SoftwareRenderer` keep the bitmap font unless fonts are set.
+  `SoftwareRenderer` keep the bitmap font unless fonts are set. Vertically
+  centred text has its capitals centred (`FontFace::cap_height()`,
+  `TextMetrics::cap_height()`), so labels in Source Sans 3 and values in
+  Source Code Pro line up instead of sitting up to a pixel apart.
 - A clinical look for panels: `viz::Theme` gets calm neutrals with one blue
   accent, hairline borders, check boxes, status chips and Source Sans 3;
   `FormView` draws it, and the Qt kit applies the same theme

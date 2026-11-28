@@ -87,6 +87,20 @@ public:
     {
         return ascent(font) + descent(font);
     }
+
+    /**
+     * @param[in] font   Font of the text.
+     *
+     * @return The height of capital letters above the baseline, or 0 if unknown; renderers centre the capitals
+     *         of vertically centred text when it is known.
+     *
+     * @since 3.0.0
+     */
+    virtual double cap_height(const Font& font) const
+    {
+        static_cast<void>(font);
+        return 0.0;
+    }
 };
 
 /**

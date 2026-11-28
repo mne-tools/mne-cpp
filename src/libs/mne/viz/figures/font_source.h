@@ -101,6 +101,7 @@ struct GlyphRun
     double advance = 0.0;                 /**< Width of the run in pixels, kerning included. */
     double ascent = 0.0;                  /**< Ascent of the primary face in whole pixels. */
     double descent = 0.0;                 /**< Descent of the primary face in whole pixels, positive. */
+    double cap_height = 0.0;              /**< Height of capitals of the primary face in pixels. */
 };
 
 //=============================================================================================================

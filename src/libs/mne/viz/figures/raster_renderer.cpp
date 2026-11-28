@@ -567,7 +567,7 @@ private:
     // Glyph outlines filled together with the non-zero rule, so overlapping glyphs and contours blend once
     void drawGlyphs(const TextShape& text, const GlyphRun& run)
     {
-        const Point origin = detail::text_origin(text, run.advance, run.ascent, run.descent);
+        const Point origin = detail::text_origin(text, run.advance, run.ascent, run.descent, run.cap_height);
         const double deviceScale = std::sqrt(std::abs(m_device.m11 * m_device.m22 - m_device.m12 * m_device.m21));
         // Without rotation the baseline starts on a whole device pixel, which keeps horizontal stems crisp
         Point snap;

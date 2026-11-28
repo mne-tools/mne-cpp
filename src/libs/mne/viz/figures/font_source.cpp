@@ -67,6 +67,7 @@ GlyphRun mne::viz::shape_text(const FontSource& fonts, const Font& font, std::st
     const double primaryScale = pixel_size / primary.units_per_em();
     run.ascent = std::round(primary.ascender() * primaryScale);
     run.descent = std::round(-primary.descender() * primaryScale);
+    run.cap_height = primary.cap_height() * primaryScale;
 
     double pen = 0.0;
     const FontFace* previousFace = nullptr;

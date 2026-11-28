@@ -448,6 +448,13 @@ Expected<std::shared_ptr<const FontFace>> FontFace::parse(std::shared_ptr<FontFa
         face->m_ascender = face->m_unitsPerEm * 4 / 5;
         face->m_descender = -face->m_unitsPerEm / 5;
     }
+    // sCapHeight exists from version 2 of the OS/2 table on
+    if (face->m_os2.length >= 90 && b.u16(face->m_os2.offset) >= 2) {
+        face->m_capHeight = static_cast<std::int16_t>(b.u16(face->m_os2.offset + 88));
+    }
+    if (face->m_capHeight <= 0) {
+        face->m_capHeight = face->m_unitsPerEm * 7 / 10;
+    }
     face->read_names();
     face->read_gpos_kerning();
     return std::shared_ptr<const FontFace>(std::move(face));

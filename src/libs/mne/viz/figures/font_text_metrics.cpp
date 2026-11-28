@@ -81,3 +81,15 @@ double FontTextMetrics::descent(const Font& font) const
     }
     return m_approximate.descent(font);
 }
+
+//=============================================================================================================
+
+double FontTextMetrics::cap_height(const Font& font) const
+{
+    if (m_fonts) {
+        if (const GlyphRun run = shape_text(*m_fonts, font, {}, pixel_size(font)); run.face) {
+            return run.cap_height;
+        }
+    }
+    return m_approximate.cap_height(font);
+}

@@ -166,6 +166,17 @@ public:
         return m_descender;
     }
 
+    /**
+     * @return Height of capital letters above the baseline, in font units: the OS/2 table's sCapHeight, or 70 %
+     *         of the em for fonts without one.
+     *
+     * @since 3.0.0
+     */
+    int cap_height() const
+    {
+        return m_capHeight;
+    }
+
     /** @return Extra space between lines, in font units. */
     int line_gap() const
     {
@@ -280,6 +291,7 @@ private:
     int m_ascender = 0;
     int m_descender = 0;
     int m_lineGap = 0;
+    int m_capHeight = 0;
     int m_glyphCount = 0;
 
     mutable std::mutex m_cacheMutex;

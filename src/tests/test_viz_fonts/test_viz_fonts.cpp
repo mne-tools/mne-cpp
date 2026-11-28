@@ -29,6 +29,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <fstream>
@@ -99,7 +100,7 @@ void test_robustness()
         }
     }
     // Garbled bytes anywhere, in the tables too
-    std::mt19937 random(42);
+    std::mt19937 random(42); // NOLINT(bugprone-random-generator-seed): a fixed seed keeps the garbled fonts reproducible
     int loaded = 0;
     for (int round = 0; round < 60; ++round) {
         std::vector<std::uint8_t> garbled = font;
@@ -127,6 +128,8 @@ void test_bundled_faces()
     const double kern = face.kerning(t, o) * 16.0 / face.units_per_em(); // pixels at 16 px
     CHECK(face.family() == "Source Sans 3" && face.style() == "Regular" && face.weight() == 400 && !face.italic());
     CHECK(face.units_per_em() > 0 && face.ascender() > 0 && face.descender() < 0 && face.line_gap() >= 0);
+    // sCapHeight of the OS/2 table, as fontTools reads it
+    CHECK(face.cap_height() == 660);
     CHECK(t != 0 && o != 0 && face.glyph_index(U'\u4e2d') == 0);
     // GPOS pair kerning (class pairs in extension lookups), as fontTools reads it
     CHECK(kern < -1.0 && face.kerning(t, o) == -66);
@@ -150,7 +153,7 @@ void test_bundled_faces()
     const auto semibold = FontLibrary::sans(true);
     const auto mono = FontLibrary::mono();
     CHECK(semibold && semibold->family() == "Source Sans 3" && semibold->weight() == 600);
-    CHECK(mono && mono->family() == "Source Code Pro");
+    CHECK(mono && mono->family() == "Source Code Pro" && mono->cap_height() == 660);
     CHECK(mono->advance(mono->glyph_index(U'i')) == mono->advance(mono->glyph_index(U'W')));
     CHECK(FontFace::from_bytes(read_bytes(FONT_DIR "/SourceCodePro-Regular.ttf")).has_value());
 
@@ -272,6 +275,46 @@ void test_rendering()
     CHECK(ms < 500.0);
 }
 
+void test_vertical_centring()
+{
+    // Capitals centred in a box sit in its middle in every face and size, so labels and values in Source Sans 3
+    // and Source Code Pro line up: the centre of the ink of "HEH" lies at the centre of the box
+    const auto fonts = std::make_shared<FontLibrary>();
+    RasterOptions options;
+    options.fonts = fonts.get();
+    const auto inkCentre = [&options](const Font& font, const Rect& box) {
+        Canvas canvas(80, 40, Color::white());
+        canvas.set_font(font);
+        canvas.set_pen(Color::black());
+        canvas.draw_text(box, Align::Left | Align::VCenter, "HEH");
+        const RasterImage image = to_raster(canvas.take(), options);
+        double weight = 0.0;
+        double sum = 0.0;
+        for (int y = 0; y < image.height(); ++y) {
+            for (int x = 0; x < image.width(); ++x) {
+                const double ink = 255.0 - image.pixel(x, y).r;
+                weight += ink;
+                sum += ink * (y + 0.5);
+            }
+        }
+        return weight > 0.0 ? sum / weight : -1.0;
+    };
+    for (const double size : {12.0, 13.0, 15.0, 16.0}) {
+        for (const double height : {20.0, 21.0, 24.0, 27.0}) {
+            const Rect box{4, 5, 70, height};
+            const double sans = inkCentre(Font{{}, 0.0, size}, box);
+            const double mono = inkCentre(Font{"Source Code Pro", 0.0, size}, box);
+            const double middle = box.center().y;
+            if (std::abs(sans - middle) > 0.55 || std::abs(mono - middle) > 0.55) {
+                std::fprintf(stderr, "size %.0f, height %.0f: sans %.2f, mono %.2f, box %.2f\n", size, height, sans, mono, middle);
+            }
+            CHECK(std::abs(sans - middle) <= 0.55);
+            CHECK(std::abs(mono - middle) <= 0.55);
+            CHECK(std::abs(sans - mono) <= 0.5);
+        }
+    }
+}
+
 void test_golden()
 {
     const auto fonts = std::make_shared<FontLibrary>();
@@ -340,6 +383,7 @@ int main()
     test_bundled_faces();
     test_font_library();
     test_rendering();
+    test_vertical_centring();
     test_golden();
     test_system_fonts();
     if (g_failures != 0) {
