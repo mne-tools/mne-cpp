@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include "panel.h"
+#include "../models/item_list.h"
 #include "../host/settings_store.h"
 
 //=============================================================================================================
@@ -44,6 +45,24 @@ Panel::Panel(std::string id, std::string title)
 //=============================================================================================================
 
 Panel::~Panel() = default;
+
+//=============================================================================================================
+
+ItemList* Panel::list(const std::string& key) const
+{
+    const auto it = m_lists.find(key);
+    return it == m_lists.end() ? nullptr : it->second.get();
+}
+
+//=============================================================================================================
+
+ItemList& Panel::add_list(const std::string& key, const std::string& label, std::shared_ptr<ItemList> list, const std::string& group)
+{
+    m_form->add_custom(key, label, group);
+    ItemList& added = *list;
+    m_lists.insert_or_assign(key, std::move(list));
+    return added;
+}
 
 //=============================================================================================================
 

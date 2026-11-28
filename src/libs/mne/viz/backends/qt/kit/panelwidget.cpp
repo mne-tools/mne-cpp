@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include "panelwidget.h"
+#include "itemlistview.h"
 #include "qttheme.h"
 #include "sceneviewport.h"
 #include "settingspanel.h"
@@ -27,6 +28,7 @@
 //=============================================================================================================
 
 #include <QSettings>
+#include <QLayout>
 #include <QVBoxLayout>
 
 //=============================================================================================================
@@ -60,6 +62,9 @@ PanelWidget::PanelWidget(std::shared_ptr<Panel> panel, const QString& settingsPa
     layout->setContentsMargins(0, 0, 0, 0);
     m_formPanel = new SettingsPanel(m_panel->shared_form(), this);
     layout->addWidget(m_formPanel);
+    // The item lists fill the custom fields of their keys, again whenever the form rebuilds its widgets
+    fillLists();
+    connect(m_formPanel, &SettingsPanel::rebuilt, this, &PanelWidget::fillLists);
     if (m_panel->figure()) {
         // The figure takes the room; the form keeps its height and shows only with fields
         m_figureViewport = new SceneViewport(m_panel->figure(), this);
@@ -136,4 +141,17 @@ void PanelWidget::updateProcessingMode(ProcessingMode mode)
 
 void PanelWidget::clearView()
 {
+}
+
+//=============================================================================================================
+
+void PanelWidget::fillLists()
+{
+    for (const auto& [key, list] : m_panel->lists()) {
+        QWidget* container = m_formPanel->customWidget(key);
+        if (!container || !container->layout() || container->findChild<ItemListView*>()) {
+            continue;
+        }
+        container->layout()->addWidget(new ItemListView(list, container));
+    }
 }

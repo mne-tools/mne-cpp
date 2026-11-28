@@ -1194,16 +1194,6 @@
       "modernize-use-nullptr": 1,
       "modernize-use-override": 2
     },
-    "src/libs/mne/viz/backends/qt/viewers/channelselectionview.cpp": {
-      "clang-analyzer-cplusplus.NewDeleteLeaks": 2,
-      "modernize-use-nullptr": 1,
-      "performance-unnecessary-copy-initialization": 1,
-      "performance-unnecessary-value-param": 5
-    },
-    "src/libs/mne/viz/backends/qt/viewers/channelselectionview.h": {
-      "modernize-use-nullptr": 2,
-      "modernize-use-override": 8
-    },
     "src/libs/mne/viz/backends/qt/viewers/connectivitysettingsview.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6

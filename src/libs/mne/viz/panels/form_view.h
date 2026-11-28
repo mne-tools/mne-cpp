@@ -32,8 +32,10 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 //=============================================================================================================
@@ -44,6 +46,7 @@ namespace mne::viz
 {
 
 class Canvas;
+class ItemList;
 class Panel;
 
 //=============================================================================================================
@@ -53,7 +56,10 @@ class Panel;
  * The title of the form comes first, then each group as a card with one row per visible field: the label on the
  * left, the editor on the right. Bool fields are switches, numbers steppers with - and + buttons (the wheel steps
  * too), choices cycle with < and > buttons, text, path and directory fields are line edits, actions buttons, colours
- * swatches and info fields toned text. Disabled fields are greyed and ignore input. The view follows the form: it
+ * swatches and info fields toned text. The item lists of a panel fill their custom fields as list boxes: a click
+ * selects, Ctrl or Cmd extends the selection of multi-selection lists, the wheel scrolls them, the arrow keys move
+ * the selection and Delete removes the selected items of removable lists. Disabled fields are greyed and ignore
+ * input. The view follows the form: it
  * lays out again when fields are added, removed or relabelled and repaints when values change. Content taller than
  * the surface scrolls with the wheel.
  *
@@ -208,6 +214,18 @@ public:
 
     //=========================================================================================================
     /**
+     * @param[in] key     Key of an item list of the panel.
+     * @param[in] index   Row of an item.
+     *
+     * @return Where the item is shown in view coordinates (scrolling applied), or nothing if the list or the item
+     *         is not shown.
+     *
+     * @since 3.0.0
+     */
+    std::optional<Rect> item_rect(const std::string& key, int index) const;
+
+    //=========================================================================================================
+    /**
      * @return Key of the text field being edited, or an empty string.
      *
      * @since 3.0.0
@@ -265,6 +283,11 @@ private:
     };
 
     void layout() const;
+    ItemList* list_of(const std::string& key) const;
+    const Row* row_of_list(const std::string& key) const;
+    double list_row_height() const;
+    void scroll_list(const std::string& key, double offset) const;
+    void draw_list(Canvas& canvas, const Row& row, const ItemList& list) const;
     void invalidate();
     const Row* row(const std::string& key) const;
     const Row* hit(double x, double y, Part* part) const;
@@ -282,6 +305,7 @@ private:
     void update() const;
 
     SettingsForm& m_form;
+    Panel* m_panel = nullptr;
     Theme m_theme;
     ApproximateTextMetrics m_approximateMetrics;
     const TextMetrics* m_metrics = &m_approximateMetrics;
@@ -296,6 +320,9 @@ private:
     std::string m_pressedKey;
     Part m_pressedPart = Part::Editor;
     std::string m_focus;
+    std::string m_listFocus;
+    std::vector<std::pair<ItemList*, int>> m_listListeners;
+    mutable std::map<std::string, double> m_listScroll;
     std::string m_editText;
     std::string m_editOriginal;
     GpuResources m_resources;

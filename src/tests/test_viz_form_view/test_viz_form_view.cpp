@@ -20,6 +20,10 @@
 #include <mne/viz/forms/settings_form.h>
 #include <mne/viz/gpu/software_renderer.h>
 #include <mne/viz/host/surface.h>
+#include <mne/base/string_utils.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/viz/models/item_list.h>
+#include <mne/viz/panels/channel_selection_panel.h>
 #include <mne/viz/panels/form_view.h>
 #include <mne/viz/panels/projectors_panel.h>
 
@@ -28,6 +32,7 @@
 //=============================================================================================================
 
 #include <cstdint>
+#include <filesystem>
 #include <cstdio>
 #include <memory>
 #include <optional>
@@ -313,6 +318,146 @@ void test_structure_and_visibility()
     view.attach(nullptr);
 }
 
+void test_item_list()
+{
+    ItemList single;
+    int items = 0;
+    int selections = 0;
+    single.add_listener([&](ItemList::Change change) {
+        (change == ItemList::Change::Items ? items : selections) += 1;
+    });
+    single.set_items({"All", "Left temporal", "Vertex"});
+    single.click(1);
+    single.click(2, true);
+    CHECK(single.selected() == std::vector<int>({2}) && single.current_item() == "Vertex");
+    single.set_selected({0, 2});
+    CHECK(single.selected() == std::vector<int>({0}) && items == 1 && selections == 3);
+    // Not removable: Delete does nothing; removable: the protected item stays
+    CHECK(!single.remove_selected());
+    single.set_removable(true);
+    single.set_protected_items({"All"});
+    CHECK(!single.remove_selected());
+    single.click(1);
+    CHECK(single.remove_selected() && single.items() == std::vector<std::string>({"All", "Vertex"}) && single.selected().empty());
+    single.click(5);
+    CHECK(single.current() == -1 && single.find("Vertex") == 1 && single.find("x") == -1);
+
+    ItemList multi(ItemList::SelectionMode::Multi);
+    multi.set_items({"MEG 0111", "MEG 0112", "MEG 0113"});
+    multi.click(0);
+    multi.click(2, true);
+    CHECK(multi.selected() == std::vector<int>({0, 2}));
+    multi.click(0, true);
+    CHECK(multi.selected() == std::vector<int>({2}));
+    multi.set_selected({2, 1, 1, 7});
+    CHECK(multi.selected() == std::vector<int>({1, 2}) && multi.is_selected(1) && !multi.is_selected(0));
+
+    ItemList none(ItemList::SelectionMode::None);
+    none.set_items({"a"});
+    none.click(0);
+    CHECK(none.selected().empty());
+}
+
+void test_lists_in_form_view()
+{
+    // The channel selection panel: its three lists in FormView, clicked, scrolled and edited with the keyboard
+    ChannelSelectionPanel panel;
+    std::vector<std::vector<std::string>> shown;
+    ChannelSelectionPanel::Callbacks callbacks;
+    callbacks.channels_shown = [&shown](const std::vector<std::string>& channels) {
+        shown.push_back(channels);
+    };
+    panel.set_callbacks(std::move(callbacks));
+    CHECK(!panel.layout_map().empty() && panel.selection_groups().size() > 2);
+    panel.set_mapped_channels({"MEG 0113", "MEG 0112", "MEG 0111"});
+    CHECK(panel.groups().current_item() == "All" && panel.group_channels().count() == 3 && !shown.empty());
+    CHECK(panel.selected_channels() == std::vector<std::string>({"MEG 0113", "MEG 0112", "MEG 0111"}));
+
+    // As drawn with the bundled fonts, with a channel picked
+    {
+        panel.select_channels({"MEG 0112"});
+        const auto fonts = std::make_shared<FontLibrary>();
+        const FontTextMetrics metrics(fonts);
+        FormView golden(panel);
+        golden.set_text_metrics(&metrics);
+        GpuFrameTarget target;
+        target.pixel_width = 380;
+        target.pixel_height = 900;
+        SoftwareRenderer renderer;
+        renderer.set_fonts(fonts);
+        CHECK(scene_golden::matches_png(renderer.render(golden.frame(target), golden.resources()), GOLDEN_DIR "/channel_selection.png"));
+        panel.select_channels({});
+    }
+
+    FormView view(panel);
+    view.set_view_size(380, 2000);
+    const std::string groups = ChannelSelectionPanel::groups_key;
+    const std::string picked = ChannelSelectionPanel::picked_key;
+    CHECK(view.editor_rect(groups).has_value() && view.item_rect(groups, 0).has_value());
+    // A click on a group chooses it and shows its channels
+    const int vertex = panel.groups().find("Vertex");
+    CHECK(vertex >= 0);
+    auto clickItem = [&view](const std::string& key, int row, Modifier modifiers = Modifier::None) {
+        const std::optional<Rect> item = view.item_rect(key, row);
+        if (!item) {
+            return false;
+        }
+        PointerEvent press;
+        press.type = PointerEvent::Type::Press;
+        press.x = item->center().x;
+        press.y = item->center().y;
+        press.button = MouseButton::Left;
+        press.modifiers = modifiers;
+        return view.handle_pointer(press);
+    };
+    // The wheel scrolls a list whose groups do not fit, until the group shows
+    for (int notch = 0; notch < 20 && !view.item_rect(groups, vertex); ++notch) {
+        WheelEvent wheel;
+        const Rect box = *view.editor_rect(groups);
+        wheel.x = box.center().x;
+        wheel.y = box.center().y;
+        wheel.angle_delta_y = -120.0;
+        view.handle_wheel(wheel);
+    }
+    CHECK(clickItem(groups, vertex) && panel.groups().current_item() == "Vertex");
+    CHECK(panel.group_channels().count() > 0 && panel.sensors().channel_kind() == FIFFV_MEG_CH);
+
+    // The arrow keys move the choice; Delete removes a group, but never "All"
+    KeyEvent key;
+    key.key = Key::Up;
+    CHECK(view.handle_key(key) && panel.groups().current() == vertex - 1);
+    const std::string removed = panel.groups().current_item();
+    key.key = Key::Delete;
+    CHECK(view.handle_key(key) && panel.groups().find(removed) < 0 && !panel.selection_groups().contains(removed));
+    panel.groups().set_selected({panel.groups().find("All")});
+    CHECK(!view.handle_key(key) && panel.groups().find("All") >= 0);
+
+    // Picking sensors fills the picked list; a group keeps them under a name
+    panel.select_channels({"MEG 0111", "MEG 0112"});
+    CHECK(panel.picked_channels().items() == std::vector<std::string>({"MEG 0111", "MEG 0112"}));
+    CHECK(shown.back() == std::vector<std::string>({"MEG 0111", "MEG 0112"}) && !panel.selection_empty());
+    panel.form().set_value("groupName", std::string("Mine"));
+    panel.form().trigger("addGroup");
+    CHECK(panel.selection_groups().at("Mine") == std::vector<std::string>({"MEG 0111", "MEG 0112"}));
+    CHECK(panel.groups().current_item() == "All");
+
+    // Ctrl+click extends the picked selection; Delete drops those channels, in the layout too
+    CHECK(clickItem(picked, 0) && clickItem(picked, 1, Modifier::Ctrl));
+    CHECK(panel.picked_channels().selected() == std::vector<int>({0, 1}));
+    CHECK(view.handle_key(key) && panel.picked_channels().count() == 0 && panel.sensors().selected_names().empty());
+    CHECK(panel.selection_empty());
+
+    // Saving and reading the groups back
+    const std::filesystem::path file = std::filesystem::temp_directory_path() / "test_viz_form_view_groups.sel";
+    CHECK(panel.save_selection_groups(file));
+    CHECK(panel.load_selection_groups(mne::utf8_from_path(file)) && panel.selection_groups().contains("Mine"));
+    CHECK(panel.group_file() == mne::utf8_from_path(file));
+    std::filesystem::remove(file);
+    CHECK(!panel.load_layout("missing.lout") && panel.layout_map().empty());
+    CHECK(panel.form().field("selectedLayoutFile")->choices.back().value == "missing.lout");
+    CHECK(panel.load_layout("Vectorview-mag.lout") && !panel.layout_map().empty());
+}
+
 void test_panel_and_golden()
 {
     ProjectorsPanel panel;
@@ -364,6 +509,8 @@ int main()
     test_text_editing();
     test_action_and_disabled();
     test_structure_and_visibility();
+    test_item_list();
+    test_lists_in_form_view();
     test_panel_and_golden();
     if (g_failures != 0) {
         std::fprintf(stderr, "%d check(s) failed\n", g_failures);

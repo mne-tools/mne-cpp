@@ -70,7 +70,8 @@
 #include "chinfowindow.h"
 #include "noisereductionwindow.h"
 
-#include <mne/viz/backends/qt/viewers/channelselectionview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/channel_selection_panel.h>
 
 
 //*************************************************************************************************************
@@ -250,9 +251,13 @@ public:
     {
         return m_pEventWindow;
     }
-    ChannelSelectionView* channelSelectionView() const
+    mne::viz::qt::PanelWidget* channelSelectionView() const
     {
         return m_pChannelSelectionView;
+    }
+    mne::viz::ChannelSelectionPanel& channelSelection() const
+    {
+        return *m_pChannelSelection;
     }
     ChInfoWindow* chInfoWindow() const
     {
@@ -530,21 +535,22 @@ protected:
     mne::MNEInverseOperator m_inverseOperator; /**< Last loaded inverse operator. */
 
     //Window widgets
-    EventWindow* m_pEventWindow;                   /**< Event widget which display the event view. */
-    AnnotationWindow* m_pAnnotationWindow;         /**< Annotation widget which displays browser annotations. */
-    CovarianceWindow* m_pCovarianceWindow;         /**< Dock widget which inspects covariance data and drives whitening. */
-    IcaWindow* m_pIcaWindow;                       /**< Dock widget for ICA component browsing and rejection. */
-    EpochWindow* m_pEpochWindow;                   /**< Dock widget which reviews epochs before averaging. */
-    VirtualChannelWindow* m_pVirtualChannelWindow; /**< Dock widget which manages browser-level derived channels. */
-    FilterWindow* m_pFilterWindow;                 /**< Filter widget which display the filter options for the user. */
-    DataWindow* m_pDataWindow;                     /**< Data widget which display the data for the user. */
-    AboutWindow* m_pAboutWindow;                   /**< About widget which displays information about this application.*/
-    InformationWindow* m_pInformationWindow;       /**< Information widget which displays information about this application (log, etc.).*/
-    ChannelSelectionView* m_pChannelSelectionView; /**< Selection manager window which can be used to select channels.*/
-    AverageWindow* m_pAverageWindow;               /**< Average window can be used to plot calculated averages in a 2D layout scene.*/
-    ScaleWindow* m_pScaleWindow;                   /**< Scale widget can be used to set the scaling of the different channels types. */
-    ChInfoWindow* m_pChInfoWindow;                 /**< Dock window which shows the information about the curretly loaded data channels. */
-    NoiseReductionWindow* m_pNoiseReductionWindow; /**< Dock widget to hold he projection manager. */
+    EventWindow* m_pEventWindow;                                          /**< Event widget which display the event view. */
+    AnnotationWindow* m_pAnnotationWindow;                                /**< Annotation widget which displays browser annotations. */
+    CovarianceWindow* m_pCovarianceWindow;                                /**< Dock widget which inspects covariance data and drives whitening. */
+    IcaWindow* m_pIcaWindow;                                              /**< Dock widget for ICA component browsing and rejection. */
+    EpochWindow* m_pEpochWindow;                                          /**< Dock widget which reviews epochs before averaging. */
+    VirtualChannelWindow* m_pVirtualChannelWindow;                        /**< Dock widget which manages browser-level derived channels. */
+    FilterWindow* m_pFilterWindow;                                        /**< Filter widget which display the filter options for the user. */
+    DataWindow* m_pDataWindow;                                            /**< Data widget which display the data for the user. */
+    AboutWindow* m_pAboutWindow;                                          /**< About widget which displays information about this application.*/
+    InformationWindow* m_pInformationWindow;                              /**< Information widget which displays information about this application (log, etc.).*/
+    std::shared_ptr<mne::viz::ChannelSelectionPanel> m_pChannelSelection; /**< Picks the channels to show. */
+    mne::viz::qt::PanelWidget* m_pChannelSelectionView;                   /**< Selection manager window which can be used to select channels.*/
+    AverageWindow* m_pAverageWindow = nullptr;                            /**< Average window can be used to plot calculated averages in a 2D layout scene.*/
+    ScaleWindow* m_pScaleWindow;                                          /**< Scale widget can be used to set the scaling of the different channels types. */
+    ChInfoWindow* m_pChInfoWindow;                                        /**< Dock window which shows the information about the curretly loaded data channels. */
+    NoiseReductionWindow* m_pNoiseReductionWindow;                        /**< Dock widget to hold he projection manager. */
 
     QDockWidget* m_pChannelSelectionViewDock;
 

@@ -467,6 +467,19 @@ aliases; replace the old spelling as below.
   spectrum` shows it in an SDL window. The read-out names the frequency where
   the axis places the bin, and the grid labels the frequencies of the lines
   instead of their normalised positions.
+- Item lists without a toolkit: `viz::ItemList` (`viz/models/item_list.h`)
+  holds a list's items, its single or multiple selection and whether Delete
+  removes items. Panels add lists in custom fields (`Panel::add_list()`);
+  `PanelWidget` shows them as `viz::qt::ItemListView`, and `FormView` draws
+  them as list boxes (click, Ctrl+click, wheel, arrow keys, Delete). Path
+  fields can ask where to save (`SettingField::save_path`).
+  `ChannelSelectionView` is replaced by `viz::ChannelSelectionPanel` in
+  mne_browse, mne_scan and mne_analyze: layout and group files, the groups,
+  their channels and the picked channels as lists, and the sensor layout as
+  its figure; the layout and group files keep their settings keys.
+  `ChannelInfoModel::table()`, `sharedTable()` and `setLayout()` and
+  `SelectionItem::fromSensors()` connect it to the Qt models;
+  `ex_scene_sdl --panel channels` shows it in an SDL window.
 - `ChannelRhiRenderer` hosts a `viz::TraceViewClient`, the same trace view
   client the SDL example runs, instead of wiring its own view, animator,
   markers and frame builder; its host becomes the client's `viz::Surface`.

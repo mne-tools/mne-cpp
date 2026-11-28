@@ -26,6 +26,7 @@
 #include "../../viz_qt_global.h"
 
 #include <mne/viz/figures/average_layout_figure.h>
+#include <mne/viz/figures/sensor_layout.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -54,7 +55,7 @@ namespace mne::viz::qt
  * @brief The channels picked in a sensor layout: names, numbers, kinds, units and layout positions, one entry
  * per channel in each vector.
  *
- * @ref ChannelSelectionView emits it when the selection changes; the average layout and the analysis plugins
+ * The hosts of mne::viz::ChannelSelectionPanel pass it on when the selection changes; the average layout and the analysis plugins
  * show only these channels.
  */
 class VIZQTSHARED_EXPORT SelectionItem
@@ -67,6 +68,27 @@ public:
     std::vector<int> m_iChannelUnit;          /**< The channel unit.*/
     std::vector<QPointF> m_qpChannelPosition; /**< The channel's 2D position in the layout.*/
     bool m_bShowAll = false;                  /**< Whether to show all channels. */
+
+    //=========================================================================================================
+    /**
+     * @param[in] sensors   Sensors of a layout, e.g. viz::SensorLayoutFigure::selection().
+     *
+     * @return Their names, kinds, units and layout positions, with channel number 0.
+     *
+     * @since 3.0.0
+     */
+    static SelectionItem fromSensors(const std::vector<viz::SensorLayout::Sensor>& sensors)
+    {
+        SelectionItem item;
+        for (const viz::SensorLayout::Sensor& sensor : sensors) {
+            item.m_sChannelName.push_back(sensor.name);
+            item.m_iChannelNumber.push_back(0);
+            item.m_iChannelKind.push_back(sensor.kind);
+            item.m_iChannelUnit.push_back(sensor.unit);
+            item.m_qpChannelPosition.emplace_back(sensor.position.x, sensor.position.y);
+        }
+        return item;
+    }
 
     //=========================================================================================================
     /**

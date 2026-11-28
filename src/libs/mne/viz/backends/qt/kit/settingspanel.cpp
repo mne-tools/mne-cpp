@@ -371,9 +371,14 @@ QWidget* SettingsPanel::buildChooser(const SettingField& field)
         if (!f) {
             return;
         }
-        const QString chosen = f->kind == SettingField::Kind::Directory
-            ? QFileDialog::getExistingDirectory(this, toQString(f->label), edit->text())
-            : QFileDialog::getOpenFileName(this, toQString(f->label), edit->text(), toQString(f->file_filter));
+        QString chosen;
+        if (f->kind == SettingField::Kind::Directory) {
+            chosen = QFileDialog::getExistingDirectory(this, toQString(f->label), edit->text());
+        } else if (f->save_path) {
+            chosen = QFileDialog::getSaveFileName(this, toQString(f->label), edit->text(), toQString(f->file_filter));
+        } else {
+            chosen = QFileDialog::getOpenFileName(this, toQString(f->label), edit->text(), toQString(f->file_filter));
+        }
         if (!chosen.isEmpty()) {
             m_form.set_value(key, chosen.toStdString());
         }

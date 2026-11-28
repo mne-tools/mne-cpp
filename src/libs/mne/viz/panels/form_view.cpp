@@ -16,6 +16,7 @@
 
 #include "form_view.h"
 #include "panel.h"
+#include "../models/item_list.h"
 #include "../figures/canvas.h"
 
 //=============================================================================================================
@@ -182,12 +183,26 @@ FormView::FormView(SettingsForm& form, Theme theme)
 FormView::FormView(Panel& panel, Theme theme)
 : FormView(panel.form(), std::move(theme))
 {
+    m_panel = &panel;
+    for (const auto& [key, list] : panel.lists()) {
+        const int id = list->add_listener([this](ItemList::Change change) {
+            if (change == ItemList::Change::Items) {
+                invalidate();
+            } else {
+                update();
+            }
+        });
+        m_listListeners.emplace_back(list.get(), id);
+    }
 }
 
 //=============================================================================================================
 
 FormView::~FormView()
 {
+    for (const auto& [list, id] : m_listListeners) {
+        list->remove_listener(id);
+    }
     m_form.remove_listener(m_listener);
     m_form.remove_listener(m_structureListener);
 }
@@ -318,13 +333,24 @@ void FormView::layout() const
         }
         Row card;
         card.type = Row::Type::Card;
-        card.rect = Rect{t.padding, y, width, t.row_height * static_cast<double>(fields.size())};
+        card.rect = Rect{t.padding, y, width, 0.0};
+        const std::size_t cardIndex = m_rows.size();
         m_rows.push_back(card);
 
         for (const SettingField* f : fields) {
             Row r;
             r.key = f->key;
             r.rect = Rect{t.padding, y, width, t.row_height};
+            // An item list: its label above a box of its visible rows
+            if (const ItemList* items = f->kind == SettingField::Kind::Custom ? list_of(f->key) : nullptr) {
+                const double labelHeight = f->label.empty() ? inset : std::round(t.row_height * 0.75);
+                const double box = items->visible_rows() * list_row_height() + 2.0;
+                r.rect.height = labelHeight + box + inset;
+                r.editor = Rect{r.rect.x + inset, y + labelHeight, width - 2.0 * inset, box};
+                m_rows.push_back(r);
+                y += r.rect.height;
+                continue;
+            }
             const double right = r.rect.right() - inset;
             const double inner = width - 2.0 * inset;
             const double editorWidth = std::min(t.editor_width, std::round(inner * 0.55));
@@ -369,6 +395,7 @@ void FormView::layout() const
             y += t.row_height;
         }
         m_rows.back().last = true;
+        m_rows[cardIndex].rect.height = y - m_rows[cardIndex].rect.y;
     }
     m_contentHeight = y + t.padding;
 }
@@ -439,8 +466,25 @@ bool FormView::handle_pointer(const PointerEvent& event)
         if (!f || !m_form.is_enabled(f->key)) {
             commit();
             m_pressedKey.clear();
+            m_listFocus.clear();
             return f != nullptr;
         }
+        if (ItemList* items = f->kind == SettingField::Kind::Custom ? list_of(f->key) : nullptr) {
+            commit();
+            m_pressedKey.clear();
+            m_listFocus = f->key;
+            int clicked = -1;
+            for (int i = 0; i < items->count(); ++i) {
+                if (const std::optional<Rect> item = item_rect(f->key, i); item && item->contains({event.x, event.y})) {
+                    clicked = i;
+                }
+            }
+            if (clicked >= 0) {
+                items->click(clicked, has_flag(event.modifiers, Modifier::Ctrl) || has_flag(event.modifiers, Modifier::Meta));
+            }
+            return true;
+        }
+        m_listFocus.clear();
         if (is_text_kind(f->kind)) {
             focus(f->key);
             m_pressedKey.clear();
@@ -535,7 +579,15 @@ bool FormView::handle_wheel(const WheelEvent& event)
     Part part = Part::Editor;
     const Row* r = hit(event.x, event.y, &part);
     const SettingField* f = r ? m_form.field(r->key) : nullptr;
-    if (f && is_number_kind(f->kind) && m_form.is_enabled(f->key)) {
+    if (f && f->kind == SettingField::Kind::Custom && list_of(f->key)) {
+        const double before = m_listScroll[f->key];
+        scroll_list(f->key, before - event.angle_delta_y / kWheelNotch * 3.0 * list_row_height());
+        if (m_listScroll[f->key] != before) {
+            update();
+            return true;
+        }
+        // At either end the wheel scrolls the form
+    } else if (f && is_number_kind(f->kind) && m_form.is_enabled(f->key)) {
         const auto steps = static_cast<int>(event.angle_delta_y / kWheelNotch);
         const int direction = event.angle_delta_y > 0.0 ? 1 : event.angle_delta_y < 0.0 ? -1
                                                                                         : 0;
@@ -551,6 +603,33 @@ bool FormView::handle_wheel(const WheelEvent& event)
 
 bool FormView::handle_key(const KeyEvent& event)
 {
+    if (ItemList* items = m_focus.empty() ? list_of(m_listFocus) : nullptr) {
+        switch (event.key) {
+            case Key::Delete:
+            case Key::Backspace:
+                return items->remove_selected();
+            case Key::Up:
+            case Key::Down: {
+                const int step = event.key == Key::Up ? -1 : 1;
+                const int next = std::clamp(items->current() < 0 ? 0 : items->current() + step, 0, items->count() - 1);
+                items->click(next);
+                // Keep the current item in the box
+                if (const Row* r = row_of_list(m_listFocus)) {
+                    const double top = next * list_row_height();
+                    const double scroll = m_listScroll[m_listFocus];
+                    if (top < scroll) {
+                        scroll_list(m_listFocus, top);
+                    } else if (top + list_row_height() > scroll + r->editor.height - 2.0) {
+                        scroll_list(m_listFocus, top + list_row_height() - (r->editor.height - 2.0));
+                    }
+                }
+                update();
+                return true;
+            }
+            default:
+                break;
+        }
+    }
     if (!m_focus.empty()) {
         switch (event.key) {
             case Key::Character:
@@ -747,6 +826,16 @@ void FormView::draw_row(Canvas& canvas, const Row& r) const
     canvas.save();
     if (!m_form.is_enabled(f->key)) {
         canvas.set_opacity(kDisabledOpacity);
+    }
+    if (const ItemList* items = f->kind == SettingField::Kind::Custom ? list_of(f->key) : nullptr) {
+        canvas.set_font(t.font(t.font_size));
+        canvas.set_pen(t.text);
+        const double left = r.rect.x + inset;
+        canvas.draw_text(Rect{left, r.rect.y, r.rect.width - 2.0 * inset, r.editor.y - r.rect.y}, Align::Left | Align::VCenter,
+                         elided(f->label, canvas.font(), r.rect.width - 2.0 * inset));
+        draw_list(canvas, r, *items);
+        canvas.restore();
+        return;
     }
     if (f->kind != SettingField::Kind::Action) {
         const double left = r.rect.x + inset;
@@ -950,6 +1039,94 @@ GpuFrame FormView::frame(const GpuFrameTarget& target)
 const GpuResources& FormView::resources() const
 {
     return m_resources;
+}
+
+//=============================================================================================================
+
+ItemList* FormView::list_of(const std::string& key) const
+{
+    return m_panel && !key.empty() ? m_panel->list(key) : nullptr;
+}
+
+//=============================================================================================================
+
+const FormView::Row* FormView::row_of_list(const std::string& key) const
+{
+    return list_of(key) ? row(key) : nullptr;
+}
+
+//=============================================================================================================
+
+double FormView::list_row_height() const
+{
+    return std::round(m_theme.font_size * 1.8);
+}
+
+//=============================================================================================================
+
+void FormView::scroll_list(const std::string& key, double offset) const
+{
+    const ItemList* items = list_of(key);
+    const Row* r = items ? row(key) : nullptr;
+    if (!r) {
+        return;
+    }
+    const double overflow = std::max(0.0, items->count() * list_row_height() - (r->editor.height - 2.0));
+    m_listScroll[key] = std::clamp(offset, 0.0, overflow);
+}
+
+//=============================================================================================================
+
+std::optional<Rect> FormView::item_rect(const std::string& key, int index) const
+{
+    const ItemList* items = list_of(key);
+    const Row* r = items ? row(key) : nullptr;
+    if (!r || index < 0 || index >= items->count()) {
+        return std::nullopt;
+    }
+    const Rect box = r->editor.adjusted(1.0, 1.0, -1.0, -1.0);
+    const double scroll = m_listScroll.contains(key) ? m_listScroll.at(key) : 0.0;
+    const Rect item{box.x, box.y + index * list_row_height() - scroll, box.width, list_row_height()};
+    if (item.bottom() <= box.y || item.y >= box.bottom()) {
+        return std::nullopt;
+    }
+    return Rect{item.x, item.y - m_scroll, item.width, item.height};
+}
+
+//=============================================================================================================
+
+void FormView::draw_list(Canvas& canvas, const Row& r, const ItemList& list) const
+{
+    const Theme& t = m_theme;
+    const Rect& e = r.editor;
+    canvas.set_pen(Pen{r.key == m_listFocus ? t.accent : t.field_border, 1.0});
+    canvas.set_brush(Brush::solid(t.field));
+    canvas.draw_rounded_rect(e.adjusted(0.5, 0.5, -0.5, -0.5), kControlRadius, kControlRadius);
+
+    const Rect box = e.adjusted(1.0, 1.0, -1.0, -1.0);
+    const double rowHeight = list_row_height();
+    const double scroll = m_listScroll.contains(r.key) ? m_listScroll.at(r.key) : 0.0;
+    const Font font = t.font(t.font_size);
+    canvas.save();
+    canvas.clip_rect(box);
+    canvas.set_font(font);
+    const int first = std::max(0, static_cast<int>(scroll / rowHeight));
+    for (int index = first; index < list.count(); ++index) {
+        const Rect item{box.x, box.y + index * rowHeight - scroll, box.width, rowHeight};
+        if (item.y >= box.bottom()) {
+            break;
+        }
+        const bool selected = list.is_selected(index);
+        if (selected) {
+            canvas.set_pen(Pen::none());
+            canvas.set_brush(Brush::solid(t.accent));
+            canvas.draw_rect(item);
+        }
+        canvas.set_pen(selected ? t.accent_text : t.text);
+        const Rect text = item.adjusted(t.spacing, 0.0, -t.spacing, 0.0);
+        canvas.draw_text(text, Align::Left | Align::VCenter, elided(list.items()[static_cast<std::size_t>(index)], font, text.width));
+    }
+    canvas.restore();
 }
 
 //=============================================================================================================

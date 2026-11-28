@@ -48,8 +48,8 @@ class SettingsPanel;
 
 //=============================================================================================================
 /**
- * @brief The Qt host of every viz::Panel: its form as a SettingsPanel, its figure in a SceneViewport, its title,
- * width, modes and settings.
+ * @brief The Qt host of every viz::Panel: its form as a SettingsPanel with its item lists as ItemListViews, its
+ * figure in a SceneViewport, its title, width, modes and settings.
  *
  * The widget shares the panel with its owner. It restores the panel from QSettings("MNECPP") under the settings
  * path when it is created and stores it when it is destroyed.
@@ -114,6 +114,8 @@ public:
 
 private:
     std::shared_ptr<viz::Panel> m_panel;
+    void fillLists();
+
     SettingsPanel* m_formPanel = nullptr;
     SceneViewport* m_figureViewport = nullptr;
     int m_structureListener = 0;

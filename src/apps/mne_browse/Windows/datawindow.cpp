@@ -1913,9 +1913,13 @@ QRect DataWindow::markerViewportRect() const
 void DataWindow::highlightChannelsInSelectionManager()
 {
     if (m_pMainWindow->channelSelectionView()->isVisible()) {
-        QModelIndexList selectedIndexes = ui->m_tableView_rawTableView->selectionModel()->selectedIndexes();
-
-        m_pMainWindow->channelSelectionView()->highlightChannels(selectedIndexes);
+        // The layout names of the selected rows' channels
+        const mne::viz::ChannelTable& channels = m_pMainWindow->chInfoWindow()->getDataModel()->table();
+        std::vector<std::string> names;
+        for (const QModelIndex& index : ui->m_tableView_rawTableView->selectionModel()->selectedIndexes()) {
+            names.push_back(channels.text(index.row(), mne::viz::ChannelTable::Column::MappedLayoutName));
+        }
+        m_pMainWindow->channelSelection().highlight_channels(names);
     }
 }
 

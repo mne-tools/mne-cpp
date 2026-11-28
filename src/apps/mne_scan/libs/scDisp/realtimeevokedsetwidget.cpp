@@ -19,7 +19,8 @@
 #include <mne/base/log.h>
 #include "realtimeevokedsetwidget.h"
 
-#include <mne/viz/backends/qt/viewers/channelselectionview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/channel_selection_panel.h>
 #include <mne/viz/backends/qt/viewers/helpers/channelinfomodel.h>
 #include <mne/viz/backends/qt/viewers/filterdesignview.h>
 #include <mne/viz/backends/qt/viewers/filtersettingsview.h>
@@ -216,30 +217,33 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
         m_pChannelInfoModel = std::make_shared<ChannelInfoModel>(m_pFiffInfo,
                                                                  this);
 
-        m_pChannelSelectionView = std::make_shared<ChannelSelectionView>(QString("MNESCAN/RTESW"),
-                                                                         this,
-                                                                         m_pChannelInfoModel,
-                                                                         Qt::Window);
+        // The panel reports to the views and the channel info model before its window restores the stored files
+        m_pChannelSelection = std::make_shared<viz::ChannelSelectionPanel>();
+        m_pChannelSelection->set_channel_table(ChannelInfoModel::sharedTable(m_pChannelInfoModel));
+        viz::ChannelSelectionPanel::Callbacks callbacks;
+        callbacks.layout_loaded = [this](const std::map<std::string, viz::Point>& layout) {
+            m_pChannelInfoModel->setLayout(layout);
+        };
+        callbacks.channels_shown = [this](const std::vector<std::string>& channels) {
+            m_pButterflyView->showSelectedChannelsOnly(channels);
+        };
+        callbacks.selection_changed = [this](const std::vector<viz::SensorLayout::Sensor>& sensors) {
+            m_pAverageLayout->set_evoked(m_pEvokedSetModel->evokedAverages());
+            m_pAverageLayout->set_selection(SelectionItem::fromSensors(sensors).averageChannels());
+        };
+        m_pChannelSelection->set_callbacks(std::move(callbacks));
+        m_pChannelSelectionView = std::make_shared<PanelWidget>(m_pChannelSelection, QString("MNESCAN/RTESW"), this);
+        m_pChannelSelectionView->setWindowFlag(Qt::Window);
         m_pChannelSelectionView->setWindowTitle(tr(QString("%1: Channel Selection Window").arg(t_sRTESName).toUtf8()));
 
-        connect(m_pChannelSelectionView.get(), &ChannelSelectionView::loadedLayoutMap,
-                m_pChannelInfoModel.get(), &ChannelInfoModel::layoutChanged);
-
         connect(m_pChannelInfoModel.get(), &ChannelInfoModel::channelsMappedToLayout,
-                m_pChannelSelectionView.get(), &ChannelSelectionView::setCurrentlyMappedFiffChannels);
-
-        connect(m_pChannelSelectionView.get(), &ChannelSelectionView::showSelectedChannelsOnly,
-                m_pButterflyView.data(), &ButterflyView::showSelectedChannelsOnly);
-
-        connect(m_pChannelSelectionView.get(), &ChannelSelectionView::selectionChanged,
-                this, [this](const SelectionItem& selection) {
-                    m_pAverageLayout->set_evoked(m_pEvokedSetModel->evokedAverages());
-                    m_pAverageLayout->set_selection(selection.averageChannels());
+                this, [this](const std::vector<std::string>& names) {
+                    m_pChannelSelection->set_mapped_channels(names);
                 });
 
         // Init the views. This needs to be done in the following order because we need to draw the items in the m_pChannelSelectionView first, hence we need to init it first.
         m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
-        m_pChannelSelectionView->updateDataView();
+        m_pChannelSelection->update_data_view();
         // The selection names the channels by layout name; the channel info model knows their rows
         m_pAverageLayout->set_info(m_pFiffInfo);
         m_pAverageLayout->set_channel_lookup([model = m_pChannelInfoModel](const std::string& name) {
@@ -250,7 +254,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
                     m_pAverageLayout->set_evoked(m_pEvokedSetModel->evokedAverages());
                 });
         m_pAverageLayout->set_evoked(m_pEvokedSetModel->evokedAverages());
-        m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
+        m_pChannelInfoModel->setLayout(m_pChannelSelection->layout_map());
 
         //Init control widgets
         QList<QWidget*> lControlWidgets;
@@ -390,11 +394,10 @@ void RealTimeEvokedSetWidget::updateViewport()
 
 void RealTimeEvokedSetWidget::showSensorSelectionWidget()
 {
-    if (!m_pChannelSelectionView) {
-        m_pChannelSelectionView = std::make_shared<ChannelSelectionView>();
+    // The window exists once the first evoked set arrived
+    if (m_pChannelSelectionView) {
+        m_pChannelSelectionView->show();
     }
-
-    m_pChannelSelectionView->show();
 }
 
 //=============================================================================================================

@@ -254,6 +254,17 @@ void ChannelInfoModel::layoutChanged(const std::map<std::string, QPointF>& layou
 
 //=============================================================================================================
 
+void ChannelInfoModel::setLayout(const std::map<std::string, viz::Point>& layout)
+{
+    std::map<std::string, QPointF> layoutMap;
+    for (const auto& [name, point] : layout) {
+        layoutMap.emplace(name, QPointF(point.x, point.y));
+    }
+    layoutChanged(layoutMap);
+}
+
+//=============================================================================================================
+
 const std::vector<std::string>& ChannelInfoModel::getMappedChannelsList()
 {
     return m_table.mapped_names();

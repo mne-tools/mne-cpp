@@ -158,6 +158,7 @@
     "test_viz_form_view": {
       "generators": [],
       "fixtures": {
+        "src/tests/test_viz_form_view/data/channel_selection.png": "21b25f755188f84c7a9986d80f41a16db68ba999d86740caf1847325b5335e91",
         "src/tests/test_viz_form_view/data/form_view.png": "e49148366e018cced32f7087a26235287bd1e86b412ccef58fc2d57248e59806"
       }
     },

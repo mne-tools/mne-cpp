@@ -3904,23 +3904,6 @@
       "python_url": null
     },
     {
-      "name": "ChannelSelectionView",
-      "module": "viz_qt",
-      "header": "viz/backends/qt/viewers/channelselectionview.h",
-      "origin": "custom",
-      "mne_c_tool": null,
-      "mne_python": null,
-      "sklearn": null,
-      "test": null,
-      "example": null,
-      "status": "documented",
-      "documented": true,
-      "sidebar_position": 16,
-      "guide": null,
-      "python_equiv": null,
-      "python_url": null
-    },
-    {
       "name": "ColorMap",
       "module": "viz_qt",
       "header": "viz/backends/qt/plots/helpers/colormap.h",
@@ -15314,6 +15297,67 @@
         "ex_scene_sdl/main.cpp#spectrum_panel_usage"
       ],
       "sidebar_position": 171
+    },
+    {
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "status": "documented",
+      "documented": true,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null,
+      "name": "ItemList",
+      "module": "viz",
+      "header": "viz/models/item_list.h",
+      "test": "test_viz_form_view",
+      "example": "ex_scene_sdl",
+      "example_mode": "run",
+      "example_snippet": [
+        "ex_scene_sdl/main.cpp#channel_selection_panel_usage"
+      ],
+      "sidebar_position": 172
+    },
+    {
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "status": "documented",
+      "documented": true,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null,
+      "name": "ChannelSelectionPanel",
+      "module": "viz",
+      "header": "viz/panels/channel_selection_panel.h",
+      "test": "test_viz_form_view",
+      "example": "ex_scene_sdl",
+      "example_mode": "run",
+      "example_snippet": [
+        "ex_scene_sdl/main.cpp#channel_selection_panel_usage"
+      ],
+      "sidebar_position": 173
+    },
+    {
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "status": "documented",
+      "documented": true,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null,
+      "name": "ItemListView",
+      "module": "viz_qt",
+      "header": "viz/backends/qt/kit/itemlistview.h",
+      "test": "test_viz_qt_viewers2",
+      "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Qt view of any viz::ItemList, created by PanelWidget for the lists of a panel; exercised by test_viz_qt_viewers2.",
+      "sidebar_position": 130
     }
   ],
   "parity": {

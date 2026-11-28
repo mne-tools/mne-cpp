@@ -47,9 +47,14 @@ class Communicator;
 class AbstractModel;
 }
 
+namespace mne::viz
+{
+class ChannelSelectionPanel;
+}
+
 namespace mne::viz::qt
 {
-class ChannelSelectionView;
+class PanelWidget;
 class ChannelInfoModel;
 class SelectionItem;
 class ApplyToView;
@@ -143,9 +148,10 @@ private:
 
     std::unique_ptr<mne::viz::qt::SelectionItem> m_pSelectionItem; /**< The selection received from the channel selection view, published to the other plugins. */
 
-    std::unique_ptr<mne::viz::qt::ChannelSelectionView> m_pChannelSelectionView; /**< View for selecting channels to be displayed. */
-    std::shared_ptr<mne::viz::qt::ChannelInfoModel> m_pChannelInfoModel;         /**< Hold channel info - needed to initialize channelselectionview. */
-    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                                  /**< Hold Information baout currently loaded file. */
+    std::shared_ptr<mne::viz::ChannelSelectionPanel> m_pChannelSelection; /**< Picks the channels to be displayed. */
+    QPointer<mne::viz::qt::PanelWidget> m_pChannelSelectionView;          /**< Controls of the channel selection, owned by the control widget; its layout figure sits in the view. */
+    std::shared_ptr<mne::viz::qt::ChannelInfoModel> m_pChannelInfoModel;  /**< Hold channel info - needed to initialize channelselectionview. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                           /**< Hold Information baout currently loaded file. */
 
     mne::viz::qt::ApplyToView* m_pApplyToView;
 

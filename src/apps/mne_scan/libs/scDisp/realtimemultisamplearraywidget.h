@@ -45,9 +45,14 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace mne::viz
+{
+class ChannelSelectionPanel;
+}
+
 namespace mne::viz::qt
 {
-class ChannelSelectionView;
+class PanelWidget;
 class ChannelInfoModel;
 class RtFiffRawView;
 class ChannelDataViewNew;
@@ -154,10 +159,11 @@ private:
 private:
     QSharedPointer<mne::scan::RealTimeMultiSampleArray> m_pRTMSA; /**< The real-time sample array measurement. */
 
-    std::shared_ptr<mne::viz::qt::QuickControlView> m_pQuickControlView;         /**< quick control widget. */
-    std::shared_ptr<mne::viz::qt::ChannelInfoModel> m_pChannelInfoModel;         /**< channel info model. */
-    std::shared_ptr<mne::viz::qt::ChannelSelectionView> m_pChannelSelectionView; /**< ChannelSelectionView. */
-    QPointer<mne::viz::qt::RtFiffRawView> m_pChannelDataView;                    /**< the QTableView being part of the model/view framework of Qt. */
+    std::shared_ptr<mne::viz::qt::QuickControlView> m_pQuickControlView;  /**< quick control widget. */
+    std::shared_ptr<mne::viz::qt::ChannelInfoModel> m_pChannelInfoModel;  /**< channel info model. */
+    std::shared_ptr<mne::viz::ChannelSelectionPanel> m_pChannelSelection; /**< Picks the channels to show. */
+    std::shared_ptr<mne::viz::qt::PanelWidget> m_pChannelSelectionView;   /**< Window of the channel selection. */
+    QPointer<mne::viz::qt::RtFiffRawView> m_pChannelDataView;             /**< the QTableView being part of the model/view framework of Qt. */
 
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< FiffInfo, which is used insteadd of ListChInfo*/
 

@@ -63,6 +63,7 @@ set(SOURCES
   panels/figure_view.cpp
   forms/settings_form.cpp
   panels/average_layout_panel.cpp
+  panels/channel_selection_panel.cpp
   panels/compensator_panel.cpp
   panels/forward_panel.cpp
   panels/panel.cpp
@@ -79,6 +80,7 @@ set(SOURCES
   models/bids_tree.cpp
   models/channel_table.cpp
   models/evoked_conditions.cpp
+  models/item_list.cpp
   models/spectrum_table.cpp
   views/brain_view_interaction.cpp
   views/brain_view_overlay.cpp
@@ -156,6 +158,7 @@ set(HEADERS
   panels/figure_view.h
   forms/settings_form.h
   panels/average_layout_panel.h
+  panels/channel_selection_panel.h
   panels/compensator_panel.h
   panels/forward_panel.h
   panels/panel.h
@@ -172,6 +175,7 @@ set(HEADERS
   models/bids_tree.h
   models/channel_table.h
   models/evoked_conditions.h
+  models/item_list.h
   models/spectrum_table.h
   views/brain_view_interaction.h
   views/brain_view_overlay.h
@@ -225,6 +229,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   mne_fiff
   mne_fs
   mne_mne
+  mne_channels
   mne_fwd
   mne_inv
   mne_connectivity

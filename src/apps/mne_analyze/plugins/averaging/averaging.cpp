@@ -28,7 +28,6 @@
 #include <mne/viz/backends/qt/viewers/helpers/evokedsetmodel.h>
 #include <mne/viz/backends/qt/viewers/averagingsettingsview.h>
 #include <mne/viz/backends/qt/viewers/modalityselectionview.h>
-#include <mne/viz/backends/qt/viewers/channelselectionview.h>
 #include <mne/viz/backends/qt/viewers/averageselectionview.h>
 #include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
 #include <mne/viz/backends/qt/kit/panelwidget.h>

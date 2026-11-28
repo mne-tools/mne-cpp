@@ -30,6 +30,7 @@
 //=============================================================================================================
 
 #include "../../viz_qt_global.h"
+#include <mne/viz/figures/geometry.h>
 #include <mne/viz/models/channel_table.h>
 
 //=============================================================================================================
@@ -149,6 +150,40 @@ public:
      * @param[in] layoutMap the layout map with the 2D positions.
      */
     void layoutChanged(const std::map<std::string, QPointF>& layoutMap);
+
+    //=========================================================================================================
+    /**
+     * Updates the layout map from toolkit-free layout positions, e.g. those viz::ChannelSelectionPanel loaded.
+     *
+     * @param[in] layout   Layout position of each channel by layout name.
+     *
+     * @since 3.0.0
+     */
+    void setLayout(const std::map<std::string, viz::Point>& layout);
+
+    //=========================================================================================================
+    /**
+     * @return The toolkit-free channel rows the model adapts.
+     *
+     * @since 3.0.0
+     */
+    const viz::ChannelTable& table() const
+    {
+        return m_table;
+    }
+
+    //=========================================================================================================
+    /**
+     * @param[in] model   A model.
+     *
+     * @return Its channel rows, keeping the model alive, e.g. for viz::ChannelSelectionPanel::set_channel_table().
+     *
+     * @since 3.0.0
+     */
+    static std::shared_ptr<const viz::ChannelTable> sharedTable(const std::shared_ptr<ChannelInfoModel>& model)
+    {
+        return model ? std::shared_ptr<const viz::ChannelTable>(model, &model->m_table) : nullptr;
+    }
 
     //=========================================================================================================
     /**

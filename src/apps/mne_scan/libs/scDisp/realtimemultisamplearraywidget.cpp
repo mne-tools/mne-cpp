@@ -21,7 +21,8 @@
 #include "realtimemultisamplearraywidget.h"
 
 #include <mne/viz/backends/qt/viewers/filterdesignview.h>
-#include <mne/viz/backends/qt/viewers/channelselectionview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/channel_selection_panel.h>
 #include <mne/viz/backends/qt/viewers/helpers/channelinfomodel.h>
 #include <mne/viz/backends/qt/viewers/rtfiffrawview.h>
 #include <mne/viz/backends/qt/viewers/scalingview.h>
@@ -158,25 +159,32 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
         m_pChannelInfoModel = std::make_shared<ChannelInfoModel>(m_pFiffInfo,
                                                                  this);
 
-        m_pChannelSelectionView = std::make_shared<ChannelSelectionView>(QString("MNESCAN/RTMSAW"),
-                                                                         this,
-                                                                         m_pChannelInfoModel,
-                                                                         Qt::Window);
+        // The panel reports to the views and the channel info model before its window restores the stored files
+        m_pChannelSelection = std::make_shared<viz::ChannelSelectionPanel>();
+        m_pChannelSelection->set_channel_table(ChannelInfoModel::sharedTable(m_pChannelInfoModel));
+        viz::ChannelSelectionPanel::Callbacks callbacks;
+        callbacks.layout_loaded = [this](const std::map<std::string, viz::Point>& layout) {
+            m_pChannelInfoModel->setLayout(layout);
+        };
+        callbacks.channels_shown = [this](const std::vector<std::string>& channels) {
+            m_pChannelDataView->showSelectedChannelsOnly(channels);
+        };
+        m_pChannelSelection->set_callbacks(std::move(callbacks));
+        m_pChannelSelectionView = std::make_shared<PanelWidget>(m_pChannelSelection, QString("MNESCAN/RTMSAW"), this);
+        m_pChannelSelectionView->setWindowFlag(Qt::Window);
         m_pChannelSelectionView->setWindowTitle(tr(QString("%1: Channel Selection Window").arg(sRTMSAWName).toUtf8()));
 
-        connect(m_pChannelSelectionView.get(), &ChannelSelectionView::loadedLayoutMap,
-                m_pChannelInfoModel.get(), &ChannelInfoModel::layoutChanged);
-
         connect(m_pChannelInfoModel.get(), &ChannelInfoModel::channelsMappedToLayout,
-                m_pChannelSelectionView.get(), &ChannelSelectionView::setCurrentlyMappedFiffChannels);
-
-        connect(m_pChannelSelectionView.get(), &ChannelSelectionView::showSelectedChannelsOnly,
-                m_pChannelDataView.data(), &RtFiffRawView::showSelectedChannelsOnly);
+                this, [this](const std::vector<std::string>& names) {
+                    m_pChannelSelection->set_mapped_channels(names);
+                });
 
         connect(m_pChannelDataView.data(), &RtFiffRawView::channelMarkingChanged,
-                m_pChannelSelectionView.get(), &ChannelSelectionView::updateBadChannels);
+                this, [this]() {
+                    m_pChannelSelection->update_bad_channels();
+                });
 
-        m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
+        m_pChannelInfoModel->setLayout(m_pChannelSelection->layout_map());
 
         //Init control widgets
         QList<QWidget*> lControlWidgets;

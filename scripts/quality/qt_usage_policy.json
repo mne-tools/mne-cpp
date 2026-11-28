@@ -165,8 +165,8 @@
       "modules": []
     },
     "viz/backends/qt": {
-      "tokens": 5396,
-      "public_header_includes": 127,
+      "tokens": 5292,
+      "public_header_includes": 126,
       "modules": [
         "Core",
         "Gui",
@@ -174,14 +174,14 @@
         "Widgets"
       ],
       "by_category": {
-        "containers": 17,
-        "files": 86,
-        "global": 807,
-        "gui": 1695,
-        "objects_signals": 554,
-        "other": 1445,
-        "strings": 778,
-        "time": 14
+        "containers": 15,
+        "files": 83,
+        "global": 800,
+        "gui": 1688,
+        "objects_signals": 543,
+        "other": 1419,
+        "strings": 731,
+        "time": 13
       }
     },
     "viz/backends/sdl": {

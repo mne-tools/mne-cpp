@@ -58,7 +58,6 @@ namespace mne::viz::qt
 class AveragingSettingsView;
 class AverageSelectionView;
 class FiffRawViewSettings;
-class ChannelSelectionView;
 class PanelWidget;
 class ChannelInfoModel;
 class EvokedSetModel;

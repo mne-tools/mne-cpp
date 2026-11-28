@@ -120,6 +120,7 @@ struct SettingField
     Commit commit = Commit::Immediately; /**< When spin boxes and line edits hand their value to the form. */
     std::vector<SettingChoice> choices;  /**< Options of Choice fields. */
     std::string file_filter;             /**< File dialog filter of Path fields, e.g. "FIFF files (*.fif)". */
+    bool save_path = false;              /**< Whether a Path field names a file to write, so dialogs ask where to save. */
     std::string group;                   /**< Title of the group the field is shown in; empty for none. */
     std::string enabled_if;              /**< Key of a Bool field the field needs on ("!key": off); empty for always. */
     std::string visible_if;              /**< Key of a Bool field the field is shown with ("!key": without). */

@@ -1268,10 +1268,23 @@ void MainWindow::setupWindowWidgets()
     //Create selection manager window - QTDesigner used - see / FormFiles
     m_pChannelSelectionViewDock = new QDockWidget(tr("Layout"), this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pChannelSelectionViewDock);
-    m_pChannelSelectionView = new ChannelSelectionView(QString("MNEBrowse"),
-                                                       m_pChannelSelectionViewDock,
-                                                       m_pChInfoWindow->getDataModel(),
-                                                       Qt::Widget);
+    m_pChannelSelection = std::make_shared<mne::viz::ChannelSelectionPanel>();
+    m_pChannelSelection->set_channel_table(ChannelInfoModel::sharedTable(m_pChInfoWindow->getDataModel()));
+    mne::viz::ChannelSelectionPanel::Callbacks callbacks;
+    callbacks.layout_loaded = [this](const std::map<std::string, mne::viz::Point>& layout) {
+        m_pChInfoWindow->getDataModel()->setLayout(layout);
+    };
+    callbacks.channels_shown = [this](const std::vector<std::string>& channels) {
+        m_pDataWindow->showSelectedChannelsOnly(channels);
+    };
+    callbacks.selection_changed = [this](const std::vector<mne::viz::SensorLayout::Sensor>& sensors) {
+        // The average window is created after the panel, which may report while it restores its files
+        if (m_pAverageWindow) {
+            m_pAverageWindow->channelSelectionManagerChanged(mne::viz::qt::SelectionItem::fromSensors(sensors));
+        }
+    };
+    m_pChannelSelection->set_callbacks(std::move(callbacks));
+    m_pChannelSelectionView = new mne::viz::qt::PanelWidget(m_pChannelSelection, QString("MNEBrowse"), m_pChannelSelectionViewDock);
     m_pChannelSelectionViewDock->setWidget(m_pChannelSelectionView);
     m_pChannelSelectionViewDock->hide();
 
@@ -1323,14 +1336,6 @@ void MainWindow::setupWindowWidgets()
 
     connect(m_pScaleWindow, &ScaleWindow::scalingChannelValueChanged,
             m_pAverageWindow, &AverageWindow::scaleAveragedData);
-
-    //Hide non selected channels in the data view
-    connect(m_pChannelSelectionView, &ChannelSelectionView::showSelectedChannelsOnly,
-            m_pDataWindow, &DataWindow::showSelectedChannelsOnly);
-
-    //Connect selection manager with average manager
-    connect(m_pChannelSelectionView, &ChannelSelectionView::selectionChanged,
-            m_pAverageWindow, &AverageWindow::channelSelectionManagerChanged);
 
     connect(m_pAverageWindow, &AverageWindow::addAverageRequested,
             this, &MainWindow::computeEvoked);
@@ -1500,11 +1505,10 @@ void MainWindow::setupWindowWidgets()
     connect(rawModel(), &RawModel::assignedOperatorsChanged,
             m_pChInfoWindow->getDataModel().get(), &ChannelInfoModel::assignedOperatorsChanged);
 
-    connect(m_pChannelSelectionView, &ChannelSelectionView::loadedLayoutMap,
-            m_pChInfoWindow->getDataModel().get(), &ChannelInfoModel::layoutChanged);
-
     connect(m_pChInfoWindow->getDataModel().get(), &ChannelInfoModel::channelsMappedToLayout,
-            m_pChannelSelectionView, &ChannelSelectionView::setCurrentlyMappedFiffChannels);
+            this, [this](const std::vector<std::string>& names) {
+                m_pChannelSelection->set_mapped_channels(names);
+            });
 
     connect(m_pChInfoWindow->getDataModel().get(), &ChannelInfoModel::channelsMappedToLayout,
             m_pAverageWindow, &AverageWindow::setMappedChannelNames);
@@ -1530,9 +1534,9 @@ void MainWindow::setupWindowWidgets()
         auto fiffInfo = m_pDataWindow->fiffInfo();
         m_pScaleWindow->hideSpinBoxes(fiffInfo);
         m_pChInfoWindow->getDataModel()->setFiffInfo(fiffInfo);
-        m_pChInfoWindow->getDataModel()->layoutChanged(m_pChannelSelectionView->getLayoutMap());
-        m_pChannelSelectionView->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
-        m_pChannelSelectionView->newFiffFileLoaded(fiffInfo);
+        m_pChInfoWindow->getDataModel()->setLayout(m_pChannelSelection->layout_map());
+        m_pChannelSelection->set_mapped_channels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
+        m_pChannelSelection->reload_layout();
         m_pFilterWindow->newFileLoaded(fiffInfo);
         m_pNoiseReductionWindow->setFiffInfo(fiffInfo);
     }
@@ -2640,9 +2644,9 @@ void MainWindow::syncAuxWindowsToFiffInfo(std::shared_ptr<FiffInfo> fiffInfo,
     m_pScaleWindow->hideSpinBoxes(fiffInfo);
 
     m_pChInfoWindow->getDataModel()->setFiffInfo(fiffInfo);
-    m_pChInfoWindow->getDataModel()->layoutChanged(m_pChannelSelectionView->getLayoutMap());
-    m_pChannelSelectionView->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
-    m_pChannelSelectionView->newFiffFileLoaded(fiffInfo);
+    m_pChInfoWindow->getDataModel()->setLayout(m_pChannelSelection->layout_map());
+    m_pChannelSelection->set_mapped_channels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
+    m_pChannelSelection->reload_layout();
 
     m_pFilterWindow->newFileLoaded(fiffInfo);
     m_pNoiseReductionWindow->setFiffInfo(fiffInfo);

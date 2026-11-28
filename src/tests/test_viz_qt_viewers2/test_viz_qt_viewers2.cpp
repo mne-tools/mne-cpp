@@ -37,7 +37,9 @@
 #include <mne/viz/backends/qt/viewers/averagingsettingsview.h>
 #include <mne/viz/backends/qt/kit/settingspanel.h>
 #include <mne/viz/backends/qt/viewers/bidsview.h>
-#include <mne/viz/backends/qt/viewers/channelselectionview.h>
+#include <mne/viz/backends/qt/kit/itemlistview.h>
+#include <mne/viz/models/item_list.h>
+#include <mne/viz/panels/channel_selection_panel.h>
 #include <mne/viz/backends/qt/viewers/channeldataview.h>
 #include <mne/viz/backends/qt/kit/panelwidget.h>
 #include <mne/viz/backends/qt/kit/sceneviewport.h>
@@ -463,17 +465,10 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies that ChannelSelectionView constructs (with and without a ChannelInfoModel)
-     * and survives lifecycle transitions.
+     * Verifies a ChannelSelectionPanel in a PanelWidget: its lists as ItemListViews, picking sensors with the
+     * mouse, Delete in the picked list, choosing a group and restoring the layout file from the settings.
      */
-    void channelSelectionView_lifecycle();
-
-    //=========================================================================================================
-    /**
-     * Verifies that the initial layout selection resolves the actual .lout resource
-     * immediately when a FIFF file is loaded, instead of requiring a manual layout switch.
-     */
-    void channelSelectionView_initialLayoutLoads();
+    void channelSelectionPanel_inPanelWidget();
 
     //=========================================================================================================
     /**
@@ -1692,7 +1687,7 @@ void TestVizQtViewers2::bidsView_lifecycle()
 
 //=============================================================================================================
 
-void TestVizQtViewers2::channelSelectionView_lifecycle()
+void TestVizQtViewers2::channelSelectionPanel_inPanelWidget()
 {
     const QString layoutPath = QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/general/2DLayouts/Vectorview-all.lout");
     if (!QFile::exists(layoutPath)) {
@@ -1700,52 +1695,96 @@ void TestVizQtViewers2::channelSelectionView_lifecycle()
     }
 
     auto info = createBrowserTestInfo();
-    std::shared_ptr<ChannelInfoModel> infoModel(new ChannelInfoModel);
+    auto infoModel = std::make_shared<ChannelInfoModel>();
     infoModel->setFiffInfo(info);
+    const QString settingsPath = QStringLiteral("test_viz_qt_viewers2_selection");
+    QSettings(QStringLiteral("MNECPP")).remove(settingsPath);
 
-    ChannelSelectionView view(QStringLiteral("test_viz_qt_viewers2_lifecycle"),
-                              nullptr,
-                              infoModel,
-                              Qt::Widget);
-    view.setGuiMode(AbstractView::GuiMode::Research);
-    view.setProcessingMode(AbstractView::ProcessingMode::Offline);
-    view.setCurrentLayoutFile(QStringLiteral("Vectorview-all.lout"));
-    view.newFiffFileLoaded(info);
-    QVERIFY(!view.getLayoutMap().empty());
+    auto panel = std::make_shared<mne::viz::ChannelSelectionPanel>();
+    panel->set_channel_table(ChannelInfoModel::sharedTable(infoModel));
+    std::vector<std::string> shown;
+    SelectionItem selection;
+    mne::viz::ChannelSelectionPanel::Callbacks callbacks;
+    callbacks.layout_loaded = [&infoModel](const std::map<std::string, mne::viz::Point>& layout) {
+        infoModel->setLayout(layout);
+    };
+    callbacks.channels_shown = [&shown](const std::vector<std::string>& channels) {
+        shown = channels;
+    };
+    callbacks.selection_changed = [&selection](const std::vector<mne::viz::SensorLayout::Sensor>& sensors) {
+        selection = SelectionItem::fromSensors(sensors);
+    };
+    panel->set_callbacks(std::move(callbacks));
+    QObject::connect(infoModel.get(), &ChannelInfoModel::channelsMappedToLayout, infoModel.get(), [&panel](const std::vector<std::string>& names) {
+        panel->set_mapped_channels(names);
+    });
+    panel->reload_layout();
+    QVERIFY(!panel->layout_map().empty());
+    QVERIFY(!infoModel->getMappedChannelsList().empty());
 
-    view.selectChannels({info->ch_names.front()});
-    view.updateBadChannels();
-    view.updateDataView();
-    view.saveSettings();
-    view.loadSettings();
-    view.clearView();
+    {
+        PanelWidget view(panel, settingsPath);
+        view.resize(700, 700);
+        view.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&view));
 
-    QApplication::processEvents();
-}
+        // The three lists sit in their custom fields; "All" is chosen and lists the mapped channels
+        const QList<ItemListView*> lists = view.findChildren<ItemListView*>();
+        QCOMPARE(lists.size(), 3);
+        ItemListView* groups = nullptr;
+        ItemListView* picked = nullptr;
+        for (ItemListView* list : lists) {
+            if (&list->list() == &panel->groups()) {
+                groups = list;
+            } else if (&list->list() == &panel->picked_channels()) {
+                picked = list;
+            }
+        }
+        QVERIFY(groups && picked);
+        QCOMPARE(panel->groups().current_item(), std::string("All"));
+        QCOMPARE(panel->group_channels().items(), infoModel->getMappedChannelsList());
+        QCOMPARE(groups->selectionModel()->selectedIndexes().size(), 1);
 
-//=============================================================================================================
+        // A click on a sensor of the layout picks it, and the picked list shows it
+        SceneViewport* viewport = view.figureViewport();
+        const std::string name = panel->group_channels().items().front();
+        const mne::viz::SensorLayout& sensors = panel->sensors().sensor_layout();
+        std::size_t index = 0;
+        while (index < sensors.sensors().size() && sensors.sensors()[index].name != name) {
+            ++index;
+        }
+        QVERIFY(index < sensors.sensors().size());
+        const QPoint at = viewport->mapFromScene(sensors.scene_position(index)).toPoint();
+        QTest::mouseClick(viewport, Qt::LeftButton, Qt::NoModifier, at);
+        QCOMPARE(panel->picked_channels().items(), std::vector<std::string>({name}));
+        QCOMPARE(picked->model()->rowCount(), 1);
+        QCOMPARE(selection.m_sChannelName, std::vector<std::string>({name}));
+        QVERIFY(!panel->selection_empty());
 
-void TestVizQtViewers2::channelSelectionView_initialLayoutLoads()
-{
-    const QString layoutPath = QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/general/2DLayouts/Vectorview-all.lout");
-    if (!QFile::exists(layoutPath)) {
-        QSKIP("Vectorview-all.lout not available in test environment");
+        // Delete in the picked list drops the channel, in the layout too, and the data view shows the group again
+        picked->setFocus();
+        picked->selectionModel()->select(picked->model()->index(0, 0), QItemSelectionModel::ClearAndSelect);
+        QCOMPARE(panel->picked_channels().selected(), std::vector<int>({0}));
+        QTest::keyClick(picked, Qt::Key_Delete);
+        QCOMPARE(panel->picked_channels().count(), 0);
+        QVERIFY(panel->sensors().selected_names().empty());
+        QCOMPARE(shown.size(), panel->group_channels().items().size());
+
+        // Choosing a group in its list shows its channels
+        const int eeg = panel->groups().find("All EEG");
+        QVERIFY(eeg >= 0);
+        groups->selectionModel()->select(groups->model()->index(eeg, 0), QItemSelectionModel::ClearAndSelect);
+        QCOMPARE(panel->groups().current_item(), std::string("All EEG"));
+        QCOMPARE(panel->group_channels().count(), 0);
+
+        // Another layout is stored with the panel
+        QVERIFY(panel->load_layout("Vectorview-grad.lout"));
+        QCOMPARE(panel->layout_file(), std::string("Vectorview-grad.lout"));
     }
-
-    auto info = createBrowserTestInfo();
-    std::shared_ptr<ChannelInfoModel> infoModel(new ChannelInfoModel);
-    infoModel->setFiffInfo(info);
-
-    ChannelSelectionView view(QStringLiteral("test_viz_qt_viewers2_selection"),
-                              nullptr,
-                              infoModel,
-                              Qt::Widget);
-    view.setCurrentLayoutFile(QStringLiteral("Vectorview-all.lout"));
-    view.newFiffFileLoaded(info);
-
-    QVERIFY(!view.getLayoutMap().empty());
-
-    QApplication::processEvents();
+    auto restored = std::make_shared<mne::viz::ChannelSelectionPanel>();
+    PanelWidget again(restored, settingsPath);
+    QCOMPARE(restored->layout_file(), std::string("Vectorview-grad.lout"));
+    QSettings(QStringLiteral("MNECPP")).remove(settingsPath);
 }
 
 //=============================================================================================================

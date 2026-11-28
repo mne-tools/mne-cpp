@@ -29,6 +29,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
 #include <memory>
 #include <string>
 #include <utility>
@@ -40,12 +41,14 @@
 namespace mne::viz
 {
 
+class ItemList;
 class SceneFigure;
 class SettingsStore;
 
 //=============================================================================================================
 /**
- * @brief Base of the toolkit-free tool panels: a title, a settings form, an optional figure, modes and persistence.
+ * @brief Base of the toolkit-free tool panels: a title, a settings form with item lists, an optional figure,
+ * modes and persistence.
  *
  * @snippet ex_scene/main.cpp panel_usage
  *
@@ -155,6 +158,23 @@ public:
 
     //=========================================================================================================
     /**
+     * @return The item lists by key; each sits in the custom field of its key, where hosts show it.
+     */
+    const std::map<std::string, std::shared_ptr<ItemList>>& lists() const
+    {
+        return m_lists;
+    }
+
+    //=========================================================================================================
+    /**
+     * @param[in] key   Key of a list.
+     *
+     * @return The list, or null.
+     */
+    ItemList* list(const std::string& key) const;
+
+    //=========================================================================================================
+    /**
      * Restores the panel from @p store. By default the persistent form fields are read from
      * "<path>/<id>/<field key>".
      *
@@ -197,6 +217,20 @@ protected:
 
     //=========================================================================================================
     /**
+     * Adds an item list in a custom field of the form; call it in the constructor.
+     *
+     * @param[in] key     Key of the field and the list.
+     * @param[in] label   Label above the list; empty for none.
+     * @param[in] list    The list.
+     * @param[in] group   Group of the field.
+     *
+     * @return The list.
+     */
+    ItemList& add_list(const std::string& key, const std::string& label, std::shared_ptr<ItemList> list,
+                       const std::string& group = {});
+
+    //=========================================================================================================
+    /**
      * @param[in] path   Settings path of the host.
      * @param[in] name   Name below the panel's group.
      *
@@ -215,6 +249,7 @@ private:
     std::string m_title;
     std::shared_ptr<SettingsForm> m_form;
     std::shared_ptr<SceneFigure> m_figure;
+    std::map<std::string, std::shared_ptr<ItemList>> m_lists;
     int m_width = 0;
     GuiMode m_guiMode = GuiMode::Research;
     ProcessingMode m_processingMode = ProcessingMode::RealTime;

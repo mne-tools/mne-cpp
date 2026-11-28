@@ -22,7 +22,9 @@
 #include <anShared/Management/eventmanager.h>
 #include <anShared/Model/bemdatamodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <mne/viz/backends/qt/viewers/channelselectionview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/backends/qt/kit/sceneviewport.h>
+#include <mne/viz/panels/channel_selection_panel.h>
 #include <mne/viz/backends/qt/viewers/helpers/selectionitem.h>
 
 //=============================================================================================================
@@ -94,19 +96,17 @@ void TestAnalyzeChannelSelection::publishesTheSelectedChannels()
         indices.push_back(item->m_iChannelNumber);
     });
 
-    auto* selection = view->findChild<mne::viz::qt::ChannelSelectionView*>();
-    if (!selection) {
-        for (QWidget* w : QApplication::topLevelWidgets()) {
-            if (auto* v = qobject_cast<mne::viz::qt::ChannelSelectionView*>(w))
-                selection = v;
-        }
-    }
+    // The panel's controls sit in the dock, its sensor layout in the view
+    auto* host = dock->findChild<mne::viz::qt::PanelWidget*>();
+    QVERIFY(host);
+    QVERIFY(view->isAncestorOf(host->figureViewport()));
+    auto* selection = dynamic_cast<mne::viz::ChannelSelectionPanel*>(&host->panel());
     QVERIFY(selection);
 
     // Selecting two sensors, twice: each time the same names and the indices of those channels in the recording
     const std::vector<std::string> wanted{"MEG 0113", "MEG 0112"};
     for (int pass = 0; pass < 2; ++pass) {
-        selection->selectChannels(wanted);
+        selection->select_channels(wanted);
         QTRY_VERIFY_WITH_TIMEOUT(std::ssize(names) > pass, 5000);
         std::vector<std::string> got = names.back();
         std::ranges::sort(got);

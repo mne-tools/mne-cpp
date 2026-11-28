@@ -20,7 +20,9 @@
 
 #include <mne/viz/backends/qt/viewers/helpers/selectionitem.h>
 #include <mne/viz/backends/qt/viewers/helpers/channelinfomodel.h>
-#include <mne/viz/backends/qt/viewers/channelselectionview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/backends/qt/kit/sceneviewport.h>
+#include <mne/viz/panels/channel_selection_panel.h>
 #include <mne/viz/backends/qt/viewers/applytoview.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Model/fiffrawviewmodel.h>
@@ -187,32 +189,33 @@ void ChannelSelection::setFiffSettings(std::shared_ptr<mne::FiffInfo> pFiffInfo)
 
     m_pChannelInfoModel = std::make_shared<mne::viz::qt::ChannelInfoModel>(m_pFiffInfo);
 
-    m_pChannelSelectionView = std::make_unique<mne::viz::qt::ChannelSelectionView>(QString("MNEANALYZE/CHANSELECT"),
-                                                                                   nullptr,
-                                                                                   m_pChannelInfoModel,
-                                                                                   Qt::Window);
+    // The panel reports to the plugin and the channel info model before its host restores the stored files
+    m_pChannelSelection = std::make_shared<mne::viz::ChannelSelectionPanel>();
+    m_pChannelSelection->set_channel_table(mne::viz::qt::ChannelInfoModel::sharedTable(m_pChannelInfoModel));
+    mne::viz::ChannelSelectionPanel::Callbacks callbacks;
+    callbacks.layout_loaded = [this](const std::map<std::string, mne::viz::Point>& layout) {
+        m_pChannelInfoModel->setLayout(layout);
+    };
+    callbacks.selection_changed = [this](const std::vector<mne::viz::SensorLayout::Sensor>& sensors) {
+        onSelectionChanged(mne::viz::qt::SelectionItem::fromSensors(sensors));
+    };
+    m_pChannelSelection->set_callbacks(std::move(callbacks));
+    connect(m_pChannelInfoModel.get(), &mne::viz::qt::ChannelInfoModel::channelsMappedToLayout,
+            this, [this](const std::vector<std::string>& names) {
+                m_pChannelSelection->set_mapped_channels(names);
+            });
 
-    m_pViewLayout->addWidget(m_pChannelSelectionView->getViewWidget());
-    m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
+    m_pChannelSelectionView = new mne::viz::qt::PanelWidget(m_pChannelSelection, QString("MNEANALYZE/CHANSELECT"), m_pControlLayout->parentWidget());
+    m_pViewLayout->addWidget(m_pChannelSelectionView->figureViewport());
+    m_pControlLayout->addWidget(m_pChannelSelectionView);
 
     m_pApplyToView = new mne::viz::qt::ApplyToView("", m_pControlLayout->parentWidget());
 
     m_pControlLayout->addWidget(m_pApplyToView);
 
-    connect(m_pChannelSelectionView.get(), &mne::viz::qt::ChannelSelectionView::loadedLayoutMap,
-            m_pChannelInfoModel.get(), &mne::viz::qt::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
+    m_pChannelInfoModel->setLayout(m_pChannelSelection->layout_map());
 
-    connect(m_pChannelInfoModel.get(), &mne::viz::qt::ChannelInfoModel::channelsMappedToLayout,
-            m_pChannelSelectionView.get(), &mne::viz::qt::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
-
-    //Slots for event loop
-
-    connect(m_pChannelSelectionView.get(), &mne::viz::qt::ChannelSelectionView::selectionChanged,
-            this, &ChannelSelection::onSelectionChanged, Qt::UniqueConnection);
-
-    m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
-
-    m_pChannelSelectionView->updateDataView();
+    m_pChannelSelection->update_data_view();
 
     m_bIsInit = true;
 }
@@ -229,7 +232,7 @@ void ChannelSelection::onSelectionChanged(const mne::viz::qt::SelectionItem& sel
         m_pSelectionItem->m_iChannelNumber.push_back(m_pChannelInfoModel->getIndexFromOrigChName(name));
     }
 
-    m_pSelectionItem->m_bShowAll = m_pChannelSelectionView->isSelectionEmpty();
+    m_pSelectionItem->m_bShowAll = m_pChannelSelection->selection_empty();
 
     m_pSelectionItem->m_sViewsToApply = m_pApplyToView->getSelectedViews();
 
@@ -245,7 +248,7 @@ void ChannelSelection::onModelRemoved([[maybe_unused]] QSharedPointer<mne::analy
         return;
     }
     if (m_pAnalyzeData->getModelsByType(ANSHAREDLIB_FIFFRAW_MODEL).size() == 0 && m_pAnalyzeData->getModelsByType(ANSHAREDLIB_AVERAGING_MODEL).size() == 0) {
-        m_pChannelSelectionView->clearView();
+        m_pChannelSelection->clear();
     }
 }
 

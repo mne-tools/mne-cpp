@@ -20,7 +20,10 @@
  * spectrum panels show their figures, synthetic averages at their sensor positions or synthetic spectra, through
  * FigureView, which zooms, pans or scrolls and passes the pointer to any SceneFigure.
  *
- * Usage: ex_scene_sdl [--panel [projectors|compensator|average|spectrum]] [--frames N]; with --frames the example renders N frames
+ * The channels panel shows the item lists of the channel selection: its groups, their channels and the channels
+ * picked by hand.
+ *
+ * Usage: ex_scene_sdl [--panel [projectors|compensator|average|spectrum|channels]] [--frames N]; with --frames the example renders N frames
  * and exits (SDL_VIDEODRIVER=dummy runs it without a display).
  */
 
@@ -35,6 +38,7 @@
 #include <mne/fiff/fiff_constants.h>
 #include <mne/fiff/fiff_info.h>
 #include <mne/viz/panels/average_layout_panel.h>
+#include <mne/viz/panels/channel_selection_panel.h>
 #include <mne/viz/panels/compensator_panel.h>
 #include <mne/viz/panels/figure_view.h>
 #include <mne/viz/panels/form_view.h>
@@ -203,10 +207,40 @@ int run_spectrum(sdl::SdlHost& host, const TextMetrics& metrics)
 
 //=============================================================================================================
 /**
+ * Shows the channel selection through FormView: the layout and group files, the selection groups, the channels of
+ * the chosen group and the picked channels as lists that a click, the arrow keys and Delete edit.
+ *
+ * @param[in] host      The window.
+ * @param[in] metrics   Metrics of the fonts the host draws with.
+ *
+ * @return The number of frames drawn.
+ */
+int run_channel_selection(sdl::SdlHost& host, const TextMetrics& metrics)
+{
+    //! [channel_selection_panel_usage]
+    // The Vectorview layout and the mne_browse_raw groups of the installed resources
+    ChannelSelectionPanel panel;
+    ChannelSelectionPanel::Callbacks callbacks;
+    callbacks.channels_shown = [](const std::vector<std::string>& channels) {
+        std::printf("Showing %zu channels\n", channels.size());
+    };
+    panel.set_callbacks(std::move(callbacks));
+    panel.set_mapped_channels({"MEG 0111", "MEG 0112", "MEG 0113", "MEG 0121"});
+    panel.select_channels({"MEG 0112"});
+
+    // Any panel's lists, without a view written for them
+    FormView view(panel);
+    view.set_text_metrics(&metrics);
+    return host.run(view);
+    //! [channel_selection_panel_usage]
+}
+
+//=============================================================================================================
+/**
  * Shows a tool panel through FormView, the toolkit-free view of any SettingsForm, without a view of its own.
  *
  * @param[in] host      The window.
- * @param[in] which     "projectors", "compensator", "average" or "spectrum".
+ * @param[in] which     "projectors", "compensator", "average", "spectrum" or "channels".
  * @param[in] metrics   Metrics of the fonts the host draws with.
  *
  * @return The number of frames drawn.
@@ -218,6 +252,9 @@ int run_panel(sdl::SdlHost& host, const std::string& which, const TextMetrics& m
     }
     if (which == "spectrum") {
         return run_spectrum(host, metrics);
+    }
+    if (which == "channels") {
+        return run_channel_selection(host, metrics);
     }
     //! [form_view_usage]
     std::unique_ptr<Panel> panel;

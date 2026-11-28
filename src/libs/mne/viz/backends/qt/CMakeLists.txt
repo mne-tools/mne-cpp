@@ -57,7 +57,6 @@ set(SOURCES
     viewers/progressview.cpp
     viewers/modalityselectionview.cpp
     viewers/butterflyview.cpp
-    viewers/channelselectionview.cpp
     viewers/spectrumsettingsview.cpp
     viewers/scalingview.cpp
     viewers/filtersettingsview.cpp
@@ -79,6 +78,7 @@ set(SOURCES
     viewers/multiview.cpp
     viewers/hpisettingsview.cpp
     viewers/covariancesettingsview.cpp
+    kit/itemlistview.cpp
     kit/panelwidget.cpp
     kit/qttheme.cpp
     kit/sceneviewport.cpp
@@ -148,7 +148,6 @@ set(HEADERS
     viewers/progressview.h
     viewers/modalityselectionview.h
     viewers/butterflyview.h
-    viewers/channelselectionview.h
     viewers/spectrumsettingsview.h
     viewers/scalingview.h
     viewers/filtersettingsview.h
@@ -170,6 +169,7 @@ set(HEADERS
     viewers/multiview.h
     viewers/hpisettingsview.h
     viewers/covariancesettingsview.h
+    kit/itemlistview.h
     kit/panelwidget.h
     kit/qttheme.h
     kit/sceneviewport.h
@@ -226,7 +226,6 @@ set(UI
     viewers/formfiles/filterdesignview.ui
     viewers/formfiles/scalecontrol.ui
     viewers/formfiles/progressview.ui
-    viewers/formfiles/channelselectionview.ui
     viewers/formfiles/scalingview.ui
     viewers/formfiles/fiffrawviewsettings.ui
     viewers/formfiles/quickcontrolview.ui
