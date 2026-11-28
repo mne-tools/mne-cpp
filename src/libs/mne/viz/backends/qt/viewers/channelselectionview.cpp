@@ -26,7 +26,8 @@
 #include "ui_channelselectionview.h"
 #include "helpers/channelinfomodel.h"
 #include "helpers/selectionitem.h"
-#include "helpers/sensorlayoutwidget.h"
+#include "../kit/sceneviewport.h"
+#include <mne/viz/figures/sensor_layout_figure.h>
 #include <mne/fiff/fiff_constants.h>
 #include <mne/mne/mne_layout.h>
 #include <mne/channels/selectionio.h>
@@ -63,6 +64,37 @@
 using namespace mne::viz;
 using namespace mne::viz::qt;
 using namespace mne;
+
+//=============================================================================================================
+// DEFINE STATIC METHODS
+//=============================================================================================================
+
+namespace
+{
+
+std::map<std::string, viz::Point> layoutPoints(const std::map<std::string, QPointF>& layout)
+{
+    std::map<std::string, viz::Point> points;
+    for (const auto& [name, position] : layout) {
+        points.emplace(name, viz::Point{position.x(), position.y()});
+    }
+    return points;
+}
+
+SelectionItem selectionItem(const std::vector<viz::SensorLayout::Sensor>& sensors)
+{
+    SelectionItem item;
+    for (const viz::SensorLayout::Sensor& sensor : sensors) {
+        item.m_sChannelName.push_back(sensor.name);
+        item.m_iChannelNumber.push_back(0);
+        item.m_iChannelKind.push_back(sensor.kind);
+        item.m_iChannelUnit.push_back(sensor.unit);
+        item.m_qpChannelPosition.emplace_back(sensor.position.x, sensor.position.y);
+    }
+    return item;
+}
+
+} // namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -123,8 +155,11 @@ void ChannelSelectionView::initListWidgets()
 
 void ChannelSelectionView::initSelectionSceneView()
 {
-    connect(m_pUi->m_sensorLayout, &SensorLayoutWidget::selectionChanged,
-            this, &ChannelSelectionView::updateUserDefinedChannelsList);
+    m_pSensorLayout = std::make_shared<viz::SensorLayoutFigure>();
+    m_pSensorLayout->set_selection_callback([this]() {
+        updateUserDefinedChannelsList();
+    });
+    m_pUi->m_sensorLayout->setFigure(m_pSensorLayout);
 }
 
 //=============================================================================================================
@@ -219,14 +254,14 @@ void ChannelSelectionView::highlightChannels(const QModelIndexList& channelIndex
         channelList.push_back(m_pChannelInfoModel->data(nameIndex, ChannelInfoModelRoles::GetMappedLayoutChName).toString().toStdString());
     }
 
-    m_pUi->m_sensorLayout->highlightNames(channelList);
+    m_pSensorLayout->highlight_names(channelList);
 }
 
 //=============================================================================================================
 
 void ChannelSelectionView::selectChannels(const std::vector<std::string>& channelList)
 {
-    m_pUi->m_sensorLayout->selectNames(channelList);
+    m_pSensorLayout->select_names(channelList);
 }
 
 //=============================================================================================================
@@ -325,7 +360,7 @@ void ChannelSelectionView::updateBadChannels()
         }
     }
 
-    m_pUi->m_sensorLayout->setLayout(m_layoutMap, badChannelMappedNames);
+    m_pSensorLayout->set_layout(layoutPoints(m_layoutMap), badChannelMappedNames);
 
     updateSceneItems();
     updateDataView();
@@ -359,7 +394,7 @@ void ChannelSelectionView::updateDataView()
     emit showSelectedChannelsOnly(selectedChannels);
 
     // The selected sensors, or without a selection the shown ones (EEG or MEG)
-    emit selectionChanged(m_pUi->m_sensorLayout->selection());
+    emit selectionChanged(selectionItem(m_pSensorLayout->selection()));
 }
 
 //=============================================================================================================
@@ -473,7 +508,7 @@ bool ChannelSelectionView::loadLayout(const QString& path)
         }
     }
 
-    m_pUi->m_sensorLayout->setLayout(m_layoutMap, {});
+    m_pSensorLayout->set_layout(layoutPoints(m_layoutMap), {});
     updateSceneItems();
     m_pUi->m_sensorLayout->fitToContents();
 
@@ -603,7 +638,7 @@ void ChannelSelectionView::updateSelectionGroupsList(QListWidgetItem* current, Q
     if (current == 0) {
         return;
     }
-    m_pUi->m_sensorLayout->setChannelKind(current->text().contains("EEG") ? FIFFV_EEG_CH : FIFFV_MEG_CH);
+    m_pSensorLayout->set_channel_kind(current->text().contains("EEG") ? FIFFV_EEG_CH : FIFFV_MEG_CH);
 
     //update visible channel list widget
     m_pUi->m_listWidget_visibleChannels->clear();
@@ -631,7 +666,7 @@ void ChannelSelectionView::updateSceneItems()
     for (int i = 0; i < m_pUi->m_listWidget_visibleChannels->count(); i++)
         visibleItems.push_back(m_pUi->m_listWidget_visibleChannels->item(i)->text().toStdString());
 
-    m_pUi->m_sensorLayout->setSelectable(visibleItems);
+    m_pSensorLayout->set_selectable(visibleItems);
 }
 
 //=============================================================================================================
@@ -639,7 +674,7 @@ void ChannelSelectionView::updateSceneItems()
 void ChannelSelectionView::updateUserDefinedChannelsList()
 {
     QStringList userDefinedChannels;
-    for (const std::string& name : m_pUi->m_sensorLayout->selectedNames()) {
+    for (const std::string& name : m_pSensorLayout->selected_names()) {
         userDefinedChannels << QString::fromStdString(name);
     }
 
@@ -785,5 +820,5 @@ bool ChannelSelectionView::isSelectionEmpty()
 
 void ChannelSelectionView::clearView()
 {
-    m_pUi->m_sensorLayout->clear();
+    m_pSensorLayout->clear();
 }

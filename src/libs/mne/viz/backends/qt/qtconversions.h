@@ -40,6 +40,8 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
+#include <string>
 #include <vector>
 
 //=============================================================================================================
@@ -164,6 +166,19 @@ inline viz::Color toColor(const QColor& c)
 inline QColor toQColor(const viz::Color& c)
 {
     return QColor(c.r, c.g, c.b, c.a);
+}
+
+/**
+ * @param[in] colors   Qt colours by name.
+ * @return The mne_viz colours by name.
+ */
+inline std::map<std::string, viz::Color> toColors(const std::map<std::string, QColor>& colors)
+{
+    std::map<std::string, viz::Color> result;
+    for (const auto& [name, color] : colors) {
+        result.emplace(name, toColor(color));
+    }
+    return result;
 }
 
 } // namespace mne::viz::qt

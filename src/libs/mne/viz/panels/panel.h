@@ -31,6 +31,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne::viz
@@ -39,11 +40,12 @@
 namespace mne::viz
 {
 
+class SceneFigure;
 class SettingsStore;
 
 //=============================================================================================================
 /**
- * @brief Base of the toolkit-free tool panels: a title, a settings form, modes and persistence.
+ * @brief Base of the toolkit-free tool panels: a title, a settings form, an optional figure, modes and persistence.
  *
  * @snippet ex_scene/main.cpp panel_usage
  *
@@ -144,6 +146,15 @@ public:
 
     //=========================================================================================================
     /**
+     * @return The interactive figure that hosts show below the form, or null for panels with only a form.
+     */
+    const std::shared_ptr<SceneFigure>& figure() const
+    {
+        return m_figure;
+    }
+
+    //=========================================================================================================
+    /**
      * Restores the panel from @p store. By default the persistent form fields are read from
      * "<path>/<id>/<field key>".
      *
@@ -175,6 +186,17 @@ protected:
 
     //=========================================================================================================
     /**
+     * Sets the figure hosts show below the form; call it in the constructor.
+     *
+     * @param[in] figure   The figure.
+     */
+    void set_figure(std::shared_ptr<SceneFigure> figure)
+    {
+        m_figure = std::move(figure);
+    }
+
+    //=========================================================================================================
+    /**
      * @param[in] path   Settings path of the host.
      * @param[in] name   Name below the panel's group.
      *
@@ -192,6 +214,7 @@ private:
     std::string m_id;
     std::string m_title;
     std::shared_ptr<SettingsForm> m_form;
+    std::shared_ptr<SceneFigure> m_figure;
     int m_width = 0;
     GuiMode m_guiMode = GuiMode::Research;
     ProcessingMode m_processingMode = ProcessingMode::RealTime;

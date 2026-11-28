@@ -31,7 +31,10 @@
 #include <mne/viz/backends/qt/viewers/channelselectionview.h>
 #include <mne/viz/backends/qt/viewers/averageselectionview.h>
 #include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
-#include <mne/viz/backends/qt/viewers/averagelayoutview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/backends/qt/kit/sceneviewport.h>
+#include <mne/viz/backends/qt/qtconversions.h>
+#include <mne/viz/panels/average_layout_panel.h>
 #include <mne/viz/backends/qt/viewers/butterflyview.h>
 #include <mne/viz/backends/qt/viewers/scalingview.h>
 #include <mne/viz/backends/qt/viewers/helpers/selectionitem.h>
@@ -143,7 +146,8 @@ QWidget* Averaging::getView()
     QVBoxLayout* pAveragingViewLayout = new QVBoxLayout(pAveragingViewWidget.get());
 
     m_pButterflyView = new mne::viz::qt::ButterflyView("", pTabView);
-    m_pAverageLayoutView = new mne::viz::qt::AverageLayoutView("", pTabView);
+    m_pAverageLayout = std::make_shared<mne::viz::AverageLayoutPanel>();
+    m_pAverageLayoutView = new mne::viz::qt::PanelWidget(m_pAverageLayout, "", pTabView);
 
     connect(this, &Averaging::showSelectedChannels,
             m_pButterflyView.data(), &mne::viz::qt::ButterflyView::showSelectedChannels, Qt::UniqueConnection);
@@ -152,7 +156,11 @@ QWidget* Averaging::getView()
             m_pButterflyView.data(), &mne::viz::qt::ButterflyView::showAllChannels, Qt::UniqueConnection);
 
     connect(this, &Averaging::channelSelectionManagerChanged,
-            m_pAverageLayoutView.data(), &mne::viz::qt::AverageLayoutView::channelSelectionChanged, Qt::UniqueConnection);
+            this, [this](const QVariant& selectionData) {
+                if (const auto* selection = selectionData.value<mne::viz::qt::SelectionItem*>()) {
+                    m_pAverageLayout->set_selection(selection->averageChannels());
+                }
+            });
 
     m_pButterflyView->setObjectName("butterflyview");
     m_pAverageLayoutView->setObjectName("layoutview");
@@ -471,7 +479,7 @@ void Averaging::createNewAverage()
 void Averaging::loadFullGui(std::shared_ptr<mne::FiffInfo> pInfo)
 {
     m_pFiffInfo = pInfo;
-    m_pAverageLayoutView->setFiffInfo(m_pFiffInfo);
+    m_pAverageLayout->set_info(m_pFiffInfo);
 
     if (m_bLoaded) {
         return;
@@ -479,7 +487,11 @@ void Averaging::loadFullGui(std::shared_ptr<mne::FiffInfo> pInfo)
 
     //Init Models
 
-    m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
+    connect(m_pEvokedModel.get(), &mne::viz::qt::EvokedSetModel::dataChanged,
+            this, [this]() {
+                m_pAverageLayout->set_evoked(m_pEvokedModel->evokedAverages());
+            });
+    m_pAverageLayout->set_evoked(m_pEvokedModel->evokedAverages());
 
     //Modality selection
     mne::viz::qt::ModalitySelectionView* pModalitySelectionView = new mne::viz::qt::ModalitySelectionView(m_pFiffInfo->chs, QString("MNEANALYZE/AVERAGING"), m_pTabView);
@@ -510,14 +522,19 @@ void Averaging::loadFullGui(std::shared_ptr<mne::FiffInfo> pInfo)
     connect(pAverageSelectionView, &mne::viz::qt::AverageSelectionView::newAverageColorMap,
             m_pButterflyView.data(), &mne::viz::qt::ButterflyView::setAverageColor, Qt::UniqueConnection);
 
-    connect(m_pEvokedModel.get(), &mne::viz::qt::EvokedSetModel::newAverageColorMap,
-            m_pAverageLayoutView.data(), &mne::viz::qt::AverageLayoutView::setAverageColor, Qt::UniqueConnection);
-    connect(m_pEvokedModel.get(), &mne::viz::qt::EvokedSetModel::newAverageActivationMap,
-            m_pAverageLayoutView.data(), &mne::viz::qt::AverageLayoutView::setAverageActivation, Qt::UniqueConnection);
-    connect(pAverageSelectionView, &mne::viz::qt::AverageSelectionView::newAverageActivationMap,
-            m_pAverageLayoutView.data(), &mne::viz::qt::AverageLayoutView::setAverageActivation, Qt::UniqueConnection);
-    connect(pAverageSelectionView, &mne::viz::qt::AverageSelectionView::newAverageColorMap,
-            m_pAverageLayoutView.data(), &mne::viz::qt::AverageLayoutView::setAverageColor, Qt::UniqueConnection);
+    // The maps of AverageSelectionView, whose colours the panel takes over
+    using AverageColors = decltype(pAverageSelectionView->getAverageColor());
+    using AverageActivation = decltype(pAverageSelectionView->getAverageActivation());
+    const auto setLayoutColors = [this](const AverageColors& colors) {
+        m_pAverageLayout->set_average_colors(colors ? mne::viz::qt::toColors(*colors) : std::map<std::string, mne::viz::Color>{});
+    };
+    const auto setLayoutActivation = [this](const AverageActivation& activation) {
+        m_pAverageLayout->set_average_activation(activation ? *activation : std::map<std::string, bool>{});
+    };
+    connect(m_pEvokedModel.get(), &mne::viz::qt::EvokedSetModel::newAverageColorMap, this, setLayoutColors);
+    connect(m_pEvokedModel.get(), &mne::viz::qt::EvokedSetModel::newAverageActivationMap, this, setLayoutActivation);
+    connect(pAverageSelectionView, &mne::viz::qt::AverageSelectionView::newAverageActivationMap, this, setLayoutActivation);
+    connect(pAverageSelectionView, &mne::viz::qt::AverageSelectionView::newAverageColorMap, this, setLayoutColors);
 
     m_pEvokedModel->setAverageActivation(pAverageSelectionView->getAverageActivation());
     m_pEvokedModel->setAverageColor(pAverageSelectionView->getAverageColor());
@@ -525,8 +542,8 @@ void Averaging::loadFullGui(std::shared_ptr<mne::FiffInfo> pInfo)
     m_pButterflyView->setAverageActivation(pAverageSelectionView->getAverageActivation());
     m_pButterflyView->setAverageColor(pAverageSelectionView->getAverageColor());
 
-    m_pAverageLayoutView->setAverageActivation(pAverageSelectionView->getAverageActivation());
-    m_pAverageLayoutView->setAverageColor(pAverageSelectionView->getAverageColor());
+    setLayoutActivation(pAverageSelectionView->getAverageActivation());
+    setLayoutColors(pAverageSelectionView->getAverageColor());
 
     //Data customization:
     // Never shown: it only provides the view settings, so the plugin keeps it
@@ -536,7 +553,7 @@ void Averaging::loadFullGui(std::shared_ptr<mne::FiffInfo> pInfo)
     pChannelDataSettingsView->setObjectName("group_tab_View_General");
 
     connect(pChannelDataSettingsView, &mne::viz::qt::FiffRawViewSettings::backgroundColorChanged,
-            m_pAverageLayoutView.data(), &mne::viz::qt::AverageLayoutView::setBackgroundColor, Qt::UniqueConnection);
+            m_pAverageLayoutView->figureViewport(), &mne::viz::qt::SceneViewport::setBackgroundColor, Qt::UniqueConnection);
 
     connect(pChannelDataSettingsView, &mne::viz::qt::FiffRawViewSettings::backgroundColorChanged,
             m_pButterflyView.data(), &mne::viz::qt::ButterflyView::setBackgroundColor, Qt::UniqueConnection);
@@ -544,7 +561,7 @@ void Averaging::loadFullGui(std::shared_ptr<mne::FiffInfo> pInfo)
     connect(pChannelDataSettingsView, &mne::viz::qt::FiffRawViewSettings::makeScreenshot,
             this, &Averaging::onMakeScreenshot, Qt::UniqueConnection);
 
-    m_pAverageLayoutView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
+    m_pAverageLayoutView->figureViewport()->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
     m_pButterflyView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
 
     m_pTabView->addTab(pModalitySelectionView, "Modality");
@@ -616,7 +633,7 @@ void Averaging::setScalingMap(const QVariant& data)
     }
 
     if (std::ranges::contains(data.value<mne::analyze::ScalingParameters>().m_sViewsToApply, "layoutview")) {
-        m_pAverageLayoutView->setScaleMap(data.value<mne::analyze::ScalingParameters>().m_mScalingMap);
+        m_pAverageLayout->set_scale_map(data.value<mne::analyze::ScalingParameters>().m_mScalingMap);
     }
     if (std::ranges::contains(data.value<mne::analyze::ScalingParameters>().m_sViewsToApply, "butterflyview")) {
         m_pButterflyView->setScaleMap(data.value<mne::analyze::ScalingParameters>().m_mScalingMap);
@@ -629,8 +646,7 @@ void Averaging::setViewSettings(mne::analyze::ViewParameters viewParams)
 {
     if (std::ranges::contains(viewParams.m_sViewsToApply, "layoutview")) {
         if (viewParams.m_sSettingsToApply == mne::analyze::ViewParameters::all || viewParams.m_sSettingsToApply == mne::analyze::ViewParameters::background) {
-            m_pAverageLayoutView->setBackgroundColor(viewParams.m_colorBackground);
-            m_pAverageLayoutView->update();
+            m_pAverageLayoutView->figureViewport()->setBackgroundColor(viewParams.m_colorBackground);
         }
     }
 
@@ -678,8 +694,8 @@ void Averaging::onModelRemoved(QSharedPointer<mne::analyze::AbstractModel> pRemo
         if (m_pButterflyView->getEvokedSetModel()->getEvokedSet().get() == qSharedPointerCast<AveragingDataModel>(pRemovedModel)->getEvokedSet().get()) {
             m_pButterflyView->clearView();
         }
-        if (m_pAverageLayoutView->getEvokedSetModel()->getEvokedSet().get() == qSharedPointerCast<AveragingDataModel>(pRemovedModel)->getEvokedSet().get()) {
-            m_pAverageLayoutView->clearView();
+        if (m_pEvokedModel && m_pEvokedModel->getEvokedSet().get() == qSharedPointerCast<AveragingDataModel>(pRemovedModel)->getEvokedSet().get()) {
+            m_pAverageLayout->clear_evoked();
         }
     }
 }
@@ -696,12 +712,11 @@ void Averaging::setAutoCompute(bool bShouldAutoCompute)
 void Averaging::updateEvokedSetModel()
 {
     m_pButterflyView->setEvokedSetModel(m_pEvokedModel);
-    m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
 
     m_pButterflyView->showAllChannels();
     m_pButterflyView->dataUpdate();
     m_pButterflyView->updateView();
-    m_pAverageLayoutView->updateData();
+    m_pAverageLayout->set_evoked(m_pEvokedModel->evokedAverages());
 }
 
 //=============================================================================================================

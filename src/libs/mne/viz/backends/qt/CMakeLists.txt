@@ -53,7 +53,6 @@ set(SOURCES
     viewers/coregsettingsview.cpp
     viewers/dipolefitview.cpp
     viewers/filterdesignview.cpp
-    viewers/averagelayoutview.cpp
     viewers/helpers/scalecontrol.cpp
     viewers/progressview.cpp
     viewers/spectrumview.cpp
@@ -83,6 +82,7 @@ set(SOURCES
     viewers/covariancesettingsview.cpp
     kit/panelwidget.cpp
     kit/qttheme.cpp
+    kit/sceneviewport.cpp
     kit/settingspanel.cpp
     viewers/bidsview.cpp
     viewers/helpers/channeldatamodel.cpp
@@ -95,9 +95,6 @@ set(SOURCES
     viewers/helpers/rtfiffrawviewmodel.cpp
     viewers/helpers/rtfiffrawviewdelegate.cpp
     viewers/helpers/evokedsetmodel.cpp
-    viewers/helpers/sceneviewport.cpp
-    viewers/helpers/averagelayoutwidget.cpp
-    viewers/helpers/sensorlayoutwidget.cpp
     viewers/helpers/channelinfomodel.cpp
     viewers/helpers/mneoperator.cpp
     viewers/helpers/draggableframelesswidget.cpp
@@ -150,7 +147,6 @@ set(HEADERS
     viewers/coregsettingsview.h
     viewers/dipolefitview.h
     viewers/filterdesignview.h
-    viewers/averagelayoutview.h
     viewers/helpers/scalecontrol.h
     viewers/progressview.h
     viewers/spectrumview.h
@@ -180,6 +176,7 @@ set(HEADERS
     viewers/covariancesettingsview.h
     kit/panelwidget.h
     kit/qttheme.h
+    kit/sceneviewport.h
     kit/settingspanel.h
     viewers/bidsview.h
     viewers/helpers/channeldatamodel.h
@@ -192,9 +189,6 @@ set(HEADERS
     viewers/helpers/rtfiffrawviewdelegate.h
     viewers/helpers/rtfiffrawviewmodel.h
     viewers/helpers/evokedsetmodel.h
-    viewers/helpers/sceneviewport.h
-    viewers/helpers/averagelayoutwidget.h
-    viewers/helpers/sensorlayoutwidget.h
     viewers/helpers/selectionitem.h
     viewers/helpers/channelinfomodel.h
     viewers/helpers/mneoperator.h

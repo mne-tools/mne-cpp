@@ -16,9 +16,11 @@
  * at 1 kHz and the view follows its end until the user scrolls.
  *
  * With --panel the window shows a tool panel instead (projectors, the default, or compensator) through FormView,
- * which draws and edits any SettingsForm without Qt and without a view written for the panel.
+ * which draws and edits any SettingsForm without Qt and without a view written for the panel. The average panel
+ * shows its figure, synthetic averages at their sensor positions, through FigureView, which zooms, pans and
+ * passes clicks to any SceneFigure.
  *
- * Usage: ex_scene_sdl [--panel [projectors|compensator]] [--frames N]; with --frames the example renders N frames
+ * Usage: ex_scene_sdl [--panel [projectors|compensator|average]] [--frames N]; with --frames the example renders N frames
  * and exits (SDL_VIDEODRIVER=dummy runs it without a display).
  */
 
@@ -29,7 +31,12 @@
 #include <mne/viz/backends/sdl/sdl_host.h>
 #include <mne/viz/figures/font_text_metrics.h>
 #include <mne/viz/host/trace_view_client.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/viz/panels/average_layout_panel.h>
 #include <mne/viz/panels/compensator_panel.h>
+#include <mne/viz/panels/figure_view.h>
 #include <mne/viz/panels/form_view.h>
 #include <mne/viz/panels/projectors_panel.h>
 #include <mne/viz/views/trace_buffer.h>
@@ -91,16 +98,81 @@ Eigen::MatrixXd synthetic_block(int first, int samples)
 
 //=============================================================================================================
 /**
+ * Shows the averages of a synthetic evoked response at the positions of a 4 x 4 grid of EEG sensors through
+ * FigureView: the wheel zooms, the right button pans, a double click fits and pressing a tile enlarges its name.
+ *
+ * @param[in] host      The window.
+ * @param[in] metrics   Metrics of the fonts the host draws with.
+ *
+ * @return The number of frames drawn.
+ */
+int run_average_layout(sdl::SdlHost& host, const TextMetrics& metrics)
+{
+    constexpr int kSensors = 16;
+    constexpr int kSamples = 300;
+    constexpr int kPreStimulus = 100;
+    //! [average_layout_panel_usage]
+    // An N100-like deflection that grows towards the back of the grid, and a later positive wave
+    auto info = std::make_shared<mne::FiffInfo>();
+    Eigen::MatrixXd auditory = Eigen::MatrixXd::Zero(kSensors, kSamples);
+    std::vector<AverageLayoutFigure::Channel> selection;
+    for (int i = 0; i < kSensors; ++i) {
+        const int row = i / 4;
+        const int column = i % 4;
+        mne::FiffChInfo channel;
+        channel.ch_name = "EEG " + std::to_string(i + 1);
+        channel.kind = FIFFV_EEG_CH;
+        channel.unit = FIFF_UNIT_V;
+        info->chs.push_back(channel);
+        info->ch_names.push_back(channel.ch_name);
+        for (int s = kPreStimulus; s < kSamples; ++s) {
+            const double t = (s - kPreStimulus) / kSfreq;
+            const double n100 = -std::exp(-std::pow((t - 0.1) / 0.02, 2));
+            const double p300 = 0.6 * std::exp(-std::pow((t - 0.3) / 0.05, 2));
+            auditory(i, s) = (n100 * (1.0 + row) + p300) * 5e-6;
+        }
+        AverageLayoutFigure::Channel tile;
+        tile.name = channel.ch_name;
+        tile.number = i;
+        tile.position = {1.6 * column, -1.2 * row};
+        selection.push_back(std::move(tile));
+    }
+    info->nchan = kSensors;
+
+    AverageLayoutPanel panel;
+    panel.set_info(info);
+    panel.set_selection(std::move(selection));
+    panel.set_scale_map({{FIFFV_EEG_CH, 1e-5f}});
+    panel.set_average_colors({{"auditory", Color{31, 111, 235}}});
+    EvokedAverages evoked;
+    evoked.averages = {{"auditory", auditory.data(), kSamples, kSensors}};
+    evoked.first_sample = -kPreStimulus;
+    evoked.bad.assign(kSensors, false);
+    evoked.bad[5] = true;
+    panel.set_evoked(std::move(evoked));
+
+    // Any panel's figure, without a view written for it
+    FigureView view(*panel.figure());
+    view.set_text_metrics(&metrics);
+    return host.run(view);
+    //! [average_layout_panel_usage]
+}
+
+//=============================================================================================================
+/**
  * Shows a tool panel through FormView, the toolkit-free view of any SettingsForm, without a view of its own.
  *
  * @param[in] host      The window.
- * @param[in] which     "projectors" or "compensator".
+ * @param[in] which     "projectors", "compensator" or "average".
  * @param[in] metrics   Metrics of the fonts the host draws with.
  *
  * @return The number of frames drawn.
  */
 int run_panel(sdl::SdlHost& host, const std::string& which, const TextMetrics& metrics)
 {
+    if (which == "average") {
+        return run_average_layout(host, metrics);
+    }
     //! [form_view_usage]
     std::unique_ptr<Panel> panel;
     if (which == "compensator") {

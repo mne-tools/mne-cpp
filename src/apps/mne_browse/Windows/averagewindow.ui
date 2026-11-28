@@ -90,7 +90,7 @@
              </widget>
             </item>
             <item row="0" column="0" colspan="3">
-             <widget class="mne::viz::qt::AverageLayoutWidget" name="m_averageLayout" native="true"/>
+             <widget class="mne::viz::qt::SceneViewport" name="m_averageLayout" native="true"/>
             </item>
             <item row="1" column="0">
              <spacer name="horizontalSpacer_2">
@@ -260,9 +260,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>mne::viz::qt::AverageLayoutWidget</class>
+   <class>mne::viz::qt::SceneViewport</class>
    <extends>QWidget</extends>
-   <header>mne/viz/backends/qt/viewers/helpers/averagelayoutwidget.h</header>
+   <header>mne/viz/backends/qt/kit/sceneviewport.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

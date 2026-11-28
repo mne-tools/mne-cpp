@@ -3,21 +3,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
  *
- * @file     sensorlayoutwidget.cpp
+ * @file     sensor_layout_figure.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    3.0.0
  * @date     November 2026
- * @brief    Definition of the SensorLayoutWidget class.
+ * @brief    SensorLayoutFigure class definition.
  */
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "sensorlayoutwidget.h"
-#include "selectionitem.h"
-#include "../../plots/helpers/scenepainter.h"
-
+#include "sensor_layout_figure.h"
 #include <mne/fiff/fiff_constants.h>
 
 //=============================================================================================================
@@ -25,116 +22,113 @@
 //=============================================================================================================
 
 #include <algorithm>
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne;
 using namespace mne::viz;
-using namespace mne::viz::qt;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SensorLayoutWidget::SensorLayoutWidget(QWidget* parent)
-: SceneViewport(parent)
-, m_kind(FIFFV_MEG_CH)
+SensorLayoutFigure::SensorLayoutFigure()
+: m_kind(FIFFV_MEG_CH)
 {
 }
 
 //=============================================================================================================
 
-void SensorLayoutWidget::setLayout(const std::map<std::string, QPointF>& layoutMap, const std::vector<std::string>& badChannels)
+void SensorLayoutFigure::set_selection_callback(std::function<void()> callback)
 {
-    std::vector<viz::SensorLayout::Sensor> sensors;
-    sensors.reserve(layoutMap.size());
-    for (const auto& [name, position] : layoutMap) {
-        viz::SensorLayout::Sensor sensor;
+    m_selectionCallback = std::move(callback);
+}
+
+//=============================================================================================================
+
+void SensorLayoutFigure::set_layout(const std::map<std::string, Point>& layout, const std::vector<std::string>& bad)
+{
+    std::vector<SensorLayout::Sensor> sensors;
+    sensors.reserve(layout.size());
+    for (const auto& [name, position] : layout) {
+        SensorLayout::Sensor sensor;
         sensor.name = name;
-        sensor.position = {position.x(), position.y()};
+        sensor.position = position;
         sensor.kind = name.find("EEG") != std::string::npos ? FIFFV_EEG_CH : FIFFV_MEG_CH;
         sensor.unit = FIFF_UNIT_T_M;
-        sensor.bad = std::ranges::contains(badChannels, name);
+        sensor.bad = std::ranges::contains(bad, name);
         sensors.push_back(std::move(sensor));
     }
-    // New sensors start unselected; as when a QGraphicsScene clears its items, a lost selection is reported
+    // New sensors start unselected; a lost selection is reported
     const bool hadSelection = !m_layout.selected().empty();
     m_layout.set_sensors(std::move(sensors));
-    contentsChanged();
+    changed(Change::Bounds);
     if (hadSelection) {
-        emit selectionChanged();
+        selection_changed();
     }
 }
 
 //=============================================================================================================
 
-void SensorLayoutWidget::setChannelKind(int kind)
+void SensorLayoutFigure::set_channel_kind(int kind)
 {
     m_kind = kind;
 }
 
 //=============================================================================================================
 
-int SensorLayoutWidget::channelKind() const
+void SensorLayoutFigure::set_selectable(const std::vector<std::string>& names)
 {
-    return m_kind;
-}
-
-//=============================================================================================================
-
-void SensorLayoutWidget::setSelectable(const std::vector<std::string>& names)
-{
-    // As in a QGraphicsScene, hidden or unselectable sensors lose their selection
     bool deselected = false;
-    for (viz::SensorLayout::Sensor& sensor : m_layout.sensors()) {
+    for (SensorLayout::Sensor& sensor : m_layout.sensors()) {
         sensor.visible = sensor.kind == m_kind;
         sensor.selectable = sensor.visible && std::ranges::contains(names, sensor.name);
         deselected |= sensor.selected && !sensor.selectable;
         sensor.selected = sensor.selected && sensor.selectable;
     }
-    contentsChanged();
+    changed(Change::Bounds);
     if (deselected) {
-        emit selectionChanged();
+        selection_changed();
     }
 }
 
 //=============================================================================================================
 
-void SensorLayoutWidget::selectNames(const std::vector<std::string>& names)
+void SensorLayoutFigure::select_names(const std::vector<std::string>& names)
 {
     if (m_layout.select_names(names)) {
-        update();
-        emit selectionChanged();
+        changed();
+        selection_changed();
     }
 }
 
 //=============================================================================================================
 
-void SensorLayoutWidget::highlightNames(const std::vector<std::string>& names)
+void SensorLayoutFigure::highlight_names(const std::vector<std::string>& names)
 {
-    for (viz::SensorLayout::Sensor& sensor : m_layout.sensors()) {
+    for (SensorLayout::Sensor& sensor : m_layout.sensors()) {
         sensor.highlighted = std::ranges::contains(names, sensor.name);
     }
-    update();
+    changed();
 }
 
 //=============================================================================================================
 
-void SensorLayoutWidget::clear()
+void SensorLayoutFigure::clear()
 {
     const bool hadSelection = !m_layout.selected().empty();
     m_layout.set_sensors({});
-    contentsChanged();
+    changed(Change::Bounds);
     if (hadSelection) {
-        emit selectionChanged();
+        selection_changed();
     }
 }
 
 //=============================================================================================================
 
-std::vector<std::string> SensorLayoutWidget::selectedNames() const
+std::vector<std::string> SensorLayoutFigure::selected_names() const
 {
     std::vector<std::string> names;
     for (std::size_t index : m_layout.selected()) {
@@ -145,70 +139,68 @@ std::vector<std::string> SensorLayoutWidget::selectedNames() const
 
 //=============================================================================================================
 
-SelectionItem SensorLayoutWidget::selection() const
+std::vector<SensorLayout::Sensor> SensorLayoutFigure::selection() const
 {
     const bool anySelected = !m_layout.selected().empty();
-    SelectionItem item;
-    for (const viz::SensorLayout::Sensor& sensor : m_layout.sensors()) {
+    std::vector<SensorLayout::Sensor> sensors;
+    for (const SensorLayout::Sensor& sensor : m_layout.sensors()) {
         if (anySelected ? sensor.selected : sensor.visible) {
-            item.m_sChannelName.push_back(sensor.name);
-            item.m_iChannelNumber.push_back(0);
-            item.m_iChannelKind.push_back(sensor.kind);
-            item.m_iChannelUnit.push_back(sensor.unit);
-            item.m_qpChannelPosition.emplace_back(sensor.position.x, sensor.position.y);
+            sensors.push_back(sensor);
         }
     }
-    return item;
+    return sensors;
 }
 
 //=============================================================================================================
 
-const mne::viz::SensorLayout& SensorLayoutWidget::sensorLayout() const
-{
-    return m_layout;
-}
-
-//=============================================================================================================
-
-mne::viz::Rect SensorLayoutWidget::sceneBounds() const
+Rect SensorLayoutFigure::bounds() const
 {
     return m_layout.bounds();
 }
 
 //=============================================================================================================
 
-void SensorLayoutWidget::drawScene(viz::Canvas& canvas) const
+void SensorLayoutFigure::draw(Canvas& canvas, const TextMetrics& metrics, const Font& font) const
 {
-    m_layout.draw(canvas, QtTextMetrics(font()), toSceneFont(font()));
+    m_layout.draw(canvas, metrics, font);
 }
 
 //=============================================================================================================
 
-bool SensorLayoutWidget::scenePressed(viz::Point point, Qt::KeyboardModifiers modifiers)
+bool SensorLayoutFigure::press(Point point, Modifier modifiers)
 {
-    const bool extend = modifiers.testFlag(Qt::ControlModifier);
+    const bool extend = has_flag(modifiers, Modifier::Ctrl);
     const bool hit = m_layout.sensor_at(point) >= 0;
     // A press beside the sensors clears the selection before a band starts, unless Ctrl is held
     if ((hit || !extend) && m_layout.click(point, extend)) {
-        update();
-        emit selectionChanged();
+        changed();
+        selection_changed();
     }
     return hit;
 }
 
 //=============================================================================================================
 
-void SensorLayoutWidget::sceneBandSelected(const viz::Rect& band, Qt::KeyboardModifiers modifiers)
+bool SensorLayoutFigure::band_selection_enabled() const
 {
-    if (m_layout.select_in(band, modifiers.testFlag(Qt::ControlModifier))) {
-        update();
-        emit selectionChanged();
+    return true;
+}
+
+//=============================================================================================================
+
+void SensorLayoutFigure::band_selected(const Rect& band, Modifier modifiers)
+{
+    if (m_layout.select_in(band, has_flag(modifiers, Modifier::Ctrl))) {
+        changed();
+        selection_changed();
     }
 }
 
 //=============================================================================================================
 
-bool SensorLayoutWidget::bandSelectionEnabled() const
+void SensorLayoutFigure::selection_changed() const
 {
-    return true;
+    if (m_selectionCallback) {
+        m_selectionCallback();
+    }
 }

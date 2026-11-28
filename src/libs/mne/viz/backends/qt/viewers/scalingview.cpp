@@ -22,6 +22,7 @@
 #include "ui_scalingview.h"
 #include <mne/fiff/fiff_constants.h>
 #include "helpers/scalecontrol.h"
+#include <mne/viz/figures/channel_scale.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -66,53 +67,7 @@ const static int MAG_TO_GRAD_LINK = 31337;
 float mne::viz::qt::getDefaultScalingValue(int iChannelKind,
                                            int iChannelUnit)
 {
-    float fMaxScale(1e-9f);
-
-    switch (iChannelKind) {
-        case FIFFV_MEG_CH: {
-            if (iChannelUnit == FIFF_UNIT_T_M) { //Gradiometers
-                fMaxScale = m_fScaleGRAD;
-            } else if (iChannelUnit == FIFF_UNIT_T) { //Magnetometers
-                fMaxScale = m_fScaleMAG;
-            }
-            break;
-        }
-
-        case FIFFV_REF_MEG_CH: {
-            fMaxScale = m_fScaleMAG;
-            break;
-        }
-
-        case FIFFV_EEG_CH: { //EEG Channels
-            fMaxScale = m_fScaleEEG;
-            break;
-        }
-
-        case FIFFV_ECG_CH: { //ECG Channels
-            fMaxScale = m_fScaleECG;
-            break;
-        }
-        case FIFFV_EMG_CH: { //EMG Channels
-            fMaxScale = m_fScaleEMG;
-            break;
-        }
-        case FIFFV_EOG_CH: { //EOG Channels
-            fMaxScale = m_fScaleEOG;
-            break;
-        }
-
-        case FIFFV_STIM_CH: { //STIM Channels
-            fMaxScale = m_fScaleSTIM;
-            break;
-        }
-
-        case FIFFV_MISC_CH: { //MISC Channels
-            fMaxScale = m_fScaleMISC;
-            break;
-        }
-    }
-
-    return fMaxScale;
+    return viz::default_channel_scale(iChannelKind, iChannelUnit);
 }
 
 //=============================================================================================================
@@ -121,20 +76,7 @@ float mne::viz::qt::getScalingValue(const std::map<int, float>& qMapChScaling,
                                     int iChannelKind,
                                     int iChannelUnit)
 {
-    const auto valueOf = [&qMapChScaling](int key) {
-        const auto it = qMapChScaling.find(key);
-        return it != qMapChScaling.end() ? it->second : 0.0f;
-    };
-    float fMaxScale = valueOf(iChannelKind);
-
-    if (iChannelKind == FIFFV_MEG_CH) {
-        fMaxScale = valueOf(iChannelUnit);
-    }
-
-    if (std::isnan(fMaxScale) || fMaxScale == 0) {
-        fMaxScale = mne::viz::qt::getDefaultScalingValue(iChannelKind, iChannelUnit);
-    }
-    return fMaxScale;
+    return viz::channel_scale(qMapChScaling, iChannelKind, iChannelUnit);
 }
 
 //=============================================================================================================

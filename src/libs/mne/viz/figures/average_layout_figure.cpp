@@ -3,35 +3,32 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
  *
- * @file     averagelayoutwidget.cpp
+ * @file     average_layout_figure.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    3.0.0
  * @date     November 2026
- * @brief    Definition of the AverageLayoutWidget class.
+ * @brief    AverageLayoutFigure class definition.
  */
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "averagelayoutwidget.h"
-#include "selectionitem.h"
-#include "../scalingview.h"
-#include "../../plots/helpers/scenepainter.h"
+#include "average_layout_figure.h"
+#include "channel_scale.h"
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstddef>
 #include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace mne;
 using namespace mne::viz;
-using namespace mne::viz::qt;
 
 //=============================================================================================================
 // DEFINE STATIC METHODS
@@ -50,115 +47,76 @@ constexpr double kPressedNameSize = 6.0;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageLayoutWidget::AverageLayoutWidget(QWidget* parent)
-: SceneViewport(parent)
-, m_signalColor(0, 80, 180)
-{
-}
-
-//=============================================================================================================
-
-std::vector<AverageLayoutWidget::Channel> AverageLayoutWidget::channelsFrom(const SelectionItem& selection)
-{
-    std::vector<Channel> channels;
-    for (std::size_t i = 0; i < selection.m_sChannelName.size(); ++i) {
-        Channel channel;
-        channel.name = selection.m_sChannelName[i];
-        channel.number = i < selection.m_iChannelNumber.size() ? selection.m_iChannelNumber[i] : -1;
-        channel.position = i < selection.m_qpChannelPosition.size() ? selection.m_qpChannelPosition[i] : QPointF();
-        channel.kind = i < selection.m_iChannelKind.size() ? selection.m_iChannelKind[i] : 0;
-        channel.unit = i < selection.m_iChannelUnit.size() ? selection.m_iChannelUnit[i] : 0;
-        channels.push_back(std::move(channel));
-    }
-    return channels;
-}
-
-//=============================================================================================================
-
-void AverageLayoutWidget::setChannels(std::vector<Channel> channels)
+void AverageLayoutFigure::set_channels(std::vector<Channel> channels)
 {
     m_channels = std::move(channels);
     m_pressedTile = -1;
-    contentsChanged();
+    changed(Change::Bounds);
 }
 
 //=============================================================================================================
 
-const std::vector<AverageLayoutWidget::Channel>& AverageLayoutWidget::channels() const
+void AverageLayoutFigure::refresh()
 {
-    return m_channels;
+    changed(Change::Bounds);
 }
 
 //=============================================================================================================
 
-std::vector<AverageLayoutWidget::Channel>& AverageLayoutWidget::channels()
+void AverageLayoutFigure::set_scale_map(std::map<int, float> scales)
 {
-    return m_channels;
+    m_scales = std::move(scales);
+    changed();
 }
 
 //=============================================================================================================
 
-void AverageLayoutWidget::setScaleMap(const std::map<int, float>& scaleMap)
+void AverageLayoutFigure::set_average_activation(std::map<std::string, bool> activation)
 {
-    m_scaleMap = scaleMap;
-    update();
+    m_activation = std::move(activation);
+    changed();
 }
 
 //=============================================================================================================
 
-void AverageLayoutWidget::setAverageActivation(const std::map<std::string, bool>& activation)
+void AverageLayoutFigure::set_average_colors(std::map<std::string, Color> colors)
 {
-    m_activation = activation;
-    update();
+    m_colors = std::move(colors);
+    changed();
 }
 
 //=============================================================================================================
 
-void AverageLayoutWidget::setAverageColors(const std::map<std::string, QColor>& colors)
-{
-    m_colors = colors;
-    update();
-}
-
-//=============================================================================================================
-
-void AverageLayoutWidget::setSignalColor(const QColor& color)
+void AverageLayoutFigure::set_signal_color(Color color)
 {
     m_signalColor = color;
-    update();
+    changed();
 }
 
 //=============================================================================================================
 
-QColor AverageLayoutWidget::signalColor() const
+AverageLayout AverageLayoutFigure::average_layout() const
 {
-    return m_signalColor;
-}
-
-//=============================================================================================================
-
-mne::viz::AverageLayout AverageLayoutWidget::averageLayout() const
-{
-    std::vector<viz::AverageTile> tiles;
+    std::vector<AverageTile> tiles;
     tiles.reserve(m_channels.size());
     for (std::size_t i = 0; i < m_channels.size(); ++i) {
         const Channel& channel = m_channels[i];
-        viz::AverageTile tile;
-        tile.box = viz::AverageLayout::box_at({channel.position.x(), channel.position.y()});
+        AverageTile tile;
+        tile.box = AverageLayout::box_at(channel.position);
         tile.name = channel.name;
         tile.name_size = static_cast<int>(i) == m_pressedTile ? kPressedNameSize : kNameSize;
         tile.bad = channel.bad;
-        tile.max_value = getScalingValue(m_scaleMap, channel.kind, channel.unit);
-        tile.stim_sample = channel.firstSample;
+        tile.max_value = channel_scale(m_scales, channel.kind, channel.unit);
+        tile.stim_sample = channel.first_sample;
         tile.columns = channel.averages.empty() ? 0 : channel.averages.front().samples;
         for (const Average& average : channel.averages) {
             // Averages missing from the activation map are drawn
             if (const auto active = m_activation.find(average.comment); active != m_activation.end() && !active->second) {
                 continue;
             }
-            viz::AverageTile::Trace trace;
+            AverageTile::Trace trace;
             const auto color = m_colors.find(average.comment);
-            trace.color = toSceneColor(color != m_colors.end() ? color->second : m_signalColor);
+            trace.color = color != m_colors.end() ? color->second : m_signalColor;
             if (average.data) {
                 trace.samples.reserve(static_cast<std::size_t>(average.samples));
                 for (int s = 0; s < average.samples; ++s) {
@@ -169,18 +127,18 @@ mne::viz::AverageLayout AverageLayoutWidget::averageLayout() const
         }
         tiles.push_back(std::move(tile));
     }
-    viz::AverageLayout layout;
+    AverageLayout layout;
     layout.set_tiles(std::move(tiles));
     return layout;
 }
 
 //=============================================================================================================
 
-mne::viz::Rect AverageLayoutWidget::sceneBounds() const
+Rect AverageLayoutFigure::bounds() const
 {
-    viz::Rect united;
+    Rect united;
     for (const Channel& channel : m_channels) {
-        const viz::Rect area = viz::AverageLayout::box_at({channel.position.x(), channel.position.y()}).adjusted(0, -kNameSize, 0, 0);
+        const Rect area = AverageLayout::box_at(channel.position).adjusted(0, -kNameSize, 0, 0);
         united = united.empty() ? area : united.united(area);
     }
     return united;
@@ -188,19 +146,19 @@ mne::viz::Rect AverageLayoutWidget::sceneBounds() const
 
 //=============================================================================================================
 
-void AverageLayoutWidget::drawScene(viz::Canvas& canvas) const
+void AverageLayoutFigure::draw(Canvas& canvas, const TextMetrics& /*metrics*/, const Font& font) const
 {
-    averageLayout().draw(canvas, toSceneFont(font()));
+    average_layout().draw(canvas, font);
 }
 
 //=============================================================================================================
 
-bool AverageLayoutWidget::scenePressed(viz::Point point, Qt::KeyboardModifiers /*modifiers*/)
+bool AverageLayoutFigure::press(Point point, Modifier /*modifiers*/)
 {
     for (std::size_t i = m_channels.size(); i-- > 0;) {
-        if (viz::AverageLayout::box_at({m_channels[i].position.x(), m_channels[i].position.y()}).contains(point)) {
+        if (AverageLayout::box_at(m_channels[i].position).contains(point)) {
             m_pressedTile = static_cast<int>(i);
-            update();
+            changed();
             return true;
         }
     }
@@ -209,8 +167,8 @@ bool AverageLayoutWidget::scenePressed(viz::Point point, Qt::KeyboardModifiers /
 
 //=============================================================================================================
 
-void AverageLayoutWidget::sceneReleased(viz::Point /*point*/)
+void AverageLayoutFigure::release(Point /*point*/)
 {
     m_pressedTile = -1;
-    update();
+    changed();
 }

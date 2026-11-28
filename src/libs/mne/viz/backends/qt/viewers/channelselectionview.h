@@ -14,7 +14,7 @@
  * @date     September 2014
  * @brief    Interactive 2-D sensor-layout picker for building and saving channel groups.
  *
- * ChannelSelectionView shows a @ref mne::viz::qt::SensorLayoutWidget of the active sensor
+ * ChannelSelectionView shows a @ref mne::viz::SensorLayoutFigure of the active sensor
  * layout together with a list of named selection groups (loaded from
  * or saved to MNE @c .sel files). The user lassoes sensors on the
  * scene to define a group; emitted @c showSelectedChannelsOnly /
@@ -61,6 +61,11 @@ namespace mne
 class FiffInfo;
 }
 
+namespace mne::viz
+{
+class SensorLayoutFigure;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE mne::viz::qt
 //=============================================================================================================
@@ -79,7 +84,7 @@ class SelectionItem;
 /**
  * @brief Interactive 2-D sensor-layout picker for building, loading and saving channel groups.
  *
- * Drives a @ref SensorLayoutWidget of layout dots; rubber band / click selection
+ * Drives a @ref mne::viz::SensorLayoutFigure of layout dots; rubber band / click selection
  * updates the named groups stored in MNE @c .sel files and emits
  * the resulting visible-channel list to the raw and butterfly
  * viewers.
@@ -397,6 +402,8 @@ private:
     std::unique_ptr<Ui::ChannelSelectionViewWidget> m_pUi; /**< Pointer to the qt designer generated ui class. */
 
     std::shared_ptr<ChannelInfoModel> m_pChannelInfoModel; /**< Pointer to the channel info model. */
+
+    std::shared_ptr<mne::viz::SensorLayoutFigure> m_pSensorLayout; /**< The sensors of the layout, picked by click and band. */
 
     std::map<std::string, QPointF> m_layoutMap;                                /**< QMap with the loaded layout. each channel name correspond to a QPointF variable. */
     std::multimap<std::string, std::vector<std::string>> m_selectionGroupsMap; /**< QMultiMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/

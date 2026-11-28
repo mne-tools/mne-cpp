@@ -15,7 +15,7 @@
  * AverageSelectionView shows a row per evoked condition (active flag,
  * label, colour swatch) and re-emits the resulting visibility +
  * colour map so any plot listening to it — typically
- * @ref mne::viz::qt::ButterflyView and @ref mne::viz::qt::AverageLayoutView — can update its
+ * @ref mne::viz::qt::ButterflyView and @ref mne::viz::AverageLayoutPanel — can update its
  * rendering accordingly.
  */
 

@@ -33,10 +33,12 @@ set(SOURCES
   brain/sourceestimateoverlay.cpp
   brain/viewstate.cpp
   figures/average_layout.cpp
+  figures/average_layout_figure.cpp
   figures/average_tile.cpp
   figures/bar_chart.cpp
   figures/butterfly_plot.cpp
   figures/canvas.cpp
+  figures/channel_scale.cpp
   figures/colormap.cpp
   figures/filter_response_plot.cpp
   figures/font_face.cpp
@@ -46,7 +48,9 @@ set(SOURCES
   figures/image_plot.cpp
   figures/line_chart.cpp
   figures/raster_renderer.cpp
+  figures/scene_figure.cpp
   figures/sensor_layout.cpp
+  figures/sensor_layout_figure.cpp
   figures/spline_plot.cpp
   figures/svg_renderer.cpp
   figures/system_fonts.cpp
@@ -55,7 +59,9 @@ set(SOURCES
   figures/vector_plot.cpp
   figures/theme.cpp
   panels/form_view.cpp
+  panels/figure_view.cpp
   forms/settings_form.cpp
+  panels/average_layout_panel.cpp
   panels/compensator_panel.cpp
   panels/forward_panel.cpp
   panels/panel.cpp
@@ -115,10 +121,12 @@ set(HEADERS
   brain/surfacekeys.h
   brain/viewstate.h
   figures/average_layout.h
+  figures/average_layout_figure.h
   figures/average_tile.h
   figures/bar_chart.h
   figures/butterfly_plot.h
   figures/canvas.h
+  figures/channel_scale.h
   figures/colormap.h
   figures/display_list.h
   figures/filter_response_plot.h
@@ -130,7 +138,9 @@ set(HEADERS
   figures/image_plot.h
   figures/line_chart.h
   figures/raster_renderer.h
+  figures/scene_figure.h
   figures/sensor_layout.h
+  figures/sensor_layout_figure.h
   figures/spline_plot.h
   figures/style.h
   figures/svg_renderer.h
@@ -140,7 +150,9 @@ set(HEADERS
   figures/vector_plot.h
   figures/theme.h
   panels/form_view.h
+  panels/figure_view.h
   forms/settings_form.h
+  panels/average_layout_panel.h
   panels/compensator_panel.h
   panels/forward_panel.h
   panels/panel.h

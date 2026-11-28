@@ -10,7 +10,7 @@
  * @brief    Tests for additional disp viewer widget classes and helper models.
  *           Covers: HpiSettingsView, CoregSettingsView, ArtifactSettingsView,
  *           PanelWidget (forward solution), FiffRawViewSettings, ProjectSettingsView, BidsView,
- *           ChannelSelectionView, AverageLayoutView, AverageSelectionView,
+ *           ChannelSelectionView, AverageLayoutPanel, AverageSelectionView,
  *           ButterflyView, SpectrumView, RtFiffRawViewModel, EvokedSetModel,
  *           ChannelInfoModel, and RtFiffRawView.
  */
@@ -39,7 +39,12 @@
 #include <mne/viz/backends/qt/viewers/bidsview.h>
 #include <mne/viz/backends/qt/viewers/channelselectionview.h>
 #include <mne/viz/backends/qt/viewers/channeldataview.h>
-#include <mne/viz/backends/qt/viewers/averagelayoutview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/backends/qt/kit/sceneviewport.h>
+#include <mne/viz/figures/svg_renderer.h>
+#include <mne/viz/figures/average_layout_figure.h>
+#include <mne/viz/figures/sensor_layout_figure.h>
+#include <mne/viz/panels/average_layout_panel.h>
 #include <mne/viz/backends/qt/viewers/averageselectionview.h>
 #include <mne/viz/backends/qt/viewers/butterflyview.h>
 #include <mne/viz/backends/qt/viewers/spectrumview.h>
@@ -56,9 +61,7 @@
 #include <mne/viz/backends/qt/viewers/helpers/bidsviewmodel.h>
 #include <mne/viz/backends/qt/viewers/helpers/mneoperator.h>
 #include <mne/viz/backends/qt/viewers/helpers/channelrhiview.h>
-#include <mne/viz/backends/qt/viewers/helpers/averagelayoutwidget.h>
 #include <mne/viz/backends/qt/viewers/helpers/selectionitem.h>
-#include <mne/viz/backends/qt/viewers/helpers/sensorlayoutwidget.h>
 #include <mne/viz/backends/qt/viewers/helpers/channeldatamodel.h>
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_ch_info.h>
@@ -476,9 +479,9 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies that AverageLayoutView constructs and survives all lifecycle transitions.
+     * Verifies that an AverageLayoutPanel in a PanelWidget survives all lifecycle transitions.
      */
-    void averageLayoutView_lifecycle();
+    void averageLayoutPanel_lifecycle();
 
     //=========================================================================================================
     /**
@@ -526,7 +529,7 @@ private slots:
      * Verifies that EvokedSetModel constructs, reports sensible defaults, and
      * setEvokedSet does not crash on an empty set.
      */
-    void averageLayoutView_drawsEachChannelsAverage();
+    void averageLayoutPanel_drawsEachChannelsAverage();
     void evokedSetModel_basics();
     void evokedSetModel_projectionRolesAndAverageMaps();
 
@@ -577,9 +580,10 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies SensorLayoutWidget wheel zoom, double-click fit, right-drag panning, click and rubber-band selection.
+     * Verifies a SensorLayoutFigure in a SceneViewport: wheel zoom, double-click fit, right-drag panning, click and
+     * rubber-band selection.
      */
-    void sensorLayoutWidget_zoomPanAndSelect();
+    void sensorLayoutFigure_zoomPanAndSelect();
     void channelRhiView_rendersAndDrawsOverlays();
     void channelDataModel_bufferDetrendAndDecimation();
 
@@ -606,10 +610,10 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies AverageLayoutWidget drawing: stim and zero line, scaling and clamping, per-average color and
+     * Verifies AverageLayoutFigure drawing: stim and zero line, scaling and clamping, per-average color and
      * activation, bad-channel opacity and the press/release label size.
      */
-    void averageLayoutWidget_paintsScaledClampedCurves();
+    void averageLayoutFigure_paintsScaledClampedCurves();
 
     //=========================================================================================================
     /**
@@ -1765,9 +1769,12 @@ void TestVizQtViewers2::channelSelectionView_initialLayoutLoads()
 
 //=============================================================================================================
 
-void TestVizQtViewers2::averageLayoutView_lifecycle()
+void TestVizQtViewers2::averageLayoutPanel_lifecycle()
 {
-    AverageLayoutView view("test_viz_qt_viewers2");
+    PanelWidget view(std::make_shared<mne::viz::AverageLayoutPanel>(), "test_viz_qt_viewers2");
+    // The panel has no settings, only its figure
+    QVERIFY(view.figureViewport() != nullptr);
+    QVERIFY(view.formPanel()->isHidden());
 
     view.setGuiMode(AbstractView::GuiMode::Research);
     view.setProcessingMode(AbstractView::ProcessingMode::Offline);
@@ -2297,7 +2304,7 @@ void TestVizQtViewers2::rtFiffRawViewModel_projectionWrapFilterAndRoles()
 
 //=============================================================================================================
 
-void TestVizQtViewers2::averageLayoutView_drawsEachChannelsAverage()
+void TestVizQtViewers2::averageLayoutPanel_drawsEachChannelsAverage()
 {
     // A positive step on MEG0111 and a negative one on MEG0113, both from the stimulus onset
     auto set = std::make_shared<FiffEvokedSet>();
@@ -2315,12 +2322,12 @@ void TestVizQtViewers2::averageLayoutView_drawsEachChannelsAverage()
     model->setEvokedSet(set);
     auto pInfo = std::make_shared<FiffInfo>(set->info);
 
-    AverageLayoutView view(QStringLiteral("test_viz_qt_viewers2_average_layout"));
-    view.setFiffInfo(pInfo);
-    view.setEvokedSetModel(model);
-    view.setBackgroundColor(Qt::white);
-    QCOMPARE(view.getBackgroundColor(), QColor(Qt::white));
-    QCOMPARE(view.getEvokedSetModel(), model);
+    auto panel = std::make_shared<mne::viz::AverageLayoutPanel>();
+    PanelWidget view(panel, QStringLiteral("test_viz_qt_viewers2_average_layout"));
+    panel->set_info(pInfo);
+    panel->set_evoked(model->evokedAverages());
+    view.figureViewport()->setBackgroundColor(Qt::white);
+    QCOMPARE(view.figureViewport()->backgroundColor(), QColor(Qt::white));
 
     // Two channels, one bad, laid out left and right
     SelectionItem selection;
@@ -2330,23 +2337,27 @@ void TestVizQtViewers2::averageLayoutView_drawsEachChannelsAverage()
     selection.m_iChannelUnit = {FIFF_UNIT_T, FIFF_UNIT_T};
     selection.m_qpChannelPosition = {QPointF(-1.0, 0.0), QPointF(1.0, 0.0)};
     selection.m_bShowAll = false;
-    view.channelSelectionChanged(QVariant::fromValue(&selection));
-    view.setScaleMap({{FIFF_UNIT_T, 1e-12f}});
-    view.setAverageColor(std::make_shared<std::map<std::string, QColor>>(std::map<std::string, QColor>{{"aud", Qt::red}}));
-    view.setAverageActivation(std::make_shared<std::map<std::string, bool>>(std::map<std::string, bool>{{"aud", true}}));
-    view.setSingleAverageColor(Qt::black);
-    QCOMPARE(mne::viz::qt::detail::valueOr(*view.getAverageColor(), "aud"), QColor(Qt::black));
-    QVERIFY(mne::viz::qt::detail::valueOr(*view.getAverageActivation(), "aud"));
+    panel->set_selection(selection.averageChannels());
+    panel->set_scale_map({{FIFF_UNIT_T, 1e-12f}});
+    panel->set_average_colors({{"aud", mne::viz::Color{255, 0, 0}}});
+    panel->set_average_activation({{"aud", true}});
+    panel->set_single_average_color(mne::viz::Color{0, 0, 0});
+    QCOMPARE(panel->average_colors().at("aud"), (mne::viz::Color{0, 0, 0}));
+    QVERIFY(panel->average_activation().at("aud"));
 
-    auto* layout = view.findChild<AverageLayoutWidget*>();
-    QVERIFY(layout != nullptr);
-    QCOMPARE(layout->channels().size(), std::size_t{2});
-    view.updateViewport();
+    const mne::viz::AverageLayoutFigure& layout = panel->layout();
+    QCOMPARE(view.figureViewport()->figure(), &layout);
+    QCOMPARE(layout.channels().size(), std::size_t{2});
+    // Each tile shows its channel's average; the bad one is marked
+    QCOMPARE(layout.channels()[0].averages.size(), std::size_t{1});
+    QCOMPARE(layout.channels()[0].averages[0].data, model->evokedAverages().averages[0].data);
+    QCOMPARE(layout.channels()[1].averages[0].data, model->evokedAverages().averages[0].data + 2);
+    QCOMPARE(layout.channels()[0].first_sample, -60);
     // Recolouring keeps the channels (name, number and layout position) intact
     QStringList names;
-    for (const AverageLayoutWidget::Channel& channel : layout->channels()) {
+    for (const mne::viz::AverageLayoutFigure::Channel& channel : layout.channels()) {
         names << QString::fromStdString(channel.name);
-        QCOMPARE(std::abs(channel.position.x()), 1.0);
+        QCOMPARE(std::abs(channel.position.x), 1.0);
     }
     names.sort();
     QCOMPARE(names, (QStringList{QStringLiteral("MEG 0111"), QStringLiteral("MEG 0113")}));
@@ -2357,9 +2368,9 @@ void TestVizQtViewers2::averageLayoutView_drawsEachChannelsAverage()
     {
         mne::viz::Canvas canvas(480, 120);
         canvas.translate(240, 60);
-        layout->averageLayout().draw(canvas, toSceneFont(layout->font()));
+        layout.average_layout().draw(canvas, toSceneFont(view.font()));
         QPainter painter(&image);
-        paintScene(painter, canvas.display_list(), layout->font());
+        paintScene(painter, canvas.display_list(), view.font());
     }
     auto darkAt = [&image](int x, int y) {
         return qGray(image.pixel(x, y)) < 160;
@@ -2377,10 +2388,11 @@ void TestVizQtViewers2::averageLayoutView_drawsEachChannelsAverage()
     QVERIFY2(std::abs(curveRow(400 + 40) - (60 + 24)) <= 2, qPrintable(QString::number(curveRow(440))));
 
     const QString shot = QDir::temp().filePath(QStringLiteral("test_viz_qt_viewers2_average_layout.svg"));
-    view.takeScreenshot(shot);
+    QVERIFY(mne::viz::write_svg(view.figureViewport()->picture(QSize(480, 120)), shot.toStdU16String()).has_value());
     QVERIFY(QFile::exists(shot));
     QFile::remove(shot);
-    view.clearView();
+    panel->clear_evoked();
+    QVERIFY(layout.channels()[0].averages.empty());
 }
 
 //=============================================================================================================
@@ -2451,7 +2463,7 @@ void TestVizQtViewers2::evokedSetModel_projectionRolesAndAverageMaps()
     const auto matrices = model.data(0, 2, EvokedSetModelRoles::GetAverageData).value<std::vector<AvrTypeRowVectorPair>>();
     QCOMPARE(matrices.size(), 2);
     QCOMPARE(matrices.at(0).second.second, 30);
-    // Column-major (nchan x nsamples), the layout AverageLayoutWidget indexes with sample * nchan + channel
+    // Column-major (nchan x nsamples), the layout AverageLayoutFigure indexes with sample * nchan + channel
     QCOMPARE(matrices.at(0).second.first[5 * 4 + 3], 5.0);
     QVERIFY(!model.data(0, 1, Qt::BackgroundRole).isValid());
     QVERIFY(!model.data(0, 1, Qt::ToolTipRole).isValid());
@@ -3063,11 +3075,23 @@ void TestVizQtViewers2::channelRhiView_gpuFrame()
 
 //=============================================================================================================
 
-void TestVizQtViewers2::sensorLayoutWidget_zoomPanAndSelect()
+void TestVizQtViewers2::sensorLayoutFigure_zoomPanAndSelect()
 {
-    SensorLayoutWidget widget;
-    QSignalSpy selectionSpy(&widget, &SensorLayoutWidget::selectionChanged);
-    widget.setLayout({{"MEG 0111", QPointF(0, 0)}, {"MEG 0121", QPointF(10, 0)}, {"EEG 001", QPointF(5, -5)}}, {"MEG 0121"});
+    const auto selectedNames = [](const std::vector<mne::viz::SensorLayout::Sensor>& sensors) {
+        std::vector<std::string> names;
+        names.reserve(sensors.size());
+        for (const mne::viz::SensorLayout::Sensor& sensor : sensors) {
+            names.push_back(sensor.name);
+        }
+        return names;
+    };
+    auto figure = std::make_shared<mne::viz::SensorLayoutFigure>();
+    int selectionChanges = 0;
+    figure->set_selection_callback([&selectionChanges]() {
+        ++selectionChanges;
+    });
+    SceneViewport widget(figure);
+    figure->set_layout({{"MEG 0111", {0, 0}}, {"MEG 0121", {10, 0}}, {"EEG 001", {5, -5}}}, {"MEG 0121"});
     widget.resize(200, 200);
     widget.show();
     QCoreApplication::processEvents();
@@ -3104,31 +3128,31 @@ void TestVizQtViewers2::sensorLayoutWidget_zoomPanAndSelect()
         return widget.mapFromScene({10 * x, -10 * y}).toPoint();
     };
     QTest::mouseClick(&widget, Qt::LeftButton, Qt::NoModifier, at(0, 0));
-    QCOMPARE(widget.selectedNames(), std::vector<std::string>({"MEG 0111"}));
+    QCOMPARE(figure->selected_names(), std::vector<std::string>({"MEG 0111"}));
     QTest::mouseClick(&widget, Qt::LeftButton, Qt::ControlModifier, at(10, 0));
-    QCOMPARE(widget.selectedNames(), std::vector<std::string>({"MEG 0111", "MEG 0121"}));
-    QCOMPARE(widget.selection().m_sChannelName, std::vector<std::string>({"MEG 0111", "MEG 0121"}));
+    QCOMPARE(figure->selected_names(), std::vector<std::string>({"MEG 0111", "MEG 0121"}));
+    QCOMPARE(selectedNames(figure->selection()), std::vector<std::string>({"MEG 0111", "MEG 0121"}));
     QTest::mouseClick(&widget, Qt::LeftButton, Qt::NoModifier, at(5, 5));
-    QVERIFY(widget.selectedNames().empty());
-    QCOMPARE(selectionSpy.count(), 3);
+    QVERIFY(figure->selected_names().empty());
+    QCOMPARE(selectionChanges, 3);
 
     // A rubber band over the left half selects the sensors it touches
     QTest::mousePress(&widget, Qt::LeftButton, Qt::NoModifier, at(-3, 4));
     QTest::mouseMove(&widget, at(6, -7));
     QTest::mouseRelease(&widget, Qt::LeftButton, Qt::NoModifier, at(6, -7));
-    QCOMPARE(widget.selectedNames(), std::vector<std::string>({"EEG 001", "MEG 0111"}));
+    QCOMPARE(figure->selected_names(), std::vector<std::string>({"EEG 001", "MEG 0111"}));
 
     // Only the shown kind remains, and only the named sensors can be picked
-    widget.setChannelKind(FIFFV_MEG_CH);
-    widget.setSelectable({"MEG 0121"});
-    QVERIFY(widget.selectedNames().empty());
-    QCOMPARE(widget.selection().m_sChannelName, std::vector<std::string>({"MEG 0111", "MEG 0121"}));
-    widget.selectNames({"MEG 0121"});
-    QCOMPARE(widget.selection().m_sChannelName, std::vector<std::string>({"MEG 0121"}));
-    widget.highlightNames({"MEG 0111"});
-    QVERIFY(widget.sensorLayout().sensors()[1].highlighted);
-    widget.clear();
-    QVERIFY(widget.sensorLayout().sensors().empty());
+    figure->set_channel_kind(FIFFV_MEG_CH);
+    figure->set_selectable({"MEG 0121"});
+    QVERIFY(figure->selected_names().empty());
+    QCOMPARE(selectedNames(figure->selection()), std::vector<std::string>({"MEG 0111", "MEG 0121"}));
+    figure->select_names({"MEG 0121"});
+    QCOMPARE(selectedNames(figure->selection()), std::vector<std::string>({"MEG 0121"}));
+    figure->highlight_names({"MEG 0111"});
+    QVERIFY(figure->sensor_layout().sensors()[1].highlighted);
+    figure->clear();
+    QVERIFY(figure->sensor_layout().sensors().empty());
 }
 
 //=============================================================================================================
@@ -3997,7 +4021,7 @@ void TestVizQtViewers2::frequencySpectrumDelegate_paintsSpectrumAndReadout()
 
 //=============================================================================================================
 
-void TestVizQtViewers2::averageLayoutWidget_paintsScaledClampedCurves()
+void TestVizQtViewers2::averageLayoutFigure_paintsScaledClampedCurves()
 {
     // Channel 1 of 2, 120 samples, stimulus at sample 30; "aud" ramps to 2x full scale, "vis" is inactive
     Eigen::MatrixXd aud = Eigen::MatrixXd::Zero(2, 120);
@@ -4006,26 +4030,27 @@ void TestVizQtViewers2::averageLayoutWidget_paintsScaledClampedCurves()
         aud(1, s) = (s < 60) ? 0.5e-12 : 2e-12;
         vis(1, s) = -0.5e-12;
     }
-    AverageLayoutWidget widget;
-    AverageLayoutWidget::Channel channel;
+    auto figure = std::make_shared<mne::viz::AverageLayoutFigure>();
+    SceneViewport widget(figure);
+    mne::viz::AverageLayoutFigure::Channel channel;
     channel.name = "MEG 0112";
     channel.number = 1;
     channel.kind = FIFFV_MEG_CH;
     channel.unit = FIFF_UNIT_T;
-    channel.firstSample = -30;
+    channel.first_sample = -30;
     channel.averages = {{"aud", aud.data() + 1, 120, 2}, {"vis", vis.data() + 1, 120, 2}};
-    widget.setChannels({channel});
-    widget.setSignalColor(Qt::darkGray);
-    widget.setScaleMap({{FIFF_UNIT_T, 1e-12f}});
-    widget.setAverageColors({{"aud", Qt::blue}});
-    widget.setAverageActivation({{"aud", true}, {"vis", false}});
-    QCOMPARE(widget.averageLayout().tiles().front().box, (mne::viz::Rect{-60, -30, 120, 60}));
+    figure->set_channels({channel});
+    figure->set_signal_color(toSceneColor(Qt::darkGray));
+    figure->set_scale_map({{FIFF_UNIT_T, 1e-12f}});
+    figure->set_average_colors({{"aud", toSceneColor(Qt::blue)}});
+    figure->set_average_activation({{"aud", true}, {"vis", false}});
+    QCOMPARE(figure->average_layout().tiles().front().box, (mne::viz::Rect{-60, -30, 120, 60}));
 
     // Render the 120 x 60 tile 1:1 into an image whose origin is the tile's top-left corner
-    auto render = [&widget]() {
+    auto render = [&widget, &figure]() {
         mne::viz::Canvas canvas(120, 60);
         canvas.translate(60, 30);
-        widget.averageLayout().draw(canvas, toSceneFont(widget.font()));
+        figure->average_layout().draw(canvas, toSceneFont(widget.font()));
         QImage image(120, 60, QImage::Format_RGB32);
         image.fill(Qt::white);
         QPainter painter(&image);
@@ -4065,21 +4090,21 @@ void TestVizQtViewers2::averageLayoutWidget_paintsScaledClampedCurves()
     QVERIFY(rowsWhere(image, 45, isGray).isEmpty());
 
     // Activating "vis" draws it in the default color a quarter below the centre
-    widget.setAverageActivation({{"aud", true}, {"vis", true}});
+    figure->set_average_activation({{"aud", true}, {"vis", true}});
     image = render();
     const QList<int> gray = rowsWhere(image, 45, isGray);
     QVERIFY2(!gray.isEmpty() && std::abs(gray.first() - 45) <= 1, qPrintable(QString::number(gray.value(0, -1))));
-    widget.setSignalColor(Qt::green);
+    figure->set_signal_color(toSceneColor(Qt::green));
     image = render();
     QVERIFY(!rowsWhere(image, 45, [](QRgb c) { return qGreen(c) > 100 && qRed(c) < qGreen(c) - 50 && qBlue(c) < qGreen(c) - 50; }).isEmpty());
 
     // A bad channel is drawn faded
-    widget.channels().front().bad = true;
+    figure->channels().front().bad = true;
     image = render();
     blue = rowsWhere(image, 45, [](QRgb c) { return qBlue(c) > qRed(c) + 20; });
     QVERIFY(!blue.isEmpty());
     QVERIFY(qRed(image.pixel(45, blue.first())) > 150);
-    widget.channels().front().bad = false;
+    figure->channels().front().bad = false;
 
     // Pressing a tile enlarges its label until the button is released
     widget.resize(240, 120);
@@ -4087,12 +4112,12 @@ void TestVizQtViewers2::averageLayoutWidget_paintsScaledClampedCurves()
     QCoreApplication::processEvents();
     const QPoint centre = widget.mapFromScene({0, 0}).toPoint();
     QTest::mousePress(&widget, Qt::LeftButton, Qt::NoModifier, centre);
-    QCOMPARE(widget.averageLayout().tiles().front().name_size, 6.0);
+    QCOMPARE(figure->average_layout().tiles().front().name_size, 6.0);
     QTest::mouseRelease(&widget, Qt::LeftButton, Qt::NoModifier, centre);
-    QCOMPARE(widget.averageLayout().tiles().front().name_size, 3.0);
+    QCOMPARE(figure->average_layout().tiles().front().name_size, 3.0);
 
     // Without data nothing but the label is drawn
-    widget.channels().front().averages.clear();
+    figure->channels().front().averages.clear();
     image = render();
     QVERIFY(rowsWhere(image, 90, isRed).isEmpty());
 }

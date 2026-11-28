@@ -43,11 +43,13 @@ struct Theme;
 namespace mne::viz::qt
 {
 
+class SceneViewport;
 class SettingsPanel;
 
 //=============================================================================================================
 /**
- * @brief The Qt host of every viz::Panel: its form as a SettingsPanel, its title, width, modes and settings.
+ * @brief The Qt host of every viz::Panel: its form as a SettingsPanel, its figure in a SceneViewport, its title,
+ * width, modes and settings.
  *
  * The widget shares the panel with its owner. It restores the panel from QSettings("MNECPP") under the settings
  * path when it is created and stores it when it is destroyed.
@@ -85,6 +87,17 @@ public:
 
     //=========================================================================================================
     /**
+     * @return The viewport of the panel's figure, or null for panels without a figure.
+     *
+     * @since 3.0.0
+     */
+    SceneViewport* figureViewport() const
+    {
+        return m_figureViewport;
+    }
+
+    //=========================================================================================================
+    /**
      * Gives the panel a theme; PanelWidget starts with viz::Theme::light().
      *
      * @param[in] theme   Colours, fonts and metrics.
@@ -102,6 +115,8 @@ public:
 private:
     std::shared_ptr<viz::Panel> m_panel;
     SettingsPanel* m_formPanel = nullptr;
+    SceneViewport* m_figureViewport = nullptr;
+    int m_structureListener = 0;
 };
 
 } // namespace mne::viz::qt

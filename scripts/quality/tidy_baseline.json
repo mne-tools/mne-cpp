@@ -1168,13 +1168,6 @@
     "src/libs/mne/viz/backends/qt/viewers/artifactsettingsview.h": {
       "modernize-use-override": 6
     },
-    "src/libs/mne/viz/backends/qt/viewers/averagelayoutview.cpp": {
-      "performance-for-range-copy": 1
-    },
-    "src/libs/mne/viz/backends/qt/viewers/averagelayoutview.h": {
-      "modernize-use-nullptr": 1,
-      "modernize-use-override": 6
-    },
     "src/libs/mne/viz/backends/qt/viewers/averageselectionview.cpp": {
       "modernize-use-nullptr": 1
     },

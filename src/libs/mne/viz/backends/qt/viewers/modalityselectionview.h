@@ -16,7 +16,7 @@
  * ModalitySelectionView builds one @c QCheckBox per channel-modality
  * present in the active @c FiffInfo and emits a @c modalitiesChanged
  * list whenever the user toggles one. It is consumed primarily by
- * @ref mne::viz::qt::ButterflyView and @ref mne::viz::qt::AverageLayoutView to hide entire
+ * @ref mne::viz::qt::ButterflyView and @ref mne::viz::AverageLayoutPanel to hide entire
  * modalities at once.
  */
 
@@ -62,7 +62,7 @@ namespace mne::viz::qt
  *
  * Builds itself from the active @c FiffInfo modalities and emits
  * @c modalitiesChanged so @ref ButterflyView and
- * @ref AverageLayoutView can hide entire modalities at once.
+ * @ref mne::viz::AverageLayoutPanel can hide entire modalities at once.
  */
 class VIZQTSHARED_EXPORT ModalitySelectionView : public AbstractView
 {

@@ -7,11 +7,12 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    3.0.0
  * @date     November 2026
- * @brief    SceneViewport: a zoomable, pannable widget that draws an mne::viz model in scene coordinates.
+ * @brief    SceneViewport: a widget that shows any toolkit-free viz::SceneFigure with zoom, pan and rubber band.
  *
- * Replaces LayoutScene and the QGraphicsView it drove: the wheel and pinch zoom around the pointer, the right
- * mouse button and pan gestures move the view, a double click fits the contents, and a left drag outside an item
- * spans a rubber band. Until the user zooms or pans, the view keeps its contents fitted as it resizes.
+ * Replaces LayoutScene and the QGraphicsView it drove. The navigation is viz::FigureView's, shared with hosts
+ * without a toolkit: the wheel and pinch zoom around the pointer, the right mouse button and pan gestures move the
+ * view, a double click fits the contents, and a left drag outside an item spans a rubber band. Until the user zooms
+ * or pans, the view keeps its contents fitted as it resizes.
  */
 
 #ifndef SCENEVIEWPORT_H
@@ -21,9 +22,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../../viz_qt_global.h"
+#include "../viz_qt_global.h"
 
-#include <mne/viz/figures/canvas.h>
+#include <mne/viz/figures/display_list.h>
+#include <mne/viz/figures/geometry.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -33,18 +35,34 @@
 #include <QWidget>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace mne::viz
+{
+class FigureView;
+class SceneFigure;
+struct Theme;
+} // namespace mne::viz
+
+//=============================================================================================================
 // DEFINE NAMESPACE mne::viz::qt
 //=============================================================================================================
 
 namespace mne::viz::qt
 {
 
+class QtTextMetrics;
+
 //=============================================================================================================
 /**
- * @brief Base of the widgets that show a scene model, such as a sensor layout, with zoom, pan and rubber band.
- *
- * Subclasses report the area of their contents in sceneBounds(), draw them in drawScene() and react to clicks
- * and bands in scenePressed() and sceneBandSelected().
+ * @brief Shows a viz::SceneFigure, such as a sensor or average layout, through a viz::FigureView.
  *
  * @since 3.0.0
  */
@@ -55,11 +73,48 @@ class VIZQTSHARED_EXPORT SceneViewport : public QWidget
 public:
     //=========================================================================================================
     /**
-     * Constructs an empty viewport with a white background.
+     * Constructs a viewport without a figure on a white background.
      *
      * @param[in] parent   Parent widget.
      */
     explicit SceneViewport(QWidget* parent = nullptr);
+
+    //=========================================================================================================
+    /**
+     * Constructs a viewport that shows @p figure.
+     *
+     * @param[in] figure   The figure; the viewport shares its ownership.
+     * @param[in] parent   Parent widget.
+     */
+    explicit SceneViewport(std::shared_ptr<viz::SceneFigure> figure, QWidget* parent = nullptr);
+
+    ~SceneViewport() override;
+
+    //=========================================================================================================
+    /**
+     * Shows @p figure, fitted.
+     *
+     * @param[in] figure   The figure, or null to show only the background; the viewport shares its ownership.
+     */
+    void setFigure(std::shared_ptr<viz::SceneFigure> figure);
+
+    //=========================================================================================================
+    /**
+     * @return The figure shown, or null.
+     */
+    viz::SceneFigure* figure() const;
+
+    //=========================================================================================================
+    /**
+     * @return The navigation of the figure, or null without a figure.
+     */
+    viz::FigureView* figureView() const;
+
+    //=========================================================================================================
+    /**
+     * @param[in] theme   Colours of the rubber band.
+     */
+    void setTheme(const viz::Theme& theme);
 
     //=========================================================================================================
     /**
@@ -127,69 +182,15 @@ public:
 
     //=========================================================================================================
     /**
-     * The contents fitted into a figure, e.g. to export them with viz::write_svg().
+     * The contents fitted into a picture, e.g. to export them with viz::write_svg().
      *
-     * @param[in] size   Size of the figure in pixels.
+     * @param[in] size   Size of the picture in pixels.
      *
      * @return The figure on the background colour.
      */
-    viz::DisplayList figure(const QSize& size) const;
+    viz::DisplayList picture(const QSize& size) const;
 
 protected:
-    //=========================================================================================================
-    /**
-     * @return The area of the contents in scene coordinates; empty without contents.
-     */
-    virtual viz::Rect sceneBounds() const = 0;
-
-    //=========================================================================================================
-    /**
-     * Draws the contents in scene coordinates; @p canvas already maps them to the widget.
-     *
-     * @param[in, out] canvas   Canvas to draw on.
-     */
-    virtual void drawScene(viz::Canvas& canvas) const = 0;
-
-    //=========================================================================================================
-    /**
-     * Called when the left button goes down.
-     *
-     * @param[in] point       Scene coordinates of the press.
-     * @param[in] modifiers   Keyboard modifiers.
-     *
-     * @return Whether an item took the press; otherwise a rubber band starts if bandSelectionEnabled().
-     */
-    virtual bool scenePressed(viz::Point point, Qt::KeyboardModifiers modifiers);
-
-    //=========================================================================================================
-    /**
-     * Called when the left button goes up after scenePressed() took the press.
-     *
-     * @param[in] point   Scene coordinates of the release.
-     */
-    virtual void sceneReleased(viz::Point point);
-
-    //=========================================================================================================
-    /**
-     * Called when a rubber band is released.
-     *
-     * @param[in] band        The band in scene coordinates.
-     * @param[in] modifiers   Keyboard modifiers at the start of the band.
-     */
-    virtual void sceneBandSelected(const viz::Rect& band, Qt::KeyboardModifiers modifiers);
-
-    //=========================================================================================================
-    /**
-     * @return Whether a left drag outside an item spans a rubber band.
-     */
-    virtual bool bandSelectionEnabled() const;
-
-    //=========================================================================================================
-    /**
-     * Refits the contents if they are kept fitted, and repaints. Subclasses call it when their contents change.
-     */
-    void contentsChanged();
-
     //=========================================================================================================
     /**
      * Draws the background, the contents and the rubber band.
@@ -208,7 +209,7 @@ protected:
 
     //=========================================================================================================
     /**
-     * Zooms by 1.15 per notch around the pointer.
+     * Zooms by 1.15 per notch around the pointer, or scrolls a figure that is not zoomable.
      *
      * @param[in] event   The wheel event.
      */
@@ -224,7 +225,7 @@ protected:
 
     //=========================================================================================================
     /**
-     * Pans or stretches the rubber band.
+     * Pans, stretches the rubber band or hovers.
      *
      * @param[in] event   The mouse event.
      */
@@ -240,7 +241,7 @@ protected:
 
     //=========================================================================================================
     /**
-     * Fits the contents on a left double click.
+     * Passes a left double click to the figure, or fits the contents.
      *
      * @param[in] event   The mouse event.
      */
@@ -248,7 +249,15 @@ protected:
 
     //=========================================================================================================
     /**
-     * Handles pinch (zoom) and pan gestures.
+     * Tells the figure that the pointer left.
+     *
+     * @param[in] event   The event.
+     */
+    void leaveEvent(QEvent* event) override;
+
+    //=========================================================================================================
+    /**
+     * Handles pinch (zoom) and pan gestures, and font changes.
      *
      * @param[in] event   The event.
      *
@@ -257,25 +266,16 @@ protected:
     bool event(QEvent* event) override;
 
 private:
-    enum class Drag
-    {
-        None,
-        Pan,
-        Item,
-        Band
-    };
+    class Surface;
 
-    void applyFit();
+    void fontChanged();
 
-    double m_zoom = 1.0;                   /**< Pixels per scene unit. */
-    QPointF m_offset;                      /**< Widget position of the scene origin. */
-    bool m_fitted = true;                  /**< Whether the contents are kept fitted. */
-    QColor m_background = Qt::white;       /**< Colour behind the contents. */
-    Drag m_drag = Drag::None;              /**< Current mouse drag. */
-    QPointF m_lastPosition;                /**< Last pointer position of a pan. */
-    QPointF m_bandStart;                   /**< Widget position where the rubber band started. */
-    QPointF m_bandEnd;                     /**< Current corner of the rubber band. */
-    Qt::KeyboardModifiers m_bandModifiers; /**< Modifiers at the start of the band. */
+    std::shared_ptr<viz::SceneFigure> m_figure; /**< The figure shown. */
+    std::unique_ptr<viz::FigureView> m_view;    /**< Navigation and drawing of the figure. */
+    std::unique_ptr<Surface> m_surface;         /**< Repaints the widget when the view asks to. */
+    std::unique_ptr<QtTextMetrics> m_metrics;   /**< Metrics of the widget's font. */
+    std::unique_ptr<viz::Theme> m_theme;        /**< Colours of the rubber band. */
+    QColor m_background = Qt::white;            /**< Colour behind the contents. */
 };
 
 } // namespace mne::viz::qt

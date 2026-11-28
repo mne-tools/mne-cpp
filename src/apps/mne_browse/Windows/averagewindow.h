@@ -26,6 +26,7 @@
 #include "../Delegates/averagedelegate.h"
 #include <mne/channels/layoutloader.h>
 #include <mne/viz/backends/qt/viewers/helpers/selectionitem.h>
+#include <mne/viz/figures/average_layout_figure.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -313,6 +314,8 @@ private:
     void updateButterflySize();
 
     std::unique_ptr<Ui::AverageWindow> ui; /**< Pointer to the qt designer generated ui class.*/
+
+    std::shared_ptr<mne::viz::AverageLayoutFigure> m_pAverageLayout; /**< The averages at the sensor positions. */
 
     QList<QColor> m_lButterflyColors; /**< List which holds 500 randomly generated colors.*/
 

@@ -18,7 +18,6 @@
 #include <mne/base/log.h>
 #include "multiviewwindow.h"
 #include "rtfiffrawview.h"
-#include "averagelayoutview.h"
 #include "butterflyview.h"
 
 //=============================================================================================================

@@ -22,7 +22,7 @@
 #include <mne/base/string_utils.h>
 #include <mne/viz/backends/qt/plots/helpers/svgwriter.h>
 #include <mne/viz/backends/qt/plots/helpers/scenepainter.h>
-#include <mne/viz/backends/qt/viewers/helpers/averagelayoutwidget.h>
+#include <mne/viz/backends/qt/kit/sceneviewport.h>
 #include <mne/viz/figures/svg_renderer.h>
 
 //=============================================================================================================
@@ -202,8 +202,10 @@ mne::FiffEvoked buildButterflyEvoked(const mne::FiffEvoked& sourceEvoked,
 AverageWindow::AverageWindow(QWidget* parent, QFile& file)
 : QDockWidget(parent)
 , ui(new Ui::AverageWindow)
+, m_pAverageLayout(std::make_shared<mne::viz::AverageLayoutFigure>())
 {
     ui->setupUi(this);
+    ui->m_averageLayout->setFigure(m_pAverageLayout);
     initMVC(file);
     init();
 }
@@ -214,8 +216,10 @@ AverageWindow::AverageWindow(QWidget* parent, QFile& file)
 AverageWindow::AverageWindow(QWidget* parent)
 : QDockWidget(parent)
 , ui(new Ui::AverageWindow)
+, m_pAverageLayout(std::make_shared<mne::viz::AverageLayoutFigure>())
 {
     ui->setupUi(this);
+    ui->m_averageLayout->setFigure(m_pAverageLayout);
     initMVC();
     init();
 }
@@ -249,7 +253,7 @@ AverageModel* AverageWindow::getAverageModel()
 void AverageWindow::channelSelectionManagerChanged(const mne::viz::qt::SelectionItem& selection)
 {
     // One tile per selected channel
-    ui->m_averageLayout->setChannels(AverageLayoutWidget::channelsFrom(selection));
+    m_pAverageLayout->set_channels(selection.averageChannels());
 
     //call the onSelection function manually to replot the data for the givven average items
     onSelectionChanged(ui->m_tableView_loadedSets->selectionModel()->selection(), QItemSelection());
@@ -274,7 +278,7 @@ void AverageWindow::scaleAveragedData(const QMap<QString, double>& scaleMap)
     newScaleMapIdx[FIFFV_STIM_CH] = scaleMap["MEG_STIM"];
     newScaleMapIdx[FIFFV_MISC_CH] = scaleMap["MEG_MISC"];
 
-    ui->m_averageLayout->setScaleMap(newScaleMapIdx);
+    m_pAverageLayout->set_scale_map(newScaleMapIdx);
     m_pButterflyScene->setScaleMap(scaleMap);
 
     // Sync spinboxes with external scale changes
@@ -480,7 +484,7 @@ void AverageWindow::initTableViewWidgets()
             this, [this](bool loaded) {
                 if (loaded) {
                     ui->m_tableView_loadedSets->resizeColumnsToContents();
-                    ui->m_averageLayout->setChannels({});
+                    m_pAverageLayout->set_channels({});
                     m_bAutoScaled = false;
                     m_bButterflyAutoScaled = false;
                     selectLoadedSets();
@@ -509,7 +513,7 @@ void AverageWindow::initAverageSceneView()
     defaultScaleMap[FIFF_UNIT_T] = 1e-11f;   // MAG
     defaultScaleMap[FIFF_UNIT_T_M] = 1e-10f; // GRAD
     defaultScaleMap[FIFFV_EEG_CH] = 1e-4f;   // EEG
-    ui->m_averageLayout->setScaleMap(defaultScaleMap);
+    m_pAverageLayout->set_scale_map(defaultScaleMap);
 
     // --- Scale controls for the 2D Layout tab ---
     // The graphics view sits in gridLayout (inside gridLayout_2 on the tab page).
@@ -562,7 +566,7 @@ void AverageWindow::initAverageSceneView()
             scaleMap[FIFF_UNIT_T] = static_cast<float>(m_pSpinMag->value() * 1e-11);
             scaleMap[FIFF_UNIT_T_M] = static_cast<float>(m_pSpinGrad->value() * 1e-10);
             scaleMap[FIFFV_EEG_CH] = static_cast<float>(m_pSpinEEG->value() * 1e-4);
-            ui->m_averageLayout->setScaleMap(scaleMap);
+            m_pAverageLayout->set_scale_map(scaleMap);
 
             // Also propagate to butterfly scene (uses STRING keys)
             QMap<QString, double> butterflyScale;
@@ -638,7 +642,7 @@ void AverageWindow::initComboBoxes()
     // 2D Layout tab combo — clear scene so it re-populates with the new channel type
     connect(ui->m_comboBox_layoutChannelKind, &QComboBox::currentTextChanged,
             this, [this]() {
-                ui->m_averageLayout->setChannels({});
+                m_pAverageLayout->set_channels({});
                 refreshPlots();
             });
 }
@@ -689,12 +693,12 @@ void AverageWindow::refreshPlots()
     }
 
     // Auto-populate layout scene if empty but evoked data is available
-    if (ui->m_averageLayout->channels().empty() && !selectedRows.isEmpty()) {
+    if (m_pAverageLayout->channels().empty() && !selectedRows.isEmpty()) {
         populateLayoutFromEvoked(selectedRows);
     }
 
     // The averages of each tile, read in place from the evoked sets (column-major channels x samples)
-    for (AverageLayoutWidget::Channel& channel : ui->m_averageLayout->channels()) {
+    for (mne::viz::AverageLayoutFigure::Channel& channel : m_pAverageLayout->channels()) {
         channel.averages.clear();
 
         for (int u = 0; u < selectedRows.size(); ++u) {
@@ -711,7 +715,7 @@ void AverageWindow::refreshPlots()
             const FiffInfo* fiffInfo = &displayEvoked.info;
             const int channelNumber = mne::index_of(fiffInfo->ch_names, channel.name);
             if (channelNumber != -1) {
-                channel.firstSample = displayEvoked.first;
+                channel.first_sample = displayEvoked.first;
                 channel.kind = fiffInfo->chs.at(channelNumber).kind;
                 channel.unit = fiffInfo->chs.at(channelNumber).unit;
                 channel.number = channelNumber;
@@ -751,7 +755,7 @@ void AverageWindow::refreshPlots()
         autoScale[FIFF_UNIT_T_M] = maxGrad > 0 ? static_cast<float>(maxGrad * 1.4) : 1e-10f;
         autoScale[FIFF_UNIT_T] = maxMag > 0 ? static_cast<float>(maxMag * 1.4) : 1e-11f;
         autoScale[FIFFV_EEG_CH] = maxEEG > 0 ? static_cast<float>(maxEEG * 1.4) : 1e-4f;
-        ui->m_averageLayout->setScaleMap(autoScale);
+        m_pAverageLayout->set_scale_map(autoScale);
 
         // Also update butterfly scene (STRING keys)
         QMap<QString, double> bfAutoScale;
@@ -771,7 +775,7 @@ void AverageWindow::refreshPlots()
         m_bAutoScaled = true;
     }
 
-    ui->m_averageLayout->update();
+    m_pAverageLayout->refresh();
     ui->m_averageLayout->fitToContents();
 
     //Draw butterfly plot
@@ -1039,7 +1043,7 @@ bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows
     }
 
     selItem.m_bShowAll = true;
-    ui->m_averageLayout->setChannels(AverageLayoutWidget::channelsFrom(selItem));
+    m_pAverageLayout->set_channels(selItem.averageChannels());
     return true;
 }
 
@@ -1057,7 +1061,7 @@ void AverageWindow::exportAverageLayoutPlot()
 
     if (!fileName.isEmpty()) {
         // The tiles at their size on screen, as vector graphics or an image
-        const mne::viz::DisplayList figure = ui->m_averageLayout->figure(ui->m_averageLayout->size());
+        const mne::viz::DisplayList figure = ui->m_averageLayout->picture(ui->m_averageLayout->size());
         if (fileName.contains(".svg")) {
             if (const auto written = mne::viz::write_svg(figure, fileName.toStdU16String()); !written) {
                 mne::Log::warning("{}", written.error().what());

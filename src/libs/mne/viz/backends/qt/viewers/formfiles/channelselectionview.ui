@@ -37,7 +37,7 @@
         <item>
          <layout class="QGridLayout" name="gridLayout_5">
           <item row="0" column="0" colspan="3">
-           <widget class="mne::viz::qt::SensorLayoutWidget" name="m_sensorLayout" native="true"/>
+           <widget class="mne::viz::qt::SceneViewport" name="m_sensorLayout" native="true"/>
           </item>
           <item row="1" column="2">
            <spacer name="horizontalSpacer">
@@ -443,9 +443,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>mne::viz::qt::SensorLayoutWidget</class>
+   <class>mne::viz::qt::SceneViewport</class>
    <extends>QWidget</extends>
-   <header>mne/viz/backends/qt/viewers/helpers/sensorlayoutwidget.h</header>
+   <header>mne/viz/backends/qt/kit/sceneviewport.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

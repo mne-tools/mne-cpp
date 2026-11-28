@@ -48,13 +48,18 @@ class AveragingDataModel;
 class Communicator;
 }
 
+namespace mne::viz
+{
+class AverageLayoutPanel;
+}
+
 namespace mne::viz::qt
 {
 class AveragingSettingsView;
 class AverageSelectionView;
 class FiffRawViewSettings;
 class ChannelSelectionView;
-class AverageLayoutView;
+class PanelWidget;
 class ChannelInfoModel;
 class EvokedSetModel;
 class ButterflyView;
@@ -308,7 +313,8 @@ private:
 
     QPointer<mne::analyze::Communicator> m_pCommu;                  /**< To broadcst signals. */
     QPointer<mne::viz::qt::ButterflyView> m_pButterflyView;         /**< The butterfly plot view. */
-    QPointer<mne::viz::qt::AverageLayoutView> m_pAverageLayoutView; /**< The average layout plot view. */
+    std::shared_ptr<mne::viz::AverageLayoutPanel> m_pAverageLayout; /**< The average layout plot. */
+    QPointer<mne::viz::qt::PanelWidget> m_pAverageLayoutView;       /**< The average layout plot view. */
 
     mne::viz::qt::AveragingSettingsView* m_pAveragingSettingsView; /**< Pointer to averaging settings GUI. */
 

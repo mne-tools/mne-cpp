@@ -460,6 +460,24 @@ qint32 EvokedSetModel::getNumPreStimSamples() const
 
 //=============================================================================================================
 
+mne::viz::EvokedAverages EvokedSetModel::evokedAverages() const
+{
+    viz::EvokedAverages evoked;
+    const int channels = rowCount();
+    evoked.first_sample = -getNumPreStimSamples();
+    evoked.bad.reserve(static_cast<std::size_t>(channels));
+    for (int row = 0; row < channels; ++row) {
+        evoked.bad.push_back(getIsChannelBad(row));
+    }
+    const auto averages = data(0, 2, EvokedSetModelRoles::GetAverageData).value<std::vector<AvrTypeRowVectorPair>>();
+    for (const auto& [comment, average] : averages) {
+        evoked.averages.push_back({comment, average.first, average.second, channels});
+    }
+    return evoked;
+}
+
+//=============================================================================================================
+
 float EvokedSetModel::getSamplingFrequency() const
 {
     return m_fSps;

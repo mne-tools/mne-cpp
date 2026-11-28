@@ -16,8 +16,10 @@
 
 #include "panelwidget.h"
 #include "qttheme.h"
+#include "sceneviewport.h"
 #include "settingspanel.h"
 #include "../qtsettingsstore.h"
+#include <mne/viz/figures/scene_figure.h>
 #include <mne/viz/panels/panel.h>
 
 //=============================================================================================================
@@ -58,6 +60,15 @@ PanelWidget::PanelWidget(std::shared_ptr<Panel> panel, const QString& settingsPa
     layout->setContentsMargins(0, 0, 0, 0);
     m_formPanel = new SettingsPanel(m_panel->shared_form(), this);
     layout->addWidget(m_formPanel);
+    if (m_panel->figure()) {
+        // The figure takes the room; the form keeps its height and shows only with fields
+        m_figureViewport = new SceneViewport(m_panel->figure(), this);
+        layout->addWidget(m_figureViewport, 1);
+        m_formPanel->setVisible(!m_panel->form().fields().empty());
+        m_structureListener = m_panel->form().add_structure_listener([this](const std::string&) {
+            m_formPanel->setVisible(!m_panel->form().fields().empty());
+        });
+    }
     // The look of viz::FormView, so a panel looks alike in every backend
     setTheme(viz::Theme::light());
 }
@@ -66,6 +77,9 @@ PanelWidget::PanelWidget(std::shared_ptr<Panel> panel, const QString& settingsPa
 
 PanelWidget::~PanelWidget()
 {
+    if (m_structureListener != 0) {
+        m_panel->form().remove_listener(m_structureListener);
+    }
     saveSettings();
 }
 
@@ -75,6 +89,9 @@ void PanelWidget::setTheme(const viz::Theme& theme)
 {
     applyTheme(this, theme);
     m_formPanel->setTheme(theme);
+    if (m_figureViewport) {
+        m_figureViewport->setTheme(theme);
+    }
 }
 
 //=============================================================================================================

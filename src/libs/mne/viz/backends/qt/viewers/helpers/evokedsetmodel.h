@@ -16,7 +16,7 @@
  * EvokedSetModel exposes one row per FIFF channel and one column per
  * condition; each cell yields the underlying time-series view
  * (plus colour / visibility) needed by @ref mne::viz::qt::ButterflyView and
- * @ref mne::viz::qt::AverageLayoutView. It also propagates baseline-correction,
+ * @ref mne::viz::AverageLayoutPanel. It also propagates baseline-correction,
  * SSP-projection and bad-channel updates so the visualisations stay
  * in sync with the latest pre-processing settings.
  */
@@ -32,6 +32,7 @@
 #include <mne/dsp/display_correction.h>
 #include <mne/dsp/filterkernel.h>
 #include <mne/fiff/fiff_types.h>
+#include <mne/viz/panels/average_layout_panel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -99,7 +100,7 @@ typedef std::pair<std::string, mne::viz::qt::RowVectorPair> AvrTypeRowVectorPair
  *
  * Propagates baseline-correction, SSP-projection and bad-channel
  * updates so connected views (@ref ButterflyView,
- * @ref AverageLayoutView) stay in sync with the latest
+ * @ref mne::viz::AverageLayoutPanel) stay in sync with the latest
  * pre-processing settings.
  */
 class VIZQTSHARED_EXPORT EvokedSetModel : public QAbstractTableModel
@@ -323,6 +324,17 @@ public:
      * @return the number of pre-stimulus samples.
      */
     qint32 getNumPreStimSamples() const;
+
+    //=========================================================================================================
+    /**
+     * The averages as an average layout shows them: the shown data of each average (frozen while frozen), the
+     * first sample relative to the stimulus and the bad channels.
+     *
+     * @return The averages; their data stay valid until the model's data change.
+     *
+     * @since 3.0.0
+     */
+    viz::EvokedAverages evokedAverages() const;
 
     //=========================================================================================================
     /**

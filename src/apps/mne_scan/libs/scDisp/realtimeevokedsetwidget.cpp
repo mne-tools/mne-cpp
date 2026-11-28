@@ -25,7 +25,13 @@
 #include <mne/viz/backends/qt/viewers/filtersettingsview.h>
 #include <mne/viz/backends/qt/viewers/helpers/evokedsetmodel.h>
 #include <mne/viz/backends/qt/viewers/butterflyview.h>
-#include <mne/viz/backends/qt/viewers/averagelayoutview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/backends/qt/kit/sceneviewport.h>
+#include <mne/viz/backends/qt/qtconversions.h>
+#include <mne/viz/backends/qt/viewers/helpers/selectionitem.h>
+#include <mne/viz/figures/svg_renderer.h>
+#include <mne/viz/panels/average_layout_panel.h>
+#include <mne/base/log.h>
 #include <mne/viz/backends/qt/viewers/scalingview.h>
 #include <mne/viz/backends/qt/viewers/modalityselectionview.h>
 #include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
@@ -109,7 +115,8 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<QTime>& pTime,
     m_pButterflyView->installEventFilter(this);
 
     //2D layout plot
-    m_pAverageLayoutView = new AverageLayoutView("MNESCAN/RTESW", this);
+    m_pAverageLayout = std::make_shared<viz::AverageLayoutPanel>();
+    m_pAverageLayoutView = new PanelWidget(m_pAverageLayout, "MNESCAN/RTESW", this);
     //m_pAverageLayoutView->installEventFilter(this);
 
     m_pToolBox->insertItem(0, m_pButterflyView, QIcon(), "Butterfly plot");
@@ -225,13 +232,24 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
                 m_pButterflyView.data(), &ButterflyView::showSelectedChannelsOnly);
 
         connect(m_pChannelSelectionView.get(), &ChannelSelectionView::selectionChanged,
-                m_pAverageLayoutView.data(), &AverageLayoutView::channelSelectionManagerChanged);
+                this, [this](const SelectionItem& selection) {
+                    m_pAverageLayout->set_evoked(m_pEvokedSetModel->evokedAverages());
+                    m_pAverageLayout->set_selection(selection.averageChannels());
+                });
 
         // Init the views. This needs to be done in the following order because we need to draw the items in the m_pChannelSelectionView first, hence we need to init it first.
         m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
         m_pChannelSelectionView->updateDataView();
-        m_pAverageLayoutView->setEvokedSetModel(m_pEvokedSetModel);
-        m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
+        // The selection names the channels by layout name; the channel info model knows their rows
+        m_pAverageLayout->set_info(m_pFiffInfo);
+        m_pAverageLayout->set_channel_lookup([model = m_pChannelInfoModel](const std::string& name) {
+            return model->getIndexFromMappedChName(name);
+        });
+        connect(m_pEvokedSetModel.get(), &EvokedSetModel::dataChanged,
+                this, [this]() {
+                    m_pAverageLayout->set_evoked(m_pEvokedSetModel->evokedAverages());
+                });
+        m_pAverageLayout->set_evoked(m_pEvokedSetModel->evokedAverages());
         m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
 
         //Init control widgets
@@ -277,10 +295,12 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
                 m_pButterflyView.data(), &ButterflyView::setScaleMap);
 
         connect(pScalingView, &ScalingView::scalingChanged,
-                m_pAverageLayoutView.data(), &AverageLayoutView::setScaleMap);
+                this, [this](const std::map<int, float>& scaleMap) {
+                    m_pAverageLayout->set_scale_map(scaleMap);
+                });
 
         m_pButterflyView->setScaleMap(pScalingView->getScaleMap());
-        m_pAverageLayoutView->setScaleMap(pScalingView->getScaleMap());
+        m_pAverageLayout->set_scale_map(pScalingView->getScaleMap());
 
         // Quick control channel data settings
         FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("MNESCAN/RTESW"), this);
@@ -289,7 +309,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
         lControlWidgets.append(pChannelDataSettingsView);
 
         connect(pChannelDataSettingsView, &FiffRawViewSettings::backgroundColorChanged,
-                m_pAverageLayoutView.data(), &AverageLayoutView::setBackgroundColor);
+                m_pAverageLayoutView->figureViewport(), &SceneViewport::setBackgroundColor);
 
         connect(pChannelDataSettingsView, &FiffRawViewSettings::backgroundColorChanged,
                 m_pButterflyView.data(), &ButterflyView::setBackgroundColor);
@@ -297,7 +317,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
         connect(pChannelDataSettingsView, &FiffRawViewSettings::makeScreenshot,
                 this, &RealTimeEvokedSetWidget::onMakeScreenshot);
 
-        m_pAverageLayoutView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
+        m_pAverageLayoutView->figureViewport()->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
         m_pButterflyView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
 
         // Quick control modality selection
@@ -329,21 +349,23 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
         connect(pAverageSelectionView, &AverageSelectionView::newAverageColorMap,
                 m_pButterflyView.data(), &ButterflyView::setAverageColor);
 
-        connect(m_pEvokedSetModel.get(), &EvokedSetModel::newAverageColorMap,
-                m_pAverageLayoutView.data(), &AverageLayoutView::setAverageColor);
-        connect(m_pEvokedSetModel.get(), &EvokedSetModel::newAverageActivationMap,
-                m_pAverageLayoutView.data(), &AverageLayoutView::setAverageActivation);
-        connect(pAverageSelectionView, &AverageSelectionView::newAverageActivationMap,
-                m_pAverageLayoutView.data(), &AverageLayoutView::setAverageActivation);
-        connect(pAverageSelectionView, &AverageSelectionView::newAverageColorMap,
-                m_pAverageLayoutView.data(), &AverageLayoutView::setAverageColor);
+        const auto setLayoutColors = [this](const std::shared_ptr<std::map<std::string, QColor>>& colors) {
+            m_pAverageLayout->set_average_colors(colors ? toColors(*colors) : std::map<std::string, viz::Color>{});
+        };
+        const auto setLayoutActivation = [this](const std::shared_ptr<std::map<std::string, bool>>& activation) {
+            m_pAverageLayout->set_average_activation(activation ? *activation : std::map<std::string, bool>{});
+        };
+        connect(m_pEvokedSetModel.get(), &EvokedSetModel::newAverageColorMap, this, setLayoutColors);
+        connect(m_pEvokedSetModel.get(), &EvokedSetModel::newAverageActivationMap, this, setLayoutActivation);
+        connect(pAverageSelectionView, &AverageSelectionView::newAverageActivationMap, this, setLayoutActivation);
+        connect(pAverageSelectionView, &AverageSelectionView::newAverageColorMap, this, setLayoutColors);
 
         m_pEvokedSetModel->setAverageActivation(pAverageSelectionView->getAverageActivation());
         m_pEvokedSetModel->setAverageColor(pAverageSelectionView->getAverageColor());
         m_pButterflyView->setAverageActivation(pAverageSelectionView->getAverageActivation());
         m_pButterflyView->setAverageColor(pAverageSelectionView->getAverageColor());
-        m_pAverageLayoutView->setAverageActivation(pAverageSelectionView->getAverageActivation());
-        m_pAverageLayoutView->setAverageColor(pAverageSelectionView->getAverageColor());
+        setLayoutActivation(pAverageSelectionView->getAverageActivation());
+        setLayoutColors(pAverageSelectionView->getAverageColor());
 
         emit displayControlWidgetsChanged(lControlWidgets, t_sRTESName);
 
@@ -357,7 +379,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
 void RealTimeEvokedSetWidget::updateViewport()
 {
     if (m_pAverageLayoutView) {
-        m_pAverageLayoutView->updateViewport();
+        m_pAverageLayoutView->figureViewport()->update();
     }
     if (m_pButterflyView) {
         m_pButterflyView->updateViewport();
@@ -414,7 +436,14 @@ void RealTimeEvokedSetWidget::onMakeScreenshot(const QString& imageType)
                                       sSuffix);
 
     if (bIsLayout) {
-        m_pAverageLayoutView->takeScreenshot(fileName);
+        SceneViewport* viewport = m_pAverageLayoutView->figureViewport();
+        if (fileName.endsWith(".svg", Qt::CaseInsensitive)) {
+            if (const auto written = viz::write_svg(viewport->picture(viewport->size()), fileName.toStdU16String()); !written) {
+                mne::Log::warning("{}", written.error().what());
+            }
+        } else {
+            viewport->grab().save(fileName);
+        }
     } else {
         m_pButterflyView->takeScreenshot(fileName);
     }

@@ -439,6 +439,23 @@ aliases; replace the old spelling as below.
   (`viz::qt::applyTheme()`, `PanelWidget::setTheme()`, the bundled fonts
   registered with Qt), with labels left and editors right-aligned in
   `SettingsPanel`.
+- Interactive figures without a toolkit: `viz::SceneFigure`
+  (`viz/figures/scene_figure.h`) is the contract of a figure (bounds,
+  drawing, presses, hovers, double clicks and rubber bands in scene
+  coordinates), and `viz::FigureView` (`viz/panels/figure_view.h`) fits,
+  zooms, pans and scrolls any figure for any host, as a `SurfaceClient` or
+  inside a widget. `viz::qt::SceneViewport` moves to
+  `viz/backends/qt/kit/sceneviewport.h` and hosts any figure through it;
+  `SensorLayoutWidget` and `AverageLayoutWidget` are replaced by
+  `viz::SensorLayoutFigure` and `viz::AverageLayoutFigure`. Panels may have a
+  figure, which `PanelWidget` shows below the form. `AverageLayoutView` is
+  replaced by `viz::AverageLayoutPanel`, fed by
+  `EvokedSetModel::evokedAverages()` and `SelectionItem::averageChannels()`,
+  in mne_scan and mne_analyze; `ex_scene_sdl --panel average` shows it in an
+  SDL window. The channel scales move to `viz::default_channel_scale()` and
+  `viz::channel_scale()` (`viz/figures/channel_scale.h`).
+  `test_viz_figure_view` drives the view with synthetic input and compares
+  golden PNGs.
 - `ChannelRhiRenderer` hosts a `viz::TraceViewClient`, the same trace view
   client the SDL example runs, instead of wiring its own view, animator,
   markers and frame builder; its host becomes the client's `viz::Surface`.

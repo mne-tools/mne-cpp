@@ -33,7 +33,6 @@
 
 #include <mne/viz/backends/qt/viewers/dipolefitview.h>
 #include <mne/viz/backends/qt/viewers/bidsview.h>
-#include <mne/viz/backends/qt/viewers/averagelayoutview.h>
 #include <mne/viz/backends/qt/viewers/butterflyview.h>
 #include <mne/viz/backends/qt/viewers/control3dview.h>
 #include <mne/viz/backends/qt/viewers/artifactsettingsview.h>
@@ -95,7 +94,6 @@ private slots:
     void initTestCase();
     void construct_dipoleFitView();
     void construct_bidsView();
-    void construct_averageLayoutView();
     void construct_butterflyView();
     void construct_control3DView();
     void construct_artifactSettingsView();
@@ -152,22 +150,6 @@ void TestVizQtViewers3::construct_bidsView()
     pView->show();
     QVERIFY2(pView->size().isValid() && !pView->size().isEmpty(),
              "widget laid out to an empty geometry");
-
-    delete pView;
-}
-
-//=============================================================================================================
-
-void TestVizQtViewers3::construct_averageLayoutView()
-{
-    // The settings path exercises the save and restore branches, which are the
-    // ones most likely to fault on a key that has never been written before.
-    AverageLayoutView* pView = new AverageLayoutView(settingsPath(), m_pHolder.data());
-    QVERIFY(pView != nullptr);
-
-    pView->resize(320, 240);
-    pView->show();
-    pView->saveSettings();
 
     delete pView;
 }

@@ -56,7 +56,12 @@ class EvokedSetModel;
 class ButterflyView;
 class ChannelSelectionView;
 class ChannelInfoModel;
-class AverageLayoutView;
+class PanelWidget;
+}
+
+namespace mne::viz
+{
+class AverageLayoutPanel;
 }
 
 class QVBoxLayout;
@@ -160,7 +165,8 @@ private:
     std::shared_ptr<mne::viz::qt::ChannelSelectionView> m_pChannelSelectionView; /**< ChannelSelectionView. */
     std::shared_ptr<mne::viz::qt::ChannelInfoModel> m_pChannelInfoModel;         /**< Channel info model. */
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                                  /**< FiffInfo, which is used instead of ListChInfo*/
-    QPointer<mne::viz::qt::AverageLayoutView> m_pAverageLayoutView;              /**< 2D layout view for plotting averages*/
+    std::shared_ptr<mne::viz::AverageLayoutPanel> m_pAverageLayout;              /**< 2D layout of the averages. */
+    QPointer<mne::viz::qt::PanelWidget> m_pAverageLayoutView;                    /**< 2D layout view for plotting averages*/
     QPointer<mne::viz::qt::ButterflyView> m_pButterflyView;                      /**< Butterfly plot. */
 
     QList<qint32> m_qListCurrentSelection; /**< Current selection list -> hack around C++11 lambda . */
