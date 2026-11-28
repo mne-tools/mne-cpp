@@ -22,8 +22,8 @@
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <mne/viz/backends/qt/viewers/filtersettingsview.h>
-#include <mne/viz/backends/qt/viewers/filterdesignview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/filter_settings_panel.h>
 #include <mne/dsp/filterkernel.h>
 
 //=============================================================================================================
@@ -47,7 +47,6 @@ using namespace mne;
 //=============================================================================================================
 
 Filtering::Filtering()
-: m_pFilterSettingsView(nullptr)
 {
 }
 
@@ -97,27 +96,59 @@ QMenu* Filtering::getMenu()
 QDockWidget* Filtering::getControl()
 {
     auto pControlDock = std::make_unique<QDockWidget>(getName());
-    m_pFilterSettingsView = new FilterSettingsView("MNEANALYZE", pControlDock.get());
+    m_pFilterPanel = std::make_shared<FilterSettingsPanel>();
+    auto* pFilterWidget = new PanelWidget(m_pFilterPanel, "MNEANALYZE", pControlDock.get());
 
     connect(this, &Filtering::guiModeChanged,
-            m_pFilterSettingsView.data(), &FilterSettingsView::setGuiMode, Qt::UniqueConnection);
+            pFilterWidget, &PanelWidget::setGuiMode, Qt::UniqueConnection);
 
-    connect(this, &Filtering::guiStyleChanged,
-            m_pFilterSettingsView.data(), &FilterSettingsView::guiStyleChanged, Qt::UniqueConnection);
+    const QPointer<Filtering> plugin(this);
+    const std::shared_ptr<FilterDesignPanel> design = m_pFilterPanel->design();
+    FilterDesignPanel::Callbacks designCallbacks;
+    designCallbacks.channel_type_changed = [plugin](const std::string& type) {
+        if (plugin) {
+            plugin->setFilterChannelType(QString::fromStdString(type));
+        }
+    };
+    designCallbacks.filter_changed = [plugin](const FilterKernel& filter) {
+        if (plugin) {
+            plugin->setFilter(filter);
+        }
+    };
+    design->set_callbacks(std::move(designCallbacks));
 
-    connect(m_pFilterSettingsView->getFilterView().get(), &FilterDesignView::filterChannelTypeChanged,
-            this, &Filtering::setFilterChannelType, Qt::UniqueConnection);
+    // The filter design opens in a window of its own
+    FilterSettingsPanel::Callbacks filterCallbacks;
+    filterCallbacks.activation_changed = [plugin](bool active) {
+        if (plugin) {
+            plugin->setFilterActive(active);
+        }
+    };
+    const QPointer<PanelWidget> filterWidget(pFilterWidget);
+    filterCallbacks.show_design = [filterWidget, design]() {
+        if (!filterWidget) {
+            return;
+        }
+        auto* window = filterWidget->findChild<PanelWidget*>(QStringLiteral("FilterDesignWindow"));
+        if (!window) {
+            window = new PanelWidget(design, QString(), filterWidget);
+            window->setObjectName(QStringLiteral("FilterDesignWindow"));
+            window->setWindowFlags(Qt::Window);
+        }
+        if (window->isVisible() && window->isActiveWindow()) {
+            window->hide();
+        } else {
+            window->show();
+            window->raise();
+            window->activateWindow();
+        }
+    };
+    m_pFilterPanel->set_callbacks(std::move(filterCallbacks));
 
-    connect(m_pFilterSettingsView->getFilterView().get(), &FilterDesignView::filterChanged,
-            this, &Filtering::setFilter, Qt::UniqueConnection);
-
-    connect(m_pFilterSettingsView.data(), &FilterSettingsView::filterActivationChanged,
-            this, &Filtering::setFilterActive, Qt::UniqueConnection);
-
-    setFilter(m_pFilterSettingsView->getFilterView()->getCurrentFilter());
+    setFilter(design->filter());
 
     pControlDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
-    pControlDock->setWidget(m_pFilterSettingsView);
+    pControlDock->setWidget(pFilterWidget);
     pControlDock->setObjectName(getName());
 
     return pControlDock.release();
@@ -138,13 +169,12 @@ void Filtering::handleEvent(QSharedPointer<Event> e)
         case SELECTED_MODEL_CHANGED:
             if (e->getData().value<QSharedPointer<AbstractModel>>()->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
                 if (QSharedPointer<FiffRawViewModel> pModel = qSharedPointerCast<FiffRawViewModel>(e->getData().value<QSharedPointer<AbstractModel>>())) {
-                    if (m_pFilterSettingsView) {
-                        setFilterActive(m_pFilterSettingsView->getFilterActive());
+                    if (m_pFilterPanel) {
+                        setFilterActive(m_pFilterPanel->active());
                         if (auto info = pModel->getFiffInfo()) {
-                            m_pFilterSettingsView->getFilterView()->setSamplingRate(info->sfreq);
-                            //m_pFilterSettingsView->getFilterView()->setMaxAllowedFilterTaps(pModel->getFiffInfo()->sfreq);
-                            setFilterChannelType(m_pFilterSettingsView->getFilterView()->getChannelType());
-                            setFilter(m_pFilterSettingsView->getFilterView()->getCurrentFilter());
+                            m_pFilterPanel->set_sampling_rate(info->sfreq);
+                            setFilterChannelType(QString::fromStdString(m_pFilterPanel->design()->channel_type()));
+                            setFilter(m_pFilterPanel->design()->filter());
                         }
                     }
                 }

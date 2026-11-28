@@ -10,9 +10,8 @@
  * @brief    Tests for the disp viewer widget classes: construction, getter/setter round-trips,
  *           settings persistence, GuiMode/ProcessingMode switching, and clearView.
  *           Covers: ScalingView, PanelWidget (compensators, projectors, covariance, time-frequency, SPHARA,
- *           minimum norm, connectivity, averaging, artifact rejection, trigger detection),
- *           ModalitySelectionView, FilterSettingsView, FilterDesignView, SettingsPanel, ProgressView,
- *           QuickControlView, and MultiView.
+ *           minimum norm, connectivity, averaging, artifact rejection, trigger detection, filter settings
+ *           and design), ModalitySelectionView, SettingsPanel, ProgressView, QuickControlView, and MultiView.
  */
 
 //=============================================================================================================
@@ -36,8 +35,7 @@
 #include <mne/viz/panels/trigger_detection_panel.h>
 #include <mne/viz/models/item_list.h>
 #include <mne/viz/backends/qt/viewers/modalityselectionview.h>
-#include <mne/viz/backends/qt/viewers/filtersettingsview.h>
-#include <mne/viz/backends/qt/viewers/filterdesignview.h>
+#include <mne/viz/panels/filter_settings_panel.h>
 #include <mne/viz/backends/qt/viewers/progressview.h>
 #include <mne/viz/backends/qt/viewers/quickcontrolview.h>
 #include <mne/viz/backends/qt/viewers/multiview.h>
@@ -57,6 +55,7 @@
 #include <QApplication>
 #include <QStringList>
 #include <QMap>
+#include <QAbstractButton>
 #include <QCheckBox>
 #include <QFontInfo>
 #include <QToolButton>
@@ -141,17 +140,16 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies that FilterSettingsView constructs and survives lifecycle transitions.
+     * Verifies that a PanelWidget of a FilterSettingsPanel constructs and survives lifecycle transitions.
      */
-    void filterSettingsView_lifecycle();
+    void filterSettingsPanel_lifecycle();
 
     //=========================================================================================================
     /**
-     * Verifies that FilterDesignView constructs, setSamplingRate/setFrom/setTo/setChannelType
-     * do not crash, getChannelType returns a non-empty string, and the view survives
-     * lifecycle transitions.
+     * Verifies that a PanelWidget of a FilterDesignPanel shows the response figure, that the panel's setters
+     * reach the widgets and that the widget survives lifecycle transitions.
      */
-    void filterDesignView_setAndGet();
+    void filterDesignPanel_setAndGet();
 
 
     //=========================================================================================================
@@ -177,10 +175,10 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies the form-built FilterSettingsView: widgets per field, the design view in sync, the activation
-     * signal, the clinical mode and the QSettings keys.
+     * Verifies the PanelWidget of a FilterSettingsPanel: widgets per field, the design panel in sync, the
+     * activation and design callbacks, the clinical mode and the QSettings keys.
      */
-    void filterSettingsView_formPanel();
+    void filterSettingsPanel_formPanel();
 
 
     //============================================================================================================
@@ -463,9 +461,9 @@ void TestVizQtViewers::modalitySelectionView_setAndGet()
 
 //=============================================================================================================
 
-void TestVizQtViewers::filterSettingsView_lifecycle()
+void TestVizQtViewers::filterSettingsPanel_lifecycle()
 {
-    FilterSettingsView view("test_viz_qt_viewers");
+    PanelWidget view(std::make_shared<FilterSettingsPanel>(), "test_viz_qt_viewers");
 
     view.setGuiMode(AbstractView::GuiMode::Clinical);
     view.setGuiMode(AbstractView::GuiMode::Research);
@@ -480,22 +478,26 @@ void TestVizQtViewers::filterSettingsView_lifecycle()
 
 //=============================================================================================================
 
-void TestVizQtViewers::filterDesignView_setAndGet()
+void TestVizQtViewers::filterDesignPanel_setAndGet()
 {
-    FilterDesignView view("test_viz_qt_viewers");
+    auto panel = std::make_shared<FilterDesignPanel>();
+    PanelWidget view(panel);
+    QVERIFY(view.figureViewport());
+    auto* from = qobject_cast<QDoubleSpinBox*>(view.formPanel()->editor(FilterDesignPanel::from_key));
+    auto* taps = qobject_cast<QSpinBox*>(view.formPanel()->editor(FilterDesignPanel::taps_key));
+    QVERIFY(from && taps);
 
-    view.setSamplingRate(600.0);
-    view.setMaxAllowedFilterTaps(512);
-    view.setFrom(1.0);
-    view.setTo(40.0);
-
-    int taps = view.getFilterTaps();
-    QVERIFY(taps > 0);
-
-    QString chType = view.getChannelType();
-    QVERIFY(!chType.isEmpty());
-
-    view.setChannelType("MEG");
+    panel->set_sampling_rate(600.0);
+    panel->set_max_taps(512);
+    panel->set_from(2.0);
+    panel->set_to(40.0);
+    QCOMPARE(from->value(), 2.0);
+    QCOMPARE(taps->maximum(), 512);
+    QVERIFY(panel->taps() > 0);
+    QVERIFY(!panel->channel_type().empty());
+    panel->set_channel_type("MEG");
+    QCOMPARE(panel->channel_type(), std::string("MEG"));
+    QVERIFY(!panel->response().plot().magnitude_db().empty());
 
     view.setGuiMode(AbstractView::GuiMode::Research);
     view.setProcessingMode(AbstractView::ProcessingMode::Offline);
@@ -695,42 +697,62 @@ void TestVizQtViewers::settingsPanel_flagsGroupsAndPersistence()
 
 //=============================================================================================================
 
-void TestVizQtViewers::filterSettingsView_formPanel()
+void TestVizQtViewers::filterSettingsPanel_formPanel()
 {
     const QString path = QStringLiteral("test_viz_qt_viewers_filter_%1").arg(QCoreApplication::applicationPid());
     QSettings(QStringLiteral("MNECPP")).remove(path);
     {
-        FilterSettingsView view(path);
+        auto filters = std::make_shared<FilterSettingsPanel>();
+        PanelWidget view(filters, path);
         view.show();
-        auto* panel = view.findChild<SettingsPanel*>();
+        SettingsPanel* panel = view.formPanel();
         QVERIFY(panel);
         auto* active = qobject_cast<QCheckBox*>(panel->editor("filterActivated"));
         auto* type = qobject_cast<QComboBox*>(panel->editor("filterChannelType"));
         auto* from = qobject_cast<QDoubleSpinBox*>(panel->editor("filterFrom"));
         auto* to = qobject_cast<QDoubleSpinBox*>(panel->editor("filterTo"));
-        auto* advanced = panel->editor("showFilterOptions");
+        auto* advanced = qobject_cast<QAbstractButton*>(panel->editor("showFilterOptions"));
         QVERIFY(active && type && from && to && advanced);
-        QCOMPARE(type->count(), 5);
-        QCOMPARE(from->suffix(), QStringLiteral("Hz"));
+        QCOMPARE(type->count(), 6);
+        QCOMPARE(from->suffix(), QStringLiteral(" Hz"));
 
-        // The pass band follows the design view and is handed to it when editing finishes
-        QCOMPARE(from->value(), view.getFilterView()->getFrom());
-        view.setSamplingRate(600.0);
+        bool activated = false;
+        int designRequests = 0;
+        int designs = 0;
+        FilterSettingsPanel::Callbacks callbacks;
+        callbacks.activation_changed = [&activated](bool on) {
+            activated = on;
+        };
+        callbacks.show_design = [&designRequests]() {
+            ++designRequests;
+        };
+        filters->set_callbacks(std::move(callbacks));
+        FilterDesignPanel::Callbacks designCallbacks;
+        designCallbacks.filter_changed = [&designs](const mne::FilterKernel&) {
+            ++designs;
+        };
+        filters->design()->set_callbacks(std::move(designCallbacks));
+
+        // The pass band follows the design panel and is handed to it when editing finishes
+        QCOMPARE(from->value(), filters->design()->from());
+        filters->set_sampling_rate(600.0);
         QCOMPARE(to->maximum(), 300.0);
+        QCOMPARE(designs, 0);
         to->setValue(40.0);
         emit to->editingFinished();
-        QCOMPARE(view.getFilterView()->getTo(), 40.0);
+        QCOMPARE(filters->design()->to(), 40.0);
         from->setValue(5.0);
         emit from->editingFinished();
-        QCOMPARE(view.getFilterView()->getFrom(), 5.0);
+        QCOMPARE(filters->design()->from(), 5.0);
+        QVERIFY(designs >= 1);
         type->setCurrentText(QStringLiteral("EEG"));
-        QCOMPARE(view.getFilterView()->getChannelType(), QStringLiteral("EEG"));
+        QCOMPARE(filters->design()->channel_type(), std::string("EEG"));
 
-        QSignalSpy activeSpy(&view, &FilterSettingsView::filterActivationChanged);
         active->click();
-        QCOMPARE(activeSpy.count(), 1);
-        QVERIFY(activeSpy.last().at(0).toBool());
-        QVERIFY(view.getFilterActive());
+        QVERIFY(activated);
+        QVERIFY(filters->active());
+        advanced->click();
+        QCOMPARE(designRequests, 1);
 
         // The clinical mode hides the advanced design
         view.setGuiMode(AbstractView::GuiMode::Clinical);
@@ -747,11 +769,17 @@ void TestVizQtViewers::filterSettingsView_formPanel()
         QCOMPARE(settings.value(group + QStringLiteral("filterTo")).toDouble(), 40.0);
         QCOMPARE(settings.value(group + QStringLiteral("filterChannelType")).toString(), QStringLiteral("EEG"));
         QVERIFY(!settings.contains(group + QStringLiteral("clinical")));
+        const QString design = path + QStringLiteral("/FilterDesignView/");
+        QCOMPARE(settings.value(design + QStringLiteral("filterFrom")).toDouble(), 5.0);
+        QCOMPARE(settings.value(design + QStringLiteral("filterChannelType")).toString(), QStringLiteral("EEG"));
+        QCOMPARE(settings.value(design + QStringLiteral("filterDesignMethod")).toInt(), 0);
     }
     {
-        FilterSettingsView view(path);
-        QVERIFY(view.getFilterActive());
-        auto* type = qobject_cast<QComboBox*>(view.findChild<SettingsPanel*>()->editor("filterChannelType"));
+        auto filters = std::make_shared<FilterSettingsPanel>();
+        PanelWidget view(filters, path);
+        QVERIFY(filters->active());
+        QCOMPARE(filters->design()->from(), 5.0);
+        auto* type = qobject_cast<QComboBox*>(view.formPanel()->editor("filterChannelType"));
         QCOMPARE(type->currentText(), QStringLiteral("EEG"));
     }
     QSettings(QStringLiteral("MNECPP")).remove(path);

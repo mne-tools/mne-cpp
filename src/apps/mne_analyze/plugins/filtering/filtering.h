@@ -33,6 +33,12 @@
 #include <QPointer>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -46,9 +52,9 @@ namespace mne
 class FilterKernel;
 }
 
-namespace mne::viz::qt
+namespace mne::viz
 {
-class FilterSettingsView;
+class FilterSettingsPanel;
 }
 
 //=============================================================================================================
@@ -121,8 +127,8 @@ private:
      */
     void setFilterActive(bool state);
 
-    QPointer<mne::analyze::Communicator> m_pCommu; /**< To broadcst signals. */
-    QPointer<mne::viz::qt::FilterSettingsView> m_pFilterSettingsView;
+    QPointer<mne::analyze::Communicator> m_pCommu;                 /**< To broadcst signals. */
+    std::shared_ptr<mne::viz::FilterSettingsPanel> m_pFilterPanel; /**< Activation and pass band, with the filter design. */
 };
 
 //=============================================================================================================

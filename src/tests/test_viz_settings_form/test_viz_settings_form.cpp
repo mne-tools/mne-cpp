@@ -20,6 +20,9 @@
 #include <mne/viz/panels/averaging_panel.h>
 #include <mne/viz/panels/compensator_panel.h>
 #include <mne/viz/panels/connectivity_panel.h>
+#include <mne/viz/panels/filter_settings_panel.h>
+#include <mne/viz/figures/canvas.h>
+#include <mne/viz/figures/text_metrics.h>
 #include <mne/viz/panels/covariance_panel.h>
 #include <mne/viz/panels/forward_panel.h>
 #include <mne/fiff/fiff_constants.h>
@@ -34,6 +37,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cmath>
 #include <cstdio>
 #include <filesystem>
 #include <functional>
@@ -41,6 +45,7 @@
 #include <string>
 #include <tuple>
 #include <utility>
+#include <variant>
 #include <vector>
 
 //=============================================================================================================
@@ -506,6 +511,175 @@ void test_artifact_and_averaging_panels()
     CHECK(averaging.baseline_from() == -20 && reports == 2);
 }
 
+//=============================================================================================================
+
+void test_filter_design_panel()
+{
+    FilterDesignPanel panel;
+    CHECK(panel.id() == "FilterDesignView" && panel.figure());
+    CHECK(panel.from() == 1.0 && panel.to() == 40.0 && panel.taps() == 128 && panel.channel_type() == "All");
+    CHECK(panel.filter().filter_type().name() == "BPF" && panel.filter().sampling_frequency() == 600.0);
+
+    std::vector<double> edges;
+    int designs = 0;
+    std::vector<std::string> types;
+    FilterDesignPanel::Callbacks callbacks;
+    callbacks.filter_changed = [&designs](const mne::FilterKernel&) {
+        ++designs;
+    };
+    callbacks.from_changed = [&edges](double from) {
+        edges.push_back(from);
+    };
+    callbacks.to_changed = [&edges](double to) {
+        edges.push_back(to);
+    };
+    callbacks.channel_type_changed = [&types](const std::string& type) {
+        types.push_back(type);
+    };
+    panel.set_callbacks(std::move(callbacks));
+
+    // Programmatic setters are silent and clamp to the Nyquist frequency
+    panel.set_sampling_rate(200.0);
+    panel.set_max_taps(101);
+    panel.set_to(150.0);
+    panel.set_channel_type("EEG");
+    CHECK(designs == 0 && types.empty() && panel.to() == 100.0 && panel.form().field(FilterDesignPanel::taps_key)->maximum == 100.0);
+    CHECK(panel.taps() == 100 && panel.filter().filter_order() == 100 && panel.channel_type() == "EEG");
+
+    // User edits design and report; the lower edge stays below the upper one
+    panel.form().set_value(FilterDesignPanel::to_key, 30.0);
+    CHECK(designs == 1 && (edges == std::vector<double>{1.0, 30.0}) && std::abs(panel.filter().lowpass_freq() - 30.0) < 1e-9);
+    CHECK(panel.form().field(FilterDesignPanel::from_key)->maximum == 30.0);
+    panel.form().set_value(FilterDesignPanel::channel_type_key, std::string("MEG"));
+    CHECK((types == std::vector<std::string>{"MEG"}));
+
+    // A low pass only has an upper edge
+    panel.form().set_value(FilterDesignPanel::type_key, std::string("LPF"));
+    CHECK(designs == 2 && panel.filter().filter_type().name() == "LPF" && std::abs(panel.filter().lowpass_freq() - 30.0) < 1e-9);
+    CHECK(!panel.form().is_visible(FilterDesignPanel::from_key) && panel.form().is_visible(FilterDesignPanel::to_key));
+    panel.form().set_value(FilterDesignPanel::type_key, std::string("BPF"));
+
+    // The response figure lays itself out to the view and draws a curve and the filter's name
+    FilterResponseFigure& figure = panel.response();
+    CHECK(!figure.zoomable() && !figure.plot().magnitude_db().empty() && figure.plot().nyquist() == 100.0);
+    figure.resize(320.0, 200.0);
+    CHECK(figure.bounds().width == 320.0 && figure.bounds().height == 200.0);
+    Canvas canvas(320.0, 200.0);
+    figure.draw(canvas, ApproximateTextMetrics(), Font{});
+    bool curve = false;
+    bool title = false;
+    for (const Command& command : canvas.display_list().commands) {
+        if (const auto* path = std::get_if<PathShape>(&command.shape)) {
+            curve = curve || path->points.size() > 10;
+        } else if (const auto* text = std::get_if<TextShape>(&command.shape)) {
+            title = title || text->text == panel.filter().name();
+        }
+    }
+    CHECK(curve && title);
+
+    // Coefficients round-trip through a file, and the plot exports as SVG and PNG
+    const std::filesystem::path dir = std::filesystem::current_path() / "test_viz_settings_form_filter";
+    std::filesystem::create_directories(dir);
+    CHECK(panel.export_coefficients(dir / "designed.txt").has_value());
+    CHECK(panel.export_plot(dir / "plot.svg").has_value() && std::filesystem::file_size(dir / "plot.svg") > 0);
+    CHECK(panel.export_plot(dir / "plot.PNG", 200.0, 120.0).has_value() && std::filesystem::file_size(dir / "plot.PNG") > 0);
+    panel.form().set_value(FilterDesignPanel::from_key, 5.0);
+    const int before = designs;
+    panel.form().set_value(FilterDesignPanel::load_filter_key, (dir / "designed.txt").string());
+    CHECK(designs == before + 1 && std::abs(panel.from() - 1.0) < 1e-6 && std::abs(panel.to() - 30.0) < 1e-6);
+    CHECK(!panel.load_filter(dir / "missing.txt").has_value());
+    std::filesystem::remove_all(dir);
+
+    // Settings keep the keys of the Qt view, the design method as its index, and restore silently
+    MemorySettingsStore store;
+    panel.form().set_value(FilterDesignPanel::method_key, std::string("Tschebyscheff"));
+    panel.save(store, "app");
+    CHECK(store.value("app/FilterDesignView/filterDesignMethod") == SettingValue(1));
+    CHECK(store.value("app/FilterDesignView/filterTo") == SettingValue(30.0));
+    CHECK(!store.contains("app/FilterDesignView/exportFilter"));
+    FilterDesignPanel restored;
+    int restoredDesigns = 0;
+    FilterDesignPanel::Callbacks restoredCallbacks;
+    restoredCallbacks.filter_changed = [&restoredDesigns](const mne::FilterKernel&) {
+        ++restoredDesigns;
+    };
+    restored.set_callbacks(std::move(restoredCallbacks));
+    restored.load(store, "app");
+    CHECK(restoredDesigns == 0 && restored.to() == 30.0 && restored.channel_type() == "MEG");
+    CHECK(restored.filter().design_method().name() == "Tschebyscheff");
+}
+
+//=============================================================================================================
+
+void test_filter_settings_panel()
+{
+    FilterSettingsPanel panel;
+    CHECK(panel.id() == "FilterSettingsView" && !panel.active() && panel.design());
+    FilterDesignPanel& design = *panel.design();
+    CHECK(panel.form().get<double>(FilterSettingsPanel::from_key) == design.from());
+
+    bool activated = false;
+    int requests = 0;
+    FilterSettingsPanel::Callbacks callbacks;
+    callbacks.activation_changed = [&activated](bool on) {
+        activated = on;
+    };
+    callbacks.show_design = [&requests]() {
+        ++requests;
+    };
+    panel.set_callbacks(std::move(callbacks));
+    int designs = 0;
+    std::vector<std::string> types;
+    FilterDesignPanel::Callbacks designCallbacks;
+    designCallbacks.filter_changed = [&designs](const mne::FilterKernel&) {
+        ++designs;
+    };
+    designCallbacks.channel_type_changed = [&types](const std::string& type) {
+        types.push_back(type);
+    };
+    design.set_callbacks(std::move(designCallbacks));
+
+    panel.set_sampling_rate(500.0);
+    CHECK(designs == 0 && panel.form().field(FilterSettingsPanel::to_key)->maximum == 250.0);
+
+    // Edits here are edits of the design, which reports them
+    panel.form().set_value(FilterSettingsPanel::to_key, 70.0);
+    panel.form().set_value(FilterSettingsPanel::from_key, 3.0);
+    CHECK(designs == 2 && design.from() == 3.0 && design.to() == 70.0);
+    panel.form().set_value(FilterSettingsPanel::channel_type_key, std::string("EOG"));
+    CHECK((types == std::vector<std::string>{"EOG"}) && design.channel_type() == "EOG");
+
+    // Edits of the design show here
+    design.form().set_value(FilterDesignPanel::to_key, 60.0);
+    design.set_from(8.0);
+    CHECK(panel.form().get<double>(FilterSettingsPanel::to_key) == 60.0 && panel.form().get<double>(FilterSettingsPanel::from_key) == 8.0);
+
+    panel.form().set_value(FilterSettingsPanel::active_key, true);
+    panel.form().trigger(FilterSettingsPanel::show_design_key);
+    CHECK(activated && panel.active() && requests == 1);
+
+    // The clinical mode hides the design action
+    CHECK(panel.form().is_visible(FilterSettingsPanel::show_design_key));
+    panel.set_gui_mode(Panel::GuiMode::Clinical);
+    CHECK(!panel.form().is_visible(FilterSettingsPanel::show_design_key));
+
+    // Settings include the design's and restore silently
+    MemorySettingsStore store;
+    panel.save(store, "app");
+    CHECK(store.value("app/FilterSettingsView/filterActivated") == SettingValue(true));
+    CHECK(store.value("app/FilterDesignView/filterFrom") == SettingValue(8.0));
+    FilterSettingsPanel restored;
+    bool reported = false;
+    FilterSettingsPanel::Callbacks restoredCallbacks;
+    restoredCallbacks.activation_changed = [&reported](bool) {
+        reported = true;
+    };
+    restored.set_callbacks(std::move(restoredCallbacks));
+    restored.load(store, "app");
+    CHECK(!reported && restored.active() && restored.design()->from() == 8.0 && restored.design()->channel_type() == "EOG");
+    CHECK(restored.form().get<double>(FilterSettingsPanel::to_key) == 60.0);
+}
+
 } // namespace
 
 //=============================================================================================================
@@ -527,6 +701,8 @@ int main()
         {"connectivity_panel", test_connectivity_panel},
         {"trigger_detection_panel", test_trigger_detection_panel},
         {"artifact_and_averaging_panels", test_artifact_and_averaging_panels},
+        {"filter_design_panel", test_filter_design_panel},
+        {"filter_settings_panel", test_filter_settings_panel},
     };
     for (const auto& [name, test] : tests) {
         const int before = g_failures;

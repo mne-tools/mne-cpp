@@ -498,6 +498,14 @@ aliases; replace the old spelling as below.
   mne_analyze and keep their settings keys. Trigger colours are edited in a
   colour field and stored as text per trigger type; colours stored by the old
   view are not read. The detected trials of the averaging panel are a list.
+- Filter settings and design are toolkit-free panels: `viz::FilterSettingsPanel`
+  and `viz::FilterDesignPanel` replace `FilterSettingsView` and
+  `FilterDesignView` and keep their settings keys. The design panel plots the
+  kernel's magnitude response in a `viz::FilterResponseFigure`, writes the
+  coefficients and the plot (SVG or PNG) to files, loads filter files and
+  offers the filter type (low-pass, high-pass, band-pass, notch). The
+  mne_analyze filtering and mne_scan noise reduction plugins host the panels
+  and open the design in a window of its own. `mne_viz` links `mne_dsp`.
 - `ChannelRhiRenderer` hosts a `viz::TraceViewClient`, the same trace view
   client the SDL example runs, instead of wiring its own view, animator,
   markers and frame builder; its host becomes the client's `viz::Surface`.

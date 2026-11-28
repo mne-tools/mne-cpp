@@ -22,8 +22,6 @@
 #include <mne/viz/backends/qt/kit/panelwidget.h>
 #include <mne/viz/panels/channel_selection_panel.h>
 #include <mne/viz/backends/qt/viewers/helpers/channelinfomodel.h>
-#include <mne/viz/backends/qt/viewers/filterdesignview.h>
-#include <mne/viz/backends/qt/viewers/filtersettingsview.h>
 #include <mne/viz/backends/qt/viewers/helpers/evokedsetmodel.h>
 #include <mne/viz/backends/qt/viewers/butterflyview.h>
 #include <mne/viz/backends/qt/kit/panelwidget.h>
@@ -257,37 +255,6 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
 
         //Init control widgets
         QList<QWidget*> lControlWidgets;
-
-        //        // Quick control filter settings
-        //        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("MNESCAN/RTESW"));
-        //        pFilterSettingsView->setObjectName("group_tab_View_Filter");
-        //        lControlWidgets.append(pFilterSettingsView);
-
-        //        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
-        //                m_pEvokedSetModel.data(), &EvokedSetModel::setFilterChannelType);
-
-        //        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
-        //                m_pEvokedSetModel.data(), &EvokedSetModel::setFilter);
-
-        //        connect(this, &RealTimeEvokedSetWidget::windowSizeChanged,
-        //                pFilterSettingsView->getFilterView().data(), &FilterDesignView::setWindowSize);
-
-        //        connect(this, &RealTimeEvokedSetWidget::windowSizeChanged,
-        //                pFilterSettingsView->getFilterView().data(), &FilterDesignView::setMaxAllowedFilterTaps);
-
-        //        connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
-        //                m_pEvokedSetModel.data(), &EvokedSetModel::setFilterActive);
-
-        //        m_pEvokedSetModel->setFilterActive(pFilterSettingsView->getFilterActive());
-
-        //        pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
-
-        //        if(!m_pRTESet->getValue()->evoked.isEmpty()) {
-        //            m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
-
-        //            pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
-        //            pFilterSettingsView->getFilterView()->setMaxAllowedFilterTaps(m_iMaxFilterTapSize);
-        //        }
 
         // Scaling
         ScalingView* pScalingView = new ScalingView(QString("MNESCAN/RTESW"), this, Qt::Widget, m_pFiffInfo->get_channel_types());

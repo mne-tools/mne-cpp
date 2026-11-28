@@ -25,8 +25,7 @@
 #include <mne/viz/backends/qt/kit/panelwidget.h>
 #include <mne/viz/panels/compensator_panel.h>
 #include <mne/viz/panels/projectors_panel.h>
-#include <mne/viz/backends/qt/viewers/filtersettingsview.h>
-#include <mne/viz/backends/qt/viewers/filterdesignview.h>
+#include <mne/viz/panels/filter_settings_panel.h>
 #include <mne/viz/panels/sphara_panel.h>
 #include <mne/dsp/rt/rt_filter.h>
 #include <mne/dsp/sphara.h>
@@ -252,26 +251,60 @@ void NoiseReduction::initPluginControlWidgets()
         });
         compensators->set_compensators(m_pFiffInfo->comps);
 
-        // Filter
-        FilterSettingsView* pFilterSettingsView = makeControlWidget<FilterSettingsView>(controlWidgets, QString("MNESCAN/%1/").arg(this->getName()));
+        // Filter: the design panel opens in a window of its own
+        auto filters = std::make_shared<FilterSettingsPanel>();
+        PanelWidget* pFilterWidget = makeControlWidget<PanelWidget>(controlWidgets, filters, QString("MNESCAN/%1/").arg(this->getName()));
         connect(this, &NoiseReduction::guiModeChanged,
-                pFilterSettingsView, &FilterSettingsView::setGuiMode);
-        pFilterSettingsView->setObjectName("group_tab_Settings_Filter");
+                pFilterWidget, &PanelWidget::setGuiMode);
+        pFilterWidget->setObjectName("group_tab_Settings_Filter");
 
-        connect(pFilterSettingsView->getFilterView().get(), &FilterDesignView::filterChannelTypeChanged,
-                this, &NoiseReduction::setFilterChannelType);
+        const std::shared_ptr<FilterDesignPanel> design = filters->design();
+        FilterDesignPanel::Callbacks designCallbacks;
+        designCallbacks.channel_type_changed = [plugin](const std::string& type) {
+            if (plugin) {
+                plugin->setFilterChannelType(QString::fromStdString(type));
+            }
+        };
+        designCallbacks.filter_changed = [plugin](const FilterKernel& filter) {
+            if (plugin) {
+                plugin->setFilter(filter);
+            }
+        };
+        design->set_callbacks(std::move(designCallbacks));
 
-        connect(pFilterSettingsView->getFilterView().get(), &FilterDesignView::filterChanged,
-                this, &NoiseReduction::setFilter);
+        FilterSettingsPanel::Callbacks filterCallbacks;
+        filterCallbacks.activation_changed = [plugin](bool active) {
+            if (plugin) {
+                plugin->setFilterActive(active);
+            }
+        };
+        const QPointer<PanelWidget> filterWidget(pFilterWidget);
+        filterCallbacks.show_design = [filterWidget, design]() {
+            if (!filterWidget) {
+                return;
+            }
+            auto* window = filterWidget->findChild<PanelWidget*>(QStringLiteral("FilterDesignWindow"));
+            if (!window) {
+                window = new PanelWidget(design, QString(), filterWidget);
+                window->setObjectName(QStringLiteral("FilterDesignWindow"));
+                window->setWindowFlags(Qt::Window);
+            }
+            if (window->isVisible() && window->isActiveWindow()) {
+                window->hide();
+            } else {
+                window->show();
+                window->raise();
+                window->activateWindow();
+            }
+        };
+        filters->set_callbacks(std::move(filterCallbacks));
 
-        connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
-                this, &NoiseReduction::setFilterActive);
+        filters->set_sampling_rate(m_pFiffInfo->sfreq);
+        design->set_max_taps(m_iMaxFilterTapSize);
 
-        pFilterSettingsView->setSamplingRate(m_pFiffInfo->sfreq);
-        pFilterSettingsView->getFilterView()->setMaxAllowedFilterTaps(m_iMaxFilterTapSize);
-
-        this->setFilterActive(pFilterSettingsView->getFilterActive());
-        this->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
+        this->setFilterActive(filters->active());
+        this->setFilterChannelType(QString::fromStdString(design->channel_type()));
+        this->setFilter(design->filter());
 
         // SPHARA settings
         auto sphara = std::make_shared<SpharaPanel>();

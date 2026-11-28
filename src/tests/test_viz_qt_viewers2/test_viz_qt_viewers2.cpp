@@ -32,8 +32,7 @@
 #include <mne/viz/panels/trigger_detection_panel.h>
 #include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
 #include <mne/viz/backends/qt/viewers/projectsettingsview.h>
-#include <mne/viz/backends/qt/viewers/filterdesignview.h>
-#include <mne/viz/backends/qt/plots/filterplot.h>
+#include <mne/viz/panels/filter_design_panel.h>
 #include <mne/viz/backends/qt/plots/helpers/scenepainter.h>
 #include <mne/viz/backends/qt/kit/settingspanel.h>
 #include <mne/viz/backends/qt/viewers/bidsview.h>
@@ -407,10 +406,10 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies FilterDesignView filter design from the controls, band clamping, channel type, plot and filter file
-     * export/import.
+     * Verifies the PanelWidget of a FilterDesignPanel: filter design from the controls, band clamping, channel type,
+     * the response figure and filter file export/import.
      */
-    void filterDesignView_designExportLoad();
+    void filterDesignPanel_designExportLoad();
 
 
     //=======================================================================================================
@@ -859,40 +858,65 @@ void TestVizQtViewers2::hpiSettingsView_lifecycle()
 
 //=============================================================================================================
 
-void TestVizQtViewers2::filterDesignView_designExportLoad()
+void TestVizQtViewers2::filterDesignPanel_designExportLoad()
 {
-    FilterDesignView view(QString{});
+    auto panel = std::make_shared<FilterDesignPanel>();
+    PanelWidget view(panel);
     view.resize(600, 400);
     view.show();
-    auto* pFrom = view.findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_from"));
-    auto* pTo = view.findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_to"));
-    auto* pTrans = view.findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_transitionband"));
-    auto* pTaps = view.findChild<QSpinBox*>(QStringLiteral("m_spinBox_filterTaps"));
-    auto* pMethod = view.findChild<QComboBox*>(QStringLiteral("m_comboBox_designMethod"));
-    auto* pApply = view.findChild<QComboBox*>(QStringLiteral("m_comboBox_filterApplyTo"));
+    SettingsPanel* form = view.formPanel();
+    auto* pFrom = qobject_cast<QDoubleSpinBox*>(form->editor(FilterDesignPanel::from_key));
+    auto* pTo = qobject_cast<QDoubleSpinBox*>(form->editor(FilterDesignPanel::to_key));
+    auto* pTrans = qobject_cast<QDoubleSpinBox*>(form->editor(FilterDesignPanel::transition_key));
+    auto* pTaps = qobject_cast<QSpinBox*>(form->editor(FilterDesignPanel::taps_key));
+    auto* pMethod = qobject_cast<QComboBox*>(form->editor(FilterDesignPanel::method_key));
+    auto* pApply = qobject_cast<QComboBox*>(form->editor(FilterDesignPanel::channel_type_key));
     QVERIFY(pFrom);
     QVERIFY(pTo);
     QVERIFY(pTrans);
     QVERIFY(pTaps);
     QVERIFY(pMethod);
     QVERIFY(pApply);
+    QVERIFY(view.figureViewport());
 
-    // A band-pass from the controls, with the taps forced even and the band edges at the requested frequencies
-    QSignalSpy filterSpy(&view, &FilterDesignView::filterChanged);
-    QSignalSpy fromSpy(&view, &FilterDesignView::updateFilterFrom);
-    QSignalSpy toSpy(&view, &FilterDesignView::updateFilterTo);
-    view.setSamplingRate(1000.0);
-    view.setMaxAllowedFilterTaps(257);
+    std::vector<FilterKernel> designed;
+    std::vector<double> froms;
+    std::vector<double> tos;
+    std::vector<std::string> types;
+    FilterDesignPanel::Callbacks callbacks;
+    callbacks.filter_changed = [&designed](const FilterKernel& filter) {
+        designed.push_back(filter);
+    };
+    callbacks.from_changed = [&froms](double from) {
+        froms.push_back(from);
+    };
+    callbacks.to_changed = [&tos](double to) {
+        tos.push_back(to);
+    };
+    callbacks.channel_type_changed = [&types](const std::string& type) {
+        types.push_back(type);
+    };
+    panel->set_callbacks(std::move(callbacks));
+
+    // A band-pass from the controls, with the taps forced even and the band edges at the requested frequencies;
+    // the panel's setters are silent
+    panel->set_sampling_rate(1000.0);
+    panel->set_max_taps(257);
     QCOMPARE(pTaps->maximum(), 256);
+    panel->set_from(2.0);
+    panel->set_to(45.0);
+    QVERIFY(designed.empty());
+    pTaps->setValue(64);
+    emit pTaps->editingFinished();
     pTaps->setValue(128);
-    view.setFrom(2.0);
-    view.setTo(45.0);
-    QCOMPARE(view.getFrom(), 2.0);
-    QCOMPARE(view.getTo(), 45.0);
-    QCOMPARE(fromSpy.last().at(0).toDouble(), 2.0);
-    QCOMPARE(toSpy.last().at(0).toDouble(), 45.0);
-    FilterKernel kernel = view.getCurrentFilter();
-    QCOMPARE(filterSpy.last().at(0).value<FilterKernel>().name(), kernel.name());
+    emit pTaps->editingFinished();
+    QCOMPARE(designed.size(), std::size_t(2));
+    QCOMPARE(panel->from(), 2.0);
+    QCOMPARE(panel->to(), 45.0);
+    QCOMPARE(froms.back(), 2.0);
+    QCOMPARE(tos.back(), 45.0);
+    FilterKernel kernel = panel->filter();
+    QCOMPARE(designed.back().name(), kernel.name());
     QCOMPARE(kernel.filter_type().name(), std::string("BPF"));
     QCOMPARE(kernel.filter_order(), 128);
     QCOMPARE(kernel.sampling_frequency(), 1000.0);
@@ -901,88 +925,78 @@ void TestVizQtViewers2::filterDesignView_designExportLoad()
     QCOMPARE(kernel.coefficients().cols(), 128);
 
     // Band edges are clamped to Nyquist and kept ordered
-    view.setSamplingRate(60.0);
+    panel->set_sampling_rate(60.0);
     QCOMPARE(pTo->maximum(), 30.0);
-    QCOMPARE(view.getTo(), 30.0);
-    QVERIFY(qAbs(view.getCurrentFilter().lowpass_freq() - 30.0) < 1e-9);
-    view.setSamplingRate(1000.0);
-    view.setTo(40.0);
-    view.setFrom(10.0);
+    QCOMPARE(panel->to(), 30.0);
+    QVERIFY(qAbs(panel->filter().lowpass_freq() - 30.0) < 1e-9);
+    panel->set_sampling_rate(1000.0);
+    panel->set_to(40.0);
+    panel->set_from(10.0);
     QCOMPARE(pTo->minimum(), 10.0);
     QCOMPARE(pFrom->maximum(), 40.0);
 
     // Editing a control and finishing the edit redesigns the filter
-    const int iBefore = filterSpy.count();
+    const std::size_t before = designed.size();
     pTrans->setValue(2.0);
     emit pTrans->editingFinished();
-    QCOMPARE(filterSpy.count(), iBefore + 1);
-    QVERIFY(qAbs(view.getCurrentFilter().parks_width() * 500.0 - 2.0) < 1e-9);
+    QCOMPARE(designed.size(), before + 1);
+    QVERIFY(qAbs(panel->filter().parks_width() * 500.0 - 2.0) < 1e-9);
     pMethod->setCurrentIndex(pMethod->count() - 1);
-    QCOMPARE(view.getCurrentFilter().design_method().name(), pMethod->currentText());
+    QCOMPARE(QString::fromStdString(panel->filter().design_method().name()), pMethod->currentText());
     pMethod->setCurrentIndex(0);
 
-    // Channel type: selection, Enter and Delete report it
-    QSignalSpy typeSpy(&view, &FilterDesignView::filterChannelTypeChanged);
-    view.setChannelType(QStringLiteral("EEG"));
-    QCOMPARE(view.getChannelType(), QStringLiteral("EEG"));
-    QCOMPARE(typeSpy.last().at(0).toString(), QStringLiteral("EEG"));
-    QTest::keyClick(&view, Qt::Key_Return);
-    QTest::keyClick(&view, Qt::Key_Delete);
-    QTest::keyClick(&view, Qt::Key_A);
-    QCOMPARE(typeSpy.count(), 3);
+    // Channel type: a programmatic change is silent, a selection reports it
+    panel->set_channel_type("EEG");
+    QCOMPARE(pApply->currentText(), QStringLiteral("EEG"));
+    QVERIFY(types.empty());
+    pApply->setCurrentText(QStringLiteral("MEG"));
+    QVERIFY(types == std::vector<std::string>{"MEG"});
 
-    // The response plot is drawn
-    auto* pPlot = view.findChild<FilterPlot*>(QStringLiteral("m_filterPlot"));
-    QVERIFY(pPlot);
-    QCOMPARE(pPlot->plot().nyquist(), view.getCurrentFilter().sampling_frequency() / 2.0);
-    const std::vector<double> db = pPlot->plot().magnitude_db();
+    // The response figure is drawn
+    QCOMPARE(panel->response().plot().nyquist(), panel->filter().sampling_frequency() / 2.0);
+    const std::vector<double> db = panel->response().plot().magnitude_db();
     QVERIFY(!db.empty());
     QCOMPARE(*std::max_element(db.begin(), db.end()), 0.0); // relative to the pass band
-    view.guiStyleChanged(AbstractView::StyleMode::Dark);
     view.resize(700, 500);
 
-    // Export the coefficients, then load them back through the load button
+    // Export the coefficients, then load them back through the file fields
     QTemporaryDir dir;
     QVERIFY(dir.isValid());
     const QString sFile = dir.filePath(QStringLiteral("designed.txt"));
-    view.setFrom(4.0);
-    view.setTo(30.0);
-    kernel = view.getCurrentFilter();
-    chooseFileInNextDialog(sFile);
-    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_exportFilter")), Qt::LeftButton);
+    panel->set_from(4.0);
+    panel->set_to(30.0);
+    kernel = panel->filter();
+    panel->form().set_value(FilterDesignPanel::export_coefficients_key, sFile.toStdString());
     QVERIFY(QFile::exists(sFile));
-    // The file is named after type, band and sampling rate, like the suggested file name
+    // The file is named after type, band and sampling rate
     const auto exported = FilterIO::read_filter(sFile.toStdString());
     QVERIFY(exported);
     QCOMPARE(exported->name(), std::format("{}_4_30_Fs{}", kernel.filter_type().name(), static_cast<int>(kernel.sampling_frequency())));
 
-    view.setFrom(1.0);
-    view.setTo(20.0);
+    panel->set_from(1.0);
+    panel->set_to(20.0);
     pTaps->setValue(64);
-    view.setFrom(1.0);
-    chooseFileInNextDialog(sFile);
-    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_loadFilter")), Qt::LeftButton);
-    QCOMPARE(view.getFrom(), 4.0);
-    QCOMPARE(view.getTo(), 30.0);
+    emit pTaps->editingFinished();
+    panel->form().set_value(FilterDesignPanel::load_filter_key, sFile.toStdString());
+    QCOMPARE(panel->from(), 4.0);
+    QCOMPARE(panel->to(), 30.0);
     QCOMPARE(pTaps->value(), 128);
-    QVERIFY(qAbs(view.getCurrentFilter().highpass_freq() - 4.0) < 1e-9);
-    QVERIFY(qAbs(view.getCurrentFilter().lowpass_freq() - 30.0) < 1e-9);
-    QVERIFY((view.getCurrentFilter().coefficients() - kernel.coefficients()).cwiseAbs().maxCoeff() < 1e-6);
+    QVERIFY(qAbs(panel->filter().highpass_freq() - 4.0) < 1e-9);
+    QVERIFY(qAbs(panel->filter().lowpass_freq() - 30.0) < 1e-9);
+    QVERIFY((panel->filter().coefficients() - kernel.coefficients()).cwiseAbs().maxCoeff() < 1e-6);
 
     // Plot export as PNG
     const QString sPng = dir.filePath(QStringLiteral("plot.png"));
-    chooseFileInNextDialog(sPng);
-    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_exportPlot")), Qt::LeftButton);
+    panel->form().set_value(FilterDesignPanel::export_plot_key, sPng.toStdString());
     QVERIFY(!QImage(sPng).isNull());
 
     // and as vector graphics, with the filter's name as text
     const QString sSvg = dir.filePath(QStringLiteral("plot.svg"));
-    chooseFileInNextDialog(sSvg);
-    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_exportPlot")), Qt::LeftButton);
+    panel->form().set_value(FilterDesignPanel::export_plot_key, sSvg.toStdString());
     QFile svg(sSvg);
     QVERIFY(svg.open(QIODevice::ReadOnly));
     const QByteArray svgText = svg.readAll();
-    QVERIFY(svgText.contains("<svg") && svgText.contains(QByteArray::fromStdString(view.getCurrentFilter().name())));
+    QVERIFY(svgText.contains("<svg") && svgText.contains(QByteArray::fromStdString(panel->filter().name())));
 }
 
 //=============================================================================================================

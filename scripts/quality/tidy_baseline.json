@@ -1205,19 +1205,6 @@
       "modernize-use-nullptr": 1,
       "modernize-use-override": 6
     },
-    "src/libs/mne/viz/backends/qt/viewers/filterdesignview.cpp": {
-      "bugprone-switch-missing-default-case": 1,
-      "performance-for-range-copy": 1
-    },
-    "src/libs/mne/viz/backends/qt/viewers/filterdesignview.h": {
-      "bugprone-derived-method-shadowing-base-method": 1,
-      "modernize-use-nullptr": 1,
-      "modernize-use-override": 8
-    },
-    "src/libs/mne/viz/backends/qt/viewers/filtersettingsview.h": {
-      "modernize-use-nullptr": 1,
-      "modernize-use-override": 6
-    },
     "src/libs/mne/viz/backends/qt/viewers/helpers/bidsviewmodel.cpp": {
       "bugprone-switch-missing-default-case": 1
     },

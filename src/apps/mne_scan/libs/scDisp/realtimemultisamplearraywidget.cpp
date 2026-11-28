@@ -20,13 +20,11 @@
 #include <mne/base/log.h>
 #include "realtimemultisamplearraywidget.h"
 
-#include <mne/viz/backends/qt/viewers/filterdesignview.h>
 #include <mne/viz/backends/qt/kit/panelwidget.h>
 #include <mne/viz/panels/channel_selection_panel.h>
 #include <mne/viz/backends/qt/viewers/helpers/channelinfomodel.h>
 #include <mne/viz/backends/qt/viewers/rtfiffrawview.h>
 #include <mne/viz/backends/qt/viewers/scalingview.h>
-#include <mne/viz/backends/qt/viewers/filtersettingsview.h>
 #include <mne/viz/backends/qt/viewers/fiffrawviewsettings.h>
 #include <mne/viz/panels/trigger_detection_panel.h>
 #include <scMeas/realtimemultisamplearray.h>
@@ -188,26 +186,6 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
 
         //Init control widgets
         QList<QWidget*> lControlWidgets;
-
-        //        // Quick control filter
-        //        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("MNESCAN/RTMSAW"));
-        //        pFilterSettingsView->setObjectName("group_tab_Noise_Filter");
-        //        lControlWidgets.append(pFilterSettingsView);
-
-        //        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
-        //                m_pChannelDataView.data(), &RtFiffRawView::setFilterChannelType);
-
-        //        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
-        //                m_pChannelDataView.data(), &RtFiffRawView::setFilter);
-
-        //        connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
-        //                m_pChannelDataView.data(), &RtFiffRawView::setFilterActive);
-
-        //        m_pChannelDataView->setFilterActive(pFilterSettingsView->getFilterActive());
-        //        m_pChannelDataView->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
-        //        pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
-        //        pFilterSettingsView->getFilterView()->setMaxAllowedFilterTaps(m_iMaxFilterTapSize);
-        //        pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
 
         // Quick control scaling
         ScalingView* pScalingView = new ScalingView(QString("MNESCAN/RTMSAW"), this, Qt::Widget, m_pFiffInfo->get_channel_types());

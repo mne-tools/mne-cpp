@@ -52,13 +52,11 @@ set(SOURCES
     viewers/applytoview.cpp
     viewers/coregsettingsview.cpp
     viewers/dipolefitview.cpp
-    viewers/filterdesignview.cpp
     viewers/helpers/scalecontrol.cpp
     viewers/progressview.cpp
     viewers/modalityselectionview.cpp
     viewers/butterflyview.cpp
     viewers/scalingview.cpp
-    viewers/filtersettingsview.cpp
     viewers/fiffrawviewsettings.cpp
     viewers/averageselectionview.cpp
     viewers/quickcontrolview.cpp
@@ -134,13 +132,11 @@ set(HEADERS
     viewers/applytoview.h
     viewers/coregsettingsview.h
     viewers/dipolefitview.h
-    viewers/filterdesignview.h
     viewers/helpers/scalecontrol.h
     viewers/progressview.h
     viewers/modalityselectionview.h
     viewers/butterflyview.h
     viewers/scalingview.h
-    viewers/filtersettingsview.h
     viewers/fiffrawviewsettings.h
     viewers/averageselectionview.h
     viewers/quickcontrolview.h
@@ -205,7 +201,6 @@ set(UI
     viewers/formfiles/applytoview.ui
     viewers/formfiles/coregsettingsview.ui
     viewers/formfiles/dipolefitview.ui
-    viewers/formfiles/filterdesignview.ui
     viewers/formfiles/scalecontrol.ui
     viewers/formfiles/progressview.ui
     viewers/formfiles/scalingview.ui

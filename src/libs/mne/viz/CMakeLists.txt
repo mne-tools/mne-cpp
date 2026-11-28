@@ -40,6 +40,7 @@ set(SOURCES
   figures/canvas.cpp
   figures/channel_scale.cpp
   figures/colormap.cpp
+  figures/filter_response_figure.cpp
   figures/filter_response_plot.cpp
   figures/font_face.cpp
   figures/font_library.cpp
@@ -74,6 +75,8 @@ set(SOURCES
   panels/minimum_norm_panel.cpp
   panels/connectivity_panel.cpp
   panels/time_frequency_panel.cpp
+  panels/filter_design_panel.cpp
+  panels/filter_settings_panel.cpp
   panels/panel.cpp
   panels/projectors_panel.cpp
   panels/spectrum_panel.cpp
@@ -141,6 +144,7 @@ set(HEADERS
   figures/channel_scale.h
   figures/colormap.h
   figures/display_list.h
+  figures/filter_response_figure.h
   figures/filter_response_plot.h
   figures/font_face.h
   figures/font_library.h
@@ -177,6 +181,8 @@ set(HEADERS
   panels/minimum_norm_panel.h
   panels/connectivity_panel.h
   panels/time_frequency_panel.h
+  panels/filter_design_panel.h
+  panels/filter_settings_panel.h
   panels/panel.h
   panels/projectors_panel.h
   panels/spectrum_panel.h
@@ -238,7 +244,8 @@ mne_warn_on_narrowing(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..> $<INSTALL_INTERFACE:include>)
 
 # Eigen carries the vectors, matrices and quaternions of the 3-D camera and picking; the view models read
-# the measurement info of mne_fiff, and the brain view's content reads FreeSurfer surfaces and BEMs
+# the measurement info of mne_fiff, the brain view's content reads FreeSurfer surfaces and BEMs and the filter
+# panels design kernels with mne_dsp
 target_link_libraries(${PROJECT_NAME} PUBLIC
   mne_base
   mne_math
@@ -250,6 +257,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   mne_inv
   mne_connectivity
   mne_ieeg
+  mne_dsp
   Eigen3::Eigen)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_VIZ_LIBRARY)
