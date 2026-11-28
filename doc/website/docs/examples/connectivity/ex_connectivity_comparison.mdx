@@ -12,7 +12,7 @@ Compare connectivity metrics side by side on the same averaged sensor- or source
 
 <ExampleFacts name="ex_connectivity_comparison" />
 
-**Libraries:** [Connectivity](../../api/connectivity/index.mdx), [Inverse](../../api/inv/index.mdx), [Visualization (Qt)](../../api/viz-qt/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Base](../../api/base/index.mdx)
+**Libraries:** [Connectivity](../../api/connectivity/index.mdx), [Inverse](../../api/inv/index.mdx), [Visualization (Qt)](../../api/viz-qt/index.mdx), [Visualization](../../api/viz/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Base](../../api/base/index.mdx)
 
 ## Background
 
@@ -57,10 +57,10 @@ The documented classes this example uses most:
 
 | Class | Library |
 |---|---|
-| [`ConnectivitySettingsView`](../../api/viz-qt/connectivity-settings-view.mdx) | Visualization (Qt) |
 | [`InvSourceEstimate`](../../api/inv/inv-source-estimate.mdx) | Inverse |
 | [`MNEForwardSolution`](../../api/mne/mne-forward-solution.mdx) | MNE Core |
 | [`BrainView`](../../api/viz-qt/brain-view.mdx) | Visualization (Qt) |
+| [`ConnectivityPanel`](../../api/viz/connectivity-panel.mdx) | Visualization |
 | [`InvMinimumNorm`](../../api/inv/inv-minimum-norm.mdx) | Inverse |
 | [`Log`](../../api/base/log.mdx) | Base |
 | [`VisualizationInfo`](../../api/connectivity/visualization-info.mdx) | Connectivity |
@@ -72,6 +72,7 @@ The documented classes this example uses most:
 - [Network](../../api/connectivity/network.mdx)
 - [VisualizationInfo](../../api/connectivity/visualization-info.mdx)
 - [MNEForwardSolution](../../api/mne/mne-forward-solution.mdx)
+- [ConnectivityPanel](../../api/viz/connectivity-panel.mdx)
 
 ## Source
 
@@ -116,7 +117,8 @@ The documented classes this example uses most:
 #include <mne/inv/minimum_norm/inv_minimum_norm.h>
 #include <mne/base/log.h>
 #include <mne/fiff/fiff_events.h>
-#include <mne/viz/backends/qt/viewers/connectivitysettingsview.h>
+#include <mne/viz/backends/qt/kit/panelwidget.h>
+#include <mne/viz/panels/connectivity_panel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -446,9 +448,10 @@ int main(int argc, char* argv[])
     pBrainView->setNetworkThreshold(0.9);
 
     // Create ConnectivitySettingsView as standalone widget
-    std::shared_ptr<ConnectivitySettingsView> pConnSettingsView = std::make_shared<ConnectivitySettingsView>("EX_CONNECTIVITY_COMP");
-    pConnSettingsView->setNumberTrials(iNumTrials);
-    pConnSettingsView->setFrequencyBand(dFreqMin, dFreqMax);
+    auto pConnPanel = std::make_shared<ConnectivityPanel>();
+    auto pConnSettingsView = std::make_unique<PanelWidget>(pConnPanel, QStringLiteral("EX_CONNECTIVITY_COMP"));
+    pConnPanel->set_number_trials(iNumTrials);
+    pConnPanel->set_frequency_band(dFreqMin, dFreqMax);
 
     //Read and show sensor helmets
     if (!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
@@ -496,11 +499,15 @@ int main(int argc, char* argv[])
         pBrainView->loadSourceEstimate(lhStcPath.toStdU16String(), rhStcPath.toStdU16String());
     }
 
-    QObject::connect(pConnSettingsView.get(), &ConnectivitySettingsView::numberTrialsChanged,
-                     [&pConnSettingsView, iNumTrials]() { pConnSettingsView->setNumberTrials(iNumTrials); });
-
-    QObject::connect(pConnSettingsView.get(), &ConnectivitySettingsView::freqBandChanged,
-                     [&pConnSettingsView, dFreqMin, dFreqMax]() { pConnSettingsView->setFrequencyBand(dFreqMin, dFreqMax); });
+    // The comparison uses fixed trials and band, so changes are reverted
+    ConnectivityPanel::Callbacks connCallbacks;
+    connCallbacks.number_trials_changed = [&pConnPanel, iNumTrials]([[maybe_unused]] int trials) {
+        pConnPanel->set_number_trials(iNumTrials);
+    };
+    connCallbacks.frequency_band_changed = [&pConnPanel, dFreqMin, dFreqMax](float, float) {
+        pConnPanel->set_frequency_band(dFreqMin, dFreqMax);
+    };
+    pConnPanel->set_callbacks(std::move(connCallbacks));
 
     pConnSettingsView->show();
     pBrainView->show();

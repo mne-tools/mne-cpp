@@ -392,8 +392,8 @@
       "missing_tests": []
     },
     "viz": {
-      "classes": 157,
-      "tested": 148,
+      "classes": 162,
+      "tested": 153,
       "untested": [
         "ElectrodeObject",
         "GeometryInfo",
@@ -408,7 +408,7 @@
       "missing_tests": []
     },
     "viz_qt": {
-      "classes": 96,
+      "classes": 90,
       "tested": 44,
       "untested": [
         "AbstractTreeItem",
@@ -426,10 +426,8 @@
         "ChannelInfoModel",
         "ChannelLabelPanel",
         "ColorMap",
-        "ConnectivitySettingsView",
         "Control3DView",
         "CoregSettingsView",
-        "CovarianceSettingsView",
         "DipoleFitView",
         "DraggableFramelessWidget",
         "FiffRawViewSettings",
@@ -441,7 +439,6 @@
         "LinePlot",
         "LiveMarker",
         "MNEOperator",
-        "MinimumNormSettingsView",
         "ModalitySelectionView",
         "MultiView",
         "MultiViewWindow",
@@ -454,11 +451,8 @@
         "ScaleControl",
         "ScalingView",
         "SensorTreeItem",
-        "SpectrumSettingsView",
-        "SpharaSettingsView",
         "Spline",
         "TFplot",
-        "TfSettingsView",
         "TimeRulerEventMark",
         "TimeRulerReferenceMark",
         "TimeRulerWidget",

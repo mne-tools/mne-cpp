@@ -15,7 +15,7 @@ sidebar_position: 171
 class mne::viz::SpectrumPanel
 ```
 
-Tool panel with the spectra of the channels, one row each, as a [`SpectrumFigure`](/docs/api/viz/spectrum-figure).
+Tool panel with the spectra of the channels, one row each, as a [`SpectrumFigure`](/docs/api/viz/spectrum-figure), and the frequency band shown as sliders between 0 Hz and the Nyquist frequency.
 
 Spectra that arrive before `init()` are dropped, as mne_scan may send them before the channels are known.
 
@@ -101,7 +101,7 @@ Shows the channels of `info`, without spectra until the next `add_data()`.
 
 ### set_boundaries(lower, upper)
 
-Shows only the frequencies between `lower` and `upper`; ignored until data have arrived.
+Shows only the frequencies between `lower` and `upper`, applied once data have arrived; the bounds are the panel's settings, without a report.
 
 **Parameters:**
 
@@ -110,6 +110,31 @@ Shows only the frequencies between `lower` and `upper`; ignored until data have 
 
 - **upper** : *float*
   Upper bound in Hz.
+
+---
+
+### set_bounds_callback(callback)
+
+**Parameters:**
+
+- **callback** : *std::function&lt; void(float lower, float upper)&gt;*
+  Called with the bounds in Hz when the user changed them.
+
+---
+
+### lower_bound()
+
+**Returns:**
+
+- *float* — The lower bound in Hz.
+
+---
+
+### upper_bound()
+
+**Returns:**
+
+- *float* — The upper bound in Hz.
 
 ---
 
